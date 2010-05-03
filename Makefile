@@ -10,7 +10,8 @@ LIB            = Lib/libTermalLibrary.a
 OBJECTS = Sources/dimensions.o          \
           Sources/material.o            \
           Sources/layer.o               \
-          Sources/floorplan_element.o
+          Sources/floorplan_element.o   \
+          Sources/die.o
 
 all: $(LIB)
 
@@ -39,6 +40,11 @@ Sources/layer.o: Sources/layer.c Include/layer.h
 
 Sources/floorplan_element.o: Sources/floorplan_element.c \
                              Include/floorplan_element.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/die.o: Sources/die.c Include/die.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################

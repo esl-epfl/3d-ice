@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/layer.c"                                              *
+ * Source file "Sources/die.c"                                                *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -9,17 +9,20 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 
-#include "layer.h"
+#include "die.h"
 
-void init_layer (Layer *layer)
+void
+init_die (Die *die)
 {
-  if (layer != NULL)
+  if (die != NULL)
   {
-    layer->Id       = 0 ;
-    layer->Height   = 0.0 ;
-    layer->Material = NULL ;
-    layer->Next     = NULL ;
+    die->Id         = NULL ;
+    die->LayersList = NULL ;
+    die->NLayers    = 0 ;
+    die->SourcesId  = 0 ;
+    die->Next       = NULL ;
   }
 }
 
@@ -27,14 +30,14 @@ void init_layer (Layer *layer)
 /******************************************************************************/
 /******************************************************************************/
 
-Layer *
-alloc_and_init_layer (void)
+Die *
+malloc_die (void)
 {
-  Layer *layer = (Layer *) malloc ( sizeof(Layer) ) ;
+  Die *die = (Die *) malloc ( sizeof(Die) ) ;
 
-  init_layer (layer) ;
+  init_die (die) ;
 
-  return layer ;
+  return die ;
 }
 
 /******************************************************************************/
@@ -42,9 +45,11 @@ alloc_and_init_layer (void)
 /******************************************************************************/
 
 void
-free_layer (Layer *layer)
+free_die (Die *die)
 {
-  free (layer) ;
+  free (die->Id) ;
+  free_layers_list (die->LayersList) ;
+  free (die) ;
 }
 
 /******************************************************************************/
@@ -52,15 +57,15 @@ free_layer (Layer *layer)
 /******************************************************************************/
 
 void
-free_layers_list (Layer *list)
+free_dies_list (Die *list)
 {
-  Layer *next_layer ;
+  Die *next_die ;
 
-  for (; list != NULL; list = next_layer->Next)
+  for ( ; list != NULL ; list = next_die->Next)
   {
-      next_layer = list->Next ;
+    next_die = list->Next ;
 
-      free_layer (list) ;
+    free_die(list) ;
   }
 }
 
@@ -68,22 +73,33 @@ free_layers_list (Layer *list)
 /******************************************************************************/
 /******************************************************************************/
 
-void print_layer (FILE *stream, char* prefix, Layer *layer)
+void
+print_die (FILE *stream, char* prefix, Die *die)
 {
-  fprintf (stream, "%sLayer %d\n",            prefix, layer->Id) ;
-  fprintf (stream, "%s  Height   %5.2f um\n", prefix, layer->Height ) ;
-  fprintf (stream, "%s  Material %s\n",       prefix, layer->Material->Id ) ;
+  fprintf (stream, "%sDie %s:\n", prefix, die->Id) ;
+  fprintf (stream, "%s  Number of layers  %d\n", prefix, die->NLayers);
+  fprintf (stream, "%s  Sources on layer  %d\n", prefix,die->SourcesId ) ;
+
+  char *new_prefix = (char *) malloc (sizeof(char)*(strlen(prefix) + 2));
+
+  strcpy (new_prefix, prefix) ;
+  strcat (new_prefix, "  ") ;
+
+  print_layers_list (stream, new_prefix, die->LayersList) ;
+
+  free (new_prefix) ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-void print_layers_list (FILE *stream, char* prefix, Layer *list)
+void
+print_dies_list (FILE *stream, char* prefix, Die *list)
 {
   for ( ; list != NULL ; list = list->Next)
   {
-    print_layer (stream, prefix, list) ;
+    print_die (stream, prefix, list) ;
   }
 }
 
@@ -91,37 +107,16 @@ void print_layers_list (FILE *stream, char* prefix, Layer *list)
 /******************************************************************************/
 /******************************************************************************/
 
-Layer *
-find_layer (Layer *list, int id)
+Die *
+find_die_in_list (Die* list, char *id)
 {
   for ( ; list != NULL ; list = list->Next)
   {
-    if (list->Id == id)
+    if (strcmp(list->Id, id) == 0)
     {
       break ;
     }
   }
 
- return list ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-LayerPosition_t
-get_layer_position (GridDimensions *gd, int layer)
-{
-  if (layer == 0)
-  {
-    return TL_LAYER_BOTTOM ;
-  }
-  else if (layer == gd->NLayers - 1)
-  {
-    return TL_LAYER_TOP ;
-  }
-  else
-  {
-    return TL_LAYER_CENTER ;
-  }
+  return list ;
 }
