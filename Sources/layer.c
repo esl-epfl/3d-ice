@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/material.c"                                           *
+ * Source file "Sources/layer.c"                                               *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -9,19 +9,17 @@
  ******************************************************************************/
 
 #include <stdlib.h>
-#include <string.h>
 
-#include "material.h"
+#include "layer.h"
 
-void
-init_material (Material * material)
+void init_layer (Layer *layer)
 {
-  if (material != NULL)
+  if (layer != NULL)
   {
-      material->Id                  = NULL ;
-      material->SpecificHeat        = 0.0 ;
-      material->ThermalConductivity = 0.0 ;
-      material->Next                = NULL ;
+    layer->Id       = 0 ;
+    layer->Height   = 0.0 ;
+    layer->Material = NULL ;
+    layer->Next     = NULL ;
   }
 }
 
@@ -29,14 +27,14 @@ init_material (Material * material)
 /******************************************************************************/
 /******************************************************************************/
 
-Material *
-alloc_and_init_material (void)
+Layer *
+alloc_and_init_layer (void)
 {
-  Material *material = (Material *) malloc (sizeof (Material)) ;
+  Layer *layer = (Layer *) malloc ( sizeof(Layer) ) ;
 
-  init_material (material) ;
+  init_layer (layer) ;
 
-  return material ;
+  return layer ;
 }
 
 /******************************************************************************/
@@ -44,10 +42,9 @@ alloc_and_init_material (void)
 /******************************************************************************/
 
 void
-free_material (Material * material)
+free_layer (Layer *layer)
 {
-  free (material->Id) ;
-  free (material) ;
+  free (layer) ;
 }
 
 /******************************************************************************/
@@ -55,15 +52,15 @@ free_material (Material * material)
 /******************************************************************************/
 
 void
-free_materials_list (Material * list)
+free_layers_list (Layer *list)
 {
-  Material *next_material ;
+  Layer *next_layer ;
 
-  for (; list != NULL; list = next_material->Next)
+  for (; list != NULL; list = next_layer->Next)
   {
-      next_material = list->Next ;
+      next_layer = list->Next ;
 
-      free_material (list) ;
+      free_layer (list) ;
   }
 }
 
@@ -71,30 +68,22 @@ free_materials_list (Material * list)
 /******************************************************************************/
 /******************************************************************************/
 
-void
-print_material (FILE * stream, char *prefix, Material * material)
+void print_layer (FILE *stream, char* prefix, Layer *layer)
 {
-  fprintf (stream,
-           "%sMaterial %s:\n",                prefix,
-                                              material->Id) ;
-  fprintf (stream,
-           "%s  Specific Heat        %.4e\n", prefix,
-                                              material->SpecificHeat) ;
-  fprintf (stream,
-           "%s  Thermal Conductivity %.4e\n", prefix,
-                                              material->ThermalConductivity) ;
+  fprintf (stream, "%sLayer %d\n",            prefix, layer->Id) ;
+  fprintf (stream, "%s  Height   %5.2f um\n", prefix, layer->Height ) ;
+  fprintf (stream, "%s  Material %s\n",       prefix, layer->Material->Id ) ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-void
-print_materials_list (FILE * stream, char *prefix, Material * list)
+void print_layers_list (FILE *stream, char* prefix, Layer *list)
 {
-  for (; list != NULL; list = list->Next)
+  for ( ; list != NULL ; list = list->Next)
   {
-    print_material (stream, prefix, list) ;
+    print_layer (stream, prefix, list) ;
   }
 }
 
@@ -102,16 +91,37 @@ print_materials_list (FILE * stream, char *prefix, Material * list)
 /******************************************************************************/
 /******************************************************************************/
 
-Material *
-find_material_in_list (Material * list, char *id)
+Layer *
+find_layer (Layer *list, int id)
 {
-  for (; list != NULL; list = list->Next)
+  for ( ; list != NULL ; list = list->Next)
   {
-    if (strcmp (list->Id, id) == 0)
+    if (list->Id == id)
     {
       break ;
     }
   }
 
-  return list ;
+ return list ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+LayerPosition_t
+get_layer_position (GridDimensions *gd, int layer)
+{
+  if (layer == 0)
+  {
+    return TL_LAYER_BOTTOM ;
+  }
+  else if (layer == gd->NLayers - 1)
+  {
+    return TL_LAYER_TOP ;
+  }
+  else
+  {
+    return TL_LAYER_CENTER ;
+  }
 }
