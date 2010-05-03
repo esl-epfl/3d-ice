@@ -7,7 +7,8 @@ CFLAGS         = -Werror -Wall -Wextra
 INCLUDE        = -IInclude
 LIB            = Lib/libTermalLibrary.a
 
-OBJECTS = Sources/material.o
+OBJECTS = Sources/dimensions.o          \
+          Sources/material.o
 
 all: $(LIB)
 
@@ -16,6 +17,11 @@ all: $(LIB)
 $(LIB):	$(OBJECTS)
 	rm -f $@
 	ar cr $@ $(OBJECTS)
+
+################################################################################
+
+Sources/dimensions.o: Sources/dimensions.c Include/dimensions.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
