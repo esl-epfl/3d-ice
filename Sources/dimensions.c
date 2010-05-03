@@ -103,7 +103,7 @@ init_dimensions (Dimensions * dim)
 /******************************************************************************/
 
 Dimensions *
-alloc_dimensions (void)
+alloc_and_init_dimensions (void)
 {
   Dimensions *dimensions = (Dimensions *) malloc (sizeof (Dimensions));
 

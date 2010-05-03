@@ -11,7 +11,10 @@ OBJECTS = Sources/dimensions.o          \
           Sources/material.o            \
           Sources/layer.o               \
           Sources/floorplan_element.o   \
-          Sources/die.o
+          Sources/die.o                 \
+          Sources/floorplan_scanner.o   \
+          Sources/floorplan_parser.o    \
+          Sources/floorplan.o           \
 
 all: $(LIB)
 
@@ -47,8 +50,36 @@ Sources/floorplan_element.o: Sources/floorplan_element.c \
 Sources/die.o: Sources/die.c Include/die.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
+###############################################################################
+
+Sources/floorplan_parser.o: Sources/floorplan_parser.c
+	$(CC) $(PARSER_CFLAGS) -o $@ $(INCLUDE) -c $<
+
+Sources/floorplan_parser.c : Bison/floorplan_parser.y
+	bison -d Bison/floorplan_parser.y
+	mv Sources/floorplan_parser.h Include/
+
+###############################################################################
+
+Sources/floorplan_scanner.o: Sources/floorplan_scanner.c \
+                             Sources/floorplan_parser.c
+	$(CC) $(SCANNER_CFLAGS) -o $@ $(INCLUDE) -c $<
+
+Sources/floorplan_scanner.c : Flex/floorplan_scanner.l
+		flex Flex/floorplan_scanner.l
+
 ################################################################################
+
+Sources/floorplan.o: Sources/floorplan.c
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+###############################################################################
 
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(LIB)
+	rm -f Sources/floorplan_scanner.c
+	rm -f Include/floorplan_scanner.h
+	rm -f Sources/floorplan_parser.c
+	rm -f Include/floorplan_parser.h
+

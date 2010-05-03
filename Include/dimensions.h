@@ -106,7 +106,7 @@ extern "C"
 
   void init_dimensions (Dimensions *dim) ;
 
-  Dimensions* alloc_dimensions (void) ;
+  Dimensions* alloc_and_init_dimensions (void) ;
 
   void free_dimensions (Dimensions *dim) ;
 
