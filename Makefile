@@ -15,7 +15,8 @@ OBJECTS = Sources/dimensions.o          \
           Sources/floorplan_scanner.o   \
           Sources/floorplan_parser.o    \
           Sources/floorplan.o           \
-          Sources/channel.o
+          Sources/channel.o             \
+          Sources/stack_element.o
 
 all: $(LIB)
 
@@ -77,6 +78,11 @@ Sources/floorplan.o: Sources/floorplan.c Include/floorplan.h
 ################################################################################
 
 Sources/channel.o: Sources/channel.c Include/channel.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/stack_element.o: Sources/stack_element.c Include/stack_element.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
