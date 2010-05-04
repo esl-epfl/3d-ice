@@ -12,21 +12,18 @@
 
 #include "system_vector.h"
 
-SystemVector *
-alloc_system_vector (int size)
+int
+alloc_system_vector (SystemVector *vector, int size)
 {
-  SystemVector *vector ;
-
-  vector->Values = malloc ( sizeof(double) * size ) ;
+  vector->Values = (double *) malloc ( sizeof(double) * size ) ;
+  vector->Size   = size ;
 
   if (vector->Values == NULL)
   {
-    return NULL ;
+    return 0 ;
   }
 
-  vector->Size = size ;
-
-  return vector ;
+  return 1 ;
 }
 
 /******************************************************************************/

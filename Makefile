@@ -20,7 +20,9 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description_scanner.o   \
           Sources/stack_description_parser.o    \
           Sources/stack_description.o           \
-          Sources/system_vector.o
+          Sources/system_vector.o               \
+          Sources/system_matrix.o               \
+          Sources/cell.o
 
 all: $(LIB)
 
@@ -116,6 +118,16 @@ Sources/stack_description.o: Sources/stack_description.c \
 ################################################################################
 
 Sources/system_vector.o: Sources/system_vector.c Include/system_vector.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/cell.o: Sources/cell.c Include/cell.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################

@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/system_vector.h"                                      *
+ * Header file "Include/cell.h"                                               *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,41 +8,47 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_SYSTEM_VECTOR_
-#define _TL_SYSTEM_VECTOR_
+#ifndef _TL_CELL_H_
+#define _TL_CELL_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+#include "stack_description.h"
+
 /******************************************************************************
  *                                                                            *
- * "SystemVector" : the representation of the B vector.                       *
+ * "Cell" : the representation of a single cell.                              *
  *                                                                            *
  ******************************************************************************/
 
   typedef struct
   {
-    double *Values ;
-    int    Size ;
+    double ResistanceNorth ;
+    double ResistanceSouth ;
 
-  } SystemVector ;
+    double ResistanceEast ;
+    double ResistanceWest ;
+
+    double ResistanceTop ;
+    double ResistanceBottom ;
+
+    double Capacity ;
+
+  } Cell ;
 
 /******************************************************************************/
 
-  int alloc_system_vector (SystemVector *vector, int size) ;
-
-  void fill_system_vector (SystemVector *vector,
-                           double *source,
-                           double *capacity,
-                           double *temperature) ;
-
-  void free_system_vector (SystemVector *vector) ;
+  void build_cell_grid (StackDescription *stkd,
+                        Cell *cell_grid,
+                        double delta_time) ;
 
 /******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _TL_SYSTEM_MATRIX_ */
+
+#endif /* _TL_CELL_H_ */

@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/system_vector.h"                                      *
+ * Header file "Include/system_matrix.h"                                      *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,37 +8,42 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_SYSTEM_VECTOR_
-#define _TL_SYSTEM_VECTOR_
+#ifndef _TL_SYSTEM_MATRIX_
+#define _TL_SYSTEM_MATRIX_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+#include "stack_description.h"
+
 /******************************************************************************
  *                                                                            *
- * "SystemVector" : the representation of the B vector.                       *
+ * "SystemVector" : the representation of the A matrix.                       *
  *                                                                            *
  ******************************************************************************/
 
   typedef struct
   {
+    int    *Columns ;
+    int    *Rows ;
     double *Values ;
-    int    Size ;
 
-  } SystemVector ;
+    int Size ;
+    int NNz ;
+
+  } SystemMatrix ;
 
 /******************************************************************************/
 
-  int alloc_system_vector (SystemVector *vector, int size) ;
+  int alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz) ;
 
-  void fill_system_vector (SystemVector *vector,
-                           double *source,
-                           double *capacity,
-                           double *temperature) ;
+  void fill_system_matrix (SystemMatrix *matrix,
+                           StackDescription *stkd,
+                           double time_delta) ;
 
-  void free_system_vector (SystemVector *vector) ;
+  void free_system_matrix (SystemMatrix *matrix) ;
 
 /******************************************************************************/
 
