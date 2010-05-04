@@ -59,7 +59,7 @@ free_materials_list (Material * list)
 {
   Material *next_material ;
 
-  for (; list != NULL; list = next_material->Next)
+  for (; list != NULL; list = next_material)
   {
       next_material = list->Next ;
 

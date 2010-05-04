@@ -3,7 +3,7 @@
 #
 
 CC             = gcc
-CFLAGS         = -Werror -Wall -Wextra
+CFLAGS         = -Werror -Wall -Wextra -g
 INCLUDE        = -IInclude
 LIB            = Lib/libTermalLibrary.a
 
@@ -72,7 +72,7 @@ Sources/floorplan_parser.c : Bison/floorplan_parser.y
 
 Sources/floorplan_scanner.o: Sources/floorplan_scanner.c \
                              Sources/floorplan_parser.c
-	$(CC) -o $@ $(INCLUDE) -c $<
+	$(CC) -g -o $@ $(INCLUDE) -c $<
 
 Sources/floorplan_scanner.c : Flex/floorplan_scanner.l
 		flex Flex/floorplan_scanner.l
@@ -95,7 +95,7 @@ Sources/stack_element.o: Sources/stack_element.c Include/stack_element.h
 ################################################################################
 
 Sources/stack_description_parser.o: Sources/stack_description_parser.c
-	$(CC) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 Sources/stack_description_parser.c : Bison/stack_description_parser.y
 	bison -d Bison/stack_description_parser.y
@@ -105,7 +105,7 @@ Sources/stack_description_parser.c : Bison/stack_description_parser.y
 
 Sources/stack_description_scanner.o: Sources/stack_description_scanner.c \
                                      Sources/stack_description_parser.c
-	$(CC) -o $@ $(INCLUDE) -c $<
+	$(CC) -g -o $@ $(INCLUDE) -c $<
 
 Sources/stack_description_scanner.c : Flex/stack_description_scanner.l
 	flex Flex/stack_description_scanner.l

@@ -68,7 +68,7 @@ void
 free_stack_elements_list (StackElement *list)
 {
   StackElement *next_stack_element ;
-  for ( ; list != NULL; list = next_stack_element->Next)
+  for ( ; list != NULL; list = next_stack_element)
     {
       next_stack_element = list->Next ;
 

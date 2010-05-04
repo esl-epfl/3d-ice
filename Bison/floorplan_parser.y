@@ -112,7 +112,7 @@ floorplan_element
   : IDENTIFIER ':' position dimension
     {
       FloorplanElement *floorplan_element
-        = malloc_and_init_floorplan_element () ;
+        = alloc_and_init_floorplan_element () ;
 
       if (floorplan_element == NULL)
       {

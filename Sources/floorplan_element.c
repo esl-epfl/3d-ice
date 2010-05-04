@@ -72,7 +72,7 @@ free_floorplan_elements_list (FloorplanElement *list)
 {
   FloorplanElement *next_floorplan_element ;
 
-  for ( ; list != NULL ; list = next_floorplan_element->Next)
+  for ( ; list != NULL ; list = next_floorplan_element)
   {
     next_floorplan_element = list->Next ;
 

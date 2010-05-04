@@ -60,7 +60,7 @@ extern "C"
 
   void init_floorplan_element(FloorplanElement *floorplan_element) ;
 
-  FloorplanElement *malloc_and_init_floorplan_element (void) ;
+  FloorplanElement *alloc_and_init_floorplan_element (void) ;
 
   void free_floorplan_element  (FloorplanElement *floorplan_element) ;
 

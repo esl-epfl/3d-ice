@@ -56,7 +56,7 @@ free_layers_list (Layer *list)
 {
   Layer *next_layer ;
 
-  for (; list != NULL; list = next_layer->Next)
+  for (; list != NULL; list = next_layer)
   {
       next_layer = list->Next ;
 

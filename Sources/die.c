@@ -31,7 +31,7 @@ init_die (Die *die)
 /******************************************************************************/
 
 Die *
-malloc_die (void)
+alloc_and_init_die (void)
 {
   Die *die = (Die *) malloc ( sizeof(Die) ) ;
 
@@ -61,7 +61,7 @@ free_dies_list (Die *list)
 {
   Die *next_die ;
 
-  for ( ; list != NULL ; list = next_die->Next)
+  for ( ; list != NULL ; list = next_die)
   {
     next_die = list->Next ;
 

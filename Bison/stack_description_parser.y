@@ -47,6 +47,8 @@
 %type <double_v> liquid_htc
 %type <double_v> liquid_sh
 
+%type <int_v> sources_position
+
 %type <string> wall
 
 %type <material_p> material
@@ -123,6 +125,15 @@ stack_description_file
   : materials_list
     channel
     dies_list
+    {
+      stkd->Dimensions = alloc_and_init_dimensions() ;
+
+      if (stkd->Dimensions == NULL)
+      {
+        stack_description_error(stkd, scanner, "alloc_and_init_dimensions") ;
+        YYABORT ;
+      }
+    }
     stack
     dimensions
   ;
@@ -239,7 +250,7 @@ die
 
   : DIE IDENTIFIER ':'
        layers_list
-       SOURCES ON LAYER IVALUE ';'
+       sources_position
     {
       Die *die = alloc_and_init_die() ;
 
@@ -252,13 +263,19 @@ die
       die->Id          = $2 ;
       die->LayersList  = tmp_layer_pointer ;
       die->NLayers     = tmp_layer_counter ;
-      die->SourcesId   = $8 ;
+      die->SourcesId   = $5 ;
 
       tmp_layer_pointer = NULL ;
       tmp_layer_counter = 0 ;
 
       $$ = die ;
     }
+  ;
+
+sources_position
+
+  : SOURCES ON LAYER IVALUE ';'
+    { $$ = $4 }
   ;
 
 /******************************************************************************/
@@ -337,14 +354,6 @@ stack
         width_mm
         stack_elements
     {
-      stkd->Dimensions = alloc_and_init_dimensions ();
-
-      if (stkd->Dimensions == NULL)
-      {
-        stack_description_error(stkd, scanner, "alloc_and_init_dimensions") ;
-        YYABORT ;
-      }
-
       stkd->Dimensions->Chip.Length = $3;
       stkd->Dimensions->Chip.Width  = $4;
     }
@@ -501,7 +510,7 @@ liquid_htc
 
 liquid_sh
 
-  : LIQUID specific_heat ';' { $$ = $2 ; } ;
+  : LIQUID SPECIFIC_HEAT DVALUE ';' { $$ = $3 ; } ;
 
 length_um
 
