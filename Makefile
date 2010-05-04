@@ -22,7 +22,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description.o           \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
-          Sources/cell.o
+          Sources/cell.o                        \
+          Sources/sources.o
 
 all: $(LIB)
 
@@ -128,6 +129,11 @@ Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
 ################################################################################
 
 Sources/cell.o: Sources/cell.c Include/cell.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/sources.o: Sources/sources.c
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
