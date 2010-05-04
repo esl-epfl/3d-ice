@@ -14,13 +14,12 @@
 
 void init_layer (Layer *layer)
 {
-  if (layer != NULL)
-  {
-    layer->Id       = 0 ;
-    layer->Height   = 0.0 ;
-    layer->Material = NULL ;
-    layer->Next     = NULL ;
-  }
+  if (layer == NULL) return ;
+
+  layer->Id       = 0 ;
+  layer->Height   = 0.0 ;
+  layer->Material = NULL ;
+  layer->Next     = NULL ;
 }
 
 /******************************************************************************/
@@ -44,6 +43,8 @@ alloc_and_init_layer (void)
 void
 free_layer (Layer *layer)
 {
+  if (layer == NULL) return ;
+
   free (layer) ;
 }
 

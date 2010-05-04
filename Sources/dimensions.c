@@ -15,13 +15,12 @@
 void
 init_cells_dimensions (CellDimensions * cd)
 {
-  if (cd != NULL)
-  {
-    cd->FirstLength = 0.0;
-    cd->Length      = 0.0;
-    cd->LastLength  = 0.0;
-    cd->Width       = 0.0;
-  }
+  if (cd == NULL) return ;
+
+  cd->FirstLength = 0.0;
+  cd->Length      = 0.0;
+  cd->LastLength  = 0.0;
+  cd->Width       = 0.0;
 }
 
 /******************************************************************************/
@@ -41,14 +40,13 @@ print_cells_dimensions (FILE * stream, char *prefix, CellDimensions * cd)
 void
 init_grid_dimensions (GridDimensions * gd)
 {
-  if (gd != NULL)
-  {
-    gd->NLayers  = 0 ;
-    gd->NRows    = 0 ;
-    gd->NColumns = 0 ;
-    gd->NCells   = 0 ;
-    gd->NNz      = 0 ;
-  }
+  if (gd == NULL) return ;
+
+  gd->NLayers  = 0 ;
+  gd->NRows    = 0 ;
+  gd->NColumns = 0 ;
+  gd->NCells   = 0 ;
+  gd->NNz      = 0 ;
 }
 
 /******************************************************************************/
@@ -68,11 +66,10 @@ print_grid_dimensions (FILE * stream, char *prefix, GridDimensions * gd)
 void
 init_chip_dimensions (ChipDimensions * cd)
 {
-  if (cd != NULL)
-  {
-    cd->Length = 0.0;
-    cd->Width  = 0.0;
-  }
+  if (cd == NULL) return ;
+
+  cd->Length = 0.0;
+  cd->Width  = 0.0;
 }
 
 /******************************************************************************/
@@ -92,12 +89,11 @@ print_chip_dimensions (FILE * stream, char *prefix, ChipDimensions * cd)
 void
 init_dimensions (Dimensions * dim)
 {
-  if (dim != NULL)
-  {
-    init_cells_dimensions (&(dim->Cell));
-    init_grid_dimensions  (&(dim->Grid));
-    init_chip_dimensions  (&(dim->Chip));
-  }
+  if (dim == NULL) return ;
+
+  init_cells_dimensions (&(dim->Cell));
+  init_grid_dimensions  (&(dim->Grid));
+  init_chip_dimensions  (&(dim->Chip));
 }
 
 /******************************************************************************/
@@ -127,6 +123,8 @@ print_dimensions (FILE * stream, char *prefix, Dimensions * dim)
 void
 free_dimensions (Dimensions * dim)
 {
+  if (dim == NULL) return ;
+
   free (dim);
 }
 

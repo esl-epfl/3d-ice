@@ -23,15 +23,14 @@ static int fill_floorplans (StackDescription *stkd) ;
 void
 init_stack_description (StackDescription *stkd)
 {
-  if (stkd != NULL)
-  {
-    stkd->FileName          = NULL ;
-    stkd->MaterialsList     = NULL ;
-    stkd->Channel           = NULL ;
-    stkd->DiesList          = NULL ;
-    stkd->StackElementsList = NULL ;
-    stkd->Dimensions        = NULL ;
-  }
+  if (stkd == NULL) return ;
+
+  stkd->FileName          = NULL ;
+  stkd->MaterialsList     = NULL ;
+  stkd->Channel           = NULL ;
+  stkd->DiesList          = NULL ;
+  stkd->StackElementsList = NULL ;
+  stkd->Dimensions        = NULL ;
 }
 
 /******************************************************************************/
@@ -66,6 +65,11 @@ fill_stack_description (StackDescription* stkd , char *filename)
 
   fclose(input);
 
+  if (result == 1)
+  {
+    return result ;
+  }
+
   stkd->Dimensions->Grid.NRows
 
       = (stkd->Dimensions->Chip.Width * 1000.0) / stkd->Dimensions->Cell.Width ;
@@ -99,9 +103,7 @@ fill_stack_description (StackDescription* stkd , char *filename)
   // Now we know all the dimensions so we can parse the floorplan
   // files and check if the floorplan elements are well positionated.
 
-  result += fill_floorplans(stkd) ;
-
-  return result;
+  return fill_floorplans(stkd) ;
 }
 
 /******************************************************************************/
@@ -111,6 +113,8 @@ fill_stack_description (StackDescription* stkd , char *filename)
 void
 free_stack_description (StackDescription *stkd)
 {
+  if (stkd == NULL) return ;
+
   free_materials_list      (stkd->MaterialsList) ;
   free_channel             (stkd->Channel) ;
   free_dies_list           (stkd->DiesList) ;

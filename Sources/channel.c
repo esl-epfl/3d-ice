@@ -15,13 +15,12 @@
 void
 init_channel (Channel* channel)
 {
-  if (channel != NULL)
-  {
-    channel->Height       = 0.0 ;
-    channel->LiquidHTC    = 0.0 ;
-    channel->LiquidSH     = 0.0 ;
-    channel->WallMaterial = NULL ;
-  }
+  if (channel == NULL) return ;
+
+  channel->Height       = 0.0 ;
+  channel->LiquidHTC    = 0.0 ;
+  channel->LiquidSH     = 0.0 ;
+  channel->WallMaterial = NULL ;
 }
 
 /******************************************************************************/
@@ -45,6 +44,8 @@ alloc_and_init_channel (void)
 void
 free_channel (Channel *channel)
 {
+  if (channel == NULL) return ;
+
   free (channel) ;
 }
 

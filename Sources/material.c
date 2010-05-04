@@ -16,13 +16,12 @@
 void
 init_material (Material * material)
 {
-  if (material != NULL)
-  {
-      material->Id                  = NULL ;
-      material->SpecificHeat        = 0.0 ;
-      material->ThermalConductivity = 0.0 ;
-      material->Next                = NULL ;
-  }
+  if (material == NULL) return ;
+
+  material->Id                  = NULL ;
+  material->SpecificHeat        = 0.0 ;
+  material->ThermalConductivity = 0.0 ;
+  material->Next                = NULL ;
 }
 
 /******************************************************************************/
@@ -46,6 +45,8 @@ alloc_and_init_material (void)
 void
 free_material (Material * material)
 {
+  if (material == NULL) return ;
+
   free (material->Id) ;
   free (material) ;
 }

@@ -15,6 +15,8 @@
 int
 alloc_system_vector (SystemVector *vector, int size)
 {
+  if (vector == NULL) return 0 ;
+
   vector->Values = (double *) malloc ( sizeof(double) * size ) ;
   vector->Size   = size ;
 
@@ -51,5 +53,7 @@ fill_system_vector (SystemVector *vector,
 
 void free_system_vector (SystemVector *vector)
 {
+  if (vector == NULL) return ;
+
   free (vector->Values) ;
 }

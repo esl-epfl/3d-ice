@@ -23,12 +23,11 @@ extern int floorplan_parse (Floorplan *floorplan,
 void
 init_floorplan (Floorplan *floorplan)
 {
-  if (floorplan != NULL)
-  {
-    floorplan->FileName     = NULL ;
-    floorplan->NElements    = 0 ;
-    floorplan->ElementsList = NULL ;
-  }
+  if (floorplan == NULL) return ;
+
+  floorplan->FileName     = NULL ;
+  floorplan->NElements    = 0 ;
+  floorplan->ElementsList = NULL ;
 }
 
 /******************************************************************************/
@@ -52,6 +51,8 @@ alloc_and_init_floorplan (void)
 void
 free_floorplan (Floorplan *floorplan)
 {
+  if (floorplan == NULL) return ;
+
   free(floorplan->FileName) ;
   free_floorplan_elements_list(floorplan->ElementsList) ;
   free (floorplan) ;

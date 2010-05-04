@@ -15,26 +15,25 @@
 void
 init_floorplan_element (FloorplanElement *floorplan_element)
 {
-  if (floorplan_element != NULL)
-  {
-    floorplan_element->Id         = NULL ;
+  if (floorplan_element == NULL) return ;
 
-    floorplan_element->SW_X       = 0 ;
-    floorplan_element->SW_Y       = 0 ;
+  floorplan_element->Id         = NULL ;
 
-    floorplan_element->Length     = 0 ;
-    floorplan_element->Width      = 0 ;
+  floorplan_element->SW_X       = 0 ;
+  floorplan_element->SW_Y       = 0 ;
 
-    floorplan_element->SW_Row     = 0 ;
-    floorplan_element->SW_Column  = 0 ;
+  floorplan_element->Length     = 0 ;
+  floorplan_element->Width      = 0 ;
 
-    floorplan_element->NE_Row     = 0 ;
-    floorplan_element->NE_Column  = 0 ;
+  floorplan_element->SW_Row     = 0 ;
+  floorplan_element->SW_Column  = 0 ;
 
-    floorplan_element->PowerValue = 0.0 ;
+  floorplan_element->NE_Row     = 0 ;
+  floorplan_element->NE_Column  = 0 ;
 
-    floorplan_element->Next       = NULL ;
-  }
+  floorplan_element->PowerValue = 0.0 ;
+
+  floorplan_element->Next       = NULL ;
 }
 
 /******************************************************************************/
@@ -57,10 +56,12 @@ alloc_and_init_floorplan_element (void)
 /******************************************************************************/
 
 void
-free_floorplan_element (FloorplanElement *flp_el)
+free_floorplan_element (FloorplanElement *floorplan_element)
 {
-  free (flp_el->Id) ;
-  free (flp_el) ;
+  if (floorplan_element == NULL) return ;
+
+  free (floorplan_element->Id) ;
+  free (floorplan_element) ;
 }
 
 /******************************************************************************/

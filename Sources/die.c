@@ -16,14 +16,13 @@
 void
 init_die (Die *die)
 {
-  if (die != NULL)
-  {
-    die->Id         = NULL ;
-    die->LayersList = NULL ;
-    die->NLayers    = 0 ;
-    die->SourcesId  = 0 ;
-    die->Next       = NULL ;
-  }
+  if (die == NULL) return ;
+
+  die->Id         = NULL ;
+  die->LayersList = NULL ;
+  die->NLayers    = 0 ;
+  die->SourcesId  = 0 ;
+  die->Next       = NULL ;
 }
 
 /******************************************************************************/
@@ -47,6 +46,8 @@ alloc_and_init_die (void)
 void
 free_die (Die *die)
 {
+  if (die == NULL) return ;
+
   free (die->Id) ;
   free_layers_list (die->LayersList) ;
   free (die) ;

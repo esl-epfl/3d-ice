@@ -26,6 +26,8 @@ static FILE   *debug ;
 int
 alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz)
 {
+  if (matrix == NULL) return 0 ;
+
   matrix->Size = nvalues ;
   matrix->NNz  = nnz ;
 
@@ -62,6 +64,8 @@ alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz)
 
 void free_system_matrix (SystemMatrix *matrix)
 {
+  if (matrix == NULL) return ;
+
   free (matrix->Columns) ;
   free (matrix->Rows) ;
   free (matrix->Values) ;

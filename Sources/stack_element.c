@@ -15,16 +15,15 @@
 void
 init_stack_element (StackElement *stack_element)
 {
-  if (stack_element != NULL)
-  {
-    stack_element->Type            = TL_STACK_ELEMENT_NONE ;
-    stack_element->Pointer.Layer   = NULL ;
-    stack_element->Pointer.Die     = NULL ;
-    stack_element->Floorplan       = NULL ;
-    stack_element->Id              = 0 ;
-    stack_element->NLayers         = 0 ;
-    stack_element->Next            = NULL ;
-  }
+  if (stack_element == NULL) return ;
+
+  stack_element->Type            = TL_STACK_ELEMENT_NONE ;
+  stack_element->Pointer.Layer   = NULL ;
+  stack_element->Pointer.Die     = NULL ;
+  stack_element->Floorplan       = NULL ;
+  stack_element->Id              = 0 ;
+  stack_element->NLayers         = 0 ;
+  stack_element->Next            = NULL ;
 }
 
 /******************************************************************************/
@@ -49,6 +48,8 @@ alloc_and_init_stack_element (void)
 void
 free_stack_element (StackElement *stack_element)
 {
+  if (stack_element == NULL) return ;
+
   if (stack_element->Type == TL_STACK_ELEMENT_DIE)
 
     free_floorplan (stack_element->Floorplan) ;
