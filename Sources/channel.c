@@ -1,8 +1,11 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Source/channel.c"                                             *
+ * Source file "Sources/channel.c"                                            *
  *                                                                            *
- *                                          -- alessandro.vincenzi@epfl.ch -- *
+ * EPFL-STI-IEL-ESL                                                           *
+ * Bâtiment ELG, ELG 130                                                      *
+ * Station 11                                                                 *
+ * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
 #include <stdlib.h>
