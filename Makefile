@@ -20,6 +20,7 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description_scanner.o   \
           Sources/stack_description_parser.o    \
           Sources/stack_description.o           \
+          Sources/system_vector.o
 
 all: $(LIB)
 
@@ -110,6 +111,11 @@ Sources/stack_description_scanner.c : Flex/stack_description_scanner.l
 
 Sources/stack_description.o: Sources/stack_description.c \
                              Include/stack_description.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/system_vector.o: Sources/system_vector.c Include/system_vector.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
