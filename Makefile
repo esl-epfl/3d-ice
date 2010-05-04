@@ -7,16 +7,19 @@ CFLAGS         = -Werror -Wall -Wextra
 INCLUDE        = -IInclude
 LIB            = Lib/libTermalLibrary.a
 
-OBJECTS = Sources/dimensions.o          \
-          Sources/material.o            \
-          Sources/layer.o               \
-          Sources/floorplan_element.o   \
-          Sources/die.o                 \
-          Sources/floorplan_scanner.o   \
-          Sources/floorplan_parser.o    \
-          Sources/floorplan.o           \
-          Sources/channel.o             \
-          Sources/stack_element.o
+OBJECTS = Sources/dimensions.o                  \
+          Sources/material.o                    \
+          Sources/layer.o                       \
+          Sources/floorplan_element.o           \
+          Sources/die.o                         \
+          Sources/floorplan_scanner.o           \
+          Sources/floorplan_parser.o            \
+          Sources/floorplan.o                   \
+          Sources/channel.o                     \
+          Sources/stack_element.o               \
+          Sources/stack_description_scanner.o   \
+          Sources/stack_description_parser.o    \
+          Sources/stack_description.o           \
 
 all: $(LIB)
 
@@ -55,7 +58,7 @@ Sources/die.o: Sources/die.c Include/die.h
 ###############################################################################
 
 Sources/floorplan_parser.o: Sources/floorplan_parser.c
-	$(CC) $(PARSER_CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 Sources/floorplan_parser.c : Bison/floorplan_parser.y
 	bison -d Bison/floorplan_parser.y
@@ -65,7 +68,7 @@ Sources/floorplan_parser.c : Bison/floorplan_parser.y
 
 Sources/floorplan_scanner.o: Sources/floorplan_scanner.c \
                              Sources/floorplan_parser.c
-	$(CC) $(SCANNER_CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) -o $@ $(INCLUDE) -c $<
 
 Sources/floorplan_scanner.c : Flex/floorplan_scanner.l
 		flex Flex/floorplan_scanner.l
@@ -87,11 +90,38 @@ Sources/stack_element.o: Sources/stack_element.c Include/stack_element.h
 
 ################################################################################
 
+Sources/stack_description_parser.o: Sources/stack_description_parser.c
+	$(CC) -o $@ $(INCLUDE) -c $<
+
+Sources/stack_description_parser.c : Bison/stack_description_parser.y
+	bison -d Bison/stack_description_parser.y
+	mv Sources/stack_description_parser.h Include/
+
+################################################################################
+
+Sources/stack_description_scanner.o: Sources/stack_description_scanner.c \
+                                     Sources/stack_description_parser.c
+	$(CC) -o $@ $(INCLUDE) -c $<
+
+Sources/stack_description_scanner.c : Flex/stack_description_scanner.l
+	flex Flex/stack_description_scanner.l
+
+################################################################################
+
+Sources/stack_description.o: Sources/stack_description.c \
+                             Include/stack_description.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(LIB)
-	rm -f Sources/floorplan_scanner.c
 	rm -f Include/floorplan_scanner.h
-	rm -f Sources/floorplan_parser.c
 	rm -f Include/floorplan_parser.h
-
+	rm -f Include/stack_description_scanner.h
+	rm -f Include/stack_description_parser.h
+	rm -f Sources/floorplan_scanner.c
+	rm -f Sources/floorplan_parser.c
+	rm -f Sources/stack_description_scanner.c
+	rm -f Sources/stack_description_parser.c

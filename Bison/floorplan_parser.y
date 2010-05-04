@@ -159,5 +159,7 @@ floorplan_error (Floorplan *floorplan,
 {
   fprintf(stderr, "%s:%d: %s\n",
     floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
-  free_floorplan(floorplan) ;
+
+  free_dimensions (dim) ;
+  free_floorplan  (floorplan) ;
 }

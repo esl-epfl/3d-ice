@@ -19,7 +19,6 @@ extern "C"
 #include <stdio.h>
 
 #include "layer.h"
-#include "channel.h"
 #include "die.h"
 #include "floorplan.h"
 
@@ -41,7 +40,6 @@ extern "C"
   typedef union
   {
     Layer   *Layer ;
-    Channel *Channel ;
     Die     *Die ;
   } StackElement_p ;
 
@@ -79,6 +77,8 @@ extern "C"
   void print_stack_elements_list (FILE *stream,
                                   char *prefix,
                                   StackElement *list) ;
+
+  StackElement *find_stack_element_in_list (StackElement *list, int id) ;
 
 /******************************************************************************/
 

@@ -19,7 +19,6 @@ init_stack_element (StackElement *stack_element)
   {
     stack_element->Type            = TL_STACK_ELEMENT_NONE ;
     stack_element->Pointer.Layer   = NULL ;
-    stack_element->Pointer.Channel = NULL ;
     stack_element->Pointer.Die     = NULL ;
     stack_element->Floorplan       = NULL ;
     stack_element->Id              = 0 ;
@@ -118,4 +117,22 @@ print_stack_elements_list (FILE *stream, char *prefix, StackElement *list)
         break ;
     }
   }
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+StackElement *
+find_stack_element_in_list (StackElement *list, int id)
+{
+  for ( ; list != NULL ; list = list->Next)
+  {
+    if (list->Id == id)
+    {
+      break ;
+    }
+  }
+
+ return list ;
 }

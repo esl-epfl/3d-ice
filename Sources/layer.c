@@ -92,7 +92,7 @@ void print_layers_list (FILE *stream, char* prefix, Layer *list)
 /******************************************************************************/
 
 Layer *
-find_layer (Layer *list, int id)
+find_layer_in_list (Layer *list, int id)
 {
   for ( ; list != NULL ; list = list->Next)
   {
