@@ -15,6 +15,7 @@ OBJECTS = Sources/dimensions.o          \
           Sources/floorplan_scanner.o   \
           Sources/floorplan_parser.o    \
           Sources/floorplan.o           \
+          Sources/channel.o
 
 all: $(LIB)
 
@@ -59,7 +60,7 @@ Sources/floorplan_parser.c : Bison/floorplan_parser.y
 	bison -d Bison/floorplan_parser.y
 	mv Sources/floorplan_parser.h Include/
 
-###############################################################################
+################################################################################
 
 Sources/floorplan_scanner.o: Sources/floorplan_scanner.c \
                              Sources/floorplan_parser.c
@@ -70,10 +71,15 @@ Sources/floorplan_scanner.c : Flex/floorplan_scanner.l
 
 ################################################################################
 
-Sources/floorplan.o: Sources/floorplan.c
+Sources/floorplan.o: Sources/floorplan.c Include/floorplan.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
-###############################################################################
+################################################################################
+
+Sources/channel.o: Sources/channel.c Include/channel.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
 
 clean:
 	rm -f $(OBJECTS)
