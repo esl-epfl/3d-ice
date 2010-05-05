@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/sources.c"                                            *
+ * Source file "Sources/fill_sources.c"                                       *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -15,6 +15,7 @@
 #include "channel.h"
 #include "die.h"
 #include "stack_description.h"
+#include "data.h"
 
 static int    __layer ;
 static double *__sources ;
@@ -28,7 +29,8 @@ static FILE   *debug ;
 /******************************************************************************/
 
 static
-void update_sources_layer (Dimensions *dim, Floorplan *floorplan)
+void
+fill_sources_layer (Dimensions *dim, Floorplan *floorplan)
 {
   double flp_el_surface, cell_surface ;
   int    row, column ;
@@ -72,7 +74,7 @@ void update_sources_layer (Dimensions *dim, Floorplan *floorplan)
 /******************************************************************************/
 
 static void
-update_sources_channel (Dimensions *dim, Channel *channel)
+fill_sources_channel (Dimensions *dim, Channel *channel)
 {
 
   double C   = channel->LiquidSH * 1.62e6 * 0.5
@@ -102,7 +104,7 @@ update_sources_channel (Dimensions *dim, Channel *channel)
 
 static
 void
-update_sources_die (Dimensions *dim, Die *die, Floorplan *floorplan)
+fill_sources_die (Dimensions *dim, Die *die, Floorplan *floorplan)
 {
   Layer* layer = die->LayersList;
 
@@ -115,7 +117,7 @@ update_sources_die (Dimensions *dim, Die *die, Floorplan *floorplan)
   {
     if (layer->Id == die->SourcesId)
     {
-      update_sources_layer (dim, floorplan) ;
+      fill_sources_layer (dim, floorplan) ;
     }
   }
 }
@@ -125,21 +127,21 @@ update_sources_die (Dimensions *dim, Die *die, Floorplan *floorplan)
 /******************************************************************************/
 
 void
-update_sources (StackDescription *stkd, double *sources)
+fill_sources (Data *data, StackDescription *stkd)
 {
   StackElement *stack_element = stkd->StackElementsList ;
 
   __layer   = 0 ;
-  __sources = sources ;
+  __sources = data->Sources ;
 
 #ifdef DEBUG_BUILD_SOURCE_VECTOR
-  debug = fopen("update_sources.txt", "w") ;
+  debug = fopen("fill_sources.txt", "w") ;
   if (debug == NULL)
   {
-    perror("update_sources.txt") ;
+    perror("fill_sources.txt") ;
     return ;
   }
-  fprintf (debug, "update_sources (l %d r %d c %d)\n",
+  fprintf (debug, "fill_sources (l %d r %d c %d)\n",
     stkd->Dimensions->Grid.NLayers,
     stkd->Dimensions->Grid.NRows,
     stkd->Dimensions->Grid.NColumns) ;
@@ -151,9 +153,9 @@ update_sources (StackDescription *stkd, double *sources)
     {
       case TL_STACK_ELEMENT_DIE :
 
-        update_sources_die (stkd->Dimensions,
-                            stack_element->Pointer.Die,
-                            stack_element->Floorplan) ;
+        fill_sources_die (stkd->Dimensions,
+                          stack_element->Pointer.Die,
+                          stack_element->Floorplan) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
@@ -163,7 +165,7 @@ update_sources (StackDescription *stkd, double *sources)
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        update_sources_channel (stkd->Dimensions, stkd->Channel) ;
+        fill_sources_channel (stkd->Dimensions, stkd->Channel) ;
         __layer++;
 
         break ;
