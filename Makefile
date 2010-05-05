@@ -2,10 +2,12 @@
 # Makefile
 #
 
-CC             = gcc
-CFLAGS         = -Werror -Wall -Wextra -g
-INCLUDE        = -IInclude
-LIB            = Lib/libTermalLibrary.a
+CC              = gcc
+CFLAGS          = -Werror -Wall -Wextra -g
+INCLUDE         = -IInclude
+LIB             = Lib/libTermalLibrary.a
+SUPERLU_INCLUDE = ../SuperLU_4.0/SRC/
+
 
 OBJECTS = Sources/dimensions.o                  \
           Sources/material.o                    \
@@ -25,7 +27,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/resistances.o                 \
           Sources/data.o                        \
           Sources/fill_sources.o                \
-          Sources/fill_capacities.o
+          Sources/fill_capacities.o             \
+          Sources/solve_system.o
 
 all: $(LIB)
 
@@ -147,6 +150,11 @@ Sources/fill_sources.o: Sources/fill_sources.c Include/data.h
 
 Sources/fill_capacities.o: Sources/fill_capacities.c Include/data.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/solve_system.o: Sources/solve_system.c
+	$(CC) $(CFLAGS) -I$(SUPERLU_INCLUDE) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
