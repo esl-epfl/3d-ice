@@ -17,6 +17,7 @@ extern "C"
 #endif
 
 #include "stack_description.h"
+#include "data.h"
 
 /******************************************************************************
  *                                                                            *
@@ -41,7 +42,7 @@ extern "C"
 
   void fill_system_matrix (SystemMatrix *matrix,
                            StackDescription *stkd,
-                           double time_delta) ;
+                           Data *data) ;
 
   void free_system_matrix (SystemMatrix *matrix) ;
 

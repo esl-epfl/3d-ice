@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/cell.c"                                               *
+ * Source file "Sources/resistances.c"                                        *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,11 +8,10 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#include "cell.h"
+#include "resistances.h"
 
-static double __delta_time ;
-static Cell   *__cell_grid ;
-static int    __layer ;
+static Resistances *__grid ;
+static int         __layer ;
 
 #ifdef DEBUG_BUILD_CELL_GRID
 static FILE   *debug ;
@@ -28,7 +27,7 @@ static
 void
 build_solid_cell (LayerPosition_t position,
                   double length, double width, double height,
-                  double thermalconductivity, double specificheat)
+                  double thermalconductivity)
 {
 #ifdef DEBUG_BUILD_CELL_GRID
   fprintf
@@ -43,41 +42,37 @@ build_solid_cell (LayerPosition_t position,
   ) ;
 #endif
 
-  __cell_grid->ResistanceNorth = __cell_grid->ResistanceSouth
+  __grid->ResistanceNorth = __grid->ResistanceSouth
 
     = (thermalconductivity * length * height ) / (width / 2.0) ;
 
-  __cell_grid->ResistanceEast = __cell_grid->ResistanceWest
+  __grid->ResistanceEast = __grid->ResistanceWest
 
     = (thermalconductivity * width * height ) / (length / 2.0) ;
 
   if (position == TL_LAYER_BOTTOM)
   {
-    __cell_grid->ResistanceBottom = 0.0 ;
+    __grid->ResistanceBottom = 0.0 ;
 
-    __cell_grid->ResistanceTop
+    __grid->ResistanceTop
 
       = (thermalconductivity * length * width) / height ;
 
   }
   else if (position == TL_LAYER_TOP)
   {
-    __cell_grid->ResistanceTop = 0.0 ;
+    __grid->ResistanceTop = 0.0 ;
 
-    __cell_grid->ResistanceBottom
+    __grid->ResistanceBottom
 
       = (thermalconductivity * length * width) / height ;
   }
   else
   {
-    __cell_grid->ResistanceTop = __cell_grid->ResistanceBottom
+    __grid->ResistanceTop = __grid->ResistanceBottom
 
      = (thermalconductivity * length * width) / (height / 2.0) ;
   }
-
-  __cell_grid->Capacity
-
-    = (specificheat * length * width * height) / __delta_time;
 }
 
 /******************************************************************************/
@@ -122,20 +117,16 @@ build_liquid_cell (LayerPosition_t position,
     fprintf (stderr, "Warning: channel on top layer not supported\n") ;
   }
 
-  __cell_grid->ResistanceNorth =  C ;
-  __cell_grid->ResistanceSouth = -C ;
+  __grid->ResistanceNorth =  C ;
+  __grid->ResistanceSouth = -C ;
 
-  __cell_grid->ResistanceEast = __cell_grid->ResistanceWest
-
-    = liquidhtc * width * height ;
-
-  __cell_grid->ResistanceTop = __cell_grid->ResistanceBottom
+  __grid->ResistanceEast = __grid->ResistanceWest
 
     = liquidhtc * width * height ;
 
-  __cell_grid->Capacity
+  __grid->ResistanceTop = __grid->ResistanceBottom
 
-    = (liquidsh * length * width * height) / __delta_time ;
+    = liquidhtc * width * height ;
 }
 
 /******************************************************************************/
@@ -157,7 +148,7 @@ build_cell_grid_layer (Dimensions *dim, Layer *layer)
 
   for (row = 0 ; row < dim->Grid.NRows ; row++)
   {
-    for (column = 0 ; column < dim->Grid.NColumns ; column++, __cell_grid++)
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, __grid++)
     {
 
 #ifdef DEBUG_BUILD_CELL_GRID
@@ -168,8 +159,7 @@ build_cell_grid_layer (Dimensions *dim, Layer *layer)
       build_solid_cell (get_layer_position (&dim->Grid, __layer),
                         get_cell_length (dim, column),
                         dim->Cell.Width, layer->Height,
-                        layer->Material->ThermalConductivity,
-                        layer->Material->SpecificHeat) ;
+                        layer->Material->ThermalConductivity) ;
     } /* column */
   } /* row */
 }
@@ -192,7 +182,7 @@ build_cell_grid_channel (Dimensions *dim, Channel *channel)
 
   for (row = 0 ; row < dim->Grid.NRows ; row++)
   {
-    for (column = 0 ; column < dim->Grid.NColumns ; column++, __cell_grid++)
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, __grid++)
     {
 
 #ifdef DEBUG_BUILD_CELL_GRID
@@ -205,8 +195,7 @@ build_cell_grid_channel (Dimensions *dim, Channel *channel)
         build_solid_cell (get_layer_position (&dim->Grid, __layer),
                           get_cell_length (dim, column),
                           dim->Cell.Width, channel->Height,
-                          channel->WallMaterial->ThermalConductivity,
-                          channel->WallMaterial->SpecificHeat) ;
+                          channel->WallMaterial->ThermalConductivity) ;
       }
       else                 // Odd -> channel
       {
@@ -245,12 +234,11 @@ build_cell_grid_die (Dimensions *dim, Die *die)
 /******************************************************************************/
 
 void
-build_cell_grid (StackDescription *stkd, Cell *cell_grid, double delta_time)
+build_resistances_grid (Resistances *grid, StackDescription *stkd)
 {
   StackElement *stack_element = stkd->StackElementsList ;
 
-  __delta_time  = delta_time ;
-  __cell_grid   = cell_grid ;
+  __grid        = grid ;
   __layer       = 0 ;
 
 #ifdef DEBUG_BUILD_CELL_GRID

@@ -22,9 +22,10 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description.o           \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
-          Sources/cell.o                        \
+          Sources/resistances.o                 \
           Sources/data.o                        \
-          Sources/fill_sources.o
+          Sources/fill_sources.o                \
+          Sources/fill_capacities.o
 
 all: $(LIB)
 
@@ -129,7 +130,7 @@ Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
 
 ################################################################################
 
-Sources/cell.o: Sources/cell.c Include/cell.h
+Sources/resistances.o: Sources/resistances.c Include/resistances.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
@@ -139,7 +140,12 @@ Sources/data.o: Sources/data.c Include/data.h
 
 ################################################################################
 
-Sources/fill_sources.o: Sources/fill_sources.c
+Sources/fill_sources.o: Sources/fill_sources.c Include/data.h
+	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+
+################################################################################
+
+Sources/fill_capacities.o: Sources/fill_capacities.c Include/data.h
 	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
 
 ################################################################################

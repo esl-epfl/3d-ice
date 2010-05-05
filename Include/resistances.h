@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/cell.h"                                               *
+ * Header file "Include/resistances.h"                                        *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,8 +8,8 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_CELL_H_
-#define _TL_CELL_H_
+#ifndef _TL_RESISTANCES_H_
+#define _TL_RESISTANCES_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -20,7 +20,7 @@ extern "C"
 
 /******************************************************************************
  *                                                                            *
- * "Cell" : the representation of a single cell.                              *
+ * "Resistances" : the six resistances inside a cell.                         *
  *                                                                            *
  ******************************************************************************/
 
@@ -35,20 +35,15 @@ extern "C"
     double ResistanceTop ;
     double ResistanceBottom ;
 
-    double Capacity ;
-
-  } Cell ;
+  } Resistances ;
 
 /******************************************************************************/
 
-  void build_cell_grid (StackDescription *stkd,
-                        Cell *cell_grid,
-                        double delta_time) ;
+  void build_resistances_grid (Resistances *grid, StackDescription *stkd) ;
 
 /******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _TL_CELL_H_ */
+#endif /* _TL_RESISTANCES_H_ */

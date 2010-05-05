@@ -7,7 +7,7 @@
 
 #include <stdlib.h>
 
-#include "cell.h"
+#include "resistances.h"
 #include "system_matrix.h"
 
 #define PARALLEL(x,y) ( (x * y) / ( x + y) )
@@ -15,7 +15,8 @@
 static int    *__columns ;
 static int    *__rows ;
 static double *__values ;
-static Cell   *__cell_grid ;
+static Resistances *__cell_grid ;
+static double *__capacities ;
 static int    __layer ;
 static int    __cell_index ;
 
@@ -154,7 +155,7 @@ add_solid_column (GridDimensions *gd, int row, int column)
   /* DIAGONAL */
 
   *__rows++        = __cell_index ;
-  *__values        = __cell_grid[__cell_index].Capacity ;
+  *__values        = __capacities[__cell_index] ;
   diagonal_pointer = __values++ ;
 
   (*__columns)++ ;
@@ -314,7 +315,7 @@ add_liquid_column (GridDimensions *gd, int row, int column)
   /* DIAGONAL */
 
   *__rows++        = __cell_index ;
-  *__values        = __cell_grid[__cell_index].Capacity ;
+  *__values        = __capacities[__cell_index] ;
   diagonal_pointer = __values++ ;
 
   (*__columns)++ ;
@@ -474,20 +475,19 @@ fill_system_matrix_channel (GridDimensions *gd)
 /******************************************************************************/
 
 void
-fill_system_matrix (SystemMatrix *matrix,
-                    StackDescription *stkd,
-                    double time_delta)
+fill_system_matrix (SystemMatrix *matrix, StackDescription *stkd, Data *data)
 {
   StackElement *stack_element = stkd->StackElementsList ;
 
   __columns    = matrix->Columns ;
   __rows       = matrix->Rows    ;
   __values     = matrix->Values  ;
-  __cell_grid  = malloc(sizeof(Cell) * stkd->Dimensions->Grid.NCells);
+  __cell_grid  = malloc(sizeof(Resistances) * stkd->Dimensions->Grid.NCells);
+  __capacities = data->Capacities ;
   __layer      = 0 ;
   __cell_index = 0 ;
 
-  build_cell_grid (stkd, __cell_grid, time_delta);
+  build_resistances_grid (__cell_grid, stkd) ;
 
   *__columns++ = 0 ;
 

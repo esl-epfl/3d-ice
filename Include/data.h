@@ -43,7 +43,7 @@ extern "C"
 
   void fill_sources    (Data *data, StackDescription *stkd) ;
 
-  void fill_capacities (Data *data, StackDescription *stkd) ;
+  void fill_capacities (Data *data, StackDescription *stkd, double delta_time) ;
 
 #ifdef __cplusplus
 }
