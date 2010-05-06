@@ -20,6 +20,7 @@ extern "C"
 
 #include "layer.h"
 #include "resistances.h"
+#include "floorplan.h"
 
 /******************************************************************************
  *                                                                            *
@@ -77,6 +78,16 @@ extern "C"
                                 double *capacities,
                                 Dimensions *dim,
                                 double delta_time) ;
+
+  double *fill_sources_die (
+#ifdef DEBUG_FILL_SOURCES
+                             FILE *debug,
+                             int current_layer,
+#endif
+                             Die *die,
+                             Floorplan *floorplan,
+                             double *sources,
+                             Dimensions *dim) ;
 
 /******************************************************************************/
 

@@ -43,11 +43,11 @@ extern "C"
 
   void free_data (Data *data) ;
 
-  void fill_sources    (Data *data, StackDescription *stkd) ;
-
   void fill_resistances (StackDescription *stkd, Data *data) ;
 
   void fill_capacities (StackDescription *stkd, Data *data, double delta_time) ;
+
+  void fill_sources (StackDescription *stkd, Data *data) ;
 
 #ifdef __cplusplus
 }

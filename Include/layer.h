@@ -19,6 +19,7 @@ extern "C"
 #include "material.h"
 #include "dimensions.h"
 #include "resistances.h"
+#include "floorplan.h"
 
 #include <stdio.h>
 
@@ -86,6 +87,25 @@ extern "C"
                                   double *capacities,
                                   Dimensions *dim,
                                   double delta_time) ;
+
+  double *fill_sources_active_layer (
+#ifdef DEBUG_FILL_SOURCES
+                                     FILE *debug,
+                                     int current_layer,
+                                     Layer *layer,
+#endif
+                                     Floorplan *floorplan,
+                                     double *sources,
+                                     Dimensions *dim) ;
+
+  double *fill_sources_empty_layer (
+#ifdef DEBUG_FILL_SOURCES
+                                   FILE *debug,
+                                   int current_layer,
+                                   Layer *layer,
+#endif
+                                   double *sources,
+                                   Dimensions *dim) ;
 
 #ifdef __cplusplus
 }

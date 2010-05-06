@@ -115,7 +115,22 @@ fill_capacities
 (
   StackDescription *stkd,
   Data *data,
-  double delta_time)
+  double delta_time
+)
 {
   fill_capacities_stack_description (stkd, data->Capacities, delta_time) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+fill_sources
+(
+  StackDescription *stkd,
+  Data *data
+)
+{
+  fill_sources_stack_description (stkd, data->Sources) ;
 }

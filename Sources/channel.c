@@ -227,3 +227,50 @@ fill_capacities_channel
 
   return capacities ;
 }
+
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+double *
+fill_sources_channel
+(
+#ifdef DEBUG_FILL_SOURCES
+  FILE *debug,
+  int current_layer,
+#endif
+  Channel *channel,
+  double *sources,
+  Dimensions *dim
+)
+{
+  int row, column ;
+
+  double C
+    = channel->LiquidSH * 1.62e6 * 0.5 * (dim->Cell.Length * channel->Height ) ;
+
+#ifdef DEBUG_FILL_SOURCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_sources_channel %s %.5e\n",
+    sources, current_layer, channel->WallMaterial->Id, C) ;
+#endif
+
+  for (row = 0 ; row < dim->Grid.NRows ; row++)
+  {
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, sources++)
+    {
+      if (row == 0 && column % 2 != 0) /* Only first row and odd columns */
+      {
+#ifdef DEBUG_FILL_SOURCES
+      fprintf (debug,
+        "%p liquid cell l %5d r %5d c %5d\n",
+        sources, current_layer, row, column) ;
+#endif
+        *sources = 2.0 * C * 300.0 ;
+      }
+    }
+  }
+
+  return sources ;
+}

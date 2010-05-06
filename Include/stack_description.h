@@ -72,6 +72,8 @@ extern "C"
                                            double *capacities,
                                            double delta_time) ;
 
+  void fill_sources_stack_description (StackDescription *stkd,
+                                       double *sources) ;
 
 /******************************************************************************/
 

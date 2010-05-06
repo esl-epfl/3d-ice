@@ -156,16 +156,16 @@ fill_resistances_die
     layer = layer->Next
   )
   {
-     resistances = fill_resistances_layer
-                   (
+    resistances = fill_resistances_layer
+                  (
 #ifdef DEBUG_FILL_RESISTANCES
-                     debug,
+                    debug,
 #endif
-                     layer,
-                     resistances,
-                     dim,
-                     current_layer
-                   ) ;
+                    layer,
+                    resistances,
+                    dim,
+                    current_layer
+                  ) ;
   }
 
   return resistances ;
@@ -208,18 +208,87 @@ fill_capacities_die
     layer = layer->Next
   )
   {
-     capacities = fill_capacities_layer
-                  (
+    capacities = fill_capacities_layer
+                 (
 #ifdef DEBUG_FILL_CAPACITIES
-                    debug,
-                    current_layer,
+                   debug,
+                   current_layer,
 #endif
-                    layer,
-                    capacities,
-                    dim,
-                    delta_time
-                  ) ;
+                   layer,
+                   capacities,
+                   dim,
+                   delta_time
+                 ) ;
   }
 
   return capacities ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+double *
+fill_sources_die
+(
+#ifdef DEBUG_FILL_SOURCES
+  FILE *debug,
+  int current_layer,
+#endif
+  Die *die,
+  Floorplan *floorplan,
+  double *sources,
+  Dimensions *dim
+)
+{
+  Layer *layer ;
+
+#ifdef DEBUG_FILL_SOURCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_sources_die %s floorplan %s\n",
+    sources, current_layer, die->Id, floorplan->FileName) ;
+#endif
+
+  for
+  (
+    layer = die->LayersList ;
+
+    layer != NULL ;
+
+#ifdef DEBUG_FILL_SOURCES
+    current_layer++,
+#endif
+    layer = layer->Next
+  )
+  {
+    if ( die->SourcesId == layer->Id )
+    {
+      sources = fill_sources_active_layer
+                (
+#ifdef DEBUG_FILL_SOURCES
+                  debug,
+                  current_layer,
+                  layer,
+#endif
+                  floorplan,
+                  sources,
+                  dim
+                ) ;
+    }
+    else
+    {
+      sources = fill_sources_empty_layer
+                (
+#ifdef DEBUG_FILL_SOURCES
+                  debug,
+                  current_layer,
+                  layer,
+#endif
+                  sources,
+                  dim
+                ) ;
+    }
+  }
+
+  return sources ;
 }

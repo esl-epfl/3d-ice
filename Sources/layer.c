@@ -233,3 +233,90 @@ fill_capacities_layer
 
   return capacities ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+double *
+fill_sources_active_layer
+(
+#ifdef DEBUG_FILL_SOURCES
+  FILE *debug,
+  int current_layer,
+  Layer *layer,
+#endif
+  Floorplan *floorplan,
+  double *sources,
+  Dimensions *dim
+)
+{
+  int row, column ;
+  double flp_el_surface, cell_surface ;
+  FloorplanElement *flp_el ;
+
+#ifdef DEBUG_FILL_SOURCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_sources_active_layer   %s\n",
+    sources, current_layer, layer->Material->Id) ;
+#endif
+
+  for
+  (
+    flp_el = floorplan->ElementsList ;
+    flp_el != NULL ;
+    flp_el = flp_el->Next
+  )
+  {
+
+    flp_el_surface = (double) (flp_el->Length * flp_el->Width) ;
+
+    for (row = flp_el->SW_Row ; row < flp_el->NE_Row ; row++ )
+    {
+      for (column = flp_el->SW_Column ; column < flp_el->NE_Column ; column++ )
+      {
+#ifdef DEBUG_FILL_SOURCES
+        fprintf (debug,
+          "cell l %5d r %5d c %5d\t%s %.5e\n",
+          current_layer, row, column, flp_el->Id, flp_el->PowerValue) ;
+#endif
+
+        cell_surface = dim->Cell.Width * get_cell_length(dim, column ) ;
+
+        *(sources + (row * dim->Grid.NColumns) + column)
+
+          = (flp_el->PowerValue * cell_surface) / flp_el_surface ;
+
+      } /* column */
+
+    } /* row */
+
+  } /* flp_el */
+
+  return sources + (dim->Grid.NRows * dim->Grid.NColumns) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+double *
+fill_sources_empty_layer
+(
+#ifdef DEBUG_FILL_SOURCES
+  FILE *debug,
+  int current_layer,
+  Layer *layer,
+#endif
+  double *sources,
+  Dimensions *dim
+)
+{
+#ifdef DEBUG_FILL_SOURCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_sources_empty_layer   %s\n",
+    sources, current_layer, layer->Material->Id) ;
+#endif
+
+  return sources + (dim->Grid.NRows * dim->Grid.NColumns) ;
+}

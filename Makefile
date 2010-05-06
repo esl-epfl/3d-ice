@@ -5,6 +5,7 @@
 # "make DEBUG=-g"
 # "make DEBUG=-DDEBUG_FILL_RESISTANCES"
 # "make DEBUG=-DDEBUG_FILL_CAPACITIES"
+# "make DEBUG=-DDEBUG_FILL_SOURCES"
 #
 
 CC              = gcc
@@ -31,8 +32,6 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/system_matrix.o               \
           Sources/resistances.o                 \
           Sources/data.o                        \
-          Sources/fill_sources.o                \
-          Sources/fill_capacities.o             \
           Sources/solve_system.o
 
 all: $(LIB)
@@ -144,16 +143,6 @@ Sources/resistances.o: Sources/resistances.c Include/resistances.h
 ################################################################################
 
 Sources/data.o: Sources/data.c Include/data.h
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
-
-################################################################################
-
-Sources/fill_sources.o: Sources/fill_sources.c Include/data.h
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
-
-################################################################################
-
-Sources/fill_capacities.o: Sources/fill_capacities.c Include/data.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################

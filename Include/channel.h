@@ -71,6 +71,15 @@ extern "C"
                                     Dimensions *dim,
                                     double delta_time) ;
 
+  double *fill_sources_channel (
+#ifdef DEBUG_FILL_SOURCES
+                                FILE *debug,
+                                int current_layer,
+#endif
+                                Channel *channel,
+                                double *sources,
+                                Dimensions *dim) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

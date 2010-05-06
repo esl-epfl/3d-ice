@@ -377,3 +377,113 @@ fill_capacities_stack_description
   fclose(debug) ;
 #endif
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+fill_sources_stack_description
+(
+  StackDescription *stkd,
+  double *sources
+)
+{
+  StackElement *stack_element ;
+
+#ifdef DEBUG_FILL_SOURCES
+  int current_layer ;
+
+  FILE *debug = fopen("fill_sources_stack_description.txt", "w") ;
+  if (debug == NULL)
+  {
+    perror("fill_sources_stack_description.txt") ;
+    return ;
+  }
+  fprintf (debug,
+    "%p fill_sources_stack_description ( l %d r %d c %d )\n",
+    sources,
+    stkd->Dimensions->Grid.NLayers,
+    stkd->Dimensions->Grid.NRows,
+    stkd->Dimensions->Grid.NColumns) ;
+#endif
+
+  for
+  (
+#ifdef DEBUG_FILL_SOURCES
+    current_layer = 0 ,
+#endif
+    stack_element = stkd->StackElementsList ;
+
+    stack_element != NULL ;
+
+#ifdef DEBUG_FILL_SOURCES
+    current_layer += stack_element->NLayers,
+#endif
+    stack_element = stack_element->Next
+  )
+  {
+    switch (stack_element->Type)
+    {
+      case TL_STACK_ELEMENT_DIE :
+
+        sources = fill_sources_die
+                  (
+#ifdef DEBUG_FILL_SOURCES
+                    debug,
+                    current_layer,
+#endif
+                    stack_element->Pointer.Die,
+                    stack_element->Floorplan,
+                    sources,
+                    stkd->Dimensions
+                  ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_LAYER :
+
+        sources = fill_sources_empty_layer
+                  (
+#ifdef DEBUG_FILL_SOURCES
+                    debug,
+                    current_layer,
+                    stack_element->Pointer.Layer,
+#endif
+                    sources,
+                    stkd->Dimensions
+                  ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_CHANNEL :
+
+        sources = fill_sources_channel
+                  (
+#ifdef DEBUG_FILL_SOURCES
+                    debug,
+                    current_layer,
+#endif
+                    stkd->Channel,
+                    sources,
+                    stkd->Dimensions
+                  ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_NONE :
+
+        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        return ;
+
+      default :
+
+        fprintf (stderr, "Error! Unknown stack element type %d\n",
+          stack_element->Type) ;
+        return ;
+
+    } /* stack_element->Type */
+
+  } /* stack_element */
+
+#ifdef DEBUG_FILL_SOURCES
+  fclose(debug) ;
+#endif
+}
