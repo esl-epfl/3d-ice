@@ -5,9 +5,14 @@
 #include "system_vector.h"
 
 int
-solve_system (SystemMatrix *SM_A,
-              SystemVector *SV_X,
-              SystemVector *SV_B)
+solve_system
+(
+  SystemMatrix *SM_A,
+  SystemVector *SV_X,
+  SystemVector *SV_B,
+  double delta_time,
+  double total_time
+)
 {
   SuperMatrix A, B, L, U, X;
 
@@ -68,9 +73,14 @@ solve_system (SystemMatrix *SM_A,
     SLU_DN, SLU_D, SLU_GE
   );
 
-  dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
-         &L, &U, NULL, 0, &B, &X, &rpg, &rcond, &ferr, &berr,
-         &mem_usage, &stat, &info);
+  for ( ; total_time > 0 ; total_time -= delta_time )
+  {
+    dgssvx(&options, &A, perm_c, perm_r, etree, equed, R, C,
+           &L, &U, NULL, 0, &B, &X, &rpg, &rcond, &ferr, &berr,
+           &mem_usage, &stat, &info);
+
+    options.Fact = FACTORED ;
+  }
 
   StatFree(&stat);
 
