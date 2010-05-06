@@ -65,8 +65,12 @@ extern "C"
                                 char *prefix,
                                 StackDescription *stkd) ;
 
-  void fill_resistances_stack_description(StackDescription *stkd,
-                                          Resistances *resistances) ;
+  void fill_resistances_stack_description (StackDescription *stkd,
+                                           Resistances *resistances) ;
+
+  void fill_capacities_stack_description  (StackDescription *stkd,
+                                           double *capacities,
+                                           double delta_time) ;
 
 
 /******************************************************************************/

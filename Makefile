@@ -4,6 +4,7 @@
 #
 # "make DEBUG=-g"
 # "make DEBUG=-DDEBUG_FILL_RESISTANCES"
+# "make DEBUG=-DDEBUG_FILL_CAPACITIES"
 #
 
 CC              = gcc

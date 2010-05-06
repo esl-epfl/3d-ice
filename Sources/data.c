@@ -103,9 +103,19 @@ fill_resistances
   Data *data
 )
 {
-  fill_resistances_stack_description(stkd, data->Resistances) ;
+  fill_resistances_stack_description (stkd, data->Resistances) ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+void
+fill_capacities
+(
+  StackDescription *stkd,
+  Data *data,
+  double delta_time)
+{
+  fill_capacities_stack_description (stkd, data->Capacities, delta_time) ;
+}

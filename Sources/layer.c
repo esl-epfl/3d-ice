@@ -175,3 +175,61 @@ fill_resistances_layer
 
   return resistances ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+static
+double
+capacity (double l, double w, double h, double s, double t)
+{
+  return (l * w * h * s) / t ;
+}
+
+double *
+fill_capacities_layer
+(
+#ifdef DEBUG_FILL_CAPACITIES
+  FILE *debug,
+  int current_layer,
+#endif
+  Layer *layer,
+  double *capacities,
+  Dimensions *dim,
+  double delta_time
+)
+{
+  int row, column ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_capacities_layer   %s\n",
+    capacities, current_layer, layer->Material->Id) ;
+#endif
+
+  for (row = 0 ; row < dim->Grid.NRows ; row++)
+  {
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, capacities++)
+    {
+#ifdef DEBUG_FILL_CAPACITIES
+      fprintf (debug,
+        "%p solid cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f sh %.5e\n",
+        capacities, current_layer, row, column,
+        get_cell_length(dim, column), dim->Cell.Width, layer->Height,
+        layer->Material->SpecificHeat) ;
+#endif
+
+      *capacities = capacity
+                    (
+                      get_cell_length(dim, column),
+                      dim->Cell.Width,
+                      layer->Height,
+                      layer->Material->SpecificHeat,
+                      delta_time
+                    ) ;
+    } /* column */
+  } /* row */
+
+  return capacities ;
+}

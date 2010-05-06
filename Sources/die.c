@@ -138,7 +138,7 @@ fill_resistances_die
   int current_layer
 )
 {
-  Layer *layer = die->LayersList ;
+  Layer *layer ;
 
 #ifdef DEBUG_FILL_RESISTANCES
   fprintf (debug,
@@ -146,7 +146,15 @@ fill_resistances_die
     resistances, current_layer, die->Id) ;
 #endif
 
-  for ( ; layer != NULL ; layer = layer->Next, current_layer++)
+  for
+  (
+    layer =  die->LayersList;
+
+    layer != NULL ;
+
+    current_layer++,
+    layer = layer->Next
+  )
   {
      resistances = fill_resistances_layer
                    (
@@ -166,3 +174,52 @@ fill_resistances_die
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+double *
+fill_capacities_die
+(
+#ifdef DEBUG_FILL_CAPACITIES
+  FILE *debug,
+  int current_layer,
+#endif
+  Die *die,
+  double *capacities,
+  Dimensions *dim,
+  double delta_time
+)
+{
+  Layer *layer ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_capacities_die     %s\n",
+    capacities, current_layer, die->Id) ;
+#endif
+
+  for
+  (
+    layer = die->LayersList ;
+
+    layer != NULL ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+    current_layer++,
+#endif
+    layer = layer->Next
+  )
+  {
+     capacities = fill_capacities_layer
+                  (
+#ifdef DEBUG_FILL_CAPACITIES
+                    debug,
+                    current_layer,
+#endif
+                    layer,
+                    capacities,
+                    dim,
+                    delta_time
+                  ) ;
+  }
+
+  return capacities ;
+}

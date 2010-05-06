@@ -264,3 +264,116 @@ fill_resistances_stack_description
   fclose (debug) ;
 #endif
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+fill_capacities_stack_description
+(
+  StackDescription *stkd,
+  double *capacities,
+  double delta_time
+)
+{
+  StackElement *stack_element ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+  int current_layer ;
+
+  FILE *debug = fopen("fill_capacities_stack_description.txt", "w") ;
+  if (debug == NULL)
+  {
+    perror("fill_capacities_stack_description.txt") ;
+    return ;
+  }
+  fprintf (debug,
+    "%p fill_capacities_stack_description ( l %d r %d c %d )\n",
+    capacities,
+    stkd->Dimensions->Grid.NLayers,
+    stkd->Dimensions->Grid.NRows,
+    stkd->Dimensions->Grid.NColumns) ;
+#endif
+
+  for
+  (
+#ifdef DEBUG_FILL_CAPACITIES
+    current_layer = 0 ,
+#endif
+    stack_element = stkd->StackElementsList ;
+
+    stack_element != NULL ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+    current_layer += stack_element->NLayers,
+#endif
+    stack_element = stack_element->Next
+  )
+  {
+    switch (stack_element->Type)
+    {
+      case TL_STACK_ELEMENT_DIE :
+
+        capacities = fill_capacities_die
+                     (
+#ifdef DEBUG_FILL_CAPACITIES
+                       debug,
+                       current_layer,
+#endif
+                       stack_element->Pointer.Die,
+                       capacities,
+                       stkd->Dimensions,
+                       delta_time
+                     ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_LAYER :
+
+        capacities = fill_capacities_layer
+                     (
+#ifdef DEBUG_FILL_CAPACITIES
+                       debug,
+                       current_layer,
+#endif
+                       stack_element->Pointer.Layer,
+                       capacities,
+                       stkd->Dimensions,
+                       delta_time
+                     ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_CHANNEL :
+
+        capacities = fill_capacities_channel
+                     (
+#ifdef DEBUG_FILL_CAPACITIES
+                       debug,
+                       current_layer,
+#endif
+                       stkd->Channel,
+                       capacities,
+                       stkd->Dimensions,
+                       delta_time
+                     ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_NONE :
+
+        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        return ;
+
+      default :
+
+        fprintf (stderr, "Error! Unknown stack element type %d\n",
+          stack_element->Type) ;
+        return ;
+
+    } /* stack_element->Type */
+
+  } /* stack_element */
+
+#ifdef DEBUG_FILL_CAPACITIES
+  fclose(debug) ;
+#endif
+}

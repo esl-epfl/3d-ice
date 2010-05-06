@@ -146,3 +146,84 @@ fill_resistances_channel
 
   return resistances ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+static
+double
+capacity (double l, double w, double h, double s, double t)
+{
+  return (l * w * h * s) / t ;
+}
+
+double *
+fill_capacities_channel
+(
+#ifdef DEBUG_FILL_CAPACITIES
+  FILE *debug,
+  int current_layer,
+#endif
+  Channel *channel,
+  double *capacities,
+  Dimensions *dim,
+  double delta_time
+)
+{
+  int row, column ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_capacities_channel %s\n",
+    capacities, current_layer, channel->WallMaterial->Id) ;
+#endif
+
+  for (row = 0 ; row < dim->Grid.NRows ; row++)
+  {
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, capacities++)
+    {
+      if (column % 2 == 0 ) /* Even -> Wall */
+      {
+#ifdef DEBUG_FILL_CAPACITIES
+      fprintf (debug,
+        "%p wall cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f sh %.5e\n",
+        capacities, current_layer, row, column,
+        get_cell_length(dim, column), dim->Cell.Width, channel->Height,
+        channel->WallMaterial->SpecificHeat) ;
+#endif
+
+        *capacities = capacity
+                      (
+                        get_cell_length(dim, column),
+                        dim->Cell.Width,
+                        channel->Height,
+                        channel->WallMaterial->SpecificHeat,
+                        delta_time
+                      ) ;
+      }
+      else                 /* Odd -> liquid */
+      {
+#ifdef DEBUG_FILL_CAPACITIES
+      fprintf (debug,
+        "%p wall cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f sh %.5e\n",
+        capacities, current_layer, row, column,
+        get_cell_length(dim, column), dim->Cell.Width, channel->Height,
+        channel->LiquidSH) ;
+#endif
+
+        *capacities  = capacity
+                       (
+                         get_cell_length(dim, column),
+                         dim->Cell.Width,
+                         channel->Height,
+                         channel->LiquidSH,
+                         delta_time
+                       ) ;
+      }
+
+    } /* column */
+  } /* row */
+
+  return capacities ;
+}

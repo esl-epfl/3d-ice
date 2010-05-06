@@ -77,6 +77,16 @@ extern "C"
                                        Dimensions *dim,
                                        int current_layer) ;
 
+  double *fill_capacities_layer (
+#ifdef DEBUG_FILL_CAPACITIES
+                                  FILE *debug,
+                                  int current_layer,
+#endif
+                                  Layer *layer,
+                                  double *capacities,
+                                  Dimensions *dim,
+                                  double delta_time) ;
+
 #ifdef __cplusplus
 }
 #endif
