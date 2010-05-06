@@ -126,3 +126,52 @@ get_layer_position (GridDimensions *gd, int layer)
     return TL_LAYER_CENTER ;
   }
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+Resistances *
+fill_resistances_layer
+(
+#ifdef DEBUG_FILL_RESISTANCES
+  FILE *debug,
+#endif
+  Layer *layer,
+  Resistances *resistances,
+  Dimensions *dim,
+  int current_layer
+)
+{
+  int row, column ;
+
+#ifdef DEBUG_FILL_RESISTANCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_resistances_layer   %s\n",
+    resistances, current_layer, layer->Material->Id) ;
+#endif
+
+  for (row = 0 ; row < dim->Grid.NRows ; row++)
+  {
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, resistances++)
+    {
+      fill_resistances_solid_cell
+      (
+#ifdef DEBUG_FILL_RESISTANCES
+        debug,
+        row,
+        column,
+#endif
+        resistances,
+        dim,
+        get_cell_length (dim, column),
+        dim->Cell.Width,
+        layer->Height,
+        layer->Material->ThermalConductivity,
+        current_layer
+      ) ;
+    } /* column */
+  } /* row */
+
+  return resistances ;
+}

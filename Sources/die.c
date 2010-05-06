@@ -121,3 +121,48 @@ find_die_in_list (Die* list, char *id)
 
   return list ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+Resistances *
+fill_resistances_die
+(
+#ifdef DEBUG_FILL_RESISTANCES
+  FILE *debug,
+#endif
+  Die *die,
+  Resistances *resistances,
+  Dimensions *dim,
+  int current_layer
+)
+{
+  Layer *layer = die->LayersList ;
+
+#ifdef DEBUG_FILL_RESISTANCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_resistances_die     %s\n",
+    resistances, current_layer, die->Id) ;
+#endif
+
+  for ( ; layer != NULL ; layer = layer->Next, current_layer++)
+  {
+     resistances = fill_resistances_layer
+                   (
+#ifdef DEBUG_FILL_RESISTANCES
+                     debug,
+#endif
+                     layer,
+                     resistances,
+                     dim,
+                     current_layer
+                   ) ;
+  }
+
+  return resistances ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

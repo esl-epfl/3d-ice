@@ -1,9 +1,13 @@
 #
 # Makefile
 #
+#
+# "make DEBUG=-g"
+# "make DEBUG=-DDEBUG_FILL_RESISTANCES"
+#
 
 CC              = gcc
-CFLAGS          = -Werror -Wall -Wextra -g
+CFLAGS          = -Werror -Wall -Wextra
 INCLUDE         = -IInclude
 LIB             = Lib/libTermalLibrary.a
 SUPERLU_INCLUDE = ../SuperLU_4.0/SRC/
@@ -41,33 +45,33 @@ $(LIB):	$(OBJECTS)
 ################################################################################
 
 Sources/dimensions.o: Sources/dimensions.c Include/dimensions.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/material.o: Sources/material.c Include/material.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/layer.o: Sources/layer.c Include/layer.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/floorplan_element.o: Sources/floorplan_element.c \
                              Include/floorplan_element.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/die.o: Sources/die.c Include/die.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ###############################################################################
 
 Sources/floorplan_parser.o: Sources/floorplan_parser.c
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 Sources/floorplan_parser.c : Bison/floorplan_parser.y
 	bison -d Bison/floorplan_parser.y
@@ -77,7 +81,7 @@ Sources/floorplan_parser.c : Bison/floorplan_parser.y
 
 Sources/floorplan_scanner.o: Sources/floorplan_scanner.c \
                              Sources/floorplan_parser.c
-	$(CC) -g -o $@ $(INCLUDE) -c $<
+	$(CC) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 Sources/floorplan_scanner.c : Flex/floorplan_scanner.l
 		flex Flex/floorplan_scanner.l
@@ -85,22 +89,22 @@ Sources/floorplan_scanner.c : Flex/floorplan_scanner.l
 ################################################################################
 
 Sources/floorplan.o: Sources/floorplan.c Include/floorplan.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/channel.o: Sources/channel.c Include/channel.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/stack_element.o: Sources/stack_element.c Include/stack_element.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/stack_description_parser.o: Sources/stack_description_parser.c
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 Sources/stack_description_parser.c : Bison/stack_description_parser.y
 	bison -d Bison/stack_description_parser.y
@@ -110,7 +114,7 @@ Sources/stack_description_parser.c : Bison/stack_description_parser.y
 
 Sources/stack_description_scanner.o: Sources/stack_description_scanner.c \
                                      Sources/stack_description_parser.c
-	$(CC) -g -o $@ $(INCLUDE) -c $<
+	$(CC) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 Sources/stack_description_scanner.c : Flex/stack_description_scanner.l
 	flex Flex/stack_description_scanner.l
@@ -119,42 +123,42 @@ Sources/stack_description_scanner.c : Flex/stack_description_scanner.l
 
 Sources/stack_description.o: Sources/stack_description.c \
                              Include/stack_description.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/system_vector.o: Sources/system_vector.c Include/system_vector.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/resistances.o: Sources/resistances.c Include/resistances.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/data.o: Sources/data.c Include/data.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/fill_sources.o: Sources/fill_sources.c Include/data.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/fill_capacities.o: Sources/fill_capacities.c Include/data.h
-	$(CC) $(CFLAGS) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
 Sources/solve_system.o: Sources/solve_system.c
-	$(CC) $(CFLAGS) -I$(SUPERLU_INCLUDE) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -I$(SUPERLU_INCLUDE) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 

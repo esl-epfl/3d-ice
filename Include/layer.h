@@ -18,6 +18,7 @@ extern "C"
 
 #include "material.h"
 #include "dimensions.h"
+#include "resistances.h"
 
 #include <stdio.h>
 
@@ -66,6 +67,15 @@ extern "C"
   Layer *find_layer_in_list (Layer *list, int id) ;
 
   LayerPosition_t get_layer_position (GridDimensions *gd, int layer) ;
+
+  Resistances *fill_resistances_layer (
+#ifdef DEBUG_FILL_RESISTANCES
+                                       FILE *debug,
+#endif
+                                       Layer *layer,
+                                       Resistances *resistances,
+                                       Dimensions *dim,
+                                       int current_layer) ;
 
 #ifdef __cplusplus
 }

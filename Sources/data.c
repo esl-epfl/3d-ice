@@ -59,6 +59,17 @@ alloc_and_init_data (Data *data, int size,
     return 0 ;
   }
 
+  data->Resistances
+    = (Resistances *) malloc ( sizeof(Resistances) * size ) ;
+
+  if (data->Resistances == NULL)
+  {
+    free (data->Temperatures) ;
+    free (data->Sources) ;
+    free (data->Capacities) ;
+    return 0 ;
+  }
+
   init_data (data->Temperatures, data->Size, temperature) ;
   init_data (data->Sources,      data->Size, source) ;
   init_data (data->Capacities,   data->Size, capacity) ;
@@ -78,4 +89,23 @@ free_data (Data *data)
   free (data->Temperatures) ;
   free (data->Sources) ;
   free (data->Capacities) ;
+  free (data->Resistances) ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+fill_resistances
+(
+  StackDescription *stkd,
+  Data *data
+)
+{
+  fill_resistances_stack_description(stkd, data->Resistances) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

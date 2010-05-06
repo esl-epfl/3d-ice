@@ -16,7 +16,7 @@ extern "C"
 {
 #endif
 
-#include "stack_description.h"
+#include "dimensions.h"
 
 /******************************************************************************
  *                                                                            *
@@ -26,22 +26,47 @@ extern "C"
 
   typedef struct
   {
-    double ResistanceNorth ;
-    double ResistanceSouth ;
+    double North ;
+    double South ;
 
-    double ResistanceEast ;
-    double ResistanceWest ;
+    double East ;
+    double West ;
 
-    double ResistanceTop ;
-    double ResistanceBottom ;
+    double Top ;
+    double Bottom ;
 
   } Resistances ;
 
 /******************************************************************************/
 
-  void build_resistances_grid (Resistances *grid, StackDescription *stkd) ;
+  void fill_resistances_solid_cell (
+#ifdef DEBUG_FILL_RESISTANCES
+                                    FILE *debug,
+                                    int row,
+                                    int column,
+#endif
+                                    Resistances *resistance,
+                                    Dimensions *dim,
+                                    double cell_length,
+                                    double cell_width,
+                                    double cell_height,
+                                    double thermal_conductivity,
+                                    int current_layer) ;
 
-/******************************************************************************/
+  void fill_resistances_liquid_cell (
+#ifdef DEBUG_FILL_RESISTANCES
+                                    FILE *debug,
+                                    int row,
+                                    int column,
+#endif
+                                    Resistances *resistance,
+                                    Dimensions *dim,
+                                    double cell_length,
+                                    double cell_width,
+                                    double cell_height,
+                                    double liquid_htc,
+                                    double liquid_sh,
+                                    int current_layer) ;
 
 #ifdef __cplusplus
 }

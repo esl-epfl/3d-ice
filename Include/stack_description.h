@@ -23,6 +23,7 @@ extern "C"
 #include "die.h"
 #include "stack_element.h"
 #include "dimensions.h"
+#include "resistances.h"
 
 /******************************************************************************
  *                                                                            *
@@ -63,6 +64,10 @@ extern "C"
   void print_stack_description (FILE *stream,
                                 char *prefix,
                                 StackDescription *stkd) ;
+
+  void fill_resistances_stack_description(StackDescription *stkd,
+                                          Resistances *resistances) ;
+
 
 /******************************************************************************/
 

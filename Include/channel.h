@@ -19,6 +19,7 @@ extern "C"
 #include <stdio.h>
 
 #include "material.h"
+#include "resistances.h"
 
 /******************************************************************************
  *                                                                            *
@@ -49,6 +50,15 @@ extern "C"
   void free_channel (Channel *channel) ;
 
   void print_channel (FILE *stream, char *prefix, Channel *channel) ;
+
+  Resistances *fill_resistances_channel (
+#ifdef DEBUG_FILL_RESISTANCES
+                                         FILE *debug,
+#endif
+                                         Channel *channel,
+                                         Resistances *resistances,
+                                         Dimensions *dim,
+                                         int current_layer) ;
 
 /******************************************************************************/
 

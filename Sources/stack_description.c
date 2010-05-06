@@ -160,3 +160,107 @@ fill_floorplans (StackDescription *stkd)
 
   return result ;
  }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+fill_resistances_stack_description
+(
+  StackDescription *stkd,
+  Resistances *resistances
+)
+{
+  StackElement *stack_element ;
+  int current_layer ;
+
+#ifdef DEBUG_FILL_RESISTANCES
+  FILE *debug = fopen("fill_resistances_stack_description.txt", "w") ;
+  if (debug == NULL)
+  {
+    perror("fill_resistances_stack_description.txt") ;
+    return ;
+  }
+  fprintf (debug,
+    "%p fill_resistances_stack_description ( l %d r %d c %d )\n",
+    resistances,
+    stkd->Dimensions->Grid.NLayers,
+    stkd->Dimensions->Grid.NRows,
+    stkd->Dimensions->Grid.NColumns) ;
+#endif
+
+  for
+  (
+    stack_element = stkd->StackElementsList,
+    current_layer = 0 ;
+
+    stack_element != NULL ;
+
+    current_layer += stack_element->NLayers,
+    stack_element = stack_element->Next
+  )
+  {
+    switch (stack_element->Type)
+    {
+      case TL_STACK_ELEMENT_DIE :
+
+        resistances = fill_resistances_die
+                      (
+#ifdef DEBUG_FILL_RESISTANCES
+                        debug,
+#endif
+                        stack_element->Pointer.Die,
+                        resistances,
+                        stkd->Dimensions,
+                        current_layer
+                      ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_LAYER :
+
+        resistances = fill_resistances_layer
+                      (
+#ifdef DEBUG_FILL_RESISTANCES
+                        debug,
+#endif
+                        stack_element->Pointer.Layer,
+                        resistances,
+                        stkd->Dimensions,
+                        current_layer
+                      ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_CHANNEL :
+
+        resistances = fill_resistances_channel
+                      (
+#ifdef DEBUG_FILL_RESISTANCES
+                        debug,
+#endif
+                        stkd->Channel,
+                        resistances,
+                        stkd->Dimensions,
+                        current_layer
+                      ) ;
+        break ;
+
+      case TL_STACK_ELEMENT_NONE :
+
+        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        return ;
+
+      default :
+
+        fprintf (stderr, "Error! Unknown stack element type %d\n",
+          stack_element->Type) ;
+        return ;
+
+    } /* stack_elementy->Type */
+
+  } /* stack_element */
+
+#ifdef DEBUG_FILL_RESISTANCES
+  fclose (debug) ;
+#endif
+}

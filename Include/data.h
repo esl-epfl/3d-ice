@@ -16,6 +16,7 @@ extern "C"
 {
 #endif
 
+#include "resistances.h"
 #include "stack_description.h"
 
 /******************************************************************************
@@ -26,9 +27,10 @@ extern "C"
 
   typedef struct
   {
-    double *Temperatures ;
-    double *Sources ;
-    double *Capacities ;
+    double      *Temperatures ;
+    double      *Sources ;
+    double      *Capacities ;
+    Resistances *Resistances ;
 
     int Size ;
 
@@ -44,6 +46,8 @@ extern "C"
   void fill_sources    (Data *data, StackDescription *stkd) ;
 
   void fill_capacities (Data *data, StackDescription *stkd, double delta_time) ;
+
+  void fill_resistances (StackDescription *stkd, Data *data) ;
 
 #ifdef __cplusplus
 }

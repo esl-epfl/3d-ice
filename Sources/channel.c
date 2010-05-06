@@ -50,6 +50,8 @@ free_channel (Channel *channel)
 }
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 void print_channel (FILE *stream, char *prefix, Channel *channel)
 {
@@ -72,4 +74,75 @@ void print_channel (FILE *stream, char *prefix, Channel *channel)
   }
   else
     fprintf(stream, "%s  Wall material not specified\n", prefix) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+Resistances *
+fill_resistances_channel
+(
+#ifdef DEBUG_FILL_RESISTANCES
+  FILE *debug,
+#endif
+  Channel *channel,
+  Resistances *resistances,
+  Dimensions *dim,
+  int current_layer
+)
+{
+  int row, column ;
+
+#ifdef DEBUG_FILL_RESISTANCES
+  fprintf (debug,
+    "%p current_layer = %d\tfill_resistances_channel %s\n",
+    resistances, current_layer, channel->WallMaterial->Id) ;
+#endif
+
+  for (row = 0 ; row < dim->Grid.NRows ; row++)
+  {
+    for (column = 0 ; column < dim->Grid.NColumns ; column++, resistances++)
+    {
+      if (column % 2 == 0) // Even -> wall
+      {
+        fill_resistances_solid_cell
+        (
+#ifdef DEBUG_FILL_RESISTANCES
+          debug,
+          row,
+          column,
+#endif
+          resistances,
+          dim,
+          get_cell_length (dim, column),
+          dim->Cell.Width,
+          channel->Height,
+          channel->WallMaterial->ThermalConductivity,
+          current_layer
+        ) ;
+      }
+      else                 // Odd -> channel
+      {
+        fill_resistances_liquid_cell
+        (
+#ifdef DEBUG_FILL_RESISTANCES
+          debug,
+          row,
+          column,
+#endif
+          resistances,
+          dim,
+          get_cell_length (dim, column),
+          dim->Cell.Width,
+          channel->Height,
+          channel->LiquidHTC,
+          channel->LiquidSH,
+          current_layer
+        ) ;
+      }
+    } /* column */
+  } /* row */
+
+  return resistances ;
 }

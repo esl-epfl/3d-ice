@@ -19,6 +19,7 @@ extern "C"
 #include <stdio.h>
 
 #include "layer.h"
+#include "resistances.h"
 
 /******************************************************************************
  *                                                                            *
@@ -57,6 +58,15 @@ extern "C"
   void print_dies_list (FILE *stream, char* prefix, Die *list) ;
 
   Die *find_die_in_list (Die *list, char *id) ;
+
+  Resistances *fill_resistances_die (
+#ifdef DEBUG_FILL_RESISTANCES
+                                     FILE *debug,
+#endif
+                                     Die *die,
+                                     Resistances *resistances,
+                                     Dimensions *dim,
+                                     int current_layer) ;
 
 /******************************************************************************/
 
