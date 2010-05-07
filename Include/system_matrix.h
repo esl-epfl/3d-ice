@@ -40,11 +40,43 @@ extern "C"
 
   int alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz) ;
 
-  void fill_system_matrix (SystemMatrix *matrix,
-                           StackDescription *stkd,
+  void fill_system_matrix (StackDescription *stkd,
+                           SystemMatrix *matrix,
                            Data *data) ;
 
   void free_system_matrix (SystemMatrix *matrix) ;
+
+  int add_solid_column
+  (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    FILE *debug,
+#endif
+    Dimensions *dim,
+    Resistances *resistances,
+    double *capacities,
+    int current_layer,
+    int current_row,
+    int current_column,
+    int *columns,
+    int *rows,
+    double *values
+  ) ;
+
+  int add_liquid_column
+  (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    FILE *debug,
+#endif
+    Dimensions *dim,
+    Resistances *resistances,
+    double *capacities,
+    int current_layer,
+    int current_row,
+    int current_column,
+    int *columns,
+    int *rows,
+    double *values
+  ) ;
 
 /******************************************************************************/
 

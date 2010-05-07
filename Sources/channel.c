@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "channel.h"
+#include "system_matrix.h"
 
 void
 init_channel (Channel* channel)
@@ -228,7 +229,6 @@ fill_capacities_channel
   return capacities ;
 }
 
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -273,4 +273,79 @@ fill_sources_channel
   }
 
   return sources ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+fill_system_matrix_channel
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE *debug,
+  Channel *channel,
+#endif
+  Dimensions *dim,
+  Resistances *resistances,
+  double *capacities,
+  int *columns,
+  int *rows,
+  double *values,
+  int current_layer
+)
+{
+  int current_row, current_column, added, tot_added ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug,
+    "%p %p %p %p %p (l %2d) fill_system_matrix_channel %s \n",
+    resistances, capacities, columns, rows, values,
+    current_layer, channel->WallMaterial->Id) ;
+#endif
+
+  for (current_row = 0 ; current_row < dim->Grid.NRows ; current_row++)
+  {
+    for
+    (
+      added          = 0,
+      tot_added      = 0,
+      current_column = 0 ;
+
+      current_column < dim->Grid.NColumns ;
+
+      resistances    ++,
+      capacities     ++,
+      columns        ++,
+      rows           += added,
+      values         += added,
+      tot_added      += added,
+      current_column ++
+    )
+    {
+       if (current_column % 2 == 0 ) /* Even -> Wall */
+       {
+         added = add_solid_column (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                   debug,
+#endif
+                   dim, resistances, capacities,
+                   current_layer, current_row, current_column,
+                   columns, rows, values) ;
+       }
+       else                  /* Odd -> liquid */
+       {
+         added = add_liquid_column (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                   debug,
+#endif
+                   dim, resistances, capacities,
+                   current_layer, current_row, current_column,
+                   columns, rows, values) ;
+       }
+    } /* column */
+
+  } /* row */
+
+  return tot_added ;
 }

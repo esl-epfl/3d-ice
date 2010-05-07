@@ -12,18 +12,6 @@
 
 #define PARALLEL(x,y) ( (x * y) / ( x + y) )
 
-static int    *__columns ;
-static int    *__rows ;
-static double *__values ;
-static Resistances *__cell_grid ;
-static double *__capacities ;
-static int    __layer ;
-static int    __cell_index ;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-static FILE   *debug ;
-#endif
-
 int
 alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz)
 {
@@ -76,156 +64,200 @@ void free_system_matrix (SystemMatrix *matrix)
 /******************************************************************************/
 /******************************************************************************/
 
-static
 void
-add_solid_column (GridDimensions *gd, int row, int column)
+fill_system_matrix
+(
+  StackDescription *stkd,
+  SystemMatrix *matrix,
+  Data *data
+)
+{
+  fill_system_matrix_stack_description (stkd,
+    data->Resistances, data->Capacities,
+    matrix->Columns, matrix->Rows, matrix->Values) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+add_solid_column
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE        *debug,
+#endif
+  Dimensions  *dim,
+  Resistances *resistances,
+  double      *capacities,
+  int         current_layer,
+  int         current_row,
+  int         current_column,
+  int         *columns,
+  int         *rows,
+  double      *values
+)
 {
   double resistance        = 0.0 ;
   double diagonal_value    = 0.0 ;
   double *diagonal_pointer = NULL ;
   int    neighbour         = 0 ;
+  int    added             = 0 ;
+  int current_cell
+    = current_layer * (dim->Grid.NRows * dim->Grid.NColumns)
+      + current_row * dim->Grid.NColumns
+      + current_column ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "add_solid_column l %d r %d c %d (%d)\n",
-    __layer, row, column, __cell_index) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fpos_t diag_fposition, last_fpos ;
+  fprintf (debug,
+    "%p %p %p %p %p add_solid_column  (l %2d r %5d c %5d) -> %5d\n",
+    resistances, capacities, columns, rows, values,
+    current_layer, current_row, current_column, current_cell) ;
 #endif
 
-  *__columns = *(__columns - 1) ;
+  *columns = *(columns - 1) ;
 
-  if ( __layer > 0 )   /* BOTTOM */
+  if ( current_layer > 0 )   /* BOTTOM */
   {
-    *__rows++ = neighbour = __cell_index - (gd->NRows * gd->NColumns) ;
+    *rows++ = neighbour
+      = current_cell - (dim->Grid.NRows * dim->Grid.NColumns) ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].Bottom,
-                           __cell_grid[neighbour].Top) ;
+    resistance = PARALLEL (resistances->Bottom,
+                           (resistances + neighbour)->Top) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  %7d bottom  \t%d\t%.4e = %.4e || %.4e\n",
-      *__rows, neighbour, *(__values-1),
-      __cell_grid[__cell_index].Bottom,
-      __cell_grid[neighbour].Top) ;
-#endif
-  }
-
-  if ( row > 0 )   /* SOUTH */
-  {
-    *__rows++ = neighbour = __cell_index - gd->NColumns ;
-
-    resistance = PARALLEL (__cell_grid[__cell_index].South,
-                           __cell_grid[neighbour].North) ;
-
-    *__values++     = -resistance ;
-    diagonal_value +=  resistance ;
-
-    (*__columns)++ ;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  south   \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].South,
-      __cell_grid[neighbour].North) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->Bottom, (resistances + neighbour)->Top) ;
 #endif
   }
 
-  if ( column > 0 )   /* WEST */
+  if ( current_row > 0 )   /* SOUTH */
   {
-    *__rows++ = neighbour = __cell_index - 1 ;
+    *rows++ = neighbour = current_cell - dim->Grid.NColumns ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].West,
-                           __cell_grid[neighbour].East) ;
+    resistance = PARALLEL (resistances->South,
+                           (resistances + neighbour)->North) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  west    \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].West,
-      __cell_grid[neighbour].East) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  south   \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->South, (resistances + neighbour)->North) ;
+#endif
+  }
+
+  if ( current_column > 0 )   /* WEST */
+  {
+    *rows++ = neighbour = current_cell - 1 ;
+
+    resistance = PARALLEL (resistances->West,
+                           (resistances + neighbour)->East) ;
+
+    *values++       = -resistance ;
+    diagonal_value +=  resistance ;
+
+    (*columns)++ ;
+    added++ ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  west    \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->West, (resistances + neighbour)->East) ;
 #endif
     }
 
   /* DIAGONAL */
 
-  *__rows++        = __cell_index ;
-  *__values        = __capacities[__cell_index] ;
-  diagonal_pointer = __values++ ;
+  *rows++          = current_cell ;
+  *values          = *capacities ;
+  diagonal_pointer = values++ ;
 
-  (*__columns)++ ;
+  (*columns)++ ;
+  added ++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf
-  (
-    debug,
-    "  diagonal\t%d\n",
-    __cell_index
-  ) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug, "  diagonal\t%d\t ", current_cell) ;
+  fgetpos (debug, &diag_fposition) ;
+  fprintf (debug, "           \n") ;
 #endif
 
-  if ( column < gd->NColumns - 1 )   /* EAST */
+  if ( current_column < dim->Grid.NColumns - 1 )   /* EAST */
   {
-    *__rows++ = neighbour = __cell_index + 1 ;
+    *rows++ = neighbour = current_cell + 1 ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].East,
-                           __cell_grid[neighbour].West) ;
+    resistance = PARALLEL (resistances->East,
+                           (resistances + neighbour)->West) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added ++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  east    \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].East,
-      __cell_grid[neighbour].West) ;
-#endif
-  }
-
-  if ( row < gd->NRows - 1 )   /* NORTH */
-  {
-    *__rows++ = neighbour = __cell_index + gd->NColumns ;
-
-    resistance = PARALLEL (__cell_grid[__cell_index].North,
-                           __cell_grid[neighbour].South) ;
-
-    *__values++     = -resistance ;
-    diagonal_value +=  resistance ;
-
-    (*__columns)++ ;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  north   \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].North,
-      __cell_grid[neighbour].South) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  east    \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->East, (resistances + neighbour)->West) ;
 #endif
   }
 
-  if ( __layer < gd->NLayers - 1) /* TOP */
+  if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
-    *__rows++ = neighbour = __cell_index + (gd->NColumns * gd->NRows) ;
+    *rows++ = neighbour = current_cell + dim->Grid.NColumns ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].Top,
-                           __cell_grid[neighbour].Bottom) ;
+    resistance = PARALLEL (resistances->North,
+                           (resistances + neighbour)->South) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  top     \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].Top,
-      __cell_grid[neighbour].Bottom) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  north   \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->North, (resistances + neighbour)->South) ;
+#endif
+  }
+
+  if ( current_layer < dim->Grid.NLayers - 1) /* TOP */
+  {
+    *rows++ = neighbour
+      = current_cell + (dim->Grid.NColumns * dim->Grid.NRows) ;
+
+    resistance = PARALLEL (resistances->Top,
+                           (resistances + neighbour)->Bottom) ;
+
+    *values++       = -resistance ;
+    diagonal_value +=  resistance ;
+
+    (*columns)++ ;
+    added++ ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  top     \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->Top, (resistances + neighbour)->Bottom) ;
 #endif
   }
 
@@ -233,147 +265,187 @@ add_solid_column (GridDimensions *gd, int row, int column)
 
   *diagonal_pointer += diagonal_value ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "  diagonal\t%.4e\n  columns \t%d\n",
-    *diagonal_pointer, *__columns) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fgetpos (debug, &last_fpos) ;
+  fsetpos (debug, &diag_fposition) ;
+  fprintf (debug, "%.5e", *diagonal_pointer) ;
+  fsetpos (debug, &last_fpos) ;
+
+  fprintf (debug, "  %d (+%d)\n", *columns, added) ;
 #endif
+
+  return added ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-static
-void
-add_liquid_column (GridDimensions *gd, int row, int column)
+int
+add_liquid_column
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE        *debug,
+#endif
+  Dimensions  *dim,
+  Resistances *resistances,
+  double      *capacities,
+  int         current_layer,
+  int         current_row,
+  int         current_column,
+  int         *columns,
+  int         *rows,
+  double      *values
+)
 {
-  double resistance        = 0.0;
+  double resistance        = 0.0 ;
   double diagonal_value    = 0.0 ;
   double *diagonal_pointer = NULL ;
   int    neighbour         = 0 ;
+  int    added             = 0 ;
+  int current_cell
+    = current_layer * (dim->Grid.NRows * dim->Grid.NColumns)
+      + current_row * dim->Grid.NColumns
+      + current_column ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "add_liquid_column l %d r %d c %d (%d)\n",
-    __layer, row, column, __cell_index) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fpos_t diag_fposition, last_fpos ;
+  fprintf (debug,
+    "%p %p %p %p %p add_liquid_column  (l %2d r %5d c %5d) -> %5d\n",
+    resistances, capacities, columns, rows, values,
+    current_layer, current_row, current_column, current_cell) ;
 #endif
 
-  *__columns = *(__columns - 1) ;
+  *columns = *(columns - 1) ;
 
-  if ( __layer > 0 )   /* BOTTOM */
+  if ( current_layer > 0 )   /* BOTTOM */
   {
-    *__rows++ = neighbour = __cell_index - (gd->NRows * gd->NColumns) ;
+    *rows++ = neighbour
+      = current_cell - (dim->Grid.NRows * dim->Grid.NColumns) ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].Bottom,
-                           __cell_grid[neighbour].Top) ;
+    resistance = PARALLEL (resistances->Bottom,
+                           (resistances + neighbour)->Top) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  bottom  \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].Bottom,
-      __cell_grid[neighbour].Top) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->Bottom, (resistances + neighbour)->Top) ;
 #endif
   }
 
-  if ( row > 0 )   /* SOUTH */
+  if ( current_row > 0 )   /* SOUTH */
   {
-    *__rows++   = __cell_index - gd->NColumns ;
-    *__values++ = __cell_grid[__cell_index].North ; // == (C)
+    *rows++   = current_cell - dim->Grid.NColumns ;
+    *values++ = resistances->North ; // == (C)
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  south   \t%d\t%.4e\n",
-      neighbour, __cell_grid[__cell_index].North) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  south   \t%d\t%.5e\n",
+      neighbour, resistances->North) ;
 #endif
   }
 
-  if ( column > 0 )   /* WEST */
+  if ( current_column > 0 )   /* WEST */
   {
-    *__rows++ = neighbour = __cell_index - 1 ;
+    *rows++ = neighbour = current_cell - 1 ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].West,
-                           __cell_grid[neighbour].East) ;
+    resistance = PARALLEL (resistances->West,
+                           (resistances + neighbour)->East) ;
 
-    *__values++      = -resistance ;
+    *values++        = -resistance ;
     diagonal_value  +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  west    \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].West,
-      __cell_grid[neighbour].East) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  west    \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->West, (resistances + neighbour)->East) ;
 #endif
   }
 
   /* DIAGONAL */
 
-  *__rows++        = __cell_index ;
-  *__values        = __capacities[__cell_index] ;
-  diagonal_pointer = __values++ ;
+  *rows++          = current_cell ;
+  *values          = *capacities ;
+  diagonal_pointer = values++ ;
 
-  (*__columns)++ ;
+  (*columns)++ ;
+  added++;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "  diagonal\t%d\n", __cell_index) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug, "  diagonal\t%d\t ", current_cell) ;
+  fgetpos (debug, &diag_fposition) ;
+  fprintf (debug, "           \n") ;
 #endif
 
-  if ( column < gd->NColumns - 1 )    /* EAST */
+  if ( current_column < dim->Grid.NColumns - 1 )    /* EAST */
   {
-    *__rows++ = neighbour = __cell_index + 1 ;
+    *rows++ = neighbour = current_cell + 1 ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].East,
-                           __cell_grid[neighbour].West) ;
+    resistance = PARALLEL (resistances->East,
+                           (resistances + neighbour)->West) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  east    \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].East,
-      __cell_grid[neighbour].West) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  east    \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->East, (resistances + neighbour)->West) ;
 #endif
   }
 
-  if ( row < gd->NRows - 1 )   /* NORTH */
+  if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
-    *__rows++   = __cell_index + gd->NColumns ;
-    *__values++ = __cell_grid[__cell_index].South ; // == -C
+    *rows++   = current_cell + dim->Grid.NColumns ;
+    *values++ = resistances->South ; // == -C
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added ++ ;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  north   \t%d\t%.4e\n",
-      neighbour, __cell_grid[__cell_index].South) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  north   \t%d\t%.5e\n",
+      neighbour, resistances->South) ;
 #endif
   }
 
-  if ( __layer < gd->NLayers - 1)  /* TOP */
+  if ( current_layer < dim->Grid.NLayers - 1)  /* TOP */
   {
-    *__rows++ = neighbour = __cell_index + (gd->NColumns * gd->NRows) ;
+    *rows++ = neighbour
+      = current_cell + (dim->Grid.NColumns * dim->Grid.NRows) ;
 
-    resistance = PARALLEL (__cell_grid[__cell_index].Top,
-                           __cell_grid[neighbour].Bottom) ;
+    resistance = PARALLEL (resistances->Top,
+                           (resistances + neighbour)->Bottom) ;
 
-    *__values++     = -resistance ;
+    *values++       = -resistance ;
     diagonal_value +=  resistance ;
 
-    (*__columns)++ ;
+    (*columns)++ ;
+    added++;
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-    fprintf (debug, "  top     \t%d\t%.4e = %.4e || %.4e\n",
-      neighbour, *(__values-1),
-      __cell_grid[__cell_index].Top,
-      __cell_grid[neighbour].Bottom) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    fprintf (debug,
+      "  top     \t%d\t%.5e = %.5e || %.5e\n",
+      neighbour, *(values-1),
+      resistances->Top, (resistances + neighbour)->Bottom) ;
 #endif
   }
 
@@ -381,167 +453,22 @@ add_liquid_column (GridDimensions *gd, int row, int column)
 
   *diagonal_pointer += diagonal_value ;
 
-  if (row == 0 || row == gd->NRows - 1)
+  if (current_row == 0 || current_row == dim->Grid.NRows - 1)
 
-    *diagonal_pointer += __cell_grid[__cell_index].North ; // == (C)
+    *diagonal_pointer += resistances->North ; // == (C)
 
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "  diagonal\t%.4e\n  columns \t%d\n",
-    *diagonal_pointer, *__columns) ;
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fgetpos (debug, &last_fpos) ;
+  fsetpos (debug, &diag_fposition) ;
+  fprintf (debug, "%.5e", *diagonal_pointer) ;
+  fsetpos (debug, &last_fpos) ;
+
+  fprintf (debug, "  %d (+%d)\n", *columns, added) ;
 #endif
+
+  return added ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-
-static
-void
-fill_system_matrix_layer (GridDimensions *gd)
-{
-  int row, column;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "build_system_matrix_layer       layer %d  cell %d\n",
-    __layer, __cell_index) ;
-#endif
-
-  for (row = 0 ; row < gd->NRows ; row++)
-  {
-    for (column = 0 ; column < gd->NColumns ;
-         column++, __columns++, __cell_index++)
-    {
-      add_solid_column (gd, row, column) ;
-    }
-  }
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-static
-void
-fill_system_matrix_die (GridDimensions *gd, Die *die)
-{
-  Layer* layer;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "build_system_matrix_die         layer %d  cell %d\n",
-    __layer, __cell_index) ;
-#endif
-
-  for (layer = die->LayersList ; layer != NULL ;
-       layer = layer->Next, __layer++)
-  {
-    fill_system_matrix_layer (gd) ;
-  }
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-static
-void
-fill_system_matrix_channel (GridDimensions *gd)
-{
-  int row, column;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fprintf (debug, "build_system_matrix_channel     layer %d  cell %d\n",
-    __layer, __cell_index) ;
-#endif
-
-  for (row = 0 ; row < gd->NRows ; row++)
-  {
-    for (column = 0 ; column < gd->NColumns ;
-         column++, __cell_index++, __columns++)
-    {
-      if (column % 2 == 0 ) // Even -> Wall
-      {
-        add_solid_column (gd, row, column) ;
-      }
-      else                  // Odd -> channel
-      {
-        add_liquid_column (gd, row, column) ;
-      }
-    }
-  }
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-fill_system_matrix (SystemMatrix *matrix, StackDescription *stkd, Data *data)
-{
-  StackElement *stack_element = stkd->StackElementsList ;
-
-  __columns    = matrix->Columns ;
-  __rows       = matrix->Rows    ;
-  __values     = matrix->Values  ;
-  __cell_grid  = malloc(sizeof(Resistances) * stkd->Dimensions->Grid.NCells);
-  __capacities = data->Capacities ;
-  __layer      = 0 ;
-  __cell_index = 0 ;
-
-  *__columns++ = 0 ;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  debug = fopen("build_system_matrix.txt", "w") ;
-  if (debug == NULL)
-  {
-    perror("build_system_matrix.txt") ;
-    return ;
-  }
-  fprintf (debug, "build_system_matrix (l %d r %d c %d)\n",
-    stkd->Dimensions.Grid.NLayers,
-    stkd->Dimensions.Grid.NRows,
-    stkd->Dimensions.Grid.NColumns) ;
-#endif
-
-  for ( ; stack_element != NULL ; stack_element = stack_element->Next)
-  {
-    switch (stack_element->Type)
-    {
-      case TL_STACK_ELEMENT_DIE :
-
-        fill_system_matrix_die (&(stkd->Dimensions->Grid),
-                                stack_element->Pointer.Die) ;
-        break ;
-
-      case TL_STACK_ELEMENT_LAYER :
-
-        fill_system_matrix_layer (&(stkd->Dimensions->Grid)) ;
-        __layer++;
-        break ;
-
-      case TL_STACK_ELEMENT_CHANNEL :
-
-        fill_system_matrix_channel (&(stkd->Dimensions->Grid)) ;
-        __layer++;
-        break ;
-
-      case TL_STACK_ELEMENT_NONE :
-
-        fprintf (stderr, "Error! Found stack element with no type\n") ;
-        break ;
-
-      default :
-
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stack_element->Type) ;
-
-    } /* stack_element->Type */
-
-  } /* stack_element */
-
-  free(__cell_grid) ;
-
-#ifdef DEBUG_BUILD_SYSTEM_MATRIX
-  fclose(debug) ;
-#endif
-
-}

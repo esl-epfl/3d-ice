@@ -11,6 +11,7 @@
 #include <stdlib.h>
 
 #include "layer.h"
+#include "system_matrix.h"
 
 void init_layer (Layer *layer)
 {
@@ -319,4 +320,67 @@ fill_sources_empty_layer
 #endif
 
   return sources + (dim->Grid.NRows * dim->Grid.NColumns) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+fill_system_matrix_layer
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE *debug,
+  Layer *layer,
+#endif
+  Dimensions *dim,
+  Resistances *resistances,
+  double *capacities,
+  int *columns,
+  int *rows,
+  double *values,
+  int current_layer
+)
+{
+  int current_row, current_column, added, tot_added ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug,
+    "%p %p %p %p %p (l %2d) fill_system_matrix_layer %s\n",
+    resistances, capacities, columns, rows, values,
+    current_layer, layer->Material->Id) ;
+#endif
+
+  for (current_row = 0 ; current_row < dim->Grid.NRows ; current_row++)
+  {
+    for
+    (
+      added          = 0 ,
+      tot_added      = 0 ,
+      current_column = 0 ;
+
+      current_column < dim->Grid.NColumns ;
+
+      resistances    ++ ,
+      capacities     ++ ,
+      columns        ++ ,
+      rows           += added ,
+      values         += added ,
+      tot_added      += added ,
+      current_column ++
+    )
+    {
+      added = add_solid_column (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                debug,
+#endif
+                dim, resistances, capacities,
+                current_layer, current_row, current_column,
+                columns, rows, values) ;
+
+    } /* column */
+
+  } /* row */
+
+  return tot_added ;
 }

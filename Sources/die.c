@@ -292,3 +292,62 @@ fill_sources_die
 
   return sources ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+fill_system_matrix_die
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE *debug,
+#endif
+  Die *die,
+  Dimensions *dim,
+  Resistances *resistances,
+  double *capacities,
+  int *columns,
+  int *rows,
+  double *values,
+  int current_layer
+)
+{
+  Layer *layer ;
+  int tot_added, added, area ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug,
+    "%p %p %p %p %p (l %2d) fill_system_matrix_die\n",
+    resistances, capacities, columns, rows, values, current_layer) ;
+#endif
+
+  for
+  (
+    added     = 0 ,
+    tot_added = 0 ,
+    area      = dim->Grid.NRows * dim->Grid.NColumns ,
+    layer     = die->LayersList ;
+
+    layer != NULL ;
+
+    current_layer ++ ,
+    resistances   += area ,
+    capacities    += area ,
+    columns       += area ,
+    rows          += added ,
+    values        += added ,
+    tot_added     += added ,
+    layer          = layer->Next
+  )
+  {
+    added = fill_system_matrix_layer (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+              debug, layer,
+#endif
+              dim, resistances, capacities,
+              columns, rows, values, current_layer) ;
+  }
+
+  return tot_added ;
+}

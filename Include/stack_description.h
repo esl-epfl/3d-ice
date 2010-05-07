@@ -75,6 +75,14 @@ extern "C"
   void fill_sources_stack_description (StackDescription *stkd,
                                        double *sources) ;
 
+  void fill_system_matrix_stack_description (
+  StackDescription *stkd,
+  Resistances *resistances,
+  double *capacities,
+  int *columns,
+  int *rows,
+  double *values) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

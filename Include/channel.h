@@ -80,6 +80,22 @@ extern "C"
                                 double *sources,
                                 Dimensions *dim) ;
 
+  int fill_system_matrix_channel
+                (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                  FILE *debug,
+                  Channel *channel,
+#endif
+                  Dimensions *dim,
+                  Resistances *resistances,
+                  double *capacities,
+                  int *columns,
+                  int *rows,
+                  double *values,
+                  int current_layer
+                ) ;
+
+
 /******************************************************************************/
 
 #ifdef __cplusplus

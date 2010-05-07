@@ -89,6 +89,25 @@ extern "C"
                              double *sources,
                              Dimensions *dim) ;
 
+
+
+  int fill_system_matrix_die
+                (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                  FILE *debug,
+#endif
+                  Die *die,
+                  Dimensions *dim,
+                  Resistances *resistances,
+                  double *capacities,
+                  int *columns,
+                  int *rows,
+                  double *values,
+                  int current_layer
+                ) ;
+
+
+
 /******************************************************************************/
 
 #ifdef __cplusplus
