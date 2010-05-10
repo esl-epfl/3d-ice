@@ -83,6 +83,8 @@ extern "C"
   int *rows,
   double *values) ;
 
+  void update_power_values (StackDescription *stkd, double *power_values) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

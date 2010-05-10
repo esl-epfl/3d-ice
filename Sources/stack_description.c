@@ -597,3 +597,28 @@ fill_system_matrix_stack_description
   fclose (debug) ;
 #endif
 }
+
+
+void
+update_power_values
+(
+  StackDescription *stkd,
+  double *power_values
+)
+{
+  StackElement *stk_el ;
+
+  for
+  (
+    stk_el = stkd->StackElementsList ;
+    stk_el != NULL ;
+    stk_el = stk_el->Next
+  )
+  {
+    if (stk_el->Type == TL_STACK_ELEMENT_DIE)
+    {
+      update_floorplan_power_values (stk_el->Floorplan, power_values) ;
+      power_values += stk_el->Floorplan->NElements ;
+    }
+  }
+}
