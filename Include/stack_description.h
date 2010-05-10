@@ -83,7 +83,8 @@ extern "C"
   int *rows,
   double *values) ;
 
-  void update_power_values (StackDescription *stkd, double *power_values) ;
+  void update_stack_description_power_values (StackDescription *stkd,
+                                              double *power_values );
 
 /******************************************************************************/
 

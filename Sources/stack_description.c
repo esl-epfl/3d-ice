@@ -598,9 +598,12 @@ fill_system_matrix_stack_description
 #endif
 }
 
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 void
-update_power_values
+update_stack_description_power_values
 (
   StackDescription *stkd,
   double *power_values

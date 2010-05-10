@@ -333,3 +333,19 @@ solve_system
 
   return tdata->SLU_Info ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+update_power_values
+(
+  StackDescription *stkd,
+  ThermalData *tdata,
+  double *power_values
+)
+{
+  update_stack_description_power_values (stkd, power_values) ;
+  fill_sources_stack_description        (stkd, tdata->Sources) ;
+}
