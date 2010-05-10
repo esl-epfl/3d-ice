@@ -19,62 +19,148 @@ init_data (double *data, int size, double init_value)
   while (size--) *data++ = init_value ;
 }
 
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
 int
-alloc_and_init_thermal_data (ThermalData *tdata, int size,
-                             double temperature, double source, double capacity)
+alloc_and_init_thermal_data
+(
+  StackDescription *stkd,
+  ThermalData *tdata,
+  double initial_temperature,
+  double delta_time
+)
 {
   if (tdata == NULL) return 0 ;
 
-  tdata->Size = size ;
+  tdata->Size                = stkd->Dimensions->Grid.NCells ;
+  tdata->initial_temperature = initial_temperature ;
+  tdata->delta_time          = delta_time ;
 
-  tdata->Temperatures
-    = (double *) malloc ( sizeof(double) * size ) ;
+  /* Memory allocation */
 
-  if (tdata->Temperatures == NULL)
-  {
-    return 0 ;
-  }
+  if ( (tdata->Temperatures
+         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
 
-  tdata->Sources
-    = (double *) malloc ( sizeof(double) * size ) ;
+    goto temperatures_fail ;
 
-  if (tdata->Sources == NULL)
-  {
-    free (tdata->Temperatures) ;
-    return 0 ;
-  }
+  if ( (tdata->Sources
+         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
 
-  tdata->Capacities
-    = (double *) malloc ( sizeof(double) * size ) ;
+    goto sources_fail ;
 
-  if (tdata->Capacities == NULL)
-  {
-    free (tdata->Temperatures) ;
-    free (tdata->Sources) ;
-    return 0 ;
-  }
+  if ( (tdata->Capacities
+        = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
 
-  tdata->Resistances
-    = (Resistances *) malloc ( sizeof(Resistances) * size ) ;
+    goto capacities_fail ;
 
-  if (tdata->Resistances == NULL)
-  {
-    free (tdata->Temperatures) ;
-    free (tdata->Sources) ;
-    free (tdata->Capacities) ;
-    return 0 ;
-  }
+  if ( (tdata->Resistances
+         = (Resistances *) malloc ( sizeof(Resistances)*tdata->Size )) == NULL)
 
-  init_data (tdata->Temperatures, size, temperature) ;
-  init_data (tdata->Sources,      size, source) ;
-  init_data (tdata->Capacities,   size, capacity) ;
+    goto resistances_fail ;
+
+  if ( (tdata->SLU_PermutationMatrixR
+         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+
+    goto slu_perm_r_fail ;
+
+  if ( (tdata->SLU_PermutationMatrixC
+    = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+
+    goto slu_perm_c_fail ;
+
+  if ( (tdata->SLU_Etree
+         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+
+    goto slu_etree_fail ;
+
+  if ( (tdata->SLU_RowsScaleFactors
+         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
+
+    goto slu_row_scale_fail ;
+
+  if ( (tdata->SLU_ColumnsScaleFactors
+         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
+
+    goto slu_column_scale_fail ;
+
+  if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
+                            stkd->Dimensions->Grid.NNz) == 0)
+    goto sm_a_fail ;
+
+  if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
+    goto sv_b_fail ;
+
+  if ( alloc_system_vector (&tdata->SV_X, tdata->Size) == 0 )
+    goto sv_x_fail ;
+
+  StatInit (&tdata->SLU_Stat) ;
+
+  /* Set initial values */
+
+  init_data (tdata->Temperatures, tdata->Size, initial_temperature) ;
+
+  init_data (tdata->Sources, tdata->Size, 0.0) ;
+
+  set_default_options (&tdata->SLU_Options) ;
+
+  tdata->SLU_Options.PrintStat       = NO ;
+  tdata->SLU_Options.Equil           = NO ;
+  tdata->SLU_Options.SymmetricMode   = YES ;
+  tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
+  tdata->SLU_Options.DiagPivotThresh = 0.01 ;
+
+  dCreate_CompCol_Matrix  /* Matrix A */
+  (
+    &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
+    tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns,
+    SLU_NC, SLU_D, SLU_GE
+  ) ;
+
+  dCreate_Dense_Matrix  /* Vector B */
+  (
+    &tdata->SLUMatrix_B, tdata->Size, 1,
+    tdata->SV_B.Values, tdata->Size,
+    SLU_DN, SLU_D, SLU_GE
+  );
+
+  dCreate_Dense_Matrix  /* Vector X */
+  (
+    &tdata->SLUMatrix_X, tdata->Size, 1,
+    tdata->SV_X.Values, tdata->Size,
+    SLU_DN, SLU_D, SLU_GE
+  );
 
   return 1 ;
+
+  /* Free if malloc errors */
+
+sv_x_fail :
+  free_system_vector (&tdata->SV_B) ;
+sv_b_fail :
+  free_system_matrix (&tdata->SM_A) ;
+sm_a_fail :
+  free (tdata->SLU_ColumnsScaleFactors) ;
+slu_column_scale_fail :
+  free (tdata->SLU_RowsScaleFactors) ;
+slu_row_scale_fail :
+  free (tdata->SLU_Etree) ;
+slu_etree_fail :
+  free (tdata->SLU_PermutationMatrixR);
+slu_perm_c_fail :
+  free (tdata->SLU_PermutationMatrixR) ;
+slu_perm_r_fail :
+  free (tdata->Resistances) ;
+resistances_fail :
+  free (tdata->Capacities) ;
+capacities_fail :
+  free (tdata->Sources) ;
+sources_fail :
+  free (tdata->Temperatures) ;
+temperatures_fail :
+
+  return 0 ;
 }
 
 /******************************************************************************/
@@ -90,6 +176,23 @@ free_thermal_data (ThermalData *tdata)
   free (tdata->Sources) ;
   free (tdata->Capacities) ;
   free (tdata->Resistances) ;
+  free (tdata->SLU_PermutationMatrixR) ;
+  free (tdata->SLU_PermutationMatrixC) ;
+  free (tdata->SLU_Etree) ;
+  free (tdata->SLU_RowsScaleFactors) ;
+  free (tdata->SLU_ColumnsScaleFactors) ;
+
+  StatFree (&tdata->SLU_Stat) ;
+
+  Destroy_CompCol_Matrix (&tdata->SLUMatrix_A) ;
+  //free_system_matrix (&tdata->SM_A) ;
+
+  Destroy_Dense_Matrix (&tdata->SLUMatrix_B);
+  //free_system_vector (&tdata->SV_B) ;
+
+  Destroy_Dense_Matrix (&tdata->SLUMatrix_X);
+  //free_system_vector (&tdata->SV_X) ;
+
 }
 
 /******************************************************************************/
@@ -97,40 +200,78 @@ free_thermal_data (ThermalData *tdata)
 /******************************************************************************/
 
 void
-fill_resistances
+fill_thermal_data
 (
   StackDescription *stkd,
   ThermalData *tdata
 )
 {
-  fill_resistances_stack_description (stkd, tdata->Resistances) ;
-}
+  fill_resistances_stack_description
+  (
+    stkd,
+    tdata->Resistances
+  ) ;
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
+  fill_capacities_stack_description
+  (
+    stkd,
+    tdata->Capacities,
+    tdata->delta_time
+  ) ;
 
-void
-fill_capacities
-(
-  StackDescription *stkd,
-  ThermalData *tdata,
-  double delta_time
-)
-{
-  fill_capacities_stack_description (stkd, tdata->Capacities, delta_time) ;
-}
+  fill_sources_stack_description
+  (
+    stkd,
+    tdata->Sources
+  ) ;
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
+  fill_system_matrix
+  (
+    stkd,
+    &tdata->SM_A,
+    tdata->Resistances,
+    tdata->Capacities
+  );
 
-void
-fill_sources
-(
-  StackDescription *stkd,
-  ThermalData *tdata
-)
-{
-  fill_sources_stack_description (stkd, tdata->Sources) ;
+  fill_system_vector
+  (
+    &tdata->SV_B,
+    tdata->Sources,
+    tdata->Capacities,
+    tdata->Temperatures
+  );
+
+
+//  get_perm_c
+//  (
+//    tdata->SLU_Options.ColPerm,
+//    &tdata->SLUMatrix_A,
+//    tdata->SLU_PermutationMatrixC
+//  ) ;
+//
+//  sp_preorder
+//  (
+//    &tdata->SLU_Options,
+//    &tdata->SLUMatrix_A,
+//    tdata->SLU_PermutationMatrixC,
+//    tdata->SLU_Etree,
+//    &tdata->SLUMatrix_A
+//  );
+//
+//  dgstrf
+//  (
+//    &tdata->SLU_Options,
+//    &tdata->SLUMatrix_A,
+//    sp_ienv(2), sp_ienv(1), /* relax and panel size */
+//    tdata->SLU_Etree,
+//    NULL, 0,                /* work and lwork */
+//    tdata->SLU_PermutationMatrixC,
+//    tdata->SLU_PermutationMatrixR,
+//    &tdata->SLUMatrix_L,
+//    &tdata->SLUMatrix_U,
+//    &tdata->SLU_Stat,
+//    &tdata->SLU_Info
+//  ) ;
+//
+//  return tdata->SLU_Info ;
 }

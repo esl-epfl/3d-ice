@@ -8,8 +8,8 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_DATA_H_
-#define _TL_DATA_H_
+#ifndef _TL_THERMAL_DATA_H_
+#define _TL_THERMAL_DATA_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -18,6 +18,9 @@ extern "C"
 
 #include "resistances.h"
 #include "stack_description.h"
+#include "system_matrix.h"
+#include "system_vector.h"
+#include "slu_ddefs.h"
 
 /******************************************************************************
  *                                                                            *
@@ -32,25 +35,54 @@ extern "C"
     double      *Capacities ;
     Resistances *Resistances ;
 
-    int Size ;
+    int    Size ;
+    double initial_temperature ,
+           delta_time ;
+
+    SystemMatrix SM_A ;
+    SystemVector SV_B ;
+    SystemVector SV_X ;
+
+    SuperMatrix SLUMatrix_A ,
+                SLUMatrix_B ,
+                SLUMatrix_L ,
+                SLUMatrix_U ,
+                SLUMatrix_X ;
+
+    SuperLUStat_t     SLU_Stat ;
+    superlu_options_t SLU_Options ;
+    mem_usage_t       SLU_MemUsage ;
+
+    int    SLU_Info ,
+           *SLU_PermutationMatrixR ,
+           *SLU_PermutationMatrixC ,
+           *SLU_Etree ;
+    double SLU_rpg ,
+           SLU_rcond ,
+           SLU_ferr ,
+           SLU_berr ,
+           *SLU_RowsScaleFactors ,
+           *SLU_ColumnsScaleFactors ;
+
+    char   SLU_equed[1] ;
 
   } ThermalData ;
 
 /******************************************************************************/
 
-  int alloc_and_init_thermal_data (ThermalData *tdata, int size,
-                           double temperature, double source, double capacity) ;
+  int alloc_and_init_thermal_data
+  (
+    StackDescription *stkd,
+    ThermalData *tdata,
+    double initial_temperature,
+    double delta_time
+  ) ;
 
   void free_thermal_data (ThermalData *tdata) ;
 
-  void fill_resistances (StackDescription *stkd, ThermalData *tdata) ;
-
-  void fill_capacities (StackDescription *stkd,
-                        ThermalData *tdata, double delta_time) ;
-
-  void fill_sources (StackDescription *stkd, ThermalData *tdata) ;
+  void fill_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* _TL_DATA_H_ */
+#endif /* _TL_THERMAL_DATA_H_ */

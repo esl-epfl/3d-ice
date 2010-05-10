@@ -69,11 +69,12 @@ fill_system_matrix
 (
   StackDescription *stkd,
   SystemMatrix *matrix,
-  ThermalData *tdata
+  Resistances *resistances,
+  double *capacities
 )
 {
   fill_system_matrix_stack_description (stkd,
-    tdata->Resistances, tdata->Capacities,
+    resistances, capacities,
     matrix->Columns, matrix->Rows, matrix->Values) ;
 }
 

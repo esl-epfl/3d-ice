@@ -144,7 +144,7 @@ Sources/resistances.o: Sources/resistances.c Include/resistances.h
 ################################################################################
 
 Sources/thermal_data.o: Sources/thermal_data.c Include/thermal_data.h
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -I$(SUPERLU_INCLUDE) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
 
