@@ -241,7 +241,6 @@ fill_thermal_data
     tdata->Temperatures
   );
 
-
 //  get_perm_c
 //  (
 //    tdata->SLU_Options.ColPerm,
@@ -347,5 +346,10 @@ update_power_values
 )
 {
   update_stack_description_power_values (stkd, power_values) ;
+
   fill_sources_stack_description        (stkd, tdata->Sources) ;
+
+  fill_system_vector (&tdata->SV_B,
+    tdata->Sources, tdata->Capacities, tdata->Temperatures) ;
+
 }
