@@ -218,13 +218,14 @@ align_to_grid (Floorplan *floorplan,
 /******************************************************************************/
 
 void
-insert_power_values (Floorplan *floorplan, double *values)
+update_floorplan_power_values (Floorplan *floorplan, double *values)
 {
-  FloorplanElement *floorplan_element = floorplan->ElementsList ;
+  FloorplanElement *floorplan_element ;
 
-  for ( ;
-       floorplan_element != NULL ;
-       floorplan_element = floorplan_element->Next )
+  for
+  ( floorplan_element = floorplan->ElementsList ;
+    floorplan_element != NULL ;
+    floorplan_element = floorplan_element->Next )
   {
     floorplan_element->PowerValue = *values++ ;
   }

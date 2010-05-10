@@ -62,7 +62,7 @@ extern "C"
                      FloorplanElement *floorplan_element,
                      Dimensions *dim) ;
 
-  void insert_power_values (Floorplan *floorplan, double *values) ;
+  void update_floorplan_power_values (Floorplan *floorplan, double *values) ;
 
 /******************************************************************************/
 
