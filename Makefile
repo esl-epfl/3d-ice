@@ -32,7 +32,7 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
           Sources/resistances.o                 \
-          Sources/data.o                        \
+          Sources/thermal_data.o                \
           Sources/solve_system.o
 
 all: $(LIB)
@@ -143,7 +143,7 @@ Sources/resistances.o: Sources/resistances.c Include/resistances.h
 
 ################################################################################
 
-Sources/data.o: Sources/data.c Include/data.h
+Sources/thermal_data.o: Sources/thermal_data.c Include/thermal_data.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################

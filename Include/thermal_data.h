@@ -34,20 +34,21 @@ extern "C"
 
     int Size ;
 
-  } Data ;
+  } ThermalData ;
 
 /******************************************************************************/
 
-  int alloc_and_init_data (Data *data, int size,
+  int alloc_and_init_thermal_data (ThermalData *tdata, int size,
                            double temperature, double source, double capacity) ;
 
-  void free_data (Data *data) ;
+  void free_thermal_data (ThermalData *tdata) ;
 
-  void fill_resistances (StackDescription *stkd, Data *data) ;
+  void fill_resistances (StackDescription *stkd, ThermalData *tdata) ;
 
-  void fill_capacities (StackDescription *stkd, Data *data, double delta_time) ;
+  void fill_capacities (StackDescription *stkd,
+                        ThermalData *tdata, double delta_time) ;
 
-  void fill_sources (StackDescription *stkd, Data *data) ;
+  void fill_sources (StackDescription *stkd, ThermalData *tdata) ;
 
 #ifdef __cplusplus
 }

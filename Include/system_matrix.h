@@ -17,7 +17,7 @@ extern "C"
 #endif
 
 #include "stack_description.h"
-#include "data.h"
+#include "thermal_data.h"
 
 /******************************************************************************
  *                                                                            *
@@ -42,7 +42,7 @@ extern "C"
 
   void fill_system_matrix (StackDescription *stkd,
                            SystemMatrix *matrix,
-                           Data *data) ;
+                           ThermalData *tdata) ;
 
   void free_system_matrix (SystemMatrix *matrix) ;
 

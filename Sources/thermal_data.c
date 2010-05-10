@@ -10,7 +10,7 @@
 
 #include <stdlib.h>
 
-#include "data.h"
+#include "thermal_data.h"
 
 static
 void
@@ -25,54 +25,54 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-alloc_and_init_data (Data *data, int size,
-                     double temperature, double source, double capacity)
+alloc_and_init_thermal_data (ThermalData *tdata, int size,
+                             double temperature, double source, double capacity)
 {
-  if (data == NULL) return 0 ;
+  if (tdata == NULL) return 0 ;
 
-  data->Size = size ;
+  tdata->Size = size ;
 
-  data->Temperatures
+  tdata->Temperatures
     = (double *) malloc ( sizeof(double) * size ) ;
 
-  if (data->Temperatures == NULL)
+  if (tdata->Temperatures == NULL)
   {
     return 0 ;
   }
 
-  data->Sources
+  tdata->Sources
     = (double *) malloc ( sizeof(double) * size ) ;
 
-  if (data->Sources == NULL)
+  if (tdata->Sources == NULL)
   {
-    free (data->Temperatures) ;
+    free (tdata->Temperatures) ;
     return 0 ;
   }
 
-  data->Capacities
+  tdata->Capacities
     = (double *) malloc ( sizeof(double) * size ) ;
 
-  if (data->Capacities == NULL)
+  if (tdata->Capacities == NULL)
   {
-    free (data->Temperatures) ;
-    free (data->Sources) ;
+    free (tdata->Temperatures) ;
+    free (tdata->Sources) ;
     return 0 ;
   }
 
-  data->Resistances
+  tdata->Resistances
     = (Resistances *) malloc ( sizeof(Resistances) * size ) ;
 
-  if (data->Resistances == NULL)
+  if (tdata->Resistances == NULL)
   {
-    free (data->Temperatures) ;
-    free (data->Sources) ;
-    free (data->Capacities) ;
+    free (tdata->Temperatures) ;
+    free (tdata->Sources) ;
+    free (tdata->Capacities) ;
     return 0 ;
   }
 
-  init_data (data->Temperatures, data->Size, temperature) ;
-  init_data (data->Sources,      data->Size, source) ;
-  init_data (data->Capacities,   data->Size, capacity) ;
+  init_data (tdata->Temperatures, size, temperature) ;
+  init_data (tdata->Sources,      size, source) ;
+  init_data (tdata->Capacities,   size, capacity) ;
 
   return 1 ;
 }
@@ -82,14 +82,14 @@ alloc_and_init_data (Data *data, int size,
 /******************************************************************************/
 
 void
-free_data (Data *data)
+free_thermal_data (ThermalData *tdata)
 {
-  if (data == NULL) return ;
+  if (tdata == NULL) return ;
 
-  free (data->Temperatures) ;
-  free (data->Sources) ;
-  free (data->Capacities) ;
-  free (data->Resistances) ;
+  free (tdata->Temperatures) ;
+  free (tdata->Sources) ;
+  free (tdata->Capacities) ;
+  free (tdata->Resistances) ;
 }
 
 /******************************************************************************/
@@ -100,10 +100,10 @@ void
 fill_resistances
 (
   StackDescription *stkd,
-  Data *data
+  ThermalData *tdata
 )
 {
-  fill_resistances_stack_description (stkd, data->Resistances) ;
+  fill_resistances_stack_description (stkd, tdata->Resistances) ;
 }
 
 /******************************************************************************/
@@ -114,11 +114,11 @@ void
 fill_capacities
 (
   StackDescription *stkd,
-  Data *data,
+  ThermalData *tdata,
   double delta_time
 )
 {
-  fill_capacities_stack_description (stkd, data->Capacities, delta_time) ;
+  fill_capacities_stack_description (stkd, tdata->Capacities, delta_time) ;
 }
 
 /******************************************************************************/
@@ -129,8 +129,8 @@ void
 fill_sources
 (
   StackDescription *stkd,
-  Data *data
+  ThermalData *tdata
 )
 {
-  fill_sources_stack_description (stkd, data->Sources) ;
+  fill_sources_stack_description (stkd, tdata->Sources) ;
 }
