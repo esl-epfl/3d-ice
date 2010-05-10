@@ -286,6 +286,8 @@ solve_system
   double total_time
 )
 {
+  int counter ;
+
   for
   ( ;
     tdata->SLU_Info != 0 && total_time > 0 ;
@@ -318,6 +320,10 @@ solve_system
 
     tdata->SLU_Options.Fact = FACTORED ;
   }
+
+  for (counter = 0; counter < tdata->SV_X.Size ; counter++)
+    tdata->Temperatures = tdata->SV_X.Values ;
+
 //    dgstrs
 //    (
 //      NOTRANS,
