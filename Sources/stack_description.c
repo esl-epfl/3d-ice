@@ -652,3 +652,86 @@ get_number_of_floorplan_elements_in_floorplan
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+void
+insert_power_values
+(
+  StackDescription *stkd,
+  double *power_values
+)
+{
+  StackElement *stk_el = stkd->StackElementsList;
+
+  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
+  {
+    if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
+    {
+      insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
+      power_values += stk_el->Floorplan->NElements ;
+    }
+  }
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+insert_power_values_in_floorplan
+(
+  StackDescription *stkd,
+  int stack_element_id,
+  double *power_values
+)
+{
+  StackElement *stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+insert_power_value_in_floorplan_element
+(
+  StackDescription *stkd,
+  int stack_element_id,
+  char *floorplan_element_id,
+  double power_value
+)
+{
+  StackElement *stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  return insert_power_value_floorplan_element
+         (
+           stk_el->Floorplan,
+           floorplan_element_id,
+           power_value
+         ) ;
+}

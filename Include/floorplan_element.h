@@ -66,6 +66,9 @@ extern "C"
 
   void free_floorplan_elements_list (FloorplanElement *list) ;
 
+  FloorplanElement *find_floorplan_element_in_list (FloorplanElement *list,
+                                                    char *id) ;
+
   void print_floorplan_element (FILE *stream,
                                 char *prefix,
                                 FloorplanElement *floorplan_element) ;

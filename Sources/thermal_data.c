@@ -341,7 +341,7 @@ solve_system
 /******************************************************************************/
 
 void
-upadte_thermal_data
+update_thermal_data
 (
   StackDescription *stkd,
   ThermalData *tdata

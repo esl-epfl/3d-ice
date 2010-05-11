@@ -89,6 +89,17 @@ extern "C"
   int get_number_of_floorplan_elements_in_floorplan (StackDescription *stkd,
                                                      int stack_element_id) ;
 
+  void insert_power_values (StackDescription *stkd, double *power_values) ;
+
+  int insert_power_values_in_floorplan (StackDescription *stkd,
+                                        int stack_element_id,
+                                        double *power_values) ;
+
+  int insert_power_value_in_floorplan_element (StackDescription *stkd,
+                                               int stack_element_id,
+                                               char *floorplan_element_id,
+                                               double power_value) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

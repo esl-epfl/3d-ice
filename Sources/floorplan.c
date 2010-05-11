@@ -216,3 +216,52 @@ align_to_grid (Floorplan *floorplan,
 }
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+insert_power_values_floorplan
+(
+  Floorplan *floorplan,
+  double *power_values
+)
+{
+  FloorplanElement *flp_el = floorplan->ElementsList ;
+
+  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
+  {
+    flp_el->PowerValue = *power_values++ ;
+  }
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+insert_power_value_floorplan_element
+(
+  Floorplan *floorplan,
+  char *floorplan_element_id,
+  double power_value
+)
+{
+  FloorplanElement *flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
+
+  if (flp_el == NULL)
+
+    return -3 ;
+
+  flp_el->PowerValue = power_value ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+

@@ -8,6 +8,7 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
+#include <string.h>
 #include <stdlib.h>
 
 #include "floorplan_element.h"
@@ -118,6 +119,28 @@ print_floorplan_elements_list (FILE *stream,
   {
     print_floorplan_element(stream, prefix, list) ;
   }
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+FloorplanElement *
+find_floorplan_element_in_list
+(
+  FloorplanElement *list,
+  char *id
+)
+{
+  for (; list != NULL; list = list->Next)
+  {
+    if (strcmp (list->Id, id) == 0)
+    {
+      break ;
+    }
+  }
+
+  return list ;
 }
 
 /******************************************************************************/
