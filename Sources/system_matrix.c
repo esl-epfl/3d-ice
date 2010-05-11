@@ -10,7 +10,10 @@
 #include "resistances.h"
 #include "system_matrix.h"
 
-#define PARALLEL(x,y) ( (x * y) / ( x + y) )
+#define PARALLEL(x,y)      ( (x * y) / ( x + y) )
+#define LAYER_OFFSET(dim)  (dim->Grid.NRows * dim->Grid.NColumns)
+#define ROW_OFFSET(dim)    (dim->Grid.NColumns)
+#define COLUMN_OFFSET(dim) (1)
 
 int
 alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz)
@@ -102,11 +105,11 @@ add_solid_column
   double resistance        = 0.0 ;
   double diagonal_value    = 0.0 ;
   double *diagonal_pointer = NULL ;
-  int    neighbour         = 0 ;
   int    added             = 0 ;
+
   int current_cell
-    = current_layer * (dim->Grid.NRows * dim->Grid.NColumns)
-      + current_row * dim->Grid.NColumns
+    = current_layer * LAYER_OFFSET(dim)
+      + current_row * ROW_OFFSET(dim)
       + current_column ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
@@ -121,11 +124,10 @@ add_solid_column
 
   if ( current_layer > 0 )   /* BOTTOM */
   {
-    *rows++ = neighbour
-      = current_cell - (dim->Grid.NRows * dim->Grid.NColumns) ;
+    *rows++ = current_cell - LAYER_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->Bottom,
-                           (resistances + neighbour)->Top) ;
+                           (resistances - LAYER_OFFSET(dim))->Top) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -136,17 +138,17 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->Bottom, (resistances + neighbour)->Top) ;
+      *(rows-1), *(values-1),
+      resistances->Bottom, (resistances - LAYER_OFFSET(dim))->Top) ;
 #endif
   }
 
   if ( current_row > 0 )   /* SOUTH */
   {
-    *rows++ = neighbour = current_cell - dim->Grid.NColumns ;
+    *rows++ = current_cell - ROW_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->South,
-                           (resistances + neighbour)->North) ;
+                           (resistances - ROW_OFFSET(dim))->North) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -157,17 +159,17 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  south   \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->South, (resistances + neighbour)->North) ;
+      *(rows-1), *(values-1),
+      resistances->South, (resistances - ROW_OFFSET(dim))->North) ;
 #endif
   }
 
   if ( current_column > 0 )   /* WEST */
   {
-    *rows++ = neighbour = current_cell - 1 ;
+    *rows++ = current_cell - COLUMN_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->West,
-                           (resistances + neighbour)->East) ;
+                           (resistances - COLUMN_OFFSET(dim))->East) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -178,8 +180,8 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  west    \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->West, (resistances + neighbour)->East) ;
+      *(rows-1), *(values-1),
+      resistances->West, (resistances - COLUMN_OFFSET(dim))->East) ;
 #endif
     }
 
@@ -193,17 +195,17 @@ add_solid_column
   added ++ ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fprintf (debug, "  diagonal\t%d\t ", current_cell) ;
+  fprintf (debug, "  diagonal\t%d\t ", *(rows-1)) ;
   fgetpos (debug, &diag_fposition) ;
   fprintf (debug, "           \n") ;
 #endif
 
   if ( current_column < dim->Grid.NColumns - 1 )   /* EAST */
   {
-    *rows++ = neighbour = current_cell + 1 ;
+    *rows++ = current_cell + COLUMN_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->East,
-                           (resistances + neighbour)->West) ;
+                           (resistances + COLUMN_OFFSET(dim))->West) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -214,17 +216,17 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  east    \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->East, (resistances + neighbour)->West) ;
+      *(rows-1), *(values-1),
+      resistances->East, (resistances + COLUMN_OFFSET(dim))->West) ;
 #endif
   }
 
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
-    *rows++ = neighbour = current_cell + dim->Grid.NColumns ;
+    *rows++ = current_cell + ROW_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->North,
-                           (resistances + neighbour)->South) ;
+                           (resistances + ROW_OFFSET(dim))->South) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -235,18 +237,17 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  north   \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->North, (resistances + neighbour)->South) ;
+      *(rows-1), *(values-1),
+      resistances->North, (resistances + ROW_OFFSET(dim))->South) ;
 #endif
   }
 
   if ( current_layer < dim->Grid.NLayers - 1) /* TOP */
   {
-    *rows++ = neighbour
-      = current_cell + (dim->Grid.NColumns * dim->Grid.NRows) ;
+    *rows++ = current_cell + LAYER_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->Top,
-                           (resistances + neighbour)->Bottom) ;
+                           (resistances + LAYER_OFFSET(dim))->Bottom) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -257,8 +258,8 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  top     \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->Top, (resistances + neighbour)->Bottom) ;
+      *(rows-1), *(values-1),
+      resistances->Top, (resistances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
 
@@ -302,11 +303,10 @@ add_liquid_column
   double resistance        = 0.0 ;
   double diagonal_value    = 0.0 ;
   double *diagonal_pointer = NULL ;
-  int    neighbour         = 0 ;
   int    added             = 0 ;
   int current_cell
-    = current_layer * (dim->Grid.NRows * dim->Grid.NColumns)
-      + current_row * dim->Grid.NColumns
+    = current_layer * LAYER_OFFSET(dim)
+      + current_row * ROW_OFFSET(dim)
       + current_column ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
@@ -321,11 +321,10 @@ add_liquid_column
 
   if ( current_layer > 0 )   /* BOTTOM */
   {
-    *rows++ = neighbour
-      = current_cell - (dim->Grid.NRows * dim->Grid.NColumns) ;
+    *rows++ = current_cell - LAYER_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->Bottom,
-                           (resistances + neighbour)->Top) ;
+                           (resistances - LAYER_OFFSET(dim))->Top) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -336,14 +335,14 @@ add_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->Bottom, (resistances + neighbour)->Top) ;
+      *(rows-1), *(values-1),
+      resistances->Bottom, (resistances - LAYER_OFFSET(dim))->Top) ;
 #endif
   }
 
   if ( current_row > 0 )   /* SOUTH */
   {
-    *rows++   = current_cell - dim->Grid.NColumns ;
+    *rows++   = current_cell - ROW_OFFSET(dim) ;
     *values++ = resistances->North ; // == (C)
 
     (*columns)++ ;
@@ -351,17 +350,16 @@ add_liquid_column
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
-      "  south   \t%d\t%.5e\n",
-      neighbour, resistances->North) ;
+      "  south   \t%d\t%.5e\n", *(rows-1), *(values-1)) ;
 #endif
   }
 
   if ( current_column > 0 )   /* WEST */
   {
-    *rows++ = neighbour = current_cell - 1 ;
+    *rows++ = current_cell - COLUMN_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->West,
-                           (resistances + neighbour)->East) ;
+                           (resistances - COLUMN_OFFSET(dim))->East) ;
 
     *values++        = -resistance ;
     diagonal_value  +=  resistance ;
@@ -372,8 +370,8 @@ add_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  west    \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->West, (resistances + neighbour)->East) ;
+      *(rows-1), *(values-1),
+      resistances->West, (resistances - COLUMN_OFFSET(dim))->East) ;
 #endif
   }
 
@@ -387,17 +385,17 @@ add_liquid_column
   added++;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fprintf (debug, "  diagonal\t%d\t ", current_cell) ;
+  fprintf (debug, "  diagonal\t%d\t ", *(rows-1)) ;
   fgetpos (debug, &diag_fposition) ;
   fprintf (debug, "           \n") ;
 #endif
 
   if ( current_column < dim->Grid.NColumns - 1 )    /* EAST */
   {
-    *rows++ = neighbour = current_cell + 1 ;
+    *rows++ = current_cell + COLUMN_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->East,
-                           (resistances + neighbour)->West) ;
+                           (resistances + COLUMN_OFFSET(dim))->West) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -408,14 +406,14 @@ add_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  east    \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->East, (resistances + neighbour)->West) ;
+      *(rows-1), *(values-1),
+      resistances->East, (resistances + COLUMN_OFFSET(dim))->West) ;
 #endif
   }
 
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
-    *rows++   = current_cell + dim->Grid.NColumns ;
+    *rows++   = current_cell + ROW_OFFSET(dim) ;
     *values++ = resistances->South ; // == -C
 
     (*columns)++ ;
@@ -423,18 +421,16 @@ add_liquid_column
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
-      "  north   \t%d\t%.5e\n",
-      neighbour, resistances->South) ;
+      "  north   \t%d\t%.5e\n", *(rows-1), *(values-1)) ;
 #endif
   }
 
   if ( current_layer < dim->Grid.NLayers - 1)  /* TOP */
   {
-    *rows++ = neighbour
-      = current_cell + (dim->Grid.NColumns * dim->Grid.NRows) ;
+    *rows++ = current_cell + LAYER_OFFSET(dim) ;
 
     resistance = PARALLEL (resistances->Top,
-                           (resistances + neighbour)->Bottom) ;
+                           (resistances + LAYER_OFFSET(dim))->Bottom) ;
 
     *values++       = -resistance ;
     diagonal_value +=  resistance ;
@@ -445,8 +441,8 @@ add_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     fprintf (debug,
       "  top     \t%d\t%.5e = %.5e || %.5e\n",
-      neighbour, *(values-1),
-      resistances->Top, (resistances + neighbour)->Bottom) ;
+      *(rows-1), *(values-1),
+      resistances->Top, (resistances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
 

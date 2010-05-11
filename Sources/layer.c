@@ -213,14 +213,6 @@ fill_capacities_layer
   {
     for (column = 0 ; column < dim->Grid.NColumns ; column++, capacities++)
     {
-#ifdef DEBUG_FILL_CAPACITIES
-      fprintf (debug,
-        "%p solid cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f sh %.5e\n",
-        capacities, current_layer, row, column,
-        get_cell_length(dim, column), dim->Cell.Width, layer->Height,
-        layer->Material->SpecificHeat) ;
-#endif
-
       *capacities = capacity
                     (
                       get_cell_length(dim, column),
@@ -229,6 +221,15 @@ fill_capacities_layer
                       layer->Material->SpecificHeat,
                       delta_time
                     ) ;
+
+#ifdef DEBUG_FILL_CAPACITIES
+      fprintf (debug,
+        "%p solid cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f " \
+        "sh %.5e %.5e --> %.5e\n",
+        capacities, current_layer, row, column,
+        get_cell_length(dim, column), dim->Cell.Width, layer->Height,
+        layer->Material->SpecificHeat, delta_time, *capacities) ;
+#endif
     } /* column */
   } /* row */
 
@@ -342,7 +343,7 @@ fill_system_matrix_layer
   int current_layer
 )
 {
-  int current_row, current_column, added, tot_added ;
+  int c_row, c_column, added, tot_added ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
@@ -351,23 +352,21 @@ fill_system_matrix_layer
     current_layer, layer->Material->Id) ;
 #endif
 
-  for (current_row = 0 ; current_row < dim->Grid.NRows ; current_row++)
+  for (tot_added = 0, c_row = 0 ; c_row < dim->Grid.NRows ; c_row++)
   {
     for
     (
-      added          = 0 ,
-      tot_added      = 0 ,
-      current_column = 0 ;
+      c_column = 0 ;
 
-      current_column < dim->Grid.NColumns ;
+      c_column < dim->Grid.NColumns ;
 
-      resistances    ++ ,
-      capacities     ++ ,
-      columns        ++ ,
-      rows           += added ,
-      values         += added ,
-      tot_added      += added ,
-      current_column ++
+      resistances ++ ,
+      capacities  ++ ,
+      columns     ++ ,
+      rows        += added ,
+      values      += added ,
+      tot_added   += added ,
+      c_column    ++
     )
     {
       added = add_solid_column (
@@ -375,7 +374,7 @@ fill_system_matrix_layer
                 debug,
 #endif
                 dim, resistances, capacities,
-                current_layer, current_row, current_column,
+                current_layer, c_row, c_column,
                 columns, rows, values) ;
 
     } /* column */

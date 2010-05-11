@@ -31,15 +31,6 @@ fill_resistances_solid_cell
   LayerPosition_t position
     = get_layer_position(&dimensions->Grid, current_layer) ;
 
-#ifdef DEBUG_FILL_RESISTANCES
-  fprintf (debug,
-    "%p fill_resistances_solid_cell\tl %2d (%d)  r %4d  c %4d" \
-                                  "\tl %5.2f  w %5.2f h %5.2f" \
-                                  "\ttc   %.4e\n",
-    resistances, current_layer, position, row, column,
-    cell_length, cell_width, cell_height, thermal_conductivity) ;
-#endif
-
   resistances->North = resistances->South
     = (thermal_conductivity * cell_length * cell_height ) / (cell_width / 2.0) ;
 
@@ -66,6 +57,18 @@ fill_resistances_solid_cell
     resistances->Top = resistances->Bottom
      = (thermal_conductivity * cell_length * cell_width) / (cell_height / 2.0) ;
   }
+
+#ifdef DEBUG_FILL_RESISTANCES
+  fprintf (debug,
+    "%p fill_resistances_solid_cell\tl %2d (%d)  r %4d  c %4d" \
+    "\tl %5.2f  w %5.2f h %5.2f\ttc   %.4e"                    \
+    "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
+    resistances, current_layer, position, row, column,
+    cell_length, cell_width, cell_height, thermal_conductivity,
+    resistances->North, resistances->South, resistances->East,
+    resistances->West, resistances->Top, resistances->Bottom) ;
+#endif
+
 }
 
 /******************************************************************************/
@@ -107,15 +110,6 @@ fill_resistances_liquid_cell
 
   double C = liquid_sh * 1.62e6 * (cell_length * cell_height ) * 0.5;
 
-#ifdef DEBUG_FILL_RESISTANCES
-  fprintf (debug,
-    "%p fill_resistances_liquid_cell\tl %2d (%d)  r %4d  c %4d" \
-                                   "\tl %5.2f  w %5.2f  h %5.2f" \
-                                   "\tlhtc %.4e lsh %.4e\n",
-    resistances, current_layer, position, row, column,
-    cell_length, cell_width, cell_height, liquid_htc, liquid_sh) ;
-#endif
-
   if (position == TL_LAYER_BOTTOM)
   {
     fprintf (stderr, "Warning: channel on bottom layer not supported\n") ;
@@ -133,6 +127,17 @@ fill_resistances_liquid_cell
 
   resistances->Top = resistances->Bottom
     = liquid_htc * cell_width * cell_length ;
+
+#ifdef DEBUG_FILL_RESISTANCES
+  fprintf (debug,
+    "%p fill_resistances_liquid_cell\tl %2d (%d)  r %4d  c %4d" \
+    "\tl %5.2f  w %5.2f  h %5.2f\tlhtc %.4e lsh %.4e"           \
+    "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
+    resistances, current_layer, position, row, column,
+    cell_length, cell_width, cell_height, liquid_htc, liquid_sh,
+    resistances->North, resistances->South, resistances->East,
+    resistances->West, resistances->Top, resistances->Bottom) ;
+#endif
 }
 
 /******************************************************************************/
