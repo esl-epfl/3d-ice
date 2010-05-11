@@ -261,12 +261,14 @@ fill_sources_channel
     {
       if (row == 0 && column % 2 != 0) /* Only first row and odd columns */
       {
+        *sources = 2.0 * C * 300.0 ;
 #ifdef DEBUG_FILL_SOURCES
       fprintf (debug,
-        "%p liquid cell l %5d r %5d c %5d\n",
-        sources, current_layer, row, column) ;
+        "liquid cell l %5d r %5d c %5d (%6d) -> %.5e\n",
+        current_layer, row, column,
+        current_layer * (dim->Grid.NColumns * dim->Grid.NRows)
+          + row * dim->Grid.NColumns + column, *sources) ;
 #endif
-        *sources = 2.0 * C * 300.0 ;
       }
 
     }

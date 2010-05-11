@@ -273,21 +273,25 @@ fill_sources_active_layer
 
     flp_el_surface = (double) (flp_el->Length * flp_el->Width) ;
 
-    for (row = flp_el->SW_Row ; row < flp_el->NE_Row ; row++ )
+    for (row = flp_el->SW_Row ; row <= flp_el->NE_Row ; row++ )
     {
       for (column = flp_el->SW_Column ; column < flp_el->NE_Column ; column++ )
       {
-#ifdef DEBUG_FILL_SOURCES
-        fprintf (debug,
-          "cell l %5d r %5d c %5d\t%s %.5e\n",
-          current_layer, row, column, flp_el->Id, flp_el->PowerValue) ;
-#endif
-
         cell_surface = dim->Cell.Width * get_cell_length(dim, column ) ;
 
         *(sources + (row * dim->Grid.NColumns) + column)
 
           = (flp_el->PowerValue * cell_surface) / flp_el_surface ;
+
+#ifdef DEBUG_FILL_SOURCES
+        fprintf (debug,
+          "cell l %5d r %5d c %5d (%6d)\t%s %.5e -> %.5e\n",
+          current_layer, row, column,
+          current_layer * (dim->Grid.NColumns * dim->Grid.NRows)
+          + row * dim->Grid.NColumns + column,
+          flp_el->Id, flp_el->PowerValue,
+          *(sources + (row * dim->Grid.NColumns) + column)) ;
+#endif
 
       } /* column */
 
