@@ -62,8 +62,6 @@ extern "C"
                      FloorplanElement *floorplan_element,
                      Dimensions *dim) ;
 
-  void update_floorplan_power_values (Floorplan *floorplan, double *values) ;
-
 /******************************************************************************/
 
 #ifdef __cplusplus

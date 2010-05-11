@@ -83,10 +83,6 @@ extern "C"
 
   int solve_system (ThermalData *tdata, double total_time) ;
 
-  void update_power_values (StackDescription *stkd,
-                            ThermalData *tdata,
-                            double *power_values) ;
-
 #ifdef __cplusplus
 }
 #endif
