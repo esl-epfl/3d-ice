@@ -13,6 +13,9 @@
 
 #include "floorplan_element.h"
 
+#define MAX(a,b)  (((a) > (b)) ? (a) : (b))
+#define MIN(a,b)  (((a) < (b)) ? (a) : (b))
+
 void
 init_floorplan_element (FloorplanElement *floorplan_element)
 {
@@ -167,4 +170,155 @@ check_intersection (FloorplanElement *floorplan_element_a,
   }
 
   return 1;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+get_max_temperature_floorplan_element
+(
+  FloorplanElement *floorplan_element,
+  Dimensions *dim,
+  double *temperatures,
+  double *max_temperature
+)
+{
+  int row    = floorplan_element->SW_Row ;
+  int column = floorplan_element->SW_Column ;
+
+  *max_temperature = *(temperatures + row * dim->Grid.NColumns + column) ;
+
+  for ( ;
+       row <= floorplan_element->NE_Row ;
+       row++ )
+  {
+    for (column = floorplan_element->SW_Column ;
+         column < floorplan_element->NE_Column ;
+         column++ )
+    {
+      *max_temperature
+        = MAX
+          (
+            *(temperatures + row * dim->Grid.NColumns + column),
+            *max_temperature
+          ) ;
+    }
+  }
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+get_min_temperature_floorplan_element
+(
+  FloorplanElement *floorplan_element,
+  Dimensions *dim,
+  double *temperatures,
+  double *min_temperature
+)
+{
+  int row    = floorplan_element->SW_Row ;
+  int column = floorplan_element->SW_Column ;
+
+  *min_temperature = *(temperatures + row * dim->Grid.NColumns + column) ;
+
+  for ( ;
+       row <= floorplan_element->NE_Row ;
+       row++ )
+  {
+    for (column = floorplan_element->SW_Column ;
+         column < floorplan_element->NE_Column ;
+         column++ )
+    {
+      *min_temperature
+        = MIN
+          (
+            *(temperatures + row * dim->Grid.NColumns + column),
+            *min_temperature
+          ) ;
+    }
+  }
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+get_avg_temperature_floorplan_element
+(
+  FloorplanElement *floorplan_element,
+  Dimensions *dim,
+  double *temperatures,
+  double *avg_temperature
+)
+{
+  int row, column ;
+  double counter = 0.0 ;
+
+  *avg_temperature = 0.0 ;
+
+  for (row =  floorplan_element->SW_Row ;
+       row <= floorplan_element->NE_Row ;
+       row++ )
+  {
+    for (column = floorplan_element->SW_Column ;
+         column < floorplan_element->NE_Column ;
+         column++, counter++ )
+    {
+      *avg_temperature += *(temperatures + row * dim->Grid.NColumns + column) ;
+    }
+  }
+
+  *avg_temperature /= counter ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+get_min_avg_max_temperatures_floorplan_element
+(
+  FloorplanElement *floorplan_element,
+  Dimensions *dim,
+  double *temperatures,
+  double *min_temperature,
+  double *avg_temperature,
+  double *max_temperature
+)
+{
+  int row        = floorplan_element->SW_Row ;
+  int column     = floorplan_element->SW_Column ;
+  double counter = 0.0 ;
+  double temp ;
+
+  *max_temperature = *min_temperature
+    = *(temperatures + row * dim->Grid.NColumns + column) ;
+
+  *avg_temperature = 0.0 ;
+
+  for ( ;
+       row <= floorplan_element->NE_Row ;
+       row++ )
+  {
+    for (column = floorplan_element->SW_Column ;
+         column < floorplan_element->NE_Column ;
+         column++, counter++ )
+    {
+      temp = *(temperatures + row * dim->Grid.NColumns + column) ;
+
+      *max_temperature = MAX (temp, *max_temperature) ;
+
+      *min_temperature = MIN (temp, *min_temperature) ;
+
+      *avg_temperature += temp ;
+    }
+  }
+
+  *avg_temperature /= counter ;
 }

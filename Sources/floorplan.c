@@ -265,3 +265,146 @@ insert_power_value_floorplan_element
 /******************************************************************************/
 /******************************************************************************/
 
+int
+get_max_temperature_floorplan
+(
+  Floorplan *floorplan,
+  char *floorplan_element_id,
+  Dimensions *dim,
+  double *temperatures,
+  double *max_temperature
+)
+{
+  FloorplanElement *flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
+
+  if (flp_el == NULL)
+
+    return -3 ;
+
+  get_max_temperature_floorplan_element
+  (
+    flp_el,
+    dim,
+    temperatures,
+    max_temperature
+  );
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_min_temperature_floorplan
+(
+  Floorplan *floorplan,
+  char *floorplan_element_id,
+  Dimensions *dim,
+  double *temperatures,
+  double *min_temperature
+)
+{
+  FloorplanElement *flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
+
+  if (flp_el == NULL)
+
+    return -3 ;
+
+  get_min_temperature_floorplan_element
+  (
+    flp_el,
+    dim,
+    temperatures,
+    min_temperature
+  );
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_avg_temperature_floorplan
+(
+  Floorplan *floorplan,
+  char *floorplan_element_id,
+  Dimensions *dim,
+  double *temperatures,
+  double *avg_temperature
+)
+{
+  FloorplanElement *flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
+
+  if (flp_el == NULL)
+
+    return -3 ;
+
+  get_avg_temperature_floorplan_element
+  (
+    flp_el,
+    dim,
+    temperatures,
+    avg_temperature
+  );
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_min_avg_max_temperatures_floorplan
+(
+  Floorplan *floorplan,
+  char *floorplan_element_id,
+  Dimensions *dim,
+  double *temperatures,
+  double *min_temperature,
+  double *avg_temperature,
+  double *max_temperature
+)
+{
+  FloorplanElement *flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
+
+  if (flp_el == NULL)
+
+    return -3 ;
+
+  get_min_avg_max_temperatures_floorplan_element
+  (
+    flp_el,
+    dim,
+    temperatures,
+    min_temperature,
+    avg_temperature,
+    max_temperature
+  );
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

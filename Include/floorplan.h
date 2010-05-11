@@ -72,6 +72,37 @@ extern "C"
                                             char *floorplan_element_id,
                                             double power_value) ;
 
+  int get_max_temperature_floorplan
+      ( Floorplan *floorplan,
+        char *floorplan_element_id,
+        Dimensions *dim,
+        double *temperatures,
+        double *max_temperature);
+
+  int get_min_temperature_floorplan
+      ( Floorplan *floorplan,
+        char *floorplan_element_id,
+        Dimensions *dim,
+        double *temperatures,
+        double *min_temperature);
+
+  int get_avg_temperature_floorplan
+      ( Floorplan *floorplan,
+        char *floorplan_element_id,
+        Dimensions *dim,
+        double *temperatures,
+        double *avg_temperature);
+
+  int get_min_avg_max_temperatures_floorplan
+      ( Floorplan *floorplan,
+        char *floorplan_element_id,
+        Dimensions *dim,
+        double *temperatures,
+        double *min_temperature,
+        double *avg_temperature,
+        double *max_temperature);
+
+
 /******************************************************************************/
 
 #ifdef __cplusplus

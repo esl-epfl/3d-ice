@@ -18,6 +18,8 @@ extern "C"
 
 #include <stdio.h>
 
+#include "dimensions.h"
+
 /******************************************************************************
  *                                                                            *
  * "FloorplanElement" : the representation of a single element composing a    *
@@ -79,6 +81,32 @@ extern "C"
 
   int check_intersection (FloorplanElement *floorplan_element_a,
                           FloorplanElement *floorplan_element_b) ;
+
+  void get_max_temperature_floorplan_element
+       ( FloorplanElement *floorplan_element,
+         Dimensions *dim,
+         double *temperatures,
+         double *max_temperature);
+
+  void get_min_temperature_floorplan_element
+       ( FloorplanElement *floorplan_element,
+         Dimensions *dim,
+         double *temperatures,
+         double *min_temperature);
+
+  void get_avg_temperature_floorplan_element
+       ( FloorplanElement *floorplan_element,
+         Dimensions *dim,
+         double *temperatures,
+         double *avg_temperature);
+
+  void get_min_avg_max_temperatures_floorplan_element
+       ( FloorplanElement *floorplan_element,
+         Dimensions *dim,
+         double *temperatures,
+         double *min_temperature,
+         double *avg_temperature,
+         double *max_temperature);
 
 /******************************************************************************/
 

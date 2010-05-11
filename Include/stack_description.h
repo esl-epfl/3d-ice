@@ -100,6 +100,32 @@ extern "C"
                                                char *floorplan_element_id,
                                                double power_value) ;
 
+  int get_max_temperature_in_floorplan_element (StackDescription *stkd,
+                                                int stack_element_id,
+                                                char *floorplan_element_id,
+                                                double *temperatures,
+                                                double *max_temperature) ;
+
+  int get_min_temperature_in_floorplan_element (StackDescription *stkd,
+                                                int stack_element_id,
+                                                char *floorplan_element_id,
+                                                double *temperatures,
+                                                double *min_temperature) ;
+
+  int get_avg_temperature_in_floorplan_element (StackDescription *stkd,
+                                                int stack_element_id,
+                                                char *floorplan_element_id,
+                                                double *temperatures,
+                                                double *avg_temperature) ;
+
+  int get_min_avg_max_temperatures_in_floorplan_element (StackDescription *stkd,
+                                                int stack_element_id,
+                                                char *floorplan_element_id,
+                                                double *temperatures,
+                                                double *min_temperature,
+                                                double *avg_temperature,
+                                                double *max_temperature) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus
