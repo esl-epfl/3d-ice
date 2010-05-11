@@ -83,6 +83,12 @@ extern "C"
   int *rows,
   double *values) ;
 
+
+  int get_total_number_of_floorplan_elements (StackDescription *stkd) ;
+
+  int get_number_of_floorplan_elements_in_floorplan (StackDescription *stkd,
+                                                     int stack_element_id) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

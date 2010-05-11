@@ -601,3 +601,54 @@ fill_system_matrix_stack_description
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+int
+get_total_number_of_floorplan_elements
+(
+  StackDescription *stkd
+)
+{
+  int          total   = 0 ;
+  StackElement *stk_el = stkd->StackElementsList;
+
+  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
+  {
+    if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
+    {
+      total += stk_el->Floorplan->NElements ;
+    }
+  }
+
+  return total ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_number_of_floorplan_elements_in_floorplan
+(
+  StackDescription *stkd,
+  int stack_element_id
+)
+{
+  StackElement *stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  return stk_el->Floorplan->NElements ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
