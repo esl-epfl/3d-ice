@@ -83,6 +83,8 @@ extern "C"
 
   int solve_system (ThermalData *tdata, double total_time) ;
 
+  void upadte_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
+
 #ifdef __cplusplus
 }
 #endif

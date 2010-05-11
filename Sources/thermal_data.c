@@ -339,3 +339,25 @@ solve_system
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+void
+upadte_thermal_data
+(
+  StackDescription *stkd,
+  ThermalData *tdata
+)
+{
+  fill_sources_stack_description
+  (
+    stkd,
+    tdata->Sources
+  ) ;
+
+  fill_system_vector
+  (
+    &tdata->SV_B,
+    tdata->Sources,
+    tdata->Capacities,
+    tdata->Temperatures
+  );
+}
