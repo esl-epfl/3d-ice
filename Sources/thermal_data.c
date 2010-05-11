@@ -92,9 +92,6 @@ alloc_and_init_thermal_data
   if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
     goto sv_b_fail ;
 
-  if ( alloc_system_vector (&tdata->SV_X, tdata->Size) == 0 )
-    goto sv_x_fail ;
-
   StatInit (&tdata->SLU_Stat) ;
 
   /* Set initial values */
@@ -128,7 +125,7 @@ alloc_and_init_thermal_data
   dCreate_Dense_Matrix  /* Vector X */
   (
     &tdata->SLUMatrix_X, tdata->Size, 1,
-    tdata->SV_X.Values, tdata->Size,
+    tdata->Temperatures, tdata->Size,
     SLU_DN, SLU_D, SLU_GE
   );
 
@@ -136,8 +133,6 @@ alloc_and_init_thermal_data
 
   /* Free if malloc errors */
 
-sv_x_fail :
-  free_system_vector (&tdata->SV_B) ;
 sv_b_fail :
   free_system_matrix (&tdata->SM_A) ;
 sm_a_fail :
@@ -172,10 +167,10 @@ free_thermal_data (ThermalData *tdata)
 {
   if (tdata == NULL) return ;
 
-  free (tdata->Temperatures) ;
   free (tdata->Sources) ;
   free (tdata->Capacities) ;
   free (tdata->Resistances) ;
+
   free (tdata->SLU_PermutationMatrixR) ;
   free (tdata->SLU_PermutationMatrixC) ;
   free (tdata->SLU_Etree) ;
@@ -184,14 +179,14 @@ free_thermal_data (ThermalData *tdata)
 
   StatFree (&tdata->SLU_Stat) ;
 
-  Destroy_CompCol_Matrix (&tdata->SLUMatrix_A) ;
-  //free_system_matrix (&tdata->SM_A) ;
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
+  free_system_matrix        (&tdata->SM_A) ;
 
-  Destroy_Dense_Matrix (&tdata->SLUMatrix_B);
-  //free_system_vector (&tdata->SV_B) ;
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
+  free_system_vector        (&tdata->SV_B) ;
 
-  Destroy_Dense_Matrix (&tdata->SLUMatrix_X);
-  //free_system_vector (&tdata->SV_X) ;
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_X);
+  free                      (tdata->Temperatures) ;
 
 }
 
@@ -286,13 +281,7 @@ solve_system
   double total_time
 )
 {
-  int counter ;
-
-  for
-  ( ;
-    tdata->SLU_Info != 0 && total_time > 0 ;
-    total_time -= tdata->delta_time
-  )
+  for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
     dgssvx
     (
@@ -318,11 +307,19 @@ solve_system
       &tdata->SLU_Info
     );
 
-    tdata->SLU_Options.Fact = FACTORED ;
-  }
+    if (tdata->SLU_Info != 0)
+      break ;
 
-  for (counter = 0; counter < tdata->SV_X.Size ; counter++)
-    tdata->Temperatures = tdata->SV_X.Values ;
+    tdata->SLU_Options.Fact = FACTORED ;
+
+    fill_system_vector
+    (
+      &tdata->SV_B,
+      tdata->Sources,
+      tdata->Capacities,
+      tdata->Temperatures
+    ) ;
+  }
 
 //    dgstrs
 //    (

@@ -41,7 +41,6 @@ extern "C"
 
     SystemMatrix SM_A ;
     SystemVector SV_B ;
-    SystemVector SV_X ;
 
     SuperMatrix SLUMatrix_A ,
                 SLUMatrix_B ,
