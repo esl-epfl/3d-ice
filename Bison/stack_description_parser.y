@@ -468,19 +468,18 @@ dimensions
         YYABORT ;
       }
 
-      stkd->Dimensions->Chip.Length      = $5  ;
-      stkd->Dimensions->Chip.Width       = $10 ;
+      stkd->Dimensions->Chip.Length      = $5  * 1000.0 ;
+      stkd->Dimensions->Chip.Width       = $10 * 1000.0 ;
       stkd->Dimensions->Cell.Length      = $15 ;
       stkd->Dimensions->Cell.Width       = $20 ;
       stkd->Dimensions->Cell.FirstLength = $26 ;
       stkd->Dimensions->Cell.LastLength  = $32 ;
 
       stkd->Dimensions->Grid.NRows
-        = (stkd->Dimensions->Chip.Width * 1000.0)
-          / stkd->Dimensions->Cell.Width ;
+        = stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width ;
 
       stkd->Dimensions->Grid.NColumns
-        = ( ( (stkd->Dimensions->Chip.Length * 1000.0)
+        = ( ( stkd->Dimensions->Chip.Length
               - stkd->Dimensions->Cell.FirstLength
               - stkd->Dimensions->Cell.LastLength )
             / stkd->Dimensions->Cell.Length )

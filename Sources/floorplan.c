@@ -161,10 +161,10 @@ check_location
 {
   if (   (floorplan_element->SW_X <  0)
           || (floorplan_element->SW_X + floorplan_element->Length
-              > get_chip_length (dimensions) * 1000.0)
+              > get_chip_length (dimensions))
       || (floorplan_element->SW_Y <  0)
           || (floorplan_element->SW_Y + floorplan_element->Width
-              > get_chip_width (dimensions) * 1000.0) )
+              > get_chip_width (dimensions)) )
   {
     fprintf (stderr,
       "%s: floorplan element %s is outside of the floorplan.\n",
@@ -225,7 +225,7 @@ align_to_grid
 
     else if (column == get_number_of_columns (dimensions) - 1)
 
-      cx = (get_chip_length (dimensions) * 1000.0)
+      cx = get_chip_length (dimensions)
            - (get_cell_length (dimensions, column) / 2.0) ;
 
     else

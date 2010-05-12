@@ -76,7 +76,7 @@ print_dimensions
             dimensions->Grid.NColumns, dimensions->Grid.NCells);
   fprintf (stream,
     "%sChip dimensions         (L x W) = (%5.2f x %5.2f) mm\n",
-    prefix, dimensions->Chip.Length, dimensions->Chip.Width);
+    prefix, dimensions->Chip.Length / 1000.0, dimensions->Chip.Width / 1000.0);
 }
 
 /******************************************************************************/
