@@ -20,103 +20,75 @@ extern "C"
 
 /******************************************************************************
  *                                                                            *
- * "CellDimensions" : the dimensions of a individual cell.                    *
- *                                                                            *
- * To describe the dimension of a single cell we store only its length(s)     *
- * and its width. We don't store the height since it coincides with the       *
- * height of the layer it belongs to. Indeed, every layer composing a         *
- * 3DChip is divided vertically into a single cell.                           *
+ * "Dimensions" : all the dimensions used in the library (cell, grid, chip)   *
  *                                                                            *
  ******************************************************************************/
 
   typedef struct
   {
-    double FirstLength ;  /* The length of the cell if it belongs to the */
-                          /* first column in a layer (column 0).         */
+    struct
+    {
+      double FirstLength ;     /* The length of the cell if it belongs to the */
+                               /* first column in a layer (column 0).         */
 
-    double LastLength ;   /* The length of the cell if it belongs to the */
-                          /* last column in a layer (column #columns-1). */
+      double LastLength ;      /* The length of the cell if it belongs to the */
+                               /* last column in a layer (column #columns-1). */
 
-    double Length  ;      /* The length of the cell if it belongs to the */
-                          /* remaining columns.                          */
+      double Length  ;         /* The length of the cell if it belongs to the */
+                               /* remaining columns.                          */
 
-    double Width ;        /* The width of every cell.                    */
+      double Width ;           /* The width of every cell.                    */
 
-  } CellDimensions ;
+    } Cell ;
 
-/******************************************************************************/
+    struct
+    {
+      int NLayers ;
+      int NRows ;
+      int NColumns ;
+      int NCells ;
+      int NNz ;
 
-  void init_cells_dimensions  (CellDimensions *cd) ;
-  void print_cells_dimensions (FILE *stream, char *prefix, CellDimensions *cd) ;
+    } Grid ;
 
-/******************************************************************************
- *                                                                            *
- * "GridDimensions" : the dimensions of a 3DGrid of cells.                    *
- *                                                                            *
- ******************************************************************************/
+    struct
+    {
+      double Length ;
+      double Width ;
 
-  typedef struct
-  {
-    int NLayers ;
-    int NRows ;
-    int NColumns ;
-    int NCells ;
-    int NNz ;
-
-  } GridDimensions ;
-
-/******************************************************************************/
-
-  void init_grid_dimensions  (GridDimensions *gd) ;
-  void print_grid_dimensions (FILE *stream, char *prefix, GridDimensions *gd) ;
-
-/******************************************************************************
- *                                                                            *
- * "ChipDimensions" : the dimensions of a 3DChip.                             *
- *                                                                            *
- ******************************************************************************/
-
-  typedef struct
-  {
-    double Length ;
-    double Width ;
-
-  } ChipDimensions ;
-
-/******************************************************************************/
-
-  void init_chip_dimensions  (ChipDimensions *cd) ;
-  void print_chip_dimensions (FILE *stream, char *prefix, ChipDimensions *gd) ;
-
-/******************************************************************************
- *                                                                            *
- * "Dimensions" : all the dimensions used in the library.                     *
- *                                                                            *
- ******************************************************************************/
-
-  typedef struct
-  {
-    CellDimensions Cell ;
-    GridDimensions Grid ;
-    ChipDimensions Chip ;
+    } Chip ;
 
   } Dimensions ;
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-  void init_dimensions (Dimensions *dim) ;
+  void
+  init_dimensions           (Dimensions *dimensions) ;
 
-  Dimensions* alloc_and_init_dimensions (void) ;
+  Dimensions*
+  alloc_and_init_dimensions (void) ;
 
-  void free_dimensions (Dimensions *dim) ;
+  void
+  free_dimensions           (Dimensions *dimensions) ;
 
-  void  print_dimensions (FILE *stream, char *prefix, Dimensions *dim) ;
+  void
+  print_dimensions          (
+                             FILE *stream,
+                             char *prefix,
+                             Dimensions *dimensions
+                            ) ;
+
+/******************************************************************************/
 
   double
-  get_cell_width           (Dimensions *dimensions) ;
+  get_cell_length (Dimensions *dimensions, int column) ;
 
   double
-  get_cell_length          (Dimensions *dimensions, int column) ;
+  get_cell_width  (Dimensions *dimensions) ;
+
+/******************************************************************************/
 
   int
   get_number_of_layers     (Dimensions *dimensions) ;
@@ -128,13 +100,38 @@ extern "C"
   get_number_of_columns    (Dimensions *dimensions) ;
 
   int
-  get_cell_top_surface     (Dimensions *dimensions, int column) ;
+  get_number_of_cells      (Dimensions *dimensions) ;
 
   int
-  get_cell_offset_in_layer (Dimensions *dimensions, int row, int column) ;
+  get_number_of_non_zeroes (Dimensions *dimensions) ;
+
+/******************************************************************************/
+
+  int
+  get_cell_top_surface    (Dimensions *dimensions, int column) ;
+
+  int
+  get_cell_bottom_surface (Dimensions *dimensions, int column) ;
+
+  int
+  get_cell_east_surface   (Dimensions *dimensions, double height) ;
+
+  int
+  get_cell_west_surface   (Dimensions *dimensions, double height) ;
+
+  int
+  get_cell_north_surface  (Dimensions *dimensions, double height, int column) ;
+
+  int
+  get_cell_south_surface  (Dimensions *dimensions, double height, int column) ;
+
+/******************************************************************************/
 
   int
   get_layer_area           (Dimensions *dimensions) ;
+
+  int
+  get_cell_offset_in_layer (Dimensions *dimensions, int row, int column) ;
 
   int
   get_cell_offset_in_stack (
@@ -143,12 +140,17 @@ extern "C"
                             int row,
                             int column
                            ) ;
+
+/******************************************************************************/
+
   double
   get_chip_length          (Dimensions *dimensions) ;
 
   double
   get_chip_width           (Dimensions *dimensions) ;
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 #ifdef __cplusplus

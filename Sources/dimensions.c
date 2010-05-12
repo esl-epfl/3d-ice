@@ -12,133 +12,88 @@
 
 #include "dimensions.h"
 
-void
-init_cells_dimensions (CellDimensions * cd)
-{
-  if (cd == NULL) return ;
-
-  cd->FirstLength = 0.0;
-  cd->Length      = 0.0;
-  cd->LastLength  = 0.0;
-  cd->Width       = 0.0;
-}
-
-/******************************************************************************/
-
-void
-print_cells_dimensions (FILE * stream, char *prefix, CellDimensions * cd)
-{
-  fprintf (stream,
-    "%sCell dimensions (Fl, l, Ll) x w = (%5.2f, %5.2f, %5.2f) x %5.2f um\n",
-    prefix, cd->FirstLength, cd->Length, cd->LastLength, cd->Width) ;
-}
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
 void
-init_grid_dimensions (GridDimensions * gd)
+init_dimensions
+(
+  Dimensions *dimensions
+)
 {
-  if (gd == NULL) return ;
+  dimensions->Cell.FirstLength = 0.0;
+  dimensions->Cell.Length      = 0.0;
+  dimensions->Cell.LastLength  = 0.0;
+  dimensions->Cell.Width       = 0.0;
 
-  gd->NLayers  = 0 ;
-  gd->NRows    = 0 ;
-  gd->NColumns = 0 ;
-  gd->NCells   = 0 ;
-  gd->NNz      = 0 ;
-}
+  dimensions->Grid.NLayers     = 0 ;
+  dimensions->Grid.NRows       = 0 ;
+  dimensions->Grid.NColumns    = 0 ;
+  dimensions->Grid.NCells      = 0 ;
+  dimensions->Grid.NNz         = 0 ;
 
-/******************************************************************************/
-
-void
-print_grid_dimensions (FILE * stream, char *prefix, GridDimensions * gd)
-{
-  fprintf (stream,
-    "%sGrid dimensions     (L x R x C) = (%d x %d x %d) -> %d cells\n",
-    prefix, gd->NLayers, gd->NRows, gd->NColumns, gd->NCells);
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-init_chip_dimensions (ChipDimensions * cd)
-{
-  if (cd == NULL) return ;
-
-  cd->Length = 0.0;
-  cd->Width  = 0.0;
-}
-
-/******************************************************************************/
-
-void
-print_chip_dimensions (FILE * stream, char *prefix, ChipDimensions * cd)
-{
-  fprintf (stream,
-    "%sChip dimensions         (L x W) = (%5.2f x %5.2f) mm\n",
-    prefix, cd->Length, cd->Width);
+  dimensions->Chip.Length      = 0.0;
+  dimensions->Chip.Width       = 0.0;
 }
 
 /******************************************************************************/
 /******************************************************************************/
-/******************************************************************************/
-
-void
-init_dimensions (Dimensions * dim)
-{
-  if (dim == NULL) return ;
-
-  init_cells_dimensions (&(dim->Cell));
-  init_grid_dimensions  (&(dim->Grid));
-  init_chip_dimensions  (&(dim->Chip));
-}
-
 /******************************************************************************/
 
 Dimensions *
-alloc_and_init_dimensions (void)
+alloc_and_init_dimensions
+(
+  void
+)
 {
   Dimensions *dimensions = (Dimensions *) malloc (sizeof (Dimensions));
 
-  init_dimensions (dimensions);
+  if (dimensions != NULL) init_dimensions (dimensions);
 
   return dimensions;
 }
 
 /******************************************************************************/
-
-void
-print_dimensions (FILE * stream, char *prefix, Dimensions * dim)
-{
-  print_cells_dimensions (stream, prefix, &(dim->Cell));
-  print_grid_dimensions  (stream, prefix, &(dim->Grid));
-  print_chip_dimensions  (stream, prefix, &(dim->Chip));
-}
-
+/******************************************************************************/
 /******************************************************************************/
 
 void
-free_dimensions (Dimensions * dim)
-{
-  if (dim == NULL) return ;
-
-  free (dim);
-}
-
-/******************************************************************************/
-
-double
-get_cell_width
+print_dimensions
 (
+  FILE *stream,
+  char *prefix,
   Dimensions *dimensions
 )
 {
-  return dimensions->Cell.Width;
+  fprintf (stream,
+    "%sCell dimensions (Fl, l, Ll) x w = (%5.2f, %5.2f, %5.2f) x %5.2f um\n",
+    prefix, dimensions->Cell.FirstLength, dimensions->Cell.Length,
+            dimensions->Cell.LastLength, dimensions->Cell.Width) ;
+  fprintf (stream,
+    "%sGrid dimensions     (L x R x C) = (%d x %d x %d) -> %d cells\n",
+    prefix, dimensions->Grid.NLayers,  dimensions->Grid.NRows,
+            dimensions->Grid.NColumns, dimensions->Grid.NCells);
+  fprintf (stream,
+    "%sChip dimensions         (L x W) = (%5.2f x %5.2f) mm\n",
+    prefix, dimensions->Chip.Length, dimensions->Chip.Width);
 }
 
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+free_dimensions
+(
+  Dimensions * dimensions
+)
+{
+  free (dimensions);
+}
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 double
@@ -159,6 +114,19 @@ get_cell_length
   return dimensions->Cell.Length;
 }
 
+/******************************************************************************/
+
+double
+get_cell_width
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Cell.Width;
+}
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 int
@@ -195,6 +163,30 @@ get_number_of_columns
 /******************************************************************************/
 
 int
+get_number_of_cells
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Grid.NCells ;
+}
+
+/******************************************************************************/
+
+int
+get_number_of_non_zeroes
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Grid.NNz ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
 get_cell_top_surface
 (
   Dimensions *dimensions,
@@ -207,16 +199,66 @@ get_cell_top_surface
 /******************************************************************************/
 
 int
-get_cell_offset_in_layer
+get_cell_bottom_surface
 (
   Dimensions *dimensions,
-  int row,
   int column
 )
 {
-  return row * dimensions->Grid.NColumns + column ;
+  return get_cell_top_surface (dimensions, column) ;
 }
 
+/******************************************************************************/
+
+int
+get_cell_east_surface
+(
+  Dimensions *dimensions,
+  double     height
+)
+{
+  return height * get_cell_width (dimensions) ;
+}
+
+/******************************************************************************/
+
+int
+get_cell_west_surface
+(
+  Dimensions *dimensions,
+  double     height
+)
+{
+  return get_cell_east_surface (dimensions, height) ;
+}
+
+/******************************************************************************/
+
+int
+get_cell_north_surface
+(
+  Dimensions *dimensions,
+  double     height,
+  int        column
+)
+{
+  return get_cell_length (dimensions, column) * height ;
+}
+/******************************************************************************/
+
+int
+get_cell_south_surface
+(
+  Dimensions *dimensions,
+  double height,
+  int column
+)
+{
+  return get_cell_north_surface (dimensions, height, column) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 int
@@ -231,6 +273,19 @@ get_layer_area
 /******************************************************************************/
 
 int
+get_cell_offset_in_layer
+(
+  Dimensions *dimensions,
+  int row,
+  int column
+)
+{
+  return row * get_number_of_columns (dimensions) + column ;
+}
+
+/******************************************************************************/
+
+int
 get_cell_offset_in_stack
 (
   Dimensions *dimensions,
@@ -240,10 +295,11 @@ get_cell_offset_in_stack
 )
 {
   return layer * get_layer_area (dimensions)
-         + row * get_number_of_columns (dimensions)
-         + column ;
+         + get_cell_offset_in_layer (dimensions, row, column) ;
 }
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 double
@@ -266,4 +322,6 @@ get_chip_width
   return dimensions->Chip.Width ;
 }
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
