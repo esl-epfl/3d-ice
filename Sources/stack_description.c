@@ -13,7 +13,9 @@
 #include "stack_description_scanner.h"
 #include "layer.h"
 
-extern int stack_description_parse (StackDescription *stkd, yyscan_t scanner) ;
+extern
+int
+stack_description_parse (StackDescription *stkd, yyscan_t scanner) ;
 
 static int fill_floorplans (StackDescription *stkd) ;
 
@@ -22,10 +24,11 @@ static int fill_floorplans (StackDescription *stkd) ;
 /******************************************************************************/
 
 void
-init_stack_description (StackDescription *stkd)
+init_stack_description
+(
+  StackDescription *stkd
+)
 {
-  if (stkd == NULL) return ;
-
   stkd->FileName          = NULL ;
   stkd->MaterialsList     = NULL ;
   stkd->Channel           = NULL ;
@@ -39,37 +42,36 @@ init_stack_description (StackDescription *stkd)
 /******************************************************************************/
 
 int
-fill_stack_description (StackDescription* stkd , char *filename)
+fill_stack_description
+(
+  StackDescription* stkd ,
+  char *filename
+)
 {
-  FILE *input;
-  int result;
+  FILE     *input;
+  int      result;
   yyscan_t scanner;
 
-  input = fopen(filename, "r");
+  input = fopen (filename, "r");
   if(input == NULL)
-    {
-      perror(filename);
-      return 1;
-    }
-
-  stkd->FileName = strdup(filename);
-
-  stack_description_lex_init(&scanner);
-
-  //stack_set_debug(1 , scanner);
-
-  stack_description_set_in(input, scanner);
-
-  result = stack_description_parse(stkd, scanner);
-
-  stack_description_lex_destroy(scanner);
-
-  fclose(input);
-
-  if (result == 1)
   {
-    return result ;
+    perror(filename);
+    return 1;
   }
+
+  stkd->FileName = strdup (filename);
+
+  stack_description_lex_init (&scanner);
+
+  stack_description_set_in (input, scanner);
+
+  result = stack_description_parse (stkd, scanner);
+
+  stack_description_lex_destroy (scanner);
+
+  fclose (input);
+
+  if (result == 1) return result ;
 
   stkd->Dimensions->Grid.NRows
 
@@ -104,7 +106,7 @@ fill_stack_description (StackDescription* stkd , char *filename)
   // Now we know all the dimensions so we can parse the floorplan
   // files and check if the floorplan elements are well positionated.
 
-  return fill_floorplans(stkd) ;
+  return fill_floorplans (stkd) ;
 }
 
 /******************************************************************************/
@@ -112,10 +114,11 @@ fill_stack_description (StackDescription* stkd , char *filename)
 /******************************************************************************/
 
 void
-free_stack_description (StackDescription *stkd)
+free_stack_description
+(
+  StackDescription *stkd
+)
 {
-  if (stkd == NULL) return ;
-
   free_materials_list      (stkd->MaterialsList) ;
   free_channel             (stkd->Channel) ;
   free_dies_list           (stkd->DiesList) ;
@@ -129,7 +132,12 @@ free_stack_description (StackDescription *stkd)
 /******************************************************************************/
 
 void
-print_stack_description (FILE *stream, char *prefix, StackDescription *stkd)
+print_stack_description
+(
+  FILE             *stream,
+  char             *prefix,
+  StackDescription *stkd
+)
 {
   fprintf(stream, "%sStack read from file %s\n", prefix, stkd->FileName) ;
 
@@ -152,12 +160,10 @@ fill_floorplans (StackDescription *stkd)
   StackElement *stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
-  {
+
     if (stack_element->Type == TL_STACK_ELEMENT_DIE)
-    {
+
       result += fill_floorplan(stack_element->Floorplan, stkd->Dimensions) ;
-    }
-  }
 
   return result ;
  }
@@ -170,7 +176,7 @@ void
 fill_resistances_stack_description
 (
   StackDescription *stkd,
-  Resistances *resistances
+  Resistances      *resistances
 )
 {
   StackElement *stack_element ;
@@ -186,22 +192,20 @@ fill_resistances_stack_description
   fprintf (debug,
     "%p fill_resistances_stack_description ( l %d r %d c %d )\n",
     resistances,
-    stkd->Dimensions->Grid.NLayers,
-    stkd->Dimensions->Grid.NRows,
-    stkd->Dimensions->Grid.NColumns) ;
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions));
 #endif
 
   for
   (
     stack_element = stkd->StackElementsList,
     current_layer = 0 ;
-
     stack_element != NULL ;
-
     current_layer += stack_element->NLayers,
     stack_element = stack_element->Next
   )
-  {
+
     switch (stack_element->Type)
     {
       case TL_STACK_ELEMENT_DIE :
@@ -259,8 +263,6 @@ fill_resistances_stack_description
 
     } /* stack_elementy->Type */
 
-  } /* stack_element */
-
 #ifdef DEBUG_FILL_RESISTANCES
   fclose (debug) ;
 #endif
@@ -274,8 +276,8 @@ void
 fill_capacities_stack_description
 (
   StackDescription *stkd,
-  double *capacities,
-  double delta_time
+  double           *capacities,
+  double           delta_time
 )
 {
   StackElement *stack_element ;
@@ -292,9 +294,9 @@ fill_capacities_stack_description
   fprintf (debug,
     "%p fill_capacities_stack_description ( l %d r %d c %d )\n",
     capacities,
-    stkd->Dimensions->Grid.NLayers,
-    stkd->Dimensions->Grid.NRows,
-    stkd->Dimensions->Grid.NColumns) ;
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions));
 #endif
 
   for
@@ -303,15 +305,12 @@ fill_capacities_stack_description
     current_layer = 0 ,
 #endif
     stack_element = stkd->StackElementsList ;
-
     stack_element != NULL ;
-
 #ifdef DEBUG_FILL_CAPACITIES
     current_layer += stack_element->NLayers,
 #endif
     stack_element = stack_element->Next
   )
-  {
     switch (stack_element->Type)
     {
       case TL_STACK_ELEMENT_DIE :
@@ -372,8 +371,6 @@ fill_capacities_stack_description
 
     } /* stack_element->Type */
 
-  } /* stack_element */
-
 #ifdef DEBUG_FILL_CAPACITIES
   fclose(debug) ;
 #endif
@@ -387,7 +384,7 @@ void
 fill_sources_stack_description
 (
   StackDescription *stkd,
-  double *sources
+  double           *sources
 )
 {
   StackElement *stack_element ;
@@ -404,9 +401,9 @@ fill_sources_stack_description
   fprintf (debug,
     "%p fill_sources_stack_description ( l %d r %d c %d )\n",
     sources,
-    stkd->Dimensions->Grid.NLayers,
-    stkd->Dimensions->Grid.NRows,
-    stkd->Dimensions->Grid.NColumns) ;
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions));
 #endif
 
   for
@@ -415,15 +412,13 @@ fill_sources_stack_description
     current_layer = 0 ,
 #endif
     stack_element = stkd->StackElementsList ;
-
     stack_element != NULL ;
-
 #ifdef DEBUG_FILL_SOURCES
     current_layer += stack_element->NLayers,
 #endif
     stack_element = stack_element->Next
   )
-  {
+
     switch (stack_element->Type)
     {
       case TL_STACK_ELEMENT_DIE :
@@ -482,8 +477,6 @@ fill_sources_stack_description
 
     } /* stack_element->Type */
 
-  } /* stack_element */
-
 #ifdef DEBUG_FILL_SOURCES
   fclose(debug) ;
 #endif
@@ -517,9 +510,9 @@ fill_system_matrix_stack_description
   fprintf (debug,
     "%p %p %p %p %p fill_system_matrix_stack_description ( l %d r %d c %d )\n",
     resistances, capacities, columns, rows, values,
-    stkd->Dimensions->Grid.NLayers,
-    stkd->Dimensions->Grid.NRows,
-    stkd->Dimensions->Grid.NColumns) ;
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions));
 #endif
 
   *columns++ = 0 ;
@@ -528,8 +521,7 @@ fill_system_matrix_stack_description
   (
     current_layer = 0,
     added         = 0,
-    area
-      = stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns,
+    area          = get_layer_area (stkd->Dimensions),
     stack_element = stkd->StackElementsList ;
 
     stack_element != NULL ;
@@ -542,7 +534,7 @@ fill_system_matrix_stack_description
     values        += added,
     stack_element  = stack_element->Next
   )
-  {
+
     switch (stack_element->Type)
     {
       case TL_STACK_ELEMENT_DIE :
@@ -592,8 +584,6 @@ fill_system_matrix_stack_description
 
     } /* stack_element->Type */
 
-  } /* stack_element */
-
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fclose (debug) ;
 #endif
@@ -613,12 +603,10 @@ get_total_number_of_floorplan_elements
   StackElement *stk_el = stkd->StackElementsList;
 
   for ( ; stk_el != NULL ; stk_el = stk_el->Next)
-  {
+
     if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
-    {
+
       total += stk_el->Floorplan->NElements ;
-    }
-  }
 
   return total ;
 }
@@ -631,7 +619,7 @@ int
 get_number_of_floorplan_elements_in_floorplan
 (
   StackDescription *stkd,
-  int stack_element_id
+  int              stack_element_id
 )
 {
   StackElement *stk_el = find_stack_element_in_list
@@ -681,8 +669,8 @@ int
 insert_power_values_in_floorplan
 (
   StackDescription *stkd,
-  int stack_element_id,
-  double *power_values
+  int              stack_element_id,
+  double           *power_values
 )
 {
   StackElement *stk_el = find_stack_element_in_list
@@ -711,9 +699,9 @@ int
 insert_power_value_in_floorplan_element
 (
   StackDescription *stkd,
-  int stack_element_id,
-  char *floorplan_element_id,
-  double power_value
+  int              stack_element_id,
+  char             *floorplan_element_id,
+  double           power_value
 )
 {
   StackElement *stk_el = find_stack_element_in_list
@@ -745,38 +733,39 @@ int
 get_max_temperature_in_floorplan_element
 (
   StackDescription *stkd,
-  int stack_element_id,
-  char *floorplan_element_id,
-  double *temperatures,
-  double *max_temperature
+  int              stack_element_id,
+  char             *floorplan_element_id,
+  double           *temperatures,
+  double           *max_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   return get_max_temperature_floorplan
          (
@@ -795,38 +784,39 @@ int
 get_min_temperature_in_floorplan_element
 (
   StackDescription *stkd,
-  int stack_element_id,
-  char *floorplan_element_id,
-  double *temperatures,
-  double *min_temperature
+  int              stack_element_id,
+  char             *floorplan_element_id,
+  double           *temperatures,
+  double           *min_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   return get_min_temperature_floorplan
          (
@@ -845,38 +835,39 @@ int
 get_avg_temperature_in_floorplan_element
 (
   StackDescription *stkd,
-  int stack_element_id,
-  char *floorplan_element_id,
-  double *temperatures,
-  double *avg_temperature
+  int              stack_element_id,
+  char             *floorplan_element_id,
+  double           *temperatures,
+  double           *avg_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   return get_avg_temperature_floorplan
          (
@@ -895,40 +886,41 @@ int
 get_min_avg_max_temperatures_in_floorplan_element
 (
   StackDescription *stkd,
-  int stack_element_id,
-  char *floorplan_element_id,
-  double *temperatures,
-  double *min_temperature,
-  double *avg_temperature,
-  double *max_temperature
+  int              stack_element_id,
+  char             *floorplan_element_id,
+  double           *temperatures,
+  double           *min_temperature,
+  double           *avg_temperature,
+  double           *max_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   return get_min_avg_max_temperatures_floorplan
          (
@@ -947,37 +939,38 @@ int
 get_all_max_temperatures_in_floorplan
 (
   StackDescription *stkd,
-  int stack_element_id,
-  double *temperatures,
-  double *max_temperature
+  int              stack_element_id,
+  double           *temperatures,
+  double           *max_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   get_all_max_temperatures_floorplan
   (
@@ -998,37 +991,38 @@ int
 get_all_min_temperature_in_floorplan
 (
   StackDescription *stkd,
-  int stack_element_id,
-  double *temperatures,
-  double *min_temperature
+  int              stack_element_id,
+  double           *temperatures,
+  double           *min_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   get_all_min_temperatures_floorplan
   (
@@ -1049,37 +1043,38 @@ int
 get_all_avg_temperatures_in_floorplan
 (
   StackDescription *stkd,
-  int stack_element_id,
-  double *temperatures,
-  double *avg_temperature
+  int              stack_element_id,
+  double           *temperatures,
+  double           *avg_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   get_all_avg_temperatures_floorplan
   (
@@ -1100,39 +1095,40 @@ int
 get_all_min_avg_max_temperatures_in_floorplan
 (
   StackDescription *stkd,
-  int stack_element_id,
-  double *temperatures,
-  double *min_temperature,
-  double *avg_temperature,
-  double *max_temperature
+  int              stack_element_id,
+  double           *temperatures,
+  double           *min_temperature,
+  double           *avg_temperature,
+  double           *max_temperature
 )
 {
-  StackElement *stk_el ;
   Layer *layer ;
+  StackElement *stk_el ;
   int layer_offset = 0 ;
-  int area = (stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns) ;
+  int area = get_layer_area (stkd->Dimensions) ;
 
-  for (stk_el  = stkd->StackElementsList ;
-       stk_el != NULL ;
-       stk_el  = stk_el->Next)
-  {
+  for
+  (
+    stk_el  = stkd->StackElementsList ;
+    stk_el != NULL ;
+    layer_offset += stk_el->NLayers,
+    stk_el  = stk_el->Next
+  )
     if (stk_el->Id == stack_element_id) break ;
-    layer_offset += stk_el->NLayers ;
-  }
 
-  if (stk_el == NULL)
-    return -1 ;
+  if (stk_el == NULL) return -1 ;
 
   if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
     return -2 ;
 
-  for (layer  = stk_el->Pointer.Die->LayersList ;
-       layer != NULL ;
-       layer  = layer->Next)
-  {
+  for
+  (
+    layer  = stk_el->Pointer.Die->LayersList ;
+    layer != NULL ;
+    layer_offset ++,
+    layer  = layer->Next
+  )
     if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
-    layer_offset ++ ;
-  }
 
   get_all_min_avg_max_temperatures_floorplan
   (

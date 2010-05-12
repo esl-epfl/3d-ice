@@ -27,129 +27,199 @@ extern "C"
 
 /******************************************************************************
  *                                                                            *
- * "StackDescription" : the representation of the 3DStack.                    *
+ * "StackDescription" : the collection of data concerning a 3Dstack           *
  *                                                                            *
  ******************************************************************************/
 
   typedef struct
   {
-    char         *FileName ; /* The name of the file used to fill the */
-                             /* stack description                     */
+    char         *FileName ;         /* The name of the file used to fill the */
+                                     /* stack description                     */
 
-    Material     *MaterialsList ; /* The list of materials componing */
-                                  /* the layers and channels         */
+    Material     *MaterialsList ;          /* The list of materials componing */
+                                           /* the layers and channels         */
 
-    Channel      *Channel ;  /* The "single" instance of a channel used */
-                             /* to compose the 3d stack                 */
+    Channel      *Channel ;        /* The "single" instance of a channel used */
+                                   /* to compose the 3d stack                 */
 
-    Die          *DiesList ; /* The list of dies available to compose */
-                             /* the 3Dstack                           */
+    Die          *DiesList ;         /* The list of dies available to compose */
+                                     /* the 3Dstack                           */
 
-    StackElement *StackElementsList ; /* The list of stack elements */
-                                      /* componing the 3Dstack      */
+    StackElement *StackElementsList ;     /* The list of stack elements       */
+                                          /* componing the 3Dstack            */
 
-    Dimensions   *Dimensions ;  /* Collection of all the dimensions */
-                                /* (chip, grid of cells, cell)      */
+    Dimensions   *Dimensions ;            /* Collection of all the dimensions */
+                                          /* (chip, grid of cells, cell)      */
 
   } StackDescription ;
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-  void init_stack_description (StackDescription *stkd) ;
+  void
+  init_stack_description               (StackDescription *stkd) ;
 
-  int fill_stack_description (StackDescription *stkd, char *filename) ;
+  int
+  fill_stack_description               (
+                                        StackDescription *stkd,
+                                        char *filename
+                                       ) ;
 
-  void free_stack_description (StackDescription *stkd) ;
+  void
+  free_stack_description               (StackDescription *stkd) ;
 
-  void print_stack_description (FILE *stream,
-                                char *prefix,
-                                StackDescription *stkd) ;
+  void
+  print_stack_description              (
+                                        FILE             *stream,
+                                        char             *prefix,
+                                        StackDescription *stkd
+                                       ) ;
 
-  void fill_resistances_stack_description (StackDescription *stkd,
-                                           Resistances *resistances) ;
+  void
+  fill_resistances_stack_description   (
+                                        StackDescription *stkd,
+                                        Resistances      *resistances
+                                       ) ;
 
-  void fill_capacities_stack_description  (StackDescription *stkd,
-                                           double *capacities,
-                                           double delta_time) ;
+  void
+  fill_capacities_stack_description    (
+                                        StackDescription *stkd,
+                                        double           *capacities,
+                                        double           delta_time
+                                       ) ;
 
-  void fill_sources_stack_description (StackDescription *stkd,
-                                       double *sources) ;
+  void
+  fill_sources_stack_description       (
+                                        StackDescription *stkd,
+                                        double           *sources
+                                       ) ;
 
-  void fill_system_matrix_stack_description (
-  StackDescription *stkd,
-  Resistances *resistances,
-  double *capacities,
-  int *columns,
-  int *rows,
-  double *values) ;
+  void
+  fill_system_matrix_stack_description (
+                                        StackDescription *stkd,
+                                        Resistances      *resistances,
+                                        double           *capacities,
+                                        int              *columns,
+                                        int              *rows,
+                                        double           *values
+                                       ) ;
 
+  int
+  get_total_number_of_floorplan_elements
+                              (
+                               StackDescription *stkd
+                              ) ;
 
-  int get_total_number_of_floorplan_elements (StackDescription *stkd) ;
+  int
+  get_number_of_floorplan_elements_in_floorplan
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id
+                              ) ;
 
-  int get_number_of_floorplan_elements_in_floorplan (StackDescription *stkd,
-                                                     int stack_element_id) ;
+  void
+  insert_power_values         (StackDescription *stkd, double *power_values) ;
 
-  void insert_power_values (StackDescription *stkd, double *power_values) ;
+  int
+  insert_power_values_in_floorplan
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               double           *power_values
+                              ) ;
 
-  int insert_power_values_in_floorplan (StackDescription *stkd,
-                                        int stack_element_id,
-                                        double *power_values) ;
+  int
+  insert_power_value_in_floorplan_element
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               char             *floorplan_element_id,
+                               double           power_value
+                              ) ;
 
-  int insert_power_value_in_floorplan_element (StackDescription *stkd,
-                                               int stack_element_id,
-                                               char *floorplan_element_id,
-                                               double power_value) ;
+  int
+  get_max_temperature_in_floorplan_element
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               char             *floorplan_element_id,
+                               double           *temperatures,
+                               double           *max_temperature
+                              ) ;
 
-  int get_max_temperature_in_floorplan_element (StackDescription *stkd,
-                                                int stack_element_id,
-                                                char *floorplan_element_id,
-                                                double *temperatures,
-                                                double *max_temperature) ;
+  int
+  get_min_temperature_in_floorplan_element
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               char             *floorplan_element_id,
+                               double           *temperatures,
+                               double           *min_temperature
+                              ) ;
 
-  int get_min_temperature_in_floorplan_element (StackDescription *stkd,
-                                                int stack_element_id,
-                                                char *floorplan_element_id,
-                                                double *temperatures,
-                                                double *min_temperature) ;
+  int
+  get_avg_temperature_in_floorplan_element
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               char             *floorplan_element_id,
+                               double           *temperatures,
+                               double           *avg_temperature
+                              ) ;
 
-  int get_avg_temperature_in_floorplan_element (StackDescription *stkd,
-                                                int stack_element_id,
-                                                char *floorplan_element_id,
-                                                double *temperatures,
-                                                double *avg_temperature) ;
+  int
+  get_min_avg_max_temperatures_in_floorplan_element
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               char             *floorplan_element_id,
+                               double           *temperatures,
+                               double           *min_temperature,
+                               double           *avg_temperature,
+                               double           *max_temperature
+                              ) ;
 
-  int get_min_avg_max_temperatures_in_floorplan_element (StackDescription *stkd,
-                                                int stack_element_id,
-                                                char *floorplan_element_id,
-                                                double *temperatures,
-                                                double *min_temperature,
-                                                double *avg_temperature,
-                                                double *max_temperature) ;
+  int
+  get_all_max_temperatures_in_floorplan
+                              (
+                               StackDescription *stkd,
+                               int stack_element_id,
+                               double *temperatures,
+                               double *max_temperature
+                              ) ;
 
+  int
+  get_all_min_temperatures_in_floorplan
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               double           *temperatures,
+                               double           *min_temperature
+                              ) ;
 
+  int
+  get_all_avg_temperatures_in_floorplan
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               double           *temperatures,
+                               double           *avg_temperature
+                              ) ;
 
-  int get_all_max_temperatures_in_floorplan (StackDescription *stkd,
-                                             int stack_element_id,
-                                             double *temperatures,
-                                             double *max_temperature) ;
+  int
+  get_all_min_avg_max_temperatures_in_floorplan
+                              (
+                               StackDescription *stkd,
+                               int              stack_element_id,
+                               double           *temperatures,
+                               double           *min_temperature,
+                               double           *avg_temperature,
+                               double           *max_temperature
+                              ) ;
 
-  int get_all_min_temperatures_in_floorplan (StackDescription *stkd,
-                                             int stack_element_id,
-                                             double *temperatures,
-                                             double *min_temperature) ;
-
-  int get_all_avg_temperatures_in_floorplan (StackDescription *stkd,
-                                             int stack_element_id,
-                                             double *temperatures,
-                                             double *avg_temperature) ;
-
-  int get_all_min_avg_max_temperatures_in_floorplan (StackDescription *stkd,
-                                                int stack_element_id,
-                                                double *temperatures,
-                                                double *min_temperature,
-                                                double *avg_temperature,
-                                                double *max_temperature) ;
-
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 #ifdef __cplusplus
