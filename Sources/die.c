@@ -13,15 +13,20 @@
 
 #include "die.h"
 
-void
-init_die (Die *die)
-{
-  if (die == NULL) return ;
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
+void
+init_die
+(
+  Die *die
+)
+{
   die->Id         = NULL ;
   die->LayersList = NULL ;
-  die->NLayers    = 0 ;
-  die->SourcesId  = 0 ;
+  die->NLayers    = 0    ;
+  die->SourcesId  = 0    ;
   die->Next       = NULL ;
 }
 
@@ -30,11 +35,14 @@ init_die (Die *die)
 /******************************************************************************/
 
 Die *
-alloc_and_init_die (void)
+alloc_and_init_die
+(
+  void
+)
 {
   Die *die = (Die *) malloc ( sizeof(Die) ) ;
 
-  init_die (die) ;
+  if (die != NULL) init_die (die) ;
 
   return die ;
 }
@@ -44,12 +52,13 @@ alloc_and_init_die (void)
 /******************************************************************************/
 
 void
-free_die (Die *die)
+free_die
+(
+  Die *die
+)
 {
-  if (die == NULL) return ;
-
-  free (die->Id) ;
   free_layers_list (die->LayersList) ;
+  free (die->Id) ;
   free (die) ;
 }
 
@@ -58,14 +67,16 @@ free_die (Die *die)
 /******************************************************************************/
 
 void
-free_dies_list (Die *list)
+free_dies_list
+(
+  Die *list
+)
 {
-  Die *next_die ;
+  Die *next ;
 
-  for ( ; list != NULL ; list = next_die)
+  for ( ; list != NULL ; list = next)
   {
-    next_die = list->Next ;
-
+    next = list->Next ;
     free_die(list) ;
   }
 }
@@ -75,11 +86,19 @@ free_dies_list (Die *list)
 /******************************************************************************/
 
 void
-print_die (FILE *stream, char* prefix, Die *die)
+print_die
+(
+  FILE *stream,
+  char *prefix,
+  Die  *die
+)
 {
-  fprintf (stream, "%sDie %s:\n", prefix, die->Id) ;
-  fprintf (stream, "%s  Number of layers  %d\n", prefix, die->NLayers);
-  fprintf (stream, "%s  Sources on layer  %d\n", prefix,die->SourcesId ) ;
+  fprintf (stream,
+    "%sDie %s:\n",                prefix, die->Id) ;
+  fprintf (stream,
+    "%s  Number of layers  %d\n", prefix, die->NLayers);
+  fprintf (stream,
+    "%s  Sources on layer  %d\n", prefix, die->SourcesId) ;
 
   char *new_prefix = (char *) malloc (sizeof(char)*(strlen(prefix) + 2));
 
@@ -96,12 +115,17 @@ print_die (FILE *stream, char* prefix, Die *die)
 /******************************************************************************/
 
 void
-print_dies_list (FILE *stream, char* prefix, Die *list)
+print_dies_list
+(
+  FILE *stream,
+  char* prefix,
+  Die *list
+)
 {
   for ( ; list != NULL ; list = list->Next)
-  {
+
     print_die (stream, prefix, list) ;
-  }
+
 }
 
 /******************************************************************************/
@@ -109,15 +133,15 @@ print_dies_list (FILE *stream, char* prefix, Die *list)
 /******************************************************************************/
 
 Die *
-find_die_in_list (Die* list, char *id)
+find_die_in_list
+(
+  Die* list,
+  char *id
+)
 {
   for ( ; list != NULL ; list = list->Next)
-  {
-    if (strcmp(list->Id, id) == 0)
-    {
-      break ;
-    }
-  }
+
+    if (strcmp(list->Id, id) == 0) break ;
 
   return list ;
 }
@@ -130,12 +154,12 @@ Resistances *
 fill_resistances_die
 (
 #ifdef DEBUG_FILL_RESISTANCES
-  FILE *debug,
+  FILE        *debug,
 #endif
-  Die *die,
+  Die         *die,
   Resistances *resistances,
-  Dimensions *dim,
-  int current_layer
+  Dimensions  *dimensions,
+  int         current_layer
 )
 {
   Layer *layer ;
@@ -149,13 +173,11 @@ fill_resistances_die
   for
   (
     layer =  die->LayersList;
-
     layer != NULL ;
-
     current_layer++,
     layer = layer->Next
   )
-  {
+
     resistances = fill_resistances_layer
                   (
 #ifdef DEBUG_FILL_RESISTANCES
@@ -163,10 +185,9 @@ fill_resistances_die
 #endif
                     layer,
                     resistances,
-                    dim,
+                    dimensions,
                     current_layer
                   ) ;
-  }
 
   return resistances ;
 }
@@ -179,13 +200,13 @@ double *
 fill_capacities_die
 (
 #ifdef DEBUG_FILL_CAPACITIES
-  FILE *debug,
-  int current_layer,
+  FILE       *debug,
+  int        current_layer,
 #endif
-  Die *die,
-  double *capacities,
-  Dimensions *dim,
-  double delta_time
+  Die        *die,
+  double     *capacities,
+  Dimensions *dimensions,
+  double     delta_time
 )
 {
   Layer *layer ;
@@ -199,15 +220,13 @@ fill_capacities_die
   for
   (
     layer = die->LayersList ;
-
     layer != NULL ;
-
 #ifdef DEBUG_FILL_CAPACITIES
     current_layer++,
 #endif
     layer = layer->Next
   )
-  {
+
     capacities = fill_capacities_layer
                  (
 #ifdef DEBUG_FILL_CAPACITIES
@@ -216,10 +235,9 @@ fill_capacities_die
 #endif
                    layer,
                    capacities,
-                   dim,
+                   dimensions,
                    delta_time
                  ) ;
-  }
 
   return capacities ;
 }
@@ -232,13 +250,13 @@ double *
 fill_sources_die
 (
 #ifdef DEBUG_FILL_SOURCES
-  FILE *debug,
-  int current_layer,
+  FILE       *debug,
+  int        current_layer,
 #endif
-  Die *die,
-  Floorplan *floorplan,
-  double *sources,
-  Dimensions *dim
+  Die        *die,
+  Floorplan  *floorplan,
+  double     *sources,
+  Dimensions *dimensions
 )
 {
   Layer *layer ;
@@ -252,17 +270,15 @@ fill_sources_die
   for
   (
     layer = die->LayersList ;
-
     layer != NULL ;
-
 #ifdef DEBUG_FILL_SOURCES
     current_layer++,
 #endif
     layer = layer->Next
   )
-  {
+
     if ( die->SourcesId == layer->Id )
-    {
+
       sources = fill_sources_active_layer
                 (
 #ifdef DEBUG_FILL_SOURCES
@@ -272,11 +288,11 @@ fill_sources_die
 #endif
                   floorplan,
                   sources,
-                  dim
+                  dimensions
                 ) ;
-    }
+
     else
-    {
+
       sources = fill_sources_empty_layer
                 (
 #ifdef DEBUG_FILL_SOURCES
@@ -285,10 +301,8 @@ fill_sources_die
                   layer,
 #endif
                   sources,
-                  dim
+                  dimensions
                 ) ;
-    }
-  }
 
   return sources ;
 }
@@ -301,20 +315,20 @@ int
 fill_system_matrix_die
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE *debug,
+  FILE        *debug,
 #endif
-  Die *die,
-  Dimensions *dim,
+  Die         *die,
+  Dimensions  *dimensions,
   Resistances *resistances,
-  double *capacities,
-  int *columns,
-  int *rows,
-  double *values,
-  int current_layer
+  double      *capacities,
+  int         *columns,
+  int         *rows,
+  double      *values,
+  int         current_layer
 )
 {
   Layer *layer ;
-  int tot_added, added, area ;
+  int tot_added, added ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
@@ -326,28 +340,30 @@ fill_system_matrix_die
   (
     added     = 0 ,
     tot_added = 0 ,
-    area      = dim->Grid.NRows * dim->Grid.NColumns ,
     layer     = die->LayersList ;
-
     layer != NULL ;
-
     current_layer ++ ,
-    resistances   += area ,
-    capacities    += area ,
-    columns       += area ,
+    resistances   += get_layer_area (dimensions) ,
+    capacities    += get_layer_area (dimensions) ,
+    columns       += get_layer_area (dimensions) ,
     rows          += added ,
     values        += added ,
     tot_added     += added ,
     layer          = layer->Next
   )
-  {
-    added = fill_system_matrix_layer (
+
+    added = fill_system_matrix_layer
+            (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
               debug, layer,
 #endif
-              dim, resistances, capacities,
-              columns, rows, values, current_layer) ;
-  }
+              dimensions, resistances, capacities,
+              columns, rows, values, current_layer
+            ) ;
 
   return tot_added ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

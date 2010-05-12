@@ -30,84 +30,97 @@ extern "C"
 
   struct die
   {
-    char* Id ;               /* The id (string) of the die */
+    char* Id ;                  /* The id (string) of the die                 */
 
-    Layer *LayersList ;      /* The list of layers composing the die */
+    Layer *LayersList ;         /* The list of layers composing the die       */
 
-    int NLayers ;            /* The number of layer composing the die */
+    int NLayers ;               /* The number of layer composing the die      */
 
-    int SourcesId ;          /* The id of the layer with the sources on it */
+    int SourcesId ;             /* The id of the layer with the sources on it */
 
-    struct die* Next ;       /* To collect dies in a linked list */
+    struct die* Next ;          /* To collect dies in a linked list           */
 
   } ;
 
   typedef struct die Die ;
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-  void init_die (Die *die) ;
+  void
+  init_die               (Die *die) ;
 
-  Die *alloc_and_init_die (void) ;
+  Die *
+  alloc_and_init_die     (void) ;
 
-  void free_die (Die *die) ;
+  void
+  free_die               (Die *die) ;
 
-  void free_dies_list (Die *list) ;
+  void
+  free_dies_list         (Die *list) ;
 
-  void print_die (FILE *stream, char* prefix, Die *die) ;
+  void
+  print_die              (FILE *stream, char* prefix, Die *die) ;
 
-  void print_dies_list (FILE *stream, char* prefix, Die *list) ;
+  void
+  print_dies_list        (FILE *stream, char* prefix, Die *list) ;
 
-  Die *find_die_in_list (Die *list, char *id) ;
+  Die *
+  find_die_in_list       (Die *list, char *id) ;
 
-  Resistances *fill_resistances_die (
-#ifdef DEBUG_FILL_RESISTANCES
-                                     FILE *debug,
-#endif
-                                     Die *die,
-                                     Resistances *resistances,
-                                     Dimensions *dim,
-                                     int current_layer) ;
+  Resistances *
+  fill_resistances_die   (
+                          #ifdef DEBUG_FILL_RESISTANCES
+                          FILE        *debug,
+                          #endif
+                          Die         *die,
+                          Resistances *resistances,
+                          Dimensions  *dimensions,
+                          int         current_layer
+                         ) ;
 
-  double *fill_capacities_die (
-#ifdef DEBUG_FILL_CAPACITIES
-                                FILE *debug,
-                                int current_layer,
-#endif
-                                Die *die,
-                                double *capacities,
-                                Dimensions *dim,
-                                double delta_time) ;
+  double *
+  fill_capacities_die    (
+                          #ifdef DEBUG_FILL_CAPACITIES
+                          FILE       *debug,
+                          int        current_layer,
+                          #endif
+                          Die        *die,
+                          double     *capacities,
+                          Dimensions *dimensions,
+                          double     delta_time
+                         ) ;
 
-  double *fill_sources_die (
-#ifdef DEBUG_FILL_SOURCES
-                             FILE *debug,
-                             int current_layer,
-#endif
-                             Die *die,
-                             Floorplan *floorplan,
-                             double *sources,
-                             Dimensions *dim) ;
+  double *
+  fill_sources_die       (
+                          #ifdef DEBUG_FILL_SOURCES
+                          FILE       *debug,
+                          int        current_layer,
+                          #endif
+                          Die        *die,
+                          Floorplan  *floorplan,
+                          double     *sources,
+                          Dimensions *dimensions
+                         ) ;
 
+  int
+  fill_system_matrix_die (
+                          #ifdef DEBUG_FILL_SYSTEM_MATRIX
+                          FILE        *debug,
+                          #endif
+                          Die         *die,
+                          Dimensions  *dimensions,
+                          Resistances *resistances,
+                          double      *capacities,
+                          int         *columns,
+                          int         *rows,
+                          double      *values,
+                          int         current_layer
+                         ) ;
 
-
-  int fill_system_matrix_die
-                (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  FILE *debug,
-#endif
-                  Die *die,
-                  Dimensions *dim,
-                  Resistances *resistances,
-                  double *capacities,
-                  int *columns,
-                  int *rows,
-                  double *values,
-                  int current_layer
-                ) ;
-
-
-
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 #ifdef __cplusplus
