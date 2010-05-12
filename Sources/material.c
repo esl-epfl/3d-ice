@@ -13,14 +13,19 @@
 
 #include "material.h"
 
-void
-init_material (Material * material)
-{
-  if (material == NULL) return ;
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
+void
+init_material
+(
+  Material *material
+)
+{
   material->Id                  = NULL ;
-  material->SpecificHeat        = 0.0 ;
-  material->ThermalConductivity = 0.0 ;
+  material->SpecificHeat        = 0.0  ;
+  material->ThermalConductivity = 0.0  ;
   material->Next                = NULL ;
 }
 
@@ -29,11 +34,14 @@ init_material (Material * material)
 /******************************************************************************/
 
 Material *
-alloc_and_init_material (void)
+alloc_and_init_material
+(
+ void
+)
 {
   Material *material = (Material *) malloc (sizeof (Material)) ;
 
-  init_material (material) ;
+  if (material != NULL) init_material (material) ;
 
   return material ;
 }
@@ -43,10 +51,11 @@ alloc_and_init_material (void)
 /******************************************************************************/
 
 void
-free_material (Material * material)
+free_material
+(
+  Material *material
+)
 {
-  if (material == NULL) return ;
-
   free (material->Id) ;
   free (material) ;
 }
@@ -56,14 +65,16 @@ free_material (Material * material)
 /******************************************************************************/
 
 void
-free_materials_list (Material * list)
+free_materials_list
+(
+  Material *list
+)
 {
   Material *next_material ;
 
-  for (; list != NULL; list = next_material)
+  for ( ; list != NULL ; list = next_material)
   {
       next_material = list->Next ;
-
       free_material (list) ;
   }
 }
@@ -73,17 +84,19 @@ free_materials_list (Material * list)
 /******************************************************************************/
 
 void
-print_material (FILE * stream, char *prefix, Material * material)
+print_material
+(
+  FILE     *stream,
+  char     *prefix,
+  Material *material
+)
 {
   fprintf (stream,
-           "%sMaterial %s:\n",                prefix,
-                                              material->Id) ;
+    "%sMaterial %s:\n",                prefix, material->Id) ;
   fprintf (stream,
-           "%s  Specific Heat        %.4e\n", prefix,
-                                              material->SpecificHeat) ;
+    "%s  Specific Heat        %.5e\n", prefix, material->SpecificHeat) ;
   fprintf (stream,
-           "%s  Thermal Conductivity %.4e\n", prefix,
-                                              material->ThermalConductivity) ;
+    "%s  Thermal Conductivity %.5e\n", prefix, material->ThermalConductivity) ;
 }
 
 /******************************************************************************/
@@ -91,12 +104,16 @@ print_material (FILE * stream, char *prefix, Material * material)
 /******************************************************************************/
 
 void
-print_materials_list (FILE * stream, char *prefix, Material * list)
+print_materials_list
+(
+  FILE     *stream,
+  char     *prefix,
+  Material *list
+)
 {
-  for (; list != NULL; list = list->Next)
-  {
+  for ( ; list != NULL ; list = list->Next)
+
     print_material (stream, prefix, list) ;
-  }
 }
 
 /******************************************************************************/
@@ -104,15 +121,19 @@ print_materials_list (FILE * stream, char *prefix, Material * list)
 /******************************************************************************/
 
 Material *
-find_material_in_list (Material * list, char *id)
+find_material_in_list
+(
+  Material *list,
+  char *id
+)
 {
-  for (; list != NULL; list = list->Next)
-  {
-    if (strcmp (list->Id, id) == 0)
-    {
-      break ;
-    }
-  }
+  for ( ; list != NULL ; list = list->Next)
+
+    if (strcmp (list->Id, id) == 0) break ;
 
   return list ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

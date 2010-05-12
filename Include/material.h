@@ -20,40 +20,51 @@ extern "C"
 
 /******************************************************************************
  *                                                                            *
- * "Material" : the representation of a single material composing layers.     *
+ * "Material" : the representation of a single material                       *
  *                                                                            *
  ******************************************************************************/
 
   struct material
   {
-    char *Id ;                   /* The Id (string) of the material */
+    char *Id ;                       /* The Id (string) of the material       */
 
-    double SpecificHeat ;        /* The specific heat (capacity) */
+    double SpecificHeat ;            /* The specific heat (capacity)          */
 
-    double ThermalConductivity ; /* The thermal conductivity (resistance) */
+    double ThermalConductivity ;     /* The thermal conductivity (resistance) */
 
-    struct material *Next ;      /* To collect materials in a linked list */
+    struct material *Next ;          /* To collect materials in a linked list */
 
   };
 
   typedef struct material Material ;
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-  void init_material (Material *material) ;
+  void
+  init_material            (Material *material) ;
 
-  Material *alloc_and_init_material (void) ;
+  Material *
+  alloc_and_init_material  (void) ;
 
-  void free_material (Material *material) ;
+  void
+  free_material            (Material *material) ;
 
-  void free_materials_list (Material *list) ;
+  void
+  free_materials_list      (Material *list) ;
 
-  void print_material (FILE *stream, char *prefix, Material *material) ;
+  void
+  print_material           (FILE *stream, char *prefix, Material *material) ;
 
-  void print_materials_list (FILE *stream, char *prefix, Material *list) ;
+  void
+  print_materials_list     (FILE *stream, char *prefix, Material *list) ;
 
-  Material *find_material_in_list (Material *list, char *id) ;
+  Material *
+  find_material_in_list    (Material *list, char *id) ;
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 #ifdef __cplusplus
