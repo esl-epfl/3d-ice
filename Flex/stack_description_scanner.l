@@ -108,7 +108,9 @@ path                    (\/|\.{1,2}|\_|[[:alnum:]])*
 
 "cell"                       return CELL ;
 "channel"                    return CHANNEL ;
+"chip"                       return CHIP ;
 "die"                        return DIE ;
+"dimensions"                 return DIMENSIONS ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
 "heat transfer coefficient"  return HTC ;

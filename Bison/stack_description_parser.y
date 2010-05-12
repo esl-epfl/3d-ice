@@ -37,19 +37,7 @@
 
 %destructor { free($$) ; } <string> ;
 
-%type <double_v> width_mm
-%type <double_v> width_um
-%type <double_v> length_mm
-%type <double_v> length_um
-%type <double_v> thermal_conductivity
-%type <double_v> specific_heat
-%type <double_v> height_um
-%type <double_v> liquid_htc
-%type <double_v> liquid_sh
-
 %type <int_v> sources_position
-
-%type <string> wall
 
 %type <material_p> material
 %type <material_p> materials_list
@@ -64,8 +52,10 @@
 %type <stack_element_p> stack_elements
 
 %token CHANNEL               "keyword channel"
+%token CHIP                  "keyword chip"
 %token CELL                  "keyword cell"
 %token DIE                   "keyword die"
+%token DIMENSIONS            "keyword dimensions"
 %token FIRST                 "keyword first"
 %token LAYER                 "keyword layer"
 %token LAST                  "keyword last"
@@ -125,15 +115,6 @@ stack_description_file
   : materials_list
     channel
     dies_list
-    {
-      stkd->Dimensions = alloc_and_init_dimensions() ;
-
-      if (stkd->Dimensions == NULL)
-      {
-        stack_description_error(stkd, scanner, "alloc_and_init_dimensions") ;
-        YYABORT ;
-      }
-    }
     stack
     dimensions
   ;
@@ -159,8 +140,8 @@ materials_list
 material
 
   : MATERIAL IDENTIFIER ':'
-       thermal_conductivity
-       specific_heat
+       THERMAL_CONDUCTIVITY DVALUE ';'
+       SPECIFIC_HEAT DVALUE ';'
     {
       Material *material = alloc_and_init_material() ;
 
@@ -171,8 +152,8 @@ material
       }
 
       material->Id                  = $2 ;
-      material->ThermalConductivity = $4 ;
-      material->SpecificHeat        = $5 ;
+      material->ThermalConductivity = $5 ;
+      material->SpecificHeat        = $8 ;
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
@@ -192,40 +173,34 @@ material
 channel
 
   : CHANNEL ':'
-      height_um
-      wall
-      liquid_htc
-      liquid_sh
+      HEIGHT DVALUE UM            ';'
+      WALL MATERIAL IDENTIFIER    ';'
+      LIQUID HTC DVALUE           ';'
+      LIQUID SPECIFIC_HEAT DVALUE ';'
     {
       stkd->Channel = alloc_and_init_channel() ;
 
       if (stkd->Channel == NULL)
       {
-        free($4) ;
+        free($9) ;
         stack_description_error(stkd, scanner, "alloc_and_init_channel") ;
         YYABORT ;
       }
 
-      stkd->Channel->Height       = $3 ;
-      stkd->Channel->LiquidHTC    = $5 ;
-      stkd->Channel->LiquidSH     = $6 ;
+      stkd->Channel->Height       = $4  ;
+      stkd->Channel->LiquidHTC    = $13 ;
+      stkd->Channel->LiquidSH     = $17 ;
       stkd->Channel->WallMaterial
-        = find_material_in_list(stkd->MaterialsList, $4) ;
+        = find_material_in_list(stkd->MaterialsList, $9) ;
 
       if (stkd->Channel->WallMaterial == NULL)
       {
-        free($4) ;
+        free($9) ;
         stack_description_error(stkd, scanner, "Unknown material id") ;
         YYABORT ;
       }
-      free($4) ;
+      free($9) ;
     }
-  ;
-
-wall
-
-  : WALL MATERIAL IDENTIFIER ';'
-    { $$ = $3; }
   ;
 
 /******************************************************************************/
@@ -362,13 +337,7 @@ sources_position
 stack
 
   : STACK ':'
-        length_mm
-        width_mm
-        stack_elements
-    {
-      stkd->Dimensions->Chip.Length = $3;
-      stkd->Dimensions->Chip.Width  = $4;
-    }
+      stack_elements
   ;
 
 stack_elements
@@ -376,9 +345,6 @@ stack_elements
   : stack_element
     {
       stkd->StackElementsList = $1 ;
-
-      stkd->Dimensions->Grid.NLayers += $1->NLayers ;
-
       $$ = $1 ;
     }
   | stack_elements stack_element
@@ -392,10 +358,8 @@ stack_elements
       }
 
       stkd->StackElementsList = $2 ;
+
       $2->Next = $1 ;
-
-      stkd->Dimensions->Grid.NLayers += $2->NLayers ;
-
       $$ = $2 ;
     }
   ;
@@ -488,58 +452,63 @@ stack_element
 
 dimensions
 
-  : CELL length_um
-    CELL width_um
-    FIRST CELL length_um
-    LAST CELL length_um
+  : DIMENSIONS ':'
+      CHIP LENGTH DVALUE MM ';'
+      CHIP WIDTH  DVALUE MM ';'
+      CELL LENGTH DVALUE UM ';'
+      CELL WIDTH  DVALUE UM ';'
+      FIRST CELL LENGTH DVALUE UM ';'
+      LAST  CELL LENGTH DVALUE UM ';'
     {
-      stkd->Dimensions->Cell.Length      = $2 ;
-      stkd->Dimensions->Cell.Width       = $4 ;
-      stkd->Dimensions->Cell.FirstLength = $7 ;
-      stkd->Dimensions->Cell.LastLength  = $10 ;
+      stkd->Dimensions = alloc_and_init_dimensions() ;
+
+      if (stkd->Dimensions == NULL)
+      {
+        stack_description_error(stkd, scanner, "alloc_and_init_dimensions") ;
+        YYABORT ;
+      }
+
+      stkd->Dimensions->Chip.Length      = $5  ;
+      stkd->Dimensions->Chip.Width       = $10 ;
+      stkd->Dimensions->Cell.Length      = $15 ;
+      stkd->Dimensions->Cell.Width       = $20 ;
+      stkd->Dimensions->Cell.FirstLength = $26 ;
+      stkd->Dimensions->Cell.LastLength  = $32 ;
+
+      stkd->Dimensions->Grid.NRows
+        = (stkd->Dimensions->Chip.Width * 1000.0)
+          / stkd->Dimensions->Cell.Width ;
+
+      stkd->Dimensions->Grid.NColumns
+        = ( ( (stkd->Dimensions->Chip.Length * 1000.0)
+              - stkd->Dimensions->Cell.FirstLength
+              - stkd->Dimensions->Cell.LastLength )
+            / stkd->Dimensions->Cell.Length )
+          + 2 ;
+
+      StackElement *stk_el = stkd->StackElementsList ;
+
+      for ( ; stk_el != NULL ; stk_el = stk_el->Next)
+
+        stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
+
+      stkd->Dimensions->Grid.NCells
+        = stkd->Dimensions->Grid.NLayers
+          * stkd->Dimensions->Grid.NRows
+          * stkd->Dimensions->Grid.NColumns ;
+
+      stkd->Dimensions->Grid.NNz
+        =   stkd->Dimensions->Grid.NLayers
+            * (
+                  stkd->Dimensions->Grid.NRows
+                  * (3 * stkd->Dimensions->Grid.NColumns - 2)
+                + 2 * stkd->Dimensions->Grid.NColumns
+                  * (stkd->Dimensions->Grid.NRows - 1)
+              )
+          + (stkd->Dimensions->Grid.NLayers - 1 ) * 2
+            * stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns ;
     }
   ;
-
-/******************************************************************************/
-/******************************* Float and integer values *********************/
-/******************************************************************************/
-
-thermal_conductivity
-
-  : THERMAL_CONDUCTIVITY DVALUE ';' { $$ = $2 ; } ;
-
-specific_heat
-
-  : SPECIFIC_HEAT DVALUE ';' { $$ = $2 ; } ;
-
-height_um
-
-  : HEIGHT DVALUE UM ';' { $$ = $2 ; } ;
-
-liquid_htc
-
-  : LIQUID HTC DVALUE ';' { $$ = $3 ; } ;
-
-liquid_sh
-
-  : LIQUID SPECIFIC_HEAT DVALUE ';' { $$ = $3 ; } ;
-
-length_um
-
-  : LENGTH DVALUE UM ';' { $$ = $2 ; } ;
-
-width_um
-
-  : WIDTH DVALUE UM ';' { $$ = $2 ; } ;
-
-length_mm
-
-  : LENGTH DVALUE MM ';' { $$ = $2 ; } ;
-
-
-width_mm
-
-  : WIDTH DVALUE MM ';' { $$ = $2 ; }  ;
 
 %%
 

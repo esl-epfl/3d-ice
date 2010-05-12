@@ -73,39 +73,6 @@ fill_stack_description
 
   if (result == 1) return result ;
 
-  stkd->Dimensions->Grid.NRows
-
-      = (stkd->Dimensions->Chip.Width * 1000.0) / stkd->Dimensions->Cell.Width ;
-
-  stkd->Dimensions->Grid.NColumns
-
-      = ( ( (stkd->Dimensions->Chip.Length * 1000.0)
-            - stkd->Dimensions->Cell.FirstLength
-            - stkd->Dimensions->Cell.LastLength )
-          / stkd->Dimensions->Cell.Length )
-        + 2 ;
-
-  stkd->Dimensions->Grid.NCells
-
-      = stkd->Dimensions->Grid.NLayers
-        * stkd->Dimensions->Grid.NRows
-        * stkd->Dimensions->Grid.NColumns ;
-
-  stkd->Dimensions->Grid.NNz
-
-      =   stkd->Dimensions->Grid.NLayers
-          * (
-                stkd->Dimensions->Grid.NRows
-                * (3 * stkd->Dimensions->Grid.NColumns - 2)
-              + 2 * stkd->Dimensions->Grid.NColumns
-                * (stkd->Dimensions->Grid.NRows - 1)
-            )
-        + (stkd->Dimensions->Grid.NLayers - 1 ) * 2
-          * stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns ;
-
-  // Now we know all the dimensions so we can parse the floorplan
-  // files and check if the floorplan elements are well positionated.
-
   return fill_floorplans (stkd) ;
 }
 

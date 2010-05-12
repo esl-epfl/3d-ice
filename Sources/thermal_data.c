@@ -188,6 +188,11 @@ free_thermal_data (ThermalData *tdata)
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_X);
   free                      (tdata->Temperatures) ;
 
+  if (tdata->SLU_Options.Fact == FACTORED)
+  {
+    Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L);
+    Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U);
+  }
 }
 
 /******************************************************************************/
