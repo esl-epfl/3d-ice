@@ -31,55 +31,65 @@ extern "C"
   typedef enum
   {
     TL_STACK_ELEMENT_NONE = 0,
-    TL_STACK_ELEMENT_LAYER,
-    TL_STACK_ELEMENT_CHANNEL,
+    TL_STACK_ELEMENT_LAYER   ,
+    TL_STACK_ELEMENT_CHANNEL ,
     TL_STACK_ELEMENT_DIE
 
   } StackElement_t ;
 
   typedef union
   {
-    Layer   *Layer ;
-    Die     *Die ;
+    Layer *Layer ;
+    Die   *Die ;
+
   } StackElement_p ;
 
   struct stack_element
   {
-    StackElement_t  Type ;    /* The type of the stack element */
+    int Id ;                  /* The id (integer) of the stack element        */
 
-    StackElement_p  Pointer ; /* The pointer to the effective stack element */
-                              /* corresponding to the value in Type         */
+    StackElement_t  Type ;    /* The type of the stack element                */
 
-    Floorplan *Floorplan ;    /* A pointer to a Floorplan. This field is   */
-                              /* used only if Type == TL_STACK_ELEMENT_DIE */
+    StackElement_p  Pointer ; /* The pointer to the effective stack element   */
+                              /* corresponding to the value in Type           */
 
-    int Id ;                  /* The id (integer) of the stack element */
+    int NLayers ;             /* The number of layer composing the stack      */
+                              /* element                                      */
 
-    int NLayers ;             /* The number of layer composing the stack */
-                              /* element                                 */
+    Floorplan *Floorplan ;    /* A pointer to a Floorplan. This field is      */
+                              /* used only if Type == TL_STACK_ELEMENT_DIE    */
 
-    struct stack_element *Next ; /* To collect stack elements in a */
-                                 /* linked list                    */
+    struct stack_element *Next ;            /* To collect stack elements in a */
+                                            /* linked list                    */
 
   } ;
 
   typedef struct stack_element StackElement ;
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-  void init_stack_element (StackElement *stack_element) ;
+  void
+  init_stack_element         (StackElement *stack_element) ;
 
-  StackElement *alloc_and_init_stack_element (void) ;
+  StackElement *
+  alloc_and_init_stack_element (void) ;
 
-  void free_stack_element (StackElement *stack_element) ;
-  void free_stack_elements_list  (StackElement *list) ;
+  void
+  free_stack_element         (StackElement *stack_element) ;
 
-  void print_stack_elements_list (FILE *stream,
-                                  char *prefix,
-                                  StackElement *list) ;
+  void
+  free_stack_elements_list   (StackElement *list) ;
 
-  StackElement *find_stack_element_in_list (StackElement *list, int id) ;
+  void
+  print_stack_elements_list  (FILE *stream, char *prefix, StackElement *list) ;
 
+  StackElement *
+  find_stack_element_in_list (StackElement *list, int id) ;
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 #ifdef __cplusplus

@@ -15,8 +15,6 @@
 void
 init_stack_element (StackElement *stack_element)
 {
-  if (stack_element == NULL) return ;
-
   stack_element->Type            = TL_STACK_ELEMENT_NONE ;
   stack_element->Pointer.Layer   = NULL ;
   stack_element->Pointer.Die     = NULL ;
@@ -31,12 +29,15 @@ init_stack_element (StackElement *stack_element)
 /******************************************************************************/
 
 StackElement *
-alloc_and_init_stack_element (void)
+alloc_and_init_stack_element
+(
+  void
+)
 {
   StackElement *stack_element
     = (StackElement *) malloc( sizeof(StackElement) ) ;
 
-  init_stack_element(stack_element) ;
+  if (stack_element != NULL) init_stack_element(stack_element) ;
 
   return stack_element ;
 }
@@ -46,10 +47,11 @@ alloc_and_init_stack_element (void)
 /******************************************************************************/
 
 void
-free_stack_element (StackElement *stack_element)
+free_stack_element
+(
+  StackElement *stack_element
+)
 {
-  if (stack_element == NULL) return ;
-
   if (stack_element->Type == TL_STACK_ELEMENT_DIE)
 
     free_floorplan (stack_element->Floorplan) ;
@@ -66,13 +68,16 @@ free_stack_element (StackElement *stack_element)
 /******************************************************************************/
 
 void
-free_stack_elements_list (StackElement *list)
+free_stack_elements_list
+(
+  StackElement *list
+)
 {
-  StackElement *next_stack_element ;
-  for ( ; list != NULL; list = next_stack_element)
-    {
-      next_stack_element = list->Next ;
+  StackElement *next ;
 
+  for ( ; list != NULL; list = next)
+    {
+      next = list->Next ;
       free_stack_element (list) ;
     }
 }
@@ -82,7 +87,12 @@ free_stack_elements_list (StackElement *list)
 /******************************************************************************/
 
 void
-print_stack_elements_list (FILE *stream, char *prefix, StackElement *list)
+print_stack_elements_list
+(
+  FILE         *stream,
+  char         *prefix,
+  StackElement *list
+)
 {
   for ( ; list != NULL ; list = list->Next)
   {
@@ -97,13 +107,15 @@ print_stack_elements_list (FILE *stream, char *prefix, StackElement *list)
 
       case TL_STACK_ELEMENT_DIE :
 
-        fprintf (stream, "die     (%s) %s \n",
+        fprintf (stream,
+          "die     (%s) %s \n",
           list->Pointer.Die->Id, list->Floorplan->FileName) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
-        fprintf (stream, "layer   (%s) %5.2f um\n",
+        fprintf (stream,
+          "layer   (%s) %5.2f um\n",
           list->Pointer.Layer->Material->Id, list->Pointer.Layer->Height) ;
         break ;
 
@@ -125,15 +137,19 @@ print_stack_elements_list (FILE *stream, char *prefix, StackElement *list)
 /******************************************************************************/
 
 StackElement *
-find_stack_element_in_list (StackElement *list, int id)
+find_stack_element_in_list
+(
+  StackElement *list,
+  int          id
+)
 {
   for ( ; list != NULL ; list = list->Next)
-  {
-    if (list->Id == id)
-    {
-      break ;
-    }
-  }
+
+    if (list->Id == id)  break ;
 
  return list ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
