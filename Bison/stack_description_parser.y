@@ -485,6 +485,12 @@ dimensions
             / stkd->Dimensions->Cell.Length )
           + 2 ;
 
+      if (stkd->Dimensions->Grid.NColumns % 2 == 0)
+      {
+        stack_description_error(stkd, scanner, "even number of columns") ;
+        YYABORT ;
+      }
+
       StackElement *stk_el = stkd->StackElementsList ;
 
       for ( ; stk_el != NULL ; stk_el = stk_el->Next)
