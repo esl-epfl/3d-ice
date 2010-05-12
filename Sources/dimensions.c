@@ -131,18 +131,117 @@ free_dimensions (Dimensions * dim)
 /******************************************************************************/
 
 double
-get_cell_length (Dimensions * dim, int column)
+get_cell_width
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Cell.Width;
+}
+
+/******************************************************************************/
+
+double
+get_cell_length
+(
+  Dimensions *dimensions,
+  int        column
+)
 {
   if (column == 0)
-  {
-    return dim->Cell.FirstLength;
-  }
-  else if (column == dim->Grid.NColumns - 1)
-  {
-    return dim->Cell.LastLength;
-  }
-  else
-  {
-    return dim->Cell.Length;
-  }
+
+    return dimensions->Cell.FirstLength;
+
+  else if (column == get_number_of_columns (dimensions) - 1)
+
+    return dimensions->Cell.LastLength;
+
+  return dimensions->Cell.Length;
 }
+
+/******************************************************************************/
+
+int
+get_number_of_layers
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Grid.NLayers ;
+}
+
+/******************************************************************************/
+
+int
+get_number_of_rows
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Grid.NRows ;
+}
+
+/******************************************************************************/
+
+int
+get_number_of_columns
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Grid.NColumns ;
+}
+
+/******************************************************************************/
+
+int
+get_cell_top_surface
+(
+  Dimensions *dimensions,
+  int        column
+)
+{
+  return get_cell_length (dimensions, column) * get_cell_width (dimensions) ;
+}
+
+/******************************************************************************/
+
+int
+get_cell_offset_in_layer
+(
+  Dimensions *dimensions,
+  int row,
+  int column
+)
+{
+  return row * dimensions->Grid.NColumns + column ;
+}
+
+/******************************************************************************/
+
+int
+get_layer_area
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Grid.NRows * dimensions->Grid.NColumns ;
+}
+
+/******************************************************************************/
+
+int
+get_cell_offset_in_stack
+(
+  Dimensions *dimensions,
+  int layer,
+  int row,
+  int column
+)
+{
+  return layer * get_layer_area (dimensions)
+         + row * get_number_of_columns (dimensions)
+         + column ;
+}
+
+/******************************************************************************/

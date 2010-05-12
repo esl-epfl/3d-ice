@@ -70,11 +70,11 @@ free_materials_list
   Material *list
 )
 {
-  Material *next_material ;
+  Material *next ;
 
-  for ( ; list != NULL ; list = next_material)
+  for ( ; list != NULL ; list = next)
   {
-      next_material = list->Next ;
+      next = list->Next ;
       free_material (list) ;
   }
 }

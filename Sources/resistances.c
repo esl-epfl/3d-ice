@@ -29,7 +29,7 @@ fill_resistances_solid_cell
 )
 {
   LayerPosition_t position
-    = get_layer_position(&dimensions->Grid, current_layer) ;
+    = get_layer_position(dimensions, current_layer) ;
 
   resistances->North = resistances->South
     = (thermal_conductivity * cell_length * cell_height ) / (cell_width / 2.0) ;
@@ -106,7 +106,7 @@ fill_resistances_liquid_cell
 )
 {
   LayerPosition_t position
-    = get_layer_position(&dimensions->Grid, current_layer) ;
+    = get_layer_position(dimensions, current_layer) ;
 
   double C = liquid_sh * 1.62e6 * (cell_length * cell_height ) * 0.5;
 
