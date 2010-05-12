@@ -408,3 +408,121 @@ get_min_avg_max_temperatures_floorplan
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+int
+get_all_max_temperatures_floorplan
+(
+  Floorplan *floorplan,
+  Dimensions *dim,
+  double *temperatures,
+  double *max_temperature
+)
+{
+  FloorplanElement *flp_el = floorplan->ElementsList ;
+
+  for ( ; flp_el != NULL ; flp_el = flp_el->Next )
+  {
+    get_max_temperature_floorplan_element
+    (
+      flp_el,
+      dim,
+      temperatures,
+      max_temperature++
+    );
+  }
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_all_min_temperatures_floorplan
+(
+  Floorplan *floorplan,
+  Dimensions *dim,
+  double *temperatures,
+  double *min_temperature
+)
+{
+  FloorplanElement *flp_el = floorplan->ElementsList ;
+
+  for ( ; flp_el != NULL ; flp_el = flp_el->Next )
+  {
+    get_min_temperature_floorplan_element
+    (
+      flp_el,
+      dim,
+      temperatures,
+      min_temperature++
+    );
+  }
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_all_avg_temperatures_floorplan
+(
+  Floorplan *floorplan,
+  Dimensions *dim,
+  double *temperatures,
+  double *avg_temperature
+)
+{
+  FloorplanElement *flp_el = floorplan->ElementsList ;
+
+  for ( ; flp_el != NULL ; flp_el = flp_el->Next )
+  {
+    get_avg_temperature_floorplan_element
+    (
+      flp_el,
+      dim,
+      temperatures,
+      avg_temperature++
+    );
+  }
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+get_all_min_avg_max_temperatures_floorplan
+(
+  Floorplan *floorplan,
+  Dimensions *dim,
+  double *temperatures,
+  double *min_temperature,
+  double *avg_temperature,
+  double *max_temperature
+)
+{
+  FloorplanElement *flp_el = floorplan->ElementsList ;
+
+  for ( ; flp_el != NULL ; flp_el = flp_el->Next )
+  {
+    get_min_avg_max_temperatures_floorplan_element
+    (
+      flp_el,
+      dim,
+      temperatures,
+      min_temperature++, avg_temperature++, max_temperature++
+    );
+  }
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

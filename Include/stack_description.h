@@ -126,6 +126,30 @@ extern "C"
                                                 double *avg_temperature,
                                                 double *max_temperature) ;
 
+
+
+  int get_all_max_temperatures_in_floorplan (StackDescription *stkd,
+                                             int stack_element_id,
+                                             double *temperatures,
+                                             double *max_temperature) ;
+
+  int get_all_min_temperatures_in_floorplan (StackDescription *stkd,
+                                             int stack_element_id,
+                                             double *temperatures,
+                                             double *min_temperature) ;
+
+  int get_all_avg_temperatures_in_floorplan (StackDescription *stkd,
+                                             int stack_element_id,
+                                             double *temperatures,
+                                             double *avg_temperature) ;
+
+  int get_all_min_avg_max_temperatures_in_floorplan (StackDescription *stkd,
+                                                int stack_element_id,
+                                                double *temperatures,
+                                                double *min_temperature,
+                                                double *avg_temperature,
+                                                double *max_temperature) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

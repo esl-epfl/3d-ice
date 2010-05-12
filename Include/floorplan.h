@@ -103,6 +103,32 @@ extern "C"
         double *max_temperature);
 
 
+  int get_all_max_temperatures_floorplan
+      ( Floorplan *floorplan,
+        Dimensions *dim,
+        double *temperatures,
+        double *max_temperature);
+
+  int get_all_min_temperatures_floorplan
+      ( Floorplan *floorplan,
+        Dimensions *dim,
+        double *temperatures,
+        double *min_temperature);
+
+  int get_all_avg_temperatures_floorplan
+      ( Floorplan *floorplan,
+        Dimensions *dim,
+        double *temperatures,
+        double *avg_temperature);
+
+  int get_all_min_avg_max_temperatures_floorplan
+      ( Floorplan *floorplan,
+        Dimensions *dim,
+        double *temperatures,
+        double *min_temperature,
+        double *avg_temperature,
+        double *max_temperature);
+
 /******************************************************************************/
 
 #ifdef __cplusplus
