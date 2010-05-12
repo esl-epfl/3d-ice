@@ -57,18 +57,23 @@
 %token DIE                   "keyword die"
 %token DIMENSIONS            "keyword dimensions"
 %token FIRST                 "keyword first"
+%token INCOMING              "keyword incoming"
+%token TEMPERATURE           "keyword temperature"
 %token LAYER                 "keyword layer"
 %token LAST                  "keyword last"
 %token MATERIAL              "keyword material"
 %token ON                    "keyword on"
 %token SOURCES               "keyword sources"
-%token SPECIFIC_HEAT         "keywords specific heat"
-%token THERMAL_CONDUCTIVITY  "keywords thermal conductivity"
+%token SPECIFIC              "keyword specific"
+%token HEAT                  "keyword heat"
+%token THERMAL               "keyword thermal"
+%token CONDUCTIVITY          "keyword conductivity"
 %token HEIGHT                "keyword height"
 %token UM                    "keyword um"
 %token WALL                  "keyword wall"
 %token LIQUID                "keyword liquid"
-%token HTC                   "keywords heat transfer coefficient"
+%token TRANSFER              "keyword transfer"
+%token COEFFICIENT           "keyword coefficient"
 %token WIDTH                 "keyword width"
 %token LENGTH                "keyword length"
 %token FLOORPLAN             "keyword floorplan"
@@ -140,8 +145,8 @@ materials_list
 material
 
   : MATERIAL IDENTIFIER ':'
-       THERMAL_CONDUCTIVITY DVALUE ';'
-       SPECIFIC_HEAT DVALUE ';'
+       THERMAL CONDUCTIVITY DVALUE ';'
+       SPECIFIC HEAT DVALUE ';'
     {
       Material *material = alloc_and_init_material() ;
 
@@ -152,8 +157,8 @@ material
       }
 
       material->Id                  = $2 ;
-      material->ThermalConductivity = $5 ;
-      material->SpecificHeat        = $8 ;
+      material->ThermalConductivity = $6 ;
+      material->SpecificHeat        = $10 ;
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
@@ -173,10 +178,11 @@ material
 channel
 
   : CHANNEL ':'
-      HEIGHT DVALUE UM            ';'
-      WALL MATERIAL IDENTIFIER    ';'
-      LIQUID HTC DVALUE           ';'
-      LIQUID SPECIFIC_HEAT DVALUE ';'
+      HEIGHT DVALUE UM ';'
+      WALL MATERIAL IDENTIFIER ';'
+      LIQUID HEAT TRANSFER COEFFICIENT DVALUE ';'
+      LIQUID SPECIFIC HEAT DVALUE ';'
+      LIQUID INCOMING TEMPERATURE DVALUE ';'
     {
       stkd->Channel = alloc_and_init_channel() ;
 
@@ -188,8 +194,8 @@ channel
       }
 
       stkd->Channel->Height       = $4  ;
-      stkd->Channel->LiquidHTC    = $13 ;
-      stkd->Channel->LiquidSH     = $17 ;
+      stkd->Channel->LiquidHTC    = $15 ;
+      stkd->Channel->LiquidSH     = $20 ;
       stkd->Channel->WallMaterial
         = find_material_in_list(stkd->MaterialsList, $9) ;
 

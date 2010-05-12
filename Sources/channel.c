@@ -23,10 +23,11 @@ init_channel
   Channel* channel
 )
 {
-  channel->Height       = 0.0  ;
-  channel->LiquidHTC    = 0.0  ;
-  channel->LiquidSH     = 0.0  ;
-  channel->WallMaterial = NULL ;
+  channel->Height        = 0.0  ;
+  channel->LiquidHTC     = 0.0  ;
+  channel->LiquidSH      = 0.0  ;
+  channel->TemperatureIn = 0.0  ;
+  channel->WallMaterial  = NULL ;
 }
 
 /******************************************************************************/
@@ -79,6 +80,9 @@ print_channel
     "%s  Liquid heat transfert coefficent %.5e\n", prefix, channel->LiquidHTC) ;
   fprintf(stream,
     "%s  Liquid specific heat             %.4e\n", prefix, channel->LiquidSH) ;
+  fprintf(stream,
+    "%s  Liquid incoming temperature      %.4e\n",
+    prefix, channel->TemperatureIn) ;
 
   Material *wall = channel->WallMaterial ;
 
@@ -310,7 +314,7 @@ fill_sources_channel
 
       if (row == 0 && column % 2 != 0) /* Only first row and odd columns */
       {
-        *sources = 2.0 * C * 300.0 ;
+        *sources = 2.0 * C * channel->TemperatureIn ;
 #ifdef DEBUG_FILL_SOURCES
       fprintf (debug,
         "liquid cell l %5d r %5d c %5d (%6d) -> %.5e\n",

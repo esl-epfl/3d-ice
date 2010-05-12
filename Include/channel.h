@@ -37,6 +37,8 @@ extern "C"
 
     double LiquidSH ;         /* The specific heat of the cooling liquid      */
 
+    double TemperatureIn ;    /* The temperarute of the incoming liquid       */
+
     Material *WallMaterial ;  /* A pointer to the Material composing the wall */
 
   } Channel ;
