@@ -18,29 +18,23 @@
 
 %union
 {
-  int  integer ;
-  char *string ;
-
-  struct integer_couple
-  {
-    int a ;
-    int b ;
-  } integers ;
-
+  int                      integer ;
+  char                     *string ;
   struct floorplan_element *p_floorplan_element ;
 }
 
 %{
 #include "floorplan_scanner.h"
 
-void floorplan_error (Floorplan *floorplan,
-                      Dimensions *dim,
-                      yyscan_t yyscanner,
-                      char const *msg) ;
+void
+floorplan_error (
+                 Floorplan *floorplan,
+                 Dimensions *dimensions,
+                 yyscan_t   yyscanner,
+                 char const *msg
+                ) ;
 %}
 
-%type <integers>            dimension ;
-%type <integers>            position ;
 %type <p_floorplan_element> floorplan_element ;
 %type <p_floorplan_element> floorplan_element_list ;
 
@@ -61,7 +55,7 @@ void floorplan_error (Floorplan *floorplan,
 %error-verbose
 
 %parse-param { Floorplan *floorplan }
-%parse-param { Dimensions *dim }
+%parse-param { Dimensions *dimensions }
 %parse-param { yyscan_t scanner }
 
 %lex-param   { yyscan_t scanner }
@@ -74,32 +68,33 @@ floorplan_element_list
 
   : floorplan_element
     {
-      int tmp_1 = check_location (floorplan, $1, dim) ;
-      int tmp_2 = align_to_grid  (floorplan, $1, dim) ;
+      int tmp_1 = check_location (floorplan, $1, dimensions) ;
+      int tmp_2 = align_to_grid  (floorplan, $1, dimensions) ;
 
       if (tmp_1 || tmp_2)
-        {
-          free_floorplan_element($1) ;
-          YYABORT ;
-        }
+      {
+        free_floorplan_element ($1) ;
+        floorplan_error (floorplan, dimensions, scanner, "") ;
+        YYABORT ;
+      }
 
       floorplan->ElementsList = $1 ;
-      floorplan->NElements  = 1 ;
+      floorplan->NElements    = 1 ;
       $$ = $1 ;
     }
   | floorplan_element_list floorplan_element
     {
       int tmp_1 = check_intersections (floorplan, $2) ;
-      int tmp_2 = check_location      (floorplan, $2, dim) ;
-      int tmp_3 = align_to_grid       (floorplan, $2, dim) ;
+      int tmp_2 = check_location      (floorplan, $2, dimensions) ;
+      int tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
 
       if (tmp_1 || tmp_2 || tmp_3 )
-        {
-          free_floorplan_element($2) ;
-          floorplan_error (floorplan, dim, scanner, "") ;
-          YYABORT ;
-        }
-      $1 -> Next = $2 ;
+      {
+        free_floorplan_element ($2) ;
+        floorplan_error (floorplan, dimensions, scanner, "") ;
+        YYABORT ;
+      }
+      $1->Next = $2 ;
 
       floorplan->NElements++ ;
 
@@ -109,7 +104,9 @@ floorplan_element_list
 
 floorplan_element
 
-  : IDENTIFIER ':' position dimension
+  : IDENTIFIER ':'
+      POSITION  UIVALUE ',' UIVALUE ';'
+      DIMENSION UIVALUE ',' UIVALUE ';'
     {
       FloorplanElement *floorplan_element
         = alloc_and_init_floorplan_element () ;
@@ -117,49 +114,36 @@ floorplan_element
       if (floorplan_element == NULL)
       {
         perror ("alloc_floorplan_element") ;
-        floorplan_error (floorplan, dim, scanner, "") ;
+        floorplan_error (floorplan, dimensions, scanner, "") ;
         YYABORT ;
       }
 
-      floorplan_element->Id     = $1 ;
-      floorplan_element->SW_X   = $3.a ;
-      floorplan_element->SW_Y   = $3.b ;
-      floorplan_element->Length = $4.a ;
-      floorplan_element->Width  = $4.b ;
+      floorplan_element->Id     = $1  ;
+      floorplan_element->SW_X   = $4  ;
+      floorplan_element->SW_Y   = $6  ;
+      floorplan_element->Length = $9  ;
+      floorplan_element->Width  = $11 ;
 
       $$ = floorplan_element ;
-    }
-  ;
-
-position
-
-  : POSITION UIVALUE ',' UIVALUE ';'
-    {
-      $$.a = $2 ;
-      $$.b = $4 ;
-    }
-  ;
-
-dimension
-
-  : DIMENSION UIVALUE ',' UIVALUE ';'
-    {
-      $$.a = $2 ;
-      $$.b  = $4 ;
     }
   ;
 
 %%
 
 void
-floorplan_error (Floorplan *floorplan,
-                 Dimensions *dim,
-                 yyscan_t yyscanner,
-                 char const *msg)
+floorplan_error
+(
+  Floorplan  *floorplan,
+  Dimensions *dimensions,
+  yyscan_t   yyscanner,
+  char const *msg
+)
 {
-  fprintf(stderr, "%s:%d: %s\n",
+  fprintf (stderr,
+    "%s:%d: %s\n",
     floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
 
-  free_dimensions (dim) ;
-  free_floorplan  (floorplan) ;
+  get_chip_length (dimensions) ;  // FIXME
+
+  free_floorplan (floorplan) ;
 }
