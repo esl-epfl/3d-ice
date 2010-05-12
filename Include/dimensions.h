@@ -113,22 +113,22 @@ extern "C"
   void  print_dimensions (FILE *stream, char *prefix, Dimensions *dim) ;
 
   double
-  get_cell_width        (Dimensions *dimensions) ;
+  get_cell_width           (Dimensions *dimensions) ;
 
   double
-  get_cell_length       (Dimensions *dimensions, int column) ;
+  get_cell_length          (Dimensions *dimensions, int column) ;
 
   int
-  get_number_of_layers  (Dimensions *dimensions) ;
+  get_number_of_layers     (Dimensions *dimensions) ;
 
   int
-  get_number_of_rows    (Dimensions *dimensions) ;
+  get_number_of_rows       (Dimensions *dimensions) ;
 
   int
-  get_number_of_columns (Dimensions *dimensions) ;
+  get_number_of_columns    (Dimensions *dimensions) ;
 
   int
-  get_cell_top_surface  (Dimensions *dimensions, int column) ;
+  get_cell_top_surface     (Dimensions *dimensions, int column) ;
 
   int
   get_cell_offset_in_layer (Dimensions *dimensions, int row, int column) ;
@@ -143,6 +143,12 @@ extern "C"
                             int row,
                             int column
                            ) ;
+  double
+  get_chip_length          (Dimensions *dimensions) ;
+
+  double
+  get_chip_width           (Dimensions *dimensions) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

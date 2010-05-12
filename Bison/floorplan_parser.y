@@ -74,7 +74,7 @@ floorplan_element_list
 
   : floorplan_element
     {
-      int tmp_1 = check_location (floorplan, $1, &dim->Chip) ;
+      int tmp_1 = check_location (floorplan, $1, dim) ;
       int tmp_2 = align_to_grid  (floorplan, $1, dim) ;
 
       if (tmp_1 || tmp_2)
@@ -90,7 +90,7 @@ floorplan_element_list
   | floorplan_element_list floorplan_element
     {
       int tmp_1 = check_intersections (floorplan, $2) ;
-      int tmp_2 = check_location      (floorplan, $2, &dim->Chip) ;
+      int tmp_2 = check_location      (floorplan, $2, dim) ;
       int tmp_3 = align_to_grid       (floorplan, $2, dim) ;
 
       if (tmp_1 || tmp_2 || tmp_3 )

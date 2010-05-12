@@ -245,3 +245,25 @@ get_cell_offset_in_stack
 }
 
 /******************************************************************************/
+
+double
+get_chip_length
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Chip.Length ;
+}
+
+/******************************************************************************/
+
+double
+get_chip_width
+(
+  Dimensions *dimensions
+)
+{
+  return dimensions->Chip.Width ;
+}
+
+/******************************************************************************/
