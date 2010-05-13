@@ -193,9 +193,10 @@ channel
         YYABORT ;
       }
 
-      stkd->Channel->Height       = $4  ;
-      stkd->Channel->LiquidHTC    = $15 ;
-      stkd->Channel->LiquidSH     = $20 ;
+      stkd->Channel->Height        = $4  ;
+      stkd->Channel->LiquidHTC     = $15 ;
+      stkd->Channel->LiquidSH      = $20 ;
+      stkd->Channel->TemperatureIn = $25 ;
       stkd->Channel->WallMaterial
         = find_material_in_list(stkd->MaterialsList, $9) ;
 

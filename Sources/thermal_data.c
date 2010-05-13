@@ -9,6 +9,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "thermal_data.h"
 
@@ -366,3 +367,43 @@ update_thermal_data
     tdata->Temperatures
   );
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+print_system_matrix
+(
+  ThermalData *tdata
+)
+{
+  print_system_matrix_columns (&tdata->SM_A, "system_matrix_columns.txt") ;
+  print_system_matrix_rows    (&tdata->SM_A, "system_matrix_rows.txt") ;
+  print_system_matrix_values  (&tdata->SM_A, "system_matrix_values.txt") ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+print_sources
+(
+  ThermalData *tdata
+)
+{
+  int counter ;
+  FILE *file = fopen("source_values.txt", "w") ;
+
+  if (file == NULL) return ;
+
+  for (counter = 0 ; counter < tdata->Size ; counter++ )
+
+    if (tdata->Sources[counter] != 0)
+
+      fprintf (file, "%d\t %.6e\n", counter + 1, tdata->Sources[counter]) ;
+
+  fclose (file) ;
+}
+

@@ -6,6 +6,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "resistances.h"
 #include "system_matrix.h"
@@ -61,6 +62,71 @@ void free_system_matrix (SystemMatrix *matrix)
   free (matrix->Columns) ;
   free (matrix->Rows) ;
   free (matrix->Values) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void print_system_matrix_columns
+(
+  SystemMatrix *matrix,
+  char *file_name
+)
+{
+  int counter ;
+  FILE * file = fopen (file_name, "w") ;
+
+  if (file == NULL) return ;
+
+  for (counter = 0 ; counter < matrix->Size + 1 ; counter++)
+    fprintf (file, "%d\n", matrix->Columns[counter]);
+
+  fclose (file) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+print_system_matrix_rows
+(
+  SystemMatrix *matrix,
+  char *file_name
+)
+{
+  int counter ;
+  FILE *file = fopen (file_name, "w") ;
+
+  if (file == NULL) return ;
+
+  for (counter = 0 ; counter < matrix->NNz ; counter++)
+    fprintf (file, "%d\n", matrix->Rows[counter] + 1);
+
+  fclose (file) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+print_system_matrix_values
+(
+  SystemMatrix *matrix,
+  char *file_name
+)
+{
+  int counter ;
+  FILE *file = fopen (file_name, "w") ;
+
+  if (file == NULL) return ;
+
+  for (counter = 0 ; counter < matrix->NNz ; counter++)
+    fprintf (file, "%.6e\n", matrix->Values[counter]);
+
+  fclose (file) ;
 }
 
 /******************************************************************************/

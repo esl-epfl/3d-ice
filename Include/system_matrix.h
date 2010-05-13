@@ -46,6 +46,10 @@ extern "C"
 
   void free_system_matrix (SystemMatrix *matrix) ;
 
+  void print_system_matrix_columns (SystemMatrix *matrix, char *file_name) ;
+  void print_system_matrix_rows    (SystemMatrix *matrix, char *file_name) ;
+  void print_system_matrix_values  (SystemMatrix *matrix, char *file_name) ;
+
   int add_solid_column
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX

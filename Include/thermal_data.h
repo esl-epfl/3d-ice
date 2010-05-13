@@ -85,6 +85,10 @@ extern "C"
 
   void update_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
 
+  void print_system_matrix (ThermalData *tdata) ;
+
+  void print_sources (ThermalData *tdata) ;
+
 #ifdef __cplusplus
 }
 #endif
