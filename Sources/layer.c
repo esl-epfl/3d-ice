@@ -264,18 +264,18 @@ fill_capacities_layer
                       get_cell_length (dimensions, column),
                       get_cell_width (dimensions),
                       layer->Height,
-                      layer->Material->SpecificHeat,
+                      layer->Material->VolHeatCapacity,
                       delta_time
                     ) ;
 
 #ifdef DEBUG_FILL_CAPACITIES
       fprintf (debug,
         "%p solid cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f " \
-        "sh %.5e %.5e --> %.5e\n",
+        "vhc %.5e %.5e --> %.5e\n",
         capacities, current_layer, row, column,
         get_cell_length(dimensions, column),
         get_cell_width (dimensions, column),
-        layer->Height, layer->Material->SpecificHeat, delta_time, *capacities) ;
+        layer->Height, layer->Material->VolHeatCapacity, delta_time, *capacities) ;
 #endif
     }
 

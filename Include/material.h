@@ -28,9 +28,11 @@ extern "C"
   {
     char *Id ;                       /* The Id (string) of the material       */
 
-    double SpecificHeat ;            /* The specific heat (capacity)          */
+    double VolHeatCapacity ;         /* The volumetric heat capacity          */
+                                     /*   [ J / ( um3 . K ) ]                 */
 
-    double ThermalConductivity ;     /* The thermal conductivity (resistance) */
+    double ThermalConductivity ;     /* The thermal conductivity              */
+                                     /*   [ W / ( um . K ) ]                  */
 
     struct material *Next ;          /* To collect materials in a linked list */
 

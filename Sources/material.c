@@ -24,7 +24,7 @@ init_material
 )
 {
   material->Id                  = NULL ;
-  material->SpecificHeat        = 0.0  ;
+  material->VolHeatCapacity     = 0.0  ;
   material->ThermalConductivity = 0.0  ;
   material->Next                = NULL ;
 }
@@ -94,7 +94,7 @@ print_material
   fprintf (stream,
     "%sMaterial %s:\n",                prefix, material->Id) ;
   fprintf (stream,
-    "%s  Specific Heat        %.5e\n", prefix, material->SpecificHeat) ;
+    "%s  Volum. Heat Capacity %.5e\n", prefix, material->VolHeatCapacity) ;
   fprintf (stream,
     "%s  Thermal Conductivity %.5e\n", prefix, material->ThermalConductivity) ;
 }

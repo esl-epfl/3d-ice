@@ -89,15 +89,15 @@ print_channel
   if (wall != NULL)
   {
     fprintf(stream,
-      "%s  Wall thermal conductivity        %.4e (%s)\n",
+    "%s  Wall thermal conductivity        %.4e (%s)\n",
       prefix, wall->ThermalConductivity, wall->Id) ;
     fprintf(stream,
-      "%s  Wall specific heat               %.4e (%s)\n",
-      prefix, wall->SpecificHeat, wall->Id) ;
+    "%s  Wall Volum. Heat Capacity        %.4e (%s)\n",
+      prefix, wall->VolHeatCapacity, wall->Id) ;
   }
   else
     fprintf(stream,
-      "%s  Wall material not specified\n", prefix) ;
+    "%s  Wall material not specified\n", prefix) ;
 }
 
 /******************************************************************************/
@@ -233,17 +233,17 @@ fill_capacities_channel
                         get_cell_length (dimensions, column),
                         get_cell_width (dimensions),
                         channel->Height,
-                        channel->WallMaterial->SpecificHeat,
+                        channel->WallMaterial->VolHeatCapacity,
                         delta_time
                       ) ;
 #ifdef DEBUG_FILL_CAPACITIES
       fprintf (debug,
         "%p wall   cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f " \
-        "sh %.5e %.5e --> %.5e\n",
+        "vhc %.5e %.5e --> %.5e\n",
         capacities, current_layer, row, column,
         get_cell_length(dimensions, column), get_cell_width (dimensions),
         channel->Height,
-        channel->WallMaterial->SpecificHeat, delta_time, *capacities) ;
+        channel->WallMaterial->VolHeatCapacity, delta_time, *capacities) ;
 #endif
       }
       else                 /* Odd -> liquid */
@@ -259,7 +259,7 @@ fill_capacities_channel
 #ifdef DEBUG_FILL_CAPACITIES
       fprintf (debug,
         "%p liquid cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f " \
-        "sh %.5e %.5e --> %.5e\n",
+        "vhc %.5e %.5e --> %.5e\n",
         capacities, current_layer, row, column,
         get_cell_length(dimensions, column), get_cell_width (dimensions),
         channel->Height,

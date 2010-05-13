@@ -106,6 +106,7 @@ path                    (\/|\.{1,2}|\_|[[:alnum:]])*
 ";"                          return yytext[0] ;
 "\""                         return yytext[0] ;
 
+"capacity"                   return CAPACITY ;
 "cell"                       return CELL ;
 "channel"                    return CHANNEL ;
 "chip"                       return CHIP ;
@@ -132,6 +133,7 @@ path                    (\/|\.{1,2}|\_|[[:alnum:]])*
 "thermal"                    return THERMAL ;
 "transfer"                   return TRANSFER ;
 "um"                         return UM ;
+"volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
 

@@ -79,6 +79,8 @@
 %token FLOORPLAN             "keyword floorplan"
 %token STACK                 "keyword stack"
 %token MM                    "keyword mm"
+%token VOLUMETRIC            "keywork volumetric"
+%token CAPACITY              "keyword capacity"
 
 %token <double_v> DVALUE     "float value"
 %token <string>   IDENTIFIER "identifier"
@@ -146,7 +148,7 @@ material
 
   : MATERIAL IDENTIFIER ':'
        THERMAL CONDUCTIVITY DVALUE ';'
-       SPECIFIC HEAT DVALUE ';'
+       VOLUMETRIC HEAT CAPACITY DVALUE ';'
     {
       Material *material = alloc_and_init_material() ;
 
@@ -158,7 +160,7 @@ material
 
       material->Id                  = $2 ;
       material->ThermalConductivity = $6 ;
-      material->SpecificHeat        = $10 ;
+      material->VolHeatCapacity     = $11 ;
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
