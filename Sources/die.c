@@ -150,24 +150,24 @@ find_die_in_list
 /******************************************************************************/
 /******************************************************************************/
 
-Resistances *
-fill_resistances_die
+Conductances *
+fill_conductances_die
 (
-#ifdef DEBUG_FILL_RESISTANCES
-  FILE        *debug,
+#ifdef DEBUG_FILL_CONDUCTANCES
+  FILE         *debug,
 #endif
-  Die         *die,
-  Resistances *resistances,
-  Dimensions  *dimensions,
-  int         current_layer
+  Die          *die,
+  Conductances *conductances,
+  Dimensions   *dimensions,
+  int          current_layer
 )
 {
   Layer *layer ;
 
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
-    "%p current_layer = %d\tfill_resistances_die     %s\n",
-    resistances, current_layer, die->Id) ;
+    "%p current_layer = %d\tfill_conductances_die     %s\n",
+    conductances, current_layer, die->Id) ;
 #endif
 
   for
@@ -178,18 +178,18 @@ fill_resistances_die
     layer = layer->Next
   )
 
-    resistances = fill_resistances_layer
-                  (
-#ifdef DEBUG_FILL_RESISTANCES
-                    debug,
+    conductances = fill_conductances_layer
+                   (
+#ifdef DEBUG_FILL_CONDUCTANCES
+                     debug,
 #endif
-                    layer,
-                    resistances,
-                    dimensions,
-                    current_layer
-                  ) ;
+                     layer,
+                     conductances,
+                     dimensions,
+                     current_layer
+                   ) ;
 
-  return resistances ;
+  return conductances ;
 }
 
 /******************************************************************************/
@@ -315,16 +315,16 @@ int
 fill_system_matrix_die
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE        *debug,
+  FILE         *debug,
 #endif
-  Die         *die,
-  Dimensions  *dimensions,
-  Resistances *resistances,
-  double      *capacities,
-  int         *columns,
-  int         *rows,
-  double      *values,
-  int         current_layer
+  Die          *die,
+  Dimensions   *dimensions,
+  Conductances *conductances,
+  double       *capacities,
+  int          *columns,
+  int          *rows,
+  double       *values,
+  int          current_layer
 )
 {
   Layer *layer ;
@@ -333,7 +333,7 @@ fill_system_matrix_die
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
     "%p %p %p %p %p (l %2d) fill_system_matrix_die\n",
-    resistances, capacities, columns, rows, values, current_layer) ;
+    conductances, capacities, columns, rows, values, current_layer) ;
 #endif
 
   for
@@ -343,7 +343,7 @@ fill_system_matrix_die
     layer     = die->LayersList ;
     layer != NULL ;
     current_layer ++ ,
-    resistances   += get_layer_area (dimensions) ,
+    conductances  += get_layer_area (dimensions) ,
     capacities    += get_layer_area (dimensions) ,
     columns       += get_layer_area (dimensions) ,
     rows          += added ,
@@ -357,7 +357,7 @@ fill_system_matrix_die
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
               debug, layer,
 #endif
-              dimensions, resistances, capacities,
+              dimensions, conductances, capacities,
               columns, rows, values, current_layer
             ) ;
 

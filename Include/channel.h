@@ -19,7 +19,7 @@ extern "C"
 #include <stdio.h>
 
 #include "material.h"
-#include "resistances.h"
+#include "conductances.h"
 
 /******************************************************************************
  *                                                                            *
@@ -59,15 +59,15 @@ extern "C"
   void
   print_channel              (FILE *stream, char *prefix, Channel *channel) ;
 
-  Resistances *
-  fill_resistances_channel   (
-                              #ifdef DEBUG_FILL_RESISTANCES
-                              FILE        *debug,
+  Conductances *
+  fill_conductances_channel  (
+                              #ifdef DEBUG_FILL_CONDUCTANCES
+                              FILE         *debug,
                               #endif
-                              Channel     *channel,
-                              Resistances *resistances,
-                              Dimensions  *dim,
-                              int         current_layer
+                              Channel      *channel,
+                              Conductances *conductances,
+                              Dimensions   *dim,
+                              int          current_layer
                              ) ;
 
 
@@ -97,16 +97,16 @@ extern "C"
   int
   fill_system_matrix_channel (
                               #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                              FILE        *debug,
-                              Channel     *channel,
+                              FILE         *debug,
+                              Channel      *channel,
                               #endif
-                              Dimensions  *dimensions,
-                              Resistances *resistances,
-                              double      *capacities,
-                              int         *columns,
-                              int         *rows,
-                              double      *values,
-                              int         current_layer
+                              Dimensions   *dimensions,
+                              Conductances *conductances,
+                              double       *capacities,
+                              int          *columns,
+                              int          *rows,
+                              double       *values,
+                              int          current_layer
                              ) ;
 
 

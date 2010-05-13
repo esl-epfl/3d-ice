@@ -140,25 +140,25 @@ fill_floorplans (StackDescription *stkd)
 /******************************************************************************/
 
 void
-fill_resistances_stack_description
+fill_conductances_stack_description
 (
   StackDescription *stkd,
-  Resistances      *resistances
+  Conductances     *conductances
 )
 {
   StackElement *stack_element ;
   int current_layer ;
 
-#ifdef DEBUG_FILL_RESISTANCES
-  FILE *debug = fopen("fill_resistances_stack_description.txt", "w") ;
+#ifdef DEBUG_FILL_CONDUCTANCES
+  FILE *debug = fopen("fill_conductances_stack_description.txt", "w") ;
   if (debug == NULL)
   {
-    perror("fill_resistances_stack_description.txt") ;
+    perror("fill_conductances_stack_description.txt") ;
     return ;
   }
   fprintf (debug,
-    "%p fill_resistances_stack_description ( l %d r %d c %d )\n",
-    resistances,
+    "%p fill_conductances_stack_description ( l %d r %d c %d )\n",
+    conductances,
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions));
@@ -177,44 +177,44 @@ fill_resistances_stack_description
     {
       case TL_STACK_ELEMENT_DIE :
 
-        resistances = fill_resistances_die
-                      (
-#ifdef DEBUG_FILL_RESISTANCES
-                        debug,
+        conductances = fill_conductances_die
+                       (
+#ifdef DEBUG_FILL_CONDUCTANCES
+                         debug,
 #endif
-                        stack_element->Pointer.Die,
-                        resistances,
-                        stkd->Dimensions,
-                        current_layer
-                      ) ;
+                         stack_element->Pointer.Die,
+                         conductances,
+                         stkd->Dimensions,
+                         current_layer
+                       ) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
-        resistances = fill_resistances_layer
-                      (
-#ifdef DEBUG_FILL_RESISTANCES
-                        debug,
+        conductances = fill_conductances_layer
+                       (
+#ifdef DEBUG_FILL_CONDUCTANCES
+                         debug,
 #endif
-                        stack_element->Pointer.Layer,
-                        resistances,
-                        stkd->Dimensions,
-                        current_layer
-                      ) ;
+                         stack_element->Pointer.Layer,
+                         conductances,
+                         stkd->Dimensions,
+                         current_layer
+                       ) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        resistances = fill_resistances_channel
-                      (
-#ifdef DEBUG_FILL_RESISTANCES
-                        debug,
+        conductances = fill_conductances_channel
+                       (
+#ifdef DEBUG_FILL_CONDUCTANCES
+                         debug,
 #endif
-                        stkd->Channel,
-                        resistances,
-                        stkd->Dimensions,
-                        current_layer
-                      ) ;
+                         stkd->Channel,
+                         conductances,
+                         stkd->Dimensions,
+                         current_layer
+                       ) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
@@ -230,7 +230,7 @@ fill_resistances_stack_description
 
     } /* stack_elementy->Type */
 
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   fclose (debug) ;
 #endif
 }
@@ -457,7 +457,7 @@ void
 fill_system_matrix_stack_description
 (
   StackDescription *stkd,
-  Resistances      *resistances,
+  Conductances     *conductances,
   double           *capacities,
   int              *columns,
   int              *rows,
@@ -476,7 +476,7 @@ fill_system_matrix_stack_description
   }
   fprintf (debug,
     "%p %p %p %p %p fill_system_matrix_stack_description ( l %d r %d c %d )\n",
-    resistances, capacities, columns, rows, values,
+    conductances, capacities, columns, rows, values,
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions));
@@ -494,7 +494,7 @@ fill_system_matrix_stack_description
     stack_element != NULL ;
 
     current_layer +=        stack_element->NLayers,
-    resistances   += area * stack_element->NLayers,
+    conductances  += area * stack_element->NLayers,
     capacities    += area * stack_element->NLayers,
     columns       += area * stack_element->NLayers,
     rows          += added,
@@ -511,7 +511,7 @@ fill_system_matrix_stack_description
                   debug,
 #endif
                   stack_element->Pointer.Die, stkd->Dimensions,
-                  resistances, capacities,
+                  conductances, capacities,
                   columns, rows, values,
                   current_layer) ;
         break ;
@@ -522,7 +522,7 @@ fill_system_matrix_stack_description
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                   debug, stack_element->Pointer.Layer,
 #endif
-                  stkd->Dimensions, resistances, capacities,
+                  stkd->Dimensions, conductances, capacities,
                   columns, rows, values,
                   current_layer) ;
         break ;
@@ -533,7 +533,7 @@ fill_system_matrix_stack_description
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                   debug, stkd->Channel,
 #endif
-                  stkd->Dimensions, resistances, capacities,
+                  stkd->Dimensions, conductances, capacities,
                   columns, rows, values,
                   current_layer) ;
         break ;

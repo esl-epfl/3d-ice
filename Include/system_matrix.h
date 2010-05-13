@@ -40,9 +40,9 @@ extern "C"
   int alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz) ;
 
   void fill_system_matrix (StackDescription *stkd,
-                           SystemMatrix *matrix,
-                           Resistances *resistances,
-                           double *capacities) ;
+                           SystemMatrix     *matrix,
+                           Conductances     *conductances,
+                           double           *capacities) ;
 
   void free_system_matrix (SystemMatrix *matrix) ;
 
@@ -56,7 +56,7 @@ extern "C"
     FILE *debug,
 #endif
     Dimensions *dim,
-    Resistances *resistances,
+    Conductances *conductances,
     double *capacities,
     int current_layer,
     int current_row,
@@ -72,7 +72,7 @@ extern "C"
     FILE *debug,
 #endif
     Dimensions *dim,
-    Resistances *resistances,
+    Conductances *conductances,
     double *capacities,
     int current_layer,
     int current_row,

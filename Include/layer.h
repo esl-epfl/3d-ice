@@ -20,7 +20,7 @@ extern "C"
 
 #include "material.h"
 #include "dimensions.h"
-#include "resistances.h"
+#include "conductances.h"
 #include "floorplan.h"
 
 /******************************************************************************
@@ -79,15 +79,15 @@ extern "C"
   LayerPosition_t
   get_layer_position        (Dimensions *dimensions, int layer) ;
 
-  Resistances *
-  fill_resistances_layer    (
-                             #ifdef DEBUG_FILL_RESISTANCES
-                             FILE        *debug,
+  Conductances *
+  fill_conductances_layer    (
+                             #ifdef DEBUG_FILL_CONDUCTANCES
+                             FILE         *debug,
                              #endif
-                             Layer       *layer,
-                             Resistances *resistances,
-                             Dimensions  *dimensions,
-                             int         current_layer
+                             Layer        *layer,
+                             Conductances *conductances,
+                             Dimensions   *dimensions,
+                             int          current_layer
                             ) ;
 
   double *
@@ -129,16 +129,16 @@ extern "C"
   int
   fill_system_matrix_layer  (
                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                             FILE        *debug,
-                             Layer       *layer,
+                             FILE         *debug,
+                             Layer        *layer,
                              #endif
-                             Dimensions  *dimensions,
-                             Resistances *resistances,
-                             double      *capacities,
-                             int         *columns,
-                             int         *rows,
-                             double      *values,
-                             int         current_layer
+                             Dimensions   *dimensions,
+                             Conductances *conductances,
+                             double       *capacities,
+                             int          *columns,
+                             int          *rows,
+                             double       *values,
+                             int          current_layer
                             ) ;
 
 /******************************************************************************/

@@ -104,24 +104,24 @@ print_channel
 /******************************************************************************/
 /******************************************************************************/
 
-Resistances *
-fill_resistances_channel
+Conductances *
+fill_conductances_channel
 (
-#ifdef DEBUG_FILL_RESISTANCES
-  FILE        *debug,
+#ifdef DEBUG_FILL_CONDUCTANCES
+  FILE         *debug,
 #endif
-  Channel     *channel,
-  Resistances *resistances,
-  Dimensions  *dimensions,
-  int         current_layer
+  Channel      *channel,
+  Conductances *conductances,
+  Dimensions   *dimensions,
+  int          current_layer
 )
 {
   int row, column ;
 
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
-    "%p current_layer = %d\tfill_resistances_channel %s\n",
-    resistances, current_layer, channel->WallMaterial->Id) ;
+    "%p current_layer = %d\tfill_conductances_channel %s\n",
+    conductances, current_layer, channel->WallMaterial->Id) ;
 #endif
 
   for
@@ -136,19 +136,19 @@ fill_resistances_channel
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
       column++,
-      resistances++
+      conductances++
     )
 
       if (column % 2 == 0) // Even -> wall
 
-        fill_resistances_solid_cell
+        fill_conductances_solid_cell
         (
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
           debug,
           row,
           column,
 #endif
-          resistances,
+          conductances,
           dimensions,
           get_cell_length (dimensions, column),
           get_cell_width (dimensions),
@@ -159,14 +159,14 @@ fill_resistances_channel
 
       else                 // Odd -> channel
 
-        fill_resistances_liquid_cell
+        fill_conductances_liquid_cell
         (
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
           debug,
           row,
           column,
 #endif
-          resistances,
+          conductances,
           dimensions,
           get_cell_length (dimensions, column),
           get_cell_width (dimensions),
@@ -176,7 +176,7 @@ fill_resistances_channel
           current_layer
         ) ;
 
-  return resistances ;
+  return conductances ;
 }
 
 /******************************************************************************/
@@ -185,10 +185,18 @@ fill_resistances_channel
 
 static
 double
-capacity (double l, double w, double h, double s, double t)
+capacity             /*   ( [um3] . [ J / ( um3 . K ) ]) / [sec]  */
+(                    /* = [ J / (K . sec) ]                       */
+  double length,     /* = [ W / K ]                               */
+  double width,
+  double height,
+  double vhc,
+  double time)
 {
-  return (l * w * h * s) / t ;
+  return ((length * width * height) * vhc) / time ;
 }
+
+
 
 double *
 fill_capacities_channel
@@ -335,16 +343,16 @@ int
 fill_system_matrix_channel
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE        *debug,
-  Channel     *channel,
+  FILE         *debug,
+  Channel      *channel,
 #endif
-  Dimensions  *dimensions,
-  Resistances *resistances,
-  double      *capacities,
-  int         *columns,
-  int         *rows,
-  double      *values,
-  int         current_layer
+  Dimensions   *dimensions,
+  Conductances *conductances,
+  double       *capacities,
+  int          *columns,
+  int          *rows,
+  double       *values,
+  int          current_layer
 )
 {
   int row, column, added, tot_added ;
@@ -352,7 +360,7 @@ fill_system_matrix_channel
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
     "%p %p %p %p %p (l %2d) fill_system_matrix_channel %s \n",
-    resistances, capacities, columns, rows, values,
+    conductances, capacities, columns, rows, values,
     current_layer, channel->WallMaterial->Id) ;
 #endif
 
@@ -368,13 +376,13 @@ fill_system_matrix_channel
     (
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
-      resistances ++ ,
-      capacities  ++ ,
-      columns     ++ ,
-      rows        += added ,
-      values      += added ,
-      tot_added   += added ,
-      column      ++
+      conductances ++ ,
+      capacities   ++ ,
+      columns      ++ ,
+      rows         += added ,
+      values       += added ,
+      tot_added    += added ,
+      column       ++
     )
 
        if (column % 2 == 0 ) /* Even -> Wall */
@@ -384,7 +392,7 @@ fill_system_matrix_channel
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                    debug,
 #endif
-                   dimensions, resistances, capacities,
+                   dimensions, conductances, capacities,
                    current_layer, row, column,
                    columns, rows, values
                  ) ;
@@ -396,7 +404,7 @@ fill_system_matrix_channel
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                    debug,
 #endif
-                   dimensions, resistances, capacities,
+                   dimensions, conductances, capacities,
                    current_layer, row, column,
                    columns, rows, values
                  ) ;

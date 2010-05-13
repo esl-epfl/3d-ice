@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/resistances.h"                                        *
+ * Header file "Include/conductances.h"                                        *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,8 +8,8 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_RESISTANCES_H_
-#define _TL_RESISTANCES_H_
+#ifndef _TL_CONDUCTANCES_H_
+#define _TL_CONDUCTANCES_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -20,7 +20,7 @@ extern "C"
 
 /******************************************************************************
  *                                                                            *
- * "Resistances" : the six resistances inside a cell.                         *
+ * "Conductances" : the six conductances of the six resistor in a cell.       *
  *                                                                            *
  ******************************************************************************/
 
@@ -35,17 +35,17 @@ extern "C"
     double Top ;
     double Bottom ;
 
-  } Resistances ;
+  } Conductances ;
 
 /******************************************************************************/
 
-  void fill_resistances_solid_cell (
-#ifdef DEBUG_FILL_RESISTANCES
+  void fill_conductances_solid_cell (
+#ifdef DEBUG_FILL_CONDUCTANCES
                                     FILE *debug,
                                     int row,
                                     int column,
 #endif
-                                    Resistances *resistance,
+                                    Conductances *conductances,
                                     Dimensions *dim,
                                     double cell_length,
                                     double cell_width,
@@ -53,13 +53,13 @@ extern "C"
                                     double thermal_conductivity,
                                     int current_layer) ;
 
-  void fill_resistances_liquid_cell (
-#ifdef DEBUG_FILL_RESISTANCES
+  void fill_conductances_liquid_cell (
+#ifdef DEBUG_FILL_CONDUCTANCES
                                     FILE *debug,
                                     int row,
                                     int column,
 #endif
-                                    Resistances *resistance,
+                                    Conductances *conductances,
                                     Dimensions *dim,
                                     double cell_length,
                                     double cell_width,
@@ -71,4 +71,4 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
-#endif /* _TL_RESISTANCES_H_ */
+#endif /* _TL_CONDUCTANCES_H_ */

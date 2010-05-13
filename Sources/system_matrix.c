@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "resistances.h"
+#include "conductances.h"
 #include "system_matrix.h"
 
 #define PARALLEL(x,y)      ( (x * y) / ( x + y) )
@@ -137,13 +137,13 @@ void
 fill_system_matrix
 (
   StackDescription *stkd,
-  SystemMatrix *matrix,
-  Resistances *resistances,
-  double *capacities
+  SystemMatrix     *matrix,
+  Conductances     *conductances,
+  double           *capacities
 )
 {
   fill_system_matrix_stack_description (stkd,
-    resistances, capacities,
+    conductances, capacities,
     matrix->Columns, matrix->Rows, matrix->Values) ;
 }
 
@@ -155,20 +155,20 @@ int
 add_solid_column
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE        *debug,
+  FILE         *debug,
 #endif
-  Dimensions  *dim,
-  Resistances *resistances,
-  double      *capacities,
-  int         current_layer,
-  int         current_row,
-  int         current_column,
-  int         *columns,
-  int         *rows,
-  double      *values
+  Dimensions   *dim,
+  Conductances *conductances,
+  double       *capacities,
+  int          current_layer,
+  int          current_row,
+  int          current_column,
+  int          *columns,
+  int          *rows,
+  double       *values
 )
 {
-  double resistance        = 0.0 ;
+  double conductance        = 0.0 ;
   double diagonal_value    = 0.0 ;
   double *diagonal_pointer = NULL ;
   int    added             = 0 ;
@@ -182,7 +182,7 @@ add_solid_column
   fpos_t diag_fposition, last_fpos ;
   fprintf (debug,
     "%p %p %p %p %p add_solid_column  (l %2d r %5d c %5d) -> %5d\n",
-    resistances, capacities, columns, rows, values,
+    conductances, capacities, columns, rows, values,
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
@@ -192,11 +192,11 @@ add_solid_column
   {
     *rows++ = current_cell - LAYER_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->Bottom,
-                           (resistances - LAYER_OFFSET(dim))->Top) ;
+    conductance = PARALLEL (conductances->Bottom,
+                           (conductances - LAYER_OFFSET(dim))->Top) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++;
@@ -205,7 +205,7 @@ add_solid_column
     fprintf (debug,
       "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->Bottom, (resistances - LAYER_OFFSET(dim))->Top) ;
+      conductances->Bottom, (conductances - LAYER_OFFSET(dim))->Top) ;
 #endif
   }
 
@@ -213,11 +213,11 @@ add_solid_column
   {
     *rows++ = current_cell - ROW_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->South,
-                           (resistances - ROW_OFFSET(dim))->North) ;
+    conductance = PARALLEL (conductances->South,
+                           (conductances - ROW_OFFSET(dim))->North) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++ ;
@@ -226,7 +226,7 @@ add_solid_column
     fprintf (debug,
       "  south   \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->South, (resistances - ROW_OFFSET(dim))->North) ;
+      conductances->South, (conductances - ROW_OFFSET(dim))->North) ;
 #endif
   }
 
@@ -234,11 +234,11 @@ add_solid_column
   {
     *rows++ = current_cell - COLUMN_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->West,
-                           (resistances - COLUMN_OFFSET(dim))->East) ;
+    conductance = PARALLEL (conductances->West,
+                           (conductances - COLUMN_OFFSET(dim))->East) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++ ;
@@ -247,7 +247,7 @@ add_solid_column
     fprintf (debug,
       "  west    \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->West, (resistances - COLUMN_OFFSET(dim))->East) ;
+      conductances->West, (conductances - COLUMN_OFFSET(dim))->East) ;
 #endif
     }
 
@@ -270,11 +270,11 @@ add_solid_column
   {
     *rows++ = current_cell + COLUMN_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->East,
-                           (resistances + COLUMN_OFFSET(dim))->West) ;
+    conductance = PARALLEL (conductances->East,
+                           (conductances + COLUMN_OFFSET(dim))->West) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added ++ ;
@@ -283,7 +283,7 @@ add_solid_column
     fprintf (debug,
       "  east    \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->East, (resistances + COLUMN_OFFSET(dim))->West) ;
+      conductances->East, (conductances + COLUMN_OFFSET(dim))->West) ;
 #endif
   }
 
@@ -291,11 +291,11 @@ add_solid_column
   {
     *rows++ = current_cell + ROW_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->North,
-                           (resistances + ROW_OFFSET(dim))->South) ;
+    conductance = PARALLEL (conductances->North,
+                           (conductances + ROW_OFFSET(dim))->South) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++ ;
@@ -304,7 +304,7 @@ add_solid_column
     fprintf (debug,
       "  north   \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->North, (resistances + ROW_OFFSET(dim))->South) ;
+      conductances->North, (conductances + ROW_OFFSET(dim))->South) ;
 #endif
   }
 
@@ -312,11 +312,11 @@ add_solid_column
   {
     *rows++ = current_cell + LAYER_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->Top,
-                           (resistances + LAYER_OFFSET(dim))->Bottom) ;
+    conductance = PARALLEL (conductances->Top,
+                           (conductances + LAYER_OFFSET(dim))->Bottom) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++ ;
@@ -325,7 +325,7 @@ add_solid_column
     fprintf (debug,
       "  top     \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->Top, (resistances + LAYER_OFFSET(dim))->Bottom) ;
+      conductances->Top, (conductances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
 
@@ -353,20 +353,20 @@ int
 add_liquid_column
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE        *debug,
+  FILE         *debug,
 #endif
-  Dimensions  *dim,
-  Resistances *resistances,
-  double      *capacities,
-  int         current_layer,
-  int         current_row,
-  int         current_column,
-  int         *columns,
-  int         *rows,
-  double      *values
+  Dimensions   *dim,
+  Conductances *conductances,
+  double       *capacities,
+  int          current_layer,
+  int          current_row,
+  int          current_column,
+  int          *columns,
+  int          *rows,
+  double       *values
 )
 {
-  double resistance        = 0.0 ;
+  double conductance        = 0.0 ;
   double diagonal_value    = 0.0 ;
   double *diagonal_pointer = NULL ;
   int    added             = 0 ;
@@ -379,7 +379,7 @@ add_liquid_column
   fpos_t diag_fposition, last_fpos ;
   fprintf (debug,
     "%p %p %p %p %p add_liquid_column  (l %2d r %5d c %5d) -> %5d\n",
-    resistances, capacities, columns, rows, values,
+    conductances, capacities, columns, rows, values,
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
@@ -389,11 +389,11 @@ add_liquid_column
   {
     *rows++ = current_cell - LAYER_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->Bottom,
-                           (resistances - LAYER_OFFSET(dim))->Top) ;
+    conductance = PARALLEL (conductances->Bottom,
+                           (conductances - LAYER_OFFSET(dim))->Top) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++ ;
@@ -402,14 +402,14 @@ add_liquid_column
     fprintf (debug,
       "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->Bottom, (resistances - LAYER_OFFSET(dim))->Top) ;
+      conductances->Bottom, (conductances - LAYER_OFFSET(dim))->Top) ;
 #endif
   }
 
   if ( current_row > 0 )   /* SOUTH */
   {
     *rows++   = current_cell - ROW_OFFSET(dim) ;
-    *values++ = resistances->North ; // == (C)
+    *values++ = conductances->North ; // == (C)
 
     (*columns)++ ;
     added++ ;
@@ -424,11 +424,11 @@ add_liquid_column
   {
     *rows++ = current_cell - COLUMN_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->West,
-                           (resistances - COLUMN_OFFSET(dim))->East) ;
+    conductance = PARALLEL (conductances->West,
+                           (conductances - COLUMN_OFFSET(dim))->East) ;
 
-    *values++        = -resistance ;
-    diagonal_value  +=  resistance ;
+    *values++        = -conductance ;
+    diagonal_value  +=  conductance ;
 
     (*columns)++ ;
     added++;
@@ -437,7 +437,7 @@ add_liquid_column
     fprintf (debug,
       "  west    \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->West, (resistances - COLUMN_OFFSET(dim))->East) ;
+      conductances->West, (conductances - COLUMN_OFFSET(dim))->East) ;
 #endif
   }
 
@@ -460,11 +460,11 @@ add_liquid_column
   {
     *rows++ = current_cell + COLUMN_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->East,
-                           (resistances + COLUMN_OFFSET(dim))->West) ;
+    conductance = PARALLEL (conductances->East,
+                           (conductances + COLUMN_OFFSET(dim))->West) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++;
@@ -473,14 +473,14 @@ add_liquid_column
     fprintf (debug,
       "  east    \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->East, (resistances + COLUMN_OFFSET(dim))->West) ;
+      conductances->East, (conductances + COLUMN_OFFSET(dim))->West) ;
 #endif
   }
 
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
     *rows++   = current_cell + ROW_OFFSET(dim) ;
-    *values++ = resistances->South ; // == -C
+    *values++ = conductances->South ; // == -C
 
     (*columns)++ ;
     added ++ ;
@@ -495,11 +495,11 @@ add_liquid_column
   {
     *rows++ = current_cell + LAYER_OFFSET(dim) ;
 
-    resistance = PARALLEL (resistances->Top,
-                           (resistances + LAYER_OFFSET(dim))->Bottom) ;
+    conductance = PARALLEL (conductances->Top,
+                           (conductances + LAYER_OFFSET(dim))->Bottom) ;
 
-    *values++       = -resistance ;
-    diagonal_value +=  resistance ;
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*columns)++ ;
     added++;
@@ -508,7 +508,7 @@ add_liquid_column
     fprintf (debug,
       "  top     \t%d\t%.5e = %.5e || %.5e\n",
       *(rows-1), *(values-1),
-      resistances->Top, (resistances + LAYER_OFFSET(dim))->Bottom) ;
+      conductances->Top, (conductances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
 
@@ -518,7 +518,7 @@ add_liquid_column
 
   if (current_row == 0 || current_row == dim->Grid.NRows - 1)
 
-    *diagonal_pointer += resistances->North ; // == (C)
+    *diagonal_pointer += conductances->North ; // == (C)
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fgetpos (debug, &last_fpos) ;

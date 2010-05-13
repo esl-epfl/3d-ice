@@ -56,10 +56,10 @@ alloc_and_init_thermal_data
 
     goto capacities_fail ;
 
-  if ( (tdata->Resistances
-         = (Resistances *) malloc ( sizeof(Resistances)*tdata->Size )) == NULL)
+  if ( (tdata->Conductances
+         = (Conductances *) malloc (sizeof(Conductances)*tdata->Size)) == NULL)
 
-    goto resistances_fail ;
+    goto conductances_fail ;
 
   if ( (tdata->SLU_PermutationMatrixR
          = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
@@ -147,8 +147,8 @@ slu_etree_fail :
 slu_perm_c_fail :
   free (tdata->SLU_PermutationMatrixR) ;
 slu_perm_r_fail :
-  free (tdata->Resistances) ;
-resistances_fail :
+  free (tdata->Conductances) ;
+conductances_fail :
   free (tdata->Capacities) ;
 capacities_fail :
   free (tdata->Sources) ;
@@ -170,7 +170,7 @@ free_thermal_data (ThermalData *tdata)
 
   free (tdata->Sources) ;
   free (tdata->Capacities) ;
-  free (tdata->Resistances) ;
+  free (tdata->Conductances) ;
 
   free (tdata->SLU_PermutationMatrixR) ;
   free (tdata->SLU_PermutationMatrixC) ;
@@ -207,10 +207,10 @@ fill_thermal_data
   ThermalData *tdata
 )
 {
-  fill_resistances_stack_description
+  fill_conductances_stack_description
   (
     stkd,
-    tdata->Resistances
+    tdata->Conductances
   ) ;
 
   fill_capacities_stack_description
@@ -230,7 +230,7 @@ fill_thermal_data
   (
     stkd,
     &tdata->SM_A,
-    tdata->Resistances,
+    tdata->Conductances,
     tdata->Capacities
   );
 

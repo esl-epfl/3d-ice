@@ -19,7 +19,7 @@ extern "C"
 #include <stdio.h>
 
 #include "layer.h"
-#include "resistances.h"
+#include "conductances.h"
 #include "floorplan.h"
 
 /******************************************************************************
@@ -69,15 +69,15 @@ extern "C"
   Die *
   find_die_in_list       (Die *list, char *id) ;
 
-  Resistances *
-  fill_resistances_die   (
-                          #ifdef DEBUG_FILL_RESISTANCES
-                          FILE        *debug,
+  Conductances *
+  fill_conductances_die  (
+                          #ifdef DEBUG_FILL_CONDUCTANCES
+                          FILE         *debug,
                           #endif
-                          Die         *die,
-                          Resistances *resistances,
-                          Dimensions  *dimensions,
-                          int         current_layer
+                          Die          *die,
+                          Conductances *conductances,
+                          Dimensions   *dimensions,
+                          int          current_layer
                          ) ;
 
   double *
@@ -107,16 +107,16 @@ extern "C"
   int
   fill_system_matrix_die (
                           #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                          FILE        *debug,
+                          FILE         *debug,
                           #endif
-                          Die         *die,
-                          Dimensions  *dimensions,
-                          Resistances *resistances,
-                          double      *capacities,
-                          int         *columns,
-                          int         *rows,
-                          double      *values,
-                          int         current_layer
+                          Die          *die,
+                          Dimensions   *dimensions,
+                          Conductances *conductances,
+                          double       *capacities,
+                          int          *columns,
+                          int          *rows,
+                          double       *values,
+                          int          current_layer
                          ) ;
 
 /******************************************************************************/

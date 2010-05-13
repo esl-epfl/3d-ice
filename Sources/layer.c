@@ -160,24 +160,24 @@ get_layer_position
 /******************************************************************************/
 /******************************************************************************/
 
-Resistances *
-fill_resistances_layer
+Conductances *
+fill_conductances_layer
 (
-#ifdef DEBUG_FILL_RESISTANCES
-  FILE        *debug,
+#ifdef DEBUG_FILL_CONDUCTANCES
+  FILE         *debug,
 #endif
-  Layer       *layer,
-  Resistances *resistances,
-  Dimensions  *dimensions,
-  int         current_layer
+  Layer        *layer,
+  Conductances *conductances,
+  Dimensions   *dimensions,
+  int          current_layer
 )
 {
   int row, column ;
 
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
-    "%p current_layer = %d\tfill_resistances_layer   %s\n",
-    resistances, current_layer, layer->Material->Id) ;
+    "%p current_layer = %d\tfill_conductances_layer   %s\n",
+    conductances, current_layer, layer->Material->Id) ;
 #endif
 
   for
@@ -192,15 +192,15 @@ fill_resistances_layer
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
       column++,
-      resistances++
+      conductances++
     )
 
-      fill_resistances_solid_cell
+      fill_conductances_solid_cell
       (
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
         debug, row, column,
 #endif
-        resistances,
+        conductances,
         dimensions,
         get_cell_length (dimensions, column),
         get_cell_width (dimensions),
@@ -209,7 +209,7 @@ fill_resistances_layer
         current_layer
       ) ;
 
-  return resistances ;
+  return conductances ;
 }
 
 /******************************************************************************/
@@ -274,7 +274,7 @@ fill_capacities_layer
         "vhc %.5e %.5e --> %.5e\n",
         capacities, current_layer, row, column,
         get_cell_length(dimensions, column),
-        get_cell_width (dimensions, column),
+        get_cell_width (dimensions),
         layer->Height, layer->Material->VolHeatCapacity, delta_time, *capacities) ;
 #endif
     }
@@ -386,16 +386,16 @@ int
 fill_system_matrix_layer
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE        *debug,
-  Layer       *layer,
+  FILE         *debug,
+  Layer        *layer,
 #endif
-  Dimensions  *dimensions,
-  Resistances *resistances,
-  double      *capacities,
-  int         *columns,
-  int         *rows,
-  double      *values,
-  int         current_layer
+  Dimensions   *dimensions,
+  Conductances *conductances,
+  double       *capacities,
+  int          *columns,
+  int          *rows,
+  double       *values,
+  int          current_layer
 )
 {
   int row, column, added, tot_added ;
@@ -403,7 +403,7 @@ fill_system_matrix_layer
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
     "%p %p %p %p %p (l %2d) fill_system_matrix_layer %s\n",
-    resistances, capacities, columns, rows, values,
+    conductances, capacities, columns, rows, values,
     current_layer, layer->Material->Id) ;
 #endif
 
@@ -419,13 +419,13 @@ fill_system_matrix_layer
     (
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
-      resistances ++ ,
-      capacities  ++ ,
-      columns     ++ ,
-      rows        += added ,
-      values      += added ,
-      tot_added   += added ,
-      column      ++
+      conductances ++ ,
+      capacities   ++ ,
+      columns      ++ ,
+      rows         += added ,
+      values       += added ,
+      tot_added    += added ,
+      column       ++
     )
 
       added = add_solid_column
@@ -433,7 +433,7 @@ fill_system_matrix_layer
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                 debug,
 #endif
-                dimensions, resistances, capacities,
+                dimensions, conductances, capacities,
                 current_layer, row, column,
                 columns, rows, values
               ) ;

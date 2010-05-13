@@ -16,7 +16,7 @@ extern "C"
 {
 #endif
 
-#include "resistances.h"
+#include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
 #include "system_vector.h"
@@ -30,10 +30,10 @@ extern "C"
 
   typedef struct
   {
-    double      *Temperatures ;
-    double      *Sources ;
-    double      *Capacities ;
-    Resistances *Resistances ;
+    double       *Temperatures ;
+    double       *Sources ;
+    double       *Capacities ;
+    Conductances *Conductances ;
 
     int    Size ;
     double initial_temperature ,

@@ -3,7 +3,7 @@
 #
 #
 # "make DEBUG=-g"
-# "make DEBUG=-DDEBUG_FILL_RESISTANCES"
+# "make DEBUG=-DDEBUG_FILL_CONDUCTANCES"
 # "make DEBUG=-DDEBUG_FILL_CAPACITIES"
 # "make DEBUG=-DDEBUG_FILL_SOURCES"
 # "make DEBUG=-DDEBUG_FILL_SYSTEM_MATRIX"
@@ -31,7 +31,7 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description.o           \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
-          Sources/resistances.o                 \
+          Sources/conductances.o                \
           Sources/thermal_data.o
 
 all: $(LIB)
@@ -137,7 +137,7 @@ Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
 
 ################################################################################
 
-Sources/resistances.o: Sources/resistances.c Include/resistances.h
+Sources/conductances.o: Sources/conductances.c Include/conductances.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) -c $<
 
 ################################################################################

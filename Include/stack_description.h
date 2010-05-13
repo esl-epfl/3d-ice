@@ -23,7 +23,7 @@ extern "C"
 #include "die.h"
 #include "stack_element.h"
 #include "dimensions.h"
-#include "resistances.h"
+#include "conductances.h"
 
 /******************************************************************************
  *                                                                            *
@@ -77,9 +77,9 @@ extern "C"
                                        ) ;
 
   void
-  fill_resistances_stack_description   (
+  fill_conductances_stack_description  (
                                         StackDescription *stkd,
-                                        Resistances      *resistances
+                                        Conductances     *conductances
                                        ) ;
 
   void
@@ -98,7 +98,7 @@ extern "C"
   void
   fill_system_matrix_stack_description (
                                         StackDescription *stkd,
-                                        Resistances      *resistances,
+                                        Conductances     *conductances,
                                         double           *capacities,
                                         int              *columns,
                                         int              *rows,

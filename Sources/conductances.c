@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/resistances.c"                                        *
+ * Source file "Sources/conductances.c"                                       *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,18 +8,18 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#include "resistances.h"
+#include "conductances.h"
 #include "layer.h"
 
 void
-fill_resistances_solid_cell
+fill_conductances_solid_cell
 (
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   FILE *debug,
   int row,
   int column,
 #endif
-  Resistances *resistances,
+  Conductances *conductances,
   Dimensions *dimensions,
   double cell_length,
   double cell_width,
@@ -31,42 +31,42 @@ fill_resistances_solid_cell
   LayerPosition_t position
     = get_layer_position(dimensions, current_layer) ;
 
-  resistances->North = resistances->South
+  conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height ) / (cell_width / 2.0) ;
 
-  resistances->East = resistances->West
+  conductances->East = conductances->West
     = (thermal_conductivity * cell_width * cell_height ) / (cell_length / 2.0) ;
 
   if (position == TL_LAYER_BOTTOM)
   {
-    resistances->Bottom = 0.0 ;
+    conductances->Bottom = 0.0 ;
 
-    resistances->Top
+    conductances->Top
       = (thermal_conductivity * cell_length * cell_width) / cell_height ;
 
   }
   else if (position == TL_LAYER_TOP)
   {
-    resistances->Top = 0.0 ;
+    conductances->Top = 0.0 ;
 
-    resistances->Bottom
+    conductances->Bottom
       = (thermal_conductivity * cell_length * cell_width) / cell_height ;
   }
   else
   {
-    resistances->Top = resistances->Bottom
+    conductances->Top = conductances->Bottom
      = (thermal_conductivity * cell_length * cell_width) / (cell_height / 2.0) ;
   }
 
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
-    "%p fill_resistances_solid_cell\tl %2d (%d)  r %4d  c %4d" \
+    "%p fill_conductances_solid_cell\tl %2d (%d)  r %4d  c %4d" \
     "\tl %5.2f  w %5.2f h %5.2f\ttc   %.4e"                    \
     "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
-    resistances, current_layer, position, row, column,
+    conductances, current_layer, position, row, column,
     cell_length, cell_width, cell_height, thermal_conductivity,
-    resistances->North, resistances->South, resistances->East,
-    resistances->West, resistances->Top, resistances->Bottom) ;
+    conductances->North, conductances->South, conductances->East,
+    conductances->West, conductances->Top, conductances->Bottom) ;
 #endif
 
 }
@@ -88,14 +88,14 @@ fill_resistances_solid_cell
 //   =   4.1692e-12    * 1.667e12 * ( 1.0 /    11.0     ) * 0.5;
 
 void
-fill_resistances_liquid_cell
+fill_conductances_liquid_cell
 (
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   FILE *debug,
   int row,
   int column,
 #endif
-  Resistances *resistances,
+  Conductances *conductances,
   Dimensions *dimensions,
   double cell_length,
   double cell_width,
@@ -119,24 +119,24 @@ fill_resistances_liquid_cell
     fprintf (stderr, "Warning: channel on top layer not supported\n") ;
   }
 
-  resistances->North =  C ;
-  resistances->South = -C ;
+  conductances->North =  C ;
+  conductances->South = -C ;
 
-  resistances->East = resistances->West
+  conductances->East = conductances->West
     = liquid_htc * cell_width * cell_height ;
 
-  resistances->Top = resistances->Bottom
+  conductances->Top = conductances->Bottom
     = liquid_htc * cell_width * cell_length ;
 
-#ifdef DEBUG_FILL_RESISTANCES
+#ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
-    "%p fill_resistances_liquid_cell\tl %2d (%d)  r %4d  c %4d" \
+    "%p fill_conductances_liquid_cell\tl %2d (%d)  r %4d  c %4d" \
     "\tl %5.2f  w %5.2f  h %5.2f\tlhtc %.4e lsh %.4e"           \
     "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
-    resistances, current_layer, position, row, column,
+    conductances, current_layer, position, row, column,
     cell_length, cell_width, cell_height, liquid_htc, liquid_sh,
-    resistances->North, resistances->South, resistances->East,
-    resistances->West, resistances->Top, resistances->Bottom) ;
+    conductances->North, conductances->South, conductances->East,
+    conductances->West, conductances->Top, conductances->Bottom) ;
 #endif
 }
 
