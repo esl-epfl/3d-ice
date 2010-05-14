@@ -29,12 +29,13 @@ init_stack_description
   StackDescription *stkd
 )
 {
-  stkd->FileName          = NULL ;
-  stkd->MaterialsList     = NULL ;
-  stkd->Channel           = NULL ;
-  stkd->DiesList          = NULL ;
-  stkd->StackElementsList = NULL ;
-  stkd->Dimensions        = NULL ;
+  stkd->FileName           = NULL ;
+  stkd->MaterialsList      = NULL ;
+  stkd->Channel            = NULL ;
+  stkd->DiesList           = NULL ;
+  stkd->StackElementsList  = NULL ;
+  stkd->Dimensions         = NULL ;
+  stkd->PowerValuesChanged = 0 ;
 }
 
 /******************************************************************************/
@@ -610,7 +611,22 @@ get_number_of_floorplan_elements_in_floorplan
 /******************************************************************************/
 
 void
-insert_power_values
+change_coolant_flow_rate
+(
+  StackDescription *stkd,
+  double flow_rate
+)
+{
+  stkd->Channel->FlowRate = ( flow_rate * 1e+12 ) / 60.0 ;
+  stkd->Channel->FlowRateChanged = 1 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+insert_all_power_values
 (
   StackDescription *stkd,
   double *power_values
@@ -626,6 +642,8 @@ insert_power_values
       power_values += stk_el->Floorplan->NElements ;
     }
   }
+
+  stkd->PowerValuesChanged = 1 ;
 }
 
 /******************************************************************************/
@@ -655,6 +673,8 @@ insert_power_values_in_floorplan
 
   insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
 
+  stkd->PowerValuesChanged = 1 ;
+
   return 0 ;
 }
 
@@ -671,6 +691,8 @@ insert_power_value_in_floorplan_element
   double           power_value
 )
 {
+  int result ;
+
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -684,12 +706,16 @@ insert_power_value_in_floorplan_element
 
     return -2 ;
 
-  return insert_power_value_floorplan_element
-         (
-           stk_el->Floorplan,
-           floorplan_element_id,
-           power_value
-         ) ;
+  result = insert_power_value_floorplan_element
+           (
+             stk_el->Floorplan,
+             floorplan_element_id,
+             power_value
+           ) ;
+
+  if (result == 0 ) stkd->PowerValuesChanged = 1 ;
+
+  return result ;
 }
 
 /******************************************************************************/

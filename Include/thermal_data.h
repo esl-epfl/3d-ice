@@ -60,25 +60,28 @@ extern "C"
 
 /******************************************************************************/
 
-  int alloc_and_init_thermal_data
-  (
-    StackDescription *stkd,
-    ThermalData *tdata,
-    double initial_temperature,
-    double delta_time
-  ) ;
+  int
+  init_thermal_data       (
+                           StackDescription *stkd,
+                           ThermalData      *tdata,
+                           double           initial_temperature,
+                           double           delta_time
+                          ) ;
 
-  void free_thermal_data (ThermalData *tdata) ;
+  int
+  fill_thermal_data       (StackDescription *stkd, ThermalData *tdata) ;
 
-  int fill_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
+  void
+  free_thermal_data       (ThermalData *tdata) ;
 
-  int solve_system (ThermalData *tdata, double total_time) ;
+  int
+  solve_system            (ThermalData *tdata, double total_time) ;
 
-  void update_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
+  void
+  print_system_matrix     (ThermalData *tdata) ;
 
-  void print_system_matrix (ThermalData *tdata) ;
-
-  void print_sources (ThermalData *tdata) ;
+  void
+  print_sources           (ThermalData *tdata) ;
 
 #ifdef __cplusplus
 }

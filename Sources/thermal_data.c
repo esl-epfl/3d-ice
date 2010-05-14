@@ -25,7 +25,7 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-alloc_and_init_thermal_data
+init_thermal_data
 (
   StackDescription *stkd,
   ThermalData *tdata,
@@ -93,6 +93,7 @@ alloc_and_init_thermal_data
 
   set_default_options (&tdata->SLU_Options) ;
 
+  tdata->SLU_Options.Fact            = DOFACT ;
   tdata->SLU_Options.PrintStat       = NO ;
   tdata->SLU_Options.Equil           = NO ;
   tdata->SLU_Options.SymmetricMode   = YES ;
@@ -164,11 +165,11 @@ free_thermal_data (ThermalData *tdata)
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
   free_system_vector        (&tdata->SV_B) ;
 
-  if (tdata->SLU_Options.Fact == FACTORED )
+  if (tdata->SLU_Options.Fact != DOFACT )
   {
     Destroy_CompCol_Permuted (&tdata->SLUMatrix_A_Permuted) ;
-    Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L);
-    Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U);
+    Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L) ;
+    Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U) ;
   }
 }
 
@@ -183,78 +184,68 @@ fill_thermal_data
   ThermalData *tdata
 )
 {
-  fill_conductances_stack_description
-  (
-    stkd,
-    tdata->Conductances
-  ) ;
+  if (stkd->Channel->FlowRateChanged == 1)
+  {
+    fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
-  fill_capacities_stack_description
-  (
-    stkd,
-    tdata->Capacities,
-    tdata->delta_time
-  ) ;
+    fill_capacities_stack_description (stkd, tdata->Capacities,
+                                             tdata->delta_time) ;
 
-  fill_sources_stack_description
-  (
-    stkd,
-    tdata->Sources
-  ) ;
+    fill_system_matrix (stkd, &tdata->SM_A, tdata->Conductances,
+                                            tdata->Capacities) ;
 
-  fill_system_matrix
-  (
-    stkd,
-    &tdata->SM_A,
-    tdata->Conductances,
-    tdata->Capacities
-  );
+    if (tdata->SLU_Options.Fact == FACTORED)
 
-  fill_system_vector
-  (
-    &tdata->SV_B,
-    tdata->Sources,
-    tdata->Capacities,
-    tdata->Temperatures
-  );
+      tdata->SLU_Options.Fact = SamePattern ;
 
-  if (tdata->SLU_Options.Fact != DOFACT )
-    return 0 ;
+    else
 
-  get_perm_c
-  (
-    tdata->SLU_Options.ColPerm,
-    &tdata->SLUMatrix_A,
-    tdata->SLU_PermutationMatrixC
-  ) ;
+      tdata->SLU_Options.Fact = DOFACT ;
 
-  sp_preorder
-  (
-    &tdata->SLU_Options,
-    &tdata->SLUMatrix_A,
-    tdata->SLU_PermutationMatrixC,
-    tdata->SLU_Etree,
-    &tdata->SLUMatrix_A_Permuted
-  );
 
-  dgstrf
-  (
-    &tdata->SLU_Options,
-    &tdata->SLUMatrix_A_Permuted,
-    sp_ienv(2), sp_ienv(1), /* relax and panel size */
-    tdata->SLU_Etree,
-    NULL, 0,                /* work and lwork */
-    tdata->SLU_PermutationMatrixC,
-    tdata->SLU_PermutationMatrixR,
-    &tdata->SLUMatrix_L,
-    &tdata->SLUMatrix_U,
-    &tdata->SLU_Stat,
-    &tdata->SLU_Info
-  ) ;
+    fill_sources_stack_description (stkd, tdata->Sources) ;
 
-  tdata->SLU_Options.Fact = FACTORED ;
+    fill_system_vector (&tdata->SV_B, tdata->Sources,
+                                      tdata->Capacities,
+                                      tdata->Temperatures) ;
 
-  return tdata->SLU_Info ;
+    stkd->Channel->FlowRateChanged = 0 ;
+    stkd->PowerValuesChanged = 0 ;
+  }
+
+  if (stkd->PowerValuesChanged == 1)
+  {
+    fill_sources_stack_description (stkd, tdata->Sources) ;
+
+    fill_system_vector (&tdata->SV_B, tdata->Sources,
+                                      tdata->Capacities,
+                                      tdata->Temperatures) ;
+  }
+
+  if (tdata->SLU_Options.Fact != FACTORED )
+  {
+    get_perm_c (tdata->SLU_Options.ColPerm,
+                &tdata->SLUMatrix_A,
+                tdata->SLU_PermutationMatrixC) ;
+
+    sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
+                 tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
+                 &tdata->SLUMatrix_A_Permuted) ;
+
+    dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+            sp_ienv(2), sp_ienv(1), /* relax and panel size */
+            tdata->SLU_Etree,
+            NULL, 0,                /* work and lwork */
+            tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+            &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+            &tdata->SLU_Stat, &tdata->SLU_Info) ;
+
+    tdata->SLU_Options.Fact = FACTORED ;
+
+    return tdata->SLU_Info ;
+  }
+
+  return 0 ;
 }
 
 /******************************************************************************/
@@ -304,32 +295,6 @@ solve_system
   }
 
   return tdata->SLU_Info ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-update_thermal_data
-(
-  StackDescription *stkd,
-  ThermalData *tdata
-)
-{
-  fill_sources_stack_description
-  (
-    stkd,
-    tdata->Sources
-  ) ;
-
-  fill_system_vector
-  (
-    &tdata->SV_B,
-    tdata->Sources,
-    tdata->Capacities,
-    tdata->Temperatures
-  );
 }
 
 /******************************************************************************/

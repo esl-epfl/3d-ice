@@ -198,11 +198,12 @@ channel
         YYABORT ;
       }
 
-      stkd->Channel->Height        = $4  ;
-      stkd->Channel->FlowRate      = ( $14 * 1e+12 ) / 60.0 ;
-      stkd->Channel->CoolantHTC    = $20 ;
-      stkd->Channel->CoolantVHC    = $26 ;
-      stkd->Channel->CoolantTIn    = $31 ;
+      stkd->Channel->Height          = $4  ;
+      stkd->Channel->FlowRate        = ( $14 * 1e+12 ) / 60.0 ;
+      stkd->Channel->CoolantHTC      = $20 ;
+      stkd->Channel->CoolantVHC      = $26 ;
+      stkd->Channel->CoolantTIn      = $31 ;
+      stkd->Channel->FlowRateChanged = 1 ;
       stkd->Channel->WallMaterial
         = find_material_in_list(stkd->MaterialsList, $9) ;
 

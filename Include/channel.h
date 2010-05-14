@@ -45,6 +45,9 @@ extern "C"
                               /* We store it as [ um3 / sec ]                 */
                               /* Shared by all the channels in the 3DStack    */
 
+    int FlowRateChanged ;     /* 0 = flow rate hasn't changet since last sim. */
+                              /* 1 = user used change_flow_rate               */
+
     Material *WallMaterial ;  /* A pointer to the Material composing the wall */
 
   } Channel ;

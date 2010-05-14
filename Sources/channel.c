@@ -28,6 +28,7 @@ init_channel
   channel->CoolantVHC       = 0.0  ;
   channel->CoolantTIn       = 0.0  ;
   channel->FlowRate         = 0.0  ;
+  channel->FlowRateChanged  = 0 ;
   channel->WallMaterial     = NULL ;
 }
 

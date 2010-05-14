@@ -51,6 +51,8 @@ extern "C"
     Dimensions   *Dimensions ;            /* Collection of all the dimensions */
                                           /* (chip, grid of cells, cell)      */
 
+    int PowerValuesChanged ;
+
   } StackDescription ;
 
 /******************************************************************************/
@@ -119,7 +121,10 @@ extern "C"
                               ) ;
 
   void
-  insert_power_values         (StackDescription *stkd, double *power_values) ;
+  change_coolant_flow_rate (StackDescription *stkd, double flow_rate) ;
+
+  void
+  insert_all_power_values     (StackDescription *stkd, double *power_values) ;
 
   int
   insert_power_values_in_floorplan
