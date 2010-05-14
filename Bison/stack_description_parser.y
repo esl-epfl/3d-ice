@@ -57,6 +57,8 @@
 %token DIE                   "keyword die"
 %token DIMENSIONS            "keyword dimensions"
 %token FIRST                 "keyword first"
+%token FLOW                  "keyword flow"
+%token RATE                  "keyword rate"
 %token INCOMING              "keyword incoming"
 %token TEMPERATURE           "keyword temperature"
 %token LAYER                 "keyword layer"
@@ -71,7 +73,7 @@
 %token HEIGHT                "keyword height"
 %token UM                    "keyword um"
 %token WALL                  "keyword wall"
-%token LIQUID                "keyword liquid"
+%token COOLANT               "keyword coolant"
 %token TRANSFER              "keyword transfer"
 %token COEFFICIENT           "keyword coefficient"
 %token WIDTH                 "keyword width"
@@ -182,9 +184,10 @@ channel
   : CHANNEL ':'
       HEIGHT DVALUE UM ';'
       WALL MATERIAL IDENTIFIER ';'
-      LIQUID HEAT TRANSFER COEFFICIENT DVALUE ';'
-      LIQUID SPECIFIC HEAT DVALUE ';'
-      LIQUID INCOMING TEMPERATURE DVALUE ';'
+      COOLANT FLOW RATE DVALUE ';'
+      COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
+      COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'
+      COOLANT INCOMING TEMPERATURE DVALUE ';'
     {
       stkd->Channel = alloc_and_init_channel() ;
 
@@ -196,9 +199,10 @@ channel
       }
 
       stkd->Channel->Height        = $4  ;
-      stkd->Channel->LiquidHTC     = $15 ;
-      stkd->Channel->LiquidSH      = $20 ;
-      stkd->Channel->TemperatureIn = $25 ;
+      stkd->Channel->FlowRate      = ( $14 * 1e+12 ) / 60.0 ;
+      stkd->Channel->CoolantHTC    = $20 ;
+      stkd->Channel->CoolantVHC    = $26 ;
+      stkd->Channel->CoolantTIn    = $31 ;
       stkd->Channel->WallMaterial
         = find_material_in_list(stkd->MaterialsList, $9) ;
 
@@ -347,6 +351,7 @@ stack
 
   : STACK ':'
       stack_elements
+
   ;
 
 stack_elements
@@ -497,6 +502,12 @@ dimensions
       if (stkd->Dimensions->Grid.NColumns % 2 == 0)
       {
         stack_description_error(stkd, scanner, "even number of columns") ;
+        YYABORT ;
+      }
+
+      if (stkd->Dimensions->Grid.NColumns < 3)
+      {
+        stack_description_error(stkd, scanner, "not enough columns") ;
         YYABORT ;
       }
 

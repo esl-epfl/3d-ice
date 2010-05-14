@@ -23,11 +23,12 @@ init_channel
   Channel* channel
 )
 {
-  channel->Height        = 0.0  ;
-  channel->LiquidHTC     = 0.0  ;
-  channel->LiquidSH      = 0.0  ;
-  channel->TemperatureIn = 0.0  ;
-  channel->WallMaterial  = NULL ;
+  channel->Height           = 0.0  ;
+  channel->CoolantHTC       = 0.0  ;
+  channel->CoolantVHC       = 0.0  ;
+  channel->CoolantTIn       = 0.0  ;
+  channel->FlowRate         = 0.0  ;
+  channel->WallMaterial     = NULL ;
 }
 
 /******************************************************************************/
@@ -73,27 +74,35 @@ print_channel
 )
 {
   fprintf(stream,
-    "%sChannel\n",                                  prefix) ;
+    "%sChannel\n",                                   prefix) ;
   fprintf(stream,
-    "%s  Height                           %5.2f\n", prefix, channel->Height) ;
+    "%s  Height                            %5.2f\n", prefix,
+                                                     channel->Height) ;
   fprintf(stream,
-    "%s  Liquid heat transfert coefficent %.5e\n", prefix, channel->LiquidHTC) ;
+    "%s  Coolant Heat Transfert Coefficent %.5e\n",  prefix,
+                                                     channel->CoolantHTC) ;
   fprintf(stream,
-    "%s  Liquid specific heat             %.4e\n", prefix, channel->LiquidSH) ;
+    "%s  Coolant Volumetric Heat Capacity  %.4e\n",  prefix,
+                                                     channel->CoolantVHC) ;
   fprintf(stream,
-    "%s  Liquid incoming temperature      %.4e\n",
-    prefix, channel->TemperatureIn) ;
+    "%s  Coolant incoming temperature      %.4e\n",  prefix,
+                                                     channel->CoolantTIn) ;
+  fprintf(stream,
+    "%s  Flow Rate                         %.4e\n",  prefix,
+                                                     channel->FlowRate) ;
 
   Material *wall = channel->WallMaterial ;
 
   if (wall != NULL)
   {
     fprintf(stream,
-    "%s  Wall thermal conductivity        %.4e (%s)\n",
-      prefix, wall->ThermalConductivity, wall->Id) ;
+    "%s  Wall thermal conductivity         %.4e (%s)\n", prefix,
+                                                     wall->ThermalConductivity,
+                                                         wall->Id) ;
     fprintf(stream,
-    "%s  Wall Volum. Heat Capacity        %.4e (%s)\n",
-      prefix, wall->VolHeatCapacity, wall->Id) ;
+    "%s  Wall Volum. Heat Capacity         %.4e (%s)\n", prefix,
+                                                         wall->VolHeatCapacity,
+                                                         wall->Id) ;
   }
   else
     fprintf(stream,
@@ -171,8 +180,9 @@ fill_conductances_channel
           get_cell_length (dimensions, column),
           get_cell_width (dimensions),
           channel->Height,
-          channel->LiquidHTC,
-          channel->LiquidSH,
+          channel->CoolantHTC,
+          channel->CoolantVHC,
+          channel->FlowRate,
           current_layer
         ) ;
 
@@ -261,7 +271,7 @@ fill_capacities_channel
                          get_cell_length(dimensions, column),
                          get_cell_width (dimensions),
                          channel->Height,
-                         channel->LiquidSH,
+                         channel->CoolantVHC,
                          delta_time
                        ) ;
 #ifdef DEBUG_FILL_CAPACITIES
@@ -271,7 +281,7 @@ fill_capacities_channel
         capacities, current_layer, row, column,
         get_cell_length(dimensions, column), get_cell_width (dimensions),
         channel->Height,
-        channel->LiquidSH, delta_time, *capacities) ;
+        channel->CoolantVHC, delta_time, *capacities) ;
 #endif
       }
 
@@ -296,13 +306,16 @@ fill_sources_channel
 {
   int row, column ;
 
-  double C
-    = channel->LiquidSH * 1.62e6 * 0.5 * (dimensions->Cell.Length * channel->Height ) ;
+  double C = (channel->CoolantVHC * channel->FlowRate)
+             / (double) ( get_number_of_columns (dimensions) - 1 );
 
 #ifdef DEBUG_FILL_SOURCES
   fprintf (debug,
-    "%p current_layer = %d\tfill_sources_channel %s %.5e\n",
-    sources, current_layer, channel->WallMaterial->Id, C) ;
+    "%p current_layer = %d\tfill_sources_channel %s " \
+    " %.5e = (%.5e * %.5e) / %d \n",
+    sources, current_layer, channel->WallMaterial->Id,
+    C, channel->CoolantVHC, channel->FlowRate,
+    get_number_of_columns (dimensions) - 1) ;
 #endif
 
   for
@@ -322,13 +335,14 @@ fill_sources_channel
 
       if (row == 0 && column % 2 != 0) /* Only first row and odd columns */
       {
-        *sources = 2.0 * C * channel->TemperatureIn ;
+        *sources = 2.0 * C * channel->CoolantTIn ;
+
 #ifdef DEBUG_FILL_SOURCES
       fprintf (debug,
-        "liquid cell l %5d r %5d c %5d (%6d) -> %.5e\n",
+        "liquid cell l %5d r %5d c %5d (%6d) -> %.5e  (Tin = %.2f)\n",
         current_layer, row, column,
         get_cell_offset_in_stack (dimensions, current_layer, row, column),
-        *sources) ;
+        *sources, channel->CoolantTIn) ;
 #endif
       }
 

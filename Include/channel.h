@@ -29,15 +29,21 @@ extern "C"
 
   typedef struct
   {
-    double Height ;           /* The heigh of the channel in um               */
+    double Height ;           /* The heigh of the channel  [um]               */
                               /* (corresponding to 1 cell).                   */
 
-    double LiquidHTC ;        /* The heat transfert coefficent of             */
-                              /* the cooling liquid                           */
+    double CoolantHTC ;       /* The heat transfert coefficent of             */
+                              /* the cooling liquid  [ (W . K / um2 ]         */
 
-    double LiquidSH ;         /* The specific heat of the cooling liquid      */
+    double CoolantVHC ;       /* the volumetric heat capacity of              */
+                              /* the cooling liquid  [ J / ( um3 . K ) ]      */
 
-    double TemperatureIn ;    /* The temperarute of the incoming liquid       */
+    double CoolantTIn ;       /* The temperarute of the incoming liquid [K]   */
+
+    double FlowRate ;         /* The flow rate of the incolimg liquid         */
+                              /* The user specify a flowrate in [ ml / min ]  */
+                              /* We store it as [ um3 / sec ]                 */
+                              /* Shared by all the channels in the 3DStack    */
 
     Material *WallMaterial ;  /* A pointer to the Material composing the wall */
 

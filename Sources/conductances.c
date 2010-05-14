@@ -75,17 +75,24 @@ fill_conductances_solid_cell
 /******************************************************************************/
 /******************************************************************************/
 
-// FlowRate = 1.667e+12;
-// FlowArea = #Channels * Ay = 11 * (50 * layer->height);
-//
-// Velocity = FlowRate / FlowArea
-//          = 1.667e+12 / (11 * (50 * layer->height));
-//
-// C = SpecificHeatH2O * Velocity * Ay * 0.5;
-//   = SpecificHeatH2O * FlowRate * ( 1.0 / (  FlowArea    ) ) * Ay * 0.5;
-//   = SpecificHeatH2O * FlowRate * ( 1.0 / (#Channels * Ay) ) * Ay * 0.5;
-//   = SpecificHeatH2O * FlowRate * ( 1.0 / (#Channels) ) * 0.5;
-//   =   4.1692e-12    * 1.667e12 * ( 1.0 /    11.0     ) * 0.5;
+/*
+ * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
+ *
+ * FlowRatePerChannel [ um3 / sec ] = FlowRate             [ um3 / sec ]
+ *                                    / #ChannelColumns    [ ]
+ *
+ * CoolantVelocity      [ m / sec ] = FlowRatePerChannel   [ um3 / sec ]
+ *                                    * ( 1 / Ay )         [   1 / um2 ]
+ *
+ * Cconv         [ J / ( K . sec) ]  = CoolantVHC          [ J / ( um3 . K ) ]
+ *                                     * CoolantVelocity   [ m / sec ]
+ *                                     * ( Ay / 2 )        [ um2 ]
+ * [ J / ( K . sec) ] = [ W / K ]
+ *
+ * CoolantVelocity = FlowRate / (#ChannelLayers * Ay )
+ *
+ * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
+ */
 
 void
 fill_conductances_liquid_cell
@@ -100,15 +107,17 @@ fill_conductances_liquid_cell
   double cell_length,
   double cell_width,
   double cell_height,
-  double liquid_htc,
-  double liquid_sh,
+  double coolant_htc,
+  double coolant_vhc,
+  double flow_rate,
   int current_layer
 )
 {
   LayerPosition_t position
     = get_layer_position(dimensions, current_layer) ;
 
-  double C = liquid_sh * 1.62e6 * (cell_length * cell_height ) * 0.5;
+  double C = (coolant_vhc * flow_rate)
+             / (double) ( get_number_of_columns (dimensions) - 1 );
 
   if (position == TL_LAYER_BOTTOM)
   {
@@ -123,10 +132,10 @@ fill_conductances_liquid_cell
   conductances->South = -C ;
 
   conductances->East = conductances->West
-    = liquid_htc * cell_width * cell_height ;
+    = coolant_htc * cell_width * cell_height ;
 
   conductances->Top = conductances->Bottom
-    = liquid_htc * cell_width * cell_length ;
+    = coolant_htc * cell_width * cell_length ;
 
 #ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
@@ -134,7 +143,7 @@ fill_conductances_liquid_cell
     "\tl %5.2f  w %5.2f  h %5.2f\tlhtc %.4e lsh %.4e"           \
     "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
     conductances, current_layer, position, row, column,
-    cell_length, cell_width, cell_height, liquid_htc, liquid_sh,
+    cell_length, cell_width, cell_height, coolant_htc, coolant_vhc,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
 #endif

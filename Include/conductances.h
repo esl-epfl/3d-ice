@@ -60,13 +60,14 @@ extern "C"
                                     int column,
 #endif
                                     Conductances *conductances,
-                                    Dimensions *dim,
-                                    double cell_length,
-                                    double cell_width,
-                                    double cell_height,
-                                    double liquid_htc,
-                                    double liquid_sh,
-                                    int current_layer) ;
+                                    Dimensions   *dimensions,
+                                    double       cell_length,
+                                    double       cell_width,
+                                    double       cell_height,
+                                    double       coolant_htc,
+                                    double       coolant_vhc,
+                                    double       flow_rate,
+                                    int          current_layer) ;
 
 #ifdef __cplusplus
 }
