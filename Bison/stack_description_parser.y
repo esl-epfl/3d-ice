@@ -414,14 +414,14 @@ stack_element
 
       $$ = stack_element ;
     }
-  | DIE IVALUE IDENTIFIER FLOORPLAN '"' PATH '"' ';'
+  | DIE IVALUE IDENTIFIER FLOORPLAN PATH ';'
     {
       StackElement *stack_element = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
         free($3) ;
-        free($6) ;
+        free($5) ;
         stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
         YYABORT ;
       }
@@ -433,7 +433,7 @@ stack_element
       if (stack_element->Pointer.Die == NULL)
       {
         free($3) ;
-        free($6) ;
+        free($5) ;
         free_stack_element(stack_element) ;
         stack_description_error(stkd, scanner, "Unknown die id") ;
         YYABORT ;
@@ -446,13 +446,13 @@ stack_element
       if (stack_element->Floorplan == NULL)
       {
         free($3) ;
-        free($6) ;
+        free($5) ;
         free_stack_element(stack_element) ;
         stack_description_error(stkd, scanner, "alloc_and_init_floorplan") ;
         YYABORT ;
       }
 
-      stack_element->Floorplan->FileName = $6 ;
+      stack_element->Floorplan->FileName = $5 ;
 
       free($3) ;
 

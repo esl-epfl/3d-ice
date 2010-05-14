@@ -81,7 +81,8 @@ signed_integer          [+-]?[[:digit:]]+
 exponent                [eE]{signed_integer}
 double                  {signed_integer}\.{unsigned_integer}{exponent}?
 identifier              [[:alpha:]](\_|[[:alnum:]])*
-path                    (\/|\.{1,2}|\_|[[:alnum:]])*
+path_begin              (\.{1,2}\/|\/)?
+path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 
 /* exclusive start conditions to exclude C/C++ like comments in */
 /* the scanned file.                                            */
@@ -104,7 +105,6 @@ path                    (\/|\.{1,2}|\_|[[:alnum:]])*
 
 ":"                          return yytext[0] ;
 ";"                          return yytext[0] ;
-"\""                         return yytext[0] ;
 
 "capacity"                   return CAPACITY ;
 "cell"                       return CELL ;
@@ -155,7 +155,14 @@ path                    (\/|\.{1,2}|\_|[[:alnum:]])*
                              }
 
 {path}                       {
-                               yylval->string = strdup(yytext) ;
+                               yylval->string
+                                 = malloc (sizeof(char) * (strlen(yytext)-2)) ;
+                               strncpy
+                               (
+                                 yylval->string,
+                                 yytext+1,
+                                 strlen(yytext)-2
+                               );
                                return PATH;
                              }
 
