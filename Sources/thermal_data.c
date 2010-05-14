@@ -76,16 +76,6 @@ alloc_and_init_thermal_data
 
     goto slu_etree_fail ;
 
-  if ( (tdata->SLU_RowsScaleFactors
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    goto slu_row_scale_fail ;
-
-  if ( (tdata->SLU_ColumnsScaleFactors
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    goto slu_column_scale_fail ;
-
   if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
                             stkd->Dimensions->Grid.NNz) == 0)
     goto sm_a_fail ;
@@ -123,13 +113,6 @@ alloc_and_init_thermal_data
     SLU_DN, SLU_D, SLU_GE
   );
 
-  dCreate_Dense_Matrix  /* Vector X */
-  (
-    &tdata->SLUMatrix_X, tdata->Size, 1,
-    tdata->Temperatures, tdata->Size,
-    SLU_DN, SLU_D, SLU_GE
-  );
-
   return 1 ;
 
   /* Free if malloc errors */
@@ -137,10 +120,6 @@ alloc_and_init_thermal_data
 sv_b_fail :
   free_system_matrix (&tdata->SM_A) ;
 sm_a_fail :
-  free (tdata->SLU_ColumnsScaleFactors) ;
-slu_column_scale_fail :
-  free (tdata->SLU_RowsScaleFactors) ;
-slu_row_scale_fail :
   free (tdata->SLU_Etree) ;
 slu_etree_fail :
   free (tdata->SLU_PermutationMatrixR);
@@ -168,6 +147,7 @@ free_thermal_data (ThermalData *tdata)
 {
   if (tdata == NULL) return ;
 
+  free (tdata->Temperatures) ;
   free (tdata->Sources) ;
   free (tdata->Capacities) ;
   free (tdata->Conductances) ;
@@ -175,8 +155,6 @@ free_thermal_data (ThermalData *tdata)
   free (tdata->SLU_PermutationMatrixR) ;
   free (tdata->SLU_PermutationMatrixC) ;
   free (tdata->SLU_Etree) ;
-  free (tdata->SLU_RowsScaleFactors) ;
-  free (tdata->SLU_ColumnsScaleFactors) ;
 
   StatFree (&tdata->SLU_Stat) ;
 
@@ -186,11 +164,9 @@ free_thermal_data (ThermalData *tdata)
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
   free_system_vector        (&tdata->SV_B) ;
 
-  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_X);
-  free                      (tdata->Temperatures) ;
-
-  if (tdata->SLU_Options.Fact == FACTORED)
+  if (tdata->SLU_Options.Fact == FACTORED )
   {
+    Destroy_CompCol_Permuted (&tdata->SLUMatrix_A_Permuted) ;
     Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L);
     Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U);
   }
@@ -200,7 +176,7 @@ free_thermal_data (ThermalData *tdata)
 /******************************************************************************/
 /******************************************************************************/
 
-void
+int
 fill_thermal_data
 (
   StackDescription *stkd,
@@ -242,38 +218,43 @@ fill_thermal_data
     tdata->Temperatures
   );
 
-//  get_perm_c
-//  (
-//    tdata->SLU_Options.ColPerm,
-//    &tdata->SLUMatrix_A,
-//    tdata->SLU_PermutationMatrixC
-//  ) ;
-//
-//  sp_preorder
-//  (
-//    &tdata->SLU_Options,
-//    &tdata->SLUMatrix_A,
-//    tdata->SLU_PermutationMatrixC,
-//    tdata->SLU_Etree,
-//    &tdata->SLUMatrix_A
-//  );
-//
-//  dgstrf
-//  (
-//    &tdata->SLU_Options,
-//    &tdata->SLUMatrix_A,
-//    sp_ienv(2), sp_ienv(1), /* relax and panel size */
-//    tdata->SLU_Etree,
-//    NULL, 0,                /* work and lwork */
-//    tdata->SLU_PermutationMatrixC,
-//    tdata->SLU_PermutationMatrixR,
-//    &tdata->SLUMatrix_L,
-//    &tdata->SLUMatrix_U,
-//    &tdata->SLU_Stat,
-//    &tdata->SLU_Info
-//  ) ;
-//
-//  return tdata->SLU_Info ;
+  if (tdata->SLU_Options.Fact != DOFACT )
+    return 0 ;
+
+  get_perm_c
+  (
+    tdata->SLU_Options.ColPerm,
+    &tdata->SLUMatrix_A,
+    tdata->SLU_PermutationMatrixC
+  ) ;
+
+  sp_preorder
+  (
+    &tdata->SLU_Options,
+    &tdata->SLUMatrix_A,
+    tdata->SLU_PermutationMatrixC,
+    tdata->SLU_Etree,
+    &tdata->SLUMatrix_A_Permuted
+  );
+
+  dgstrf
+  (
+    &tdata->SLU_Options,
+    &tdata->SLUMatrix_A_Permuted,
+    sp_ienv(2), sp_ienv(1), /* relax and panel size */
+    tdata->SLU_Etree,
+    NULL, 0,                /* work and lwork */
+    tdata->SLU_PermutationMatrixC,
+    tdata->SLU_PermutationMatrixR,
+    &tdata->SLUMatrix_L,
+    &tdata->SLUMatrix_U,
+    &tdata->SLU_Stat,
+    &tdata->SLU_Info
+  ) ;
+
+  tdata->SLU_Options.Fact = FACTORED ;
+
+  return tdata->SLU_Info ;
 }
 
 /******************************************************************************/
@@ -287,36 +268,31 @@ solve_system
   double total_time
 )
 {
+  int counter;
+
+  if (tdata->SLU_Options.Fact == DOFACT)
+    return 1 ;
+
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
-    dgssvx
+    dgstrs
     (
-      &tdata->SLU_Options,
-      &tdata->SLUMatrix_A,
-      tdata->SLU_PermutationMatrixC,
-      tdata->SLU_PermutationMatrixR,
-      tdata->SLU_Etree,
-      tdata->SLU_equed,
-      tdata->SLU_RowsScaleFactors,
-      tdata->SLU_ColumnsScaleFactors,
+      NOTRANS,
       &tdata->SLUMatrix_L,
       &tdata->SLUMatrix_U,
-      NULL, 0,
+      tdata->SLU_PermutationMatrixC,
+      tdata->SLU_PermutationMatrixR,
       &tdata->SLUMatrix_B,
-      &tdata->SLUMatrix_X,
-      &tdata->SLU_rpg,
-      &tdata->SLU_rcond,
-      &tdata->SLU_ferr,
-      &tdata->SLU_berr,
-      &tdata->SLU_MemUsage,
       &tdata->SLU_Stat,
       &tdata->SLU_Info
-    );
+    ) ;
 
     if (tdata->SLU_Info != 0)
       break ;
 
-    tdata->SLU_Options.Fact = FACTORED ;
+    for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+
+      tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
 
     fill_system_vector
     (
@@ -326,18 +302,6 @@ solve_system
       tdata->Temperatures
     ) ;
   }
-
-//    dgstrs
-//    (
-//      NOTRANS,
-//      &tdata->SLUMatrix_L,
-//      &tdata->SLUMatrix_U,
-//      tdata->SLU_PermutationMatrixC,
-//      tdata->SLU_PermutationMatrixR,
-//      &tdata->SLUMatrix_B,
-//      &tdata->SLU_Stat,
-//      &tdata->SLU_Info
-//    ) ;
 
   return tdata->SLU_Info ;
 }

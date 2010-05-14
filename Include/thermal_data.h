@@ -43,27 +43,18 @@ extern "C"
     SystemVector SV_B ;
 
     SuperMatrix SLUMatrix_A ,
+                SLUMatrix_A_Permuted ,
                 SLUMatrix_B ,
                 SLUMatrix_L ,
-                SLUMatrix_U ,
-                SLUMatrix_X ;
+                SLUMatrix_U ;
 
     SuperLUStat_t     SLU_Stat ;
     superlu_options_t SLU_Options ;
-    mem_usage_t       SLU_MemUsage ;
 
     int    SLU_Info ,
            *SLU_PermutationMatrixR ,
            *SLU_PermutationMatrixC ,
            *SLU_Etree ;
-    double SLU_rpg ,
-           SLU_rcond ,
-           SLU_ferr ,
-           SLU_berr ,
-           *SLU_RowsScaleFactors ,
-           *SLU_ColumnsScaleFactors ;
-
-    char   SLU_equed[1] ;
 
   } ThermalData ;
 
@@ -79,7 +70,7 @@ extern "C"
 
   void free_thermal_data (ThermalData *tdata) ;
 
-  void fill_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
+  int fill_thermal_data (StackDescription *stkd, ThermalData *tdata) ;
 
   int solve_system (ThermalData *tdata, double total_time) ;
 
