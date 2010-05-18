@@ -128,7 +128,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "mm"                         return MM ;
 "on"                         return ON ;
 "rate"                       return RATE ;
-"sources"                    return SOURCES ;
+"source"                     return SOURCE ;
 "specific"                   return SPECIFIC ;
 "stack"                      return STACK ;
 "temperature"                return TEMPERATURE ;

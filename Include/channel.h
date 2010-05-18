@@ -27,7 +27,7 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  typedef struct
+  typedef struct channel
   {
     double Height ;           /* The heigh of the channel  [um]               */
                               /* (corresponding to 1 cell).                   */

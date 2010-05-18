@@ -36,8 +36,6 @@ extern "C"
 
     int NLayers ;               /* The number of layer composing the die      */
 
-    int SourcesId ;             /* The id of the layer with the sources on it */
-
     struct die* Next ;          /* To collect dies in a linked list           */
 
   } ;

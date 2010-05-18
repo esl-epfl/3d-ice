@@ -39,14 +39,13 @@ extern "C"
 
   struct layer
   {
-    int Id ;                        /* The identifier of the layer            */
-
     double Height ;                 /* The heigh of the layer in um. (1 cell) */
 
     Material* Material ;            /* The material composing the layer       */
 
-    struct layer *Next ;            /* To collect layers in a linked list     */
+    int IsSource       ;
 
+    struct layer *Next ;            /* To collect layers in a linked list     */
   } ;
 
   typedef struct layer Layer ;
@@ -73,8 +72,8 @@ extern "C"
   void
   print_layers_list         (FILE *stream, char* prefix, Layer *list) ;
 
-  Layer *
-  find_layer_in_list        (Layer *list, int id) ;
+//  Layer *
+//  find_layer_in_list        (Layer *list, int id) ;
 
   LayerPosition_t
   get_layer_position        (Dimensions *dimensions, int layer) ;

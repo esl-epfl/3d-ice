@@ -758,7 +758,7 @@ get_max_temperature_in_floorplan_element
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   return get_max_temperature_floorplan
          (
@@ -809,7 +809,7 @@ get_min_temperature_in_floorplan_element
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   return get_min_temperature_floorplan
          (
@@ -860,7 +860,7 @@ get_avg_temperature_in_floorplan_element
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   return get_avg_temperature_floorplan
          (
@@ -913,7 +913,7 @@ get_min_avg_max_temperatures_in_floorplan_element
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   return get_min_avg_max_temperatures_floorplan
          (
@@ -963,7 +963,7 @@ get_all_max_temperatures_in_floorplan
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   get_all_max_temperatures_floorplan
   (
@@ -1015,7 +1015,7 @@ get_all_min_temperature_in_floorplan
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   get_all_min_temperatures_floorplan
   (
@@ -1067,7 +1067,7 @@ get_all_avg_temperatures_in_floorplan
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   get_all_avg_temperatures_floorplan
   (
@@ -1121,7 +1121,7 @@ get_all_min_avg_max_temperatures_in_floorplan
     layer_offset ++,
     layer  = layer->Next
   )
-    if (stk_el->Pointer.Die->SourcesId == layer->Id) break ;
+    if (layer->IsSource == 1 ) break ;
 
   get_all_min_avg_max_temperatures_floorplan
   (

@@ -23,10 +23,10 @@ init_layer
   Layer *layer
 )
 {
-  layer->Id       = 0    ;
   layer->Height   = 0.0  ;
   layer->Material = NULL ;
   layer->Next     = NULL ;
+  layer->IsSource = 0    ;
 }
 
 /******************************************************************************/
@@ -90,12 +90,17 @@ print_layer
   Layer *layer
 )
 {
-  fprintf (stream,
-    "%sLayer %d\n",            prefix, layer->Id) ;
-  fprintf (stream,
-    "%s  Height   %5.2f um\n", prefix, layer->Height ) ;
-  fprintf (stream,
-    "%s  Material %s\n",       prefix, layer->Material->Id ) ;
+  if (layer->IsSource)
+
+    fprintf (stream,
+      "%sSource layer ( height %5.2f um, material %s )\n",
+      prefix, layer->Height, layer->Material->Id) ;
+
+  else
+
+    fprintf (stream,
+      "%sLayer        ( height %5.2f um, material %s )\n",
+      prefix, layer->Height, layer->Material->Id) ;
 }
 
 /******************************************************************************/
@@ -120,19 +125,19 @@ print_layers_list
 /******************************************************************************/
 /******************************************************************************/
 
-Layer *
-find_layer_in_list
-(
-  Layer *list,
-  int id
-)
-{
-  for ( ; list != NULL ; list = list->Next)
-
-    if (list->Id == id) break ;
-
-  return list ;
-}
+//Layer *
+//find_layer_in_list
+//(
+//  Layer *list,
+//  int id
+//)
+//{
+//  for ( ; list != NULL ; list = list->Next)
+//
+//    if (list->Id == id) break ;
+//
+//  return list ;
+//}
 
 /******************************************************************************/
 /******************************************************************************/

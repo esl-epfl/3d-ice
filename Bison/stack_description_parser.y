@@ -35,9 +35,10 @@
    struct stack_element *stack_element_p ;
 }
 
-%destructor { free($$) ; } <string> ;
-
-%type <int_v> sources_position
+%destructor { free($$) ;                      } <string> ;
+%destructor { free_layers_list ($$) ;         } <layers> ;
+%destructor { free_dies_list ($$) ;           } <dies> ;
+%destructor { free_stack_elements_list ($$) ; } <stack_elements> ;
 
 %type <material_p> material
 %type <material_p> materials_list
@@ -46,7 +47,9 @@
 %type <die_p> dies_list
 
 %type <layer_p> layer
+%type <layer_p> layers
 %type <layer_p> layers_list
+%type <layer_p> source_layer
 
 %type <stack_element_p> stack_element
 %type <stack_element_p> stack_elements
@@ -65,7 +68,7 @@
 %token LAST                  "keyword last"
 %token MATERIAL              "keyword material"
 %token ON                    "keyword on"
-%token SOURCES               "keyword sources"
+%token SOURCE                "keyword source"
 %token SPECIFIC              "keyword specific"
 %token HEAT                  "keyword heat"
 %token THERMAL               "keyword thermal"
@@ -92,12 +95,12 @@
 %{
 #include "stack_description_scanner.h"
 
-void stack_description_error (StackDescription *stack,
-                              yyscan_t yyscanner,
-                              char const *msg) ;
-
-static Layer *tmp_layer_pointer = NULL ;
-static int   tmp_layer_counter  = 0 ;
+void stack_description_error
+(
+  StackDescription *stack,
+  yyscan_t yyscanner,
+  char const *msg
+) ;
 
 %}
 
@@ -134,16 +137,8 @@ stack_description_file
 
 materials_list
 
-  : material
-    {
-      stkd->MaterialsList = $1 ;
-      $$ = $1 ;
-    }
-  | materials_list material
-    {
-      $1->Next = $2 ;
-      $$ = $2 ;
-    }
+  : material                { stkd->MaterialsList = $1 ; $$ = $1 ; }
+  | materials_list material { $1->Next = $2            ; $$ = $2 ; }
   ;
 
 material
@@ -193,8 +188,8 @@ channel
 
       if (stkd->Channel == NULL)
       {
-        free($9) ;
         stack_description_error(stkd, scanner, "alloc_and_init_channel") ;
+        free ($9) ;
         YYABORT ;
       }
 
@@ -205,15 +200,16 @@ channel
       stkd->Channel->CoolantTIn      = $31 ;
       stkd->Channel->FlowRateChanged = 1 ;
       stkd->Channel->WallMaterial
-        = find_material_in_list(stkd->MaterialsList, $9) ;
+        = find_material_in_list (stkd->MaterialsList, $9) ;
 
       if (stkd->Channel->WallMaterial == NULL)
       {
-        free($9) ;
         stack_description_error(stkd, scanner, "Unknown material id") ;
+        free ($9) ;
         YYABORT ;
       }
-      free($9) ;
+
+      free ($9) ;
     }
   ;
 
@@ -223,41 +219,49 @@ channel
 
 dies_list
 
-  : die
-    {
-      stkd->DiesList = $1 ;
-      $$ = $1 ;
-    }
-  | dies_list die
-    {
-      $1->Next = $2 ;
-      $$ = $2 ;
-    }
+  : die             { stkd->DiesList = $1 ; $$ = $1 ; }
+  | dies_list die   { $1->Next = $2       ; $$ = $2 ; }
   ;
 
 die
 
   : DIE IDENTIFIER ':'
        layers_list
-       sources_position
+       source_layer
+       layers_list
     {
-      Die *die = alloc_and_init_die() ;
+      Layer *layer ;
+      Die   *die = $$ = alloc_and_init_die() ;
 
       if (die == NULL)
       {
+        free ($2) ;
         stack_description_error(stkd, scanner, "alloc_and_init_die") ;
         YYABORT ;
       }
 
-      die->Id          = $2 ;
-      die->LayersList  = tmp_layer_pointer ;
-      die->NLayers     = tmp_layer_counter ;
-      die->SourcesId   = $5 ;
+      die->Id = $2 ;
 
-      tmp_layer_pointer = NULL ;
-      tmp_layer_counter = 0 ;
+      if ($6 != NULL)
+      {
+        die->LayersList = $6 ;
 
-      $$ = die ;
+        layer = $6 ;
+        while (layer->Next != NULL)
+          layer = layer->Next ;
+        layer->Next = $5 ;
+      }
+      else
+        die->LayersList = $5 ;
+
+      $5->Next = $4 ;
+
+      layer = die->LayersList ;
+      while (layer != NULL)
+      {
+        die->NLayers++ ;
+        layer = layer->Next ;
+      }
     }
   ;
 
@@ -267,80 +271,70 @@ die
 
 layers_list
 
-  : layer
-    {
-      tmp_layer_pointer = $1 ;
-      tmp_layer_counter = 1 ;
+  : /* empty */   { $$ = NULL ; }
+  | layers        { $$ = $1   ; }
+  ;
 
-      $$ = $1 ;
-    }
-  | layers_list layer
-    {
-      if (find_layer_in_list(tmp_layer_pointer, $2->Id) != NULL)
-      {
-        free_layer($2) ;
-        free_layers_list(tmp_layer_pointer) ;
-        stack_description_error (stkd, scanner, "Layer id already declared") ;
-        YYABORT ;
-      }
+layers
 
-      tmp_layer_pointer = $2 ;
-      $2->Next = $1 ;
-
-      tmp_layer_counter++ ;
-
-      $$ = $2 ;
-    }
+  : layer         {                 $$ = $1 ; }
+  | layers layer  { $2->Next = $1 ; $$ = $2 ; }
   ;
 
 layer
 
-  : LAYER IVALUE DVALUE UM IDENTIFIER ';'
+  : LAYER DVALUE UM IDENTIFIER ';'
     {
-      Layer *layer = alloc_and_init_layer() ;
+      Layer *layer = $$ = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {
-        free($5) ;
-        free_layers_list(tmp_layer_pointer) ;
+        free($4) ;
         stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
         YYABORT ;
       }
 
-      layer->Id       = $2 ;
-      layer->Height   = $3 ;
-      layer->Material = find_material_in_list(stkd->MaterialsList, $5) ;
+      layer->Height   = $2 ;
+      layer->Material = find_material_in_list(stkd->MaterialsList, $4) ;
 
       if (layer->Material == NULL)
       {
-        free($5) ;
+        free($4) ;
         free_layer(layer) ;
-        free_layers_list(tmp_layer_pointer) ;
         stack_description_error(stkd, scanner, "Unknown material id") ;
         YYABORT ;
       }
 
-      free($5) ;
-
-      $$ = layer ;
+      free($4) ;
     }
   ;
 
-/******************************************************************************/
-/******************************* Sources **************************************/
-/******************************************************************************/
+source_layer
 
-sources_position
-
-  : SOURCES ON LAYER IVALUE ';'
+  : SOURCE DVALUE UM IDENTIFIER ';'
     {
-      if (find_layer_in_list(tmp_layer_pointer, $4) == NULL)
+      Layer *layer = $$ = alloc_and_init_layer() ;
+
+      if (layer == NULL)
       {
-        free_layers_list(tmp_layer_pointer) ;
-        stack_description_error (stkd, scanner, "Source layer not declared") ;
+        free($4) ;
+        stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
         YYABORT ;
       }
-      $$ = $4
+
+      layer->Height   = $2 ;
+      layer->IsSource = 1 ;
+      layer->Material = find_material_in_list(stkd->MaterialsList, $4) ;
+
+      if (layer->Material == NULL)
+      {
+        free($4) ;
+        free_layer(layer) ;
+        stack_description_error(stkd, scanner, "Unknown material id") ;
+        YYABORT ;
+      }
+
+      free($4) ;
     }
   ;
 
@@ -352,14 +346,15 @@ stack
 
   : STACK ':'
       stack_elements
-
+    {
+      stkd->StackElementsList = $3 ;
+    }
   ;
 
 stack_elements
 
   : stack_element
     {
-      stkd->StackElementsList = $1 ;
       $$ = $1 ;
     }
   | stack_elements stack_element
@@ -372,8 +367,6 @@ stack_elements
         YYABORT ;
       }
 
-      stkd->StackElementsList = $2 ;
-
       $2->Next = $1 ;
       $$ = $2 ;
     }
@@ -381,27 +374,49 @@ stack_elements
 
 stack_element
 
-  : layer
+  : LAYER IVALUE DVALUE UM IDENTIFIER ';'
     {
-      StackElement *stack_element = alloc_and_init_stack_element() ;
+      StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
-        free_layer ($1) ;
+        free($5) ;
         stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
         YYABORT ;
       }
 
-      stack_element->Type          = TL_STACK_ELEMENT_LAYER ;
-      stack_element->Pointer.Layer = $1 ;
-      stack_element->Id            = $1->Id ;
-      stack_element->NLayers       = 1 ;
+      Layer *layer = alloc_and_init_layer() ;
 
-      $$ = stack_element ;
+      if (layer == NULL)
+      {
+        free($5) ;
+        free_stack_element (stack_element) ;
+        stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
+        YYABORT ;
+      }
+
+      layer->Height   = $3 ;
+      layer->Material = find_material_in_list(stkd->MaterialsList, $5) ;
+
+      if (layer->Material == NULL)
+      {
+        free($5) ;
+        free_layer(layer) ;
+        free_stack_element (stack_element) ;
+        stack_description_error(stkd, scanner, "Unknown material id") ;
+        YYABORT ;
+      }
+
+      free($5) ;
+
+      stack_element->Type          = TL_STACK_ELEMENT_LAYER ;
+      stack_element->Pointer.Layer = layer ;
+      stack_element->Id            = $2 ;
+      stack_element->NLayers       = 1 ;
     }
   | CHANNEL IVALUE ';'
     {
-      StackElement *stack_element = alloc_and_init_stack_element() ;
+      StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
@@ -412,12 +427,10 @@ stack_element
       stack_element->Type    = TL_STACK_ELEMENT_CHANNEL ;
       stack_element->Id      = $2 ;
       stack_element->NLayers = 1 ;
-
-      $$ = stack_element ;
     }
   | DIE IVALUE IDENTIFIER FLOORPLAN PATH ';'
     {
-      StackElement *stack_element = alloc_and_init_stack_element() ;
+      StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
@@ -456,8 +469,6 @@ stack_element
       stack_element->Floorplan->FileName = $5 ;
 
       free($3) ;
-
-      $$ = stack_element ;
     }
   ;
 
