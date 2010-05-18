@@ -46,7 +46,7 @@ extern "C"
 
   struct stack_element
   {
-    int Id ;                  /* The id (integer) of the stack element        */
+    char *Id ;                /* The id (string) of the stack element         */
 
     StackElement_t  Type ;    /* The type of the stack element                */
 
@@ -86,7 +86,7 @@ extern "C"
   print_stack_elements_list  (FILE *stream, char *prefix, StackElement *list) ;
 
   StackElement *
-  find_stack_element_in_list (StackElement *list, int id) ;
+  find_stack_element_in_list (StackElement *list, char *id) ;
 
 /******************************************************************************/
 /******************************************************************************/

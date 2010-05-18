@@ -374,13 +374,14 @@ stack_elements
 
 stack_element
 
-  : LAYER IVALUE DVALUE UM IDENTIFIER ';'
+  : LAYER IDENTIFIER DVALUE UM IDENTIFIER ';'
     {
       StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
-        free($5) ;
+        free ($2);
+        free ($5) ;
         stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
         YYABORT ;
       }
@@ -389,7 +390,8 @@ stack_element
 
       if (layer == NULL)
       {
-        free($5) ;
+        free ($2);
+        free ($5) ;
         free_stack_element (stack_element) ;
         stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
         YYABORT ;
@@ -400,7 +402,8 @@ stack_element
 
       if (layer->Material == NULL)
       {
-        free($5) ;
+        free ($2);
+        free ($5) ;
         free_layer(layer) ;
         free_stack_element (stack_element) ;
         stack_description_error(stkd, scanner, "Unknown material id") ;
@@ -414,12 +417,13 @@ stack_element
       stack_element->Id            = $2 ;
       stack_element->NLayers       = 1 ;
     }
-  | CHANNEL IVALUE ';'
+  | CHANNEL IDENTIFIER ';'
     {
       StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
+        free ($2) ;
         stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
         YYABORT ;
       }
@@ -428,14 +432,15 @@ stack_element
       stack_element->Id      = $2 ;
       stack_element->NLayers = 1 ;
     }
-  | DIE IVALUE IDENTIFIER FLOORPLAN PATH ';'
+  | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'
     {
       StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
-        free($3) ;
-        free($5) ;
+        free ($3) ;
+        free ($2) ;
+        free ($5) ;
         stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
         YYABORT ;
       }

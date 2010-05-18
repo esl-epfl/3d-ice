@@ -19,7 +19,7 @@ init_stack_element (StackElement *stack_element)
   stack_element->Pointer.Layer   = NULL ;
   stack_element->Pointer.Die     = NULL ;
   stack_element->Floorplan       = NULL ;
-  stack_element->Id              = 0 ;
+  stack_element->Id              = NULL ;
   stack_element->NLayers         = 0 ;
   stack_element->Next            = NULL ;
 }
@@ -52,15 +52,18 @@ free_stack_element
   StackElement *stack_element
 )
 {
-  if (stack_element->Type == TL_STACK_ELEMENT_DIE)
+  if (stack_element->Type == TL_STACK_ELEMENT_DIE
+      && stack_element->Floorplan != NULL)
 
     free_floorplan (stack_element->Floorplan) ;
 
-  else if (stack_element->Type == TL_STACK_ELEMENT_LAYER)
+  else if (stack_element->Type == TL_STACK_ELEMENT_LAYER
+           && stack_element->Pointer.Layer != NULL)
 
     free_layer (stack_element->Pointer.Layer) ;
 
-  free(stack_element) ;
+  free (stack_element->Id) ;
+  free (stack_element) ;
 }
 
 /******************************************************************************/
@@ -96,7 +99,7 @@ print_stack_elements_list
 {
   for ( ; list != NULL ; list = list->Next)
   {
-    fprintf (stream, "%sElement %2d  ", prefix, list->Id);
+    fprintf (stream, "%s%s  ", prefix, list->Id);
 
     switch (list->Type)
     {
@@ -140,12 +143,12 @@ StackElement *
 find_stack_element_in_list
 (
   StackElement *list,
-  int          id
+  char         *id
 )
 {
   for ( ; list != NULL ; list = list->Next)
 
-    if (list->Id == id)  break ;
+    if (strcmp(list->Id, id) == 0)  break ;
 
  return list ;
 }

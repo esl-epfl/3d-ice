@@ -117,7 +117,7 @@ extern "C"
   get_number_of_floorplan_elements_in_floorplan
                               (
                                StackDescription *stkd,
-                               int              stack_element_id
+                               char             *stack_element_id
                               ) ;
 
   void
@@ -130,7 +130,7 @@ extern "C"
   insert_power_values_in_floorplan
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                double           *power_values
                               ) ;
 
@@ -138,7 +138,7 @@ extern "C"
   insert_power_value_in_floorplan_element
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                char             *floorplan_element_id,
                                double           power_value
                               ) ;
@@ -147,7 +147,7 @@ extern "C"
   get_max_temperature_in_floorplan_element
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                char             *floorplan_element_id,
                                double           *temperatures,
                                double           *max_temperature
@@ -157,7 +157,7 @@ extern "C"
   get_min_temperature_in_floorplan_element
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                char             *floorplan_element_id,
                                double           *temperatures,
                                double           *min_temperature
@@ -167,7 +167,7 @@ extern "C"
   get_avg_temperature_in_floorplan_element
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                char             *floorplan_element_id,
                                double           *temperatures,
                                double           *avg_temperature
@@ -177,7 +177,7 @@ extern "C"
   get_min_avg_max_temperatures_in_floorplan_element
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                char             *floorplan_element_id,
                                double           *temperatures,
                                double           *min_temperature,
@@ -189,7 +189,7 @@ extern "C"
   get_all_max_temperatures_in_floorplan
                               (
                                StackDescription *stkd,
-                               int stack_element_id,
+                               char   *stack_element_id,
                                double *temperatures,
                                double *max_temperature
                               ) ;
@@ -198,7 +198,7 @@ extern "C"
   get_all_min_temperatures_in_floorplan
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                double           *temperatures,
                                double           *min_temperature
                               ) ;
@@ -207,7 +207,7 @@ extern "C"
   get_all_avg_temperatures_in_floorplan
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                double           *temperatures,
                                double           *avg_temperature
                               ) ;
@@ -216,7 +216,7 @@ extern "C"
   get_all_min_avg_max_temperatures_in_floorplan
                               (
                                StackDescription *stkd,
-                               int              stack_element_id,
+                               char             *stack_element_id,
                                double           *temperatures,
                                double           *min_temperature,
                                double           *avg_temperature,
