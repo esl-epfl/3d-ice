@@ -169,7 +169,6 @@ fill_conductances_stack_description
 )
 {
   StackElement *stack_element ;
-  int current_layer ;
 
 #ifdef DEBUG_FILL_CONDUCTANCES
   FILE *debug = fopen("fill_conductances_stack_description.txt", "w") ;
@@ -188,10 +187,10 @@ fill_conductances_stack_description
 
   for
   (
-    stack_element = stkd->StackElementsList,
-    current_layer = 0 ;
+    stack_element = stkd->StackElementsList ;
+
     stack_element != NULL ;
-    current_layer += stack_element->NLayers,
+
     stack_element = stack_element->Next
   )
 
@@ -205,9 +204,8 @@ fill_conductances_stack_description
                          debug,
 #endif
                          stack_element->Pointer.Die,
-                         conductances,
-                         stkd->Dimensions,
-                         current_layer
+                         conductances, stkd->Dimensions,
+                         stack_element->LayersOffset
                        ) ;
         break ;
 
@@ -219,9 +217,8 @@ fill_conductances_stack_description
                          debug,
 #endif
                          stack_element->Pointer.Layer,
-                         conductances,
-                         stkd->Dimensions,
-                         current_layer
+                         conductances, stkd->Dimensions,
+                         stack_element->LayersOffset
                        ) ;
         break ;
 
@@ -233,9 +230,8 @@ fill_conductances_stack_description
                          debug,
 #endif
                          stkd->Channel,
-                         conductances,
-                         stkd->Dimensions,
-                         current_layer
+                         conductances, stkd->Dimensions,
+                         stack_element->LayersOffset
                        ) ;
         break ;
 
@@ -272,8 +268,6 @@ fill_capacities_stack_description
   StackElement *stack_element ;
 
 #ifdef DEBUG_FILL_CAPACITIES
-  int current_layer ;
-
   FILE *debug = fopen("fill_capacities_stack_description.txt", "w") ;
   if (debug == NULL)
   {
@@ -290,14 +284,10 @@ fill_capacities_stack_description
 
   for
   (
-#ifdef DEBUG_FILL_CAPACITIES
-    current_layer = 0 ,
-#endif
     stack_element = stkd->StackElementsList ;
+
     stack_element != NULL ;
-#ifdef DEBUG_FILL_CAPACITIES
-    current_layer += stack_element->NLayers,
-#endif
+
     stack_element = stack_element->Next
   )
     switch (stack_element->Type)
@@ -308,13 +298,10 @@ fill_capacities_stack_description
                      (
 #ifdef DEBUG_FILL_CAPACITIES
                        debug,
-                       current_layer,
+                       stack_element->LayersOffset,
 #endif
                        stack_element->Pointer.Die,
-                       capacities,
-                       stkd->Dimensions,
-                       delta_time
-                     ) ;
+                       capacities, stkd->Dimensions, delta_time) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
@@ -323,13 +310,10 @@ fill_capacities_stack_description
                      (
 #ifdef DEBUG_FILL_CAPACITIES
                        debug,
-                       current_layer,
+                       stack_element->LayersOffset,
 #endif
                        stack_element->Pointer.Layer,
-                       capacities,
-                       stkd->Dimensions,
-                       delta_time
-                     ) ;
+                       capacities, stkd->Dimensions, delta_time) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
@@ -338,13 +322,10 @@ fill_capacities_stack_description
                      (
 #ifdef DEBUG_FILL_CAPACITIES
                        debug,
-                       current_layer,
+                       stack_element->LayersOffset,
 #endif
                        stkd->Channel,
-                       capacities,
-                       stkd->Dimensions,
-                       delta_time
-                     ) ;
+                       capacities, stkd->Dimensions, delta_time) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
@@ -379,8 +360,6 @@ fill_sources_stack_description
   StackElement *stack_element ;
 
 #ifdef DEBUG_FILL_SOURCES
-  int current_layer ;
-
   FILE *debug = fopen("fill_sources_stack_description.txt", "w") ;
   if (debug == NULL)
   {
@@ -397,14 +376,10 @@ fill_sources_stack_description
 
   for
   (
-#ifdef DEBUG_FILL_SOURCES
-    current_layer = 0 ,
-#endif
     stack_element = stkd->StackElementsList ;
+
     stack_element != NULL ;
-#ifdef DEBUG_FILL_SOURCES
-    current_layer += stack_element->NLayers,
-#endif
+
     stack_element = stack_element->Next
   )
 
@@ -416,13 +391,11 @@ fill_sources_stack_description
                   (
 #ifdef DEBUG_FILL_SOURCES
                     debug,
-                    current_layer,
+                    stack_element->LayersOffset,
 #endif
                     stack_element->Pointer.Die,
                     stack_element->Floorplan,
-                    sources,
-                    stkd->Dimensions
-                  ) ;
+                    sources, stkd->Dimensions) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
@@ -431,12 +404,10 @@ fill_sources_stack_description
                   (
 #ifdef DEBUG_FILL_SOURCES
                     debug,
-                    current_layer,
+                    stack_element->LayersOffset,
                     stack_element->Pointer.Layer,
 #endif
-                    sources,
-                    stkd->Dimensions
-                  ) ;
+                    sources, stkd->Dimensions) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
@@ -445,12 +416,10 @@ fill_sources_stack_description
                   (
 #ifdef DEBUG_FILL_SOURCES
                     debug,
-                    current_layer,
+                    stack_element->LayersOffset,
 #endif
                     stkd->Channel,
-                    sources,
-                    stkd->Dimensions
-                  ) ;
+                    sources, stkd->Dimensions) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
@@ -487,7 +456,7 @@ fill_system_matrix_stack_description
 )
 {
   StackElement *stack_element ;
-  int current_layer, added, area ;
+  int added, area ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE *debug = fopen("fill_system_matrix_stack_description.txt", "w") ;
@@ -508,14 +477,12 @@ fill_system_matrix_stack_description
 
   for
   (
-    current_layer = 0,
     added         = 0,
     area          = get_layer_area (stkd->Dimensions),
     stack_element = stkd->StackElementsList ;
 
     stack_element != NULL ;
 
-    current_layer +=        stack_element->NLayers,
     conductances  += area * stack_element->NLayers,
     capacities    += area * stack_element->NLayers,
     columns       += area * stack_element->NLayers,
@@ -535,7 +502,7 @@ fill_system_matrix_stack_description
                   stack_element->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
                   columns, rows, values,
-                  current_layer) ;
+                  stack_element->LayersOffset) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
@@ -546,7 +513,7 @@ fill_system_matrix_stack_description
 #endif
                   stkd->Dimensions, conductances, capacities,
                   columns, rows, values,
-                  current_layer) ;
+                  stack_element->LayersOffset) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
@@ -557,7 +524,7 @@ fill_system_matrix_stack_description
 #endif
                   stkd->Dimensions, conductances, capacities,
                   columns, rows, values,
-                  current_layer) ;
+                  stack_element->LayersOffset) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
