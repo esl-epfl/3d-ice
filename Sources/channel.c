@@ -28,7 +28,7 @@ init_channel
   channel->CoolantVHC       = 0.0  ;
   channel->CoolantTIn       = 0.0  ;
   channel->FlowRate         = 0.0  ;
-  channel->FlowRateChanged  = 0 ;
+  channel->FlowRateChanged  = 0    ;
   channel->WallMaterial     = NULL ;
 }
 
@@ -380,15 +380,19 @@ fill_system_matrix_channel
   for
   (
     tot_added = 0 ,
-    row = 0 ;
+    row       = 0 ;
+
     row < get_number_of_rows (dimensions) ;
+
     row++
   )
 
     for
     (
       column = 0 ;
+
       column < get_number_of_columns (dimensions) ;
+
       conductances ++ ,
       capacities   ++ ,
       columns      ++ ,

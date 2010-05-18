@@ -35,7 +35,7 @@ init_stack_description
   stkd->DiesList           = NULL ;
   stkd->StackElementsList  = NULL ;
   stkd->Dimensions         = NULL ;
-  stkd->PowerValuesChanged = 0 ;
+  stkd->PowerValuesChanged = 0    ;
 }
 
 /******************************************************************************/

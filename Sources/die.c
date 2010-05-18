@@ -99,7 +99,7 @@ print_die
     "%s  Number of layers  %d\n", prefix, die->NLayers);
 
   fprintf (stream,
-    "%s  Source layer is ...\n", prefix);
+    "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->LayersOffset);
 
   char *new_prefix = (char *) malloc (sizeof(char)*(strlen(prefix) + 2));
 
@@ -174,8 +174,9 @@ fill_conductances_die
   for
   (
     layer =  die->LayersList;
+
     layer != NULL ;
-    current_layer++,
+
     layer = layer->Next
   )
 
@@ -187,7 +188,7 @@ fill_conductances_die
                      layer,
                      conductances,
                      dimensions,
-                     current_layer
+                     current_layer + layer->LayersOffset
                    ) ;
 
   return conductances ;
@@ -221,10 +222,9 @@ fill_capacities_die
   for
   (
     layer = die->LayersList ;
+
     layer != NULL ;
-#ifdef DEBUG_FILL_CAPACITIES
-    current_layer++,
-#endif
+
     layer = layer->Next
   )
 
@@ -232,7 +232,7 @@ fill_capacities_die
                  (
 #ifdef DEBUG_FILL_CAPACITIES
                    debug,
-                   current_layer,
+                   current_layer + layer->LayersOffset,
 #endif
                    layer,
                    capacities,
@@ -271,10 +271,9 @@ fill_sources_die
   for
   (
     layer = die->LayersList ;
+
     layer != NULL ;
-#ifdef DEBUG_FILL_SOURCES
-    current_layer++,
-#endif
+
     layer = layer->Next
   )
 
@@ -284,7 +283,7 @@ fill_sources_die
                 (
 #ifdef DEBUG_FILL_SOURCES
                   debug,
-                  current_layer,
+                  current_layer + layer->LayersOffset,
                   layer,
 #endif
                   floorplan,
@@ -298,7 +297,7 @@ fill_sources_die
                 (
 #ifdef DEBUG_FILL_SOURCES
                   debug,
-                  current_layer,
+                  current_layer + layer->LayersOffset,
                   layer,
 #endif
                   sources,
@@ -342,8 +341,9 @@ fill_system_matrix_die
     added     = 0 ,
     tot_added = 0 ,
     layer     = die->LayersList ;
+
     layer != NULL ;
-    current_layer ++ ,
+
     conductances  += get_layer_area (dimensions) ,
     capacities    += get_layer_area (dimensions) ,
     columns       += get_layer_area (dimensions) ,
@@ -359,7 +359,8 @@ fill_system_matrix_die
               debug, layer,
 #endif
               dimensions, conductances, capacities,
-              columns, rows, values, current_layer
+              columns, rows, values,
+              current_layer + layer->LayersOffset
             ) ;
 
   return tot_added ;
