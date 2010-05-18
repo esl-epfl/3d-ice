@@ -97,13 +97,11 @@ print_channel
   if (wall != NULL)
   {
     fprintf(stream,
-    "%s  Wall thermal conductivity         %.4e (%s)\n", prefix,
-                                                     wall->ThermalConductivity,
-                                                         wall->Id) ;
+    "%s  Wall thermal conductivity         %.4e (%s)\n",
+    prefix, wall->ThermalConductivity, wall->Id) ;
     fprintf(stream,
-    "%s  Wall Volum. Heat Capacity         %.4e (%s)\n", prefix,
-                                                         wall->VolHeatCapacity,
-                                                         wall->Id) ;
+    "%s  Wall Volum. Heat Capacity         %.4e (%s)\n",
+    prefix, wall->VolHeatCapacity, wall->Id) ;
   }
   else
     fprintf(stream,

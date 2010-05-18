@@ -15,13 +15,14 @@
 void
 init_stack_element (StackElement *stack_element)
 {
-  stack_element->Type            = TL_STACK_ELEMENT_NONE ;
-  stack_element->Pointer.Layer   = NULL ;
-  stack_element->Pointer.Die     = NULL ;
-  stack_element->Floorplan       = NULL ;
-  stack_element->Id              = NULL ;
-  stack_element->NLayers         = 0 ;
-  stack_element->Next            = NULL ;
+  stack_element->Type          = TL_STACK_ELEMENT_NONE ;
+  stack_element->Pointer.Layer = NULL ;
+  stack_element->Pointer.Die   = NULL ;
+  stack_element->Floorplan     = NULL ;
+  stack_element->Id            = NULL ;
+  stack_element->NLayers       = 0 ;
+  stack_element->LayersOffset  = 0 ;
+  stack_element->Next          = NULL ;
 }
 
 /******************************************************************************/
@@ -99,7 +100,7 @@ print_stack_elements_list
 {
   for ( ; list != NULL ; list = list->Next)
   {
-    fprintf (stream, "%s%s  ", prefix, list->Id);
+    fprintf (stream, "%s(%-3d)%s\t", prefix, list->LayersOffset, list->Id);
 
     switch (list->Type)
     {
@@ -124,7 +125,8 @@ print_stack_elements_list
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        fprintf (stream, "channel\n") ;
+        fprintf (stream,
+          "channel\n") ;
         break ;
 
       default :

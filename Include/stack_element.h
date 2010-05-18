@@ -59,6 +59,9 @@ extern "C"
     Floorplan *Floorplan ;    /* A pointer to a Floorplan. This field is      */
                               /* used only if Type == TL_STACK_ELEMENT_DIE    */
 
+    int LayersOffset ;        /* The offset (#of layers) counting from the    */
+                              /* first layer in the stack                     */
+
     struct stack_element *Next ;            /* To collect stack elements in a */
                                             /* linked list                    */
 
