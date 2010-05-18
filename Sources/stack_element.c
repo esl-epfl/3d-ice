@@ -100,7 +100,9 @@ print_stack_elements_list
 {
   for ( ; list != NULL ; list = list->Next)
   {
-    fprintf (stream, "%s(%-3d)%s\t", prefix, list->LayersOffset, list->Id);
+    fprintf (stream,
+      "%s Stackelement (l %-2d)\t%s\t",
+      prefix, list->LayersOffset, list->Id);
 
     switch (list->Type)
     {

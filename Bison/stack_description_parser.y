@@ -47,6 +47,7 @@
 %type <die_p> dies_list
 
 %type <layer_p> layer
+%type <layer_p> layer_content ;
 %type <layer_p> layers
 %type <layer_p> layers_list
 %type <layer_p> source_layer
@@ -254,6 +255,7 @@ die
       else
         die->LayersList = $5 ;
 
+      die->SourceLayer = $5 ;
       $5->Next = $4 ;
 
       layer = die->LayersList ;
@@ -281,60 +283,34 @@ layers
   | layers layer  { $2->Next = $1 ; $$ = $2 ; }
   ;
 
-layer
+layer         : LAYER  layer_content { $$ = $2 ; } ;
 
-  : LAYER DVALUE UM IDENTIFIER ';'
+source_layer  : SOURCE layer_content { $$ = $2 ; } ;
+
+layer_content : DVALUE UM IDENTIFIER ';'
+
     {
       Layer *layer = $$ = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {
-        free($4) ;
+        free ($3) ;
         stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
         YYABORT ;
       }
 
-      layer->Height   = $2 ;
-      layer->Material = find_material_in_list(stkd->MaterialsList, $4) ;
+      layer->Height   = $1 ;
+      layer->Material = find_material_in_list(stkd->MaterialsList, $3) ;
 
       if (layer->Material == NULL)
       {
-        free($4) ;
+        free ($3) ;
         free_layer(layer) ;
         stack_description_error(stkd, scanner, "Unknown material id") ;
         YYABORT ;
       }
 
-      free($4) ;
-    }
-  ;
-
-source_layer
-
-  : SOURCE DVALUE UM IDENTIFIER ';'
-    {
-      Layer *layer = $$ = alloc_and_init_layer() ;
-
-      if (layer == NULL)
-      {
-        free($4) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
-        YYABORT ;
-      }
-
-      layer->Height   = $2 ;
-      layer->IsSource = 1 ;
-      layer->Material = find_material_in_list(stkd->MaterialsList, $4) ;
-
-      if (layer->Material == NULL)
-      {
-        free($4) ;
-        free_layer(layer) ;
-        stack_description_error(stkd, scanner, "Unknown material id") ;
-        YYABORT ;
-      }
-
-      free($4) ;
+      free ($3) ;
     }
   ;
 

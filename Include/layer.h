@@ -43,7 +43,8 @@ extern "C"
 
     Material* Material ;            /* The material composing the layer       */
 
-    int IsSource       ;
+    int LayersOffset ;              /* The offset (#of layers) counting from  */
+                                    /* the first layer in the die             */
 
     struct layer *Next ;            /* To collect layers in a linked list     */
   } ;
@@ -71,9 +72,6 @@ extern "C"
 
   void
   print_layers_list         (FILE *stream, char* prefix, Layer *list) ;
-
-//  Layer *
-//  find_layer_in_list        (Layer *list, int id) ;
 
   LayerPosition_t
   get_layer_position        (Dimensions *dimensions, int layer) ;

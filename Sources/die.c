@@ -23,10 +23,11 @@ init_die
   Die *die
 )
 {
-  die->Id         = NULL ;
-  die->LayersList = NULL ;
-  die->NLayers    = 0    ;
-  die->Next       = NULL ;
+  die->Id          = NULL ;
+  die->LayersList  = NULL ;
+  die->NLayers     = 0    ;
+  die->SourceLayer = NULL ;
+  die->Next        = NULL ;
 }
 
 /******************************************************************************/
@@ -96,6 +97,9 @@ print_die
     "%sDie %s:\n",                prefix, die->Id) ;
   fprintf (stream,
     "%s  Number of layers  %d\n", prefix, die->NLayers);
+
+  fprintf (stream,
+    "%s  Source layer is ...\n", prefix);
 
   char *new_prefix = (char *) malloc (sizeof(char)*(strlen(prefix) + 2));
 
@@ -274,7 +278,7 @@ fill_sources_die
     layer = layer->Next
   )
 
-    if ( layer->IsSource == 1 )
+    if ( die->SourceLayer == layer )
 
       sources = fill_sources_active_layer
                 (

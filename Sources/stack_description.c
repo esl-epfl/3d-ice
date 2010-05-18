@@ -15,6 +15,7 @@
 
 extern int  stack_description_parse (StackDescription *stkd, yyscan_t scanner) ;
 static int  fill_floorplans         (StackDescription *stkd) ;
+static void align_layers_in_die     (StackDescription *stkd) ;
 static void align_stack_elements    (StackDescription *stkd) ;
 
 
@@ -74,6 +75,7 @@ fill_stack_description
   if (result == 1) return result ;
 
   align_stack_elements (stkd) ;
+  align_layers_in_die  (stkd) ;
 
   return fill_floorplans (stkd) ;
 }
@@ -113,6 +115,9 @@ print_stack_description
   print_materials_list      (stream, prefix, stkd->MaterialsList) ;
   print_channel             (stream, prefix, stkd->Channel);
   print_dies_list           (stream, prefix, stkd->DiesList) ;
+
+  fprintf(stream, "%sStack:\n", prefix) ;
+
   print_stack_elements_list (stream, prefix, stkd->StackElementsList) ;
   print_dimensions          (stream, prefix, stkd->Dimensions) ;
 }
@@ -136,6 +141,32 @@ fill_floorplans (StackDescription *stkd)
 
   return result ;
  }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+static
+void
+align_layers_in_die
+(
+  StackDescription *stkd
+)
+{
+  Layer *layer ;
+  int layer_offset ;
+
+  Die *die = stkd->DiesList ;
+  for ( ; die != NULL ; die = die->Next)
+  {
+    layer_offset = 0 ;
+    layer = die->LayersList ;
+    for ( ; layer != NULL ; layer = layer->Next)
+    {
+      layer->LayersOffset = layer_offset++ ;
+    }
+  }
+}
 
 /******************************************************************************/
 /******************************************************************************/
@@ -655,7 +686,8 @@ insert_power_values_in_floorplan
 
     return -1 ;
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
 
     return -2 ;
 
@@ -690,7 +722,8 @@ insert_power_value_in_floorplan_element
 
     return -1 ;
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
 
     return -2 ;
 
@@ -720,36 +753,29 @@ get_max_temperature_in_floorplan_element
   double           *max_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   return get_max_temperature_floorplan
          (
            stk_el->Floorplan, floorplan_element_id,
            stkd->Dimensions,
-           temperatures + layer_offset * area,
+           temperatures
+           + ((stk_el->LayersOffset
+               + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+              * get_layer_area (stkd->Dimensions)),
            max_temperature
          );
 }
@@ -768,36 +794,29 @@ get_min_temperature_in_floorplan_element
   double           *min_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   return get_min_temperature_floorplan
          (
            stk_el->Floorplan, floorplan_element_id,
            stkd->Dimensions,
-           temperatures + layer_offset * area,
+           temperatures
+           + ((stk_el->LayersOffset
+               + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+              * get_layer_area (stkd->Dimensions)),
            min_temperature
          );
 }
@@ -816,36 +835,29 @@ get_avg_temperature_in_floorplan_element
   double           *avg_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   return get_avg_temperature_floorplan
          (
            stk_el->Floorplan, floorplan_element_id,
            stkd->Dimensions,
-           temperatures + layer_offset * area,
+           temperatures
+           + ((stk_el->LayersOffset
+               + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+              * get_layer_area (stkd->Dimensions)),
            avg_temperature
          );
 }
@@ -866,36 +878,29 @@ get_min_avg_max_temperatures_in_floorplan_element
   double           *max_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   return get_min_avg_max_temperatures_floorplan
          (
            stk_el->Floorplan, floorplan_element_id,
            stkd->Dimensions,
-           temperatures + layer_offset * area,
+           temperatures
+           + ((stk_el->LayersOffset
+               + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+              * get_layer_area (stkd->Dimensions)),
            min_temperature, avg_temperature, max_temperature
          );
 }
@@ -913,36 +918,29 @@ get_all_max_temperatures_in_floorplan
   double           *max_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   get_all_max_temperatures_floorplan
   (
     stk_el->Floorplan,
     stkd->Dimensions,
-    temperatures + layer_offset * area,
+    temperatures
+    + ((stk_el->LayersOffset
+        + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+       * get_layer_area (stkd->Dimensions)),
     max_temperature
   );
 
@@ -962,36 +960,29 @@ get_all_min_temperature_in_floorplan
   double           *min_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   get_all_min_temperatures_floorplan
   (
     stk_el->Floorplan,
     stkd->Dimensions,
-    temperatures + layer_offset * area,
+    temperatures
+    + ((stk_el->LayersOffset
+        + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+       * get_layer_area (stkd->Dimensions)),
     min_temperature
   );
 
@@ -1011,36 +1002,29 @@ get_all_avg_temperatures_in_floorplan
   double           *avg_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   get_all_avg_temperatures_floorplan
   (
     stk_el->Floorplan,
     stkd->Dimensions,
-    temperatures + layer_offset * area,
+    temperatures
+    + ((stk_el->LayersOffset
+        + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+       * get_layer_area (stkd->Dimensions)),
     avg_temperature
   );
 
@@ -1062,36 +1046,29 @@ get_all_min_avg_max_temperatures_in_floorplan
   double           *max_temperature
 )
 {
-  Layer *layer ;
-  int layer_offset = 0 ;
-  int area = get_layer_area (stkd->Dimensions) ;
-
   StackElement *stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
                            stack_element_id
                          ) ;
 
-  if (stk_el == NULL) return -1 ;
+  if (stk_el == NULL)
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    return -1 ;
+
+  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
     return -2 ;
-
-  for
-  (
-    layer_offset = stk_el->LayersOffset,
-    layer  = stk_el->Pointer.Die->LayersList ;
-    layer != NULL ;
-    layer_offset ++,
-    layer  = layer->Next
-  )
-    if (layer->IsSource == 1 ) break ;
 
   get_all_min_avg_max_temperatures_floorplan
   (
     stk_el->Floorplan,
     stkd->Dimensions,
-    temperatures + layer_offset * area,
+    temperatures
+    + ((stk_el->LayersOffset
+        + stk_el->Pointer.Die->SourceLayer->LayersOffset)
+       * get_layer_area (stkd->Dimensions)),
     min_temperature, avg_temperature, max_temperature
   );
 

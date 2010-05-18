@@ -36,6 +36,8 @@ extern "C"
 
     int NLayers ;               /* The number of layer composing the die      */
 
+    Layer *SourceLayer ;        /* Pointer to the source layer (in the list)  */
+
     struct die* Next ;          /* To collect dies in a linked list           */
 
   } ;
