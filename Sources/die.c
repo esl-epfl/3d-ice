@@ -332,7 +332,7 @@ fill_ccs_system_matrix_die
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
-    "%p %p %p %p %p (l %2d) fill_system_matrix_die\n",
+    "%p %p %p %p %p (l %2d) fill_ccs_system_matrix_die\n",
     conductances, capacities, columns, rows, values, current_layer) ;
 #endif
 
@@ -360,6 +360,65 @@ fill_ccs_system_matrix_die
 #endif
               dimensions, conductances, capacities,
               columns, rows, values,
+              current_layer + layer->LayersOffset
+            ) ;
+
+  return tot_added ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+fill_crs_system_matrix_die
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE         *debug,
+#endif
+  Die          *die,
+  Dimensions   *dimensions,
+  Conductances *conductances,
+  double       *capacities,
+  int          *rows,
+  int          *columns,
+  double       *values,
+  int          current_layer
+)
+{
+  Layer *layer ;
+  int tot_added, added ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug,
+    "%p %p %p %p %p (l %2d) fill_crs_system_matrix_die\n",
+    conductances, capacities, rows, columns, values, current_layer) ;
+#endif
+
+  for
+  (
+    added     = 0 ,
+    tot_added = 0 ,
+    layer     = die->LayersList ;
+
+    layer != NULL ;
+
+    conductances  += get_layer_area (dimensions) ,
+    capacities    += get_layer_area (dimensions) ,
+    rows          += get_layer_area (dimensions) ,
+    columns       += added ,
+    values        += added ,
+    tot_added     += added ,
+    layer          = layer->Next
+  )
+
+    added = fill_crs_system_matrix_layer
+            (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+              debug, layer,
+#endif
+              dimensions, conductances, capacities,
+              rows, columns, values,
               current_layer + layer->LayersOffset
             ) ;
 

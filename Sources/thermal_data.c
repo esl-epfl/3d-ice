@@ -28,9 +28,10 @@ int
 init_thermal_data
 (
   StackDescription *stkd,
-  ThermalData *tdata,
-  double initial_temperature,
-  double delta_time
+  ThermalData      *tdata,
+  MatrixStorage_t  storage,
+  double           initial_temperature,
+  double           delta_time
 )
 {
   if (tdata == NULL) return 0 ;
@@ -76,7 +77,7 @@ init_thermal_data
 
     goto slu_etree_fail ;
 
-  if ( alloc_system_matrix (&tdata->SM_A, TL_CCS_MATRIX,
+  if ( alloc_system_matrix (&tdata->SM_A, storage,
                             tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
     goto sm_a_fail ;
 
@@ -100,12 +101,23 @@ init_thermal_data
   tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
   tdata->SLU_Options.DiagPivotThresh = 0.01 ;
 
-  dCreate_CompCol_Matrix  /* Matrix A */
-  (
-    &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-    tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns,
-    SLU_NC, SLU_D, SLU_GE
-  ) ;
+  if (storage == TL_CRS_MATRIX)
+
+    dCreate_CompRow_Matrix  /* Matrix A */
+    (
+      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
+      tdata->SM_A.Values, tdata->SM_A.Columns, tdata->SM_A.Rows,
+      SLU_NR, SLU_D, SLU_GE
+    ) ;
+
+  else
+
+    dCreate_CompCol_Matrix  /* Matrix A */
+    (
+      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
+      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns,
+      SLU_NC, SLU_D, SLU_GE
+    ) ;
 
   dCreate_Dense_Matrix  /* Vector B */
   (
@@ -312,9 +324,20 @@ print_system_matrix
   ThermalData *tdata
 )
 {
-  print_system_matrix_columns (&tdata->SM_A, "system_matrix_columns.txt") ;
-  print_system_matrix_rows    (&tdata->SM_A, "system_matrix_rows.txt") ;
-  print_system_matrix_values  (&tdata->SM_A, "system_matrix_values.txt") ;
+  if (tdata->SM_A.Storage == TL_CCS_MATRIX)
+  {
+    print_system_matrix_columns(&tdata->SM_A, "system_ccs_matrix_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "system_ccs_matrix_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "system_ccs_matrix_values.txt") ;
+  }
+  else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
+  {
+    print_system_matrix_columns(&tdata->SM_A, "system_crs_matrix_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "system_crs_matrix_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "system_crs_matrix_values.txt") ;
+  }
+  else
+    fprintf (stderr, "Matrix format unknown\n") ;
 }
 
 /******************************************************************************/

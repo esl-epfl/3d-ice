@@ -64,6 +64,7 @@ extern "C"
   init_thermal_data       (
                            StackDescription *stkd,
                            ThermalData      *tdata,
+                           MatrixStorage_t  storage,
                            double           initial_temperature,
                            double           delta_time
                           ) ;

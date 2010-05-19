@@ -116,6 +116,21 @@ extern "C"
                               int          current_layer
                              ) ;
 
+  int
+  fill_crs_system_matrix_channel (
+                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
+                              FILE         *debug,
+                              Channel      *channel,
+                              #endif
+                              Dimensions   *dimensions,
+                              Conductances *conductances,
+                              double       *capacities,
+                              int          *rows,
+                              int          *columns,
+                              double       *values,
+                              int          current_layer
+                             ) ;
+
 
 /******************************************************************************/
 /******************************************************************************/

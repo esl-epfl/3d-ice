@@ -372,7 +372,7 @@ fill_ccs_system_matrix_channel
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fprintf (debug,
-    "%p %p %p %p %p (l %2d) fill_system_matrix_channel %s \n",
+    "%p %p %p %p %p (l %2d) fill_ccs_system_matrix_channel %s \n",
     conductances, capacities, columns, rows, values,
     current_layer, channel->WallMaterial->Id) ;
 #endif
@@ -424,6 +424,87 @@ fill_ccs_system_matrix_channel
                    dimensions, conductances, capacities,
                    current_layer, row, column,
                    columns, rows, values
+                 ) ;
+
+  return tot_added ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+fill_crs_system_matrix_channel
+(
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE         *debug,
+  Channel      *channel,
+#endif
+  Dimensions   *dimensions,
+  Conductances *conductances,
+  double       *capacities,
+  int          *rows,
+  int          *columns,
+  double       *values,
+  int          current_layer
+)
+{
+  int row, column, added, tot_added ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fprintf (debug,
+    "%p %p %p %p %p (l %2d) fill_crs_system_matrix_channel %s \n",
+    conductances, capacities, rows, columns, values,
+    current_layer, channel->WallMaterial->Id) ;
+#endif
+
+  for
+  (
+    tot_added = 0 ,
+    row       = 0 ;
+
+    row < get_number_of_rows (dimensions) ;
+
+    row++
+  )
+
+    for
+    (
+      column = 0 ;
+
+      column < get_number_of_columns (dimensions) ;
+
+      conductances ++ ,
+      capacities   ++ ,
+      rows         ++ ,
+      columns      += added ,
+      values       += added ,
+      tot_added    += added ,
+      column       ++
+    )
+
+       if (column % 2 == 0 ) /* Even -> Wall */
+
+         added = add_crs_solid_column
+                 (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                   debug,
+#endif
+                   dimensions, conductances, capacities,
+                   current_layer, row, column,
+                   rows, columns, values
+                 ) ;
+
+       else                  /* Odd -> liquid */
+
+         added = add_crs_liquid_column
+                 (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                   debug,
+#endif
+                   dimensions, conductances, capacities,
+                   current_layer, row, column,
+                   rows, columns, values
                  ) ;
 
   return tot_added ;

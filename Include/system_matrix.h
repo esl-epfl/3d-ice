@@ -82,6 +82,22 @@ extern "C"
     double *values
   ) ;
 
+  int add_crs_solid_column
+  (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    FILE *debug,
+#endif
+    Dimensions *dim,
+    Conductances *conductances,
+    double *capacities,
+    int current_layer,
+    int current_row,
+    int current_column,
+    int *rows,
+    int *columns,
+    double *values
+  ) ;
+
   int add_ccs_liquid_column
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
@@ -95,6 +111,22 @@ extern "C"
     int current_column,
     int *columns,
     int *rows,
+    double *values
+  ) ;
+
+  int add_crs_liquid_column
+  (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+    FILE *debug,
+#endif
+    Dimensions *dim,
+    Conductances *conductances,
+    double *capacities,
+    int current_layer,
+    int current_row,
+    int current_column,
+    int *rows,
+    int *columns,
     double *values
   ) ;
 

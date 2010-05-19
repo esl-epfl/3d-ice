@@ -581,6 +581,112 @@ fill_ccs_system_matrix_stack_description
 /******************************************************************************/
 /******************************************************************************/
 
+void
+fill_crs_system_matrix_stack_description
+(
+  StackDescription *stkd,
+  Conductances     *conductances,
+  double           *capacities,
+  int              *rows,
+  int              *columns,
+  double           *values
+)
+{
+  StackElement *stack_element ;
+  int added, area ;
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  FILE *debug = fopen("fill_crs_system_matrix_stack_description.txt", "w") ;
+  if (debug == NULL)
+  {
+    perror("fill_crs_system_matrix_stack_description.txt") ;
+    return ;
+  }
+  fprintf (debug,
+    "%p %p %p %p %p fill_crs_system_matrix_stack_description " \
+    "( l %d r %d c %d )\n",
+    conductances, capacities, rows, columns, values,
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions));
+#endif
+
+  *rows++ = 0 ;
+
+  for
+  (
+    added         = 0,
+    area          = get_layer_area (stkd->Dimensions),
+    stack_element = stkd->StackElementsList ;
+
+    stack_element != NULL ;
+
+    conductances  += area * stack_element->NLayers,
+    capacities    += area * stack_element->NLayers,
+    rows          += area * stack_element->NLayers,
+    columns       += added,
+    values        += added,
+    stack_element  = stack_element->Next
+  )
+
+    switch (stack_element->Type)
+    {
+      case TL_STACK_ELEMENT_DIE :
+
+        added = fill_crs_system_matrix_die (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                  debug,
+#endif
+                  stack_element->Pointer.Die, stkd->Dimensions,
+                  conductances, capacities,
+                  rows, columns, values,
+                  stack_element->LayersOffset) ;
+        break ;
+
+      case TL_STACK_ELEMENT_LAYER :
+
+        added = fill_crs_system_matrix_layer (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                  debug, stack_element->Pointer.Layer,
+#endif
+                  stkd->Dimensions, conductances, capacities,
+                  rows, columns, values,
+                  stack_element->LayersOffset) ;
+        break ;
+
+      case TL_STACK_ELEMENT_CHANNEL :
+
+        added = fill_crs_system_matrix_channel (
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+                  debug, stkd->Channel,
+#endif
+                  stkd->Dimensions, conductances, capacities,
+                  rows, columns, values,
+                  stack_element->LayersOffset) ;
+        break ;
+
+      case TL_STACK_ELEMENT_NONE :
+
+        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        return ;
+
+      default :
+
+        fprintf (stderr, "Error! Unknown stack element type %d\n",
+          stack_element->Type) ;
+        return ;
+
+    } /* stack_element->Type */
+
+#ifdef DEBUG_FILL_SYSTEM_MATRIX
+  fclose (debug) ;
+#endif
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
 int
 get_total_number_of_floorplan_elements
 (

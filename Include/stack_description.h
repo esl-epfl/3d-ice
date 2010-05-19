@@ -107,6 +107,16 @@ extern "C"
                                             double           *values
                                            ) ;
 
+  void
+  fill_crs_system_matrix_stack_description (
+                                            StackDescription *stkd,
+                                            Conductances     *conductances,
+                                            double           *capacities,
+                                            int              *rows,
+                                            int              *columns,
+                                            double           *values
+                                           ) ;
+
   int
   get_total_number_of_floorplan_elements
                               (
