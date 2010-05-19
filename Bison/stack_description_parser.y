@@ -101,7 +101,7 @@ stack_description_error
 (
   StackDescription *stack  ,
   yyscan_t         scanner ,
-  char             *msg
+  char             *message
 ) ;
 
 %}
@@ -539,7 +539,7 @@ stack_description_error
 (
   StackDescription *stkd   ,
   yyscan_t         scanner ,
-  char             *msg
+  char             *message
 )
 {
   fprintf (stack_description_get_out (scanner),

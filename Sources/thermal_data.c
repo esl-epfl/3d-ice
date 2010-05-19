@@ -76,8 +76,8 @@ init_thermal_data
 
     goto slu_etree_fail ;
 
-  if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
-                            stkd->Dimensions->Grid.NNz) == 0)
+  if ( alloc_system_matrix (&tdata->SM_A, TL_CCS_MATRIX,
+                            tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
     goto sm_a_fail ;
 
   if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
@@ -191,8 +191,13 @@ fill_thermal_data
     fill_capacities_stack_description (stkd, tdata->Capacities,
                                              tdata->delta_time) ;
 
-    fill_system_matrix (stkd, &tdata->SM_A, tdata->Conductances,
-                                            tdata->Capacities) ;
+    fill_system_matrix
+    (
+      stkd,
+      &tdata->SM_A,
+      tdata->Conductances,
+      tdata->Capacities
+    ) ;
 
     if (tdata->SLU_Options.Fact == FACTORED)
 

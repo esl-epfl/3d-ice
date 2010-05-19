@@ -124,7 +124,7 @@ extern "C"
 
 
   int
-  fill_system_matrix_layer  (
+  fill_ccs_system_matrix_layer  (
                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
                              FILE         *debug,
                              Layer        *layer,

@@ -24,6 +24,12 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
+  typedef enum
+  {
+    TL_CCS_MATRIX = 0, TL_CRS_MATRIX
+
+  } MatrixStorage_t ;
+
   typedef struct
   {
     int    *Columns ;
@@ -33,11 +39,21 @@ extern "C"
     int Size ;
     int NNz ;
 
+    int columns_size ;
+    int rows_size ;
+
+    MatrixStorage_t Storage ;
+
   } SystemMatrix ;
 
 /******************************************************************************/
 
-  int alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz) ;
+  int alloc_system_matrix (
+                           SystemMatrix *matrix,
+                           MatrixStorage_t storage,
+                           int nvalues,
+                           int nnz
+                          ) ;
 
   void fill_system_matrix (StackDescription *stkd,
                            SystemMatrix     *matrix,
@@ -50,7 +66,7 @@ extern "C"
   void print_system_matrix_rows    (SystemMatrix *matrix, char *file_name) ;
   void print_system_matrix_values  (SystemMatrix *matrix, char *file_name) ;
 
-  int add_solid_column
+  int add_ccs_solid_column
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
@@ -66,7 +82,7 @@ extern "C"
     double *values
   ) ;
 
-  int add_liquid_column
+  int add_ccs_liquid_column
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,

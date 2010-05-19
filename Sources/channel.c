@@ -353,7 +353,7 @@ fill_sources_channel
 /******************************************************************************/
 
 int
-fill_system_matrix_channel
+fill_ccs_system_matrix_channel
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -404,7 +404,7 @@ fill_system_matrix_channel
 
        if (column % 2 == 0 ) /* Even -> Wall */
 
-         added = add_solid_column
+         added = add_ccs_solid_column
                  (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                    debug,
@@ -416,7 +416,7 @@ fill_system_matrix_channel
 
        else                  /* Odd -> liquid */
 
-         added = add_liquid_column
+         added = add_ccs_liquid_column
                  (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                    debug,

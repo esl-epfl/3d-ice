@@ -312,7 +312,7 @@ fill_sources_die
 /******************************************************************************/
 
 int
-fill_system_matrix_die
+fill_ccs_system_matrix_die
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -353,7 +353,7 @@ fill_system_matrix_die
     layer          = layer->Next
   )
 
-    added = fill_system_matrix_layer
+    added = fill_ccs_system_matrix_layer
             (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
               debug, layer,

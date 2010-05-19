@@ -105,7 +105,7 @@ extern "C"
                          ) ;
 
   int
-  fill_system_matrix_die (
+  fill_ccs_system_matrix_die (
                           #ifdef DEBUG_FILL_SYSTEM_MATRIX
                           FILE         *debug,
                           #endif

@@ -22,34 +22,32 @@ extern "C"
 #include "conductances.h"
 
 /******************************************************************************
- *                                                                            *
- * "Channel" : the representation of a single channel.                        *
- *                                                                            *
+ *                                 "Channel"                                  *
  ******************************************************************************/
 
   typedef struct channel
   {
-    double Height ;           /* The heigh of the channel  [um]               */
-                              /* (corresponding to 1 cell).                   */
-
+                              /*                                              */
+    double Height ;           /* The heigh of the channel  [um] (1 cell)      */
+                              /*                                              */
     double CoolantHTC ;       /* The heat transfert coefficent of             */
-                              /* the cooling liquid  [ (W . K / um2 ]         */
-
-    double CoolantVHC ;       /* the volumetric heat capacity of              */
-                              /* the cooling liquid  [ J / ( um3 . K ) ]      */
-
+                              /* the cooling liquid  [ (W * K / um2 ]         */
+                              /*                                              */
+    double CoolantVHC ;       /* The volumetric heat capacity of              */
+                              /* the cooling liquid  [ J / ( um3 * K ) ]      */
+                              /*                                              */
     double CoolantTIn ;       /* The temperarute of the incoming liquid [K]   */
-
+                              /*                                              */
     double FlowRate ;         /* The flow rate of the incolimg liquid         */
                               /* The user specify a flowrate in [ ml / min ]  */
                               /* We store it as [ um3 / sec ]                 */
                               /* Shared by all the channels in the 3DStack    */
-
+                              /*                                              */
     int FlowRateChanged ;     /* 0 = flow rate hasn't changet since last sim. */
                               /* 1 = user used change_flow_rate               */
-
+                              /*                                              */
     Material *WallMaterial ;  /* A pointer to the Material composing the wall */
-
+                              /*                                              */
   } Channel ;
 
 /******************************************************************************/
@@ -104,7 +102,7 @@ extern "C"
                              ) ;
 
   int
-  fill_system_matrix_channel (
+  fill_ccs_system_matrix_channel (
                               #ifdef DEBUG_FILL_SYSTEM_MATRIX
                               FILE         *debug,
                               Channel      *channel,

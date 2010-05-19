@@ -17,21 +17,37 @@
 #define COLUMN_OFFSET(dim) (1)
 
 int
-alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz)
+alloc_system_matrix
+(
+  SystemMatrix    *matrix,
+  MatrixStorage_t storage,
+  int             nvalues,
+  int             nnz
+)
 {
-  if (matrix == NULL) return 0 ;
+  matrix->Size    = nvalues ;
+  matrix->NNz     = nnz ;
+  matrix->Storage = storage ;
 
-  matrix->Size = nvalues ;
-  matrix->NNz  = nnz ;
+  if (storage == TL_CCS_MATRIX)
+  {
+    matrix->columns_size = nvalues + 1 ;
+    matrix->rows_size    = nnz ;
+  }
+  else
+  {
+    fprintf (stderr, "Matrix storage type %d not supported\n", storage) ;
+    return 0 ;
+  }
 
-  matrix->Columns = (int *) malloc (sizeof(int) * nvalues + 1 ) ;
+  matrix->Columns = (int *) malloc (sizeof(int) * matrix->columns_size ) ;
 
   if (matrix->Columns == NULL)
   {
     return 0 ;
   }
 
-  matrix->Rows = (int *) malloc (sizeof(int) * nnz ) ;
+  matrix->Rows = (int *) malloc (sizeof(int) * matrix->rows_size ) ;
 
   if (matrix->Rows == NULL)
   {
@@ -57,8 +73,6 @@ alloc_system_matrix (SystemMatrix *matrix, int nvalues, int nnz)
 
 void free_system_matrix (SystemMatrix *matrix)
 {
-  if (matrix == NULL) return ;
-
   free (matrix->Columns) ;
   free (matrix->Rows) ;
   free (matrix->Values) ;
@@ -75,11 +89,12 @@ void print_system_matrix_columns
 )
 {
   int counter ;
+
   FILE * file = fopen (file_name, "w") ;
 
   if (file == NULL) return ;
 
-  for (counter = 0 ; counter < matrix->Size + 1 ; counter++)
+  for (counter = 0 ; counter < matrix->columns_size ; counter++)
     fprintf (file, "%d\n", matrix->Columns[counter]);
 
   fclose (file) ;
@@ -101,8 +116,10 @@ print_system_matrix_rows
 
   if (file == NULL) return ;
 
-  for (counter = 0 ; counter < matrix->NNz ; counter++)
-    fprintf (file, "%d\n", matrix->Rows[counter] + 1);
+  if (matrix->Storage == TL_CCS_MATRIX)
+
+    for (counter = 0 ; counter < matrix->rows_size ; counter++)
+      fprintf (file, "%d\n", matrix->Rows[counter] + 1);
 
   fclose (file) ;
 }
@@ -142,9 +159,21 @@ fill_system_matrix
   double           *capacities
 )
 {
-  fill_system_matrix_stack_description (stkd,
-    conductances, capacities,
-    matrix->Columns, matrix->Rows, matrix->Values) ;
+  if (matrix->Storage == TL_CCS_MATRIX)
+
+    fill_ccs_system_matrix_stack_description
+    (
+      stkd,
+      conductances,
+      capacities,
+      matrix->Columns,
+      matrix->Rows,
+      matrix->Values
+    ) ;
+
+  else
+
+    fprintf (stderr, "Unsupported matrix type\n") ;
 }
 
 /******************************************************************************/
@@ -152,7 +181,7 @@ fill_system_matrix
 /******************************************************************************/
 
 int
-add_solid_column
+add_ccs_solid_column
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -181,7 +210,7 @@ add_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
   fprintf (debug,
-    "%p %p %p %p %p add_solid_column  (l %2d r %5d c %5d) -> %5d\n",
+    "%p %p %p %p %p add_CCS_solid_column  (l %2d r %5d c %5d) -> %5d\n",
     conductances, capacities, columns, rows, values,
     current_layer, current_row, current_column, current_cell) ;
 #endif
@@ -350,7 +379,7 @@ add_solid_column
 /******************************************************************************/
 
 int
-add_liquid_column
+add_ccs_liquid_column
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -378,7 +407,7 @@ add_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
   fprintf (debug,
-    "%p %p %p %p %p add_liquid_column  (l %2d r %5d c %5d) -> %5d\n",
+    "%p %p %p %p %p add_CCS_liquid_column  (l %2d r %5d c %5d) -> %5d\n",
     conductances, capacities, columns, rows, values,
     current_layer, current_row, current_column, current_cell) ;
 #endif

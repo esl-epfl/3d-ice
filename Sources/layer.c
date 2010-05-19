@@ -362,7 +362,7 @@ fill_sources_empty_layer
 /******************************************************************************/
 
 int
-fill_system_matrix_layer
+fill_ccs_system_matrix_layer
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -407,7 +407,7 @@ fill_system_matrix_layer
       column       ++
     )
 
-      added = add_solid_column
+      added = add_ccs_solid_column
               (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                 debug,
