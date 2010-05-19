@@ -29,19 +29,19 @@
    double  double_v ;
    char    *string ;
 
-   struct material      *material_p ;
+   struct material      *material ;
    struct die           *die_p ;
    struct layer         *layer_p ;
    struct stack_element *stack_element_p ;
 }
 
-%destructor { free($$) ;                      } <string> ;
-%destructor { free_layers_list ($$) ;         } <layers> ;
-%destructor { free_dies_list ($$) ;           } <dies> ;
-%destructor { free_stack_elements_list ($$) ; } <stack_elements> ;
+%destructor { free($$) ;                      } <string>
+%destructor { free_layers_list ($$) ;         } <layers>
+%destructor { free_dies_list ($$) ;           } <dies>
+%destructor { free_stack_elements_list ($$) ; } <stack_elements>
 
-%type <material_p> material
-%type <material_p> materials_list
+%type <material> material
+%type <material> materials_list
 
 %type <die_p> die
 %type <die_p> dies_list
@@ -96,11 +96,12 @@
 %{
 #include "stack_description_scanner.h"
 
-void stack_description_error
+void
+stack_description_error
 (
-  StackDescription *stack,
-  yyscan_t yyscanner,
-  char const *msg
+  StackDescription *stack  ,
+  yyscan_t         scanner ,
+  char             *msg
 ) ;
 
 %}
@@ -145,14 +146,15 @@ materials_list
 material
 
   : MATERIAL IDENTIFIER ':'
-       THERMAL CONDUCTIVITY DVALUE ';'
+       THERMAL CONDUCTIVITY     DVALUE ';'
        VOLUMETRIC HEAT CAPACITY DVALUE ';'
     {
-      Material *material = alloc_and_init_material() ;
+      Material *material = $$ = alloc_and_init_material() ;
 
       if (material == NULL)
       {
-        stack_description_error(stkd, scanner, "alloc_and_init_material") ;
+        free ($2) ;
+        stack_description_error (stkd, scanner, "alloc material failed") ;
         YYABORT ;
       }
 
@@ -162,12 +164,14 @@ material
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
+        char *message = malloc ((26 + strlen($2)) * sizeof (char)) ;
+        sprintf (message, "Material %s already declared", $2) ;
+        stack_description_error (stkd, scanner, message) ;
+
         free_material (material) ;
-        stack_description_error (stkd, scanner, "Material already declared") ;
+        free (message) ;
         YYABORT ;
       }
-
-      $$ = material ;
     }
   ;
 
@@ -531,12 +535,17 @@ dimensions
 %%
 
 void
-stack_description_error (StackDescription *stkd,
-                         void *yyscanner,
-                         char const *msg)
+stack_description_error
+(
+  StackDescription *stkd   ,
+  yyscan_t         scanner ,
+  char             *msg
+)
 {
-  fprintf(stderr, "%s:%d: %s\n",
-    stkd->FileName, stack_description_get_lineno(yyscanner), msg) ;
+  fprintf (stack_description_get_out (scanner),
+    "%s:%d: %s\n", stkd->FileName,
+                   stack_description_get_lineno (scanner),
+                   message) ;
 
-  free_stack_description(stkd) ;
+  free_stack_description (stkd) ;
 }

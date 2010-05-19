@@ -1,0 +1,24 @@
+
+1   - Stack Description File.
+
+1.1 - Materials
+
+      The first section of the file specifies a list of at least one material. A
+      single material is declared with this syntax:
+
+      --------------------------------------------------------------------------
+      |                                                                        |
+      |  material MATERIAL_ID :                                                |
+      |                                                                        |
+      |      thermal conductivity       1.30e-04 ;                             |
+      |      volumetric heat capacity   1.63e-12 ;                             |
+      |                                                                        |
+      --------------------------------------------------------------------------
+
+      where :
+
+      * spaces, new lines and tabulations are skipped ;
+      * keywords are in low case ;
+      * MATERIAL_ID is a unique identifier to refer to this material ;
+      * thermal conductivity is expressed as     [ W / ( um  * K ) ] ;
+      * volumetric heat capacity is expressed as [ J / ( um3 * K ) ] .

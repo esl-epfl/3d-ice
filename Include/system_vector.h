@@ -31,14 +31,19 @@ extern "C"
 
 /******************************************************************************/
 
-  int alloc_system_vector (SystemVector *vector, int size) ;
+  int
+  alloc_system_vector  (SystemVector *vector, int size) ;
 
-  void fill_system_vector (SystemVector *vector,
-                           double *source,
-                           double *capacity,
-                           double *temperature) ;
+  void
+  fill_system_vector   (
+                        SystemVector *vector,
+                        double       *source,
+                        double       *capacity,
+                        double       *temperature
+                       ) ;
 
-  void free_system_vector (SystemVector *vector) ;
+  void
+  free_system_vector   (SystemVector *vector) ;
 
 /******************************************************************************/
 

@@ -14,14 +14,9 @@
 #include "material.h"
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 void
-init_material
-(
-  Material *material
-)
+init_material (Material *material)
 {
   material->Id                  = NULL ;
   material->VolHeatCapacity     = 0.0  ;
@@ -30,14 +25,9 @@ init_material
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 Material *
-alloc_and_init_material
-(
- void
-)
+alloc_and_init_material (void)
 {
   Material *material = (Material *) malloc (sizeof (Material)) ;
 
@@ -47,28 +37,18 @@ alloc_and_init_material
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 void
-free_material
-(
-  Material *material
-)
+free_material (Material *material)
 {
   free (material->Id) ;
   free (material) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 void
-free_materials_list
-(
-  Material *list
-)
+free_materials_list (Material *list)
 {
   Material *next ;
 
@@ -80,36 +60,25 @@ free_materials_list
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 void
-print_material
-(
-  FILE     *stream,
-  char     *prefix,
-  Material *material
-)
+print_material (FILE *stream, char *prefix, Material *material)
 {
   fprintf (stream,
-    "%sMaterial %s:\n",                prefix, material->Id) ;
+    "%sMaterial %s:\n",                    prefix,
+                                           material->Id) ;
   fprintf (stream,
-    "%s  Volum. Heat Capacity %.5e\n", prefix, material->VolHeatCapacity) ;
+    "%s  Volumetric Heat Capacity %.3e\n", prefix,
+                                           material->VolHeatCapacity) ;
   fprintf (stream,
-    "%s  Thermal Conductivity %.5e\n", prefix, material->ThermalConductivity) ;
+    "%s  Thermal Conductivity     %.3e\n", prefix,
+                                           material->ThermalConductivity) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 void
-print_materials_list
-(
-  FILE     *stream,
-  char     *prefix,
-  Material *list
-)
+print_materials_list (FILE *stream, char *prefix, Material *list)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -117,15 +86,9 @@ print_materials_list
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 Material *
-find_material_in_list
-(
-  Material *list,
-  char *id
-)
+find_material_in_list (Material *list, char *id)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -134,6 +97,4 @@ find_material_in_list
   return list ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
