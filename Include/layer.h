@@ -11,11 +11,6 @@
 #ifndef _TL_LAYER_H_
 #define _TL_LAYER_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdio.h>
 
 #include "material.h"
@@ -29,97 +24,95 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  typedef enum
+  enum LayerPosition_t
   {
     TL_LAYER_BOTTOM = 0,
     TL_LAYER_CENTER    ,
     TL_LAYER_TOP
 
-  } LayerPosition_t ;
+  } ;
 
-  struct layer
+  struct Layer
   {
     double Height ;                 /* The heigh of the layer in um. (1 cell) */
 
-    Material* Material ;            /* The material composing the layer       */
+    struct Material* Material ;     /* The material composing the layer       */
 
     int LayersOffset ;              /* The offset (#of layers) counting from  */
                                     /* the first layer in the die             */
 
-    struct layer *Next ;            /* To collect layers in a linked list     */
+    struct Layer *Next ;            /* To collect layers in a linked list     */
   } ;
-
-  typedef struct layer Layer ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
   void
-  init_layer                (Layer *layer) ;
+  init_layer                (struct Layer *layer) ;
 
-  Layer *
+  struct Layer *
   alloc_and_init_layer      (void) ;
 
   void
-  free_layer                (Layer *layer) ;
+  free_layer                (struct Layer *layer) ;
 
   void
-  free_layers_list          (Layer *list) ;
+  free_layers_list          (struct Layer *list) ;
 
   void
-  print_layer               (FILE *stream, char* prefix, Layer *layer) ;
+  print_layer               (FILE *stream, char* prefix, struct Layer *layer) ;
 
   void
-  print_layers_list         (FILE *stream, char* prefix, Layer *list) ;
+  print_layers_list         (FILE *stream, char* prefix, struct Layer *list) ;
 
-  LayerPosition_t
-  get_layer_position        (Dimensions *dimensions, int layer) ;
+  enum LayerPosition_t
+  get_layer_position        (struct Dimensions *dimensions, int layer) ;
 
-  Conductances *
+  struct Conductances *
   fill_conductances_layer    (
                              #ifdef DEBUG_FILL_CONDUCTANCES
                              FILE         *debug,
                              #endif
-                             Layer        *layer,
-                             Conductances *conductances,
-                             Dimensions   *dimensions,
+                             struct Layer *layer,
+                             struct Conductances *conductances,
+                             struct Dimensions   *dimensions,
                              int          current_layer
                             ) ;
 
   double *
   fill_capacities_layer     (
                              #ifdef DEBUG_FILL_CAPACITIES
-                             FILE       *debug,
-                             int        current_layer,
+                             FILE         *debug,
+                             int          current_layer,
                              #endif
-                             Layer      *layer,
-                             double     *capacities,
-                             Dimensions *dimensions,
-                             double     delta_time
+                             struct Layer *layer,
+                             double       *capacities,
+                             struct Dimensions   *dimensions,
+                             double       delta_time
                             ) ;
 
   double *
   fill_sources_active_layer (
                              #ifdef DEBUG_FILL_SOURCES
-                             FILE       *debug,
-                             int        current_layer,
-                             Layer      *layer,
+                             FILE         *debug,
+                             int          current_layer,
+                             struct Layer *layer,
                              #endif
-                             Floorplan  *floorplan,
-                             double     *sources,
-                             Dimensions *dimensions
+                             struct Floorplan    *floorplan,
+                             double       *sources,
+                             struct Dimensions   *dimensions
                             ) ;
 
   double *
   fill_sources_empty_layer  (
                              #ifdef DEBUG_FILL_SOURCES
-                             FILE       *debug,
-                             int        current_layer,
-                             Layer      *layer,
+                             FILE         *debug,
+                             int          current_layer,
+                             struct Layer *layer,
                              #endif
-                             double     *sources,
-                             Dimensions *dimensions
+                             double       *sources,
+                             struct Dimensions   *dimensions
                             ) ;
 
 
@@ -127,10 +120,10 @@ extern "C"
   fill_ccs_system_matrix_layer  (
                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
                              FILE         *debug,
-                             Layer        *layer,
+                             struct Layer *layer,
                              #endif
-                             Dimensions   *dimensions,
-                             Conductances *conductances,
+                             struct Dimensions   *dimensions,
+                             struct Conductances *conductances,
                              double       *capacities,
                              int          *columns,
                              int          *rows,
@@ -142,10 +135,10 @@ extern "C"
   fill_crs_system_matrix_layer  (
                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
                              FILE         *debug,
-                             Layer        *layer,
+                             struct Layer *layer,
                              #endif
-                             Dimensions   *dimensions,
-                             Conductances *conductances,
+                             struct Dimensions   *dimensions,
+                             struct Conductances *conductances,
                              double       *capacities,
                              int          *rows,
                              int          *columns,
@@ -157,7 +150,4 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_LAYER_H_ */

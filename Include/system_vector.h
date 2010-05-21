@@ -11,43 +11,35 @@
 #ifndef _TL_SYSTEM_VECTOR_
 #define _TL_SYSTEM_VECTOR_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 /******************************************************************************
  *                                                                            *
  * "SystemVector" : the representation of the B vector.                       *
  *                                                                            *
  ******************************************************************************/
 
-  typedef struct
+  struct SystemVector
   {
     double *Values ;
     int    Size ;
 
-  } SystemVector ;
+  } ;
 
 /******************************************************************************/
 
   int
-  alloc_system_vector  (SystemVector *vector, int size) ;
+  alloc_system_vector  (struct SystemVector *vector, int size) ;
 
   void
   fill_system_vector   (
-                        SystemVector *vector,
+                        struct SystemVector *vector,
                         double       *source,
                         double       *capacity,
                         double       *temperature
                        ) ;
 
   void
-  free_system_vector   (SystemVector *vector) ;
+  free_system_vector   (struct SystemVector *vector) ;
 
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_SYSTEM_MATRIX_ */

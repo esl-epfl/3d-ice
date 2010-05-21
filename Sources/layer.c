@@ -20,7 +20,7 @@
 void
 init_layer
 (
-  Layer *layer
+  struct Layer *layer
 )
 {
   layer->Height       = 0.0  ;
@@ -33,13 +33,13 @@ init_layer
 /******************************************************************************/
 /******************************************************************************/
 
-Layer *
+struct Layer *
 alloc_and_init_layer
 (
   void
 )
 {
-  Layer *layer = (Layer *) malloc ( sizeof(Layer) ) ;
+  struct Layer *layer = (struct Layer *) malloc ( sizeof(struct Layer) ) ;
 
   if (layer != NULL) init_layer (layer) ;
 
@@ -66,10 +66,10 @@ free_layer
 void
 free_layers_list
 (
-  Layer *list
+  struct Layer *list
 )
 {
-  Layer *next ;
+  struct Layer *next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -85,9 +85,9 @@ free_layers_list
 void
 print_layer
 (
-  FILE  *stream,
-  char  *prefix,
-  Layer *layer
+  FILE         *stream,
+  char         *prefix,
+  struct Layer *layer
 )
 {
   fprintf (stream,
@@ -102,9 +102,9 @@ print_layer
 void
 print_layers_list
 (
-  FILE  *stream,
-  char  *prefix,
-  Layer *list
+  FILE         *stream,
+  char         *prefix,
+  struct Layer *list
 )
 {
   for ( ; list != NULL ; list = list->Next)
@@ -120,7 +120,7 @@ print_layers_list
 LayerPosition_t
 get_layer_position
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   int        layer
 )
 {
@@ -139,15 +139,15 @@ get_layer_position
 /******************************************************************************/
 /******************************************************************************/
 
-Conductances *
+struct Conductances *
 fill_conductances_layer
 (
 #ifdef DEBUG_FILL_CONDUCTANCES
   FILE         *debug,
 #endif
-  Layer        *layer,
-  Conductances *conductances,
-  Dimensions   *dimensions,
+  struct Layer *layer,
+  struct Conductances *conductances,
+  struct Dimensions   *dimensions,
   int          current_layer
 )
 {
@@ -206,13 +206,13 @@ double *
 fill_capacities_layer
 (
 #ifdef DEBUG_FILL_CAPACITIES
-  FILE       *debug,
-  int        current_layer,
+  FILE         *debug,
+  int          current_layer,
 #endif
-  Layer      *layer,
-  double     *capacities,
-  Dimensions *dimensions,
-  double     delta_time
+  struct Layer *layer,
+  double       *capacities,
+  struct Dimensions   *dimensions,
+  double       delta_time
 )
 {
   int row, column ;
@@ -269,18 +269,18 @@ double *
 fill_sources_active_layer
 (
 #ifdef DEBUG_FILL_SOURCES
-  FILE       *debug,
-  int        current_layer,
-  Layer      *layer,
+  FILE         *debug,
+  int          current_layer,
+  struct Layer *layer,
 #endif
-  Floorplan  *floorplan,
-  double     *sources,
-  Dimensions *dimensions
+  struct Floorplan    *floorplan,
+  double       *sources,
+  struct Dimensions   *dimensions
 )
 {
   int              row, column ;
   double           flp_el_surface ;
-  FloorplanElement *flp_el ;
+  struct FloorplanElement *flp_el ;
 
 #ifdef DEBUG_FILL_SOURCES
   fprintf (debug,
@@ -340,12 +340,12 @@ double *
 fill_sources_empty_layer
 (
 #ifdef DEBUG_FILL_SOURCES
-  FILE       *debug,
-  int        current_layer,
-  Layer      *layer,
+  FILE         *debug,
+  int          current_layer,
+  struct Layer *layer,
 #endif
-  double     *sources,
-  Dimensions *dimensions
+  double       *sources,
+  struct Dimensions   *dimensions
 )
 {
 #ifdef DEBUG_FILL_SOURCES
@@ -366,10 +366,10 @@ fill_ccs_system_matrix_layer
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
-  Layer        *layer,
+  struct Layer *layer,
 #endif
-  Dimensions   *dimensions,
-  Conductances *conductances,
+  struct Dimensions   *dimensions,
+  struct Conductances *conductances,
   double       *capacities,
   int          *columns,
   int          *rows,
@@ -429,10 +429,10 @@ fill_crs_system_matrix_layer
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
-  Layer        *layer,
+  struct Layer *layer,
 #endif
-  Dimensions   *dimensions,
-  Conductances *conductances,
+  struct Dimensions   *dimensions,
+  struct Conductances *conductances,
   double       *capacities,
   int          *rows,
   int          *columns,

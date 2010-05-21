@@ -11,11 +11,6 @@
 #ifndef _TL_CHANNEL_H_
 #define _TL_CHANNEL_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdio.h>
 
 #include "material.h"
@@ -25,7 +20,7 @@ extern "C"
  *                                 "Channel"                                  *
  ******************************************************************************/
 
-  typedef struct channel
+  struct Channel
   {
                               /*                                              */
     double Height ;           /* The heigh of the channel  [um] (1 cell)      */
@@ -46,34 +41,34 @@ extern "C"
     int FlowRateChanged ;     /* 0 = flow rate hasn't changet since last sim. */
                               /* 1 = user used change_flow_rate               */
                               /*                                              */
-    Material *WallMaterial ;  /* A pointer to the Material composing the wall */
+    struct Material *Wall ;   /* A pointer to the Material composing the wall */
                               /*                                              */
-  } Channel ;
+  } ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
   void
-  init_channel               (Channel *channel) ;
+  init_channel               (struct Channel *channel) ;
 
-  Channel *
+  struct Channel *
   alloc_and_init_channel     (void) ;
 
   void
-  free_channel               (Channel *channel) ;
+  free_channel               (struct Channel *channel) ;
 
   void
-  print_channel              (FILE *stream, char *prefix, Channel *channel) ;
+  print_channel              (FILE *stream, char *prefix, struct Channel *channel) ;
 
-  Conductances *
+  struct Conductances *
   fill_conductances_channel  (
                               #ifdef DEBUG_FILL_CONDUCTANCES
                               FILE         *debug,
                               #endif
-                              Channel      *channel,
-                              Conductances *conductances,
-                              Dimensions   *dim,
+                              struct Channel      *channel,
+                              struct Conductances *conductances,
+                              struct Dimensions   *dim,
                               int          current_layer
                              ) ;
 
@@ -84,9 +79,9 @@ extern "C"
                               FILE       *debug,
                               int        current_layer,
                               #endif
-                              Channel    *channel,
+                              struct Channel    *channel,
                               double     *capacities,
-                              Dimensions *dimensions,
+                              struct Dimensions *dimensions,
                               double     delta_time
                              ) ;
 
@@ -96,19 +91,19 @@ extern "C"
                               FILE       *debug,
                               int        current_layer,
                               #endif
-                              Channel    *channel,
+                              struct Channel    *channel,
                               double     *sources,
-                              Dimensions *dim
+                              struct Dimensions *dim
                              ) ;
 
   int
   fill_ccs_system_matrix_channel (
                               #ifdef DEBUG_FILL_SYSTEM_MATRIX
                               FILE         *debug,
-                              Channel      *channel,
+                              struct Channel      *channel,
                               #endif
-                              Dimensions   *dimensions,
-                              Conductances *conductances,
+                              struct Dimensions   *dimensions,
+                              struct Conductances *conductances,
                               double       *capacities,
                               int          *columns,
                               int          *rows,
@@ -120,10 +115,10 @@ extern "C"
   fill_crs_system_matrix_channel (
                               #ifdef DEBUG_FILL_SYSTEM_MATRIX
                               FILE         *debug,
-                              Channel      *channel,
+                              struct Channel      *channel,
                               #endif
-                              Dimensions   *dimensions,
-                              Conductances *conductances,
+                              struct Dimensions   *dimensions,
+                              struct Conductances *conductances,
                               double       *capacities,
                               int          *rows,
                               int          *columns,
@@ -136,7 +131,4 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_CHANNEL_H_ */

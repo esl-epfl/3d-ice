@@ -27,9 +27,9 @@ init_data (double *data, int size, double init_value)
 int
 slu_init_thermal_data
 (
-  StackDescription *stkd,
-  SLUThermalData   *tdata,
-  MatrixStorage_t  storage,
+  struct StackDescription *stkd,
+  struct SLUThermalData   *tdata,
+  enum MatrixStorage_t  storage,
   double           initial_temperature,
   double           delta_time
 )
@@ -58,7 +58,7 @@ slu_init_thermal_data
     goto capacities_fail ;
 
   if ( (tdata->Conductances
-         = (Conductances *) malloc (sizeof(Conductances)*tdata->Size)) == NULL)
+         = (struct Conductances *) malloc (sizeof(struct Conductances)*tdata->Size)) == NULL)
 
     goto conductances_fail ;
 
@@ -156,7 +156,7 @@ temperatures_fail :
 /******************************************************************************/
 
 void
-slu_free_thermal_data (SLUThermalData *tdata)
+slu_free_thermal_data (struct SLUThermalData *tdata)
 {
   if (tdata == NULL) return ;
 
@@ -192,8 +192,8 @@ slu_free_thermal_data (SLUThermalData *tdata)
 int
 slu_fill_thermal_data
 (
-  StackDescription *stkd,
-  SLUThermalData *tdata
+  struct StackDescription *stkd,
+  struct SLUThermalData *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -272,7 +272,7 @@ slu_fill_thermal_data
 int
 slu_solve_system
 (
-  SLUThermalData *tdata,
+  struct SLUThermalData *tdata,
   double         total_time
 )
 {
@@ -321,7 +321,7 @@ slu_solve_system
 void
 slu_print_system_matrix
 (
-  SLUThermalData *tdata
+  struct SLUThermalData *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
@@ -347,7 +347,7 @@ slu_print_system_matrix
 void
 slu_print_sources
 (
-  SLUThermalData *tdata
+  struct SLUThermalData *tdata
 )
 {
   int counter ;

@@ -139,32 +139,32 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
 
-{double}                     {
-                               yylval->double_v = atof(yytext) ;
-                               return DVALUE ;
-                             }
+{double}         {
+                   yylval->double_v = atof(yytext) ;
+                   return DVALUE ;
+                 }
 
-{signed_integer}             {
-                               yylval->int_v = atoi(yytext) ;
-                               return IVALUE ;
-                             }
+{signed_integer} {
+                   yylval->int_v = atoi(yytext) ;
+                   return IVALUE ;
+                 }
 
-{identifier}                 {
-                               yylval->string = strdup(yytext) ;
-                               return IDENTIFIER ;
-                             }
+{identifier}     {
+                   yylval->string = strdup(yytext) ;
+                   return IDENTIFIER ;
+                 }
 
-{path}                       {
-                               yylval->string
-                                 = malloc (sizeof(char) * (strlen(yytext)-2)) ;
-                               strncpy
-                               (
-                                 yylval->string,
-                                 yytext+1,
-                                 strlen(yytext)-2
-                               );
-                               return PATH;
-                             }
+{path}           {
+                   yylval->string
+                     = (char *) malloc (sizeof(char) * (strlen(yytext)-2)) ;
+                   strncpy
+                   (
+                     yylval->string,
+                     yytext+1,
+                     strlen(yytext)-2
+                   );
+                   return PATH;
+                 }
 
 <ONE_LINE_COMMENT>\n              BEGIN(INITIAL);
 <ONE_LINE_COMMENT>.               ;

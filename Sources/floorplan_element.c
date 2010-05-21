@@ -23,7 +23,7 @@
 void
 init_floorplan_element
 (
-  FloorplanElement *floorplan_element
+  struct FloorplanElement *floorplan_element
 )
 {
   floorplan_element->Id         = NULL ;
@@ -49,14 +49,14 @@ init_floorplan_element
 /******************************************************************************/
 /******************************************************************************/
 
-FloorplanElement *
+struct FloorplanElement *
 alloc_and_init_floorplan_element
 (
   void
 )
 {
-  FloorplanElement *floorplan_element
-    = (FloorplanElement *) malloc ( sizeof(FloorplanElement) );
+  struct FloorplanElement *floorplan_element
+    = (struct FloorplanElement *) malloc ( sizeof(struct FloorplanElement) );
 
   if (floorplan_element != NULL)
 
@@ -72,7 +72,7 @@ alloc_and_init_floorplan_element
 void
 free_floorplan_element
 (
-  FloorplanElement *floorplan_element
+  struct FloorplanElement *floorplan_element
 )
 {
   free (floorplan_element->Id) ;
@@ -86,10 +86,10 @@ free_floorplan_element
 void
 free_floorplan_elements_list
 (
-  FloorplanElement *list
+  struct FloorplanElement *list
 )
 {
-  FloorplanElement *next ;
+  struct FloorplanElement *next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -107,7 +107,7 @@ print_floorplan_element
 (
   FILE             *stream,
   char             *prefix,
-  FloorplanElement *floorplan_element
+  struct FloorplanElement *floorplan_element
 )
 {
   fprintf (stream,
@@ -135,7 +135,7 @@ print_floorplan_elements_list
 (
   FILE *stream,
   char *prefix,
-  FloorplanElement *list
+  struct FloorplanElement *list
 )
 {
   for ( ; list != NULL ; list = list->Next)
@@ -148,10 +148,10 @@ print_floorplan_elements_list
 /******************************************************************************/
 /******************************************************************************/
 
-FloorplanElement *
+struct FloorplanElement *
 find_floorplan_element_in_list
 (
-  FloorplanElement *list,
+  struct FloorplanElement *list,
   char             *id
 )
 {
@@ -169,8 +169,8 @@ find_floorplan_element_in_list
 int
 check_intersection
 (
-  FloorplanElement *floorplan_element_a,
-  FloorplanElement *floorplan_element_b
+  struct FloorplanElement *floorplan_element_a,
+  struct FloorplanElement *floorplan_element_b
 )
 {
   if ((floorplan_element_a->SW_X + floorplan_element_a->Length)
@@ -197,8 +197,8 @@ check_intersection
 void
 get_max_temperature_floorplan_element
 (
-  FloorplanElement *floorplan_element,
-  Dimensions       *dimensions,
+  struct FloorplanElement *floorplan_element,
+  struct Dimensions       *dimensions,
   double           *temperatures,
   double           *max_temperature
 )
@@ -237,8 +237,8 @@ get_max_temperature_floorplan_element
 void
 get_min_temperature_floorplan_element
 (
-  FloorplanElement *floorplan_element,
-  Dimensions       *dimensions,
+  struct FloorplanElement *floorplan_element,
+  struct Dimensions       *dimensions,
   double           *temperatures,
   double           *min_temperature
 )
@@ -277,8 +277,8 @@ get_min_temperature_floorplan_element
 void
 get_avg_temperature_floorplan_element
 (
-  FloorplanElement *floorplan_element,
-  Dimensions       *dimensions,
+  struct FloorplanElement *floorplan_element,
+  struct Dimensions       *dimensions,
   double           *temperatures,
   double           *avg_temperature
 )
@@ -316,8 +316,8 @@ get_avg_temperature_floorplan_element
 void
 get_min_avg_max_temperatures_floorplan_element
 (
-  FloorplanElement *floorplan_element,
-  Dimensions       *dimensions,
+  struct FloorplanElement *floorplan_element,
+  struct Dimensions       *dimensions,
   double           *temperatures,
   double           *min_temperature,
   double           *avg_temperature,

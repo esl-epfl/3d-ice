@@ -11,11 +11,6 @@
 #ifndef _TL_CONDUCTANCES_H_
 #define _TL_CONDUCTANCES_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "dimensions.h"
 
 /******************************************************************************
@@ -24,7 +19,7 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  typedef struct
+  struct Conductances
   {
     double North ;
     double South ;
@@ -35,7 +30,7 @@ extern "C"
     double Top ;
     double Bottom ;
 
-  } Conductances ;
+  } ;
 
 /******************************************************************************/
 
@@ -45,8 +40,8 @@ extern "C"
                                     int row,
                                     int column,
 #endif
-                                    Conductances *conductances,
-                                    Dimensions *dim,
+                                    struct Conductances *conductances,
+                                    struct Dimensions *dim,
                                     double cell_length,
                                     double cell_width,
                                     double cell_height,
@@ -59,8 +54,8 @@ extern "C"
                                     int row,
                                     int column,
 #endif
-                                    Conductances *conductances,
-                                    Dimensions   *dimensions,
+                                    struct Conductances *conductances,
+                                    struct Dimensions   *dimensions,
                                     double       cell_length,
                                     double       cell_width,
                                     double       cell_height,
@@ -69,7 +64,4 @@ extern "C"
                                     double       flow_rate,
                                     int          current_layer) ;
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_CONDUCTANCES_H_ */

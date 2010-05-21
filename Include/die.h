@@ -11,11 +11,6 @@
 #ifndef _TL_DIE_H_
 #define _TL_DIE_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdio.h>
 
 #include "layer.h"
@@ -28,55 +23,53 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  struct die
+  struct Die
   {
     char* Id ;                  /* The id (string) of the die                 */
 
-    Layer *LayersList ;         /* The list of layers composing the die       */
+    struct Layer *LayersList ;  /* The list of layers composing the die       */
 
     int NLayers ;               /* The number of layer composing the die      */
 
-    Layer *SourceLayer ;        /* Pointer to the source layer (in the list)  */
+    struct Layer *SourceLayer ; /* Pointer to the source layer (in the list)  */
 
-    struct die* Next ;          /* To collect dies in a linked list           */
+    struct Die* Next ;          /* To collect dies in a linked list           */
 
   } ;
 
-  typedef struct die Die ;
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
   void
-  init_die               (Die *die) ;
+  init_die               (struct Die *die) ;
 
-  Die *
+  struct Die *
   alloc_and_init_die     (void) ;
 
   void
-  free_die               (Die *die) ;
+  free_die               (struct Die *die) ;
 
   void
-  free_dies_list         (Die *list) ;
+  free_dies_list         (struct Die *list) ;
 
   void
-  print_die              (FILE *stream, char* prefix, Die *die) ;
+  print_die              (FILE *stream, char* prefix, struct Die *die) ;
 
   void
-  print_dies_list        (FILE *stream, char* prefix, Die *list) ;
+  print_dies_list        (FILE *stream, char* prefix, struct Die *list) ;
 
-  Die *
-  find_die_in_list       (Die *list, char *id) ;
+  struct Die *
+  find_die_in_list       (struct Die *list, char *id) ;
 
-  Conductances *
+  struct Conductances *
   fill_conductances_die  (
                           #ifdef DEBUG_FILL_CONDUCTANCES
                           FILE         *debug,
                           #endif
-                          Die          *die,
-                          Conductances *conductances,
-                          Dimensions   *dimensions,
+                          struct Die   *die,
+                          struct Conductances *conductances,
+                          struct Dimensions   *dimensions,
                           int          current_layer
                          ) ;
 
@@ -86,22 +79,22 @@ extern "C"
                           FILE       *debug,
                           int        current_layer,
                           #endif
-                          Die        *die,
+                          struct Die *die,
                           double     *capacities,
-                          Dimensions *dimensions,
+                          struct Dimensions *dimensions,
                           double     delta_time
                          ) ;
 
   double *
   fill_sources_die       (
                           #ifdef DEBUG_FILL_SOURCES
-                          FILE       *debug,
-                          int        current_layer,
+                          FILE              *debug,
+                          int               current_layer,
                           #endif
-                          Die        *die,
-                          Floorplan  *floorplan,
-                          double     *sources,
-                          Dimensions *dimensions
+                          struct Die        *die,
+                          struct Floorplan  *floorplan,
+                          double            *sources,
+                          struct Dimensions        *dimensions
                          ) ;
 
   int
@@ -109,9 +102,9 @@ extern "C"
                           #ifdef DEBUG_FILL_SYSTEM_MATRIX
                           FILE         *debug,
                           #endif
-                          Die          *die,
-                          Dimensions   *dimensions,
-                          Conductances *conductances,
+                          struct Die   *die,
+                          struct Dimensions   *dimensions,
+                          struct Conductances *conductances,
                           double       *capacities,
                           int          *columns,
                           int          *rows,
@@ -124,9 +117,9 @@ extern "C"
                           #ifdef DEBUG_FILL_SYSTEM_MATRIX
                           FILE         *debug,
                           #endif
-                          Die          *die,
-                          Dimensions   *dimensions,
-                          Conductances *conductances,
+                          struct Die   *die,
+                          struct Dimensions   *dimensions,
+                          struct Conductances *conductances,
                           double       *capacities,
                           int          *rows,
                           int          *columns,
@@ -138,7 +131,4 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_DIE_H_ */

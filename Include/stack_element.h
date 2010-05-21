@@ -11,11 +11,6 @@
 #ifndef _TL_STACK_ELEMENT_H_
 #define _TL_STACK_ELEMENT_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdio.h>
 
 #include "layer.h"
@@ -28,74 +23,70 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  typedef enum
+  enum StackElement_t
   {
     TL_STACK_ELEMENT_NONE = 0,
     TL_STACK_ELEMENT_LAYER   ,
     TL_STACK_ELEMENT_CHANNEL ,
     TL_STACK_ELEMENT_DIE
+  } ;
 
-  } StackElement_t ;
-
-  typedef union
+  union StackElement_p
   {
-    Layer *Layer ;
-    Die   *Die ;
+    struct Layer *Layer ;
+    struct Die   *Die ;
+  } ;
 
-  } StackElement_p ;
-
-  struct stack_element
+  struct StackElement
   {
     char *Id ;                /* The id (string) of the stack element         */
 
-    StackElement_t  Type ;    /* The type of the stack element                */
+    enum StackElement_t Type ;
+                              /* The type of the stack element                */
 
-    StackElement_p  Pointer ; /* The pointer to the effective stack element   */
+    union StackElement_p Pointer ;
+                              /* The pointer to the effective stack element   */
                               /* corresponding to the value in Type           */
 
     int NLayers ;             /* The number of layer composing the stack      */
                               /* element                                      */
 
-    Floorplan *Floorplan ;    /* A pointer to a Floorplan. This field is      */
+    struct Floorplan *Floorplan ;
+                              /* A pointer to a Floorplan. This field is      */
                               /* used only if Type == TL_STACK_ELEMENT_DIE    */
 
     int LayersOffset ;        /* The offset (#of layers) counting from the    */
                               /* first layer in the stack                     */
 
-    struct stack_element *Next ;            /* To collect stack elements in a */
+    struct StackElement *Next ;             /* To collect stack elements in a */
                                             /* linked list                    */
 
   } ;
 
-  typedef struct stack_element StackElement ;
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
   void
-  init_stack_element         (StackElement *stack_element) ;
+  init_stack_element         (struct StackElement *stack_element) ;
 
-  StackElement *
+  struct StackElement *
   alloc_and_init_stack_element (void) ;
 
   void
-  free_stack_element         (StackElement *stack_element) ;
+  free_stack_element         (struct StackElement *stack_element) ;
 
   void
-  free_stack_elements_list   (StackElement *list) ;
+  free_stack_elements_list   (struct StackElement *list) ;
 
   void
-  print_stack_elements_list  (FILE *stream, char *prefix, StackElement *list) ;
+  print_stack_elements_list  (FILE *stream, char *prefix, struct StackElement *list) ;
 
-  StackElement *
-  find_stack_element_in_list (StackElement *list, char *id) ;
+  struct StackElement *
+  find_stack_element_in_list (struct StackElement *list, char *id) ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_STACK_ELEMENT_H_ */

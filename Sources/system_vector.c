@@ -13,7 +13,7 @@
 #include "system_vector.h"
 
 int
-alloc_system_vector (SystemVector *vector, int size)
+alloc_system_vector (struct SystemVector *vector, int size)
 {
   if (vector == NULL) return 0 ;
 
@@ -33,7 +33,7 @@ alloc_system_vector (SystemVector *vector, int size)
 /******************************************************************************/
 
 void
-fill_system_vector (SystemVector *vector,
+fill_system_vector (struct SystemVector *vector,
                     double *source,
                     double *capacity,
                     double *temperature)
@@ -51,7 +51,7 @@ fill_system_vector (SystemVector *vector,
 /******************************************************************************/
 /******************************************************************************/
 
-void free_system_vector (SystemVector *vector)
+void free_system_vector (struct SystemVector *vector)
 {
   if (vector == NULL) return ;
 

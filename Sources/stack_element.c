@@ -13,7 +13,7 @@
 #include "stack_element.h"
 
 void
-init_stack_element (StackElement *stack_element)
+init_stack_element (struct StackElement *stack_element)
 {
   stack_element->Type          = TL_STACK_ELEMENT_NONE ;
   stack_element->Pointer.Layer = NULL ;
@@ -29,14 +29,14 @@ init_stack_element (StackElement *stack_element)
 /******************************************************************************/
 /******************************************************************************/
 
-StackElement *
+struct StackElement *
 alloc_and_init_stack_element
 (
   void
 )
 {
-  StackElement *stack_element
-    = (StackElement *) malloc( sizeof(StackElement) ) ;
+  struct StackElement *stack_element
+    = (struct StackElement *) malloc( sizeof(struct StackElement) ) ;
 
   if (stack_element != NULL) init_stack_element(stack_element) ;
 
@@ -50,7 +50,7 @@ alloc_and_init_stack_element
 void
 free_stack_element
 (
-  StackElement *stack_element
+  struct StackElement *stack_element
 )
 {
   if (stack_element->Type == TL_STACK_ELEMENT_DIE
@@ -74,10 +74,10 @@ free_stack_element
 void
 free_stack_elements_list
 (
-  StackElement *list
+  struct StackElement *list
 )
 {
-  StackElement *next ;
+  struct StackElement *next ;
 
   for ( ; list != NULL; list = next)
     {
@@ -93,9 +93,9 @@ free_stack_elements_list
 void
 print_stack_elements_list
 (
-  FILE         *stream,
-  char         *prefix,
-  StackElement *list
+  FILE                *stream,
+  char                *prefix,
+  struct StackElement *list
 )
 {
   for ( ; list != NULL ; list = list->Next)
@@ -143,11 +143,11 @@ print_stack_elements_list
 /******************************************************************************/
 /******************************************************************************/
 
-StackElement *
+struct StackElement *
 find_stack_element_in_list
 (
-  StackElement *list,
-  char         *id
+  struct StackElement *list,
+  char                *id
 )
 {
   for ( ; list != NULL ; list = list->Next)

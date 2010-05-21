@@ -15,8 +15,8 @@
 extern
 int
 floorplan_parse (
-                 Floorplan *floorplan,
-                 Dimensions *dimensions,
+                 struct Floorplan *floorplan,
+                 struct Dimensions *dimensions,
                  yyscan_t scanner
                 ) ;
 
@@ -27,7 +27,7 @@ floorplan_parse (
 void
 init_floorplan
 (
-  Floorplan *floorplan
+  struct Floorplan *floorplan
 )
 {
   floorplan->FileName     = NULL ;
@@ -39,13 +39,14 @@ init_floorplan
 /******************************************************************************/
 /******************************************************************************/
 
-Floorplan *
+struct Floorplan *
 alloc_and_init_floorplan
 (
   void
 )
 {
-  Floorplan *floorplan = (Floorplan *) malloc ( sizeof(Floorplan) );
+  struct Floorplan *floorplan
+    = (struct Floorplan *) malloc ( sizeof(struct Floorplan) );
 
   if (floorplan != NULL) init_floorplan (floorplan) ;
 
@@ -59,7 +60,7 @@ alloc_and_init_floorplan
 void
 free_floorplan
 (
-  Floorplan *floorplan
+  struct Floorplan *floorplan
 )
 {
   free_floorplan_elements_list (floorplan->ElementsList) ;
@@ -74,8 +75,8 @@ free_floorplan
 int
 fill_floorplan
 (
-  Floorplan *floorplan,
-  Dimensions *dimensions
+  struct Floorplan *floorplan,
+  struct Dimensions *dimensions
 )
 {
   FILE     *input ;
@@ -111,7 +112,7 @@ print_floorplan
 (
   FILE      *stream,
   char      *prefix,
-  Floorplan *floorplan
+  struct Floorplan *floorplan
 )
 {
   fprintf(stream,
@@ -127,12 +128,12 @@ print_floorplan
 int
 check_intersections
 (
-  Floorplan        *floorplan,
-  FloorplanElement *floorplan_element
+  struct Floorplan        *floorplan,
+  struct FloorplanElement *floorplan_element
 )
 {
   int result = 0 ;
-  FloorplanElement *tmp = floorplan->ElementsList ;
+  struct FloorplanElement *tmp = floorplan->ElementsList ;
 
   for ( ; tmp != NULL; tmp = tmp->Next)
 
@@ -154,9 +155,9 @@ check_intersections
 int
 check_location
 (
-  Floorplan        *floorplan,
-  FloorplanElement *floorplan_element,
-  Dimensions       *dimensions
+  struct Floorplan        *floorplan,
+  struct FloorplanElement *floorplan_element,
+  struct Dimensions       *dimensions
 )
 {
   if (   (floorplan_element->SW_X <  0)
@@ -182,9 +183,9 @@ check_location
 int
 align_to_grid
 (
-  Floorplan        *floorplan,
-  FloorplanElement *floorplan_element,
-  Dimensions       *dimensions
+  struct Floorplan        *floorplan,
+  struct FloorplanElement *floorplan_element,
+  struct Dimensions       *dimensions
 )
 {
   double cx, cy ;
@@ -278,11 +279,11 @@ align_to_grid
 void
 insert_power_values_floorplan
 (
-  Floorplan *floorplan,
+  struct Floorplan *floorplan,
   double    *power_values
 )
 {
-  FloorplanElement *flp_el = floorplan->ElementsList ;
+  struct FloorplanElement *flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 
@@ -297,17 +298,16 @@ insert_power_values_floorplan
 int
 insert_power_value_floorplan_element
 (
-  Floorplan *floorplan,
+  struct Floorplan *floorplan,
   char *floorplan_element_id,
   double power_value
 )
 {
-  FloorplanElement *flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
-
+  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+                                    (
+                                      floorplan->ElementsList,
+                                      floorplan_element_id
+                                    ) ;
   if (flp_el == NULL)
 
     return -3 ;
@@ -324,19 +324,18 @@ insert_power_value_floorplan_element
 int
 get_max_temperature_floorplan
 (
-  Floorplan  *floorplan,
+  struct Floorplan  *floorplan,
   char       *floorplan_element_id,
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *max_temperature
 )
 {
-  FloorplanElement *flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
-
+  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+                                    (
+                                      floorplan->ElementsList,
+                                      floorplan_element_id
+                                    ) ;
   if (flp_el == NULL)
 
     return -3 ;
@@ -359,18 +358,18 @@ get_max_temperature_floorplan
 int
 get_min_temperature_floorplan
 (
-  Floorplan  *floorplan,
+  struct Floorplan  *floorplan,
   char       *floorplan_element_id,
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *min_temperature
 )
 {
-  FloorplanElement *flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
+  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+                                    (
+                                      floorplan->ElementsList,
+                                      floorplan_element_id
+                                    ) ;
 
   if (flp_el == NULL)
 
@@ -394,18 +393,18 @@ get_min_temperature_floorplan
 int
 get_avg_temperature_floorplan
 (
-  Floorplan  *floorplan,
+  struct Floorplan  *floorplan,
   char       *floorplan_element_id,
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *avg_temperature
 )
 {
-  FloorplanElement *flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
+  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+                                    (
+                                      floorplan->ElementsList,
+                                      floorplan_element_id
+                                    ) ;
 
   if (flp_el == NULL)
 
@@ -429,20 +428,20 @@ get_avg_temperature_floorplan
 int
 get_min_avg_max_temperatures_floorplan
 (
-  Floorplan  *floorplan,
+  struct Floorplan  *floorplan,
   char       *floorplan_element_id,
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *min_temperature,
   double     *avg_temperature,
   double     *max_temperature
 )
 {
-  FloorplanElement *flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
+  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+                                    (
+                                      floorplan->ElementsList,
+                                      floorplan_element_id
+                                    ) ;
 
   if (flp_el == NULL)
 
@@ -466,13 +465,13 @@ get_min_avg_max_temperatures_floorplan
 int
 get_all_max_temperatures_floorplan
 (
-  Floorplan  *floorplan,
-  Dimensions *dimensions,
+  struct Floorplan  *floorplan,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *max_temperature
 )
 {
-  FloorplanElement *flp_el = floorplan->ElementsList ;
+  struct FloorplanElement *flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 
@@ -494,13 +493,13 @@ get_all_max_temperatures_floorplan
 int
 get_all_min_temperatures_floorplan
 (
-  Floorplan  *floorplan,
-  Dimensions *dimensions,
+  struct Floorplan  *floorplan,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *min_temperature
 )
 {
-  FloorplanElement *flp_el = floorplan->ElementsList ;
+  struct FloorplanElement *flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
   {
@@ -523,13 +522,13 @@ get_all_min_temperatures_floorplan
 int
 get_all_avg_temperatures_floorplan
 (
-  Floorplan  *floorplan,
-  Dimensions *dimensions,
+  struct Floorplan  *floorplan,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *avg_temperature
 )
 {
-  FloorplanElement *flp_el = floorplan->ElementsList ;
+  struct FloorplanElement *flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 
@@ -551,15 +550,15 @@ get_all_avg_temperatures_floorplan
 int
 get_all_min_avg_max_temperatures_floorplan
 (
-  Floorplan  *floorplan,
-  Dimensions *dimensions,
+  struct Floorplan  *floorplan,
+  struct Dimensions *dimensions,
   double     *temperatures,
   double     *min_temperature,
   double     *avg_temperature,
   double     *max_temperature
 )
 {
-  FloorplanElement *flp_el = floorplan->ElementsList ;
+  struct FloorplanElement *flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 

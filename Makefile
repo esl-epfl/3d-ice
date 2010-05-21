@@ -9,12 +9,15 @@
 # "make DEBUG=-DDEBUG_FILL_SYSTEM_MATRIX"
 #
 
-CC              = gcc
+CC              = g++
 CFLAGS          = -Werror -Wall -Wextra
 INCLUDE         = -IInclude
 LIB             = Lib/libTermalLibrary.a
-SUPERLU_INCLUDE = ../SuperLU_4.0/SRC/
-
+SLU_INCLUDE     = -I../SuperLU_4.0/SRC/
+BICG_INCLUDE    = -I../IterativeMethodsLibrary/include/ 
+BICG_OPT        = -DCOMPLEX='std::complex<double>'
+SL_INCLUDE      = -I../SparseLibrary/include/ \
+                  -I../SparseLibrary/mv/include/
 
 OBJECTS = Sources/dimensions.o                  \
           Sources/material.o                    \
@@ -32,7 +35,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
           Sources/conductances.o                \
-          Sources/slu_thermal_data.o
+          Sources/slu_thermal_data.o            \
+          Sources/bicg_thermal_data.o
 
 all: $(LIB)
 
@@ -143,7 +147,12 @@ Sources/conductances.o: Sources/conductances.c Include/conductances.h
 ################################################################################
 
 Sources/slu_thermal_data.o: Sources/slu_thermal_data.c Include/slu_thermal_data.h
-	$(CC) $(CFLAGS) $(DEBUG) -I$(SUPERLU_INCLUDE) -o $@ $(INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(SLU_INCLUDE) -c $<
+
+################################################################################
+
+Sources/bicg_thermal_data.o: Sources/bicg_thermal_data.c Include/bicg_thermal_data.h
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
 
 ################################################################################
 

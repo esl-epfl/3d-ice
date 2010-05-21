@@ -11,11 +11,6 @@
 #ifndef _TL_SLU_THERMAL_DATA_H_
 #define _TL_SLU_THERMAL_DATA_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
@@ -26,19 +21,19 @@ extern "C"
  * "SLUThermalData"                                                           *
  ******************************************************************************/
 
-  typedef struct
+  struct SLUThermalData
   {
-    double       *Temperatures ;
-    double       *Sources ;
-    double       *Capacities ;
-    Conductances *Conductances ;
+    double              *Temperatures ;
+    double              *Sources ;
+    double              *Capacities ;
+    struct Conductances *Conductances ;
 
     int    Size ;
     double initial_temperature ,
            delta_time ;
 
-    SystemMatrix SM_A ;
-    SystemVector SV_B ;
+    struct SystemMatrix SM_A ;
+    struct SystemVector SV_B ;
 
     SuperMatrix SLUMatrix_A ,
                 SLUMatrix_A_Permuted ,
@@ -54,35 +49,32 @@ extern "C"
            *SLU_PermutationMatrixC ,
            *SLU_Etree ;
 
-  } SLUThermalData ;
+  } ;
 
 /******************************************************************************/
 
   int
   slu_init_thermal_data   (
-                           StackDescription *stkd,
-                           SLUThermalData   *tdata,
-                           MatrixStorage_t  storage,
+                           struct StackDescription *stkd,
+                           struct SLUThermalData   *tdata,
+                           enum MatrixStorage_t  storage,
                            double           initial_temperature,
                            double           delta_time
                           ) ;
 
   int
-  slu_fill_thermal_data  (StackDescription *stkd, SLUThermalData *tdata) ;
+  slu_fill_thermal_data  (struct StackDescription *stkd, struct SLUThermalData *tdata) ;
 
   void
-  slu_free_thermal_data  (SLUThermalData *tdata) ;
+  slu_free_thermal_data  (struct SLUThermalData *tdata) ;
 
   int
-  slu_solve_system       (SLUThermalData *tdata, double total_time) ;
+  slu_solve_system       (struct SLUThermalData *tdata, double total_time) ;
 
   void
-  slu_print_system_matrix (SLUThermalData *tdata) ;
+  slu_print_system_matrix (struct SLUThermalData *tdata) ;
 
   void
-  slu_print_sources       (SLUThermalData *tdata) ;
+  slu_print_sources       (struct SLUThermalData *tdata) ;
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_SLU_THERMAL_DATA_H_ */

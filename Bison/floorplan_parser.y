@@ -20,7 +20,7 @@
 {
   int                      integer ;
   char                     *string ;
-  struct floorplan_element *p_floorplan_element ;
+  struct FloorplanElement  *p_floorplan_element ;
 }
 
 %{
@@ -28,8 +28,8 @@
 
 void
 floorplan_error (
-                 Floorplan *floorplan,
-                 Dimensions *dimensions,
+                 struct Floorplan *floorplan,
+                 struct Dimensions *dimensions,
                  yyscan_t   yyscanner,
                  char const *msg
                 ) ;
@@ -54,8 +54,8 @@ floorplan_error (
 
 %error-verbose
 
-%parse-param { Floorplan *floorplan }
-%parse-param { Dimensions *dimensions }
+%parse-param { struct Floorplan *floorplan }
+%parse-param { struct Dimensions *dimensions }
 %parse-param { yyscan_t scanner }
 
 %lex-param   { yyscan_t scanner }
@@ -108,7 +108,7 @@ floorplan_element
       POSITION  UIVALUE ',' UIVALUE ';'
       DIMENSION UIVALUE ',' UIVALUE ';'
     {
-      FloorplanElement *floorplan_element
+      struct FloorplanElement *floorplan_element
         = alloc_and_init_floorplan_element () ;
 
       if (floorplan_element == NULL)
@@ -133,8 +133,8 @@ floorplan_element
 void
 floorplan_error
 (
-  Floorplan  *floorplan,
-  Dimensions *dimensions,
+  struct Floorplan  *floorplan,
+  struct Dimensions *dimensions,
   yyscan_t   yyscanner,
   char const *msg
 )

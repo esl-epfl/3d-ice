@@ -29,10 +29,10 @@
    double  double_v ;
    char    *string ;
 
-   struct material      *material ;
-   struct die           *die_p ;
-   struct layer         *layer_p ;
-   struct stack_element *stack_element_p ;
+   struct Material      *material ;
+   struct Die           *die_p ;
+   struct Layer         *layer_p ;
+   struct StackElement  *stack_element_p ;
 }
 
 %destructor { free($$) ;                      } <string>
@@ -99,7 +99,7 @@
 void
 stack_description_error
 (
-  StackDescription *stack  ,
+  struct StackDescription *stack  ,
   yyscan_t         scanner ,
   char             *message
 ) ;
@@ -112,7 +112,7 @@ stack_description_error
 
 %pure-parser
 %error-verbose
-%parse-param { StackDescription *stkd }
+%parse-param { struct StackDescription *stkd }
 %parse-param { yyscan_t scanner }
 %lex-param   { yyscan_t scanner }
 
@@ -149,7 +149,7 @@ material
        THERMAL CONDUCTIVITY     DVALUE ';'
        VOLUMETRIC HEAT CAPACITY DVALUE ';'
     {
-      Material *material = $$ = alloc_and_init_material() ;
+      struct Material *material = $$ = alloc_and_init_material() ;
 
       if (material == NULL)
       {
@@ -164,7 +164,7 @@ material
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
-        char *message = malloc ((26 + strlen($2)) * sizeof (char)) ;
+        char *message = (char *) malloc ((26 + strlen($2)) * sizeof (char)) ;
         sprintf (message, "Material %s already declared", $2) ;
         stack_description_error (stkd, scanner, message) ;
 
@@ -204,10 +204,10 @@ channel
       stkd->Channel->CoolantVHC      = $26 ;
       stkd->Channel->CoolantTIn      = $31 ;
       stkd->Channel->FlowRateChanged = 1 ;
-      stkd->Channel->WallMaterial
+      stkd->Channel->Wall
         = find_material_in_list (stkd->MaterialsList, $9) ;
 
-      if (stkd->Channel->WallMaterial == NULL)
+      if (stkd->Channel->Wall == NULL)
       {
         stack_description_error(stkd, scanner, "Unknown material id") ;
         free ($9) ;
@@ -235,8 +235,8 @@ die
        source_layer
        layers_list
     {
-      Layer *layer ;
-      Die   *die = $$ = alloc_and_init_die() ;
+      struct Layer *layer ;
+      struct Die   *die = $$ = alloc_and_init_die() ;
 
       if (die == NULL)
       {
@@ -294,7 +294,7 @@ source_layer  : SOURCE layer_content { $$ = $2 ; } ;
 layer_content : DVALUE UM IDENTIFIER ';'
 
     {
-      Layer *layer = $$ = alloc_and_init_layer() ;
+      struct Layer *layer = $$ = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {
@@ -356,7 +356,7 @@ stack_element
 
   : LAYER IDENTIFIER DVALUE UM IDENTIFIER ';'
     {
-      StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
+      struct StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
@@ -366,7 +366,7 @@ stack_element
         YYABORT ;
       }
 
-      Layer *layer = alloc_and_init_layer() ;
+      struct Layer *layer = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {
@@ -399,7 +399,7 @@ stack_element
     }
   | CHANNEL IDENTIFIER ';'
     {
-      StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
+      struct StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
@@ -414,7 +414,7 @@ stack_element
     }
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'
     {
-      StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
+      struct StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (stack_element == NULL)
       {
@@ -487,14 +487,14 @@ dimensions
       stkd->Dimensions->Cell.LastLength  = $32 ;
 
       stkd->Dimensions->Grid.NRows
-        = stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width ;
+        = (int) (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
 
       stkd->Dimensions->Grid.NColumns
-        = ( ( stkd->Dimensions->Chip.Length
-              - stkd->Dimensions->Cell.FirstLength
-              - stkd->Dimensions->Cell.LastLength )
-            / stkd->Dimensions->Cell.Length )
-          + 2 ;
+        = (int) (( ( stkd->Dimensions->Chip.Length
+                     - stkd->Dimensions->Cell.FirstLength
+                     - stkd->Dimensions->Cell.LastLength )
+                   / stkd->Dimensions->Cell.Length )
+                 + 2) ;
 
       if (stkd->Dimensions->Grid.NColumns % 2 == 0)
       {
@@ -508,7 +508,7 @@ dimensions
         YYABORT ;
       }
 
-      StackElement *stk_el = stkd->StackElementsList ;
+      struct StackElement *stk_el = stkd->StackElementsList ;
 
       for ( ; stk_el != NULL ; stk_el = stk_el->Next)
 
@@ -537,7 +537,7 @@ dimensions
 void
 stack_description_error
 (
-  StackDescription *stkd   ,
+  struct StackDescription *stkd   ,
   yyscan_t         scanner ,
   char             *message
 )

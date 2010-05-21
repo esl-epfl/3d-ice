@@ -19,8 +19,8 @@ fill_conductances_solid_cell
   int row,
   int column,
 #endif
-  Conductances *conductances,
-  Dimensions *dimensions,
+  struct Conductances *conductances,
+  struct Dimensions *dimensions,
   double cell_length,
   double cell_width,
   double cell_height,
@@ -102,8 +102,8 @@ fill_conductances_liquid_cell
   int row,
   int column,
 #endif
-  Conductances *conductances,
-  Dimensions *dimensions,
+  struct Conductances *conductances,
+  struct Dimensions *dimensions,
   double cell_length,
   double cell_width,
   double cell_height,

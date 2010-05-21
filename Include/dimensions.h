@@ -11,11 +11,6 @@
 #ifndef _TL_DIMENSIONS_H_
 #define _TL_DIMENSIONS_H_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include <stdio.h>
 
 /******************************************************************************
@@ -24,118 +19,115 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  typedef struct
+  struct Dimensions
   {
-    struct
+    struct Cell
     {
-      double FirstLength ;     /* The length of the cell if it belongs to the */
+      double FirstLength ,     /* The length of the cell if it belongs to the */
                                /* first column in a layer (column 0).         */
-
-      double LastLength ;      /* The length of the cell if it belongs to the */
+             LastLength ,      /* The length of the cell if it belongs to the */
                                /* last column in a layer (column #columns-1). */
-
-      double Length  ;         /* The length of the cell if it belongs to the */
+             Length  ,         /* The length of the cell if it belongs to the */
                                /* remaining columns.                          */
-
-      double Width ;           /* The width of every cell.                    */
+             Width ;           /* The width of every cell.                    */
 
     } Cell ;
 
-    struct
+    struct Grid
     {
-      int NLayers ;
-      int NRows ;
-      int NColumns ;
-      int NCells ;
-      int NNz ;
+      int NLayers ,
+          NRows ,
+          NColumns ,
+          NCells ,
+          NNz ;
 
     } Grid ;
 
-    struct
+    struct Chip
     {
-      double Length ;
-      double Width ;
+      double Length ,
+             Width ;
 
     } Chip ;
 
-  } Dimensions ;
+  } ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
   void
-  init_dimensions           (Dimensions *dimensions) ;
+  init_dimensions           (struct Dimensions *dimensions) ;
 
-  Dimensions*
+  struct Dimensions*
   alloc_and_init_dimensions (void) ;
 
   void
-  free_dimensions           (Dimensions *dimensions) ;
+  free_dimensions           (struct Dimensions *dimensions) ;
 
   void
   print_dimensions          (
                              FILE *stream,
                              char *prefix,
-                             Dimensions *dimensions
+                             struct Dimensions *dimensions
                             ) ;
 
 /******************************************************************************/
 
   double
-  get_cell_length (Dimensions *dimensions, int column) ;
+  get_cell_length (struct Dimensions *dimensions, int column) ;
 
   double
-  get_cell_width  (Dimensions *dimensions) ;
+  get_cell_width  (struct Dimensions *dimensions) ;
 
 /******************************************************************************/
 
   int
-  get_number_of_layers     (Dimensions *dimensions) ;
+  get_number_of_layers     (struct Dimensions *dimensions) ;
 
   int
-  get_number_of_rows       (Dimensions *dimensions) ;
+  get_number_of_rows       (struct Dimensions *dimensions) ;
 
   int
-  get_number_of_columns    (Dimensions *dimensions) ;
+  get_number_of_columns    (struct Dimensions *dimensions) ;
 
   int
-  get_number_of_cells      (Dimensions *dimensions) ;
+  get_number_of_cells      (struct Dimensions *dimensions) ;
 
   int
-  get_number_of_non_zeroes (Dimensions *dimensions) ;
+  get_number_of_non_zeroes (struct Dimensions *dimensions) ;
+
+/******************************************************************************/
+
+  double
+  get_cell_top_surface    (struct Dimensions *dimensions, int column) ;
+
+  double
+  get_cell_bottom_surface (struct Dimensions *dimensions, int column) ;
+
+  double
+  get_cell_east_surface   (struct Dimensions *dimensions, double height) ;
+
+  double
+  get_cell_west_surface   (struct Dimensions *dimensions, double height) ;
+
+  double
+  get_cell_north_surface  (struct Dimensions *dimensions, double height, int column) ;
+
+  double
+  get_cell_south_surface  (struct Dimensions *dimensions, double height, int column) ;
 
 /******************************************************************************/
 
   int
-  get_cell_top_surface    (Dimensions *dimensions, int column) ;
+  get_layer_area           (struct Dimensions *dimensions) ;
 
   int
-  get_cell_bottom_surface (Dimensions *dimensions, int column) ;
-
-  int
-  get_cell_east_surface   (Dimensions *dimensions, double height) ;
-
-  int
-  get_cell_west_surface   (Dimensions *dimensions, double height) ;
-
-  int
-  get_cell_north_surface  (Dimensions *dimensions, double height, int column) ;
-
-  int
-  get_cell_south_surface  (Dimensions *dimensions, double height, int column) ;
-
-/******************************************************************************/
-
-  int
-  get_layer_area           (Dimensions *dimensions) ;
-
-  int
-  get_cell_offset_in_layer (Dimensions *dimensions, int row, int column) ;
+  get_cell_offset_in_layer (struct Dimensions *dimensions, int row, int column) ;
 
   int
   get_cell_offset_in_stack (
-                            Dimensions *dimensions,
+                            struct Dimensions *dimensions,
                             int layer,
                             int row,
                             int column
@@ -144,16 +136,13 @@ extern "C"
 /******************************************************************************/
 
   double
-  get_chip_length          (Dimensions *dimensions) ;
+  get_chip_length          (struct Dimensions *dimensions) ;
 
   double
-  get_chip_width           (Dimensions *dimensions) ;
+  get_chip_width           (struct Dimensions *dimensions) ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_DIMENSIONS_H_ */

@@ -11,11 +11,6 @@
 #ifndef _TL_SYSTEM_MATRIX_
 #define _TL_SYSTEM_MATRIX_
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 #include "stack_description.h"
 
 /******************************************************************************
@@ -24,13 +19,13 @@ extern "C"
  *                                                                            *
  ******************************************************************************/
 
-  typedef enum
+  enum MatrixStorage_t
   {
     TL_CCS_MATRIX = 0, TL_CRS_MATRIX
 
-  } MatrixStorage_t ;
+  } ;
 
-  typedef struct
+  struct SystemMatrix
   {
     int    *Columns ;
     int    *Rows ;
@@ -42,37 +37,37 @@ extern "C"
     int columns_size ;
     int rows_size ;
 
-    MatrixStorage_t Storage ;
+    enum MatrixStorage_t Storage ;
 
-  } SystemMatrix ;
+  } ;
 
 /******************************************************************************/
 
   int alloc_system_matrix (
-                           SystemMatrix *matrix,
-                           MatrixStorage_t storage,
+                           struct SystemMatrix *matrix,
+                           enum MatrixStorage_t storage,
                            int nvalues,
                            int nnz
                           ) ;
 
-  void fill_system_matrix (StackDescription *stkd,
-                           SystemMatrix     *matrix,
-                           Conductances     *conductances,
+  void fill_system_matrix (struct StackDescription *stkd,
+                           struct SystemMatrix     *matrix,
+                           struct Conductances     *conductances,
                            double           *capacities) ;
 
-  void free_system_matrix (SystemMatrix *matrix) ;
+  void free_system_matrix (struct SystemMatrix *matrix) ;
 
-  void print_system_matrix_columns (SystemMatrix *matrix, char *file_name) ;
-  void print_system_matrix_rows    (SystemMatrix *matrix, char *file_name) ;
-  void print_system_matrix_values  (SystemMatrix *matrix, char *file_name) ;
+  void print_system_matrix_columns (struct SystemMatrix *matrix, char *file_name) ;
+  void print_system_matrix_rows    (struct SystemMatrix *matrix, char *file_name) ;
+  void print_system_matrix_values  (struct SystemMatrix *matrix, char *file_name) ;
 
   int add_ccs_solid_column
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    Dimensions *dim,
-    Conductances *conductances,
+    struct Dimensions *dim,
+    struct Conductances *conductances,
     double *capacities,
     int current_layer,
     int current_row,
@@ -87,8 +82,8 @@ extern "C"
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    Dimensions *dim,
-    Conductances *conductances,
+    struct Dimensions *dim,
+    struct Conductances *conductances,
     double *capacities,
     int current_layer,
     int current_row,
@@ -103,8 +98,8 @@ extern "C"
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    Dimensions *dim,
-    Conductances *conductances,
+    struct Dimensions *dim,
+    struct Conductances *conductances,
     double *capacities,
     int current_layer,
     int current_row,
@@ -119,8 +114,8 @@ extern "C"
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    Dimensions *dim,
-    Conductances *conductances,
+    struct Dimensions *dim,
+    struct Conductances *conductances,
     double *capacities,
     int current_layer,
     int current_row,
@@ -132,7 +127,4 @@ extern "C"
 
 /******************************************************************************/
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* _TL_SYSTEM_MATRIX_ */

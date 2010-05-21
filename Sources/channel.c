@@ -20,7 +20,7 @@
 void
 init_channel
 (
-  Channel* channel
+  struct Channel* channel
 )
 {
   channel->Height           = 0.0  ;
@@ -29,20 +29,21 @@ init_channel
   channel->CoolantTIn       = 0.0  ;
   channel->FlowRate         = 0.0  ;
   channel->FlowRateChanged  = 0    ;
-  channel->WallMaterial     = NULL ;
+  channel->Wall             = NULL ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-Channel *
+struct Channel *
 alloc_and_init_channel
 (
   void
 )
 {
-  Channel *channel = (Channel *) malloc ( sizeof(Channel) ) ;
+  struct Channel *channel
+    = (struct Channel *) malloc ( sizeof(struct Channel) ) ;
 
   if (channel != NULL) init_channel (channel) ;
 
@@ -56,7 +57,7 @@ alloc_and_init_channel
 void
 free_channel
 (
-  Channel *channel
+  struct Channel *channel
 )
 {
   free (channel) ;
@@ -71,7 +72,7 @@ print_channel
 (
   FILE    *stream,
   char    *prefix,
-  Channel *channel
+  struct Channel *channel
 )
 {
   fprintf(stream,
@@ -92,7 +93,7 @@ print_channel
     "%s  Flow Rate                         %.4e\n",  prefix,
                                                      channel->FlowRate) ;
 
-  Material *wall = channel->WallMaterial ;
+  struct Material *wall = channel->Wall ;
 
   if (wall != NULL)
   {
@@ -112,15 +113,15 @@ print_channel
 /******************************************************************************/
 /******************************************************************************/
 
-Conductances *
+struct Conductances *
 fill_conductances_channel
 (
 #ifdef DEBUG_FILL_CONDUCTANCES
   FILE         *debug,
 #endif
-  Channel      *channel,
-  Conductances *conductances,
-  Dimensions   *dimensions,
+  struct Channel      *channel,
+  struct Conductances *conductances,
+  struct Dimensions   *dimensions,
   int          current_layer
 )
 {
@@ -129,7 +130,7 @@ fill_conductances_channel
 #ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
     "%p current_layer = %d\tfill_conductances_channel %s\n",
-    conductances, current_layer, channel->WallMaterial->Id) ;
+    conductances, current_layer, channel->Wall->Id) ;
 #endif
 
   for
@@ -161,7 +162,7 @@ fill_conductances_channel
           get_cell_length (dimensions, column),
           get_cell_width (dimensions),
           channel->Height,
-          channel->WallMaterial->ThermalConductivity,
+          channel->Wall->ThermalConductivity,
           current_layer
         ) ;
 
@@ -214,9 +215,9 @@ fill_capacities_channel
   FILE       *debug,
   int        current_layer,
 #endif
-  Channel    *channel,
+  struct Channel    *channel,
   double     *capacities,
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     delta_time
 )
 {
@@ -225,7 +226,7 @@ fill_capacities_channel
 #ifdef DEBUG_FILL_CAPACITIES
   fprintf (debug,
     "%p current_layer = %d\tfill_capacities_channel %s\n",
-    capacities, current_layer, channel->WallMaterial->Id) ;
+    capacities, current_layer, channel->Wall->Id) ;
 #endif
 
   for
@@ -250,7 +251,7 @@ fill_capacities_channel
                         get_cell_length (dimensions, column),
                         get_cell_width (dimensions),
                         channel->Height,
-                        channel->WallMaterial->VolHeatCapacity,
+                        channel->Wall->VolHeatCapacity,
                         delta_time
                       ) ;
 #ifdef DEBUG_FILL_CAPACITIES
@@ -260,7 +261,7 @@ fill_capacities_channel
         capacities, current_layer, row, column,
         get_cell_length(dimensions, column), get_cell_width (dimensions),
         channel->Height,
-        channel->WallMaterial->VolHeatCapacity, delta_time, *capacities) ;
+        channel->Wall->VolHeatCapacity, delta_time, *capacities) ;
 #endif
       }
       else                 /* Odd -> liquid */
@@ -298,9 +299,9 @@ fill_sources_channel
   FILE       *debug,
   int        current_layer,
 #endif
-  Channel    *channel,
+  struct Channel    *channel,
   double     *sources,
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   int row, column ;
@@ -312,7 +313,7 @@ fill_sources_channel
   fprintf (debug,
     "%p current_layer = %d\tfill_sources_channel %s " \
     " %.5e = (%.5e * %.5e) / %d \n",
-    sources, current_layer, channel->WallMaterial->Id,
+    sources, current_layer, channel->Wall->Id,
     C, channel->CoolantVHC, channel->FlowRate,
     get_number_of_columns (dimensions) - 1) ;
 #endif
@@ -357,10 +358,10 @@ fill_ccs_system_matrix_channel
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
-  Channel      *channel,
+  struct Channel      *channel,
 #endif
-  Dimensions   *dimensions,
-  Conductances *conductances,
+  struct Dimensions   *dimensions,
+  struct Conductances *conductances,
   double       *capacities,
   int          *columns,
   int          *rows,
@@ -374,7 +375,7 @@ fill_ccs_system_matrix_channel
   fprintf (debug,
     "%p %p %p %p %p (l %2d) fill_ccs_system_matrix_channel %s \n",
     conductances, capacities, columns, rows, values,
-    current_layer, channel->WallMaterial->Id) ;
+    current_layer, channel->Wall->Id) ;
 #endif
 
   for
@@ -438,10 +439,10 @@ fill_crs_system_matrix_channel
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
-  Channel      *channel,
+  struct Channel      *channel,
 #endif
-  Dimensions   *dimensions,
-  Conductances *conductances,
+  struct Dimensions   *dimensions,
+  struct Conductances *conductances,
   double       *capacities,
   int          *rows,
   int          *columns,
@@ -455,7 +456,7 @@ fill_crs_system_matrix_channel
   fprintf (debug,
     "%p %p %p %p %p (l %2d) fill_crs_system_matrix_channel %s \n",
     conductances, capacities, rows, columns, values,
-    current_layer, channel->WallMaterial->Id) ;
+    current_layer, channel->Wall->Id) ;
 #endif
 
   for

@@ -20,7 +20,7 @@
 void
 init_die
 (
-  Die *die
+  struct Die *die
 )
 {
   die->Id          = NULL ;
@@ -34,13 +34,13 @@ init_die
 /******************************************************************************/
 /******************************************************************************/
 
-Die *
+struct Die *
 alloc_and_init_die
 (
   void
 )
 {
-  Die *die = (Die *) malloc ( sizeof(Die) ) ;
+  struct Die *die = (struct Die *) malloc ( sizeof(struct Die) ) ;
 
   if (die != NULL) init_die (die) ;
 
@@ -54,7 +54,7 @@ alloc_and_init_die
 void
 free_die
 (
-  Die *die
+  struct Die *die
 )
 {
   free_layers_list (die->LayersList) ;
@@ -69,10 +69,10 @@ free_die
 void
 free_dies_list
 (
-  Die *list
+  struct Die *list
 )
 {
-  Die *next ;
+  struct Die *next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -88,9 +88,9 @@ free_dies_list
 void
 print_die
 (
-  FILE *stream,
-  char *prefix,
-  Die  *die
+  FILE       *stream,
+  char       *prefix,
+  struct Die *die
 )
 {
   fprintf (stream,
@@ -118,9 +118,9 @@ print_die
 void
 print_dies_list
 (
-  FILE *stream,
-  char* prefix,
-  Die *list
+  FILE       *stream,
+  char       *prefix,
+  struct Die *list
 )
 {
   for ( ; list != NULL ; list = list->Next)
@@ -133,11 +133,11 @@ print_dies_list
 /******************************************************************************/
 /******************************************************************************/
 
-Die *
+struct Die *
 find_die_in_list
 (
-  Die* list,
-  char *id
+  struct Die *list,
+  char       *id
 )
 {
   for ( ; list != NULL ; list = list->Next)
@@ -151,19 +151,19 @@ find_die_in_list
 /******************************************************************************/
 /******************************************************************************/
 
-Conductances *
+struct Conductances *
 fill_conductances_die
 (
 #ifdef DEBUG_FILL_CONDUCTANCES
   FILE         *debug,
 #endif
-  Die          *die,
-  Conductances *conductances,
-  Dimensions   *dimensions,
+  struct Die   *die,
+  struct Conductances *conductances,
+  struct Dimensions   *dimensions,
   int          current_layer
 )
 {
-  Layer *layer ;
+  struct Layer *layer ;
 
 #ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
@@ -205,13 +205,13 @@ fill_capacities_die
   FILE       *debug,
   int        current_layer,
 #endif
-  Die        *die,
+  struct Die *die,
   double     *capacities,
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     delta_time
 )
 {
-  Layer *layer ;
+  struct Layer *layer ;
 
 #ifdef DEBUG_FILL_CAPACITIES
   fprintf (debug,
@@ -254,13 +254,13 @@ fill_sources_die
   FILE       *debug,
   int        current_layer,
 #endif
-  Die        *die,
-  Floorplan  *floorplan,
+  struct Die *die,
+  struct Floorplan  *floorplan,
   double     *sources,
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
-  Layer *layer ;
+  struct Layer *layer ;
 
 #ifdef DEBUG_FILL_SOURCES
   fprintf (debug,
@@ -317,9 +317,9 @@ fill_ccs_system_matrix_die
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
 #endif
-  Die          *die,
-  Dimensions   *dimensions,
-  Conductances *conductances,
+  struct Die   *die,
+  struct Dimensions   *dimensions,
+  struct Conductances *conductances,
   double       *capacities,
   int          *columns,
   int          *rows,
@@ -327,7 +327,7 @@ fill_ccs_system_matrix_die
   int          current_layer
 )
 {
-  Layer *layer ;
+  struct Layer *layer ;
   int tot_added, added ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
@@ -376,9 +376,9 @@ fill_crs_system_matrix_die
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
 #endif
-  Die          *die,
-  Dimensions   *dimensions,
-  Conductances *conductances,
+  struct Die   *die,
+  struct Dimensions   *dimensions,
+  struct Conductances *conductances,
   double       *capacities,
   int          *rows,
   int          *columns,
@@ -386,7 +386,7 @@ fill_crs_system_matrix_die
   int          current_layer
 )
 {
-  Layer *layer ;
+  struct Layer *layer ;
   int tot_added, added ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX

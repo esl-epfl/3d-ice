@@ -19,7 +19,7 @@
 void
 init_dimensions
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   dimensions->Cell.FirstLength = 0.0;
@@ -41,13 +41,14 @@ init_dimensions
 /******************************************************************************/
 /******************************************************************************/
 
-Dimensions *
+struct Dimensions *
 alloc_and_init_dimensions
 (
   void
 )
 {
-  Dimensions *dimensions = (Dimensions *) malloc (sizeof (Dimensions));
+  struct Dimensions *dimensions
+    = (struct Dimensions *) malloc (sizeof (struct Dimensions));
 
   if (dimensions != NULL) init_dimensions (dimensions);
 
@@ -63,7 +64,7 @@ print_dimensions
 (
   FILE *stream,
   char *prefix,
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   fprintf (stream,
@@ -86,7 +87,7 @@ print_dimensions
 void
 free_dimensions
 (
-  Dimensions * dimensions
+  struct Dimensions * dimensions
 )
 {
   free (dimensions);
@@ -99,7 +100,7 @@ free_dimensions
 double
 get_cell_length
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   int        column
 )
 {
@@ -119,7 +120,7 @@ get_cell_length
 double
 get_cell_width
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Cell.Width;
@@ -132,7 +133,7 @@ get_cell_width
 int
 get_number_of_layers
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Grid.NLayers ;
@@ -143,7 +144,7 @@ get_number_of_layers
 int
 get_number_of_rows
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Grid.NRows ;
@@ -154,7 +155,7 @@ get_number_of_rows
 int
 get_number_of_columns
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Grid.NColumns ;
@@ -165,7 +166,7 @@ get_number_of_columns
 int
 get_number_of_cells
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Grid.NCells ;
@@ -176,7 +177,7 @@ get_number_of_cells
 int
 get_number_of_non_zeroes
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Grid.NNz ;
@@ -186,10 +187,10 @@ get_number_of_non_zeroes
 /******************************************************************************/
 /******************************************************************************/
 
-int
+double
 get_cell_top_surface
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   int        column
 )
 {
@@ -198,10 +199,10 @@ get_cell_top_surface
 
 /******************************************************************************/
 
-int
+double
 get_cell_bottom_surface
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   int column
 )
 {
@@ -210,10 +211,10 @@ get_cell_bottom_surface
 
 /******************************************************************************/
 
-int
+double
 get_cell_east_surface
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     height
 )
 {
@@ -222,10 +223,10 @@ get_cell_east_surface
 
 /******************************************************************************/
 
-int
+double
 get_cell_west_surface
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     height
 )
 {
@@ -234,10 +235,10 @@ get_cell_west_surface
 
 /******************************************************************************/
 
-int
+double
 get_cell_north_surface
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double     height,
   int        column
 )
@@ -246,10 +247,10 @@ get_cell_north_surface
 }
 /******************************************************************************/
 
-int
+double
 get_cell_south_surface
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   double height,
   int column
 )
@@ -264,7 +265,7 @@ get_cell_south_surface
 int
 get_layer_area
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Grid.NRows * dimensions->Grid.NColumns ;
@@ -275,7 +276,7 @@ get_layer_area
 int
 get_cell_offset_in_layer
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   int row,
   int column
 )
@@ -288,7 +289,7 @@ get_cell_offset_in_layer
 int
 get_cell_offset_in_stack
 (
-  Dimensions *dimensions,
+  struct Dimensions *dimensions,
   int layer,
   int row,
   int column
@@ -305,7 +306,7 @@ get_cell_offset_in_stack
 double
 get_chip_length
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Chip.Length ;
@@ -316,7 +317,7 @@ get_chip_length
 double
 get_chip_width
 (
-  Dimensions *dimensions
+  struct Dimensions *dimensions
 )
 {
   return dimensions->Chip.Width ;
