@@ -32,7 +32,7 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
           Sources/conductances.o                \
-          Sources/thermal_data.o
+          Sources/slu_thermal_data.o
 
 all: $(LIB)
 
@@ -142,7 +142,7 @@ Sources/conductances.o: Sources/conductances.c Include/conductances.h
 
 ################################################################################
 
-Sources/thermal_data.o: Sources/thermal_data.c Include/thermal_data.h
+Sources/slu_thermal_data.o: Sources/slu_thermal_data.c Include/slu_thermal_data.h
 	$(CC) $(CFLAGS) $(DEBUG) -I$(SUPERLU_INCLUDE) -o $@ $(INCLUDE) -c $<
 
 ################################################################################
@@ -158,3 +158,4 @@ clean:
 	rm -f Sources/floorplan_parser.c
 	rm -f Sources/stack_description_scanner.c
 	rm -f Sources/stack_description_parser.c
+

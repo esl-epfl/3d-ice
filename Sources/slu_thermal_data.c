@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "thermal_data.h"
+#include "slu_thermal_data.h"
 
 static
 void
@@ -25,10 +25,10 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-init_thermal_data
+slu_init_thermal_data
 (
   StackDescription *stkd,
-  ThermalData      *tdata,
+  SLUThermalData   *tdata,
   MatrixStorage_t  storage,
   double           initial_temperature,
   double           delta_time
@@ -156,7 +156,7 @@ temperatures_fail :
 /******************************************************************************/
 
 void
-free_thermal_data (ThermalData *tdata)
+slu_free_thermal_data (SLUThermalData *tdata)
 {
   if (tdata == NULL) return ;
 
@@ -190,10 +190,10 @@ free_thermal_data (ThermalData *tdata)
 /******************************************************************************/
 
 int
-fill_thermal_data
+slu_fill_thermal_data
 (
   StackDescription *stkd,
-  ThermalData *tdata
+  SLUThermalData *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -270,10 +270,10 @@ fill_thermal_data
 /******************************************************************************/
 
 int
-solve_system
+slu_solve_system
 (
-  ThermalData *tdata,
-  double total_time
+  SLUThermalData *tdata,
+  double         total_time
 )
 {
   int counter;
@@ -319,9 +319,9 @@ solve_system
 /******************************************************************************/
 
 void
-print_system_matrix
+slu_print_system_matrix
 (
-  ThermalData *tdata
+  SLUThermalData *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
@@ -345,9 +345,9 @@ print_system_matrix
 /******************************************************************************/
 
 void
-print_sources
+slu_print_sources
 (
-  ThermalData *tdata
+  SLUThermalData *tdata
 )
 {
   int counter ;
@@ -364,3 +364,6 @@ print_sources
   fclose (file) ;
 }
 
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
