@@ -11,12 +11,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "thermal_data_cgs.h"
+#include "thermal_data_gmres.h"
 
 #include "diagpre_double.h"
 #include "compcol_double.h"
 #include "mvblasd.h"
-#include "cgs.h"
+#include "mvmd.h"
+#include "gmres.h"
 
 static
 void
@@ -30,12 +31,12 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-cgs_init_thermal_data
+gmres_init_thermal_data
 (
-  struct StackDescription *stkd,
-  struct CGSThermalData   *tdata,
-  double                  initial_temperature,
-  double                  delta_time
+  struct StackDescription  *stkd,
+  struct GMRESThermalData  *tdata,
+  double                   initial_temperature,
+  double                   delta_time
 )
 {
   if (tdata == NULL) return 0 ;
@@ -115,7 +116,7 @@ sources_fail :
 /******************************************************************************/
 
 void
-cgs_free_thermal_data (struct CGSThermalData *tdata)
+gmres_free_thermal_data (struct GMRESThermalData *tdata)
 {
   free (tdata->Temperatures) ;
   free (tdata->Sources) ;
@@ -132,10 +133,10 @@ cgs_free_thermal_data (struct CGSThermalData *tdata)
 /******************************************************************************/
 
 int
-cgs_fill_thermal_data
+gmres_fill_thermal_data
 (
   struct StackDescription *stkd,
-  struct CGSThermalData   *tdata
+  struct GMRESThermalData  *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -176,12 +177,13 @@ cgs_fill_thermal_data
 /******************************************************************************/
 
 int
-cgs_solve_system
+gmres_solve_system
 (
-  struct CGSThermalData  *tdata,
-  double                 total_time,
-  double                 *tolerance,
-  int                    *max_iterations
+  struct GMRESThermalData *tdata,
+  double                  total_time,
+  double                  *tolerance,
+  int                     *max_iterations,
+  int                     restart
 )
 {
   int counter, _max_iterations = *max_iterations ;
@@ -196,6 +198,8 @@ cgs_solve_system
       tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
       tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
     ) ;
+ 
+    MATRIX_double H(restart+1, restart, 0.0);
 
     DiagPreconditioner_double Preconditioner (A) ;
 
@@ -206,7 +210,7 @@ cgs_solve_system
     _tolerance      = *tolerance ;
     _max_iterations = *max_iterations ;
 
-    if ( CGS (A, x, B, Preconditioner, _max_iterations, _tolerance) == 1)
+    if ( GMRES (A, x, B, Preconditioner, H, restart, _max_iterations, _tolerance) == 1)
 
       return 1 ;
 
@@ -231,22 +235,22 @@ cgs_solve_system
 /******************************************************************************/
 
 void
-cgs_print_system_matrix
+gmres_print_system_matrix
 (
-  struct CGSThermalData *tdata
+  struct GMRESThermalData *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "cgs_sm_ccs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "cgs_sm_ccs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "cgs_sm_ccs_values.txt") ;
+    print_system_matrix_columns(&tdata->SM_A, "gmres_sm_ccs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "gmres_sm_ccs_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "gmres_sm_ccs_values.txt") ;
   }
   else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "cgs_sm_crs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "cgs_sm_crs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "cgs_sm_crs_values.txt") ;
+    print_system_matrix_columns(&tdata->SM_A, "gmres_sm_crs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "gmres_sm_crs_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "gmres_sm_crs_values.txt") ;
   }
   else
     fprintf (stderr, "Matrix format unknown\n") ;
@@ -257,9 +261,9 @@ cgs_print_system_matrix
 /******************************************************************************/
 
 void
-cgs_print_sources
+gmres_print_sources
 (
-  struct CGSThermalData *tdata
+  struct GMRESThermalData *tdata
 )
 {
   int counter ;
