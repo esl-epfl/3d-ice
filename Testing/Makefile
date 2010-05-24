@@ -22,9 +22,10 @@ SL_LIBS            = -lmv -lsparse -lspblas -lm
 
 MV_INCLUDE         = -I$(SL_DIR)/mv/include
 
-EXECS              = slu_small_step  slu_big_step   \
-                     bicg_small_step bicg_big_step  \
-                     bicgstab_small_step bicgstab_big_step
+EXECS              = slu_small_step  slu_big_step          \
+                     bicg_small_step bicg_big_step         \
+                     bicgstab_small_step bicgstab_big_step \
+                     cgs_small_step cgs_big_step
 
 
 all : $(EXECS)
@@ -75,6 +76,22 @@ bicgstab_small_step.o: test_bicgstab.cc
 	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 bicgstab_big_step.o: test_bicgstab.cc
+	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+################################################################################
+# Conjugate Gradient Squared Method ############################################
+################################################################################
+
+cgs_small_step: cgs_small_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+cgs_big_step: cgs_big_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+cgs_small_step.o: test_cgs.cc
+	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+cgs_big_step.o: test_cgs.cc
 	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
