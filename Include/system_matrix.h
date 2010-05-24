@@ -61,6 +61,8 @@
   void print_system_matrix_rows    (struct SystemMatrix *matrix, char *file_name) ;
   void print_system_matrix_values  (struct SystemMatrix *matrix, char *file_name) ;
 
+  void print_system_matrix (struct SystemMatrix *matrix, char *file_name) ;
+
   int add_ccs_solid_column
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX

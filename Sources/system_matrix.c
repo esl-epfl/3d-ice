@@ -149,6 +149,57 @@ print_system_matrix_values
   fclose (file) ;
 }
 
+
+void
+print_system_matrix
+(
+  struct SystemMatrix *matrix,
+  char *file_name
+)
+{
+  int mycol, myrow;
+  FILE *file = fopen (file_name, "w") ;
+
+  if (file == NULL) return ;
+
+  if (matrix->Storage == TL_CCS_MATRIX)
+  {
+    for(mycol=0; mycol < matrix->columns_size; mycol++)
+    {
+      fprintf (file, "%d\t:\t", mycol) ;
+      for
+      (
+        myrow = matrix->Columns[mycol]   ;
+        myrow < matrix->Columns[mycol+1] ;
+        myrow++
+      )
+        fprintf (file,
+          "(%6d)   % .5f\t", matrix->Rows[myrow], matrix->Values[myrow]) ;
+      fprintf (file,"\n") ;
+    }
+  }
+  else if (matrix->Storage == TL_CRS_MATRIX)
+  {
+    for(myrow=0; myrow < matrix->rows_size; myrow++)
+    {
+      fprintf (file, "%d\t:\t", myrow) ;
+      for
+      (
+        mycol = matrix->Rows[myrow]   ;
+        mycol < matrix->Rows[myrow+1] ;
+        mycol++
+      )
+        fprintf (file,
+          "(%6d)   % .5f\t", matrix->Columns[mycol], matrix->Values[mycol]) ;
+      fprintf (file,"\n") ;
+    }
+  }
+  else
+      fprintf (file,"Unsupprted matrix format\n") ;
+
+  fclose (file) ;
+}
+
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/

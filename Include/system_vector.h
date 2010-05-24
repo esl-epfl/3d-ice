@@ -37,6 +37,8 @@
                         double       *temperature
                        ) ;
 
+  void print_system_vector (struct SystemVector *vector, char *file_name) ;
+
   void
   free_system_vector   (struct SystemVector *vector) ;
 
