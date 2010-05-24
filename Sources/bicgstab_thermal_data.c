@@ -192,8 +192,6 @@ bicgstab_solve_system
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
-    printf ("iteration %.4f\n", total_time);
-
     CompCol_Mat_double A (
       tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
       tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns

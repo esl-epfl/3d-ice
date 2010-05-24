@@ -22,8 +22,9 @@ SL_LIBS            = -lmv -lsparse -lspblas -lm
 
 MV_INCLUDE         = -I$(SL_DIR)/mv/include
 
-EXECS              = slu_small_step  slu_big_step \
-                     bicg_small_step bicg_big_step
+EXECS              = slu_small_step  slu_big_step   \
+                     bicg_small_step bicg_big_step  \
+                     bicgstab_small_step bicgstab_big_step
 
 
 all : $(EXECS)
@@ -58,6 +59,22 @@ bicg_small_step.o: test_bicg.cc
 	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 bicg_big_step.o: test_bicg.cc
+	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+################################################################################
+# Biconjugate Gradient stabilized ##############################################
+################################################################################
+
+bicgstab_small_step: bicgstab_small_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+bicgstab_big_step: bicgstab_big_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+bicgstab_small_step.o: test_bicgstab.cc
+	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+bicgstab_big_step.o: test_bicgstab.cc
 	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
