@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "stack_description.h"
-#include "slu_thermal_data.h"
+#include "thermal_data_slu.h"
 
 void
 slu_print_temps (struct SLUThermalData *tdata, struct StackDescription *stkd, double time)

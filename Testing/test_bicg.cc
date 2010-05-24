@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "stack_description.h"
-#include "bicg_thermal_data.h"
+#include "thermal_data_bicg.h"
 
 #define MAX_ITER   2000
 #define TOLERANCE 1e-06

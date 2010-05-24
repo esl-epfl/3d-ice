@@ -36,9 +36,9 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/system_vector.o               \
           Sources/system_matrix.o               \
           Sources/conductances.o                \
-          Sources/slu_thermal_data.o            \
-          Sources/bicg_thermal_data.o           \
-          Sources/bicgstab_thermal_data.o
+          Sources/thermal_data_slu.o            \
+          Sources/thermal_data_bicg.o           \
+          Sources/thermal_data_bicgstab.o
 
 all: $(LIB)
 
@@ -148,17 +148,17 @@ Sources/conductances.o: Sources/conductances.c Include/conductances.h
 
 ################################################################################
 
-Sources/slu_thermal_data.o: Sources/slu_thermal_data.c Include/slu_thermal_data.h
+Sources/thermal_data_slu.o: Sources/thermal_data_slu.c Include/thermal_data_slu.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(SLU_INCLUDE) -c $<
 
 ################################################################################
 
-Sources/bicg_thermal_data.o: Sources/bicg_thermal_data.c Include/bicg_thermal_data.h
+Sources/thermal_data_bicg.o: Sources/thermal_data_bicg.c Include/thermal_data_bicg.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
 
 ################################################################################
 
-Sources/bicgstab_thermal_data.o: Sources/bicgstab_thermal_data.c Include/bicgstab_thermal_data.h
+Sources/thermal_data_bicgstab.o: Sources/thermal_data_bicgstab.c Include/thermal_data_bicgstab.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
 
 ################################################################################

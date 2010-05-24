@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "stack_description.h"
-#include "bicgstab_thermal_data.h"
+#include "thermal_data_bicgstab.h"
 
 #define MAX_ITER   5000
 #define TOLERANCE 1e-03

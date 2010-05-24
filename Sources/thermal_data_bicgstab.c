@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "bicgstab_thermal_data.h"
+#include "thermal_data_bicgstab.h"
 
 #include "diagpre_double.h"
 #include "compcol_double.h"
