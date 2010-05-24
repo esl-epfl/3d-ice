@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "bicg_thermal_data.h"
+#include "bicgstab_thermal_data.h"
 
 #include "diagpre_double.h"
 #include "compcol_double.h"
 #include "mvblasd.h"
-#include "bicg.h"
+#include "bicgstab.h"
 
 static
 void
@@ -30,12 +30,12 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-bicg_init_thermal_data
+bicgstab_init_thermal_data
 (
-  struct StackDescription *stkd,
-  struct BICGThermalData  *tdata,
-  double                  initial_temperature,
-  double                  delta_time
+  struct StackDescription    *stkd,
+  struct BICGStabThermalData *tdata,
+  double                     initial_temperature,
+  double                     delta_time
 )
 {
   if (tdata == NULL) return 0 ;
@@ -110,7 +110,7 @@ sources_fail :
 /******************************************************************************/
 
 void
-bicg_free_thermal_data (struct BICGThermalData *tdata)
+bicgstab_free_thermal_data (struct BICGStabThermalData *tdata)
 {
   free (tdata->Temperatures) ;
   free (tdata->Sources) ;
@@ -126,10 +126,10 @@ bicg_free_thermal_data (struct BICGThermalData *tdata)
 /******************************************************************************/
 
 int
-bicg_fill_thermal_data
+bicgstab_fill_thermal_data
 (
-  struct StackDescription *stkd,
-  struct BICGThermalData  *tdata
+  struct StackDescription    *stkd,
+  struct BICGStabThermalData *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -170,12 +170,12 @@ bicg_fill_thermal_data
 /******************************************************************************/
 
 int
-bicg_solve_system
+bicgstab_solve_system
 (
-  struct BICGThermalData *tdata,
-  double                 total_time,
-  double                 *tolerance,
-  int                    *max_iterations
+  struct BICGStabThermalData *tdata,
+  double                     total_time,
+  double                     *tolerance,
+  int                        *max_iterations
 )
 {
   int counter ;
@@ -204,7 +204,7 @@ bicg_solve_system
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
 
-    if ( BiCG (A, x, B, Preconditioner, *max_iterations, *tolerance) == 1)
+    if ( BiCGSTAB (A, x, B, Preconditioner, *max_iterations, *tolerance) == 1)
 
       return 1 ;
 
@@ -229,22 +229,22 @@ bicg_solve_system
 /******************************************************************************/
 
 void
-bicg_print_system_matrix
+bicgstab_print_system_matrix
 (
-  struct BICGThermalData *tdata
+  struct BICGStabThermalData *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "bicg_sm_ccs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "bicg_sm_ccs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "bicg_sm_ccs_values.txt") ;
+    print_system_matrix_columns(&tdata->SM_A, "bicgstab_sm_ccs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "bicgstab_sm_ccs_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "bicgstab_sm_ccs_values.txt") ;
   }
   else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "bicg_sm_crs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "bicg_sm_crs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "bicg_sm_crs_values.txt") ;
+    print_system_matrix_columns(&tdata->SM_A, "bicgstab_sm_crs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "bicgstab_sm_crs_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "bicgstab_sm_crs_values.txt") ;
   }
   else
     fprintf (stderr, "Matrix format unknown\n") ;
@@ -255,9 +255,9 @@ bicg_print_system_matrix
 /******************************************************************************/
 
 void
-bicg_print_sources
+bicgstab_print_sources
 (
-  struct BICGThermalData *tdata
+  struct BICGStabThermalData *tdata
 )
 {
   int counter ;

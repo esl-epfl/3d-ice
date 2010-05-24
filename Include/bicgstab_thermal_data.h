@@ -8,8 +8,8 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_BICG_THERMAL_DATA_H_
-#define _TL_BICG_THERMAL_DATA_H_
+#ifndef _TL_BICGSTAB_THERMAL_DATA_H_
+#define _TL_BICGSTAB_THERMAL_DATA_H_
 
 #include "conductances.h"
 #include "stack_description.h"
@@ -20,7 +20,7 @@
  * "SLUThermalData"                                                           *
  ******************************************************************************/
 
-  struct BICGThermalData
+  struct BICGStabThermalData
   {
     double              *Temperatures ;
     double              *Sources ;
@@ -39,30 +39,30 @@
 /******************************************************************************/
 
   int
-  bicg_init_thermal_data  (
-                           struct StackDescription *stkd,
-                           struct BICGThermalData  *tdata,
-                           double                  initial_temperature,
-                           double                  delta_time
-                          ) ;
+  bicgstab_init_thermal_data  (
+                               struct StackDescription    *stkd,
+                               struct BICGStabThermalData *tdata,
+                               double                     initial_temperature,
+                               double                     delta_time
+                              ) ;
 
   int
-  bicg_fill_thermal_data (struct StackDescription *stkd,
-                          struct BICGThermalData *tdata) ;
+  bicgstab_fill_thermal_data (struct StackDescription    *stkd,
+                              struct BICGStabThermalData *tdata) ;
 
   void
-  bicg_free_thermal_data  (struct BICGThermalData *tdata) ;
+  bicgstab_free_thermal_data  (struct BICGStabThermalData *tdata) ;
 
   int
-  bicg_solve_system       (struct BICGThermalData *tdata,
-                           double                 total_time,
-                           double                 *tolerance,
-                           int                    *max_iterations) ;
+  bicgstab_solve_system       (struct BICGStabThermalData *tdata,
+                               double total_time,
+                               double *tolerance,
+                               int    *max_iterations) ;
 
   void
-  bicg_print_system_matrix (struct BICGThermalData *tdata) ;
+  bicgstab_print_system_matrix (struct BICGStabThermalData *tdata) ;
 
   void
-  bicg_print_sources      (struct BICGThermalData *tdata) ;
+  bicgstab_print_sources      (struct BICGStabThermalData *tdata) ;
 
-#endif /* _TL_BICG_THERMAL_DATA_H_ */
+#endif /* _TL_BICGSTAB_THERMAL_DATA_H_ */

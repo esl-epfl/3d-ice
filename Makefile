@@ -37,7 +37,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/system_matrix.o               \
           Sources/conductances.o                \
           Sources/slu_thermal_data.o            \
-          Sources/bicg_thermal_data.o
+          Sources/bicg_thermal_data.o           \
+          Sources/bicgstab_thermal_data.o
 
 all: $(LIB)
 
@@ -153,6 +154,11 @@ Sources/slu_thermal_data.o: Sources/slu_thermal_data.c Include/slu_thermal_data.
 ################################################################################
 
 Sources/bicg_thermal_data.o: Sources/bicg_thermal_data.c Include/bicg_thermal_data.h
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
+
+################################################################################
+
+Sources/bicgstab_thermal_data.o: Sources/bicgstab_thermal_data.c Include/bicgstab_thermal_data.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
 
 ################################################################################
