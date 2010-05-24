@@ -33,6 +33,7 @@
 
     struct SystemMatrix SM_A ;
     struct SystemVector SV_B ;
+    struct SystemVector SV_X ;
 
   } ;
 

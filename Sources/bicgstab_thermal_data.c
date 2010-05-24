@@ -73,6 +73,9 @@ bicgstab_init_thermal_data
   if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
     goto sv_b_fail ;
 
+  if ( alloc_system_vector (&tdata->SV_X, tdata->Size) == 0 )
+    goto sv_x_fail ;
+
 //  (tdata->BICG_Matrix_A).newsize (tdata->Size,
 //                                  tdata->Size,
 //                                  stkd->Dimensions->Grid.NNz);
@@ -91,6 +94,8 @@ bicgstab_init_thermal_data
 
   /* Free if malloc errors */
 
+sv_x_fail:
+  free_system_vector (&tdata->SV_B) ;
 sv_b_fail :
   free_system_matrix (&tdata->SM_A) ;
 sm_a_fail :
@@ -119,6 +124,7 @@ bicgstab_free_thermal_data (struct BICGStabThermalData *tdata)
 
   free_system_matrix (&tdata->SM_A) ;
   free_system_vector (&tdata->SV_B) ;
+  free_system_vector (&tdata->SV_X) ;
 }
 
 /******************************************************************************/
@@ -178,48 +184,46 @@ bicgstab_solve_system
   int                        *max_iterations
 )
 {
-  int counter ;
+  int counter, _max_iterations = *max_iterations ;
+  double _tolerance = *tolerance;
 
-  CompCol_Mat_double A (
-                        tdata->SM_A.Size,
-                        tdata->SM_A.Size,
-                        tdata->SM_A.NNz,
-                        tdata->SM_A.Values,
-                        tdata->SM_A.Rows,
-                        tdata->SM_A.Columns
-                       ) ;
-
-  DiagPreconditioner_double Preconditioner (A) ;
-
-  VECTOR_double B (
-                   tdata->SV_B.Values,
-                   tdata->SV_B.Size
-                  ) ;
-
-  VECTOR_double x (
-                   tdata->Temperatures,
-                   tdata->SV_B.Size
-                  ) ;
+  for (counter = 0 ; counter < tdata->SV_X.Size ; counter++)
+    tdata->SV_X.Values[counter] = tdata->Temperatures[counter] ;
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
+    printf ("iteration %.4f\n", total_time);
 
-    if ( BiCGSTAB (A, x, B, Preconditioner, *max_iterations, *tolerance) == 1)
+    CompCol_Mat_double A (
+      tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
+      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
+    ) ;
+
+    DiagPreconditioner_double Preconditioner (A) ;
+
+    VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
+
+    VECTOR_double x (tdata->SV_X.Values, tdata->SV_X.Size) ;
+
+    _tolerance      = *tolerance ;
+    _max_iterations = *max_iterations ;
+
+    if ( BiCGSTAB (A, x, B, Preconditioner, _max_iterations, _tolerance) == 1)
 
       return 1 ;
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
-
       tdata->Temperatures[counter] = x(counter) ;
 
-    fill_system_vector
-    (
+    fill_system_vector (
       &tdata->SV_B,
-      tdata->Sources,
-      tdata->Capacities,
-      tdata->Temperatures
+      tdata->Sources, tdata->Capacities, tdata->Temperatures
     ) ;
+
   }
+
+  *max_iterations = _max_iterations ;
+  *tolerance      = _tolerance ;
 
   return 0 ;
 }
