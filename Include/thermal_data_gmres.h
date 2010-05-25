@@ -55,11 +55,18 @@
   gmres_free_thermal_data (struct GMRESThermalData *tdata) ;
 
   int
-  gmres_solve_system      (struct GMRESThermalData *tdata,
-                           double                  total_time,
-                           double                  *tolerance,
-                           int                     *max_iterations,
-                           int                     restart) ;
+  gmres_diag_pre_solve_system     (struct GMRESThermalData *tdata,
+                                   double                  total_time,
+                                   double                  *tolerance,
+                                   int                     *max_iterations,
+                                   int                     restart) ;
+
+  int
+  gmres_ilu_pre_solve_system      (struct GMRESThermalData *tdata,
+                                   double                  total_time,
+                                   double                  *tolerance,
+                                   int                     *max_iterations,
+                                   int                     restart) ;
 
   void
   gmres_print_system_matrix (struct GMRESThermalData *tdata) ;

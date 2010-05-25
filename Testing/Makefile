@@ -33,15 +33,16 @@ BICGSTAB_EXECS     = bicgstab_diag_pre_small_step bicgstab_diag_pre_big_step \
 CGS_EXECS          = cgs_diag_pre_small_step cgs_diag_pre_big_step \
                      cgs_ilu_pre_small_step cgs_ilu_pre_big_step
 
+GMRES_EXECS        = gmres_diag_pre_small_step gmres_diag_pre_big_step \
+                     gmres_ilu_pre_small_step gmres_ilu_pre_big_step
+
 IR_EXECS           = ir_ilu_pre_small_step ir_ilu_pre_big_step
 
 QMR_EXECS          = qmr_diag_pre_small_step qmr_diag_pre_big_step \
                      qmr_ilu_pre_small_step qmr_ilu_pre_big_step
 
 EXECS              = $(SLU_EXECS) $(BICG_EXECS) $(BICGSTAB_EXECS) \
-                     $(CGS_EXECS) $(IR_EXECS) $(QMR_EXECS)        \
-                     gmres_small_step gmres_big_step
-
+                     $(CGS_EXECS) $(GMRES_EXECS) $(IR_EXECS) $(QMR_EXECS)
 
 all : $(EXECS)
 
@@ -149,17 +150,29 @@ cgs_ilu_pre_big_step.o: iterative_test.cc
 # Generalized minimum Residual Method ##########################################
 ################################################################################
 
-gmres_small_step: gmres_small_step.o
+gmres_diag_pre_small_step: gmres_diag_pre_small_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-gmres_big_step: gmres_big_step.o
+gmres_diag_pre_big_step: gmres_diag_pre_big_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-gmres_small_step.o: test_gmres.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+gmres_ilu_pre_small_step: gmres_ilu_pre_small_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-gmres_big_step.o: test_gmres.cc
-	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+gmres_ilu_pre_big_step: gmres_ilu_pre_big_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+gmres_diag_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_GMRES -DTL_DIAGONAL_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+gmres_diag_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_GMRES -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+gmres_ilu_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_GMRES -DTL_ILU_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+gmres_ilu_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_GMRES -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
 # Iterative Refinement #########################################################

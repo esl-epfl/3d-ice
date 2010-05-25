@@ -14,6 +14,8 @@
 #include "thermal_data_gmres.h"
 
 #include "diagpre_double.h"
+#include "ilupre_double.h"
+
 #include "compcol_double.h"
 #include "mvblasd.h"
 #include "mvmd.h"
@@ -177,7 +179,66 @@ gmres_fill_thermal_data
 /******************************************************************************/
 
 int
-gmres_solve_system
+gmres_ilu_pre_solve_system
+(
+  struct GMRESThermalData *tdata,
+  double                  total_time,
+  double                  *tolerance,
+  int                     *max_iterations,
+  int                     restart
+)
+{
+  int result, counter, _max_iterations = *max_iterations ;
+  double _tolerance = *tolerance;
+
+  for (counter = 0 ; counter < tdata->SV_X.Size ; counter++)
+    tdata->SV_X.Values[counter] = tdata->Temperatures[counter] ;
+
+  for ( ; total_time > 0 ; total_time -= tdata->delta_time)
+  {
+    CompCol_Mat_double A (
+      tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
+      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
+    ) ;
+
+    MATRIX_double H(restart+1, restart, 0.0);
+
+    CompCol_ILUPreconditioner_double Preconditioner (A) ;
+
+    VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
+
+    VECTOR_double x (tdata->SV_X.Values, tdata->SV_X.Size) ;
+
+    _tolerance      = *tolerance ;
+    _max_iterations = *max_iterations ;
+
+    result = GMRES (A, x, B, Preconditioner, H, restart, _max_iterations, _tolerance) ;
+
+    if (result != 0)
+      return result ;
+
+    for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+      tdata->Temperatures[counter] = x(counter) ;
+
+    fill_system_vector (
+      &tdata->SV_B,
+      tdata->Sources, tdata->Capacities, tdata->Temperatures
+    ) ;
+
+  }
+
+  *max_iterations = _max_iterations ;
+  *tolerance      = _tolerance ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+int
+gmres_diag_pre_solve_system
 (
   struct GMRESThermalData *tdata,
   double                  total_time,

@@ -49,6 +49,22 @@
   #endif
 #endif
 
+#ifdef TD_GMRES
+  #define TD_INCLUDE "thermal_data_gmres.h"
+  #define TD_TYPE    GMRESThermalData
+  #define TD_INIT    gmres_init_thermal_data
+  #define TD_FILL    gmres_fill_thermal_data
+  #define TD_FREE    gmres_free_thermal_data
+  #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
+
+  #ifdef TL_DIAGONAL_PRECONDITIONER
+    #define TD_SOLVE gmres_diag_pre_solve_system
+  #endif
+  #ifdef TL_ILU_PRECONDITIONER
+    #define TD_SOLVE gmres_ilu_pre_solve_system
+  #endif
+#endif
+
 #ifdef TD_IR
   #define TD_INCLUDE "thermal_data_ir.h"
   #define TD_TYPE    IRThermalData
@@ -140,11 +156,20 @@ main(int argc, char** argv)
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
 
+#ifdef TD_GMRES
+  if (argc != 5)
+    {
+      fprintf(stderr, "Usage: \"%s file.stk max_iter tolerance restart\"\n", argv[0]);
+      return EXIT_FAILURE;
+    }
+  int RESTART = atoi (argv[4]) ;
+#else
   if (argc != 4)
     {
       fprintf(stderr, "Usage: \"%s file.stk max_iter tolerance\"\n", argv[0]);
       return EXIT_FAILURE;
     }
+#endif
 
   MAX_ITER  = atoi (argv[2]) ;
   TOLERANCE = atof (argv[3]) ;
@@ -158,6 +183,9 @@ main(int argc, char** argv)
 
   TD_INIT (&stkd, &tdata, 300.00, delta_time) ;
 
+#ifdef TD_GMRES
+  printf("Using restart %d\n", RESTART) ;
+#endif
   printf("Using max %d iterations\n", MAX_ITER) ;
   printf("Using tolerance %.2e \n", TOLERANCE) ;
 
@@ -190,7 +218,13 @@ main(int argc, char** argv)
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
+    result = TD_SOLVE
+             (
+               &tdata, sim_time, &tolerance, &max_iter
+#ifdef TD_GMRES
+               ,RESTART
+#endif
+             ) ;
 
     if (result != 0)
     {
@@ -227,7 +261,13 @@ main(int argc, char** argv)
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
+    result = TD_SOLVE
+             (
+               &tdata, sim_time, &tolerance, &max_iter
+#ifdef TD_GMRES
+               ,RESTART
+#endif
+             ) ;
 
     if (result != 0)
     {
@@ -265,7 +305,13 @@ main(int argc, char** argv)
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
+    result = TD_SOLVE
+             (
+               &tdata, sim_time, &tolerance, &max_iter
+#ifdef TD_GMRES
+               ,RESTART
+#endif
+             ) ;
 
     if (result != 0)
     {
@@ -302,7 +348,13 @@ main(int argc, char** argv)
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
+    result = TD_SOLVE
+             (
+               &tdata, sim_time, &tolerance, &max_iter
+#ifdef TD_GMRES
+               ,RESTART
+#endif
+             ) ;
 
     if (result != 0)
     {
