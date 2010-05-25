@@ -1,13 +1,13 @@
 #include <stdlib.h>
 
 #include "stack_description.h"
-#include "thermal_data_bicg.h"
+#include "thermal_data_ir.h"
 
 #define MAX_ITER   2000
 #define TOLERANCE 1e-06
 
 void
-bicg_print_temps (struct BICGThermalData *tdata, struct StackDescription *stkd, double time)
+ir_print_temps (struct IRThermalData *tdata, struct StackDescription *stkd, double time)
 {
   int column ;
   int ncolumns = get_number_of_columns(stkd->Dimensions) ;
@@ -49,7 +49,7 @@ int
 main(int argc, char** argv)
 {
   struct StackDescription stkd ;
-  struct BICGThermalData  tdata ;
+  struct IRThermalData  tdata ;
 
   double delta_time = 0.00125 ;
   double sim_time ;
@@ -79,7 +79,7 @@ main(int argc, char** argv)
 
   print_stack_description (stdout, "", &stkd) ;
 
-  bicg_init_thermal_data (&stkd, &tdata, 300.00, delta_time) ;
+  ir_init_thermal_data (&stkd, &tdata, 300.00, delta_time) ;
 
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
@@ -90,7 +90,7 @@ main(int argc, char** argv)
    */
 
   insert_all_power_values (&stkd, powers) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  ir_fill_thermal_data (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -99,16 +99,16 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
+    ir_print_temps (&tdata, &stkd, time) ;
 #else
-    bicg_print_temps (&tdata, &stkd, 0.0) ;
+    ir_print_temps (&tdata, &stkd, 0.0) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
+    if (ir_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-        printf("\nBiCG failed !!!!!!!!!!\n") ;
+        printf("\nIR failed !!!!!!!!!!\n") ;
         goto exit ;
     }
 
@@ -123,7 +123,7 @@ main(int argc, char** argv)
    */
 
   change_coolant_flow_rate (&stkd, 0.7) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  ir_fill_thermal_data (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -132,16 +132,16 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
+    ir_print_temps (&tdata, &stkd, time) ;
 #else
-    bicg_print_temps (&tdata, &stkd, 0.10) ;
+    ir_print_temps (&tdata, &stkd, 0.10) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
+    if (ir_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-      printf("\nBiCG failed !!!!!!!!!!\n") ;
+      printf("\nIR failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 
@@ -157,7 +157,7 @@ main(int argc, char** argv)
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  ir_fill_thermal_data (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -166,16 +166,16 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
+    ir_print_temps (&tdata, &stkd, time) ;
 #else
-    bicg_print_temps (&tdata, &stkd, 0.20) ;
+    ir_print_temps (&tdata, &stkd, 0.20) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
+    if (ir_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-      printf("\nBiCG failed !!!!!!!!!!\n") ;
+      printf("\nIR failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 
@@ -190,7 +190,7 @@ main(int argc, char** argv)
    */
 
   change_coolant_flow_rate (&stkd, 1.4) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  ir_fill_thermal_data (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -199,16 +199,16 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
+    ir_print_temps (&tdata, &stkd, time) ;
 #else
-    bicg_print_temps (&tdata, &stkd, 0.30) ;
+    ir_print_temps (&tdata, &stkd, 0.30) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
+    if (ir_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-      printf("\nBiCG failed !!!!!!!!!!\n") ;
+      printf("\nIR failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 
@@ -217,12 +217,12 @@ main(int argc, char** argv)
 #ifdef DETAILS
   }
 #else
-    bicg_print_temps (&tdata, &stkd, 0.40) ;
+    ir_print_temps (&tdata, &stkd, 0.40) ;
 #endif
 
 exit :
 
-  bicg_free_thermal_data (&tdata) ;
+  ir_free_thermal_data (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;

@@ -61,7 +61,7 @@ main(int argc, char** argv)
   double time ;
   sim_time = delta_time ;
 #else
-  sim_time = 0.10 ; 
+  sim_time = 0.10 ;
 #endif
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
@@ -108,7 +108,7 @@ main(int argc, char** argv)
     max_iter = MAX_ITER ;
     if (bicgstab_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-        printf("BiCGStab failed !!!!!!!!!!\n") ;
+        printf("\nBiCGStab failed !!!!!!!!!!\n") ;
         goto exit ;
     }
 
@@ -141,7 +141,7 @@ main(int argc, char** argv)
     max_iter = MAX_ITER ;
     if (bicgstab_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-      printf("BiCGStab failed !!!!!!!!!!\n") ;
+      printf("\nBiCGStab failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 
@@ -175,7 +175,7 @@ main(int argc, char** argv)
     max_iter = MAX_ITER ;
     if (bicgstab_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-      printf("BiCGStab failed !!!!!!!!!!\n") ;
+      printf("\nBiCGStab failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 
@@ -208,7 +208,7 @@ main(int argc, char** argv)
     max_iter = MAX_ITER ;
     if (bicgstab_solve_system (&tdata, sim_time, &tolerance, &max_iter ) == 1)
     {
-      printf("BiCGStab failed !!!!!!!!!!\n") ;
+      printf("\nBiCGStab failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 
@@ -227,26 +227,3 @@ exit :
 
   return EXIT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

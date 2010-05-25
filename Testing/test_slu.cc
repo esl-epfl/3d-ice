@@ -55,7 +55,7 @@ main(int argc, char** argv)
   double time ;
   sim_time = delta_time ;
 #else
-  sim_time = 0.10 ; 
+  sim_time = 0.10 ;
 #endif
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
@@ -100,7 +100,7 @@ main(int argc, char** argv)
 
     if (slu_solve_system (&tdata, sim_time ) == 1)
     {
-        printf("BiCG failed !!!!!!!!!!\n") ;
+        printf("\nSLU failed !!!!!!!!!!\n") ;
         goto exit ;
     }
 #ifdef DETAILS
@@ -128,7 +128,7 @@ main(int argc, char** argv)
 
     if (slu_solve_system (&tdata, sim_time) == 1)
     {
-      printf("BiCG failed !!!!!!!!!!\n") ;
+      printf("\nSLU failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 #ifdef DETAILS
@@ -157,7 +157,7 @@ main(int argc, char** argv)
 
     if (slu_solve_system (&tdata, sim_time) == 1)
     {
-      printf("BiCG failed !!!!!!!!!!\n") ;
+      printf("\nSLU failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 #ifdef DETAILS
@@ -185,7 +185,7 @@ main(int argc, char** argv)
 
     if (slu_solve_system (&tdata, sim_time) == 1)
     {
-      printf("BiCG failed !!!!!!!!!!\n") ;
+      printf("\nSLU failed !!!!!!!!!!\n") ;
       goto exit ;
     }
 #ifdef DETAILS
@@ -201,26 +201,3 @@ exit :
 
   return EXIT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

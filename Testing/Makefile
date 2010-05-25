@@ -26,7 +26,8 @@ EXECS              = slu_small_step  slu_big_step          \
                      bicg_small_step bicg_big_step         \
                      bicgstab_small_step bicgstab_big_step \
                      cgs_small_step cgs_big_step           \
-                     gmres_small_step gmres_big_step
+                     gmres_small_step gmres_big_step       \
+                     ir_small_step ir_big_step
 
 
 all : $(EXECS)
@@ -109,6 +110,22 @@ gmres_small_step.o: test_gmres.cc
 	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 gmres_big_step.o: test_gmres.cc
+	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+################################################################################
+# Iterative Refinement #########################################################
+################################################################################
+
+ir_small_step: ir_small_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+ir_big_step: ir_big_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+ir_small_step.o: test_ir.cc
+	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+ir_big_step.o: test_ir.cc
 	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################

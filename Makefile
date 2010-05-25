@@ -40,7 +40,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/thermal_data_bicg.o           \
           Sources/thermal_data_bicgstab.o       \
           Sources/thermal_data_cgs.o            \
-          Sources/thermal_data_gmres.o
+          Sources/thermal_data_gmres.o          \
+          Sources/thermal_data_ir.o
 
 all: $(LIB)
 
@@ -175,6 +176,11 @@ Sources/thermal_data_gmres.o: Sources/thermal_data_gmres.c Include/thermal_data_
 
 ################################################################################
 
+Sources/thermal_data_ir.o: Sources/thermal_data_ir.c Include/thermal_data_ir.h
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
+
+################################################################################
+
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(LIB)
@@ -186,4 +192,3 @@ clean:
 	rm -f Sources/floorplan_parser.c
 	rm -f Sources/stack_description_scanner.c
 	rm -f Sources/stack_description_parser.c
-
