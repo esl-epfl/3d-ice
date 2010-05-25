@@ -59,6 +59,22 @@
   #define TD_SOLVE   ir_ilu_pre_solve_system
 #endif
 
+#ifdef TD_QMR
+  #define TD_INCLUDE "thermal_data_qmr.h"
+  #define TD_TYPE    QMRThermalData
+  #define TD_INIT    qmr_init_thermal_data
+  #define TD_FILL    qmr_fill_thermal_data
+  #define TD_FREE    qmr_free_thermal_data
+  #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
+
+  #ifdef TL_DIAGONAL_PRECONDITIONER
+    #define TD_SOLVE qmr_diag_pre_solve_system
+  #endif
+  #ifdef TL_ILU_PRECONDITIONER
+    #define TD_SOLVE qmr_ilu_pre_solve_system
+  #endif
+#endif
+
 #include "stack_description.h"
 #include TD_INCLUDE
 

@@ -55,10 +55,16 @@
   qmr_free_thermal_data  (struct QMRThermalData *tdata) ;
 
   int
-  qmr_solve_system        (struct QMRThermalData *tdata,
-                          double               total_time,
-                          double               *tolerance,
-                          int                  *max_iterations) ;
+  qmr_diag_pre_solve_system (struct QMRThermalData *tdata,
+                             double               total_time,
+                             double               *tolerance,
+                             int                  *max_iterations) ;
+
+  int
+  qmr_ilu_pre_solve_system (struct QMRThermalData *tdata,
+                            double               total_time,
+                            double               *tolerance,
+                            int                  *max_iterations) ;
 
   void
   qmr_print_system_matrix (struct QMRThermalData *tdata) ;
