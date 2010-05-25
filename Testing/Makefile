@@ -22,12 +22,16 @@ SL_LIBS            = -lmv -lsparse -lspblas -lm
 
 MV_INCLUDE         = -I$(SL_DIR)/mv/include
 
-EXECS              = slu_small_step  slu_big_step          \
-                     bicg_small_step bicg_big_step         \
-                     bicgstab_small_step bicgstab_big_step \
-                     cgs_small_step cgs_big_step           \
-                     gmres_small_step gmres_big_step       \
-                     ir_small_step ir_big_step             \
+SLU_EXECS          = slu_small_step slu_big_step
+
+BICG_EXECS         = bicg_diag_pre_small_step bicg_diag_pre_big_step \
+                     bicg_ilu_pre_small_step bicg_ilu_pre_big_step
+                     
+EXECS              = $(SLU_EXECS) $(BICG_EXECS) \
+                     bicgstab_small_step bicgstab_big_step           \
+                     cgs_small_step cgs_big_step                     \
+                     gmres_small_step gmres_big_step                 \
+                     ir_small_step ir_big_step                       \
                      qmr_small_step qmr_big_step
 
 
@@ -53,17 +57,29 @@ slu_big_step.o: test_slu.cc
 # Biconjugate Gradient #########################################################
 ################################################################################
 
-bicg_small_step: bicg_small_step.o
+bicg_diag_pre_small_step: bicg_diag_pre_small_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-bicg_big_step: bicg_big_step.o
+bicg_diag_pre_big_step: bicg_diag_pre_big_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-bicg_small_step.o: test_bicg.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicg_ilu_pre_small_step: bicg_ilu_pre_small_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-bicg_big_step.o: test_bicg.cc
-	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicg_ilu_pre_big_step: bicg_ilu_pre_big_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+bicg_diag_pre_small_step.o: test_bicg.cc
+	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+bicg_diag_pre_big_step.o: test_bicg.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+bicg_ilu_pre_small_step.o: test_bicg.cc
+	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+bicg_ilu_pre_big_step.o: test_bicg.cc
+	$(CPP) $(CPPFLAGS) -c -DTL_ILU_PRECONDITIONER $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
 # Biconjugate Gradient stabilized ##############################################

@@ -1,10 +1,8 @@
 #include <stdlib.h>
+#include <time.h>
 
 #include "stack_description.h"
 #include "thermal_data_bicg.h"
-
-#define MAX_ITER  15000
-#define TOLERANCE 1e-03
 
 void
 bicg_print_temps (struct BICGThermalData *tdata, struct StackDescription *stkd, double time)
@@ -54,8 +52,8 @@ main(int argc, char** argv)
   double delta_time = 0.00125 ;
   double sim_time ;
 
-  int max_iter ;
-  double tolerance ;
+  int max_iter, MAX_ITER ;
+  double tolerance, TOLERANCE ;
 
   int result ;
 
@@ -68,11 +66,14 @@ main(int argc, char** argv)
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
 
-  if (argc != 2)
+  if (argc != 4)
     {
-      fprintf(stderr, "Error: missing input file parameter.\n");
+      fprintf(stderr, "Usage: \"%s file.stk max_iter tolerance\"\n", argv[0]);
       return EXIT_FAILURE;
     }
+
+  MAX_ITER  = atoi (argv[2]) ;
+  TOLERANCE = atof (argv[3]) ;
 
   init_stack_description (&stkd) ;
 
@@ -83,9 +84,14 @@ main(int argc, char** argv)
 
   bicg_init_thermal_data (&stkd, &tdata, 300.00, delta_time) ;
 
+  printf("Using max %d iterations\n", MAX_ITER) ;
+  printf("Using tolerance %.2e \n", TOLERANCE) ;
+
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
+
+  clock_t time_start = clock();
 
   /*
    *  Insert first set of power values and update
@@ -108,7 +114,16 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    result = bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) ;
+
+#ifdef TL_DIAGONAL_PRECONDITIONER
+    result = bicg_diag_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+#ifdef TL_ILU_PRECONDITIONER
+    result = bicg_ilu_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+
     if (result != 0)
     {
         printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
@@ -142,7 +157,16 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    result = bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) ;
+
+#ifdef TL_DIAGONAL_PRECONDITIONER
+    result = bicg_diag_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+#ifdef TL_ILU_PRECONDITIONER
+    result = bicg_ilu_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+
     if (result != 0)
     {
         printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
@@ -177,7 +201,16 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    result = bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) ;
+
+#ifdef TL_DIAGONAL_PRECONDITIONER
+    result = bicg_diag_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+#ifdef TL_ILU_PRECONDITIONER
+    result = bicg_ilu_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+
     if (result != 0)
     {
         printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
@@ -211,7 +244,16 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    result = bicg_solve_system (&tdata, sim_time, &tolerance, &max_iter ) ;
+
+#ifdef TL_DIAGONAL_PRECONDITIONER
+    result = bicg_diag_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+#ifdef TL_ILU_PRECONDITIONER
+    result = bicg_ilu_pre_solve_system
+             (&tdata, sim_time, &tolerance, &max_iter ) ;
+#endif
+
     if (result != 0)
     {
         printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
@@ -225,6 +267,8 @@ main(int argc, char** argv)
 #else
     bicg_print_temps (&tdata, &stkd, 0.40) ;
 #endif
+
+  printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 
 exit :
 

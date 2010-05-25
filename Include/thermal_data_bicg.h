@@ -55,10 +55,22 @@
   bicg_free_thermal_data  (struct BICGThermalData *tdata) ;
 
   int
-  bicg_solve_system       (struct BICGThermalData *tdata,
-                           double                 total_time,
-                           double                 *tolerance,
-                           int                    *max_iterations) ;
+  bicg_diag_pre_solve_system
+  (
+    struct BICGThermalData *tdata,
+    double                 total_time,
+    double                 *tolerance,
+    int                    *max_iterations
+  ) ;
+
+  int
+  bicg_ilu_pre_solve_system
+  (
+    struct BICGThermalData *tdata,
+    double                 total_time,
+    double                 *tolerance,
+    int                    *max_iterations
+  ) ;
 
   void
   bicg_print_system_matrix (struct BICGThermalData *tdata) ;
