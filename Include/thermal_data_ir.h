@@ -55,10 +55,10 @@
   ir_free_thermal_data  (struct IRThermalData *tdata) ;
 
   int
-  ir_solve_system        (struct IRThermalData *tdata,
-                          double               total_time,
-                          double               *tolerance,
-                          int                  *max_iterations) ;
+  ir_ilu_pre_solve_system (struct IRThermalData *tdata,
+                           double               total_time,
+                           double               *tolerance,
+                           int                  *max_iterations) ;
 
   void
   ir_print_system_matrix (struct IRThermalData *tdata) ;

@@ -13,7 +13,7 @@
 
 #include "thermal_data_ir.h"
 
-#include "diagpre_double.h"
+#include "ilupre_double.h"
 #include "compcol_double.h"
 #include "mvblasd.h"
 #include "ir.h"
@@ -176,7 +176,7 @@ ir_fill_thermal_data
 /******************************************************************************/
 
 int
-ir_solve_system
+ir_ilu_pre_solve_system
 (
   struct IRThermalData  *tdata,
   double                 total_time,
@@ -197,7 +197,7 @@ ir_solve_system
       tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
     ) ;
 
-    DiagPreconditioner_double Preconditioner (A) ;
+    CompCol_ILUPreconditioner_double Preconditioner (A) ;
 
     VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
 

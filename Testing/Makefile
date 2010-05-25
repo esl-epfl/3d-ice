@@ -33,10 +33,11 @@ BICGSTAB_EXECS     = bicgstab_diag_pre_small_step bicgstab_diag_pre_big_step \
 CGS_EXECS          = cgs_diag_pre_small_step cgs_diag_pre_big_step \
                      cgs_ilu_pre_small_step cgs_ilu_pre_big_step
 
+IR_EXECS           = ir_ilu_pre_small_step ir_ilu_pre_big_step
+
 EXECS              = $(SLU_EXECS) $(BICG_EXECS) $(BICGSTAB_EXECS) \
-                     $(CGS_EXECS)                                 \
+                     $(CGS_EXECS) $(IR_EXECS)                     \
                      gmres_small_step gmres_big_step              \
-                     ir_small_step ir_big_step                    \
                      qmr_small_step qmr_big_step
 
 
@@ -162,17 +163,17 @@ gmres_big_step.o: test_gmres.cc
 # Iterative Refinement #########################################################
 ################################################################################
 
-ir_small_step: ir_small_step.o
+ir_ilu_pre_small_step: ir_ilu_pre_small_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-ir_big_step: ir_big_step.o
+ir_ilu_pre_big_step: ir_ilu_pre_big_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-ir_small_step.o: test_ir.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+ir_ilu_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_IR -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-ir_big_step.o: test_ir.cc
-	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+ir_ilu_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_IR $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
 # Quasi Minimal Residual #######################################################

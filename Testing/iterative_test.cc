@@ -49,6 +49,16 @@
   #endif
 #endif
 
+#ifdef TD_IR
+  #define TD_INCLUDE "thermal_data_ir.h"
+  #define TD_TYPE    IRThermalData
+  #define TD_INIT    ir_init_thermal_data
+  #define TD_FILL    ir_fill_thermal_data
+  #define TD_FREE    ir_free_thermal_data
+  #define TD_MESSAGE "\n%d: IR failed (%d - %.5e)\n"
+  #define TD_SOLVE   ir_ilu_pre_solve_system
+#endif
+
 #include "stack_description.h"
 #include TD_INCLUDE
 
