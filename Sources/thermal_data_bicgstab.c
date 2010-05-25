@@ -184,7 +184,7 @@ bicgstab_solve_system
   int                        *max_iterations
 )
 {
-  int counter, _max_iterations = *max_iterations ;
+  int result, counter, _max_iterations = *max_iterations ;
   double _tolerance = *tolerance;
 
   for (counter = 0 ; counter < tdata->SV_X.Size ; counter++)
@@ -206,9 +206,10 @@ bicgstab_solve_system
     _tolerance      = *tolerance ;
     _max_iterations = *max_iterations ;
 
-    if ( BiCGSTAB (A, x, B, Preconditioner, _max_iterations, _tolerance) == 1)
+    result = BiCGSTAB (A, x, B, Preconditioner, _max_iterations, _tolerance) ;
 
-      return 1 ;
+    if (result != 0)
+      return result ;
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
       tdata->Temperatures[counter] = x(counter) ;

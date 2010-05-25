@@ -3,8 +3,8 @@
 #include "stack_description.h"
 #include "thermal_data_gmres.h"
 
-#define MAX_ITER   2000
-#define TOLERANCE 1e-06
+#define MAX_ITER  15000
+#define TOLERANCE 1e-03
 
 void
 gmres_print_temps (struct GMRESThermalData *tdata, struct StackDescription *stkd, double time)
@@ -57,6 +57,8 @@ main(int argc, char** argv)
   int max_iter ;
   double tolerance ;
 
+  int result ;
+
 #ifdef DETAILS
   double time ;
   sim_time = delta_time ;
@@ -106,9 +108,10 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) == 1)
+    result = gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) ;
+    if (result != 0)
     {
-        printf("\nGMRES failed !!!!!!!!!!\n") ;
+        printf("\n%d: GMRES failed (%d - %.5e)\n",result, max_iter, tolerance) ;
         goto exit ;
     }
 
@@ -139,10 +142,11 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) == 1)
+    result = gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) ;
+    if (result != 0)
     {
-      printf("\nGMRES failed !!!!!!!!!!\n") ;
-      goto exit ;
+        printf("\n%d: GMRES failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        goto exit ;
     }
 
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
@@ -173,10 +177,11 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) == 1)
+    result = gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) ;
+    if (result != 0)
     {
-      printf("\nGMRES failed !!!!!!!!!!\n") ;
-      goto exit ;
+        printf("\n%d: GMRES failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        goto exit ;
     }
 
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
@@ -206,10 +211,11 @@ main(int argc, char** argv)
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
-    if (gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) == 1)
+    result = gmres_solve_system (&tdata, sim_time, &tolerance, &max_iter, 100 ) ;
+    if (result != 0)
     {
-      printf("\nGMRES failed !!!!!!!!!!\n") ;
-      goto exit ;
+        printf("\n%d: GMRES failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        goto exit ;
     }
 
     printf ("\t%d\t%e\n", max_iter, tolerance) ;

@@ -186,7 +186,7 @@ gmres_solve_system
   int                     restart
 )
 {
-  int counter, _max_iterations = *max_iterations ;
+  int result, counter, _max_iterations = *max_iterations ;
   double _tolerance = *tolerance;
 
   for (counter = 0 ; counter < tdata->SV_X.Size ; counter++)
@@ -210,9 +210,10 @@ gmres_solve_system
     _tolerance      = *tolerance ;
     _max_iterations = *max_iterations ;
 
-    if ( GMRES (A, x, B, Preconditioner, H, restart, _max_iterations, _tolerance) == 1)
+    result = GMRES (A, x, B, Preconditioner, H, restart, _max_iterations, _tolerance) ;
 
-      return 1 ;
+    if (result != 0)
+      return result ;
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
       tdata->Temperatures[counter] = x(counter) ;
