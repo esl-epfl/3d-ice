@@ -74,17 +74,17 @@ bicg_ilu_pre_small_step: bicg_ilu_pre_small_step.o
 bicg_ilu_pre_big_step: bicg_ilu_pre_big_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-bicg_diag_pre_small_step.o: test_bicg.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicg_diag_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICG -DTL_DIAGONAL_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-bicg_diag_pre_big_step.o: test_bicg.cc
-	$(CPP) $(CPPFLAGS) -c $< -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicg_diag_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICG -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-bicg_ilu_pre_small_step.o: test_bicg.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicg_ilu_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICG -DTL_ILU_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-bicg_ilu_pre_big_step.o: test_bicg.cc
-	$(CPP) $(CPPFLAGS) -c -DTL_ILU_PRECONDITIONER $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicg_ilu_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICG -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
 # Biconjugate Gradient stabilized ##############################################
@@ -102,17 +102,17 @@ bicgstab_ilu_pre_small_step: bicgstab_ilu_pre_small_step.o
 bicgstab_ilu_pre_big_step: bicgstab_ilu_pre_big_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-bicgstab_diag_pre_small_step.o: test_bicgstab.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicgstab_diag_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICGSTAB -DTL_DIAGONAL_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-bicgstab_diag_pre_big_step.o: test_bicgstab.cc
-	$(CPP) $(CPPFLAGS) -c $< -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicgstab_diag_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICGSTAB -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-bicgstab_ilu_pre_small_step.o: test_bicgstab.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicgstab_ilu_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICGSTAB -DTL_ILU_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-bicgstab_ilu_pre_big_step.o: test_bicgstab.cc
-	$(CPP) $(CPPFLAGS) -c -DTL_ILU_PRECONDITIONER $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+bicgstab_ilu_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_BICGSTAB -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
 # Conjugate Gradient Squared Method ############################################
@@ -130,17 +130,17 @@ cgs_ilu_pre_small_step: cgs_ilu_pre_small_step.o
 cgs_ilu_pre_big_step: cgs_ilu_pre_big_step.o
 	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
 
-cgs_diag_pre_small_step.o: test_cgs.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+cgs_diag_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_CGS -DTL_DIAGONAL_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-cgs_diag_pre_big_step.o: test_cgs.cc
-	$(CPP) $(CPPFLAGS) -c $< -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+cgs_diag_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_CGS -DTL_DIAGONAL_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-cgs_ilu_pre_small_step.o: test_cgs.cc
-	$(CPP) $(CPPFLAGS) -c $< -DDETAILS -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+cgs_ilu_pre_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_CGS -DTL_ILU_PRECONDITIONER -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
-cgs_ilu_pre_big_step.o: test_cgs.cc
-	$(CPP) $(CPPFLAGS) -c -DTL_ILU_PRECONDITIONER $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+cgs_ilu_pre_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< -DTD_CGS -DTL_ILU_PRECONDITIONER $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################
 # Generalized minimum Residual Method ##########################################

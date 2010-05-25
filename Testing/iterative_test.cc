@@ -1,11 +1,59 @@
 #include <stdlib.h>
 #include <time.h>
 
+#ifdef TD_BICG
+  #define TD_INCLUDE "thermal_data_bicg.h"
+  #define TD_TYPE    BICGThermalData
+  #define TD_INIT    bicg_init_thermal_data
+  #define TD_FILL    bicg_fill_thermal_data
+  #define TD_FREE    bicg_free_thermal_data
+  #define TD_MESSAGE "\n%d: BiCG failed (%d - %.5e)\n"
+
+  #ifdef TL_DIAGONAL_PRECONDITIONER
+    #define TD_SOLVE bicg_diag_pre_solve_system
+  #endif
+  #ifdef TL_ILU_PRECONDITIONER
+    #define TD_SOLVE bicg_ilu_pre_solve_system
+  #endif
+#endif
+
+#ifdef TD_BICGSTAB
+  #define TD_INCLUDE "thermal_data_bicgstab.h"
+  #define TD_TYPE    BICGStabThermalData
+  #define TD_INIT    bicgstab_init_thermal_data
+  #define TD_FILL    bicgstab_fill_thermal_data
+  #define TD_FREE    bicgstab_free_thermal_data
+  #define TD_MESSAGE "\n%d: BiCGStab failed (%d - %.5e)\n"
+
+  #ifdef TL_DIAGONAL_PRECONDITIONER
+    #define TD_SOLVE bicgstab_diag_pre_solve_system
+  #endif
+  #ifdef TL_ILU_PRECONDITIONER
+    #define TD_SOLVE bicgstab_ilu_pre_solve_system
+  #endif
+#endif
+
+#ifdef TD_CGS
+  #define TD_INCLUDE "thermal_data_cgs.h"
+  #define TD_TYPE    CGSThermalData
+  #define TD_INIT    cgs_init_thermal_data
+  #define TD_FILL    cgs_fill_thermal_data
+  #define TD_FREE    cgs_free_thermal_data
+  #define TD_MESSAGE "\n%d: CGS failed (%d - %.5e)\n"
+
+  #ifdef TL_DIAGONAL_PRECONDITIONER
+    #define TD_SOLVE cgs_diag_pre_solve_system
+  #endif
+  #ifdef TL_ILU_PRECONDITIONER
+    #define TD_SOLVE cgs_ilu_pre_solve_system
+  #endif
+#endif
+
 #include "stack_description.h"
-#include "thermal_data_bicg.h"
+#include TD_INCLUDE
 
 void
-bicg_print_temps (struct BICGThermalData *tdata, struct StackDescription *stkd, double time)
+print_temps (struct TD_TYPE *tdata, struct StackDescription *stkd, double time)
 {
   int column ;
   int ncolumns = get_number_of_columns(stkd->Dimensions) ;
@@ -47,7 +95,7 @@ int
 main(int argc, char** argv)
 {
   struct StackDescription stkd ;
-  struct BICGThermalData  tdata ;
+  struct TD_TYPE tdata ;
 
   double delta_time = 0.00125 ;
   double sim_time ;
@@ -82,7 +130,7 @@ main(int argc, char** argv)
 
   print_stack_description (stdout, "", &stkd) ;
 
-  bicg_init_thermal_data (&stkd, &tdata, 300.00, delta_time) ;
+  TD_INIT (&stkd, &tdata, 300.00, delta_time) ;
 
   printf("Using max %d iterations\n", MAX_ITER) ;
   printf("Using tolerance %.2e \n", TOLERANCE) ;
@@ -98,7 +146,7 @@ main(int argc, char** argv)
    */
 
   insert_all_power_values (&stkd, powers) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  TD_FILL (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -107,29 +155,26 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
+    print_temps (&tdata, &stkd, time) ;
 #else
-    bicg_print_temps (&tdata, &stkd, 0.0) ;
+    print_temps (&tdata, &stkd, 0.0) ;
+    printf ("\n") ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-#ifdef TL_DIAGONAL_PRECONDITIONER
-    result = bicg_diag_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
-#ifdef TL_ILU_PRECONDITIONER
-    result = bicg_ilu_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
+    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
 
     if (result != 0)
     {
-        printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        printf(TD_MESSAGE, result, max_iter, tolerance) ;
         goto exit ;
     }
 
+#ifndef DETAILS
+    print_temps (&tdata, &stkd, 0.10) ;
+#endif
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 
 #ifdef DETAILS
@@ -141,7 +186,7 @@ main(int argc, char** argv)
    */
 
   change_coolant_flow_rate (&stkd, 0.7) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  TD_FILL (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -150,29 +195,23 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
-#else
-    bicg_print_temps (&tdata, &stkd, 0.10) ;
+    print_temps (&tdata, &stkd, time) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-#ifdef TL_DIAGONAL_PRECONDITIONER
-    result = bicg_diag_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
-#ifdef TL_ILU_PRECONDITIONER
-    result = bicg_ilu_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
+    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
 
     if (result != 0)
     {
-        printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        printf(TD_MESSAGE, result, max_iter, tolerance) ;
         goto exit ;
     }
 
+#ifndef DETAILS
+    print_temps (&tdata, &stkd, 0.20) ;
+#endif
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 
 #ifdef DETAILS
@@ -185,7 +224,7 @@ main(int argc, char** argv)
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  TD_FILL (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -194,29 +233,23 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
-#else
-    bicg_print_temps (&tdata, &stkd, 0.20) ;
+    print_temps (&tdata, &stkd, time) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-#ifdef TL_DIAGONAL_PRECONDITIONER
-    result = bicg_diag_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
-#ifdef TL_ILU_PRECONDITIONER
-    result = bicg_ilu_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
+    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
 
     if (result != 0)
     {
-        printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        printf(TD_MESSAGE, result, max_iter, tolerance) ;
         goto exit ;
     }
 
+#ifndef DETAILS
+    print_temps (&tdata, &stkd, 0.30) ;
+#endif
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 
 #ifdef DETAILS
@@ -228,7 +261,7 @@ main(int argc, char** argv)
    */
 
   change_coolant_flow_rate (&stkd, 1.4) ;
-  bicg_fill_thermal_data (&stkd, &tdata) ;
+  TD_FILL (&stkd, &tdata) ;
 
   /*
    *  Solve for 0.1 seconds
@@ -237,42 +270,34 @@ main(int argc, char** argv)
 #ifdef DETAILS
   for (time = 0.00 ; time < 0.10 ; time += delta_time)
   {
-    bicg_print_temps (&tdata, &stkd, time) ;
-#else
-    bicg_print_temps (&tdata, &stkd, 0.30) ;
+    print_temps (&tdata, &stkd, time) ;
 #endif
 
     tolerance = TOLERANCE ;
     max_iter = MAX_ITER ;
 
-#ifdef TL_DIAGONAL_PRECONDITIONER
-    result = bicg_diag_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
-#ifdef TL_ILU_PRECONDITIONER
-    result = bicg_ilu_pre_solve_system
-             (&tdata, sim_time, &tolerance, &max_iter ) ;
-#endif
+    result = TD_SOLVE (&tdata, sim_time, &tolerance, &max_iter ) ;
 
     if (result != 0)
     {
-        printf("\n%d: BiCG failed (%d - %.5e)\n",result, max_iter, tolerance) ;
+        printf(TD_MESSAGE, result, max_iter, tolerance) ;
         goto exit ;
     }
 
+#ifndef DETAILS
+    print_temps (&tdata, &stkd, 0.40) ;
+#endif
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 
 #ifdef DETAILS
   }
-#else
-    bicg_print_temps (&tdata, &stkd, 0.40) ;
 #endif
 
   printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 
 exit :
 
-  bicg_free_thermal_data (&tdata) ;
+  TD_FREE (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;
