@@ -41,7 +41,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/thermal_data_bicgstab.o       \
           Sources/thermal_data_cgs.o            \
           Sources/thermal_data_gmres.o          \
-          Sources/thermal_data_ir.o
+          Sources/thermal_data_ir.o             \
+          Sources/thermal_data_qmr.o
 
 all: $(LIB)
 
@@ -177,6 +178,11 @@ Sources/thermal_data_gmres.o: Sources/thermal_data_gmres.c Include/thermal_data_
 ################################################################################
 
 Sources/thermal_data_ir.o: Sources/thermal_data_ir.c Include/thermal_data_ir.h
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
+
+################################################################################
+
+Sources/thermal_data_qmr.o: Sources/thermal_data_qmr.c Include/thermal_data_qmr.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $<
 
 ################################################################################

@@ -27,7 +27,8 @@ EXECS              = slu_small_step  slu_big_step          \
                      bicgstab_small_step bicgstab_big_step \
                      cgs_small_step cgs_big_step           \
                      gmres_small_step gmres_big_step       \
-                     ir_small_step ir_big_step
+                     ir_small_step ir_big_step             \
+                     qmr_small_step qmr_big_step
 
 
 all : $(EXECS)
@@ -126,6 +127,22 @@ ir_small_step.o: test_ir.cc
 	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ir_big_step.o: test_ir.cc
+	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+################################################################################
+# Quasi Minimal Residual #######################################################
+################################################################################
+
+qmr_small_step: qmr_small_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+qmr_big_step: qmr_big_step.o
+	$(CPP) $(CPPFLAGS) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ 
+
+qmr_small_step.o: test_qmr.cc
+	$(CPP) $(CPPFLAGS) -c $< -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@
+
+qmr_big_step.o: test_qmr.cc
 	$(CPP) $(CPPFLAGS) -c $< $(TL_INCLUDE) $(IML_INCLUDE) -o $@
 
 ################################################################################

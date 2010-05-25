@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/bicg_thermal_data.h"                                  *
+ * Header file "Include/thermal_data_bicg.h"                                  *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -17,7 +17,7 @@
 #include "system_vector.h"
 
 /******************************************************************************
- * "SLUThermalData"                                                           *
+ * "BICGThermalData"                                                          *
  ******************************************************************************/
 
   struct BICGThermalData

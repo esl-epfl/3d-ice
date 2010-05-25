@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/thermal_data_slu.h"                                   *
+ * Header file "Include/thermal_data_qmr.h"                                   *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,20 +8,19 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_SLU_THERMAL_DATA_H_
-#define _TL_SLU_THERMAL_DATA_H_
+#ifndef _TL_QMR_THERMAL_DATA_H_
+#define _TL_QMR_THERMAL_DATA_H_
 
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
 #include "system_vector.h"
-#include "slu_ddefs.h"
 
 /******************************************************************************
- * "SLUThermalData"                                                           *
+ * "QMRThermalData"                                                           *
  ******************************************************************************/
 
-  struct SLUThermalData
+  struct QMRThermalData
   {
     double              *Temperatures ;
     double              *Sources ;
@@ -34,47 +33,37 @@
 
     struct SystemMatrix SM_A ;
     struct SystemVector SV_B ;
-
-    SuperMatrix SLUMatrix_A ,
-                SLUMatrix_A_Permuted ,
-                SLUMatrix_B ,
-                SLUMatrix_L ,
-                SLUMatrix_U ;
-
-    SuperLUStat_t     SLU_Stat ;
-    superlu_options_t SLU_Options ;
-
-    int    SLU_Info ,
-           *SLU_PermutationMatrixR ,
-           *SLU_PermutationMatrixC ,
-           *SLU_Etree ;
+    struct SystemVector SV_X ;
 
   } ;
 
 /******************************************************************************/
 
   int
-  slu_init_thermal_data   (
-                           struct StackDescription *stkd,
-                           struct SLUThermalData   *tdata,
-                           enum MatrixStorage_t  storage,
-                           double           initial_temperature,
-                           double           delta_time
+  qmr_init_thermal_data   (
+                          struct StackDescription *stkd,
+                          struct QMRThermalData    *tdata,
+                          double                  initial_temperature,
+                          double                  delta_time
                           ) ;
 
   int
-  slu_fill_thermal_data  (struct StackDescription *stkd, struct SLUThermalData *tdata) ;
+  qmr_fill_thermal_data  (struct StackDescription *stkd,
+                         struct QMRThermalData *tdata) ;
 
   void
-  slu_free_thermal_data  (struct SLUThermalData *tdata) ;
+  qmr_free_thermal_data  (struct QMRThermalData *tdata) ;
 
   int
-  slu_solve_system       (struct SLUThermalData *tdata, double total_time) ;
+  qmr_solve_system        (struct QMRThermalData *tdata,
+                          double               total_time,
+                          double               *tolerance,
+                          int                  *max_iterations) ;
 
   void
-  slu_print_system_matrix (struct SLUThermalData *tdata) ;
+  qmr_print_system_matrix (struct QMRThermalData *tdata) ;
 
   void
-  slu_print_sources       (struct SLUThermalData *tdata) ;
+  qmr_print_sources       (struct QMRThermalData *tdata) ;
 
-#endif /* _TL_SLU_THERMAL_DATA_H_ */
+#endif /* _TL_QMR_THERMAL_DATA_H_ */

@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/thermal_data_bicgstab.c"                              *
+ * Source file "Sources/thermal_data_qmr.c"                                   *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -11,12 +11,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "thermal_data_bicgstab.h"
+#include "thermal_data_qmr.h"
 
 #include "diagpre_double.h"
 #include "compcol_double.h"
 #include "mvblasd.h"
-#include "bicgstab.h"
+#include "qmr.h"
 
 static
 void
@@ -30,12 +30,12 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-bicgstab_init_thermal_data
+qmr_init_thermal_data
 (
-  struct StackDescription    *stkd,
-  struct BICGStabThermalData *tdata,
-  double                     initial_temperature,
-  double                     delta_time
+  struct StackDescription *stkd,
+  struct QMRThermalData   *tdata,
+  double                  initial_temperature,
+  double                  delta_time
 )
 {
   if (tdata == NULL) return 0 ;
@@ -115,7 +115,7 @@ sources_fail :
 /******************************************************************************/
 
 void
-bicgstab_free_thermal_data (struct BICGStabThermalData *tdata)
+qmr_free_thermal_data (struct QMRThermalData *tdata)
 {
   free (tdata->Temperatures) ;
   free (tdata->Sources) ;
@@ -132,10 +132,10 @@ bicgstab_free_thermal_data (struct BICGStabThermalData *tdata)
 /******************************************************************************/
 
 int
-bicgstab_fill_thermal_data
+qmr_fill_thermal_data
 (
-  struct StackDescription    *stkd,
-  struct BICGStabThermalData *tdata
+  struct StackDescription *stkd,
+  struct QMRThermalData   *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -176,12 +176,12 @@ bicgstab_fill_thermal_data
 /******************************************************************************/
 
 int
-bicgstab_solve_system
+qmr_solve_system
 (
-  struct BICGStabThermalData *tdata,
-  double                     total_time,
-  double                     *tolerance,
-  int                        *max_iterations
+  struct QMRThermalData  *tdata,
+  double                 total_time,
+  double                 *tolerance,
+  int                    *max_iterations
 )
 {
   int counter, _max_iterations = *max_iterations ;
@@ -206,7 +206,8 @@ bicgstab_solve_system
     _tolerance      = *tolerance ;
     _max_iterations = *max_iterations ;
 
-    if ( BiCGSTAB (A, x, B, Preconditioner, _max_iterations, _tolerance) == 1)
+    if ( QMR (A, x, B, Preconditioner, Preconditioner,
+              _max_iterations, _tolerance) == 1)
 
       return 1 ;
 
@@ -231,22 +232,22 @@ bicgstab_solve_system
 /******************************************************************************/
 
 void
-bicgstab_print_system_matrix
+qmr_print_system_matrix
 (
-  struct BICGStabThermalData *tdata
+  struct QMRThermalData *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "bicgstab_sm_ccs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "bicgstab_sm_ccs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "bicgstab_sm_ccs_values.txt") ;
+    print_system_matrix_columns(&tdata->SM_A, "qmr_sm_ccs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "qmr_sm_ccs_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "qmr_sm_ccs_values.txt") ;
   }
   else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "bicgstab_sm_crs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "bicgstab_sm_crs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "bicgstab_sm_crs_values.txt") ;
+    print_system_matrix_columns(&tdata->SM_A, "qmr_sm_crs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SM_A, "qmr_sm_crs_rows.txt") ;
+    print_system_matrix_values (&tdata->SM_A, "qmr_sm_crs_values.txt") ;
   }
   else
     fprintf (stderr, "Matrix format unknown\n") ;
@@ -257,9 +258,9 @@ bicgstab_print_system_matrix
 /******************************************************************************/
 
 void
-bicgstab_print_sources
+qmr_print_sources
 (
-  struct BICGStabThermalData *tdata
+  struct QMRThermalData *tdata
 )
 {
   int counter ;

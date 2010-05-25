@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/data.c"                                               *
+ * Source file "Sources/thermal_data_gmres.c"                                 *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -198,7 +198,7 @@ gmres_solve_system
       tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
       tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
     ) ;
- 
+
     MATRIX_double H(restart+1, restart, 0.0);
 
     DiagPreconditioner_double Preconditioner (A) ;
