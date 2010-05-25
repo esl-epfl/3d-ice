@@ -55,10 +55,22 @@
   bicgstab_free_thermal_data  (struct BICGStabThermalData *tdata) ;
 
   int
-  bicgstab_solve_system       (struct BICGStabThermalData *tdata,
-                               double total_time,
-                               double *tolerance,
-                               int    *max_iterations) ;
+  bicgstab_diag_pre_solve_system
+  (
+    struct BICGStabThermalData *tdata,
+    double total_time,
+    double *tolerance,
+    int    *max_iterations
+  ) ;
+
+  int
+  bicgstab_ilu_pre_solve_system
+  (
+    struct BICGStabThermalData *tdata,
+    double total_time,
+    double *tolerance,
+    int    *max_iterations
+  ) ;
 
   void
   bicgstab_print_system_matrix (struct BICGStabThermalData *tdata) ;
