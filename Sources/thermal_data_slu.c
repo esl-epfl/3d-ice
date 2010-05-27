@@ -283,6 +283,7 @@ slu_solve_system
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
+
     dgstrs
     (
       NOTRANS,

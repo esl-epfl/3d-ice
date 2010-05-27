@@ -187,22 +187,22 @@ bicg_diag_pre_solve_system
   int result, counter, _max_iterations = *max_iterations ;
   double _tolerance = *tolerance;
 
-  for (counter = 0 ; counter < tdata->SV_X.Size ; counter++)
-    tdata->SV_X.Values[counter] = tdata->Temperatures[counter] ;
+  CompCol_Mat_double A (
+    tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
+    tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
+  ) ;
+
+  DiagPreconditioner_double Preconditioner (A) ;
+
+  VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
+
+  VECTOR_double x (tdata->SV_B.Size) ;
+
+  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    x(counter) = tdata->Temperatures[counter] ;
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
-    CompCol_Mat_double A (
-      tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
-      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
-    ) ;
-
-    DiagPreconditioner_double        Preconditioner (A) ;
-
-    VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
-
-    VECTOR_double x (tdata->SV_X.Values, tdata->SV_X.Size) ;
-
     _tolerance      = *tolerance ;
     _max_iterations = *max_iterations ;
 
@@ -212,14 +212,16 @@ bicg_diag_pre_solve_system
       return result ;
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    {
       tdata->Temperatures[counter] = x(counter) ;
 
-    fill_system_vector (
-      &tdata->SV_B,
-      tdata->Sources, tdata->Capacities, tdata->Temperatures
-    ) ;
-
+      B(counter) = tdata->Sources[counter]
+                   + tdata->Capacities[counter] * x(counter) ;
+    }
   }
+
+  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    tdata->SV_B.Values[counter] = B(counter) ;
 
   *max_iterations = _max_iterations ;
   *tolerance      = _tolerance ;
@@ -243,22 +245,22 @@ bicg_ilu_pre_solve_system
   int result, counter, _max_iterations = *max_iterations ;
   double _tolerance = *tolerance;
 
-  for (counter = 0 ; counter < tdata->SV_X.Size ; counter++)
-    tdata->SV_X.Values[counter] = tdata->Temperatures[counter] ;
+  CompCol_Mat_double A (
+    tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
+    tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
+  ) ;
+
+  CompCol_ILUPreconditioner_double Preconditioner (A) ;
+
+  VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
+
+  VECTOR_double x (tdata->SV_B.Size) ;
+
+  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    x(counter) = tdata->Temperatures[counter] ;
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
-    CompCol_Mat_double A (
-      tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
-      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
-    ) ;
-
-    CompCol_ILUPreconditioner_double Preconditioner (A) ;
-
-    VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
-
-    VECTOR_double x (tdata->SV_X.Values, tdata->SV_X.Size) ;
-
     _tolerance      = *tolerance ;
     _max_iterations = *max_iterations ;
 
@@ -268,14 +270,16 @@ bicg_ilu_pre_solve_system
       return result ;
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    {
       tdata->Temperatures[counter] = x(counter) ;
 
-    fill_system_vector (
-      &tdata->SV_B,
-      tdata->Sources, tdata->Capacities, tdata->Temperatures
-    ) ;
-
+      B(counter) = tdata->Sources[counter]
+                   + tdata->Capacities[counter] * x(counter) ;
+    }
   }
+
+  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    tdata->SV_B.Values[counter] = B(counter) ;
 
   *max_iterations = _max_iterations ;
   *tolerance      = _tolerance ;

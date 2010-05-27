@@ -1,7 +1,15 @@
-#include <stdlib.h>
-#include <time.h>
+#if defined SLU
 
-#ifdef TD_BICG
+  #define TD_INCLUDE "thermal_data_slu.h"
+  #define TD_TYPE    SLUThermalData
+  #define TD_INIT    slu_init_thermal_data
+  #define TD_FILL    slu_fill_thermal_data
+  #define TD_FREE    slu_free_thermal_data
+  #define TD_MESSAGE "\n%d: SLU failed\n"
+  #define TD_SOLVE   slu_solve_system
+
+#elif defined BICG
+
   #define TD_INCLUDE "thermal_data_bicg.h"
   #define TD_TYPE    BICGThermalData
   #define TD_INIT    bicg_init_thermal_data
@@ -9,15 +17,16 @@
   #define TD_FREE    bicg_free_thermal_data
   #define TD_MESSAGE "\n%d: BiCG failed (%d - %.5e)\n"
 
-  #ifdef TL_DIAGONAL_PRECONDITIONER
+  #if defined DIAGONAL
     #define TD_SOLVE bicg_diag_pre_solve_system
-  #endif
-  #ifdef TL_ILU_PRECONDITIONER
+  #elif defined ILU
     #define TD_SOLVE bicg_ilu_pre_solve_system
+  #else
+    #error Wrong BICG preconditioner
   #endif
-#endif
 
-#ifdef TD_BICGSTAB
+#elif defined BICGSTAB
+
   #define TD_INCLUDE "thermal_data_bicgstab.h"
   #define TD_TYPE    BICGStabThermalData
   #define TD_INIT    bicgstab_init_thermal_data
@@ -25,15 +34,16 @@
   #define TD_FREE    bicgstab_free_thermal_data
   #define TD_MESSAGE "\n%d: BiCGStab failed (%d - %.5e)\n"
 
-  #ifdef TL_DIAGONAL_PRECONDITIONER
+  #if defined DIAGONAL
     #define TD_SOLVE bicgstab_diag_pre_solve_system
-  #endif
-  #ifdef TL_ILU_PRECONDITIONER
+  #elif defined ILU
     #define TD_SOLVE bicgstab_ilu_pre_solve_system
+  #else
+    #error Wrong BICGSTAB preconditioner
   #endif
-#endif
 
-#ifdef TD_CGS
+#elif defined CGS
+
   #define TD_INCLUDE "thermal_data_cgs.h"
   #define TD_TYPE    CGSThermalData
   #define TD_INIT    cgs_init_thermal_data
@@ -41,15 +51,16 @@
   #define TD_FREE    cgs_free_thermal_data
   #define TD_MESSAGE "\n%d: CGS failed (%d - %.5e)\n"
 
-  #ifdef TL_DIAGONAL_PRECONDITIONER
+  #if defined DIAGONAL
     #define TD_SOLVE cgs_diag_pre_solve_system
-  #endif
-  #ifdef TL_ILU_PRECONDITIONER
+  #elif defined ILU
     #define TD_SOLVE cgs_ilu_pre_solve_system
+  #else
+    #error Wrong CGS preconditioner
   #endif
-#endif
 
-#ifdef TD_GMRES
+#elif defined GMRES
+
   #define TD_INCLUDE "thermal_data_gmres.h"
   #define TD_TYPE    GMRESThermalData
   #define TD_INIT    gmres_init_thermal_data
@@ -57,15 +68,16 @@
   #define TD_FREE    gmres_free_thermal_data
   #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
 
-  #ifdef TL_DIAGONAL_PRECONDITIONER
+  #if defined DIAGONAL
     #define TD_SOLVE gmres_diag_pre_solve_system
-  #endif
-  #ifdef TL_ILU_PRECONDITIONER
+  #elif defined ILU
     #define TD_SOLVE gmres_ilu_pre_solve_system
+  #else
+    #error Wrong GMRES preconditioner
   #endif
-#endif
 
-#ifdef TD_IR
+#elif defined IR
+
   #define TD_INCLUDE "thermal_data_ir.h"
   #define TD_TYPE    IRThermalData
   #define TD_INIT    ir_init_thermal_data
@@ -73,9 +85,9 @@
   #define TD_FREE    ir_free_thermal_data
   #define TD_MESSAGE "\n%d: IR failed (%d - %.5e)\n"
   #define TD_SOLVE   ir_ilu_pre_solve_system
-#endif
 
-#ifdef TD_QMR
+#elif defined QMR
+
   #define TD_INCLUDE "thermal_data_qmr.h"
   #define TD_TYPE    QMRThermalData
   #define TD_INIT    qmr_init_thermal_data
@@ -83,19 +95,37 @@
   #define TD_FREE    qmr_free_thermal_data
   #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
 
-  #ifdef TL_DIAGONAL_PRECONDITIONER
+  #if defined DIAGONAL
     #define TD_SOLVE qmr_diag_pre_solve_system
-  #endif
-  #ifdef TL_ILU_PRECONDITIONER
+  #elif defined ILU
     #define TD_SOLVE qmr_ilu_pre_solve_system
+  #else
+    #error Wrong QMR preconditioner
   #endif
+
+#else
+
+  #error Wrong SOLVER type
+
 #endif
 
+#include <time.h>
 #include "stack_description.h"
 #include TD_INCLUDE
 
+#if defined SLU
+  #define TEMP_STRING "%.5f  %.5f  %.5f  %.5f\n"
+#else
+  #define TEMP_STRING "%.5f  %.5f  %.5f  %.5f"
+#endif
+
 void
-print_temps (struct TD_TYPE *tdata, struct StackDescription *stkd, double time)
+print_temps
+(
+  struct TD_TYPE          *tdata,
+  struct StackDescription *stkd ,
+  double                  time
+)
 {
   int column ;
   int ncolumns = get_number_of_columns(stkd->Dimensions) ;
@@ -128,9 +158,85 @@ print_temps (struct TD_TYPE *tdata, struct StackDescription *stkd, double time)
   tdie_3_row_099 /= ncolumns ;
   tdie_3_row_100 /= ncolumns ;
 
-  printf ("%.5f  %.5f  %.5f  %.5f", time, (tdie_1_row_099 + tdie_1_row_100)/2.0,
-                                          (tdie_2_row_099 + tdie_2_row_100)/2.0,
-                                          (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
+  printf (TEMP_STRING, time, (tdie_1_row_099 + tdie_1_row_100)/2.0,
+                             (tdie_2_row_099 + tdie_2_row_100)/2.0,
+                             (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
+}
+
+#if !defined SLU
+  int    MAX_ITER ;
+  double TOLERANCE ;
+#endif
+
+#if defined GMRES
+  int RESTART ;
+#endif
+
+int
+simulate
+(
+  struct TD_TYPE          *tdata,
+  struct StackDescription *stkd ,
+  double                  sim_time ,
+  double                  delta_time
+)
+{
+  int result ;
+
+#if !defined DETAILS
+  static double print_time = sim_time ;
+  delta_time = sim_time ;
+#endif
+
+#if defined DETAILS
+  for (double time = delta_time ; time <= sim_time ; time += delta_time)
+  {
+#endif
+
+#if defined SLU
+
+    result = TD_SOLVE (tdata, delta_time) ;
+    if (result != 0)
+    {
+      printf(TD_MESSAGE, result) ;
+      return result ;
+    }
+
+#else
+
+    double tolerance = TOLERANCE ;
+    int max_iter = MAX_ITER ;
+
+  #if defined GMRES
+    result = TD_SOLVE (tdata, delta_time, &tolerance, &max_iter, RESTART) ;
+  #else
+    result = TD_SOLVE (tdata, delta_time, &tolerance, &max_iter) ;
+  #endif
+
+    if (result != 0)
+    {
+      printf(TD_MESSAGE, result, max_iter, tolerance) ;
+      return result ;
+    }
+
+#endif
+
+#if defined DETAILS
+    print_temps (tdata, stkd, time) ;
+#else
+    print_temps (tdata, stkd, print_time) ;
+    print_time += sim_time ;
+#endif
+
+#if !defined SLU
+    printf ("\t%d\t%e\n", max_iter, tolerance) ;
+#endif
+
+#if defined DETAILS
+  }
+#endif
+
+  return 0 ;
 }
 
 int
@@ -140,236 +246,93 @@ main(int argc, char** argv)
   struct TD_TYPE tdata ;
 
   double delta_time = 0.00125 ;
-  double sim_time ;
-
-  int max_iter, MAX_ITER ;
-  double tolerance, TOLERANCE ;
-
-  int result ;
-
-#ifdef DETAILS
-  double time ;
-  sim_time = delta_time ;
-#else
-  sim_time = 0.10 ;
-#endif
+  double sim_time   = 0.10000 ;
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
 
-#ifdef TD_GMRES
-  if (argc != 5)
+#if defined SLU
+  if (argc != 2)
     {
-      fprintf(stderr, "Usage: \"%s file.stk max_iter tolerance restart\"\n", argv[0]);
+      fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
       return EXIT_FAILURE;
     }
-  int RESTART = atoi (argv[4]) ;
+#elif defined GMRES
+  if (argc != 5)
+    {
+      fprintf(stderr,
+        "Usage: \"%s file.stk max_iter tolerance restart\"\n", argv[0]);
+      return EXIT_FAILURE;
+    }
 #else
   if (argc != 4)
     {
-      fprintf(stderr, "Usage: \"%s file.stk max_iter tolerance\"\n", argv[0]);
+      fprintf(stderr,
+        "Usage: \"%s file.stk max_iter tolerance\"\n", argv[0]);
       return EXIT_FAILURE;
     }
 #endif
 
+#if !defined SLU
   MAX_ITER  = atoi (argv[2]) ;
+  printf("Using max %d iterations\n", MAX_ITER) ;
   TOLERANCE = atof (argv[3]) ;
+  printf("Using tolerance %.2e \n", TOLERANCE) ;
+#endif
+
+#if defined GMRES
+  RESTART = atoi (argv[4]) ;
+  printf("Using restart %d\n", RESTART) ;
+#endif
 
   init_stack_description (&stkd) ;
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
+
     return EXIT_FAILURE ;
 
   print_stack_description (stdout, "", &stkd) ;
 
+#if defined SLU
+  TD_INIT (&stkd, &tdata, TL_CCS_MATRIX, 300.00, delta_time) ;
+#else
   TD_INIT (&stkd, &tdata, 300.00, delta_time) ;
-
-#ifdef TD_GMRES
-  printf("Using restart %d\n", RESTART) ;
 #endif
-  printf("Using max %d iterations\n", MAX_ITER) ;
-  printf("Using tolerance %.2e \n", TOLERANCE) ;
 
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
+
+  print_temps (&tdata, &stkd, 0.0) ;
+#if !defined SLU
+  printf ("\n") ;
+#endif
 
   clock_t time_start = clock();
-
-  /*
-   *  Insert first set of power values and update
-   */
 
   insert_all_power_values (&stkd, powers) ;
   TD_FILL (&stkd, &tdata) ;
 
-  /*
-   *  Solve for 0.1 seconds
-   */
-
-#ifdef DETAILS
-  for (time = 0.00 ; time < 0.10 ; time += delta_time)
-  {
-    print_temps (&tdata, &stkd, time) ;
-#else
-    print_temps (&tdata, &stkd, 0.0) ;
-    printf ("\n") ;
-#endif
-
-    tolerance = TOLERANCE ;
-    max_iter = MAX_ITER ;
-
-    result = TD_SOLVE
-             (
-               &tdata, sim_time, &tolerance, &max_iter
-#ifdef TD_GMRES
-               ,RESTART
-#endif
-             ) ;
-
-    if (result != 0)
-    {
-        printf(TD_MESSAGE, result, max_iter, tolerance) ;
-        goto exit ;
-    }
-
-#ifndef DETAILS
-    print_temps (&tdata, &stkd, 0.10) ;
-#endif
-    printf ("\t%d\t%e\n", max_iter, tolerance) ;
-
-#ifdef DETAILS
-  }
-#endif
-
-  /*
-   *  Change coolant flow rate and update
-   */
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
+    goto exit ;
 
   change_coolant_flow_rate (&stkd, 0.7) ;
   TD_FILL (&stkd, &tdata) ;
 
-  /*
-   *  Solve for 0.1 seconds
-   */
-
-#ifdef DETAILS
-  for (time = 0.00 ; time < 0.10 ; time += delta_time)
-  {
-    print_temps (&tdata, &stkd, time) ;
-#endif
-
-    tolerance = TOLERANCE ;
-    max_iter = MAX_ITER ;
-
-    result = TD_SOLVE
-             (
-               &tdata, sim_time, &tolerance, &max_iter
-#ifdef TD_GMRES
-               ,RESTART
-#endif
-             ) ;
-
-    if (result != 0)
-    {
-        printf(TD_MESSAGE, result, max_iter, tolerance) ;
-        goto exit ;
-    }
-
-#ifndef DETAILS
-    print_temps (&tdata, &stkd, 0.20) ;
-#endif
-    printf ("\t%d\t%e\n", max_iter, tolerance) ;
-
-#ifdef DETAILS
-  }
-#endif
-
-  /*
-   *  Insert second set of power values and update
-   */
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
+    goto exit ;
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
   TD_FILL (&stkd, &tdata) ;
 
-  /*
-   *  Solve for 0.1 seconds
-   */
-
-#ifdef DETAILS
-  for (time = 0.00 ; time < 0.10 ; time += delta_time)
-  {
-    print_temps (&tdata, &stkd, time) ;
-#endif
-
-    tolerance = TOLERANCE ;
-    max_iter = MAX_ITER ;
-
-    result = TD_SOLVE
-             (
-               &tdata, sim_time, &tolerance, &max_iter
-#ifdef TD_GMRES
-               ,RESTART
-#endif
-             ) ;
-
-    if (result != 0)
-    {
-        printf(TD_MESSAGE, result, max_iter, tolerance) ;
-        goto exit ;
-    }
-
-#ifndef DETAILS
-    print_temps (&tdata, &stkd, 0.30) ;
-#endif
-    printf ("\t%d\t%e\n", max_iter, tolerance) ;
-
-#ifdef DETAILS
-  }
-#endif
-
-  /*
-   *  Change coolant flow rate and update
-   */
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
+    goto exit ;
 
   change_coolant_flow_rate (&stkd, 1.4) ;
   TD_FILL (&stkd, &tdata) ;
 
-  /*
-   *  Solve for 0.1 seconds
-   */
-
-#ifdef DETAILS
-  for (time = 0.00 ; time < 0.10 ; time += delta_time)
-  {
-    print_temps (&tdata, &stkd, time) ;
-#endif
-
-    tolerance = TOLERANCE ;
-    max_iter = MAX_ITER ;
-
-    result = TD_SOLVE
-             (
-               &tdata, sim_time, &tolerance, &max_iter
-#ifdef TD_GMRES
-               ,RESTART
-#endif
-             ) ;
-
-    if (result != 0)
-    {
-        printf(TD_MESSAGE, result, max_iter, tolerance) ;
-        goto exit ;
-    }
-
-#ifndef DETAILS
-    print_temps (&tdata, &stkd, 0.40) ;
-#endif
-    printf ("\t%d\t%e\n", max_iter, tolerance) ;
-
-#ifdef DETAILS
-  }
-#endif
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
+    goto exit ;
 
   printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 
