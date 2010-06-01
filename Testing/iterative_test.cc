@@ -126,6 +126,7 @@ print_temps
   struct StackDescription *stkd ,
   double                  time
 )
+#if defined PRINT_TEMPS
 {
   int column ;
   int ncolumns = get_number_of_columns(stkd->Dimensions) ;
@@ -162,6 +163,9 @@ print_temps
                              (tdie_2_row_099 + tdie_2_row_100)/2.0,
                              (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
 }
+#else
+{ }
+#endif
 
 #if !defined SLU
   int    MAX_ITER ;
@@ -228,7 +232,7 @@ simulate
     print_time += sim_time ;
 #endif
 
-#if !defined SLU
+#if defined PRINT_TEMPS && !defined SLU
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 #endif
 
