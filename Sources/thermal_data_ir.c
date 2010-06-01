@@ -176,7 +176,7 @@ ir_fill_thermal_data
 /******************************************************************************/
 
 int
-ir_ilu_pre_solve_system
+ir_solve_system
 (
   struct IRThermalData  *tdata,
   double                 total_time,

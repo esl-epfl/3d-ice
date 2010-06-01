@@ -24,22 +24,17 @@ MV_INCLUDE         = -I$(SL_DIR)/mv/include
 
 SLU_EXECS          = slu_small_step slu_big_step
 
-BICG_EXECS         = bicg_diag_pre_small_step bicg_diag_pre_big_step \
-                     bicg_ilu_pre_small_step bicg_ilu_pre_big_step
+BICG_EXECS         = bicg_small_step bicg_big_step
 
-BICGSTAB_EXECS     = bicgstab_diag_pre_small_step bicgstab_diag_pre_big_step \
-                     bicgstab_ilu_pre_small_step bicgstab_ilu_pre_big_step
+BICGSTAB_EXECS     = bicgstab_small_step bicgstab_big_step
 
-CGS_EXECS          = cgs_diag_pre_small_step cgs_diag_pre_big_step \
-                     cgs_ilu_pre_small_step cgs_ilu_pre_big_step
+CGS_EXECS          = cgs_small_step cgs_big_step 
 
-GMRES_EXECS        = gmres_diag_pre_small_step gmres_diag_pre_big_step \
-                     gmres_ilu_pre_small_step gmres_ilu_pre_big_step
+GMRES_EXECS        = gmres_small_step gmres_big_step
 
-IR_EXECS           = ir_ilu_pre_small_step ir_ilu_pre_big_step
+IR_EXECS           = ir_small_step ir_big_step
 
-QMR_EXECS          = qmr_diag_pre_small_step qmr_diag_pre_big_step \
-                     qmr_ilu_pre_small_step qmr_ilu_pre_big_step
+QMR_EXECS          = qmr_small_step qmr_big_step
 
 EXECS              = $(SLU_EXECS) $(BICG_EXECS) $(BICGSTAB_EXECS) \
                      $(CGS_EXECS) $(GMRES_EXECS) $(IR_EXECS) $(QMR_EXECS)
@@ -66,157 +61,97 @@ slu_big_step.o: iterative_test.cc
 # Biconjugate Gradient #########################################################
 ################################################################################
 
-bicg_diag_pre_small_step: bicg_diag_pre_small_step.o
+bicg_small_step: bicg_small_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-bicg_diag_pre_big_step: bicg_diag_pre_big_step.o
+bicg_big_step: bicg_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-bicg_ilu_pre_small_step: bicg_ilu_pre_small_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
+bicg_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-bicg_ilu_pre_big_step: bicg_ilu_pre_big_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
-
-bicg_diag_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DDIAGONAL -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-bicg_diag_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DDIAGONAL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-bicg_ilu_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DILU -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-bicg_ilu_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DILU $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+bicg_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 # Biconjugate Gradient stabilized ##############################################
 ################################################################################
 
-bicgstab_diag_pre_small_step: bicgstab_diag_pre_small_step.o
+bicgstab_small_step: bicgstab_small_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE) 
 
-bicgstab_diag_pre_big_step: bicgstab_diag_pre_big_step.o
+bicgstab_big_step: bicgstab_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-bicgstab_ilu_pre_small_step: bicgstab_ilu_pre_small_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
+bicgstab_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-bicgstab_ilu_pre_big_step: bicgstab_ilu_pre_big_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
-
-bicgstab_diag_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DDIAGONAL -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-bicgstab_diag_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DDIAGONAL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-bicgstab_ilu_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DILU -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-bicgstab_ilu_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DILU $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+bicgstab_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 # Conjugate Gradient Squared Method ############################################
 ################################################################################
 
-cgs_diag_pre_small_step: cgs_diag_pre_small_step.o
+cgs_small_step: cgs_small_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-cgs_diag_pre_big_step: cgs_diag_pre_big_step.o
+cgs_big_step: cgs_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-cgs_ilu_pre_small_step: cgs_ilu_pre_small_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
+cgs_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-cgs_ilu_pre_big_step: cgs_ilu_pre_big_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
-
-cgs_diag_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DDIAGONAL -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-cgs_diag_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DDIAGONAL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-cgs_ilu_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DILU -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-cgs_ilu_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DILU $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+cgs_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 # Generalized minimum Residual Method ##########################################
 ################################################################################
 
-gmres_diag_pre_small_step: gmres_diag_pre_small_step.o
+gmres_small_step: gmres_small_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-gmres_diag_pre_big_step: gmres_diag_pre_big_step.o
+gmres_big_step: gmres_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-gmres_ilu_pre_small_step: gmres_ilu_pre_small_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
+gmres_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-gmres_ilu_pre_big_step: gmres_ilu_pre_big_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
-
-gmres_diag_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DDIAGONAL -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-gmres_diag_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DDIAGONAL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-gmres_ilu_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DILU -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-gmres_ilu_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DILU $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+gmres_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 # Iterative Refinement #########################################################
 ################################################################################
 
-ir_ilu_pre_small_step: ir_ilu_pre_small_step.o
+ir_small_step: ir_small_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE) 
 
-ir_ilu_pre_big_step: ir_ilu_pre_big_step.o
+ir_big_step: ir_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-ir_ilu_pre_small_step.o: iterative_test.cc
+ir_small_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DIR -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-ir_ilu_pre_big_step.o: iterative_test.cc
+ir_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DIR $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 # Quasi Minimal Residual #######################################################
 ################################################################################
 
-qmr_diag_pre_small_step: qmr_diag_pre_small_step.o
+qmr_small_step: qmr_small_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-qmr_diag_pre_big_step: qmr_diag_pre_big_step.o
+qmr_big_step: qmr_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
-qmr_ilu_pre_small_step: qmr_ilu_pre_small_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
+qmr_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-qmr_ilu_pre_big_step: qmr_ilu_pre_big_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
-
-qmr_diag_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DDIAGONAL -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-qmr_diag_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DDIAGONAL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-qmr_ilu_pre_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DILU -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
-
-qmr_ilu_pre_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DILU $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+qmr_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 

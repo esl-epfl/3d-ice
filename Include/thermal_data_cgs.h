@@ -55,16 +55,10 @@
   cgs_free_thermal_data (struct CGSThermalData *tdata) ;
 
   int
-  cgs_diag_pre_solve_system      (struct CGSThermalData *tdata,
-                                  double                 total_time,
-                                  double                 *tolerance,
-                                  int                    *max_iterations) ;
-
-  int
-  cgs_ilu_pre_solve_system       (struct CGSThermalData *tdata,
-                                  double                 total_time,
-                                  double                 *tolerance,
-                                  int                    *max_iterations) ;
+  cgs_solve_system       (struct CGSThermalData *tdata,
+                          double                 total_time,
+                          double                 *tolerance,
+                          int                    *max_iterations) ;
 
   void
   cgs_print_system_matrix (struct CGSThermalData *tdata) ;

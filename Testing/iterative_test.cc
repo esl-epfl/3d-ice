@@ -16,14 +16,7 @@
   #define TD_FILL    bicg_fill_thermal_data
   #define TD_FREE    bicg_free_thermal_data
   #define TD_MESSAGE "\n%d: BiCG failed (%d - %.5e)\n"
-
-  #if defined DIAGONAL
-    #define TD_SOLVE bicg_diag_pre_solve_system
-  #elif defined ILU
-    #define TD_SOLVE bicg_ilu_pre_solve_system
-  #else
-    #error Wrong BICG preconditioner
-  #endif
+  #define TD_SOLVE   bicg_solve_system
 
 #elif defined BICGSTAB
 
@@ -33,14 +26,7 @@
   #define TD_FILL    bicgstab_fill_thermal_data
   #define TD_FREE    bicgstab_free_thermal_data
   #define TD_MESSAGE "\n%d: BiCGStab failed (%d - %.5e)\n"
-
-  #if defined DIAGONAL
-    #define TD_SOLVE bicgstab_diag_pre_solve_system
-  #elif defined ILU
-    #define TD_SOLVE bicgstab_ilu_pre_solve_system
-  #else
-    #error Wrong BICGSTAB preconditioner
-  #endif
+  #define TD_SOLVE   bicgstab_solve_system
 
 #elif defined CGS
 
@@ -50,14 +36,7 @@
   #define TD_FILL    cgs_fill_thermal_data
   #define TD_FREE    cgs_free_thermal_data
   #define TD_MESSAGE "\n%d: CGS failed (%d - %.5e)\n"
-
-  #if defined DIAGONAL
-    #define TD_SOLVE cgs_diag_pre_solve_system
-  #elif defined ILU
-    #define TD_SOLVE cgs_ilu_pre_solve_system
-  #else
-    #error Wrong CGS preconditioner
-  #endif
+  #define TD_SOLVE   cgs_solve_system
 
 #elif defined GMRES
 
@@ -67,14 +46,7 @@
   #define TD_FILL    gmres_fill_thermal_data
   #define TD_FREE    gmres_free_thermal_data
   #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
-
-  #if defined DIAGONAL
-    #define TD_SOLVE gmres_diag_pre_solve_system
-  #elif defined ILU
-    #define TD_SOLVE gmres_ilu_pre_solve_system
-  #else
-    #error Wrong GMRES preconditioner
-  #endif
+  #define TD_SOLVE   gmres_solve_system
 
 #elif defined IR
 
@@ -84,7 +56,7 @@
   #define TD_FILL    ir_fill_thermal_data
   #define TD_FREE    ir_free_thermal_data
   #define TD_MESSAGE "\n%d: IR failed (%d - %.5e)\n"
-  #define TD_SOLVE   ir_ilu_pre_solve_system
+  #define TD_SOLVE   ir_solve_system
 
 #elif defined QMR
 
@@ -94,14 +66,7 @@
   #define TD_FILL    qmr_fill_thermal_data
   #define TD_FREE    qmr_free_thermal_data
   #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
-
-  #if defined DIAGONAL
-    #define TD_SOLVE qmr_diag_pre_solve_system
-  #elif defined ILU
-    #define TD_SOLVE qmr_ilu_pre_solve_system
-  #else
-    #error Wrong QMR preconditioner
-  #endif
+  #define TD_SOLVE   qmr_solve_system
 
 #else
 
@@ -164,7 +129,11 @@ print_temps
                              (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
 }
 #else
-{ }
+{
+  *tdata = *tdata ;
+  *stkd  = *stkd ;
+  time   = time ;
+}
 #endif
 
 #if !defined SLU
