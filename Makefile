@@ -18,7 +18,6 @@ INCLUDE         = -IInclude
 LIB             = Lib/libTermalLibrary.a
 SLU_INCLUDE     = -I../SuperLU_4.0/SRC/
 BICG_INCLUDE    = -I../IterativeMethodsLibrary/include/ 
-BICG_OPT        = -DCOMPLEX='std::complex<double>'
 SL_INCLUDE      = -I../SparseLibrary/include/ \
                   -I../SparseLibrary/mv/include/
 
@@ -160,32 +159,32 @@ Sources/thermal_data_slu.o: Sources/thermal_data_slu.c Include/thermal_data_slu.
 ################################################################################
 
 Sources/thermal_data_bicg.o: Sources/thermal_data_bicg.c Include/thermal_data_bicg.h
-	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $< $(PROFILE)
+	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(SL_INCLUDE) -c $< $(PROFILE)
 
 ################################################################################
 
 Sources/thermal_data_bicgstab.o: Sources/thermal_data_bicgstab.c Include/thermal_data_bicgstab.h
-	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $< $(PROFILE)
+	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(SL_INCLUDE) -c $< $(PROFILE)
 
 ################################################################################
 
 Sources/thermal_data_cgs.o: Sources/thermal_data_cgs.c Include/thermal_data_cgs.h
-	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $< $(PROFILE)
+	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(SL_INCLUDE) -c $< $(PROFILE)
 
 ################################################################################
 
 Sources/thermal_data_gmres.o: Sources/thermal_data_gmres.c Include/thermal_data_gmres.h
-	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $< $(PROFILE)
+	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(SL_INCLUDE) -c $< $(PROFILE)
 
 ################################################################################
 
 Sources/thermal_data_ir.o: Sources/thermal_data_ir.c Include/thermal_data_ir.h
-	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $< $(PROFILE)
+	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(SL_INCLUDE) -c $< $(PROFILE)
 
 ################################################################################
 
 Sources/thermal_data_qmr.o: Sources/thermal_data_qmr.c Include/thermal_data_qmr.h
-	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(BICG_OPT) $(SL_INCLUDE) -c $< $(PROFILE)
+	$(CC) $(CFLAGS) $(DEBUG) $(OPT) -o $@ $(INCLUDE) $(BICG_INCLUDE) $(SL_INCLUDE) -c $< $(PROFILE)
 
 ################################################################################
 
