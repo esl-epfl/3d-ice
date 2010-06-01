@@ -57,9 +57,9 @@
 
   void free_system_matrix (struct SystemMatrix *matrix) ;
 
-  void print_system_matrix_columns (struct SystemMatrix *matrix, char *file_name) ;
-  void print_system_matrix_rows    (struct SystemMatrix *matrix, char *file_name) ;
-  void print_system_matrix_values  (struct SystemMatrix *matrix, char *file_name) ;
+  void print_system_matrix_columns (struct SystemMatrix *matrix, char const *file_name) ;
+  void print_system_matrix_rows    (struct SystemMatrix *matrix, char const *file_name) ;
+  void print_system_matrix_values  (struct SystemMatrix *matrix, char const *file_name) ;
 
   void print_system_matrix (struct SystemMatrix *matrix, char *file_name) ;
 

@@ -263,7 +263,7 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
-  print_stack_description (stdout, "", &stkd) ;
+  //print_stack_description (stdout, "", &stkd) ;
 
 #if defined SLU
   TD_INIT (&stkd, &tdata, TL_CCS_MATRIX, 300.00, delta_time) ;
@@ -271,12 +271,12 @@ main(int argc, char** argv)
   TD_INIT (&stkd, &tdata, 300.00, delta_time) ;
 #endif
 
-  printf("-----------------------------------------------------------------\n");
-  printf("-----------------------------------------------------------------\n");
-  printf("-----------------------------------------------------------------\n");
+  //printf("-----------------------------------------------------------------\n");
+  //printf("-----------------------------------------------------------------\n");
+  //printf("-----------------------------------------------------------------\n");
 
   print_temps (&tdata, &stkd, 0.0) ;
-#if !defined SLU
+#if defined PRINT_TEMPS && !defined SLU
   printf ("\n") ;
 #endif
 
@@ -307,7 +307,7 @@ main(int argc, char** argv)
   if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
 
-  printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
+  printf ("sim time: %f\n\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 
 exit :
 

@@ -101,7 +101,7 @@ stack_description_error
 (
   struct StackDescription *stack  ,
   yyscan_t         scanner ,
-  char             *message
+  char const       *message
 ) ;
 
 %}
@@ -539,7 +539,7 @@ stack_description_error
 (
   struct StackDescription *stkd   ,
   yyscan_t         scanner ,
-  char             *message
+  char const       *message
 )
 {
   fprintf (stack_description_get_out (scanner),
