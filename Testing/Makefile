@@ -176,7 +176,7 @@ cula_small_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCULA -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
 
 cula_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCULA $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 
