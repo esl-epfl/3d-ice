@@ -68,16 +68,6 @@
   #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
   #define TD_SOLVE   qmr_solve_system
 
-#elif defined CULA
-
-  #define TD_INCLUDE "thermal_data_cula.h"
-  #define TD_TYPE    CULAThermalData
-  #define TD_INIT    cula_init_thermal_data
-  #define TD_FILL    cula_fill_thermal_data
-  #define TD_FREE    cula_free_thermal_data
-  #define TD_MESSAGE "\n%d: CULA failed\n"
-  #define TD_SOLVE   cula_solve_system
-
 #else
 
   #error Wrong SOLVER type
@@ -88,7 +78,7 @@
 #include "stack_description.h"
 #include TD_INCLUDE
 
-#if defined SLU || defined CULA
+#if defined SLU
   #define TEMP_STRING "%.5f  %.5f  %.5f  %.5f\n"
 #else
   #define TEMP_STRING "%.5f  %.5f  %.5f  %.5f"
@@ -146,7 +136,7 @@ print_temps
 }
 #endif
 
-#if !(defined SLU || defined CULA)
+#if !defined SLU
   int    MAX_ITER ;
   double TOLERANCE ;
 #endif
@@ -166,17 +156,17 @@ simulate
 {
   int result ;
 
-#if !defined DETAILS
+#if !defined SMALL
   static double print_time = sim_time ;
   delta_time = sim_time ;
 #endif
 
-#if defined DETAILS
+#if defined SMALL
   for (double time = delta_time ; time <= sim_time ; time += delta_time)
   {
 #endif
 
-#if defined SLU || defined CULA
+#if defined SLU
 
     result = TD_SOLVE (tdata, delta_time) ;
     if (result != 0)
@@ -204,18 +194,18 @@ simulate
 
 #endif
 
-#if defined DETAILS
+#if defined SMALL
     print_temps (tdata, stkd, time) ;
 #else
     print_temps (tdata, stkd, print_time) ;
     print_time += sim_time ;
 #endif
 
-#if defined PRINT_TEMPS && !(defined SLU || defined CULA)
+#if defined PRINT_TEMPS && !defined SLU
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 #endif
 
-#if defined DETAILS
+#if defined SMALL
   }
 #endif
 
@@ -233,7 +223,7 @@ main(int argc, char** argv)
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
 
-#if defined SLU || defined CULA
+#if defined SLU
   if (argc != 2)
     {
       fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
@@ -255,7 +245,7 @@ main(int argc, char** argv)
     }
 #endif
 
-#if !(defined SLU || defined CULA)
+#if !defined SLU
   MAX_ITER  = atoi (argv[2]) ;
   printf("Using max %d iterations\n", MAX_ITER) ;
   TOLERANCE = atof (argv[3]) ;

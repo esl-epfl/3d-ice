@@ -20,12 +20,6 @@ SL_INCLUDE         = -I$(SL_DIR)/include
 SL_LIB_DIR         = -L$(SL_DIR)/lib
 SL_LIBS            = -lmv -lsparse -lspblas -lm
 
-CULA_DIR           = /home/vincenzi/cula
-CULA_INCLUDE       = -I$(CULA_DIR)/include
-CULA_LIB_DIR       = -L$(CULA_DIR)/lib64
-CULA_LIBS          = -lcula -lcublas -lcudart
-
-
 MV_INCLUDE         = -I$(SL_DIR)/mv/include
 
 SLU_EXECS          = slu_small_step slu_big_step
@@ -42,11 +36,8 @@ IR_EXECS           = ir_small_step ir_big_step
 
 QMR_EXECS          = qmr_small_step qmr_big_step
 
-CULA_EXECS         = cula_small_step cula_big_step
-
 EXECS              = $(SLU_EXECS) $(BICG_EXECS) $(BICGSTAB_EXECS) \
-                     $(CGS_EXECS) $(GMRES_EXECS) $(IR_EXECS) $(QMR_EXECS) \
-                     $(CULA_EXECS)
+                     $(CGS_EXECS) $(GMRES_EXECS) $(IR_EXECS) $(QMR_EXECS)
 
 all : $(EXECS)
 
@@ -61,7 +52,7 @@ slu_big_step: slu_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SLU_LIB_DIR) $(TL_LIB) $(SLU_LIBS) -o $@ $(PROFILE)
 
 slu_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DSLU -DDETAILS $(TL_INCLUDE) $(SLU_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DSLU -DSMALL $(TL_INCLUDE) $(SLU_INCLUDE) -o $@ $(PROFILE)
 
 slu_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DSLU $(TL_INCLUDE) $(SLU_INCLUDE) -o $@ $(PROFILE)
@@ -77,7 +68,7 @@ bicg_big_step: bicg_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
 bicg_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG -DSMALL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 bicg_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICG $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
@@ -93,7 +84,7 @@ bicgstab_big_step: bicgstab_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
 bicgstab_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB -DSMALL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 bicgstab_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DBICGSTAB $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
@@ -109,7 +100,7 @@ cgs_big_step: cgs_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
 cgs_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS -DSMALL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 cgs_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCGS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
@@ -125,7 +116,7 @@ gmres_big_step: gmres_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
 gmres_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES -DSMALL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 gmres_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DGMRES $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
@@ -141,7 +132,7 @@ ir_big_step: ir_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
 ir_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DIR -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DIR -DSMALL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 ir_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DIR $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
@@ -157,28 +148,12 @@ qmr_big_step: qmr_big_step.o
 	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(TL_LIB) $(SL_LIBS) -o $@ $(PROFILE)
 
 qmr_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR -DSMALL $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
 qmr_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
 
-################################################################################
-# CULA Lapack ##################################################################
-################################################################################
-
-cula_small_step: cula_small_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(CULA_LIB_DIR) $(TL_LIB) $(SL_LIBS) $(CULA_LIBS) -o $@ $(PROFILE)
-
-cula_big_step: cula_big_step.o
-	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(CULA_LIB_DIR) $(TL_LIB) $(SL_LIBS) $(CULA_LIBS) -o $@ $(PROFILE)
-
-cula_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCULA -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
-
-cula_big_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCULA $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
-
-################################################################################
+###############################################################################
 
 clean:
 	rm -fr *.o
