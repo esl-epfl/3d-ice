@@ -5,7 +5,7 @@ CPPFLAGS           = -Wall -Wextra -pedantic
 TL_DIR             = /home/vincenzi/ThermalLibrary
 TL_INCLUDE         = -I$(TL_DIR)/Include
 TL_LIB_DIR         = -L$(TL_DIR)/Lib
-TL_LIB             = -lTermalLibrary
+TL_LIB             = -lThermalLibrary
 
 SLU_DIR            = /home/vincenzi/SuperLU_4.0
 SLU_INCLUDE        = -I$(SLU_DIR)/SRC
@@ -19,6 +19,12 @@ SL_DIR             = /home/vincenzi/SparseLibrary
 SL_INCLUDE         = -I$(SL_DIR)/include
 SL_LIB_DIR         = -L$(SL_DIR)/lib
 SL_LIBS            = -lmv -lsparse -lspblas -lm
+
+CULA_DIR           = /home/vincenzi/cula
+CULA_INCLUDE       = -I$(CULA_DIR)/include
+CULA_LIB_DIR       = -L$(CULA_DIR)/lib64
+CULA_LIBS          = -lcula -lcublas -lcudart
+
 
 MV_INCLUDE         = -I$(SL_DIR)/mv/include
 
@@ -36,8 +42,11 @@ IR_EXECS           = ir_small_step ir_big_step
 
 QMR_EXECS          = qmr_small_step qmr_big_step
 
+CULA_EXECS         = cula_small_step cula_big_step
+
 EXECS              = $(SLU_EXECS) $(BICG_EXECS) $(BICGSTAB_EXECS) \
-                     $(CGS_EXECS) $(GMRES_EXECS) $(IR_EXECS) $(QMR_EXECS)
+                     $(CGS_EXECS) $(GMRES_EXECS) $(IR_EXECS) $(QMR_EXECS) \
+                     $(CULA_EXECS)
 
 all : $(EXECS)
 
@@ -152,6 +161,22 @@ qmr_small_step.o: iterative_test.cc
 
 qmr_big_step.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR $(TL_INCLUDE) $(IML_INCLUDE) -o $@ $(PROFILE)
+
+################################################################################
+# CULA Lapack ##################################################################
+################################################################################
+
+cula_small_step: cula_small_step.o
+	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(CULA_LIB_DIR) $(TL_LIB) $(SL_LIBS) $(CULA_LIBS) -o $@ $(PROFILE)
+
+cula_big_step: cula_big_step.o
+	$(CPP) $(CPPFLAGS) $(OPT) $< $(TL_LIB_DIR) $(SL_LIB_DIR) $(CULA_LIB_DIR) $(TL_LIB) $(SL_LIBS) $(CULA_LIBS) -o $@ $(PROFILE)
+
+cula_small_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DCULA -DDETAILS $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
+
+cula_big_step.o: iterative_test.cc
+	$(CPP) $(CPPFLAGS) $(OPT) -c $< $(PRINT_TEMPS) -DQMR $(TL_INCLUDE) $(IML_INCLUDE) $(CULA_INCLUDE) -o $@ $(PROFILE)
 
 ################################################################################
 

@@ -68,6 +68,16 @@
   #define TD_MESSAGE "\n%d: QMR failed (%d - %.5e)\n"
   #define TD_SOLVE   qmr_solve_system
 
+#elif defined CULA
+
+  #define TD_INCLUDE "thermal_data_cula.h"
+  #define TD_TYPE    CULAThermalData
+  #define TD_INIT    cula_init_thermal_data
+  #define TD_FILL    cula_fill_thermal_data
+  #define TD_FREE    cula_free_thermal_data
+  #define TD_MESSAGE "\n%d: CULA failed\n"
+  #define TD_SOLVE   cula_solve_system
+
 #else
 
   #error Wrong SOLVER type
@@ -78,7 +88,7 @@
 #include "stack_description.h"
 #include TD_INCLUDE
 
-#if defined SLU
+#if defined SLU || defined CULA
   #define TEMP_STRING "%.5f  %.5f  %.5f  %.5f\n"
 #else
   #define TEMP_STRING "%.5f  %.5f  %.5f  %.5f"
@@ -136,7 +146,7 @@ print_temps
 }
 #endif
 
-#if !defined SLU
+#if !(defined SLU || defined CULA)
   int    MAX_ITER ;
   double TOLERANCE ;
 #endif
@@ -166,7 +176,7 @@ simulate
   {
 #endif
 
-#if defined SLU
+#if defined SLU || defined CULA
 
     result = TD_SOLVE (tdata, delta_time) ;
     if (result != 0)
@@ -201,7 +211,7 @@ simulate
     print_time += sim_time ;
 #endif
 
-#if defined PRINT_TEMPS && !defined SLU
+#if defined PRINT_TEMPS && !(defined SLU || defined CULA)
     printf ("\t%d\t%e\n", max_iter, tolerance) ;
 #endif
 
@@ -223,7 +233,7 @@ main(int argc, char** argv)
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
 
-#if defined SLU
+#if defined SLU || defined CULA
   if (argc != 2)
     {
       fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
@@ -245,7 +255,7 @@ main(int argc, char** argv)
     }
 #endif
 
-#if !defined SLU
+#if !(defined SLU || defined CULA)
   MAX_ITER  = atoi (argv[2]) ;
   printf("Using max %d iterations\n", MAX_ITER) ;
   TOLERANCE = atof (argv[3]) ;
@@ -276,7 +286,7 @@ main(int argc, char** argv)
   //printf("-----------------------------------------------------------------\n");
 
   print_temps (&tdata, &stkd, 0.0) ;
-#if defined PRINT_TEMPS && !defined SLU
+#if defined PRINT_TEMPS && !(defined SLU || defined CULA)
   printf ("\n") ;
 #endif
 
