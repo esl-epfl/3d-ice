@@ -15,7 +15,7 @@
 CC              = g++
 CFLAGS          = -Werror -Wall -Wextra
 INCLUDE         = -IInclude
-LIB             = Lib/libTermalLibrary.a
+LIB             = Lib/libThermalLibrary.a
 SLU_INCLUDE     = -I../SuperLU_4.0/SRC/
 BICG_INCLUDE    = -I../IterativeMethodsLibrary/include/ 
 SL_INCLUDE      = -I../SparseLibrary/include/ \
