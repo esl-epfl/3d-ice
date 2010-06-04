@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/thermal_data_qmr.h"                                   *
+ * Header file "Include/thermal_data_iterative.h"                             *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,8 +8,8 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_QMR_THERMAL_DATA_H_
-#define _TL_QMR_THERMAL_DATA_H_
+#ifndef _TL_THERMAL_DATA_ITERATIVE_H_
+#define _TL_THERMAL_DATA_ITERATIVE_H_
 
 #include "conductances.h"
 #include "stack_description.h"
@@ -17,10 +17,10 @@
 #include "system_vector.h"
 
 /******************************************************************************
- * "QMRThermalData"                                                           *
+ * "ThermalDataIterative"                                                     *
  ******************************************************************************/
 
-  struct QMRThermalData
+  struct ThermalDataIterative
   {
     double              *Temperatures ;
     double              *Sources ;
@@ -40,30 +40,43 @@
 /******************************************************************************/
 
   int
-  qmr_init_thermal_data   (
-                          struct StackDescription *stkd,
-                          struct QMRThermalData    *tdata,
-                          double                  initial_temperature,
-                          double                  delta_time
-                          ) ;
+  init_thermal_data_iterative
+  (
+    struct StackDescription     *stkd,
+    struct ThermalDataIterative *tdata,
+    double                      initial_temperature,
+    double                      delta_time
+  ) ;
 
   int
-  qmr_fill_thermal_data  (struct StackDescription *stkd,
-                         struct QMRThermalData *tdata) ;
+  fill_thermal_data_iterative
+  (
+    struct StackDescription     *stkd,
+    struct ThermalDataIterative *tdata
+  ) ;
 
   void
-  qmr_free_thermal_data  (struct QMRThermalData *tdata) ;
+  free_thermal_data_iterative
+  (
+    struct ThermalDataIterative *tdata
+  ) ;
 
   int
-  qmr_solve_system (struct QMRThermalData *tdata,
-                    double               total_time,
-                    double               *tolerance,
-                    int                  *max_iterations) ;
+  solve_system_iterative
+  (
+    struct ThermalDataIterative *tdata,
+    double                      total_time,
+    double                      *tolerance,
+    int                         *max_iterations
+#if defined TL_GMRES_ITERATIVE_SOLVER
+    ,int                        restart
+#endif
+  ) ;
 
   void
-  qmr_print_system_matrix (struct QMRThermalData *tdata) ;
+  print_system_matrix_iterative (struct ThermalDataIterative *tdata) ;
 
   void
-  qmr_print_sources       (struct QMRThermalData *tdata) ;
+  print_sources_iterative (struct ThermalDataIterative *tdata) ;
 
-#endif /* _TL_QMR_THERMAL_DATA_H_ */
+#endif /* _TL_THERMAL_DATA_ITERATIVE_H_ */

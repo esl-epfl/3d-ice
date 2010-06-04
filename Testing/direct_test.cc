@@ -1,7 +1,7 @@
 #include <time.h>
 
 #include "stack_description.h"
-#include "thermal_data_iterative.h"
+#include "thermal_data_direct.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -10,9 +10,9 @@
 void
 print_temps
 (
-  struct ThermalDataIterative *tdata,
-  struct StackDescription     *stkd ,
-  double                      time
+  struct ThermalDataDirect *tdata,
+  struct StackDescription  *stkd ,
+  double                  time
 )
 #if defined PRINT_TEMPS
 {
@@ -47,7 +47,7 @@ print_temps
   tdie_3_row_099 /= ncolumns ;
   tdie_3_row_100 /= ncolumns ;
 
-  printf ("%.5f  %.5f  %.5f  %.5f",
+  printf ("%.5f  %.5f  %.5f  %.5f\n",
           time, (tdie_1_row_099 + tdie_1_row_100)/2.0,
                 (tdie_2_row_099 + tdie_2_row_100)/2.0,
                 (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
@@ -65,24 +65,16 @@ print_temps
 /******************************************************************************/
 /******************************************************************************/
 
-#if defined TL_GMRES_ITERATIVE_SOLVER
-int restart ;
-#endif
-
 int
 simulate
 (
-  struct ThermalDataIterative *tdata,
-  struct StackDescription     *stkd ,
-  double                      sim_time ,
-  double                      delta_time,
-  int                         max_iter,
-  double                      tolerance
+  struct ThermalDataDirect *tdata,
+  struct StackDescription  *stkd ,
+  double                   sim_time ,
+  double                   delta_time
 )
 {
   int result ;
-  int local_max_iter ;
-  double local_tolerance ;
 
 #if !defined SMALL
   static double print_time = delta_time = sim_time ;
@@ -91,21 +83,10 @@ simulate
   {
 #endif
 
-    local_max_iter  = max_iter ;
-    local_tolerance = tolerance ;
-
-    result = solve_system_iterative
-             (
-               tdata, delta_time, &local_tolerance, &local_max_iter
-#if defined TL_GMRES_ITERATIVE_SOLVER
-               , restart
-#endif
-             ) ;
-
+    result = solve_system_direct (tdata, delta_time) ;
     if (result != 0)
     {
-      printf("\n%d: Solver failed (%d - %.5e)\n",
-             result, local_max_iter, local_tolerance) ;
+      printf("%d: Solver failed\n", result) ;
       return result ;
     }
 
@@ -114,10 +95,6 @@ simulate
 #else
     print_temps (tdata, stkd, print_time) ;
     print_time += sim_time ;
-#endif
-
-#if defined PRINT_TEMPS
-    printf ("\t%d\t%e\n", local_max_iter, local_tolerance) ;
 #endif
 
 #if defined SMALL
@@ -134,40 +111,19 @@ simulate
 int
 main(int argc, char** argv)
 {
-  struct StackDescription     stkd ;
-  struct ThermalDataIterative tdata ;
+  struct StackDescription  stkd ;
+  struct ThermalDataDirect tdata ;
 
   double delta_time = 0.00125 ;
   double sim_time   = 0.10000 ;
 
   double powers [] = { 1.5, 0.3, 1.2, 1.5} ;
 
-#if defined TL_GMRES_ITERATIVE_SOLVER
-  if (argc != 5)
+  if (argc != 2)
   {
-    fprintf(stderr,
-      "Usage: \"%s file.stk max_iter tolerance restart\"\n", argv[0]);
+    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
     return EXIT_FAILURE;
   }
-#else
-  if (argc != 4)
-  {
-    fprintf(stderr,
-      "Usage: \"%s file.stk max_iter tolerance\"\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-#endif
-
-  int max_iter = atoi (argv[2]) ;
-  printf("Using max %d iterations\n", max_iter) ;
-
-  double tolerance = atof (argv[3]) ;
-  printf("Using tolerance %.2e \n", tolerance) ;
-
-#if defined TL_GMRES_ITERATIVE_SOLVER
-  restart = atoi (argv[4]) ;
-  printf("Using restart %d\n", restart) ;
-#endif
 
   init_stack_description (&stkd) ;
 
@@ -175,48 +131,47 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
-  init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time) ;
+  init_thermal_data_direct (&stkd, &tdata, TL_CCS_MATRIX, 300.00, delta_time) ;
 
 #if defined PRINT_TEMPS
   print_stack_description (stdout, "", &stkd) ;
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
   print_temps (&tdata, &stkd, 0.0) ;
-  printf ("\n") ;
 #endif
 
   clock_t time_start = clock();
 
   insert_all_power_values (&stkd, powers) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  fill_thermal_data_direct (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
 
   change_coolant_flow_rate (&stkd, 0.7) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  fill_thermal_data_direct (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  fill_thermal_data_direct (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
 
   change_coolant_flow_rate (&stkd, 1.4) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  fill_thermal_data_direct (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+  if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
 
   printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 
 exit :
 
-  free_thermal_data_iterative (&tdata) ;
+  free_thermal_data_direct (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;

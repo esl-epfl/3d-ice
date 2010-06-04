@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/thermal_data_bicg.c"                                  *
+ * Source file "Sources/thermal_data_iterative.c"                             *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -11,11 +11,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "thermal_data_bicg.h"
+#include "thermal_data_iterative.h"
+
 #include "ilupre_double.h"
 #include "compcol_double.h"
+
 #include "mvblasd.h"
-#include "bicg.h"
+
+#if defined TL_BICG_ITERATIVE_SOLVER
+
+#  include "bicg.h"
+#  define iterative_solver BiCG
+
+#elif defined TL_BICGSTAB_ITERATIVE_SOLVER
+
+#  include "bicgstab.h"
+#  define iterative_solver BiCGSTAB
+
+#elif defined TL_CGS_ITERATIVE_SOLVER
+
+#  include "cgs.h"
+#  define iterative_solver CGS
+
+#elif defined TL_GMRES_ITERATIVE_SOLVER
+
+#  include "gmres.h"
+#  include "mvmd.h"
+#  define iterative_solver GMRES
+
+#elif TL_IR_ITERATIVE_SOLVER
+
+#  include "ir.h"
+#  define iterative_solver IR
+
+#elif TL_QMR_ITERATIVE_SOLVER
+
+#  include "qmr.h"
+#  define iterative_solver QMR
+
+#endif
 
 static
 void
@@ -29,12 +63,12 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-bicg_init_thermal_data
+init_thermal_data_iterative
 (
-  struct StackDescription *stkd,
-  struct BICGThermalData  *tdata,
-  double                  initial_temperature,
-  double                  delta_time
+  struct StackDescription     *stkd,
+  struct ThermalDataIterative *tdata,
+  double                      initial_temperature,
+  double                      delta_time
 )
 {
   if (tdata == NULL) return 0 ;
@@ -75,18 +109,9 @@ bicg_init_thermal_data
   if ( alloc_system_vector (&tdata->SV_X, tdata->Size) == 0 )
     goto sv_x_fail ;
 
-//  (tdata->BICG_Matrix_A).newsize (tdata->Size,
-//                                  tdata->Size,
-//                                  stkd->Dimensions->Grid.NNz);
-//
-//  (tdata->BICG_Vector_B).newsize (tdata->Size) ;
-//
-//  (tdata->BICG_Vector_X).newsize (tdata->Size) ;
-
   /* Set initial values */
 
   init_data (tdata->Temperatures, tdata->Size, initial_temperature) ;
-
   init_data (tdata->Sources, tdata->Size, 0.0) ;
 
   return 1 ;
@@ -114,7 +139,10 @@ sources_fail :
 /******************************************************************************/
 
 void
-bicg_free_thermal_data (struct BICGThermalData *tdata)
+free_thermal_data_iterative
+(
+  struct ThermalDataIterative *tdata
+)
 {
   free (tdata->Temperatures) ;
   free (tdata->Sources) ;
@@ -131,10 +159,10 @@ bicg_free_thermal_data (struct BICGThermalData *tdata)
 /******************************************************************************/
 
 int
-bicg_fill_thermal_data
+fill_thermal_data_iterative
 (
-  struct StackDescription *stkd,
-  struct BICGThermalData  *tdata
+  struct StackDescription     *stkd,
+  struct ThermalDataIterative *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -175,16 +203,19 @@ bicg_fill_thermal_data
 /******************************************************************************/
 
 int
-bicg_solve_system
+solve_system_iterative
 (
-  struct BICGThermalData  *tdata,
-  double                  total_time,
-  double                  *tolerance,
-  int                     *max_iterations
+  struct ThermalDataIterative *tdata,
+  double                      total_time,
+  double                      *tolerance,
+  int                         *max_iterations
+#if defined TL_GMRES_ITERATIVE_SOLVER
+  ,int                        restart
+#endif
 )
 {
-  int result, counter, _max_iterations = *max_iterations ;
-  double _tolerance = *tolerance;
+  int result, counter, local_max_iterations = *max_iterations ;
+  double local_tolerance = *tolerance;
 
   CompCol_Mat_double A (
     tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
@@ -192,6 +223,12 @@ bicg_solve_system
   ) ;
 
   CompCol_ILUPreconditioner_double Preconditioner (A) ;
+
+#if defined   TL_QMR_ITERATIVE_SOLVER
+  CompCol_ILUPreconditioner_double Preconditioner2 (A) ;
+#elif defined TL_GMRES_ITERATIVE_SOLVER
+  MATRIX_double H(restart+1, restart, 0.0);
+#endif
 
   VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
 
@@ -202,10 +239,19 @@ bicg_solve_system
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
-    _tolerance      = *tolerance ;
-    _max_iterations = *max_iterations ;
+    local_tolerance      = *tolerance ;
+    local_max_iterations = *max_iterations ;
 
-    result = BiCG (A, x, B, Preconditioner, _max_iterations, _tolerance) ;
+    result = iterative_solver
+             (
+               A, x, B, Preconditioner,
+#if defined   TL_QMR_ITERATIVE_SOLVER
+               Preconditioner2,
+#elif defined TL_GMRES_ITERATIVE_SOLVER
+               H, restart,
+#endif
+               local_max_iterations, local_tolerance
+             ) ;
 
     if ( result != 0)
       return result ;
@@ -222,8 +268,8 @@ bicg_solve_system
   for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
     tdata->SV_B.Values[counter] = B(counter) ;
 
-  *max_iterations = _max_iterations ;
-  *tolerance      = _tolerance ;
+  *max_iterations = local_max_iterations ;
+  *tolerance      = local_tolerance ;
 
   return 0 ;
 }
@@ -232,9 +278,9 @@ bicg_solve_system
 /******************************************************************************/
 /******************************************************************************/
 void
-bicg_print_system_matrix
+print_system_matrix_iterative
 (
-  struct BICGThermalData *tdata
+  struct ThermalDataIterative *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
@@ -258,9 +304,9 @@ bicg_print_system_matrix
 /******************************************************************************/
 
 void
-bicg_print_sources
+print_sources_iterative
 (
-  struct BICGThermalData *tdata
+  struct ThermalDataIterative *tdata
 )
 {
   int counter ;
