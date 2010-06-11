@@ -51,6 +51,11 @@
 
 #endif
 
+#ifdef SUPPORT_CUBLAS
+#  include "cublas.h"
+#endif
+
+
 static
 void
 init_data (double *data, int size, double init_value)
@@ -76,6 +81,19 @@ init_thermal_data_iterative
   tdata->Size                = stkd->Dimensions->Grid.NCells ;
   tdata->initial_temperature = initial_temperature ;
   tdata->delta_time          = delta_time ;
+
+#ifdef SUPPORT_CUBLAS
+  cublasStatus stat;
+
+  cublasInit();
+
+  stat = cublasGetError();
+  if (stat != CUBLAS_STATUS_SUCCESS)
+  {
+    printf ("CUBLAS: cublasInit() error %d\n", stat);
+    return 0;
+  }
+#endif
 
   /* Memory allocation */
 
@@ -152,6 +170,17 @@ free_thermal_data_iterative
   free_system_matrix (&tdata->SM_A) ;
   free_system_vector (&tdata->SV_B) ;
   free_system_vector (&tdata->SV_X) ;
+
+#ifdef SUPPORT_CUBLAS
+  cublasStatus stat;
+
+  cublasShutdown();
+
+  stat = cublasGetError();
+  if (stat != CUBLAS_STATUS_SUCCESS)
+    printf ("CUBLAS: cublasShutdown() error %d\n", stat);
+#endif
+
 }
 
 /******************************************************************************/
