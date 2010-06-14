@@ -3,7 +3,9 @@
 #include "stack_description.h"
 #include "thermal_data_iterative.h"
 
-//extern void print_sl_profile_data(void);
+#ifdef SL_PROFILE
+extern void print_sl_profile_data(void);
+#endif
 
 /******************************************************************************/
 /******************************************************************************/
@@ -192,15 +194,6 @@ main(int argc, char** argv)
   insert_all_power_values (&stkd, powers) ;
   fill_thermal_data_iterative (&stkd, &tdata) ;
 
-//   solve_system_iterative
-//   (
-//     &tdata, delta_time, &tolerance, &max_iter
-//#if defined TL_GMRES_ITERATIVE_SOLVER
-//     , restart
-//#endif
-//   ) ;
-//   print_sl_profile_data() ;
-
   if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
     goto exit ;
 
@@ -224,6 +217,10 @@ main(int argc, char** argv)
     goto exit ;
 
   printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
+
+#ifdef SL_PROFILE
+  print_sl_profile_data() ;
+#endif
 
 exit :
 
