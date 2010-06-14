@@ -37,7 +37,6 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description_scanner.o   \
           Sources/stack_description_parser.o    \
           Sources/stack_description.o           \
-          Sources/system_vector.o               \
           Sources/system_matrix.o               \
           Sources/conductances.o                \
           Sources/thermal_data_direct.o         \
@@ -165,11 +164,6 @@ Sources/stack_description.o: Sources/stack_description.c \
 
 ################################################################################
 
-Sources/system_vector.o: Sources/system_vector.c Include/system_vector.h
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(TL_INCLUDE) -c $<
-
-################################################################################
-
 Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(TL_INCLUDE) -c $<
 
@@ -181,7 +175,7 @@ Sources/conductances.o: Sources/conductances.c Include/conductances.h
 ################################################################################
 
 Sources/thermal_data_direct.o: Sources/thermal_data_direct.c Include/thermal_data_direct.h
-	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(TL_INCLUDE) $(SLU_INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(TL_INCLUDE) $(SLU_INCLUDE) $(SL_INCLUDE) -c $<
 
 ################################################################################
 

@@ -14,7 +14,8 @@
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
-#include "system_vector.h"
+
+#include "mvvd.h"
 
 /******************************************************************************
  * "ThermalDataIterative"                                                     *
@@ -32,8 +33,7 @@
            delta_time ;
 
     struct SystemMatrix SM_A ;
-    struct SystemVector SV_B ;
-    struct SystemVector SV_X ;
+    MV_Vector_double I_Vector_B ;
 
   } ;
 

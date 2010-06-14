@@ -45,7 +45,7 @@ init_thermal_data_direct
   if ( (tdata->Temperatures
          = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
 
-    goto temperatures_fail ;
+    return 0 ;
 
   if ( (tdata->Sources
          = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
@@ -77,19 +77,17 @@ init_thermal_data_direct
 
     goto slu_etree_fail ;
 
-  if ( alloc_system_matrix (&tdata->SM_A, storage,
+  if ( alloc_system_matrix (&tdata->SMD_A, storage,
                             tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
     goto sm_a_fail ;
 
-  if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
-    goto sv_b_fail ;
+  tdata->D_Vector_B.newsize(tdata->Size) ;
 
   StatInit (&tdata->SLU_Stat) ;
 
   /* Set initial values */
 
   init_data (tdata->Temperatures, tdata->Size, initial_temperature) ;
-
   init_data (tdata->Sources, tdata->Size, 0.0) ;
 
   set_default_options (&tdata->SLU_Options) ;
@@ -105,8 +103,8 @@ init_thermal_data_direct
 
     dCreate_CompRow_Matrix  /* Matrix A */
     (
-      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-      tdata->SM_A.Values, tdata->SM_A.Columns, tdata->SM_A.Rows,
+      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SMD_A.NNz,
+      tdata->SMD_A.Values, tdata->SMD_A.Columns, tdata->SMD_A.Rows,
       SLU_NR, SLU_D, SLU_GE
     ) ;
 
@@ -114,15 +112,15 @@ init_thermal_data_direct
 
     dCreate_CompCol_Matrix  /* Matrix A */
     (
-      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns,
+      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SMD_A.NNz,
+      tdata->SMD_A.Values, tdata->SMD_A.Rows, tdata->SMD_A.Columns,
       SLU_NC, SLU_D, SLU_GE
     ) ;
 
   dCreate_Dense_Matrix  /* Vector B */
   (
     &tdata->SLUMatrix_B, tdata->Size, 1,
-    tdata->SV_B.Values, tdata->Size,
+    &tdata->D_Vector_B[0], tdata->Size,
     SLU_DN, SLU_D, SLU_GE
   );
 
@@ -130,8 +128,6 @@ init_thermal_data_direct
 
   /* Free if malloc errors */
 
-sv_b_fail :
-  free_system_matrix (&tdata->SM_A) ;
 sm_a_fail :
   free (tdata->SLU_Etree) ;
 slu_etree_fail :
@@ -146,7 +142,6 @@ capacities_fail :
   free (tdata->Sources) ;
 sources_fail :
   free (tdata->Temperatures) ;
-temperatures_fail :
 
   return 0 ;
 }
@@ -175,10 +170,9 @@ free_thermal_data_direct
   StatFree (&tdata->SLU_Stat) ;
 
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
-  free_system_matrix        (&tdata->SM_A) ;
+  free_system_matrix        (&tdata->SMD_A) ;
 
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
-  free_system_vector        (&tdata->SV_B) ;
 
   if (tdata->SLU_Options.Fact != DOFACT )
   {
@@ -209,7 +203,7 @@ fill_thermal_data_direct
     fill_system_matrix
     (
       stkd,
-      &tdata->SM_A,
+      &tdata->SMD_A,
       tdata->Conductances,
       tdata->Capacities
     ) ;
@@ -225,9 +219,12 @@ fill_thermal_data_direct
 
     fill_sources_stack_description (stkd, tdata->Sources) ;
 
-    fill_system_vector (&tdata->SV_B, tdata->Sources,
-                                      tdata->Capacities,
-                                      tdata->Temperatures) ;
+    for(int count = 0 ; count < tdata->Size ; count++)
+    {
+        tdata->D_Vector_B[count] = tdata->Sources[count]
+                                   + tdata->Capacities[count]
+                                     * tdata->Temperatures[count] ;
+    }
 
     stkd->Channel->FlowRateChanged = 0 ;
     stkd->PowerValuesChanged = 0 ;
@@ -237,9 +234,12 @@ fill_thermal_data_direct
   {
     fill_sources_stack_description (stkd, tdata->Sources) ;
 
-    fill_system_vector (&tdata->SV_B, tdata->Sources,
-                                      tdata->Capacities,
-                                      tdata->Temperatures) ;
+    for(int count = 0 ; count < tdata->Size ; count++)
+    {
+        tdata->D_Vector_B[count] = tdata->Sources[count]
+                                 + tdata->Capacities[count]
+                                   * tdata->Temperatures[count] ;
+    }
 
     stkd->PowerValuesChanged = 0 ;
   }
@@ -304,17 +304,16 @@ solve_system_direct
     if (tdata->SLU_Info != 0)
       break ;
 
-    for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    for (counter = 0 ; counter < tdata->Size ; counter++)
 
-      tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
+      tdata->Temperatures[counter] = tdata->D_Vector_B[counter] ;
 
-    fill_system_vector
-    (
-      &tdata->SV_B,
-      tdata->Sources,
-      tdata->Capacities,
-      tdata->Temperatures
-    ) ;
+    for(int count = 0 ; count < tdata->Size ; count++)
+    {
+        tdata->D_Vector_B[count] = tdata->Sources[count]
+                                   + tdata->Capacities[count]
+                                     * tdata->Temperatures[count] ;
+    }
   }
 
   return tdata->SLU_Info ;
@@ -330,17 +329,17 @@ print_system_matrix_direct
   struct ThermalDataDirect *tdata
 )
 {
-  if (tdata->SM_A.Storage == TL_CCS_MATRIX)
+  if (tdata->SMD_A.Storage == TL_CCS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "slu_sm_ccs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "slu_sm_ccs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "slu_sm_ccs_values.txt") ;
+    print_system_matrix_columns(&tdata->SMD_A, "slu_sm_ccs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SMD_A, "slu_sm_ccs_rows.txt") ;
+    print_system_matrix_values (&tdata->SMD_A, "slu_sm_ccs_values.txt") ;
   }
-  else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
+  else if (tdata->SMD_A.Storage == TL_CRS_MATRIX)
   {
-    print_system_matrix_columns(&tdata->SM_A, "slu_sm_crs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "slu_sm_crs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "slu_sm_crs_values.txt") ;
+    print_system_matrix_columns(&tdata->SMD_A, "slu_sm_crs_columns.txt") ;
+    print_system_matrix_rows   (&tdata->SMD_A, "slu_sm_crs_rows.txt") ;
+    print_system_matrix_values (&tdata->SMD_A, "slu_sm_crs_values.txt") ;
   }
   else
     fprintf (stderr, "Matrix format unknown\n") ;

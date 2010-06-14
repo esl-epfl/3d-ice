@@ -14,7 +14,8 @@
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
-#include "system_vector.h"
+
+#include "mvvd.h"
 
 #include "slu_ddefs.h"
 
@@ -33,8 +34,9 @@
     double initial_temperature ,
            delta_time ;
 
-    struct SystemMatrix SM_A ;
-    struct SystemVector SV_B ;
+    struct SystemMatrix SMD_A ;
+
+    MV_Vector_double D_Vector_B ;
 
     SuperMatrix SLUMatrix_A ,
                 SLUMatrix_A_Permuted ,

@@ -7,6 +7,7 @@
 /******************************************************************************/
 /******************************************************************************/
 
+#if defined PRINT_TEMPS
 void
 print_temps
 (
@@ -14,7 +15,6 @@ print_temps
   struct StackDescription  *stkd ,
   double                  time
 )
-#if defined PRINT_TEMPS
 {
   int column ;
   int ncolumns = get_number_of_columns(stkd->Dimensions) ;
@@ -53,11 +53,14 @@ print_temps
                 (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
 }
 #else
+void
+print_temps
+(
+  struct ThermalDataDirect __attribute__((unused)) *tdata,
+  struct StackDescription __attribute__((unused)) *stkd ,
+  double __attribute__((unused)) time
+)
 {
-  // just to avoid warning messages ...
-  *tdata = *tdata ;
-  *stkd  = *stkd ;
-  time   = time ;
 }
 #endif
 

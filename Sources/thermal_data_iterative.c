@@ -121,11 +121,7 @@ init_thermal_data_iterative
                             tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
     goto sm_a_fail ;
 
-  if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
-    goto sv_b_fail ;
-
-  if ( alloc_system_vector (&tdata->SV_X, tdata->Size) == 0 )
-    goto sv_x_fail ;
+  tdata->I_Vector_B.newsize(tdata->Size) ;
 
   /* Set initial values */
 
@@ -136,10 +132,6 @@ init_thermal_data_iterative
 
   /* Free if malloc errors */
 
-sv_x_fail:
-  free_system_vector (&tdata->SV_B) ;
-sv_b_fail :
-  free_system_matrix (&tdata->SM_A) ;
 sm_a_fail :
   free (tdata->Conductances) ;
 conductances_fail :
@@ -168,8 +160,6 @@ free_thermal_data_iterative
   free (tdata->Conductances) ;
 
   free_system_matrix (&tdata->SM_A) ;
-  free_system_vector (&tdata->SV_B) ;
-  free_system_vector (&tdata->SV_X) ;
 
 #ifdef SUPPORT_CUBLAS
   cublasStatus stat;
@@ -217,10 +207,12 @@ fill_thermal_data_iterative
   {
     fill_sources_stack_description (stkd, tdata->Sources) ;
 
-    fill_system_vector (&tdata->SV_B, tdata->Sources,
-                                      tdata->Capacities,
-                                      tdata->Temperatures) ;
-
+    for(int count = 0 ; count < tdata->Size ; count++)
+    {
+        tdata->I_Vector_B[count] = tdata->Sources[count]
+                                   + tdata->Capacities[count]
+                                     * tdata->Temperatures[count] ;
+    }
     stkd->PowerValuesChanged = 0 ;
   }
 
@@ -259,11 +251,9 @@ solve_system_iterative
   MATRIX_double H(restart+1, restart, 0.0);
 #endif
 
-  VECTOR_double B (tdata->SV_B.Values, tdata->SV_B.Size) ;
+  VECTOR_double x (tdata->Size) ;
 
-  VECTOR_double x (tdata->SV_B.Size) ;
-
-  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+  for (counter = 0 ; counter < tdata->Size ; counter++)
     x(counter) = tdata->Temperatures[counter] ;
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
@@ -273,7 +263,7 @@ solve_system_iterative
 
     result = iterative_solver
              (
-               A, x, B, Preconditioner,
+               A, x, tdata->I_Vector_B, Preconditioner,
 #if defined   TL_QMR_ITERATIVE_SOLVER
                Preconditioner2,
 #elif defined TL_GMRES_ITERATIVE_SOLVER
@@ -285,17 +275,15 @@ solve_system_iterative
     if ( result != 0)
       return result ;
 
-    for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    for (counter = 0 ; counter < tdata->Size ; counter++)
     {
       tdata->Temperatures[counter] = x(counter) ;
 
-      B(counter) = tdata->Sources[counter]
-                   + tdata->Capacities[counter] * x(counter) ;
+      tdata->I_Vector_B[counter] = tdata->Sources[counter]
+                                   + tdata->Capacities[counter]
+                                     * x(counter) ;
     }
   }
-
-  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
-    tdata->SV_B.Values[counter] = B(counter) ;
 
   *max_iterations = local_max_iterations ;
   *tolerance      = local_tolerance ;

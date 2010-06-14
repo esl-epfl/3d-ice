@@ -32,7 +32,7 @@ IML_INCLUDE        = -I$(IML_DIR)/include
 #
 
 SL_DIR             = /home/vincenzi/SparseLibrary
-SL_INCLUDE         = -I$(SL_DIR)/include
+SL_INCLUDE         = -I$(SL_DIR)/include -I$(SL_DIR)/mv/include
 SL_LIB_DIR         = -L$(SL_DIR)/lib
 SL_LIB             = -lmv -lsparse -lspblas -lm
 
@@ -49,9 +49,9 @@ CUBLAS_LIB         = -lcublasemu
 # Direct compiling parameters
 #
 
-DIRECT_INCLUDE     = $(TL_INCLUDE) $(SLU_INCLUDE)
-DIRECT_LIB_DIR     = $(TL_LIB_DIR) $(SLU_LIB_DIR)
-DIRECT_LIB         = $(TL_LIB) $(SLU_LIB)
+DIRECT_INCLUDE     = $(TL_INCLUDE) $(SLU_INCLUDE) $(SL_INCLUDE)
+DIRECT_LIB_DIR     = $(TL_LIB_DIR) $(SLU_LIB_DIR) $(SL_LIB_DIR)
+DIRECT_LIB         = $(TL_LIB) $(SLU_LIB) $(SL_LIB)
 DIRECT_EXECS       = direct_small_step direct_big_step \
                      direct_small_step_print_temps direct_big_step_print_temps
 
@@ -59,7 +59,7 @@ DIRECT_EXECS       = direct_small_step direct_big_step \
 # Iterative compiling parameters
 #
 
-ITERATIVE_INCLUDE  = $(TL_INCLUDE)
+ITERATIVE_INCLUDE  = $(TL_INCLUDE) $(SL_INCLUDE)
 ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR) $(CUBLAS_LIB_DIR)
 ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB) $(CUBLAS_LIB)
 ITERATIVE_EXECS    = iterative_small_step iterative_big_step \
