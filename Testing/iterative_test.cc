@@ -11,6 +11,7 @@ extern void print_sl_profile_data(void);
 /******************************************************************************/
 /******************************************************************************/
 
+#if defined PRINT_TEMPS
 void
 print_temps
 (
@@ -18,7 +19,6 @@ print_temps
   struct StackDescription     *stkd ,
   double                      time
 )
-#if defined PRINT_TEMPS
 {
   int column ;
   int ncolumns = get_number_of_columns(stkd->Dimensions) ;
@@ -57,11 +57,14 @@ print_temps
                 (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
 }
 #else
+void
+print_temps
+(
+  struct ThermalDataIterative __attribute__((unused)) *tdata,
+  struct StackDescription __attribute__((unused)) *stkd ,
+  double __attribute__((unused)) time
+)
 {
-  // just to avoid warning messages ...
-  *tdata = *tdata ;
-  *stkd  = *stkd ;
-  time   = time ;
 }
 #endif
 
@@ -77,22 +80,22 @@ int
 simulate
 (
   struct ThermalDataIterative *tdata,
-  struct StackDescription     *stkd ,
-  double                      sim_time ,
-  double                      delta_time,
-  int                         max_iter,
-  double                      tolerance
+  struct StackDescription  *stkd ,
+  double                   sim_time ,
+  double                   delta_time,
+  int                      max_iter,
+  double                   tolerance
 )
 {
   int result ;
   int local_max_iter ;
   double local_tolerance ;
 
-#if !defined SMALL
-  static double print_time = delta_time = sim_time ;
-#else
+#if defined SMALL
   for (double time = delta_time ; time <= sim_time ; time += delta_time)
   {
+#else
+    delta_time = sim_time ;
 #endif
 
     local_max_iter  = max_iter ;
@@ -116,6 +119,7 @@ simulate
 #if defined SMALL
     print_temps (tdata, stkd, time) ;
 #else
+    static double print_time = sim_time ;
     print_temps (tdata, stkd, print_time) ;
     print_time += sim_time ;
 #endif

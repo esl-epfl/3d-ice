@@ -79,11 +79,11 @@ simulate
 {
   int result ;
 
-#if !defined SMALL
-  static double print_time = delta_time = sim_time ;
-#else
+#if defined SMALL
   for (double time = delta_time ; time <= sim_time ; time += delta_time)
   {
+#else
+    delta_time = sim_time ;
 #endif
 
     result = solve_system_direct (tdata, delta_time) ;
@@ -96,6 +96,7 @@ simulate
 #if defined SMALL
     print_temps (tdata, stkd, time) ;
 #else
+    static double print_time = sim_time ;
     print_temps (tdata, stkd, print_time) ;
     print_time += sim_time ;
 #endif
