@@ -13,9 +13,9 @@
 
 #include "conductances.h"
 #include "stack_description.h"
-#include "system_matrix.h"
 
 #include "mvvd.h"
+#include "comprow_double.h"
 
 #include "slu_ddefs.h"
 
@@ -25,18 +25,18 @@
 
   struct ThermalDataDirect
   {
-    double              *Temperatures ;
-    double              *Sources ;
-    double              *Capacities ;
+    MV_Vector_double Temperatures ;
+    MV_Vector_double Sources ;
+    MV_Vector_double Capacities ;
+
     struct Conductances *Conductances ;
 
     int    Size ;
     double initial_temperature ,
            delta_time ;
 
-    struct SystemMatrix SMD_A ;
-
-    MV_Vector_double D_Vector_B ;
+    CompRow_Mat_double D_Matrix_A ;
+    MV_Vector_double   D_Vector_B ;
 
     SuperMatrix SLUMatrix_A ,
                 SLUMatrix_A_Permuted ,
@@ -61,7 +61,6 @@
   (
     struct StackDescription  *stkd,
     struct ThermalDataDirect *tdata,
-    enum MatrixStorage_t     storage,
     double                   initial_temperature,
     double                   delta_time
   ) ;
@@ -85,11 +84,5 @@
     struct ThermalDataDirect *tdata,
     double total_time
   ) ;
-
-  void
-  print_system_matrix_direct (struct ThermalDataDirect *tdata) ;
-
-  void
-  print_sources_direct (struct ThermalDataDirect *tdata) ;
 
 #endif /* _TL_THERMAL_DATA_DIRECT_H_ */

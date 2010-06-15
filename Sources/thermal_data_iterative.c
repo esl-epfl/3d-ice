@@ -55,14 +55,6 @@
 #  include "cublas.h"
 #endif
 
-
-static
-void
-init_data (double *data, int size, double init_value)
-{
-  while (size--) *data++ = init_value ;
-}
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -97,51 +89,25 @@ init_thermal_data_iterative
 
   /* Memory allocation */
 
-  if ( (tdata->Temperatures
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    return 0 ;
-
-  if ( (tdata->Sources
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    goto sources_fail ;
-
-  if ( (tdata->Capacities
-        = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    goto capacities_fail ;
-
   if ( (tdata->Conductances
          = (struct Conductances *) malloc (sizeof(struct Conductances)*tdata->Size)) == NULL)
 
-    goto conductances_fail ;
+    return 0 ;
 
-  if ( alloc_system_matrix (&tdata->SM_A, TL_CCS_MATRIX,
-                            tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
-    goto sm_a_fail ;
+  tdata->Temperatures.newsize(tdata->Size) ;
+  tdata->Temperatures = initial_temperature ;
+
+  tdata->Sources.newsize(tdata->Size) ;
+  tdata->Sources = 0.0 ;
+
+  tdata->Capacities.newsize(tdata->Size) ;
 
   tdata->I_Vector_B.newsize(tdata->Size) ;
 
-  /* Set initial values */
-
-  init_data (tdata->Temperatures, tdata->Size, initial_temperature) ;
-  init_data (tdata->Sources, tdata->Size, 0.0) ;
+  tdata->I_Matrix_A.newsize(tdata->Size, tdata->Size,
+                            stkd->Dimensions->Grid.NNz) ;
 
   return 1 ;
-
-  /* Free if malloc errors */
-
-sm_a_fail :
-  free (tdata->Conductances) ;
-conductances_fail :
-  free (tdata->Capacities) ;
-capacities_fail :
-  free (tdata->Sources) ;
-sources_fail :
-  free (tdata->Temperatures) ;
-
-  return 0 ;
 }
 
 /******************************************************************************/
@@ -154,12 +120,7 @@ free_thermal_data_iterative
   struct ThermalDataIterative *tdata
 )
 {
-  free (tdata->Temperatures) ;
-  free (tdata->Sources) ;
-  free (tdata->Capacities) ;
   free (tdata->Conductances) ;
-
-  free_system_matrix (&tdata->SM_A) ;
 
 #ifdef SUPPORT_CUBLAS
   cublasStatus stat;
@@ -188,15 +149,17 @@ fill_thermal_data_iterative
   {
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
-    fill_capacities_stack_description (stkd, tdata->Capacities,
+    fill_capacities_stack_description (stkd, &tdata->Capacities[0],
                                              tdata->delta_time) ;
 
-    fill_system_matrix
+    fill_ccs_system_matrix_stack_description
     (
       stkd,
-      &tdata->SM_A,
       tdata->Conductances,
-      tdata->Capacities
+      &tdata->Capacities[0],
+      &tdata->I_Matrix_A.col_ptr(0),
+      &tdata->I_Matrix_A.row_ind(0),
+      &tdata->I_Matrix_A.val(0)
     ) ;
 
     stkd->Channel->FlowRateChanged = 0 ;
@@ -205,7 +168,7 @@ fill_thermal_data_iterative
 
   if (stkd->PowerValuesChanged == 1)
   {
-    fill_sources_stack_description (stkd, tdata->Sources) ;
+    fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
 
     for(int count = 0 ; count < tdata->Size ; count++)
     {
@@ -238,15 +201,10 @@ solve_system_iterative
   int result, counter, local_max_iterations = *max_iterations ;
   double local_tolerance = *tolerance;
 
-  CompCol_Mat_double A (
-    tdata->SM_A.Size, tdata->SM_A.Size, tdata->SM_A.NNz,
-    tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns
-  ) ;
-
-  CompCol_ILUPreconditioner_double Preconditioner (A) ;
+  CompCol_ILUPreconditioner_double Preconditioner (tdata->I_Matrix_A) ;
 
 #if defined   TL_QMR_ITERATIVE_SOLVER
-  CompCol_ILUPreconditioner_double Preconditioner2 (A) ;
+  CompCol_ILUPreconditioner_double Preconditioner2 (tdata->I_Matrix_A) ;
 #elif defined TL_GMRES_ITERATIVE_SOLVER
   MATRIX_double H(restart+1, restart, 0.0);
 #endif
@@ -263,7 +221,7 @@ solve_system_iterative
 
     result = iterative_solver
              (
-               A, x, tdata->I_Vector_B, Preconditioner,
+               tdata->I_Matrix_A, x, tdata->I_Vector_B, Preconditioner,
 #if defined   TL_QMR_ITERATIVE_SOLVER
                Preconditioner2,
 #elif defined TL_GMRES_ITERATIVE_SOLVER
@@ -289,55 +247,6 @@ solve_system_iterative
   *tolerance      = local_tolerance ;
 
   return 0 ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-void
-print_system_matrix_iterative
-(
-  struct ThermalDataIterative *tdata
-)
-{
-  if (tdata->SM_A.Storage == TL_CCS_MATRIX)
-  {
-    print_system_matrix_columns(&tdata->SM_A, "bicg_sm_ccs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "bicg_sm_ccs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "bicg_sm_ccs_values.txt") ;
-  }
-  else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
-  {
-    print_system_matrix_columns(&tdata->SM_A, "bicg_sm_crs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "bicg_sm_crs_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "bicg_sm_crs_values.txt") ;
-  }
-  else
-    fprintf (stderr, "Matrix format unknown\n") ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_sources_iterative
-(
-  struct ThermalDataIterative *tdata
-)
-{
-  int counter ;
-  FILE *file = fopen("source_values.txt", "w") ;
-
-  if (file == NULL) return ;
-
-  for (counter = 0 ; counter < tdata->Size ; counter++ )
-
-    if (tdata->Sources[counter] != 0)
-
-      fprintf (file, "%d\t %.6e\n", counter + 1, tdata->Sources[counter]) ;
-
-  fclose (file) ;
 }
 
 /******************************************************************************/

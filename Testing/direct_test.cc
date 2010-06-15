@@ -134,7 +134,7 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
-  init_thermal_data_direct (&stkd, &tdata, TL_CCS_MATRIX, 300.00, delta_time) ;
+  init_thermal_data_direct (&stkd, &tdata, 300.00, delta_time) ;
 
 #if defined PRINT_TEMPS
   print_stack_description (stdout, "", &stkd) ;

@@ -13,13 +13,6 @@
 
 #include "thermal_data_direct.h"
 
-static
-void
-init_data (double *data, int size, double init_value)
-{
-  while (size--) *data++ = init_value ;
-}
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -29,7 +22,6 @@ init_thermal_data_direct
 (
   struct StackDescription  *stkd,
   struct ThermalDataDirect *tdata,
-  enum MatrixStorage_t     storage,
   double                   initial_temperature,
   double                   delta_time
 )
@@ -42,25 +34,10 @@ init_thermal_data_direct
 
   /* Memory allocation */
 
-  if ( (tdata->Temperatures
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    return 0 ;
-
-  if ( (tdata->Sources
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    goto sources_fail ;
-
-  if ( (tdata->Capacities
-        = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
-
-    goto capacities_fail ;
-
   if ( (tdata->Conductances
          = (struct Conductances *) malloc (sizeof(struct Conductances)*tdata->Size)) == NULL)
 
-    goto conductances_fail ;
+    return 0 ;
 
   if ( (tdata->SLU_PermutationMatrixR
          = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
@@ -77,18 +54,20 @@ init_thermal_data_direct
 
     goto slu_etree_fail ;
 
-  if ( alloc_system_matrix (&tdata->SMD_A, storage,
-                            tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
-    goto sm_a_fail ;
-
-  tdata->D_Vector_B.newsize(tdata->Size) ;
-
-  StatInit (&tdata->SLU_Stat) ;
+  tdata->Temperatures.newsize (tdata->Size) ;
+  tdata->Sources.newsize      (tdata->Size) ;
+  tdata->Capacities.newsize   (tdata->Size) ;
+  tdata->D_Matrix_A.newsize   (tdata->Size,
+                               tdata->Size,
+                               stkd->Dimensions->Grid.NNz) ;
+  tdata->D_Vector_B.newsize   (tdata->Size) ;
 
   /* Set initial values */
 
-  init_data (tdata->Temperatures, tdata->Size, initial_temperature) ;
-  init_data (tdata->Sources, tdata->Size, 0.0) ;
+  tdata->Temperatures = initial_temperature;
+  tdata->Sources = 0.0;
+
+  StatInit (&tdata->SLU_Stat) ;
 
   set_default_options (&tdata->SLU_Options) ;
 
@@ -99,49 +78,42 @@ init_thermal_data_direct
   tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
   tdata->SLU_Options.DiagPivotThresh = 0.01 ;
 
-  if (storage == TL_CRS_MATRIX)
-
-    dCreate_CompRow_Matrix  /* Matrix A */
-    (
-      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SMD_A.NNz,
-      tdata->SMD_A.Values, tdata->SMD_A.Columns, tdata->SMD_A.Rows,
-      SLU_NR, SLU_D, SLU_GE
-    ) ;
-
-  else
-
-    dCreate_CompCol_Matrix  /* Matrix A */
-    (
-      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SMD_A.NNz,
-      tdata->SMD_A.Values, tdata->SMD_A.Rows, tdata->SMD_A.Columns,
-      SLU_NC, SLU_D, SLU_GE
-    ) ;
+  dCreate_CompRow_Matrix                /* Matrix A */
+  (
+   &tdata->SLUMatrix_A,                 // SLU Matrix Refernce
+   tdata->D_Matrix_A.size(0),           // #rows
+   tdata->D_Matrix_A.size(1),           // #columns
+   tdata->D_Matrix_A.NumNonzeros(),     // #nonzeroes
+   &tdata->D_Matrix_A.val(0),           // Coefficients reference
+   &tdata->D_Matrix_A.col_ind(0),       // Column indeces reference
+   &tdata->D_Matrix_A.row_ptr(0),       // Row pointers reference
+   SLU_NR,                              // row-wize, no supernode
+   SLU_D,                               // double precision
+   SLU_GE                               // general matrix
+  ) ;
 
   dCreate_Dense_Matrix  /* Vector B */
   (
-    &tdata->SLUMatrix_B, tdata->Size, 1,
-    &tdata->D_Vector_B[0], tdata->Size,
-    SLU_DN, SLU_D, SLU_GE
+    &tdata->SLUMatrix_B,                // Slu Vector reference
+    tdata->Size,                        // #rows
+    1,                                  // #columns
+    &tdata->D_Vector_B[0],              // Coefficients reference
+    tdata->Size,                        // leading dimension
+    SLU_DN,                             // column-wise storage for dense matrix
+    SLU_D,                              // double precision
+    SLU_GE                              // general matrix
   );
 
   return 1 ;
 
   /* Free if malloc errors */
 
-sm_a_fail :
-  free (tdata->SLU_Etree) ;
 slu_etree_fail :
   free (tdata->SLU_PermutationMatrixR);
 slu_perm_c_fail :
   free (tdata->SLU_PermutationMatrixR) ;
 slu_perm_r_fail :
   free (tdata->Conductances) ;
-conductances_fail :
-  free (tdata->Capacities) ;
-capacities_fail :
-  free (tdata->Sources) ;
-sources_fail :
-  free (tdata->Temperatures) ;
 
   return 0 ;
 }
@@ -158,9 +130,6 @@ free_thermal_data_direct
 {
   if (tdata == NULL) return ;
 
-  free (tdata->Temperatures) ;
-  free (tdata->Sources) ;
-  free (tdata->Capacities) ;
   free (tdata->Conductances) ;
 
   free (tdata->SLU_PermutationMatrixR) ;
@@ -170,8 +139,6 @@ free_thermal_data_direct
   StatFree (&tdata->SLU_Stat) ;
 
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
-  free_system_matrix        (&tdata->SMD_A) ;
-
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
 
   if (tdata->SLU_Options.Fact != DOFACT )
@@ -197,15 +164,17 @@ fill_thermal_data_direct
   {
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
-    fill_capacities_stack_description (stkd, tdata->Capacities,
+    fill_capacities_stack_description (stkd, &tdata->Capacities[0],
                                              tdata->delta_time) ;
 
-    fill_system_matrix
+    fill_crs_system_matrix_stack_description
     (
       stkd,
-      &tdata->SMD_A,
       tdata->Conductances,
-      tdata->Capacities
+      &tdata->Capacities[0],
+      &tdata->D_Matrix_A.row_ptr(0),
+      &tdata->D_Matrix_A.col_ind(0),
+      &tdata->D_Matrix_A.val(0)
     ) ;
 
     if (tdata->SLU_Options.Fact == FACTORED)
@@ -217,7 +186,7 @@ fill_thermal_data_direct
       tdata->SLU_Options.Fact = DOFACT ;
 
 
-    fill_sources_stack_description (stkd, tdata->Sources) ;
+    fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
 
     for(int count = 0 ; count < tdata->Size ; count++)
     {
@@ -232,7 +201,7 @@ fill_thermal_data_direct
 
   if (stkd->PowerValuesChanged == 1)
   {
-    fill_sources_stack_description (stkd, tdata->Sources) ;
+    fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
 
     for(int count = 0 ; count < tdata->Size ; count++)
     {
@@ -317,56 +286,6 @@ solve_system_direct
   }
 
   return tdata->SLU_Info ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_system_matrix_direct
-(
-  struct ThermalDataDirect *tdata
-)
-{
-  if (tdata->SMD_A.Storage == TL_CCS_MATRIX)
-  {
-    print_system_matrix_columns(&tdata->SMD_A, "slu_sm_ccs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SMD_A, "slu_sm_ccs_rows.txt") ;
-    print_system_matrix_values (&tdata->SMD_A, "slu_sm_ccs_values.txt") ;
-  }
-  else if (tdata->SMD_A.Storage == TL_CRS_MATRIX)
-  {
-    print_system_matrix_columns(&tdata->SMD_A, "slu_sm_crs_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SMD_A, "slu_sm_crs_rows.txt") ;
-    print_system_matrix_values (&tdata->SMD_A, "slu_sm_crs_values.txt") ;
-  }
-  else
-    fprintf (stderr, "Matrix format unknown\n") ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_sources_direct
-(
-  struct ThermalDataDirect *tdata
-)
-{
-  int counter ;
-  FILE *file = fopen("source_values.txt", "w") ;
-
-  if (file == NULL) return ;
-
-  for (counter = 0 ; counter < tdata->Size ; counter++ )
-
-    if (tdata->Sources[counter] != 0)
-
-      fprintf (file, "%d\t %.6e\n", counter + 1, tdata->Sources[counter]) ;
-
-  fclose (file) ;
 }
 
 /******************************************************************************/

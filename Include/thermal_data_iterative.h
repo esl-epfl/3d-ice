@@ -13,9 +13,9 @@
 
 #include "conductances.h"
 #include "stack_description.h"
-#include "system_matrix.h"
 
 #include "mvvd.h"
+#include "compcol_double.h"
 
 /******************************************************************************
  * "ThermalDataIterative"                                                     *
@@ -23,17 +23,18 @@
 
   struct ThermalDataIterative
   {
-    double              *Temperatures ;
-    double              *Sources ;
-    double              *Capacities ;
+    MV_Vector_double Temperatures ;
+    MV_Vector_double Sources ;
+    MV_Vector_double Capacities ;
+
     struct Conductances *Conductances ;
 
     int    Size ;
     double initial_temperature ,
            delta_time ;
 
-    struct SystemMatrix SM_A ;
-    MV_Vector_double I_Vector_B ;
+    CompCol_Mat_double I_Matrix_A ;
+    MV_Vector_double   I_Vector_B ;
 
   } ;
 
@@ -72,11 +73,5 @@
     ,int                        restart
 #endif
   ) ;
-
-  void
-  print_system_matrix_iterative (struct ThermalDataIterative *tdata) ;
-
-  void
-  print_sources_iterative (struct ThermalDataIterative *tdata) ;
 
 #endif /* _TL_THERMAL_DATA_ITERATIVE_H_ */

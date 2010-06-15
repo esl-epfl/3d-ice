@@ -37,7 +37,7 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/stack_description_scanner.o   \
           Sources/stack_description_parser.o    \
           Sources/stack_description.o           \
-          Sources/system_matrix.o               \
+          Sources/add_rows_and_columns.o        \
           Sources/conductances.o                \
           Sources/thermal_data_direct.o         \
           Sources/thermal_data_iterative.o
@@ -164,7 +164,7 @@ Sources/stack_description.o: Sources/stack_description.c \
 
 ################################################################################
 
-Sources/system_matrix.o: Sources/system_matrix.c Include/system_matrix.h
+Sources/add_rows_and_columns.o: Sources/add_rows_and_columns.c Include/add_rows_and_columns.h
 	$(CC) $(CFLAGS) $(DEBUG) -o $@ $(TL_INCLUDE) -c $<
 
 ################################################################################
