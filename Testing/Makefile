@@ -1,6 +1,6 @@
 
 CPP                = g++
-CPPFLAGS           = -Wall -Wextra -pedantic -g -O3
+CPPFLAGS           = -Wall -Wextra -pedantic -g -O3 -DSL_PROFILE
 
 #
 # Thermal Library
@@ -60,8 +60,8 @@ DIRECT_EXECS       = direct_small_step direct_big_step \
 #
 
 ITERATIVE_INCLUDE  = $(TL_INCLUDE) $(SL_INCLUDE)
-ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR) $(CUBLAS_LIB_DIR)
-ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB) $(CUBLAS_LIB)
+ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR)# $(CUBLAS_LIB_DIR)
+ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB)# $(CUBLAS_LIB)
 ITERATIVE_EXECS    = iterative_small_step iterative_big_step \
                      iterative_small_step_print_temps iterative_big_step_print_temps
 

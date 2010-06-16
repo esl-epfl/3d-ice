@@ -16,6 +16,7 @@
 
 #include "mvvd.h"
 #include "compcol_double.h"
+#include "ilupre_double.h"
 
 /******************************************************************************
  * "ThermalDataIterative"                                                     *
@@ -35,6 +36,12 @@
 
     CompCol_Mat_double I_Matrix_A ;
     MV_Vector_double   I_Vector_B ;
+
+    CompCol_ILUPreconditioner Preconditioner;
+
+#if defined TL_QMR_ITERATIVE_SOLVER
+    CompCol_ILUPreconditioner Preconditioner2;
+#endif
 
   } ;
 

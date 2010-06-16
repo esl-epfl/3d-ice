@@ -180,7 +180,8 @@ Sources/thermal_data_direct.o: Sources/thermal_data_direct.c Include/thermal_dat
 ################################################################################
 
 Sources/thermal_data_iterative.o: Sources/thermal_data_iterative.c Include/thermal_data_iterative.h
-	$(CC) $(CFLAGS) $(DEBUG) $(ITERATIVE_SOLVER) -DSUPPORT_CUBLAS -o $@ $(TL_INCLUDE) $(IML_INCLUDE) $(SL_INCLUDE) $(CUBLAS_INCLUDE) -c $<
+#	$(CC) $(CFLAGS) $(DEBUG) $(ITERATIVE_SOLVER) -DSUPPORT_CUBLAS -o $@ $(TL_INCLUDE) $(IML_INCLUDE) $(SL_INCLUDE) $(CUBLAS_INCLUDE) -c $<
+	$(CC) $(CFLAGS) $(DEBUG) $(ITERATIVE_SOLVER) -o $@ $(TL_INCLUDE) $(IML_INCLUDE) $(SL_INCLUDE) -c $<
 
 ################################################################################
 
