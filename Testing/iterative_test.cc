@@ -68,8 +68,8 @@ simulate
   struct StackDescription  *stkd ,
   double                   sim_time ,
   double                   delta_time,
-  int                      max_iter,
-  double                   tolerance
+  double                   tolerance,
+  int                      max_iter
 )
 {
   int result, local_max_iter ;
