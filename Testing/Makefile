@@ -1,6 +1,6 @@
 
 CPP                = g++
-CPPFLAGS           = -Wall -Wextra -pedantic -g -O3
+CPPFLAGS           = -Wall -Wextra -pedantic -O3 
 
 #
 # Thermal Library
@@ -52,8 +52,7 @@ CUBLAS_LIB         = -lcublasemu
 DIRECT_INCLUDE     = $(TL_INCLUDE) $(SLU_INCLUDE) $(SL_INCLUDE)
 DIRECT_LIB_DIR     = $(TL_LIB_DIR) $(SLU_LIB_DIR) $(SL_LIB_DIR)
 DIRECT_LIB         = $(TL_LIB) $(SLU_LIB) $(SL_LIB)
-DIRECT_EXECS       = direct_small_step direct_big_step \
-                     direct_small_step_print_temps direct_big_step_print_temps
+DIRECT_EXECS       = direct direct_print_temps
 
 #
 # Iterative compiling parameters
@@ -62,8 +61,7 @@ DIRECT_EXECS       = direct_small_step direct_big_step \
 ITERATIVE_INCLUDE  = $(TL_INCLUDE) $(SL_INCLUDE)
 ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR)# $(CUBLAS_LIB_DIR)
 ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB)# $(CUBLAS_LIB)
-ITERATIVE_EXECS    = iterative_small_step iterative_big_step \
-                     iterative_small_step_print_temps iterative_big_step_print_temps
+ITERATIVE_EXECS    = iterative iterative_print_temps
 
 
 EXECS = $(DIRECT_EXECS) $(ITERATIVE_EXECS)
@@ -74,60 +72,36 @@ all : $(EXECS)
 ## Direct ######################################################################
 ################################################################################
 
-direct_small_step: direct_small_step.o
+direct: direct.o
 	$(CPP) $(CPPFLAGS) $< $(DIRECT_LIB_DIR) $(DIRECT_LIB) -o $@
 
-direct_big_step: direct_big_step.o
-	$(CPP) $(CPPFLAGS) $< $(DIRECT_LIB_DIR) $(DIRECT_LIB) -o $@
-
-direct_small_step_print_temps: direct_small_step_print_temps.o
-	$(CPP) $(CPPFLAGS) $< $(DIRECT_LIB_DIR) $(DIRECT_LIB) -o $@
-
-direct_big_step_print_temps: direct_big_step_print_temps.o
+direct_print_temps: direct_print_temps.o
 	$(CPP) $(CPPFLAGS) $< $(DIRECT_LIB_DIR) $(DIRECT_LIB) -o $@
 
 ################################################################################
 
-direct_small_step.o: direct_test.cc
-	$(CPP) $(CPPFLAGS) -c $< -DSMALL $(DIRECT_INCLUDE) -o $@
-
-direct_big_step.o: direct_test.cc
+direct.o: direct_test.cc
 	$(CPP) $(CPPFLAGS) -c $< $(DIRECT_INCLUDE) -o $@
 
-direct_small_step_print_temps.o: direct_test.cc
-	$(CPP) $(CPPFLAGS) -c $< -DSMALL -DPRINT_TEMPS $(DIRECT_INCLUDE) -o $@
-
-direct_big_step_print_temps.o: direct_test.cc
+direct_print_temps.o: direct_test.cc
 	$(CPP) $(CPPFLAGS) -c $< -DPRINT_TEMPS $(DIRECT_INCLUDE) -o $@
 
 ################################################################################
 # Iterative  ###################################################################
 ################################################################################
 
-iterative_small_step: iterative_small_step.o
+iterative: iterative.o
 	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
 
-iterative_big_step: iterative_big_step.o
-	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
-
-iterative_small_step_print_temps: iterative_small_step_print_temps.o
-	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
-
-iterative_big_step_print_temps: iterative_big_step_print_temps.o
+iterative_print_temps: iterative_print_temps.o
 	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
 
 ################################################################################
 
-iterative_small_step.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) -DSMALL $(ITERATIVE_INCLUDE) -o $@
-
-iterative_big_step.o: iterative_test.cc
+iterative.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) $(ITERATIVE_INCLUDE) -o $@
 
-iterative_small_step_print_temps.o: iterative_test.cc
-	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) -DSMALL -DPRINT_TEMPS $(ITERATIVE_INCLUDE) -o $@
-
-iterative_big_step_print_temps.o: iterative_test.cc
+iterative_print_temps.o: iterative_test.cc
 	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) -DPRINT_TEMPS $(ITERATIVE_INCLUDE) -o $@
 
 ###############################################################################
@@ -135,3 +109,4 @@ iterative_big_step_print_temps.o: iterative_test.cc
 clean:
 	@rm -vf *.o
 	@rm -vf $(EXECS)
+

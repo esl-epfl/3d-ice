@@ -7,6 +7,10 @@
 extern void print_sl_profile_data(void);
 #endif
 
+#if defined TL_GMRES_ITERATIVE_SOLVER
+int restart ;
+#endif
+
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -56,25 +60,6 @@ print_temps
                 (tdie_2_row_099 + tdie_2_row_100)/2.0,
                 (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
 }
-#else
-void
-print_temps
-(
-  struct ThermalDataIterative __attribute__((unused)) *tdata,
-  struct StackDescription __attribute__((unused)) *stkd ,
-  double __attribute__((unused)) time
-)
-{
-}
-#endif
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-#if defined TL_GMRES_ITERATIVE_SOLVER
-int restart ;
-#endif
 
 int
 simulate
@@ -87,16 +72,10 @@ simulate
   double                   tolerance
 )
 {
-  int result ;
-  int local_max_iter ;
+  int result, local_max_iter ;
   double local_tolerance ;
-
-#if defined SMALL
-  for (double time = delta_time ; time <= sim_time ; time += delta_time)
+  for (double time = 0.0; time <= sim_time ; time += delta_time)
   {
-#else
-    delta_time = sim_time ;
-#endif
 
     local_max_iter  = max_iter ;
     local_tolerance = tolerance ;
@@ -116,24 +95,14 @@ simulate
       return result ;
     }
 
-#if defined SMALL
     print_temps (tdata, stkd, time) ;
-#else
-    static double print_time = sim_time ;
-    print_temps (tdata, stkd, print_time) ;
-    print_time += sim_time ;
-#endif
-
-#if defined PRINT_TEMPS
     printf ("\t%d\t%e\n", local_max_iter, local_tolerance) ;
-#endif
-
-#if defined SMALL
   }
-#endif
 
   return 0 ;
 }
+
+#endif
 
 /******************************************************************************/
 /******************************************************************************/
@@ -166,6 +135,11 @@ main(int argc, char** argv)
   }
 #endif
 
+#ifndef PRINT_TEMPS
+  int local_max_iter;
+  double local_tolerance;
+#endif
+
   int max_iter = atoi (argv[2]) ;
   printf("Using max %d iterations\n", max_iter) ;
 
@@ -190,7 +164,8 @@ main(int argc, char** argv)
 #endif
 
 #if defined PRINT_TEMPS
-  print_stack_description (stdout, "", &stkd) ;
+  char prefix[] = "";
+  print_stack_description (stdout, prefix, &stkd) ;
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
   print_temps (&tdata, &stkd, 0.0) ;
@@ -202,27 +177,92 @@ main(int argc, char** argv)
   insert_all_power_values (&stkd, powers) ;
   fill_thermal_data_iterative (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+#ifdef PRINT_TEMPS
+  if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
     goto exit ;
+#else
+  int result;
+  local_max_iter = max_iter;
+  local_tolerance = tolerance;
+  result = solve_system_iterative (&tdata, sim_time,
+                                   &local_tolerance, &local_max_iter
+#                                  if defined TL_GMRES_ITERATIVE_SOLVER
+                                   , restart);
+#                                  endif
+                                  );
+  if (result != 0)
+  {
+    printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
+    goto exit ;
+  }
+#endif
 
   change_coolant_flow_rate (&stkd, 0.7) ;
   fill_thermal_data_iterative (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+#ifdef PRINT_TEMPS
+  if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
     goto exit ;
+#else
+  local_max_iter = max_iter;
+  local_tolerance = tolerance;
+  result = solve_system_iterative (&tdata, sim_time,
+                                   &local_tolerance, &local_max_iter
+#                                  if defined TL_GMRES_ITERATIVE_SOLVER
+                                   , restart);
+#                                  endif
+                                  );
+  if (result != 0)
+  {
+    printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
+    goto exit ;
+  }
+#endif
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
   fill_thermal_data_iterative (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+#ifdef PRINT_TEMPS
+  if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
     goto exit ;
+#else
+  local_max_iter = max_iter;
+  local_tolerance = tolerance;
+  result = solve_system_iterative (&tdata, sim_time,
+                                   &local_tolerance, &local_max_iter
+#                                  if defined TL_GMRES_ITERATIVE_SOLVER
+                                   , restart);
+#                                  endif
+                                  );
+  if (result != 0)
+  {
+    printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
+    goto exit ;
+  }
+#endif
 
   change_coolant_flow_rate (&stkd, 1.4) ;
   fill_thermal_data_iterative (&stkd, &tdata) ;
 
-  if (simulate (&tdata, &stkd, sim_time, delta_time, max_iter, tolerance) != 0)
+#ifdef PRINT_TEMPS
+  if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
     goto exit ;
+#else
+  local_max_iter = max_iter;
+  local_tolerance = tolerance;
+  result = solve_system_iterative (&tdata, sim_time,
+                                   &local_tolerance, &local_max_iter
+#                                  if defined TL_GMRES_ITERATIVE_SOLVER
+                                   , restart);
+#                                  endif
+                                  );
+  if (result != 0)
+  {
+    printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
+    goto exit ;
+  }
+#endif
 
   printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 

@@ -52,21 +52,6 @@ print_temps
                 (tdie_2_row_099 + tdie_2_row_100)/2.0,
                 (tdie_3_row_099 + tdie_3_row_100)/2.0 ) ;
 }
-#else
-void
-print_temps
-(
-  struct ThermalDataDirect __attribute__((unused)) *tdata,
-  struct StackDescription __attribute__((unused)) *stkd ,
-  double __attribute__((unused)) time
-)
-{
-}
-#endif
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 int
 simulate
@@ -78,35 +63,19 @@ simulate
 )
 {
   int result ;
-
-#if defined SMALL
-  for (double time = delta_time ; time <= sim_time ; time += delta_time)
+  for (double time = 0.0 ; time <= sim_time ; time += delta_time)
   {
-#else
-    delta_time = sim_time ;
-#endif
-
     result = solve_system_direct (tdata, delta_time) ;
     if (result != 0)
     {
       printf("%d: Solver failed\n", result) ;
       return result ;
     }
-
-#if defined SMALL
     print_temps (tdata, stkd, time) ;
-#else
-    static double print_time = sim_time ;
-    print_temps (tdata, stkd, print_time) ;
-    print_time += sim_time ;
-#endif
-
-#if defined SMALL
   }
-#endif
-
   return 0 ;
 }
+#endif
 
 /******************************************************************************/
 /******************************************************************************/
@@ -138,7 +107,8 @@ main(int argc, char** argv)
   init_thermal_data_direct (&stkd, &tdata, 300.00, delta_time) ;
 
 #if defined PRINT_TEMPS
-  print_stack_description (stdout, "", &stkd) ;
+  char prefix[] = "";
+  print_stack_description (stdout, prefix, &stkd) ;
   printf("-----------------------------------------------------------------\n");
   printf("-----------------------------------------------------------------\n");
   print_temps (&tdata, &stkd, 0.0) ;
@@ -149,27 +119,60 @@ main(int argc, char** argv)
   insert_all_power_values (&stkd, powers) ;
   fill_thermal_data_direct (&stkd, &tdata) ;
 
+#ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
+#else
+  int result ;
+  if ((result = solve_system_direct (&tdata, sim_time)) != 0)
+  {
+    printf("%d: Solver failed\n", result) ;
+    goto exit ;
+  }
+#endif
 
   change_coolant_flow_rate (&stkd, 0.7) ;
   fill_thermal_data_direct (&stkd, &tdata) ;
 
+#ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
+#else
+  if ((result = solve_system_direct (&tdata, sim_time)) != 0)
+  {
+    printf("%d: Solver failed\n", result) ;
+    goto exit ;
+  }
+#endif
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
   fill_thermal_data_direct (&stkd, &tdata) ;
 
+#ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
+#else
+  if ((result = solve_system_direct (&tdata, sim_time)) != 0)
+  {
+    printf("%d: Solver failed\n", result) ;
+    goto exit ;
+  }
+#endif
 
   change_coolant_flow_rate (&stkd, 1.4) ;
   fill_thermal_data_direct (&stkd, &tdata) ;
 
+#ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time) != 0)
     goto exit ;
+#else
+  if ((result = solve_system_direct (&tdata, sim_time)) != 0)
+  {
+    printf("%d: Solver failed\n", result) ;
+    goto exit ;
+  }
+#endif
 
   printf ("sim time: %f\n", ( (double)clock() - time_start ) / CLOCKS_PER_SEC );
 

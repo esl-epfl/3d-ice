@@ -11,7 +11,7 @@
 #
 
 CC              = g++
-CFLAGS          = -Werror -Wall -Wextra -g -O3
+CFLAGS          = -Werror -Wall -Wextra -O3
 
 TL_INCLUDE      = -IInclude
 TL_LIB          = Lib/libThermalLibrary.a
