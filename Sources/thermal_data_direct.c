@@ -60,12 +60,11 @@ init_thermal_data_direct
   tdata->D_Matrix_A.newsize   (tdata->Size,
                                tdata->Size,
                                stkd->Dimensions->Grid.NNz) ;
-  tdata->D_Vector_B.newsize   (tdata->Size) ;
 
   /* Set initial values */
 
   tdata->Temperatures = initial_temperature;
-  tdata->Sources = 0.0;
+  tdata->Sources      = 0.0;
 
   StatInit (&tdata->SLU_Stat) ;
 
@@ -97,7 +96,7 @@ init_thermal_data_direct
     &tdata->SLUMatrix_B,                // Slu Vector reference
     tdata->Size,                        // #rows
     1,                                  // #columns
-    &tdata->D_Vector_B[0],              // Coefficients reference
+    &tdata->Temperatures[0],            // Coefficients reference
     tdata->Size,                        // leading dimension
     SLU_DN,                             // column-wise storage for dense matrix
     SLU_D,                              // double precision
@@ -161,30 +160,20 @@ fill_thermal_data_direct
 )
 {
   //
-  // FlowRateChanged is 0 when ThermalDataDirect is set to default with
-  // "init_thermal_data_direct". It becomes one after the parsing of the .stk
-  // file or throught "change_coolant_flow_rate".
+  // If the flow rate changed then all the conductances and then the
+  // capacities are re evaluated. With these new values the A matrix
+  // must be re filled and factorized. Since the flow rate is used also
+  // for heat injection, we must re evauate also the sources.
   //
 
   if (stkd->Channel->FlowRateChanged == 1)
   {
-    //
-    // if the flow rate has been changed ...
-    //
-    // All the conductances and then the capacities are re evaluated
-    // FlowRateChanged is then set to zero.
-    //
-
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
     fill_capacities_stack_description (stkd, &tdata->Capacities[0],
                                              tdata->delta_time) ;
 
     stkd->Channel->FlowRateChanged = 0 ;
-
-    //
-    // With these new values we re-create the A matrix.
-    //
 
     fill_crs_system_matrix_stack_description
     (
@@ -196,68 +185,33 @@ fill_thermal_data_direct
       &tdata->D_Matrix_A.val(0)
     ) ;
 
-    //
-    // If the matrix is already factored then we will perform a new
-    // factorization saving the permutation matrices (coefficents might
-    // be different but still in the same place). If it is in another
-    // tate, then we will refact the matrix from scratch.
-    //
-
     if (tdata->SLU_Options.Fact == FACTORED)
-
       tdata->SLU_Options.Fact = SamePattern ;
-
     else
-
       tdata->SLU_Options.Fact = DOFACT ;
-
-    //
-    // We recompute the sources. PowerValuesChanged is set to 0 to skip the next if.
-    // Necessary ???
-    //
 
     fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
     stkd->PowerValuesChanged = 0 ;
-
-    //
-    // We re compute the content of the B Vector since capacities (for
-    // sure) and sources (maybe) are different.
-    //
-
-    for(int count = 0 ; count < tdata->Size ; count++)
-    {
-        tdata->D_Vector_B[count] = tdata->Sources[count]
-                                   + tdata->Capacities[count]
-                                     * tdata->Temperatures[count] ;
-    }
   }
+
+  //
+  // If power values are different ne need to re compute the sources array.
+  //
 
   if (stkd->PowerValuesChanged == 1)
   {
-    //
-    // If power values are different ne need to re compute the sources
-    // array and update only the B vector.
-    //
-
     fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
-
-    for(int count = 0 ; count < tdata->Size ; count++)
-    {
-        tdata->D_Vector_B[count] = tdata->Sources[count]
-                                 + tdata->Capacities[count]
-                                   * tdata->Temperatures[count] ;
-    }
-
     stkd->PowerValuesChanged = 0 ;
   }
 
+  //
+  // If the A matrix is not factored, we factorize it .... this must
+  // be don at the end of this function since we must return the result
+  // of this operation.
+  //
+
   if (tdata->SLU_Options.Fact != FACTORED )
   {
-    //
-    // If the A matrix is not factored, we factorize it .... this must
-    // be don at the end of this function since we must report the result
-    // of this operation.
-    //
 
     get_perm_c (tdata->SLU_Options.ColPerm,
                 &tdata->SLUMatrix_A,
@@ -294,13 +248,18 @@ solve_system_direct
   double                   total_time
 )
 {
-  int counter;
+  int index;
 
   if (tdata->SLU_Options.Fact == DOFACT)
     return 1 ;
 
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
+
+    for (index = 0 ; index < tdata->Size ; index++)
+      tdata->Temperatures[index] = tdata->Sources[index]
+                                   + tdata->Capacities[index]
+                                     * tdata->Temperatures[index] ;
 
     dgstrs
     (
@@ -316,17 +275,6 @@ solve_system_direct
 
     if (tdata->SLU_Info != 0)
       break ;
-
-    for (counter = 0 ; counter < tdata->Size ; counter++)
-
-      tdata->Temperatures[counter] = tdata->D_Vector_B[counter] ;
-
-    for(int count = 0 ; count < tdata->Size ; count++)
-    {
-        tdata->D_Vector_B[count] = tdata->Sources[count]
-                                   + tdata->Capacities[count]
-                                     * tdata->Temperatures[count] ;
-    }
   }
 
   return tdata->SLU_Info ;

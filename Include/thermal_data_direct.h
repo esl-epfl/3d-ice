@@ -36,7 +36,6 @@
            delta_time ;
 
     CompRow_Mat_double D_Matrix_A ;
-    MV_Vector_double   D_Vector_B ;
 
     SuperMatrix SLUMatrix_A ,
                 SLUMatrix_A_Permuted ,
