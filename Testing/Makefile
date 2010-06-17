@@ -1,6 +1,6 @@
 
 CPP                = g++
-CPPFLAGS           = -Wall -Wextra -pedantic -g -O3 -DSL_PROFILE
+CPPFLAGS           = -Wall -Wextra -pedantic -g -O3
 
 #
 # Thermal Library

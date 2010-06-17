@@ -146,30 +146,21 @@ fill_thermal_data_iterative
 )
 {
   //
-  // FlowRateChanged is 0 when ThermalDataDirect is set to default with
-  // "init_thermal_data_direct". It becomes one after the parsing of the .stk
-  // file or throught "change_coolant_flow_rate".
+  // If the flow rate changed then all the conductances and then the
+  // capacities are re evaluated. With these new values the A matrix
+  // must be re filled and the preconditioner must be rebuilt.
+  // Since the flow rate is used also for heat injection, we must
+  // re evauate also the sources.
   //
 
   if (stkd->Channel->FlowRateChanged == 1)
   {
-    //
-    // if the flow rate has been changed ...
-    //
-    // All the conductances and then the capacities are re evaluated
-    // FlowRateChanged is then set to zero.
-    //
-
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
     fill_capacities_stack_description (stkd, &tdata->Capacities[0],
                                              tdata->delta_time) ;
 
     stkd->Channel->FlowRateChanged = 0 ;
-
-    //
-    // With these new values we re-create the A matrix and the preconditioner
-    //
 
     fill_ccs_system_matrix_stack_description
     (
@@ -186,43 +177,17 @@ fill_thermal_data_iterative
     tdata->Preconditioner2.reset(tdata->I_Matrix_A);
 #endif
 
-    //
-    // We recompute the sources. PowerValuesChanged is set to 0 to skip the next if.
-    // Necessary ???
-    //
-
     fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
     stkd->PowerValuesChanged = 0 ;
-
-    //
-    // We re compute the content of the B Vector since capacities (for
-    // sure) and sources (maybe) are different.
-    //
-
-    for(int count = 0 ; count < tdata->Size ; count++)
-    {
-        tdata->I_Vector_B[count] = tdata->Sources[count]
-                                   + tdata->Capacities[count]
-                                     * tdata->Temperatures[count] ;
-    }
   }
+
+  //
+  // If power values are different ne need to re compute the sources array.
+  //
 
   if (stkd->PowerValuesChanged == 1)
   {
-    //
-    // If power values are different ne need to re compute the sources
-    // array and update only the B vector.
-    //
-
     fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
-
-    for(int count = 0 ; count < tdata->Size ; count++)
-    {
-        tdata->I_Vector_B[count] = tdata->Sources[count]
-                                   + tdata->Capacities[count]
-                                     * tdata->Temperatures[count] ;
-    }
-
     stkd->PowerValuesChanged = 0 ;
   }
 
@@ -252,19 +217,22 @@ solve_system_iterative
   MATRIX_double H(restart+1, restart, 0.0);
 #endif
 
-  VECTOR_double x (tdata->Size) ;
-
-  for (counter = 0 ; counter < tdata->Size ; counter++)
-    x(counter) = tdata->Temperatures[counter] ;
-
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
     local_tolerance      = *tolerance ;
     local_max_iterations = *max_iterations ;
 
+    for (counter = 0 ; counter < tdata->Size ; counter++)
+    {
+      tdata->I_Vector_B[counter] = tdata->Sources[counter]
+                                   + tdata->Capacities[counter]
+                                     * tdata->Temperatures[counter] ;
+    }
+
     result = iterative_solver
              (
-               tdata->I_Matrix_A, x, tdata->I_Vector_B, tdata->Preconditioner,
+               tdata->I_Matrix_A, tdata->Temperatures, tdata->I_Vector_B,
+               tdata->Preconditioner,
 #if defined   TL_QMR_ITERATIVE_SOLVER
                tdata->Preconditioner2,
 #elif defined TL_GMRES_ITERATIVE_SOLVER
@@ -275,15 +243,6 @@ solve_system_iterative
 
     if ( result != 0)
       return result ;
-
-    for (counter = 0 ; counter < tdata->Size ; counter++)
-    {
-      tdata->Temperatures[counter] = x(counter) ;
-
-      tdata->I_Vector_B[counter] = tdata->Sources[counter]
-                                   + tdata->Capacities[counter]
-                                     * x(counter) ;
-    }
   }
 
   *max_iterations = local_max_iterations ;
