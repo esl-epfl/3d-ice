@@ -14,7 +14,8 @@
 #include "conductances.h"
 #include "stack_description.h"
 
-#include "mvvd.h"
+#include "mvv.h"
+#include "mvm.h"
 #include "compcol_double.h"
 #include "ilupre_double.h"
 
@@ -42,6 +43,9 @@
 #if defined TL_QMR_ITERATIVE_SOLVER
     CompCol_ILUPreconditioner Preconditioner2;
 #endif
+#if defined TL_GMRES_ITERATIVE_SOLVER
+    MV_ColMat_double H;
+#endif
 
   } ;
 
@@ -54,6 +58,9 @@
     struct ThermalDataIterative *tdata,
     double                      initial_temperature,
     double                      delta_time
+#if defined TL_GMRES_ITERATIVE_SOLVER
+    ,int                        restert
+#endif
   ) ;
 
   int

@@ -13,11 +13,6 @@
 
 #include "thermal_data_iterative.h"
 
-#include "ilupre_double.h"
-#include "compcol_double.h"
-
-#include "mvblasd.h"
-
 #if defined TL_BICG_ITERATIVE_SOLVER
 
 #  include "bicg.h"
@@ -66,6 +61,9 @@ init_thermal_data_iterative
   struct ThermalDataIterative *tdata,
   double                      initial_temperature,
   double                      delta_time
+#if defined TL_GMRES_ITERATIVE_SOLVER
+  ,int                        restart
+#endif
 )
 {
   if (tdata == NULL) return 0 ;
@@ -106,6 +104,11 @@ init_thermal_data_iterative
 
   tdata->I_Matrix_A.newsize(tdata->Size, tdata->Size,
                             stkd->Dimensions->Grid.NNz) ;
+
+#if defined TL_GMRES_ITERATIVE_SOLVER
+  tdata->H.newsize(restart+1, restart);
+  tdata->H = 0.0;
+#endif
 
   return 1 ;
 }
@@ -213,10 +216,6 @@ solve_system_iterative
   int result, counter, local_max_iterations = *max_iterations ;
   double local_tolerance = *tolerance;
 
-#if defined TL_GMRES_ITERATIVE_SOLVER
-  MATRIX_double H(restart+1, restart, 0.0);
-#endif
-
   for ( ; total_time > 0 ; total_time -= tdata->delta_time)
   {
     local_tolerance      = *tolerance ;
@@ -236,7 +235,7 @@ solve_system_iterative
 #if defined   TL_QMR_ITERATIVE_SOLVER
                tdata->Preconditioner2,
 #elif defined TL_GMRES_ITERATIVE_SOLVER
-               H, restart,
+               tdata->H, restart,
 #endif
                local_max_iterations, local_tolerance
              ) ;

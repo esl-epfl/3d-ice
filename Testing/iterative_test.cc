@@ -183,7 +183,11 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
-  init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time) ;
+#if defined TL_GMRES_ITERATIVE_SOLVER
+  init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time, restart);
+#else
+  init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time);
+#endif
 
 #if defined PRINT_TEMPS
   print_stack_description (stdout, "", &stkd) ;
