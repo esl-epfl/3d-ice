@@ -187,7 +187,7 @@ main(int argc, char** argv)
   result = solve_system_iterative (&tdata, sim_time,
                                    &local_tolerance, &local_max_iter
 #                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart);
+                                   , restart
 #                                  endif
                                   );
   if (result != 0)
@@ -209,7 +209,7 @@ main(int argc, char** argv)
   result = solve_system_iterative (&tdata, sim_time,
                                    &local_tolerance, &local_max_iter
 #                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart);
+                                   , restart
 #                                  endif
                                   );
   if (result != 0)
@@ -232,7 +232,7 @@ main(int argc, char** argv)
   result = solve_system_iterative (&tdata, sim_time,
                                    &local_tolerance, &local_max_iter
 #                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart);
+                                   , restart
 #                                  endif
                                   );
   if (result != 0)
@@ -254,7 +254,7 @@ main(int argc, char** argv)
   result = solve_system_iterative (&tdata, sim_time,
                                    &local_tolerance, &local_max_iter
 #                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart);
+                                   , restart
 #                                  endif
                                   );
   if (result != 0)
