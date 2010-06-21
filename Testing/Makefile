@@ -59,8 +59,8 @@ DIRECT_EXECS       = direct direct_print_temps
 #
 
 ITERATIVE_INCLUDE  = $(TL_INCLUDE) $(SL_INCLUDE)
-ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR)# $(CUBLAS_LIB_DIR)
-ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB)# $(CUBLAS_LIB)
+ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR)
+ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB)
 ITERATIVE_EXECS    = iterative iterative_print_temps
 
 

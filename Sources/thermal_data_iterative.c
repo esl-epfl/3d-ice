@@ -46,10 +46,6 @@
 
 #endif
 
-#ifdef SUPPORT_CUBLAS
-#  include "cublas.h"
-#endif
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -72,19 +68,6 @@ init_thermal_data_iterative
   tdata->initial_temperature = initial_temperature ;
   tdata->delta_time          = delta_time ;
 
-#ifdef SUPPORT_CUBLAS
-  cublasStatus stat;
-
-  cublasInit();
-
-  stat = cublasGetError();
-  if (stat != CUBLAS_STATUS_SUCCESS)
-  {
-    printf ("CUBLAS: cublasInit() error %d\n", stat);
-    return 0;
-  }
-#endif
-
   /* Memory allocation */
 
   if ( (tdata->Conductances
@@ -105,7 +88,9 @@ init_thermal_data_iterative
   tdata->I_Matrix_A.newsize(tdata->Size, tdata->Size,
                             stkd->Dimensions->Grid.NNz) ;
 
+  tdata->Preconditioner.newsize(tdata->I_Matrix_A);
 #if defined TL_GMRES_ITERATIVE_SOLVER
+  tdata->Preconditioner2.newsize(tdata->I_Matrix_A);
   tdata->H.newsize(restart+1, restart);
   tdata->H = 0.0;
 #endif
@@ -124,17 +109,6 @@ free_thermal_data_iterative
 )
 {
   free (tdata->Conductances) ;
-
-#ifdef SUPPORT_CUBLAS
-  cublasStatus stat;
-
-  cublasShutdown();
-
-  stat = cublasGetError();
-  if (stat != CUBLAS_STATUS_SUCCESS)
-    printf ("CUBLAS: cublasShutdown() error %d\n", stat);
-#endif
-
 }
 
 /******************************************************************************/
