@@ -219,7 +219,7 @@ add_ccs_solid_column
 /******************************************************************************/
 
 int
-add_crs_solid_column
+add_crs_solid_row
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -476,7 +476,7 @@ add_ccs_liquid_column
   if ( current_row > 0 )   /* SOUTH */
   {
     *rows++   = current_cell - ROW_OFFSET(dim) ;
-    *values++ = conductances->North ; // == (C)
+    *values++ = conductances->North ; // == C
 
     (*columns)++ ;
     added++ ;
@@ -585,7 +585,7 @@ add_ccs_liquid_column
 
   if (current_row == 0 || current_row == dim->Grid.NRows - 1)
 
-    *diagonal_pointer += conductances->North ; // == (C)
+    *diagonal_pointer += conductances->North ; // == C
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fgetpos (debug, &last_fpos) ;
@@ -604,7 +604,7 @@ add_ccs_liquid_column
 /******************************************************************************/
 
 int
-add_crs_liquid_column
+add_crs_liquid_row
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
@@ -663,7 +663,7 @@ add_crs_liquid_column
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
     *columns++ = current_cell + ROW_OFFSET(dim) ;
-    *values++  = conductances->South ; // == -C
+    *values++  = conductances->North ; // == C
 
     (*rows)++ ;
     added ++ ;
@@ -734,7 +734,7 @@ add_crs_liquid_column
   if ( current_row > 0 )   /* SOUTH */
   {
     *columns++ = current_cell - ROW_OFFSET(dim) ;
-    *values++  = conductances->North ; // == (C)
+    *values++  = conductances->South ; // == -C
 
     (*rows)++ ;
     added++ ;
@@ -772,7 +772,7 @@ add_crs_liquid_column
 
   if (current_row == 0 || current_row == dim->Grid.NRows - 1)
 
-    *diagonal_pointer += conductances->North ; // == (C)
+    *diagonal_pointer += conductances->North ; // == C
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   fgetpos (debug, &last_fpos) ;

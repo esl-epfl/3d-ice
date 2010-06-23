@@ -486,7 +486,7 @@ fill_crs_system_matrix_channel
 
        if (column % 2 == 0 ) /* Even -> Wall */
 
-         added = add_crs_solid_column
+         added = add_crs_solid_row
                  (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                    debug,
@@ -498,7 +498,7 @@ fill_crs_system_matrix_channel
 
        else                  /* Odd -> liquid */
 
-         added = add_crs_liquid_column
+         added = add_crs_liquid_row
                  (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                    debug,

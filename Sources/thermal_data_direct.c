@@ -175,7 +175,7 @@ fill_thermal_data_direct
 
     stkd->Channel->FlowRateChanged = 0 ;
 
-    fill_crs_system_matrix_stack_description
+    fill_ccs_system_matrix_stack_description
     (
       stkd,
       tdata->Conductances,

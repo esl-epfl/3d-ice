@@ -470,7 +470,7 @@ fill_crs_system_matrix_layer
       column       ++
     )
 
-      added = add_crs_solid_column
+      added = add_crs_solid_row
               (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
                 debug,

@@ -1,6 +1,6 @@
 
 CPP                = g++
-CPPFLAGS           = -Wall -Wextra -pedantic -O3 
+CPPFLAGS           = -Wall -Wextra -pedantic -g 
 
 #
 # Thermal Library
@@ -63,7 +63,7 @@ ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR)
 ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB)
 ITERATIVE_EXECS    = ccs_iterative ccs_iterative_print_temps \
                      crs_iterative crs_iterative_print_temps \
-
+                     test_crs test_ccs doubletest
 
 EXECS = $(DIRECT_EXECS) $(ITERATIVE_EXECS)
 
@@ -122,6 +122,26 @@ crs_iterative_print_temps.o: crs_iterative_test.cc
 	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) -DPRINT_TEMPS $(ITERATIVE_INCLUDE) -o $@
 
 ###############################################################################
+
+test_crs: test_crs.o
+	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
+
+test_crs.o: test_crs.cc
+	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) $(ITERATIVE_INCLUDE) -o $@
+
+test_ccs: test_ccs.o
+	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
+
+test_ccs.o: test_ccs.cc
+	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) $(ITERATIVE_INCLUDE) -o $@
+
+###############################################################################
+
+doubletest: doubletest.o
+	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
+
+doubletest.o: doubletest.cc
+	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) $(ITERATIVE_INCLUDE) -o $@
 
 clean:
 	@rm -vf *.o

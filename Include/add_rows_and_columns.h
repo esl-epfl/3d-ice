@@ -30,7 +30,7 @@
     double *values
   ) ;
 
-  int add_crs_solid_column
+  int add_crs_solid_row
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
@@ -62,7 +62,7 @@
     double *values
   ) ;
 
-  int add_crs_liquid_column
+  int add_crs_liquid_row
   (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
