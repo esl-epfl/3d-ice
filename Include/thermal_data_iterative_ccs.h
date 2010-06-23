@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/thermal_data_iterative.h"                             *
+ * Header file "Include/thermal_data_iterative_ccs.h"                         *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -20,10 +20,10 @@
 #include "ilupre_double.h"
 
 /******************************************************************************
- * "ThermalDataIterative"                                                     *
+ * "CCSThermalDataIterative"                                                     *
  ******************************************************************************/
 
-  struct ThermalDataIterative
+  struct CCSThermalDataIterative
   {
     MV_Vector_double Temperatures ;
     MV_Vector_double Sources ;
@@ -52,10 +52,10 @@
 /******************************************************************************/
 
   int
-  init_thermal_data_iterative
+  ccs_init_thermal_data_iterative
   (
     struct StackDescription     *stkd,
-    struct ThermalDataIterative *tdata,
+    struct CCSThermalDataIterative *tdata,
     double                      initial_temperature,
     double                      delta_time
 #if defined TL_GMRES_ITERATIVE_SOLVER
@@ -64,22 +64,22 @@
   ) ;
 
   int
-  fill_thermal_data_iterative
+  ccs_fill_thermal_data_iterative
   (
     struct StackDescription     *stkd,
-    struct ThermalDataIterative *tdata
+    struct CCSThermalDataIterative *tdata
   ) ;
 
   void
-  free_thermal_data_iterative
+  ccs_free_thermal_data_iterative
   (
-    struct ThermalDataIterative *tdata
+    struct CCSThermalDataIterative *tdata
   ) ;
 
   int
-  solve_system_iterative
+  ccs_solve_system_iterative
   (
-    struct ThermalDataIterative *tdata,
+    struct CCSThermalDataIterative *tdata,
     double                      total_time,
     double                      *tolerance,
     int                         *max_iterations

@@ -11,7 +11,7 @@
 #
 
 CC              = g++
-CFLAGS          = -Werror -Wall -Wextra -O3
+CFLAGS          = -Werror -Wall -Wextra -g
 
 TL_INCLUDE      = -IInclude
 TL_LIB          = Lib/libThermalLibrary.a
@@ -38,7 +38,7 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/add_rows_and_columns.o        \
           Sources/conductances.o                \
           Sources/thermal_data_direct.o         \
-          Sources/thermal_data_iterative.o
+          Sources/thermal_data_iterative_ccs.o
 
 #
 # These rules are not well written! FIX THEM
@@ -177,7 +177,7 @@ Sources/thermal_data_direct.o: Sources/thermal_data_direct.c Include/thermal_dat
 
 ################################################################################
 
-Sources/thermal_data_iterative.o: Sources/thermal_data_iterative.c Include/thermal_data_iterative.h
+Sources/thermal_data_iterative_ccs.o: Sources/thermal_data_iterative_ccs.c Include/thermal_data_iterative_ccs.h
 	$(CC) $(CFLAGS) $(DEBUG) $(ITERATIVE_SOLVER) -o $@ $(TL_INCLUDE) $(IML_INCLUDE) $(SL_INCLUDE) -c $<
 
 ################################################################################

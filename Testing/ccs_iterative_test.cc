@@ -1,7 +1,7 @@
 #include <time.h>
 
 #include "stack_description.h"
-#include "thermal_data_iterative.h"
+#include "thermal_data_iterative_ccs.h"
 
 #ifdef SL_PROFILE
 extern void print_sl_profile_data(void);
@@ -19,7 +19,7 @@ int restart ;
 void
 print_temps
 (
-  struct ThermalDataIterative *tdata,
+  struct CCSThermalDataIterative *tdata,
   struct StackDescription     *stkd ,
   double                      time
 )
@@ -64,7 +64,7 @@ print_temps
 int
 simulate
 (
-  struct ThermalDataIterative *tdata,
+  struct CCSThermalDataIterative *tdata,
   struct StackDescription  *stkd ,
   double                   sim_time ,
   double                   delta_time,
@@ -80,7 +80,7 @@ simulate
     local_max_iter  = max_iter ;
     local_tolerance = tolerance ;
 
-    result = solve_system_iterative
+    result = ccs_solve_system_iterative
              (
                tdata, delta_time, &local_tolerance, &local_max_iter
 #if defined TL_GMRES_ITERATIVE_SOLVER
@@ -112,7 +112,7 @@ int
 main(int argc, char** argv)
 {
   struct StackDescription     stkd ;
-  struct ThermalDataIterative tdata ;
+  struct CCSThermalDataIterative tdata ;
 
   double delta_time = 0.00125 ;
   double sim_time   = 0.10000 ;
@@ -158,9 +158,9 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
 
 #if defined TL_GMRES_ITERATIVE_SOLVER
-  init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time, restart);
+  ccs_init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time, restart);
 #else
-  init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time);
+  ccs_init_thermal_data_iterative (&stkd, &tdata, 300.00, delta_time);
 #endif
 
 #if defined PRINT_TEMPS
@@ -175,7 +175,7 @@ main(int argc, char** argv)
   clock_t time_start = clock();
 
   insert_all_power_values (&stkd, powers) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  ccs_fill_thermal_data_iterative (&stkd, &tdata) ;
 
 #ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
@@ -184,12 +184,12 @@ main(int argc, char** argv)
   int result;
   local_max_iter = max_iter;
   local_tolerance = tolerance;
-  result = solve_system_iterative (&tdata, sim_time,
-                                   &local_tolerance, &local_max_iter
-#                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart
-#                                  endif
-                                  );
+  result = ccs_solve_system_iterative (&tdata, sim_time,
+                                       &local_tolerance, &local_max_iter
+#                                      if defined TL_GMRES_ITERATIVE_SOLVER
+                                       , restart
+#                                      endif
+                                      );
   if (result != 0)
   {
     printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
@@ -198,7 +198,7 @@ main(int argc, char** argv)
 #endif
 
   change_coolant_flow_rate (&stkd, 0.7) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  ccs_fill_thermal_data_iterative (&stkd, &tdata) ;
 
 #ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
@@ -206,12 +206,12 @@ main(int argc, char** argv)
 #else
   local_max_iter = max_iter;
   local_tolerance = tolerance;
-  result = solve_system_iterative (&tdata, sim_time,
-                                   &local_tolerance, &local_max_iter
-#                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart
-#                                  endif
-                                  );
+  result = ccs_solve_system_iterative (&tdata, sim_time,
+                                       &local_tolerance, &local_max_iter
+#                                      if defined TL_GMRES_ITERATIVE_SOLVER
+                                       , restart
+#                                      endif
+                                      );
   if (result != 0)
   {
     printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
@@ -221,7 +221,7 @@ main(int argc, char** argv)
 
   powers[1] = 1.5 ;
   insert_all_power_values (&stkd, powers) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  ccs_fill_thermal_data_iterative (&stkd, &tdata) ;
 
 #ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
@@ -229,12 +229,12 @@ main(int argc, char** argv)
 #else
   local_max_iter = max_iter;
   local_tolerance = tolerance;
-  result = solve_system_iterative (&tdata, sim_time,
-                                   &local_tolerance, &local_max_iter
-#                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart
-#                                  endif
-                                  );
+  result = ccs_solve_system_iterative (&tdata, sim_time,
+                                       &local_tolerance, &local_max_iter
+#                                      if defined TL_GMRES_ITERATIVE_SOLVER
+                                       , restart
+#                                      endif
+                                       );
   if (result != 0)
   {
     printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
@@ -243,7 +243,7 @@ main(int argc, char** argv)
 #endif
 
   change_coolant_flow_rate (&stkd, 1.4) ;
-  fill_thermal_data_iterative (&stkd, &tdata) ;
+  ccs_fill_thermal_data_iterative (&stkd, &tdata) ;
 
 #ifdef PRINT_TEMPS
   if (simulate (&tdata, &stkd, sim_time, delta_time, tolerance, max_iter) != 0)
@@ -251,12 +251,12 @@ main(int argc, char** argv)
 #else
   local_max_iter = max_iter;
   local_tolerance = tolerance;
-  result = solve_system_iterative (&tdata, sim_time,
-                                   &local_tolerance, &local_max_iter
-#                                  if defined TL_GMRES_ITERATIVE_SOLVER
-                                   , restart
-#                                  endif
-                                  );
+  result = ccs_solve_system_iterative (&tdata, sim_time,
+                                       &local_tolerance, &local_max_iter
+#                                      if defined TL_GMRES_ITERATIVE_SOLVER
+                                       , restart
+#                                      endif
+                                      );
   if (result != 0)
   {
     printf("\n%d: Solver failed (%d - %.5e)\n", result, max_iter, tolerance) ;
@@ -272,7 +272,7 @@ main(int argc, char** argv)
 
 exit :
 
-  free_thermal_data_iterative (&tdata) ;
+  ccs_free_thermal_data_iterative (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;
