@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/thermal_data_iterative_ccs.h"                         *
+ * Header file "Include/thermal_data_iterative_crs.h"                         *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,22 +8,22 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_THERMAL_DATA_ITERATIVE_CCS_H_
-#define _TL_THERMAL_DATA_ITERATIVE_CCS_H_
+#ifndef _TL_THERMAL_DATA_ITERATIVE_CRS_H_
+#define _TL_THERMAL_DATA_ITERATIVE_CRS_H_
 
 #include "conductances.h"
 #include "stack_description.h"
 
 #include "mvv.h"
 #include "mvm.h"
-#include "compcol_double.h"
+#include "comprow_double.h"
 #include "ilupre_double.h"
 
 /******************************************************************************
- * "CCSThermalDataIterative"                                                     *
+ * "CRSThermalDataIterative"                                                     *
  ******************************************************************************/
 
-  struct CCSThermalDataIterative
+  struct CRSThermalDataIterative
   {
     MV_Vector_double Temperatures ;
     MV_Vector_double Sources ;
@@ -35,13 +35,13 @@
     double initial_temperature ,
            delta_time ;
 
-    CompCol_Mat_double I_Matrix_A ;
+    CompRow_Mat_double I_Matrix_A ;
     MV_Vector_double   I_Vector_B ;
 
-    CompCol_ILUPreconditioner Preconditioner;
+    CompRow_ILUPreconditioner Preconditioner;
 
 #if defined TL_QMR_ITERATIVE_SOLVER
-    CompCol_ILUPreconditioner Preconditioner2;
+    CompRow_ILUPreconditioner Preconditioner2;
 #endif
 #if defined TL_GMRES_ITERATIVE_SOLVER
     MV_ColMat_double H;
@@ -52,10 +52,10 @@
 /******************************************************************************/
 
   int
-  ccs_init_thermal_data_iterative
+  crs_init_thermal_data_iterative
   (
     struct StackDescription     *stkd,
-    struct CCSThermalDataIterative *tdata,
+    struct CRSThermalDataIterative *tdata,
     double                      initial_temperature,
     double                      delta_time
 #if defined TL_GMRES_ITERATIVE_SOLVER
@@ -64,22 +64,22 @@
   ) ;
 
   int
-  ccs_fill_thermal_data_iterative
+  crs_fill_thermal_data_iterative
   (
     struct StackDescription     *stkd,
-    struct CCSThermalDataIterative *tdata
+    struct CRSThermalDataIterative *tdata
   ) ;
 
   void
-  ccs_free_thermal_data_iterative
+  crs_free_thermal_data_iterative
   (
-    struct CCSThermalDataIterative *tdata
+    struct CRSThermalDataIterative *tdata
   ) ;
 
   int
-  ccs_solve_system_iterative
+  crs_solve_system_iterative
   (
-    struct CCSThermalDataIterative *tdata,
+    struct CRSThermalDataIterative *tdata,
     double                      total_time,
     double                      *tolerance,
     int                         *max_iterations
@@ -88,4 +88,4 @@
 #endif
   ) ;
 
-#endif /* _TL_THERMAL_DATA_ITERATIVE_CCS_H_ */
+#endif /* _TL_THERMAL_DATA_ITERATIVE_H_ */

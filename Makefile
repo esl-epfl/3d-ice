@@ -38,7 +38,8 @@ OBJECTS = Sources/dimensions.o                  \
           Sources/add_rows_and_columns.o        \
           Sources/conductances.o                \
           Sources/thermal_data_direct.o         \
-          Sources/thermal_data_iterative_ccs.o
+          Sources/thermal_data_iterative_ccs.o  \
+          Sources/thermal_data_iterative_crs.o
 
 #
 # These rules are not well written! FIX THEM
@@ -178,6 +179,11 @@ Sources/thermal_data_direct.o: Sources/thermal_data_direct.c Include/thermal_dat
 ################################################################################
 
 Sources/thermal_data_iterative_ccs.o: Sources/thermal_data_iterative_ccs.c Include/thermal_data_iterative_ccs.h
+	$(CC) $(CFLAGS) $(DEBUG) $(ITERATIVE_SOLVER) -o $@ $(TL_INCLUDE) $(IML_INCLUDE) $(SL_INCLUDE) -c $<
+
+################################################################################
+
+Sources/thermal_data_iterative_crs.o: Sources/thermal_data_iterative_crs.c Include/thermal_data_iterative_crs.h
 	$(CC) $(CFLAGS) $(DEBUG) $(ITERATIVE_SOLVER) -o $@ $(TL_INCLUDE) $(IML_INCLUDE) $(SL_INCLUDE) -c $<
 
 ################################################################################

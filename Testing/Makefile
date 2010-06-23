@@ -61,7 +61,8 @@ DIRECT_EXECS       = direct direct_print_temps
 ITERATIVE_INCLUDE  = $(TL_INCLUDE) $(SL_INCLUDE)
 ITERATIVE_LIB_DIR  = $(TL_LIB_DIR) $(SL_LIB_DIR)
 ITERATIVE_LIB      = $(TL_LIB) $(SL_LIB)
-ITERATIVE_EXECS    = ccs_iterative ccs_iterative_print_temps
+ITERATIVE_EXECS    = ccs_iterative ccs_iterative_print_temps \
+                     crs_iterative crs_iterative_print_temps \
 
 
 EXECS = $(DIRECT_EXECS) $(ITERATIVE_EXECS)
@@ -102,6 +103,22 @@ ccs_iterative.o: ccs_iterative_test.cc
 	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) $(ITERATIVE_INCLUDE) -o $@
 
 ccs_iterative_print_temps.o: ccs_iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) -DPRINT_TEMPS $(ITERATIVE_INCLUDE) -o $@
+
+###############################################################################
+
+crs_iterative: crs_iterative.o
+	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
+
+crs_iterative_print_temps: crs_iterative_print_temps.o
+	$(CPP) $(CPPFLAGS) $< $(ITERATIVE_LIB_DIR) $(ITERATIVE_LIB) -o $@
+
+################################################################################
+
+crs_iterative.o: crs_iterative_test.cc
+	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) $(ITERATIVE_INCLUDE) -o $@
+
+crs_iterative_print_temps.o: crs_iterative_test.cc
 	$(CPP) $(CPPFLAGS) -c $< $(ITERATIVE_SOLVER) -DPRINT_TEMPS $(ITERATIVE_INCLUDE) -o $@
 
 ###############################################################################
