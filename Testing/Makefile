@@ -17,7 +17,7 @@ TL_LIB             = -lThermalLibrary
 
 SLU_DIR            = /home/vincenzi/SuperLU_4.0
 SLU_INCLUDE        = -I$(SLU_DIR)/SRC
-SLU_LIB_DIR        = -L$(SLU_DIR)/lib -L/usr/lib64
+SLU_LIB_DIR        = -L$(SLU_DIR)/lib -L/usr/lib64 
 SLU_LIB            = -lsuperlu_4.0 -lblas -lm
 
 #

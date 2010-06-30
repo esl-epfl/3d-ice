@@ -13,6 +13,26 @@
 
 #include "thermal_data_direct.h"
 
+#ifdef TL_NO_CHANNELS
+void
+insert_extra_sources
+(
+  struct StackDescription  *stkd,
+  struct ThermalDataDirect *tdata
+)
+{
+  int last_layer = get_cell_offset_in_stack(stkd->Dimensions, 3, 0, 0);
+  int index;
+
+  for (index = 0; index < get_layer_area(stkd->Dimensions); index++)
+  {
+    //printf ("Cell %d: %e\n", last_layer + index, tdata->Conductances[last_layer + index].Top );
+    tdata->Sources[last_layer + index] +=
+      300.0 * tdata->Conductances[last_layer + index].Top;
+  }
+}
+#endif
+
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -191,6 +211,9 @@ fill_thermal_data_direct
       tdata->SLU_Options.Fact = DOFACT ;
 
     fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
+#ifdef TL_NO_CHANNELS
+    insert_extra_sources(stkd, tdata);
+#endif
     stkd->PowerValuesChanged = 0 ;
   }
 
@@ -201,6 +224,9 @@ fill_thermal_data_direct
   if (stkd->PowerValuesChanged == 1)
   {
     fill_sources_stack_description (stkd, &tdata->Sources[0]) ;
+#ifdef TL_NO_CHANNELS
+    insert_extra_sources(stkd, tdata);
+#endif
     stkd->PowerValuesChanged = 0 ;
   }
 

@@ -197,6 +197,12 @@ add_ccs_solid_column
       conductances->Top, (conductances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
+#ifdef TL_NO_CHANNELS
+  else
+  {
+    diagonal_value += conductances->Top ;
+  }
+#endif
 
   /* DIAGONAL ELEMENT */
 
@@ -275,6 +281,12 @@ add_crs_solid_row
       conductances->Top, (conductances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
+#ifdef TL_NO_CHANNELS
+  else
+  {
+    diagonal_value +=  conductances->Top ;
+  }
+#endif
 
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {

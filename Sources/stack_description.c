@@ -418,8 +418,7 @@ fill_sources_stack_description
     {
       case TL_STACK_ELEMENT_DIE :
 
-        sources = fill_sources_die
-                  (
+        sources = fill_sources_die (
 #ifdef DEBUG_FILL_SOURCES
                     debug,
                     stack_element->LayersOffset,
@@ -431,8 +430,7 @@ fill_sources_stack_description
 
       case TL_STACK_ELEMENT_LAYER :
 
-        sources = fill_sources_empty_layer
-                  (
+        sources = fill_sources_empty_layer (
 #ifdef DEBUG_FILL_SOURCES
                     debug,
                     stack_element->LayersOffset,
