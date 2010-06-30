@@ -88,11 +88,6 @@ crs_init_thermal_data_iterative
   tdata->I_Matrix_A.newsize(tdata->Size, tdata->Size,
                             stkd->Dimensions->Grid.NNz) ;
 
-  tdata->Preconditioner.newsize(tdata->I_Matrix_A);
-
-#if defined TL_QMR_ITERATIVE_SOLVER
-  tdata->Preconditioner2.newsize(tdata->I_Matrix_A);
-#endif
 #if defined TL_GMRES_ITERATIVE_SOLVER
   tdata->H.newsize(restart+1, restart);
   tdata->H = 0.0;
