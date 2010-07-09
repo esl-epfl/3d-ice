@@ -33,10 +33,10 @@
                               /*                                              */
     double CoolantTIn ;       /* The temperarute of the incoming liquid [K]   */
                               /*                                              */
-    double FlowRate ;         /* The flow rate of the incolimg liquid         */
+    double FlowRate ;         /* The flow rate per channel layer of the incolimg liquid         */
                               /* The user specify a flowrate in [ ml / min ]  */
                               /* We store it as [ um3 / sec ]                 */
-                              /* Shared by all the channels in the 3DStack    */
+                              /* Shared by all the channels for each layer in the 3DStack    */
                               /*                                              */
     int FlowRateChanged ;     /* 0 = flow rate hasn't changet since last sim. */
                               /* 1 = user used change_flow_rate               */
