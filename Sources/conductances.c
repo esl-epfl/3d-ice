@@ -101,7 +101,7 @@ fill_conductances_solid_cell
  *                                     * ( Ay / 2 )        [ um2 ]
  * [ J / ( K . sec) ] = [ W / K ]
  *
- * CoolantVelocity = FlowRate / (#ChannelLayers * Ay )
+ * CoolantVelocity = FlowRate / (#ChannelColumns * Ay )
  *
  * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
  */
