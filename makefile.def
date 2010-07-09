@@ -1,6 +1,6 @@
 #******************************************************************************
 #*                                                                            *
-#* Makefile                                                                   *
+#* makefile.def                                                               *
 #*                                                                            *
 #* EPFL-STI-IEL-ESL                                                           *
 #* Bâtiment ELG, ELG 130                                                      *
@@ -8,12 +8,7 @@
 #* 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
 #******************************************************************************
 
-all:
-	cd ./Flex    ; make ;
-	cd ./Bison   ; make ;
-	cd ./Sources ; make ;
+TL_LIB_DIR     = $(TL_MAIN_DIR)/Lib
+TL_INCLUDE_DIR = $(TL_MAIN_DIR)/Include
 
-clean:
-	cd ./Flex    ; make clean ;
-	cd ./Bison   ; make clean ;
-	cd ./Sources ; make clean ;
+TL_LIB_A = $(TL_LIB_DIR)/libThermalLibrary.a
