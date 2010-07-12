@@ -48,7 +48,7 @@ floorplan_error (
 
 %require     "2.4.1"
 %name-prefix "floorplan_"
-%output      "Sources/floorplan_parser.c"
+%output      "../Sources/floorplan_parser.c"
 
 %pure-parser
 

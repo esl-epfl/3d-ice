@@ -8,7 +8,48 @@
 #* 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
 #******************************************************************************
 
-TL_LIB_DIR     = $(TL_MAIN_DIR)/Lib
-TL_INCLUDE_DIR = $(TL_MAIN_DIR)/Include
+#
+# Commands and flags
+###############################################################################
 
-TL_LIB_A = $(TL_LIB_DIR)/libThermalLibrary.a
+AR      = ar
+ARFLAGS = rsv
+
+CC      = gcc
+CFLAGS  = -MD -O3
+#CFLAGS := $(CFLAGS) -DDEBUG_FILL_CONDUCTANCES
+#CFLAGS := $(CFLAGS) -DDEBUG_FILL_CAPACITIES
+#CFLAGS := $(CFLAGS) -DDEBUG_FILL_SOURCES
+#CFLAGS := $(CFLAGS) -DDEBUG_FILL_SYSTEM_MATRIX
+#CFLAGS := $(CFLAGS) -DDEBUG_FILL_SYSTEM_VECTOR
+
+YACC    = bison
+YFLAGS  = -d
+
+LEX     = flex
+LFLAGS  = 
+
+RM      = rm
+RMFLAGS = -vf
+
+MV      = mv
+MVFLAGS = -vf
+
+#
+# Thermal Library variables
+###############################################################################
+
+TL_LIB     = $(TL_MAIN)/Lib
+TL_INCLUDE = $(TL_MAIN)/Include
+TL_SOURCES = $(TL_MAIN)/Sources
+TL_BISON   = $(TL_MAIN)/Bison
+TL_FLEX    = $(TL_MAIN)/Flex
+
+TL_ARCHIVE = $(TL_LIB)/libThermalLibrary.a
+
+#
+# SuperLU variables
+###############################################################################
+
+SLU_MAIN    = ~/SuperLU_4.0
+SLU_INCLUDE = $(SLU_MAIN)/SRC

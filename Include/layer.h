@@ -29,7 +29,6 @@
     TL_LAYER_BOTTOM = 0,
     TL_LAYER_CENTER    ,
     TL_LAYER_TOP
-
   } ;
 
   struct Layer

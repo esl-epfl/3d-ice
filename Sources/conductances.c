@@ -28,7 +28,7 @@ fill_conductances_solid_cell
   int current_layer
 )
 {
-  LayerPosition_t position
+  enum LayerPosition_t position
     = get_layer_position(dimensions, current_layer) ;
 
   conductances->North = conductances->South
@@ -125,7 +125,7 @@ fill_conductances_liquid_cell
   int current_layer
 )
 {
-  LayerPosition_t position
+  enum LayerPosition_t position
     = get_layer_position(dimensions, current_layer) ;
 
   double C = (coolant_vhc * flow_rate)

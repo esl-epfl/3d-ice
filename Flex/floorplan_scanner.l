@@ -22,11 +22,11 @@
 /* external API is exported by the header file. Many macros that are usable */
 /* from within scanner actions are not exported to the header file.         */
 
-%option header-file="Include/floorplan_scanner.h"
+%option header-file="floorplan_scanner.h"
 
 /* Directs flex to write the scanner to outfile instead of lex.yy.c. */
 
-%option outfile="Sources/floorplan_scanner.c"
+%option outfile="floorplan_scanner.c"
 
 /* Changes the default `yy' prefix used by flex for all globally-visible */
 /* variable and function names to instead be `PREFIX'.                   */

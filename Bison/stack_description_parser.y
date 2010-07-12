@@ -108,7 +108,7 @@ stack_description_error
 
 %require     "2.4.1"
 %name-prefix "stack_description_"
-%output      "Sources/stack_description_parser.c"
+%output      "../Sources/stack_description_parser.c"
 
 %pure-parser
 %error-verbose

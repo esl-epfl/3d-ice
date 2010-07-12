@@ -53,7 +53,7 @@ alloc_and_init_layer
 void
 free_layer
 (
-  Layer *layer
+  struct Layer *layer
 )
 {
   free (layer) ;
@@ -117,7 +117,7 @@ print_layers_list
 /******************************************************************************/
 /******************************************************************************/
 
-LayerPosition_t
+enum LayerPosition_t
 get_layer_position
 (
   struct Dimensions *dimensions,
