@@ -10,13 +10,20 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
-#include "material.h"
+#ifdef ENABLE_ASSERT
+#  include "material.h"
+#endif
 
 /******************************************************************************/
 
 void init_material (Material *material)
 {
+#ifdef ENABLE_ASSERT
+  assert (material) ;
+#endif
+
   material->Id                  = NULL ;
   material->VolHeatCapacity     = 0.0  ;
   material->ThermalConductivity = 0.0  ;
@@ -38,6 +45,11 @@ Material *alloc_and_init_material (void)
 
 void free_material (Material *material)
 {
+#ifdef ENABLE_ASSERT
+  assert (material) ;
+  assert (material->Id) ;
+#endif
+
   free (material->Id) ;
   free (material) ;
 }
@@ -57,8 +69,10 @@ void free_materials_list (Material *list)
 
 /******************************************************************************/
 
-void print_material (FILE *stream, char *prefix, Material *material)
+void print_material (FILE *stream, String prefix, Material *material)
 {
+  assert (material) ;
+
   fprintf (stream,
     "%sMaterial %s:\n",                    prefix,
                                            material->Id) ;
@@ -72,7 +86,7 @@ void print_material (FILE *stream, char *prefix, Material *material)
 
 /******************************************************************************/
 
-void print_materials_list (FILE *stream, char *prefix, Material *list)
+void print_materials_list (FILE *stream, String prefix, Material *list)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -81,7 +95,7 @@ void print_materials_list (FILE *stream, char *prefix, Material *list)
 
 /******************************************************************************/
 
-Material *find_material_in_list (Material *list, char *id)
+Material *find_material_in_list (Material *list, String id)
 {
   for ( ; list != NULL ; list = list->Next)
 

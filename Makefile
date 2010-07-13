@@ -8,6 +8,8 @@
 #* 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
 #******************************************************************************
 
+.PHONY: all clean
+
 all:
 	cd ./Flex    ; make ;
 	cd ./Bison   ; make ;

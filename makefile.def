@@ -8,6 +8,8 @@
 #* 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
 #******************************************************************************
 
+.PHONY: all clean
+
 #
 # Commands and flags
 ###############################################################################
@@ -16,7 +18,8 @@ AR      = ar
 ARFLAGS = rsv
 
 CC      = gcc
-CFLAGS  = -MD -O3
+CFLAGS  = -MD -g -Wall
+CFLAGS := $(CFLAGS) -DENABLE_ASSERT
 #CFLAGS := $(CFLAGS) -DDEBUG_FILL_CONDUCTANCES
 #CFLAGS := $(CFLAGS) -DDEBUG_FILL_CAPACITIES
 #CFLAGS := $(CFLAGS) -DDEBUG_FILL_SOURCES

@@ -47,7 +47,6 @@ $(TL_ARCHIVE): $(TL_SOURCES:.c=.o)
 
 -include $(TL_SOURCES:.c=.d)
 
-
 clean:
 	@$(RM) $(RMFLAGS) $(TL_SOURCES:.c=.o)
 	@$(RM) $(RMFLAGS) $(TL_SOURCES:.c=.d)
