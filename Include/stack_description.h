@@ -31,7 +31,7 @@
     char         *FileName ;         /* The name of the file used to fill the */
                                      /* stack description                     */
 
-    struct Material *MaterialsList ;       /* The list of materials componing */
+    Material *MaterialsList ;              /* The list of materials componing */
                                            /* the layers and channels         */
 
     struct Channel *Channel ;      /* The "single" instance of a channel used */

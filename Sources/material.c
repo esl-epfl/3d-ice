@@ -15,7 +15,7 @@
 
 /******************************************************************************/
 
-void init_material (struct Material *material)
+void init_material (Material *material)
 {
   material->Id                  = NULL ;
   material->VolHeatCapacity     = 0.0  ;
@@ -25,10 +25,9 @@ void init_material (struct Material *material)
 
 /******************************************************************************/
 
-struct Material *alloc_and_init_material (void)
+Material *alloc_and_init_material (void)
 {
-  struct Material *material
-    = (struct Material *) malloc (sizeof (struct Material)) ;
+  Material *material = (Material *) malloc (sizeof (Material)) ;
 
   if (material != NULL) init_material (material) ;
 
@@ -37,7 +36,7 @@ struct Material *alloc_and_init_material (void)
 
 /******************************************************************************/
 
-void free_material (struct Material *material)
+void free_material (Material *material)
 {
   free (material->Id) ;
   free (material) ;
@@ -45,9 +44,9 @@ void free_material (struct Material *material)
 
 /******************************************************************************/
 
-void free_materials_list (struct Material *list)
+void free_materials_list (Material *list)
 {
-  struct Material *next ;
+  Material *next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -58,7 +57,7 @@ void free_materials_list (struct Material *list)
 
 /******************************************************************************/
 
-void print_material (FILE *stream, char *prefix, struct Material *material)
+void print_material (FILE *stream, char *prefix, Material *material)
 {
   fprintf (stream,
     "%sMaterial %s:\n",                    prefix,
@@ -73,7 +72,7 @@ void print_material (FILE *stream, char *prefix, struct Material *material)
 
 /******************************************************************************/
 
-void print_materials_list (FILE *stream, char *prefix, struct Material *list)
+void print_materials_list (FILE *stream, char *prefix, Material *list)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -82,7 +81,7 @@ void print_materials_list (FILE *stream, char *prefix, struct Material *list)
 
 /******************************************************************************/
 
-struct Material *find_material_in_list (struct Material *list, char *id)
+Material *find_material_in_list (Material *list, char *id)
 {
   for ( ; list != NULL ; list = list->Next)
 

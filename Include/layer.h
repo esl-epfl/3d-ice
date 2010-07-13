@@ -35,7 +35,7 @@
   {
     double Height ;                 /* The heigh of the layer in um. (1 cell) */
 
-    struct Material* Material ;     /* The material composing the layer       */
+    Material* Material ;            /* The material composing the layer       */
 
     int LayersOffset ;              /* The offset (#of layers) counting from  */
                                     /* the first layer in the die             */

@@ -11,6 +11,10 @@
 #ifndef _TL_MATERIAL_H_
 #define _TL_MATERIAL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 /******************************************************************************
@@ -32,13 +36,15 @@
                                      /*                                       */
   };
 
+  typedef struct Material Material;
+
 /******************************************************************************/
 
   /* Given a valid address of a Material structure, "init_material" sets all  */
   /* its fields to a default value. If the address is not valid, the call to  */
   /* this function will cause a segmentation fault signal.                    */
 
-  void init_material (struct Material *material) ;
+  void init_material (Material *material) ;
 
 /******************************************************************************/
 
@@ -46,7 +52,7 @@
   /* their default values. Returns a valid Material address if the allocation */
   /* succeed or NULL if it fails.                                             */
 
-  struct Material *alloc_and_init_material (void) ;
+  Material *alloc_and_init_material (void) ;
 
 /******************************************************************************/
 
@@ -55,7 +61,7 @@
   /* address received. If the address belongs to an automatic variable then   */
   /* using this function will cause a segmentation fault signal.              */
 
-  void free_material (struct Material *material) ;
+  void free_material (Material *material) ;
 
 /******************************************************************************/
 
@@ -65,7 +71,7 @@
   /* This function uses the previous "free_material" function so every        */
   /* Material in the linked list must be a dynamically allocated structure.   */
 
-  void free_materials_list (struct Material *list) ;
+  void free_materials_list (Material *list) ;
 
 /******************************************************************************/
 
@@ -74,7 +80,7 @@
   /* actual values it contains. Prefix is a string (at least empty and null   */
   /* terminated) that is printed in every line at the before the description. */
 
-  void print_material (FILE *stream, char *prefix, struct Material *material) ;
+  void print_material (FILE *stream, char *prefix, Material *material) ;
 
 /******************************************************************************/
 
@@ -84,7 +90,7 @@
   /* printed for every material in the list                                   */
 
   void
-  print_materials_list (FILE *stream, char *prefix, struct Material *list) ;
+  print_materials_list (FILE *stream, char *prefix, Material *list) ;
 
 /******************************************************************************/
 
@@ -92,8 +98,12 @@
   /* this function search a material with id "id" and returns its address.    */
   /* It returns NULL if it does not find a material with such Id.             */
 
-  struct Material *find_material_in_list (struct Material *list, char *id) ;
+  Material *find_material_in_list (Material *list, char *id) ;
 
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_MATERIAL_H_ */

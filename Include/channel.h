@@ -41,7 +41,7 @@
     int FlowRateChanged ;     /* 0 = flow rate hasn't changet since last sim. */
                               /* 1 = user used change_flow_rate               */
                               /*                                              */
-    struct Material *Wall ;   /* A pointer to the Material composing the wall */
+    Material *Wall ;          /* A pointer to the Material composing the wall */
                               /*                                              */
   } ;
 

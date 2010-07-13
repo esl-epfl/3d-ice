@@ -93,7 +93,7 @@ print_channel
     "%s  Flow Rate                         %.4e\n",  prefix,
                                                      channel->FlowRate) ;
 
-  struct Material *wall = channel->Wall ;
+  Material *wall = channel->Wall ;
 
   if (wall != NULL)
   {

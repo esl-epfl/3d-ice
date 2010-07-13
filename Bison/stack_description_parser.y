@@ -108,7 +108,7 @@ stack_description_error
 
 %require     "2.4.1"
 %name-prefix "stack_description_"
-%output      "../Sources/stack_description_parser.c"
+%output      "stack_description_parser.c"
 
 %pure-parser
 %error-verbose
@@ -149,7 +149,7 @@ material
        THERMAL CONDUCTIVITY     DVALUE ';'
        VOLUMETRIC HEAT CAPACITY DVALUE ';'
     {
-      struct Material *material = $$ = alloc_and_init_material() ;
+      Material *material = $$ = alloc_and_init_material() ;
 
       if (material == NULL)
       {
