@@ -450,6 +450,12 @@ add_crs_solid_column
       conductances->Top, (conductances + LAYER_OFFSET(dim))->Bottom) ;
 #endif
   }
+#ifdef TL_NO_CHANNELS
+  else
+  {
+    diagonal_value +=  conductances->Top ;
+  }
+#endif
 
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
@@ -838,7 +844,7 @@ add_crs_liquid_column
   if ( current_row < dim->Grid.NRows - 1 )   /* NORTH */
   {
     *columns++ = current_cell + ROW_OFFSET(dim) ;
-    *values++  = conductances->South ; // == -C
+    *values++  = conductances->North ; // == -C
 
     (*rows)++ ;
     added ++ ;
@@ -909,7 +915,7 @@ add_crs_liquid_column
   if ( current_row > 0 )   /* SOUTH */
   {
     *columns++ = current_cell - ROW_OFFSET(dim) ;
-    *values++  = conductances->North ; // == (C)
+    *values++  = conductances->South ; // == (C)
 
     (*rows)++ ;
     added++ ;

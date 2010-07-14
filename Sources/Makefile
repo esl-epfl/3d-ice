@@ -20,7 +20,6 @@ TL_SOURCES = channel.c                   \
              floorplan_element.c         \
              layer.c                     \
              material.c                  \
-             add_rows_and_columns.c      \
              stack_description.c         \
              stack_element.c             \
              system_matrix.c             \
