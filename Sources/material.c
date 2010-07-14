@@ -18,7 +18,7 @@
 
 /******************************************************************************/
 
-void init_material (Material *material)
+void init_material (Material* material)
 {
 #ifdef ENABLE_ASSERT
   assert (material) ;
@@ -32,9 +32,9 @@ void init_material (Material *material)
 
 /******************************************************************************/
 
-Material *alloc_and_init_material (void)
+Material* alloc_and_init_material (void)
 {
-  Material *material = (Material *) malloc (sizeof (Material)) ;
+  Material* material = (Material*) malloc (sizeof (Material)) ;
 
   if (material != NULL) init_material (material) ;
 
@@ -43,7 +43,7 @@ Material *alloc_and_init_material (void)
 
 /******************************************************************************/
 
-void free_material (Material *material)
+void free_material (Material* material)
 {
 #ifdef ENABLE_ASSERT
   assert (material) ;
@@ -56,9 +56,9 @@ void free_material (Material *material)
 
 /******************************************************************************/
 
-void free_materials_list (Material *list)
+void free_materials_list (Material* list)
 {
-  Material *next ;
+  Material* next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -69,7 +69,7 @@ void free_materials_list (Material *list)
 
 /******************************************************************************/
 
-void print_material (FILE *stream, String prefix, Material *material)
+void print_material (FILE* stream, String_t prefix, Material* material)
 {
   assert (material) ;
 
@@ -86,7 +86,7 @@ void print_material (FILE *stream, String prefix, Material *material)
 
 /******************************************************************************/
 
-void print_materials_list (FILE *stream, String prefix, Material *list)
+void print_materials_list (FILE* stream, String_t prefix, Material* list)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -95,7 +95,7 @@ void print_materials_list (FILE *stream, String prefix, Material *list)
 
 /******************************************************************************/
 
-Material *find_material_in_list (Material *list, String id)
+Material* find_material_in_list (Material* list, String_t id)
 {
   for ( ; list != NULL ; list = list->Next)
 

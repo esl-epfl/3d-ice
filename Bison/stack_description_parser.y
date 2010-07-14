@@ -235,7 +235,7 @@ die
        source_layer
        layers_list
     {
-      struct Layer *layer ;
+      Layer* layer ;
       struct Die   *die = $$ = alloc_and_init_die() ;
 
       if (die == NULL)
@@ -294,7 +294,7 @@ source_layer  : SOURCE layer_content { $$ = $2 ; } ;
 layer_content : DVALUE UM IDENTIFIER ';'
 
     {
-      struct Layer *layer = $$ = alloc_and_init_layer() ;
+      Layer* layer = $$ = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {
@@ -366,7 +366,7 @@ stack_element
         YYABORT ;
       }
 
-      struct Layer *layer = alloc_and_init_layer() ;
+      Layer* layer = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {

@@ -11,6 +11,10 @@
 #ifndef _TL_FLOORPLAN_ELEMENT_H_
 #define _TL_FLOORPLAN_ELEMENT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 #include "dimensions.h"
@@ -89,7 +93,7 @@
   get_max_temperature_floorplan_element
                                    (
                                     struct FloorplanElement *floorplan_element,
-                                    struct Dimensions *dimensions,
+                                    Dimensions *dimensions,
                                     double *temperatures,
                                     double *max_temperature
                                    );
@@ -98,7 +102,7 @@
   get_min_temperature_floorplan_element
                                    (
                                     struct FloorplanElement *floorplan_element,
-                                    struct Dimensions *dimensions,
+                                    Dimensions *dimensions,
                                     double *temperatures,
                                     double *min_temperature
                                    );
@@ -107,7 +111,7 @@
   get_avg_temperature_floorplan_element
                                    (
                                     struct FloorplanElement *floorplan_element,
-                                    struct Dimensions *dimensions,
+                                    Dimensions *dimensions,
                                     double *temperatures,
                                     double *avg_temperature
                                    );
@@ -116,7 +120,7 @@
   get_min_avg_max_temperatures_floorplan_element
                                    (
                                     struct FloorplanElement *floorplan_element,
-                                    struct Dimensions       *dimensions,
+                                    Dimensions       *dimensions,
                                     double           *temperatures,
                                     double           *min_temperature,
                                     double           *avg_temperature,
@@ -126,5 +130,9 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_FLOORPLAN_ELEMENT_H_ */

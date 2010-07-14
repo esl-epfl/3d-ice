@@ -11,6 +11,10 @@
 #ifndef _TL_SYSTEM_VECTOR_
 #define _TL_SYSTEM_VECTOR_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /******************************************************************************
  *                                                                            *
  * "SystemVector" : the representation of the B vector.                       *
@@ -41,5 +45,9 @@
   free_system_vector   (struct SystemVector *vector) ;
 
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_SYSTEM_MATRIX_ */

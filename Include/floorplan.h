@@ -11,6 +11,10 @@
 #ifndef _TL_FLOORPLAN_H_
 #define _TL_FLOORPLAN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,7 +53,7 @@
   free_floorplan           (struct Floorplan *floorplan) ;
 
   int
-  fill_floorplan           (struct Floorplan *floorplan, struct Dimensions *dim) ;
+  fill_floorplan           (struct Floorplan *floorplan, Dimensions *dim) ;
 
   void
   print_floorplan          (FILE *stream, char* prefix, struct Floorplan *floorplan) ;
@@ -64,14 +68,14 @@
   check_location           (
                             struct Floorplan *floorplan,
                             struct FloorplanElement *floorplan_element,
-                            struct Dimensions *dimensions
+                            Dimensions *dimensions
                            ) ;
 
   int
   align_to_grid            (
                             struct Floorplan *floorplan,
                             struct FloorplanElement *floorplan_element,
-                            struct Dimensions *dimensions
+                            Dimensions *dimensions
                            ) ;
 
   void
@@ -91,7 +95,7 @@
   get_max_temperature_floorplan              (
                                               struct Floorplan  *floorplan,
                                               char       *floorplan_element_id,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *max_temperature
                                              );
@@ -100,7 +104,7 @@
   get_min_temperature_floorplan              (
                                               struct Floorplan *floorplan,
                                               char       *floorplan_element_id,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *min_temperature
                                              );
@@ -109,7 +113,7 @@
   get_avg_temperature_floorplan              (
                                               struct Floorplan  *floorplan,
                                               char       *floorplan_element_id,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *avg_temperature
                                              );
@@ -118,7 +122,7 @@
   get_min_avg_max_temperatures_floorplan     (
                                               struct Floorplan  *floorplan,
                                               char       *floorplan_element_id,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *min_temperature,
                                               double     *avg_temperature,
@@ -128,7 +132,7 @@
   int
   get_all_max_temperatures_floorplan         (
                                               struct Floorplan  *floorplan,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *max_temperature
                                              );
@@ -136,7 +140,7 @@
   int
   get_all_min_temperatures_floorplan         (
                                               struct Floorplan  *floorplan,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *min_temperature
                                              );
@@ -144,7 +148,7 @@
   int
   get_all_avg_temperatures_floorplan         (
                                               struct Floorplan  *floorplan,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *avg_temperature
                                              );
@@ -152,7 +156,7 @@
   int
   get_all_min_avg_max_temperatures_floorplan (
                                               struct Floorplan  *floorplan,
-                                              struct Dimensions *dimensions,
+                                              Dimensions *dimensions,
                                               double     *temperatures,
                                               double     *min_temperature,
                                               double     *avg_temperature,
@@ -162,5 +166,9 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_FLOORPLAN_H_ */

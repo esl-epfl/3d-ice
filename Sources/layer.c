@@ -14,14 +14,8 @@
 #include "system_matrix.h"
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-init_layer
-(
-  struct Layer *layer
-)
+void init_layer (Layer *layer)
 {
   layer->Height       = 0.0  ;
   layer->LayersOffset = 0    ;
@@ -30,16 +24,10 @@ init_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct Layer *
-alloc_and_init_layer
-(
-  void
-)
+Layer* alloc_and_init_layer (void)
 {
-  struct Layer *layer = (struct Layer *) malloc ( sizeof(struct Layer) ) ;
+  Layer* layer = (Layer*) malloc (sizeof (Layer)) ;
 
   if (layer != NULL) init_layer (layer) ;
 
@@ -47,29 +35,17 @@ alloc_and_init_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_layer
-(
-  struct Layer *layer
-)
+void free_layer (Layer* layer)
 {
   free (layer) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_layers_list
-(
-  struct Layer *list
-)
+void free_layers_list (Layer *list)
 {
-  struct Layer *next ;
+  Layer* next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -79,16 +55,8 @@ free_layers_list
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_layer
-(
-  FILE         *stream,
-  char         *prefix,
-  struct Layer *layer
-)
+void print_layer (FILE* stream, String_t prefix, Layer* layer)
 {
   fprintf (stream,
     "%sLayer #%d height %5.2f um, material %s\n",
@@ -96,32 +64,21 @@ print_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_layers_list
-(
-  FILE         *stream,
-  char         *prefix,
-  struct Layer *list
-)
+void print_layers_list (FILE* stream, String_t prefix, Layer* list)
 {
   for ( ; list != NULL ; list = list->Next)
 
     print_layer (stream, prefix, list) ;
-
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
 enum LayerPosition_t
 get_layer_position
 (
-  struct Dimensions *dimensions,
-  int        layer
+  Dimensions* dimensions,
+  LayerIndex_t       layer
 )
 {
   if (layer == 0)
@@ -136,8 +93,6 @@ get_layer_position
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 struct Conductances *
 fill_conductances_layer
@@ -145,10 +100,10 @@ fill_conductances_layer
 #ifdef DEBUG_FILL_CONDUCTANCES
   FILE         *debug,
 #endif
-  struct Layer *layer,
+  Layer*              layer,
   struct Conductances *conductances,
-  struct Dimensions   *dimensions,
-  int          current_layer
+  Dimensions   *dimensions,
+  LayerIndex_t        current_layer
 )
 {
   int row, column ;
@@ -192,8 +147,6 @@ fill_conductances_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 static
 double
@@ -206,12 +159,12 @@ double *
 fill_capacities_layer
 (
 #ifdef DEBUG_FILL_CAPACITIES
-  FILE         *debug,
-  int          current_layer,
+  FILE*        debug,
+  LayerIndex_t current_layer,
 #endif
-  struct Layer *layer,
+  Layer*       layer,
   double       *capacities,
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   double       delta_time
 )
 {
@@ -262,20 +215,18 @@ fill_capacities_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 double *
 fill_sources_active_layer
 (
 #ifdef DEBUG_FILL_SOURCES
   FILE         *debug,
-  int          current_layer,
-  struct Layer *layer,
+  LayerIndex_t current_layer,
+  Layer*       layer,
 #endif
   struct Floorplan    *floorplan,
   double       *sources,
-  struct Dimensions   *dimensions
+  Dimensions   *dimensions
 )
 {
   int              row, column ;
@@ -333,19 +284,17 @@ fill_sources_active_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 double *
 fill_sources_empty_layer
 (
 #ifdef DEBUG_FILL_SOURCES
   FILE         *debug,
-  int          current_layer,
-  struct Layer *layer,
+  LayerIndex_t current_layer,
+  Layer*       layer,
 #endif
   double       *sources,
-  struct Dimensions   *dimensions
+  Dimensions   *dimensions
 )
 {
 #ifdef DEBUG_FILL_SOURCES
@@ -358,23 +307,21 @@ fill_sources_empty_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 int
 fill_ccs_system_matrix_layer
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
-  struct Layer *layer,
+  Layer*       layer,
 #endif
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   struct Conductances *conductances,
   double       *capacities,
   int          *columns,
   int          *rows,
   double       *values,
-  int          current_layer
+  LayerIndex_t current_layer
 )
 {
   int row, column, added, tot_added ;
@@ -421,23 +368,21 @@ fill_ccs_system_matrix_layer
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 int
 fill_crs_system_matrix_layer
 (
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
-  struct Layer *layer,
+  Layer*       layer,
 #endif
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   struct Conductances *conductances,
   double       *capacities,
   int          *rows,
   int          *columns,
   double       *values,
-  int          current_layer
+  LayerIndex_t current_layer
 )
 {
   int row, column, added, tot_added ;
@@ -483,6 +428,4 @@ fill_crs_system_matrix_layer
   return tot_added ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

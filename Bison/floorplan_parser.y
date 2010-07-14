@@ -29,8 +29,8 @@
 void
 floorplan_error (
                  struct Floorplan *floorplan,
-                 struct Dimensions *dimensions,
-                 yyscan_t   yyscanner,
+                 Dimensions* dimensions,
+                 yyscan_t    yyscanner,
                  char const *msg
                 ) ;
 %}
@@ -55,7 +55,7 @@ floorplan_error (
 %error-verbose
 
 %parse-param { struct Floorplan *floorplan }
-%parse-param { struct Dimensions *dimensions }
+%parse-param { Dimensions* dimensions }
 %parse-param { yyscan_t scanner }
 
 %lex-param   { yyscan_t scanner }
@@ -134,7 +134,7 @@ void
 floorplan_error
 (
   struct Floorplan  *floorplan,
-  struct Dimensions *dimensions,
+  Dimensions* dimensions,
   yyscan_t   yyscanner,
   char const *msg
 )

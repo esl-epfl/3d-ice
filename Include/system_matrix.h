@@ -11,6 +11,10 @@
 #ifndef _TL_SYSTEM_MATRIX_
 #define _TL_SYSTEM_MATRIX_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stack_description.h"
 
 /******************************************************************************
@@ -66,7 +70,7 @@
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    struct Dimensions *dim,
+    Dimensions *dim,
     struct Conductances *conductances,
     double *capacities,
     int current_layer,
@@ -82,7 +86,7 @@
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    struct Dimensions *dim,
+    Dimensions *dim,
     struct Conductances *conductances,
     double *capacities,
     int current_layer,
@@ -98,7 +102,7 @@
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    struct Dimensions *dim,
+    Dimensions *dim,
     struct Conductances *conductances,
     double *capacities,
     int current_layer,
@@ -114,7 +118,7 @@
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
     FILE *debug,
 #endif
-    struct Dimensions *dim,
+    Dimensions *dim,
     struct Conductances *conductances,
     double *capacities,
     int current_layer,
@@ -126,5 +130,9 @@
   ) ;
 
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_SYSTEM_MATRIX_ */

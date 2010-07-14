@@ -11,6 +11,10 @@
 #ifndef _TL_CHANNEL_H_
 #define _TL_CHANNEL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 #include "material.h"
@@ -68,7 +72,7 @@
                               #endif
                               struct Channel      *channel,
                               struct Conductances *conductances,
-                              struct Dimensions   *dim,
+                              Dimensions* dimensions,
                               int          current_layer
                              ) ;
 
@@ -81,7 +85,7 @@
                               #endif
                               struct Channel    *channel,
                               double     *capacities,
-                              struct Dimensions *dimensions,
+                              Dimensions* dimensions,
                               double     delta_time
                              ) ;
 
@@ -93,7 +97,7 @@
                               #endif
                               struct Channel    *channel,
                               double     *sources,
-                              struct Dimensions *dim
+                              Dimensions* dimensions
                              ) ;
 
   int
@@ -102,7 +106,7 @@
                               FILE         *debug,
                               struct Channel      *channel,
                               #endif
-                              struct Dimensions   *dimensions,
+                              Dimensions*  dimensions,
                               struct Conductances *conductances,
                               double       *capacities,
                               int          *columns,
@@ -117,7 +121,7 @@
                               FILE         *debug,
                               struct Channel      *channel,
                               #endif
-                              struct Dimensions   *dimensions,
+                              Dimensions*  dimensions,
                               struct Conductances *conductances,
                               double       *capacities,
                               int          *rows,
@@ -130,5 +134,9 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_CHANNEL_H_ */

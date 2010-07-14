@@ -11,6 +11,11 @@
 #ifndef _TL_STACK_DESCRIPTION_H_
 #define _TL_STACK_DESCRIPTION_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdio.h>
 
 #include "material.h"
@@ -44,7 +49,7 @@
                                           /* The list of stack elements       */
                                           /* componing the 3Dstack            */
 
-    struct Dimensions *Dimensions ;       /* Collection of all the dimensions */
+    Dimensions* Dimensions ;              /* Collection of all the dimensions */
                                           /* (chip, grid of cells, cell)      */
 
     int PowerValuesChanged ;
@@ -232,5 +237,9 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_STACK_DESCRIPTION_H_ */

@@ -11,6 +11,10 @@
 #ifndef _TL_SLU_THERMAL_DATA_H_
 #define _TL_SLU_THERMAL_DATA_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
@@ -76,5 +80,9 @@
 
   void
   slu_print_sources       (struct SLUThermalData *tdata) ;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_SLU_THERMAL_DATA_H_ */

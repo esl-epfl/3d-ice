@@ -11,6 +11,10 @@
 #ifndef _TL_STACK_ELEMENT_H_
 #define _TL_STACK_ELEMENT_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 #include "layer.h"
@@ -33,7 +37,7 @@
 
   union StackElement_p
   {
-    struct Layer *Layer ;
+    Layer*       Layer ;
     struct Die   *Die ;
   } ;
 
@@ -88,5 +92,9 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_STACK_ELEMENT_H_ */

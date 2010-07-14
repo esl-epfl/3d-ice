@@ -20,7 +20,7 @@ fill_conductances_solid_cell
   int column,
 #endif
   struct Conductances *conductances,
-  struct Dimensions *dimensions,
+  Dimensions *dimensions,
   double cell_length,
   double cell_width,
   double cell_height,
@@ -115,7 +115,7 @@ fill_conductances_liquid_cell
   int column,
 #endif
   struct Conductances *conductances,
-  struct Dimensions *dimensions,
+  Dimensions *dimensions,
   double cell_length,
   double cell_width,
   double cell_height,

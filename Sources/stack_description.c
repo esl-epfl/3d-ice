@@ -153,8 +153,8 @@ align_layers_in_die
   struct StackDescription *stkd
 )
 {
-  struct Layer *layer ;
-  int layer_offset ;
+  Layer* layer ;
+  LayerIndex_t layer_offset ;
 
   struct Die *die = stkd->DiesList ;
   for ( ; die != NULL ; die = die->Next)

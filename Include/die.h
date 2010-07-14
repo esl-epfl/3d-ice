@@ -11,6 +11,10 @@
 #ifndef _TL_DIE_H_
 #define _TL_DIE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 
 #include "layer.h"
@@ -27,11 +31,11 @@
   {
     char* Id ;                  /* The id (string) of the die                 */
 
-    struct Layer *LayersList ;  /* The list of layers composing the die       */
+    Layer* LayersList ;         /* The list of layers composing the die       */
 
     int NLayers ;               /* The number of layer composing the die      */
 
-    struct Layer *SourceLayer ; /* Pointer to the source layer (in the list)  */
+    Layer* SourceLayer ;        /* Pointer to the source layer (in the list)  */
 
     struct Die* Next ;          /* To collect dies in a linked list           */
 
@@ -69,7 +73,7 @@
                           #endif
                           struct Die   *die,
                           struct Conductances *conductances,
-                          struct Dimensions   *dimensions,
+                          Dimensions* dimensions,
                           int          current_layer
                          ) ;
 
@@ -81,7 +85,7 @@
                           #endif
                           struct Die *die,
                           double     *capacities,
-                          struct Dimensions *dimensions,
+                          Dimensions* dimensions,
                           double     delta_time
                          ) ;
 
@@ -94,7 +98,7 @@
                           struct Die        *die,
                           struct Floorplan  *floorplan,
                           double            *sources,
-                          struct Dimensions        *dimensions
+                          Dimensions*       dimensions
                          ) ;
 
   int
@@ -103,7 +107,7 @@
                           FILE         *debug,
                           #endif
                           struct Die   *die,
-                          struct Dimensions   *dimensions,
+                          Dimensions*  dimensions,
                           struct Conductances *conductances,
                           double       *capacities,
                           int          *columns,
@@ -118,7 +122,7 @@
                           FILE         *debug,
                           #endif
                           struct Die   *die,
-                          struct Dimensions   *dimensions,
+                          Dimensions*  dimensions,
                           struct Conductances *conductances,
                           double       *capacities,
                           int          *rows,
@@ -130,5 +134,9 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_DIE_H_ */

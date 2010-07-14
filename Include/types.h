@@ -15,12 +15,23 @@
 extern "C" {
 #endif
 
-  typedef char * String;
+  typedef char* String_t ;
+
+  /* Indexes */
+
+  typedef int LayerIndex_t ;
+
+  /* Dimensions */
+
+  typedef double CellDimension_t ;
+  typedef int    GridDimension_t ;
+  typedef double ChipDimension_t ;
 
   /* Material */
 
   typedef double VolHeatCapacity_t ;
   typedef double ThermalConductivity_t;
+
 
 #ifdef __cplusplus
 }

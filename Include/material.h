@@ -27,7 +27,7 @@ extern "C" {
   {
     /* The Id of the material */
 
-    String Id ;
+    String_t Id ;
 
     /* The volume-specific heat capacity [ J / ( um3 * K ) ] */
 
@@ -39,18 +39,20 @@ extern "C" {
 
     /* To collect materials in a linked list */
 
-    struct Material *Next ;
+    struct Material* Next ;
 
   };
 
   typedef struct Material Material;
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
   /* Given a valid address of a Material structure,  */
   /* sets all its fields to a default value.         */
 
-  void init_material (Material *material) ;
+  void init_material (Material* material) ;
 
 /******************************************************************************/
 
@@ -59,7 +61,7 @@ extern "C" {
   /* Material address if the allocation succeed or   */
   /* NULL if it fails.                               */
 
-  Material *alloc_and_init_material (void) ;
+  Material* alloc_and_init_material (void) ;
 
 /******************************************************************************/
 
@@ -67,7 +69,7 @@ extern "C" {
   /* frees both the Id string and the memory pointed */
   /* by the address received.                        */
 
-  void free_material (Material *material) ;
+  void free_material (Material* material) ;
 
 /******************************************************************************/
 
@@ -76,7 +78,7 @@ extern "C" {
   /* all the materials it finds following the linked */
   /* list (see Next field).                          */
 
-  void free_materials_list (Material *list) ;
+  void free_materials_list (Material* list) ;
 
 /******************************************************************************/
 
@@ -85,7 +87,7 @@ extern "C" {
   /* empty and null terminated) that is printed in   */
   /* every line before the description.              */
 
-  void print_material (FILE *stream, String prefix, Material *material) ;
+  void print_material (FILE* stream, String_t prefix, Material* material) ;
 
 /******************************************************************************/
 
@@ -94,7 +96,7 @@ extern "C" {
   /* linked list (see Next field). "prefix" is       */
   /* printed for every material in the list.         */
 
-  void print_materials_list (FILE *stream, String prefix, Material *list) ;
+  void print_materials_list (FILE* stream, String_t prefix, Material* list) ;
 
 /******************************************************************************/
 
@@ -103,7 +105,7 @@ extern "C" {
   /* founded structure or NULL if it does not find   */
   /* it.                                             */
 
-  Material *find_material_in_list (Material *list, String id) ;
+  Material* find_material_in_list (Material* list, String_t id) ;
 
 /******************************************************************************/
 

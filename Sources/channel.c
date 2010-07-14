@@ -121,7 +121,7 @@ fill_conductances_channel
 #endif
   struct Channel      *channel,
   struct Conductances *conductances,
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   int          current_layer
 )
 {
@@ -217,7 +217,7 @@ fill_capacities_channel
 #endif
   struct Channel    *channel,
   double     *capacities,
-  struct Dimensions *dimensions,
+  Dimensions *dimensions,
   double     delta_time
 )
 {
@@ -301,7 +301,7 @@ fill_sources_channel
 #endif
   struct Channel    *channel,
   double     *sources,
-  struct Dimensions *dimensions
+  Dimensions *dimensions
 )
 {
   int row, column ;
@@ -360,7 +360,7 @@ fill_ccs_system_matrix_channel
   FILE         *debug,
   struct Channel      *channel,
 #endif
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   struct Conductances *conductances,
   double       *capacities,
   int          *columns,
@@ -441,7 +441,7 @@ fill_crs_system_matrix_channel
   FILE         *debug,
   struct Channel      *channel,
 #endif
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   struct Conductances *conductances,
   double       *capacities,
   int          *rows,

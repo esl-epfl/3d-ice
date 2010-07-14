@@ -11,6 +11,10 @@
 #ifndef _TL_CONDUCTANCES_H_
 #define _TL_CONDUCTANCES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "dimensions.h"
 
 /******************************************************************************
@@ -41,7 +45,7 @@
                                     int column,
 #endif
                                     struct Conductances *conductances,
-                                    struct Dimensions *dim,
+                                    Dimensions* dimensions,
                                     double cell_length,
                                     double cell_width,
                                     double cell_height,
@@ -55,7 +59,7 @@
                                     int column,
 #endif
                                     struct Conductances *conductances,
-                                    struct Dimensions   *dimensions,
+                                    Dimensions* dimensions,
                                     double       cell_length,
                                     double       cell_width,
                                     double       cell_height,
@@ -63,5 +67,9 @@
                                     double       coolant_vhc,
                                     double       flow_rate,
                                     int          current_layer) ;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _TL_CONDUCTANCES_H_ */

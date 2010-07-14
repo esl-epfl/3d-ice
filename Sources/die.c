@@ -159,11 +159,11 @@ fill_conductances_die
 #endif
   struct Die   *die,
   struct Conductances *conductances,
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   int          current_layer
 )
 {
-  struct Layer *layer ;
+  Layer* layer ;
 
 #ifdef DEBUG_FILL_CONDUCTANCES
   fprintf (debug,
@@ -207,11 +207,11 @@ fill_capacities_die
 #endif
   struct Die *die,
   double     *capacities,
-  struct Dimensions *dimensions,
+  Dimensions *dimensions,
   double     delta_time
 )
 {
-  struct Layer *layer ;
+  Layer* layer ;
 
 #ifdef DEBUG_FILL_CAPACITIES
   fprintf (debug,
@@ -257,10 +257,10 @@ fill_sources_die
   struct Die *die,
   struct Floorplan  *floorplan,
   double     *sources,
-  struct Dimensions *dimensions
+  Dimensions *dimensions
 )
 {
-  struct Layer *layer ;
+  Layer* layer ;
 
 #ifdef DEBUG_FILL_SOURCES
   fprintf (debug,
@@ -318,7 +318,7 @@ fill_ccs_system_matrix_die
   FILE         *debug,
 #endif
   struct Die   *die,
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   struct Conductances *conductances,
   double       *capacities,
   int          *columns,
@@ -327,7 +327,7 @@ fill_ccs_system_matrix_die
   int          current_layer
 )
 {
-  struct Layer *layer ;
+  Layer* layer ;
   int tot_added, added ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
@@ -377,7 +377,7 @@ fill_crs_system_matrix_die
   FILE         *debug,
 #endif
   struct Die   *die,
-  struct Dimensions   *dimensions,
+  Dimensions   *dimensions,
   struct Conductances *conductances,
   double       *capacities,
   int          *rows,
@@ -386,7 +386,7 @@ fill_crs_system_matrix_die
   int          current_layer
 )
 {
-  struct Layer *layer ;
+  Layer* layer ;
   int tot_added, added ;
 
 #ifdef DEBUG_FILL_SYSTEM_MATRIX

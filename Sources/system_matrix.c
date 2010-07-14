@@ -201,7 +201,7 @@ add_ccs_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
 #endif
-  struct Dimensions   *dim,
+  Dimensions   *dim,
   struct Conductances *conductances,
   double       *capacities,
   int          current_layer,
@@ -399,7 +399,7 @@ add_crs_solid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
 #endif
-  struct Dimensions   *dim,
+  Dimensions   *dim,
   struct Conductances *conductances,
   double       *capacities,
   int          current_layer,
@@ -597,7 +597,7 @@ add_ccs_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
 #endif
-  struct Dimensions   *dim,
+  Dimensions   *dim,
   struct Conductances *conductances,
   double       *capacities,
   int          current_layer,
@@ -784,7 +784,7 @@ add_crs_liquid_column
 #ifdef DEBUG_FILL_SYSTEM_MATRIX
   FILE         *debug,
 #endif
-  struct Dimensions   *dim,
+  Dimensions   *dim,
   struct Conductances *conductances,
   double       *capacities,
   int          current_layer,
