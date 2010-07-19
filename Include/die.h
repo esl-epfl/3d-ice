@@ -12,7 +12,8 @@
 #define _TL_DIE_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <stdio.h>
@@ -66,70 +67,59 @@ extern "C" {
   struct Die *
   find_die_in_list       (struct Die *list, char *id) ;
 
-  struct Conductances *
-  fill_conductances_die  (
-                          #ifdef DEBUG_FILL_CONDUCTANCES
-                          FILE         *debug,
-                          #endif
-                          struct Die   *die,
-                          struct Conductances *conductances,
-                          Dimensions* dimensions,
-                          int          current_layer
-                         ) ;
+  Conductances*   fill_conductances_die
+  (
+    struct Die*   die,
+    Conductances* conductances,
+    Dimensions*   dimensions,
+    LayerIndex_t  current_layer
+  ) ;
 
-  double *
-  fill_capacities_die    (
-                          #ifdef DEBUG_FILL_CAPACITIES
-                          FILE       *debug,
-                          int        current_layer,
-                          #endif
-                          struct Die *die,
-                          double     *capacities,
-                          Dimensions* dimensions,
-                          double     delta_time
-                         ) ;
+  Capacity_t*     fill_capacities_die
+  (
+#   ifdef PRINT_CAPACITIES
+    LayerIndex_t  current_layer,
+#   endif
+    struct Die*   die,
+    Capacity_t*   capacities,
+    Dimensions*   dimensions,
+    Time_t        delta_time
+  ) ;
 
-  double *
-  fill_sources_die       (
-                          #ifdef DEBUG_FILL_SOURCES
-                          FILE              *debug,
-                          int               current_layer,
-                          #endif
-                          struct Die        *die,
-                          struct Floorplan  *floorplan,
-                          double            *sources,
-                          Dimensions*       dimensions
-                         ) ;
+  Source_t*           fill_sources_die
+  (
+#   ifdef PRINT_SOURCES
+    LayerIndex_t      current_layer,
+#   endif
+    struct Die*       die,
+    struct Floorplan* floorplan,
+    Source_t*         sources,
+    Dimensions*       dimensions
+  ) ;
 
-  int
-  fill_ccs_system_matrix_die (
-                          #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                          FILE         *debug,
-                          #endif
-                          struct Die   *die,
-                          Dimensions*  dimensions,
-                          struct Conductances *conductances,
-                          double       *capacities,
-                          int          *columns,
-                          int          *rows,
-                          double       *values,
-                          int          current_layer
-                         ) ;
+  int                    fill_ccs_system_matrix_die
+  (
+    struct Die*          die,
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    int*                 columns,
+    int*                 rows,
+    double*              values
+  ) ;
 
-  int
-  fill_crs_system_matrix_die (
-                          #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                          FILE         *debug,
-                          #endif
-                          struct Die   *die,
-                          Dimensions*  dimensions,
-                          struct Conductances *conductances,
-                          double       *capacities,
-                          int          *rows,
-                          int          *columns,
-                          double       *values,
-                          int          current_layer
-                         ) ;
+  int                    fill_crs_system_matrix_die
+  (
+    struct Die*          die,
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    int*                 rows,
+    int*                 columns,
+    double*              values
+  ) ;
 
 /******************************************************************************/
 /******************************************************************************/

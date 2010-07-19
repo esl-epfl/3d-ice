@@ -12,7 +12,8 @@
 #define _TL_LAYER_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <stdio.h>
@@ -23,6 +24,10 @@ extern "C" {
 #include "conductances.h"
 #include "floorplan.h"
 
+/******************************************************************************
+ *                                "Layer"                                     *
+ ******************************************************************************/
+
   enum LayerPosition_t
   {
     TL_LAYER_BOTTOM = 0,
@@ -30,9 +35,9 @@ extern "C" {
     TL_LAYER_TOP
   } ;
 
-/******************************************************************************
- *                                "Layer"                                     *
- ******************************************************************************/
+  typedef enum LayerPosition_t LayerPosition_t;
+
+/******************************************************************************/
 
   struct Layer
   {
@@ -76,87 +81,79 @@ extern "C" {
 
 /******************************************************************************/
 
-  enum LayerPosition_t
+  LayerPosition_t
   get_layer_position (Dimensions* dimensions, LayerIndex_t layer) ;
 
 /******************************************************************************/
 
-  struct Conductances *
-  fill_conductances_layer    (
-                             #ifdef DEBUG_FILL_CONDUCTANCES
-                             FILE*                debug,
-                             #endif
-                             Layer*               layer,
-                             struct Conductances* conductances,
-                             Dimensions*   dimensions,
-                             LayerIndex_t         current_layer
-                            ) ;
+  struct Conductances* fill_conductances_layer
+  (
+    Layer*        layer,
+    struct Conductances* conductances,
+    Dimensions*   dimensions,
+    LayerIndex_t  current_layer
+  ) ;
 
-  double *
-  fill_capacities_layer     (
-                             #ifdef DEBUG_FILL_CAPACITIES
-                             FILE*        debug,
-                             LayerIndex_t current_layer,
-                             #endif
-                             Layer*       layer,
-                             double       *capacities,
-                             Dimensions   *dimensions,
-                             double       delta_time
-                            ) ;
+  Capacity_t*    fill_capacities_layer
+  (
+#   ifdef PRINT_CAPACITIES
+    LayerIndex_t current_layer,
+#   endif
+    Layer*       layer,
+    Capacity_t*  capacities,
+    Dimensions   *dimensions,
+    Time_t       delta_time
+  ) ;
 
-  double *
-  fill_sources_active_layer (
-                             #ifdef DEBUG_FILL_SOURCES
-                             FILE         *debug,
-                             LayerIndex_t current_layer,
-                             Layer* layer,
-                             #endif
-                             struct Floorplan    *floorplan,
-                             double       *sources,
-                             Dimensions   *dimensions
-                            ) ;
+  Source_t*           fill_sources_active_layer
+  (
+#   ifdef PRINT_SOURCES
+    LayerIndex_t      current_layer,
+    Layer*            layer,
+#   endif
+    struct Floorplan* floorplan,
+    Source_t*         sources,
+    Dimensions*       dimensions
+  ) ;
 
-  double *
-  fill_sources_empty_layer  (
-                             #ifdef DEBUG_FILL_SOURCES
-                             FILE         *debug,
-                             LayerIndex_t current_layer,
-                             Layer* layer,
-                             #endif
-                             double       *sources,
-                             Dimensions   *dimensions
-                            ) ;
+  Source_t*      fill_sources_empty_layer
+  (
+#   ifdef PRINT_SOURCES
+    LayerIndex_t current_layer,
+    Layer*       layer,
+#   endif
+    Source_t*    sources,
+    Dimensions*  dimensions
+  ) ;
 
 
-  int
-  fill_ccs_system_matrix_layer  (
-                             #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                             FILE         *debug,
-                             Layer* layer,
-                             #endif
-                             Dimensions   *dimensions,
-                             struct Conductances *conductances,
-                             double       *capacities,
-                             int          *columns,
-                             int          *rows,
-                             double       *values,
-                             LayerIndex_t current_layer
-                            ) ;
+  int                    fill_ccs_system_matrix_layer
+  (
+#   ifdef PRINT_SYSTEM_MATRIX
+    Layer*               layer,
+#   endif
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    int*                 columns,
+    int*                 rows,
+    double*              values
+  ) ;
 
-  int
-  fill_crs_system_matrix_layer  (
-                             #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                             FILE         *debug,
-                             Layer*       layer,
-                             #endif
-                             Dimensions   *dimensions,
-                             struct Conductances *conductances,
-                             double       *capacities,
-                             int          *rows,
-                             int          *columns,
-                             double       *values,
-                             LayerIndex_t current_layer
-                            ) ;
+  int                    fill_crs_system_matrix_layer
+  (
+#   ifdef PRINT_SYSTEM_MATRIX
+    Layer*               layer,
+#   endif
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    int*                 rows,
+    int*                 columns,
+    double*              values
+  ) ;
 
 /******************************************************************************/
 /******************************************************************************/

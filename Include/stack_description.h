@@ -12,7 +12,8 @@
 #define _TL_STACK_DESCRIPTION_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 

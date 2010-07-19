@@ -12,7 +12,8 @@
 #define _TL_TYPES_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
   typedef char* String_t ;
@@ -20,6 +21,8 @@ extern "C" {
   /* Indexes */
 
   typedef int LayerIndex_t ;
+  typedef int RowIndex_t ;
+  typedef int ColumnIndex_t ;
 
   /* Dimensions */
 
@@ -32,6 +35,16 @@ extern "C" {
   typedef double VolHeatCapacity_t ;
   typedef double ThermalConductivity_t;
 
+  typedef double Conductance_t ;
+  typedef double Capacity_t ;
+  typedef double Source_t ;
+
+  typedef double CoolantHTC_t ;
+  typedef double CoolantVHC_t ;
+  typedef double CoolantFR_t ;
+
+  typedef double Temperature_t ;
+  typedef double Time_t ;
 
 #ifdef __cplusplus
 }

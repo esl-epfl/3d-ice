@@ -12,7 +12,8 @@
 #define _TL_SYSTEM_MATRIX_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "stack_description.h"
@@ -65,68 +66,56 @@ extern "C" {
   void print_system_matrix_rows    (struct SystemMatrix *matrix, char *file_name) ;
   void print_system_matrix_values  (struct SystemMatrix *matrix, char *file_name) ;
 
-  int add_ccs_solid_column
+  int                    add_ccs_solid_column
   (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-    FILE *debug,
-#endif
-    Dimensions *dim,
-    struct Conductances *conductances,
-    double *capacities,
-    int current_layer,
-    int current_row,
-    int current_column,
-    int *columns,
-    int *rows,
-    double *values
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    RowIndex_t           current_row,
+    ColumnIndex_t        current_column,
+    int*                 columns,
+    int*                 rows,
+    double*              values
   ) ;
 
-  int add_crs_solid_column
+  int                    add_crs_solid_column
   (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-    FILE *debug,
-#endif
-    Dimensions *dim,
-    struct Conductances *conductances,
-    double *capacities,
-    int current_layer,
-    int current_row,
-    int current_column,
-    int *rows,
-    int *columns,
-    double *values
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    RowIndex_t           current_row,
+    ColumnIndex_t        current_column,
+    int*                 rows,
+    int*                 columns,
+    double*              values
   ) ;
 
-  int add_ccs_liquid_column
+  int                    add_ccs_liquid_column
   (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-    FILE *debug,
-#endif
-    Dimensions *dim,
-    struct Conductances *conductances,
-    double *capacities,
-    int current_layer,
-    int current_row,
-    int current_column,
-    int *columns,
-    int *rows,
-    double *values
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    RowIndex_t           current_row,
+    ColumnIndex_t        current_column,
+    int*                 columns,
+    int*                 rows,
+    double*              values
   ) ;
 
-  int add_crs_liquid_column
+  int                    add_crs_liquid_column
   (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-    FILE *debug,
-#endif
-    Dimensions *dim,
-    struct Conductances *conductances,
-    double *capacities,
-    int current_layer,
-    int current_row,
-    int current_column,
-    int *rows,
-    int *columns,
-    double *values
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    RowIndex_t           current_row,
+    ColumnIndex_t        current_column,
+    int*                 rows,
+    int*                 columns,
+    double*              values
   ) ;
 
 /******************************************************************************/

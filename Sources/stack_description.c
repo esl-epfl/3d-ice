@@ -201,27 +201,21 @@ fill_conductances_stack_description
 {
   struct StackElement *stack_element ;
 
-#ifdef DEBUG_FILL_CONDUCTANCES
-  FILE *debug = fopen("fill_conductances_stack_description.txt", "w") ;
-  if (debug == NULL)
-  {
-    perror("fill_conductances_stack_description.txt") ;
-    return ;
-  }
-  fprintf (debug,
-    "%p fill_conductances_stack_description ( l %d r %d c %d )\n",
-    conductances,
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "fill_conductances_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions));
+    get_number_of_columns (stkd->Dimensions)
+  ) ;
 #endif
 
   for
   (
     stack_element = stkd->StackElementsList ;
-
     stack_element != NULL ;
-
     stack_element = stack_element->Next
   )
 
@@ -231,11 +225,9 @@ fill_conductances_stack_description
 
         conductances = fill_conductances_die
                        (
-#ifdef DEBUG_FILL_CONDUCTANCES
-                         debug,
-#endif
                          stack_element->Pointer.Die,
-                         conductances, stkd->Dimensions,
+                         conductances,
+                         stkd->Dimensions,
                          stack_element->LayersOffset
                        ) ;
         break ;
@@ -244,11 +236,9 @@ fill_conductances_stack_description
 
         conductances = fill_conductances_layer
                        (
-#ifdef DEBUG_FILL_CONDUCTANCES
-                         debug,
-#endif
                          stack_element->Pointer.Layer,
-                         conductances, stkd->Dimensions,
+                         conductances,
+                         stkd->Dimensions,
                          stack_element->LayersOffset
                        ) ;
         break ;
@@ -257,9 +247,6 @@ fill_conductances_stack_description
 
         conductances = fill_conductances_channel
                        (
-#ifdef DEBUG_FILL_CONDUCTANCES
-                         debug,
-#endif
                          stkd->Channel,
                          conductances, stkd->Dimensions,
                          stack_element->LayersOffset
@@ -268,57 +255,51 @@ fill_conductances_stack_description
 
       case TL_STACK_ELEMENT_NONE :
 
-        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        fprintf (stderr, "Error! Found stack element with unset type\n") ;
         return ;
 
       default :
 
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stack_element->Type) ;
+        fprintf
+        (
+          stderr,
+          "Error! Unknown stack element type %d\n",
+          stack_element->Type
+        ) ;
         return ;
 
-    } /* stack_elementy->Type */
-
-#ifdef DEBUG_FILL_CONDUCTANCES
-  fclose (debug) ;
-#endif
+    } /* switch stack_elementy->Type */
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-void
-fill_capacities_stack_description
+
+void                       fill_capacities_stack_description
 (
-  struct StackDescription *stkd,
-  double           *capacities,
-  double           delta_time
+  struct StackDescription* stkd,
+  Capacity_t*              capacities,
+  Time_t                   delta_time
 )
 {
   struct StackElement *stack_element ;
 
-#ifdef DEBUG_FILL_CAPACITIES
-  FILE *debug = fopen("fill_capacities_stack_description.txt", "w") ;
-  if (debug == NULL)
-  {
-    perror("fill_capacities_stack_description.txt") ;
-    return ;
-  }
-  fprintf (debug,
-    "%p fill_capacities_stack_description ( l %d r %d c %d )\n",
-    capacities,
+#ifdef PRINT_CAPACITIES
+  fprintf
+  (
+    stderr,
+    "fill_capacities_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions));
+    get_number_of_columns (stkd->Dimensions)
+  );
 #endif
 
   for
   (
     stack_element = stkd->StackElementsList ;
-
     stack_element != NULL ;
-
     stack_element = stack_element->Next
   )
     switch (stack_element->Type)
@@ -327,54 +308,60 @@ fill_capacities_stack_description
 
         capacities = fill_capacities_die
                      (
-#ifdef DEBUG_FILL_CAPACITIES
-                       debug,
+#                      ifdef PRINT_CAPACITIES
                        stack_element->LayersOffset,
-#endif
+#                      endif
                        stack_element->Pointer.Die,
-                       capacities, stkd->Dimensions, delta_time) ;
+                       capacities,
+                       stkd->Dimensions,
+                       delta_time
+                     ) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
         capacities = fill_capacities_layer
                      (
-#ifdef DEBUG_FILL_CAPACITIES
-                       debug,
+#                      ifdef PRINT_CAPACITIES
                        stack_element->LayersOffset,
-#endif
+#                      endif
                        stack_element->Pointer.Layer,
-                       capacities, stkd->Dimensions, delta_time) ;
+                       capacities,
+                       stkd->Dimensions,
+                       delta_time
+                     ) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
 
         capacities = fill_capacities_channel
                      (
-#ifdef DEBUG_FILL_CAPACITIES
-                       debug,
+#                      ifdef PRINT_CAPACITIES
                        stack_element->LayersOffset,
-#endif
+#                      endif
                        stkd->Channel,
-                       capacities, stkd->Dimensions, delta_time) ;
+                       capacities,
+                       stkd->Dimensions,
+                       delta_time
+                     ) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
 
-        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        fprintf (stderr, "Error! Found stack element with unset type\n") ;
         return ;
 
       default :
 
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stack_element->Type) ;
+        fprintf
+        (
+          stderr,
+          "Error! Unknown stack element type %d\n",
+          stack_element->Type
+        ) ;
         return ;
 
-    } /* stack_element->Type */
-
-#ifdef DEBUG_FILL_CAPACITIES
-  fclose(debug) ;
-#endif
+    } /* switch stack_element->Type */
 }
 
 /******************************************************************************/
@@ -390,16 +377,9 @@ fill_sources_stack_description
 {
   struct StackElement *stack_element ;
 
-#ifdef DEBUG_FILL_SOURCES
-  FILE *debug = fopen("fill_sources_stack_description.txt", "w") ;
-  if (debug == NULL)
-  {
-    perror("fill_sources_stack_description.txt") ;
-    return ;
-  }
-  fprintf (debug,
-    "%p fill_sources_stack_description ( l %d r %d c %d )\n",
-    sources,
+#ifdef PRINT_SOURCES
+  fprintf (stderr,
+    "fill_sources_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions));
@@ -420,10 +400,9 @@ fill_sources_stack_description
 
         sources = fill_sources_die
                   (
-#ifdef DEBUG_FILL_SOURCES
-                    debug,
+#                   ifdef PRINT_SOURCES
                     stack_element->LayersOffset,
-#endif
+#                   endif
                     stack_element->Pointer.Die,
                     stack_element->Floorplan,
                     sources, stkd->Dimensions) ;
@@ -433,11 +412,10 @@ fill_sources_stack_description
 
         sources = fill_sources_empty_layer
                   (
-#ifdef DEBUG_FILL_SOURCES
-                    debug,
+#                   ifdef PRINT_SOURCES
                     stack_element->LayersOffset,
                     stack_element->Pointer.Layer,
-#endif
+#                   endif
                     sources, stkd->Dimensions) ;
         break ;
 
@@ -445,10 +423,9 @@ fill_sources_stack_description
 
         sources = fill_sources_channel
                   (
-#ifdef DEBUG_FILL_SOURCES
-                    debug,
+#                   ifdef PRINT_SOURCES
                     stack_element->LayersOffset,
-#endif
+#                   endif
                     stkd->Channel,
                     sources, stkd->Dimensions) ;
         break ;
@@ -464,11 +441,7 @@ fill_sources_stack_description
           stack_element->Type) ;
         return ;
 
-    } /* stack_element->Type */
-
-#ifdef DEBUG_FILL_SOURCES
-  fclose(debug) ;
-#endif
+    } /* switch stack_element->Type */
 }
 
 /******************************************************************************/
@@ -489,17 +462,11 @@ fill_ccs_system_matrix_stack_description
   struct StackElement *stack_element ;
   int added, area ;
 
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE *debug = fopen("fill_ccs_system_matrix_stack_description.txt", "w") ;
-  if (debug == NULL)
-  {
-    perror("fill_ccs_system_matrix_stack_description.txt") ;
-    return ;
-  }
-  fprintf (debug,
-    "%p %p %p %p %p fill_ccs_system_matrix_stack_description " \
-    "( l %d r %d c %d )\n",
-    conductances, capacities, columns, rows, values,
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf
+  (
+    stderr,
+    "fill_ccs_system_matrix_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions));
@@ -527,36 +494,39 @@ fill_ccs_system_matrix_stack_description
     {
       case TL_STACK_ELEMENT_DIE :
 
-        added = fill_ccs_system_matrix_die (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  debug,
-#endif
+        added = fill_ccs_system_matrix_die
+                (
                   stack_element->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
-                  columns, rows, values,
-                  stack_element->LayersOffset) ;
+                  stack_element->LayersOffset,
+                  columns, rows, values
+                ) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
-        added = fill_ccs_system_matrix_layer (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  debug, stack_element->Pointer.Layer,
-#endif
+        added = fill_ccs_system_matrix_layer
+                (
+#                 ifdef PRINT_SYSTEM_MATRIX
+                  stack_element->Pointer.Layer,
+#                 endif
                   stkd->Dimensions, conductances, capacities,
-                  columns, rows, values,
-                  stack_element->LayersOffset) ;
+                  stack_element->LayersOffset,
+                  columns, rows, values
+                ) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        added = fill_ccs_system_matrix_channel (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  debug, stkd->Channel,
-#endif
+        added = fill_ccs_system_matrix_channel
+                (
+#                 ifdef PRINT_SYSTEM_MATRIX
+                  stkd->Channel,
+#                 endif
                   stkd->Dimensions, conductances, capacities,
-                  columns, rows, values,
-                  stack_element->LayersOffset) ;
+                  stack_element->LayersOffset,
+                  columns, rows, values
+                ) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
@@ -570,11 +540,7 @@ fill_ccs_system_matrix_stack_description
           stack_element->Type) ;
         return ;
 
-    } /* stack_element->Type */
-
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fclose (debug) ;
-#endif
+    } /* switch stack_element->Type */
 }
 
 /******************************************************************************/
@@ -595,17 +561,11 @@ fill_crs_system_matrix_stack_description
   struct StackElement *stack_element ;
   int added, area ;
 
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE *debug = fopen("fill_crs_system_matrix_stack_description.txt", "w") ;
-  if (debug == NULL)
-  {
-    perror("fill_crs_system_matrix_stack_description.txt") ;
-    return ;
-  }
-  fprintf (debug,
-    "%p %p %p %p %p fill_crs_system_matrix_stack_description " \
-    "( l %d r %d c %d )\n",
-    conductances, capacities, rows, columns, values,
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf
+  (
+    stderr,
+    "fill_crs_system_matrix_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions));
@@ -633,36 +593,39 @@ fill_crs_system_matrix_stack_description
     {
       case TL_STACK_ELEMENT_DIE :
 
-        added = fill_crs_system_matrix_die (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  debug,
-#endif
+        added = fill_crs_system_matrix_die
+                (
                   stack_element->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
-                  rows, columns, values,
-                  stack_element->LayersOffset) ;
+                  stack_element->LayersOffset,
+                  rows, columns, values
+                ) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
-        added = fill_crs_system_matrix_layer (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  debug, stack_element->Pointer.Layer,
-#endif
+        added = fill_crs_system_matrix_layer
+                (
+#                 ifdef PRINT_SYSTEM_MATRIX
+                  stack_element->Pointer.Layer,
+#                 endif
                   stkd->Dimensions, conductances, capacities,
-                  rows, columns, values,
-                  stack_element->LayersOffset) ;
+                  stack_element->LayersOffset,
+                  rows, columns, values
+                ) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        added = fill_crs_system_matrix_channel (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                  debug, stkd->Channel,
-#endif
+        added = fill_crs_system_matrix_channel
+                (
+#                 ifdef PRINT_SYSTEM_MATRIX
+                  stkd->Channel,
+#                 endif
                   stkd->Dimensions, conductances, capacities,
-                  rows, columns, values,
-                  stack_element->LayersOffset) ;
+                  stack_element->LayersOffset,
+                  rows, columns, values
+                ) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
@@ -677,10 +640,6 @@ fill_crs_system_matrix_stack_description
         return ;
 
     } /* stack_element->Type */
-
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fclose (debug) ;
-#endif
 }
 
 /******************************************************************************/
@@ -743,7 +702,7 @@ change_coolant_flow_rate
   double flow_rate
 )
 {
-  stkd->Channel->FlowRate = ( flow_rate * 1e+12 ) / 60.0 ;
+  stkd->Channel->CoolantFR = ( flow_rate * 1e+12 ) / 60.0 ;
   stkd->Channel->FlowRateChanged = 1 ;
 }
 

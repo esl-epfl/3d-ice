@@ -12,7 +12,8 @@
 #define _TL_SYSTEM_VECTOR_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 /******************************************************************************

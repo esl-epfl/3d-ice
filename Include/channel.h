@@ -12,7 +12,8 @@
 #define _TL_CHANNEL_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <stdio.h>
@@ -27,17 +28,17 @@ extern "C" {
   struct Channel
   {
                               /*                                              */
-    double Height ;           /* The heigh of the channel  [um] (1 cell)      */
+    CellDimension_t Height ;  /* The heigh of the channel  [um] (1 cell)      */
                               /*                                              */
-    double CoolantHTC ;       /* The heat transfert coefficent of             */
+    CoolantHTC_t CoolantHTC ; /* The heat transfert coefficent of             */
                               /* the cooling liquid  [ (W * K / um2 ]         */
                               /*                                              */
-    double CoolantVHC ;       /* The volumetric heat capacity of              */
+    CoolantVHC_t CoolantVHC ; /* The volumetric heat capacity of              */
                               /* the cooling liquid  [ J / ( um3 * K ) ]      */
                               /*                                              */
-    double CoolantTIn ;       /* The temperarute of the incoming liquid [K]   */
+    Temperature_t CoolantTIn ;/* The temperarute of the incoming liquid [K]   */
                               /*                                              */
-    double FlowRate ;         /* The flow rate per channel layer of the incolimg liquid         */
+    CoolantFR_t CoolantFR ;   /* The flow rate per channel layer of the incolimg liquid         */
                               /* The user specify a flowrate in [ ml / min ]  */
                               /* We store it as [ um3 / sec ]                 */
                               /* Shared by all the channels for each layer in the 3DStack    */
@@ -65,71 +66,62 @@ extern "C" {
   void
   print_channel              (FILE *stream, char *prefix, struct Channel *channel) ;
 
-  struct Conductances *
-  fill_conductances_channel  (
-                              #ifdef DEBUG_FILL_CONDUCTANCES
-                              FILE         *debug,
-                              #endif
-                              struct Channel      *channel,
-                              struct Conductances *conductances,
-                              Dimensions* dimensions,
-                              int          current_layer
-                             ) ;
+  Conductances*     fill_conductances_channel
+  (
+    struct Channel* channel,
+    Conductances*   conductances,
+    Dimensions*     dimensions,
+    LayerIndex_t    current_layer
+  ) ;
 
+  Capacity_t*       fill_capacities_channel
+  (
+#   ifdef PRINT_CAPACITIES
+    LayerIndex_t    current_layer,
+#   endif
+    struct Channel* channel,
+    Capacity_t*     capacities,
+    Dimensions*     dimensions,
+    double          delta_time
+  ) ;
 
-  double *
-  fill_capacities_channel    (
-                              #ifdef DEBUG_FILL_CAPACITIES
-                              FILE       *debug,
-                              int        current_layer,
-                              #endif
-                              struct Channel    *channel,
-                              double     *capacities,
-                              Dimensions* dimensions,
-                              double     delta_time
-                             ) ;
+  Source_t*         fill_sources_channel
+  (
+#   ifdef PRINT_SOURCES
+    LayerIndex_t    current_layer,
+#   endif
+    struct Channel* channel,
+    Source_t*       sources,
+    Dimensions*     dimensions
+  ) ;
 
-  double *
-  fill_sources_channel       (
-                              #ifdef DEBUG_FILL_SOURCES
-                              FILE       *debug,
-                              int        current_layer,
-                              #endif
-                              struct Channel    *channel,
-                              double     *sources,
-                              Dimensions* dimensions
-                             ) ;
+  int                    fill_ccs_system_matrix_channel
+  (
+#   ifdef PRINT_SYSTEM_MATRIX
+    struct Channel*      channel,
+#   endif
+    Dimensions*          dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    int*                 columns,
+    int*                 rows,
+    double*              values
+  ) ;
 
-  int
-  fill_ccs_system_matrix_channel (
-                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                              FILE         *debug,
-                              struct Channel      *channel,
-                              #endif
-                              Dimensions*  dimensions,
-                              struct Conductances *conductances,
-                              double       *capacities,
-                              int          *columns,
-                              int          *rows,
-                              double       *values,
-                              int          current_layer
-                             ) ;
-
-  int
-  fill_crs_system_matrix_channel (
-                              #ifdef DEBUG_FILL_SYSTEM_MATRIX
-                              FILE         *debug,
-                              struct Channel      *channel,
-                              #endif
-                              Dimensions*  dimensions,
-                              struct Conductances *conductances,
-                              double       *capacities,
-                              int          *rows,
-                              int          *columns,
-                              double       *values,
-                              int          current_layer
-                             ) ;
-
+  int  fill_crs_system_matrix_channel
+  (
+#   ifdef PRINT_SYSTEM_MATRIX
+    struct Channel*      channel,
+#   endif
+    Dimensions*  dimensions,
+    struct Conductances* conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    int*                 rows,
+    int*                 columns,
+    double*              values
+  ) ;
 
 /******************************************************************************/
 /******************************************************************************/

@@ -94,24 +94,26 @@ get_layer_position
 
 /******************************************************************************/
 
-struct Conductances *
+Conductances*
 fill_conductances_layer
 (
-#ifdef DEBUG_FILL_CONDUCTANCES
-  FILE         *debug,
-#endif
-  Layer*              layer,
-  struct Conductances *conductances,
-  Dimensions   *dimensions,
-  LayerIndex_t        current_layer
+  Layer*        layer,
+  Conductances* conductances,
+  Dimensions*   dimensions,
+  LayerIndex_t  current_layer
 )
 {
-  int row, column ;
+  RowIndex_t    row ;
+  ColumnIndex_t column ;
 
-#ifdef DEBUG_FILL_CONDUCTANCES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_conductances_layer   %s\n",
-    conductances, current_layer, layer->Material->Id) ;
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "current_layer = %d\tfill_conductances_layer %s\n",
+    current_layer,
+    layer->Material->Id
+  ) ;
 #endif
 
   for
@@ -125,19 +127,18 @@ fill_conductances_layer
     (
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
-      column++,
-      conductances++
+      column++, conductances++
     )
 
       fill_conductances_solid_cell
       (
-#ifdef DEBUG_FILL_CONDUCTANCES
-        debug, row, column,
+#ifdef PRINT_CONDUCTANCES
+        row, column,
 #endif
         conductances,
         dimensions,
         get_cell_length (dimensions, column),
-        get_cell_width (dimensions),
+        get_cell_width  (dimensions),
         layer->Height,
         layer->Material->ThermalConductivity,
         current_layer
@@ -155,25 +156,28 @@ capacity (double l, double w, double h, double s, double t)
   return (l * w * h * s) / t ;
 }
 
-double *
-fill_capacities_layer
+Capacity_t*    fill_capacities_layer
 (
-#ifdef DEBUG_FILL_CAPACITIES
-  FILE*        debug,
+#ifdef PRINT_CAPACITIES
   LayerIndex_t current_layer,
 #endif
   Layer*       layer,
-  double       *capacities,
-  Dimensions   *dimensions,
-  double       delta_time
+  Capacity_t*  capacities,
+  Dimensions*  dimensions,
+  Time_t       delta_time
 )
 {
-  int row, column ;
+  RowIndex_t    row ;
+  ColumnIndex_t column ;
 
-#ifdef DEBUG_FILL_CAPACITIES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_capacities_layer   %s\n",
-    capacities, current_layer, layer->Material->Id) ;
+#ifdef PRINT_CAPACITIES
+  fprintf
+  (
+    stderr,
+    "current_layer = %d\tfill_capacities_layer %s\n",
+    current_layer,
+    layer->Material->Id
+  ) ;
 #endif
 
   for
@@ -200,14 +204,19 @@ fill_capacities_layer
                       delta_time
                     ) ;
 
-#ifdef DEBUG_FILL_CAPACITIES
-      fprintf (debug,
-        "%p solid cell l %5d r %5d c %5d l %5.2f w %5.2f h %5.2f " \
-        "vhc %.5e %.5e --> %.5e\n",
-        capacities, current_layer, row, column,
+#ifdef PRINT_CAPACITIES
+      fprintf
+      (
+        stderr,
+        "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "   \
+                    " |  vhc %.5e --> %.5e\n",
+        current_layer, row, column,
+        get_cell_offset_in_stack (dimensions, current_layer, row, column),
         get_cell_length(dimensions, column),
         get_cell_width (dimensions),
-        layer->Height, layer->Material->VolHeatCapacity, delta_time, *capacities) ;
+        layer->Height, layer->Material->VolHeatCapacity,
+        *capacities
+      ) ;
 #endif
     }
 
@@ -216,27 +225,28 @@ fill_capacities_layer
 
 /******************************************************************************/
 
-double *
-fill_sources_active_layer
+Source_t*           fill_sources_active_layer
 (
-#ifdef DEBUG_FILL_SOURCES
-  FILE         *debug,
-  LayerIndex_t current_layer,
-  Layer*       layer,
-#endif
-  struct Floorplan    *floorplan,
-  double       *sources,
-  Dimensions   *dimensions
+# ifdef PRINT_SOURCES
+  LayerIndex_t      current_layer,
+  Layer*            layer,
+# endif
+  struct Floorplan* floorplan,
+  Source_t*         sources,
+  Dimensions*       dimensions
 )
 {
   int              row, column ;
   double           flp_el_surface ;
   struct FloorplanElement *flp_el ;
 
-#ifdef DEBUG_FILL_SOURCES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_sources_active_layer   %s\n",
-    sources, current_layer, layer->Material->Id) ;
+#ifdef PRINT_SOURCES
+  fprintf
+  (
+    stderr,
+    "current_layer = %d\tfill_sources_source_layer   %s\n",
+    current_layer, layer->Material->Id
+  ) ;
 #endif
 
   for
@@ -267,13 +277,17 @@ fill_sources_active_layer
           = (flp_el->PowerValue * get_cell_top_surface (dimensions, column))
             / flp_el_surface ;
 
-#ifdef DEBUG_FILL_SOURCES
-        fprintf (debug,
-          "cell l %5d r %5d c %5d (%6d)\t%s %.5e -> %.5e\n",
+#ifdef PRINT_SOURCES
+        fprintf
+        (
+          stderr,
+          "solid  cell  |  l %2d r %4d c %4d [%6d] | %s %.5e -> %.5e\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
-          flp_el->Id, flp_el->PowerValue,
-          sources [get_cell_offset_in_layer (dimensions, row, column)]) ;
+          flp_el->Id,
+          flp_el->PowerValue,
+          sources [get_cell_offset_in_layer (dimensions, row, column)]
+        ) ;
 #endif
 
       }
@@ -285,22 +299,20 @@ fill_sources_active_layer
 
 /******************************************************************************/
 
-double *
-fill_sources_empty_layer
+Source_t*      fill_sources_empty_layer
 (
-#ifdef DEBUG_FILL_SOURCES
-  FILE         *debug,
+# ifdef PRINT_SOURCES
   LayerIndex_t current_layer,
   Layer*       layer,
-#endif
-  double       *sources,
-  Dimensions   *dimensions
+# endif
+  Source_t*    sources,
+  Dimensions*  dimensions
 )
 {
-#ifdef DEBUG_FILL_SOURCES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_sources_empty_layer   %s\n",
-    sources, current_layer, layer->Material->Id) ;
+#ifdef PRINT_SOURCES
+  fprintf (stderr,
+    "current_layer = %d\tfill_sources_empty_layer    %s\n",
+    current_layer, layer->Material->Id) ;
 #endif
 
   return sources + get_layer_area (dimensions) ;
@@ -308,29 +320,30 @@ fill_sources_empty_layer
 
 /******************************************************************************/
 
-int
-fill_ccs_system_matrix_layer
+int                    fill_ccs_system_matrix_layer
 (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE         *debug,
-  Layer*       layer,
-#endif
-  Dimensions   *dimensions,
-  struct Conductances *conductances,
-  double       *capacities,
-  int          *columns,
-  int          *rows,
-  double       *values,
-  LayerIndex_t current_layer
+# ifdef PRINT_SYSTEM_MATRIX
+  Layer*               layer,
+# endif
+  Dimensions*          dimensions,
+  struct Conductances* conductances,
+  Capacity_t*          capacities,
+  LayerIndex_t         current_layer,
+  int*                 columns,
+  int*                 rows,
+  double*              values
 )
 {
   int row, column, added, tot_added ;
 
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fprintf (debug,
-    "%p %p %p %p %p (l %2d) fill_ccs_system_matrix_layer %s\n",
-    conductances, capacities, columns, rows, values,
-    current_layer, layer->Material->Id) ;
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf
+  (
+    stderr,
+    "(l %2d) fill_ccs_system_matrix_layer %s\n",
+    current_layer,
+    layer->Material->Id
+  ) ;
 #endif
 
   for
@@ -356,9 +369,6 @@ fill_ccs_system_matrix_layer
 
       added = add_ccs_solid_column
               (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                debug,
-#endif
                 dimensions, conductances, capacities,
                 current_layer, row, column,
                 columns, rows, values
@@ -369,29 +379,30 @@ fill_ccs_system_matrix_layer
 
 /******************************************************************************/
 
-int
-fill_crs_system_matrix_layer
+int                    fill_crs_system_matrix_layer
 (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE         *debug,
-  Layer*       layer,
-#endif
-  Dimensions   *dimensions,
-  struct Conductances *conductances,
-  double       *capacities,
-  int          *rows,
-  int          *columns,
-  double       *values,
-  LayerIndex_t current_layer
+# ifdef PRINT_SYSTEM_MATRIX
+  Layer*               layer,
+# endif
+  Dimensions*          dimensions,
+  struct Conductances* conductances,
+  Capacity_t*          capacities,
+  LayerIndex_t         current_layer,
+  int*                 rows,
+  int*                 columns,
+  double*              values
 )
 {
   int row, column, added, tot_added ;
 
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fprintf (debug,
-    "%p %p %p %p %p (l %2d) fill_crs_system_matrix_layer %s\n",
-    conductances, capacities, rows, columns, values,
-    current_layer, layer->Material->Id) ;
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf
+  (
+    stderr,
+    "(l %2d) fill_crs_system_matrix_layer %s\n",
+    current_layer,
+    layer->Material->Id
+  ) ;
 #endif
 
   for
@@ -417,9 +428,6 @@ fill_crs_system_matrix_layer
 
       added = add_crs_solid_column
               (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-                debug,
-#endif
                 dimensions, conductances, capacities,
                 current_layer, row, column,
                 rows, columns, values

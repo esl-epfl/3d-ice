@@ -151,40 +151,36 @@ find_die_in_list
 /******************************************************************************/
 /******************************************************************************/
 
-struct Conductances *
+Conductances*
 fill_conductances_die
 (
-#ifdef DEBUG_FILL_CONDUCTANCES
-  FILE         *debug,
-#endif
   struct Die   *die,
-  struct Conductances *conductances,
+  Conductances *conductances,
   Dimensions   *dimensions,
-  int          current_layer
+  LayerIndex_t current_layer
 )
 {
   Layer* layer ;
 
-#ifdef DEBUG_FILL_CONDUCTANCES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_conductances_die     %s\n",
-    conductances, current_layer, die->Id) ;
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "current_layer = %d\tfill_conductances_die  %s\n",
+    current_layer,
+    die->Id
+  ) ;
 #endif
 
   for
   (
     layer =  die->LayersList;
-
     layer != NULL ;
-
     layer = layer->Next
   )
 
     conductances = fill_conductances_layer
                    (
-#ifdef DEBUG_FILL_CONDUCTANCES
-                     debug,
-#endif
                      layer,
                      conductances,
                      dimensions,
@@ -198,40 +194,39 @@ fill_conductances_die
 /******************************************************************************/
 /******************************************************************************/
 
-double *
-fill_capacities_die
+Capacity_t*    fill_capacities_die
 (
-#ifdef DEBUG_FILL_CAPACITIES
-  FILE       *debug,
-  int        current_layer,
+#ifdef PRINT_CAPACITIES
+  LayerIndex_t current_layer,
 #endif
-  struct Die *die,
-  double     *capacities,
-  Dimensions *dimensions,
-  double     delta_time
+  struct Die*  die,
+  Capacity_t*  capacities,
+  Dimensions*  dimensions,
+  Time_t       delta_time
 )
 {
   Layer* layer ;
 
-#ifdef DEBUG_FILL_CAPACITIES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_capacities_die     %s\n",
-    capacities, current_layer, die->Id) ;
+#ifdef PRINT_CAPACITIES
+  fprintf
+  (
+    stderr,
+    "current_layer = %d\tfill_capacities_die %s\n",
+    current_layer,
+    die->Id
+  ) ;
 #endif
 
   for
   (
     layer = die->LayersList ;
-
     layer != NULL ;
-
     layer = layer->Next
   )
 
     capacities = fill_capacities_layer
                  (
-#ifdef DEBUG_FILL_CAPACITIES
-                   debug,
+#ifdef PRINT_CAPACITIES
                    current_layer + layer->LayersOffset,
 #endif
                    layer,
@@ -247,25 +242,23 @@ fill_capacities_die
 /******************************************************************************/
 /******************************************************************************/
 
-double *
-fill_sources_die
+Source_t*           fill_sources_die
 (
-#ifdef DEBUG_FILL_SOURCES
-  FILE       *debug,
-  int        current_layer,
-#endif
-  struct Die *die,
-  struct Floorplan  *floorplan,
-  double     *sources,
-  Dimensions *dimensions
+# ifdef PRINT_SOURCES
+  LayerIndex_t      current_layer,
+# endif
+  struct Die*       die,
+  struct Floorplan* floorplan,
+  Source_t*         sources,
+  Dimensions*       dimensions
 )
 {
   Layer* layer ;
 
-#ifdef DEBUG_FILL_SOURCES
-  fprintf (debug,
-    "%p current_layer = %d\tfill_sources_die %s floorplan %s\n",
-    sources, current_layer, die->Id, floorplan->FileName) ;
+#ifdef PRINT_SOURCES
+  fprintf (stderr,
+    "current_layer = %d\tfill_sources_die %s floorplan %s\n",
+    current_layer, die->Id, floorplan->FileName) ;
 #endif
 
   for
@@ -281,11 +274,10 @@ fill_sources_die
 
       sources = fill_sources_active_layer
                 (
-#ifdef DEBUG_FILL_SOURCES
-                  debug,
+#                 ifdef PRINT_SOURCES
                   current_layer + layer->LayersOffset,
                   layer,
-#endif
+#                 endif
                   floorplan,
                   sources,
                   dimensions
@@ -295,11 +287,10 @@ fill_sources_die
 
       sources = fill_sources_empty_layer
                 (
-#ifdef DEBUG_FILL_SOURCES
-                  debug,
+#                 ifdef PRINT_SOURCES
                   current_layer + layer->LayersOffset,
                   layer,
-#endif
+#                 endif
                   sources,
                   dimensions
                 ) ;
@@ -311,29 +302,23 @@ fill_sources_die
 /******************************************************************************/
 /******************************************************************************/
 
-int
-fill_ccs_system_matrix_die
+int                    fill_ccs_system_matrix_die
 (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE         *debug,
-#endif
-  struct Die   *die,
-  Dimensions   *dimensions,
-  struct Conductances *conductances,
-  double       *capacities,
-  int          *columns,
-  int          *rows,
-  double       *values,
-  int          current_layer
+  struct Die*          die,
+  Dimensions*          dimensions,
+  struct Conductances* conductances,
+  Capacity_t*          capacities,
+  LayerIndex_t         current_layer,
+  int*                 columns,
+  int*                 rows,
+  double*              values
 )
 {
   Layer* layer ;
   int tot_added, added ;
 
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fprintf (debug,
-    "%p %p %p %p %p (l %2d) fill_ccs_system_matrix_die\n",
-    conductances, capacities, columns, rows, values, current_layer) ;
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf (stderr, "(l %2d) fill_ccs_system_matrix_die\n", current_layer) ;
 #endif
 
   for
@@ -355,12 +340,12 @@ fill_ccs_system_matrix_die
 
     added = fill_ccs_system_matrix_layer
             (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-              debug, layer,
-#endif
+#             ifdef PRINT_SYSTEM_MATRIX
+              layer,
+#             endif
               dimensions, conductances, capacities,
-              columns, rows, values,
-              current_layer + layer->LayersOffset
+              current_layer + layer->LayersOffset,
+              columns, rows, values
             ) ;
 
   return tot_added ;
@@ -370,29 +355,28 @@ fill_ccs_system_matrix_die
 /******************************************************************************/
 /******************************************************************************/
 
-int
-fill_crs_system_matrix_die
+int                    fill_crs_system_matrix_die
 (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  FILE         *debug,
-#endif
-  struct Die   *die,
-  Dimensions   *dimensions,
-  struct Conductances *conductances,
-  double       *capacities,
-  int          *rows,
-  int          *columns,
-  double       *values,
-  int          current_layer
+  struct Die*          die,
+  Dimensions*          dimensions,
+  struct Conductances* conductances,
+  Capacity_t*          capacities,
+  LayerIndex_t         current_layer,
+  int*                 rows,
+  int*                 columns,
+  double*              values
 )
 {
   Layer* layer ;
   int tot_added, added ;
 
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-  fprintf (debug,
-    "%p %p %p %p %p (l %2d) fill_crs_system_matrix_die\n",
-    conductances, capacities, rows, columns, values, current_layer) ;
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf
+  (
+    stderr,
+    "(l %2d) fill_crs_system_matrix_die\n",
+    current_layer
+  ) ;
 #endif
 
   for
@@ -414,12 +398,12 @@ fill_crs_system_matrix_die
 
     added = fill_crs_system_matrix_layer
             (
-#ifdef DEBUG_FILL_SYSTEM_MATRIX
-              debug, layer,
-#endif
+#             ifdef PRINT_SYSTEM_MATRIX
+              layer,
+#             endif
               dimensions, conductances, capacities,
-              rows, columns, values,
-              current_layer + layer->LayersOffset
+              current_layer + layer->LayersOffset,
+              rows, columns, values
             ) ;
 
   return tot_added ;

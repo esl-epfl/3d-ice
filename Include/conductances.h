@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/conductances.h"                                        *
+ * Header file "Include/conductances.h"                                       *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -12,64 +12,70 @@
 #define _TL_CONDUCTANCES_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "dimensions.h"
+#include "layer.h"
 
 /******************************************************************************
- *                                                                            *
- * "Conductances" : the six conductances of the six resistor in a cell.       *
- *                                                                            *
+ *                                "Conductances"                              *
  ******************************************************************************/
 
   struct Conductances
   {
-    double North ;
-    double South ;
+    Conductance_t North;
+    Conductance_t South;
 
-    double East ;
-    double West ;
+    Conductance_t East;
+    Conductance_t West;
 
-    double Top ;
-    double Bottom ;
+    Conductance_t Top;
+    Conductance_t Bottom;
 
-  } ;
+  };
+
+  typedef struct Conductances Conductances;
 
 /******************************************************************************/
 
-  void fill_conductances_solid_cell (
-#ifdef DEBUG_FILL_CONDUCTANCES
-                                    FILE *debug,
-                                    int row,
-                                    int column,
-#endif
-                                    struct Conductances *conductances,
-                                    Dimensions* dimensions,
-                                    double cell_length,
-                                    double cell_width,
-                                    double cell_height,
-                                    double thermal_conductivity,
-                                    int current_layer) ;
+  void
+  fill_conductances_solid_cell
+  (
+#   ifdef PRINT_CONDUCTANCES
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Conductances*          conductances,
+    Dimensions*            dimensions,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    ThermalConductivity_t  thermal_conductivity,
+    LayerIndex_t           current_layer
+  ) ;
 
-  void fill_conductances_liquid_cell (
-#ifdef DEBUG_FILL_CONDUCTANCES
-                                    FILE *debug,
-                                    int row,
-                                    int column,
-#endif
-                                    struct Conductances *conductances,
-                                    Dimensions* dimensions,
-                                    double       cell_length,
-                                    double       cell_width,
-                                    double       cell_height,
-                                    double       coolant_htc,
-                                    double       coolant_vhc,
-                                    double       flow_rate,
-                                    int          current_layer) ;
+  void
+  fill_conductances_liquid_cell
+  (
+#   ifdef PRINT_CONDUCTANCES
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Conductances*          conductances,
+    Dimensions*            dimensions,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    CoolantHTC_t           coolant_htc,
+    CoolantVHC_t           coolant_vhc,
+    CoolantFR_t            coolant_fr,
+    LayerIndex_t           current_layer
+  ) ;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _TL_CONDUCTANCES_H_ */
+#endif    /* _TL_CONDUCTANCES_H_ */

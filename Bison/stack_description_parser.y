@@ -181,7 +181,7 @@ material
 
 channel
 
-  : CHANNEL ':'
+  :  CHANNEL ':'
       HEIGHT DVALUE UM ';'
       WALL MATERIAL IDENTIFIER ';'
       COOLANT FLOW RATE DVALUE ';'
@@ -199,7 +199,7 @@ channel
       }
 
       stkd->Channel->Height          = $4  ;
-      stkd->Channel->FlowRate        = ( $14 * 1e+12 ) / 60.0 ;
+      stkd->Channel->CoolantFR       = ( $14 * 1e+12 ) / 60.0 ;
       stkd->Channel->CoolantHTC      = $20 ;
       stkd->Channel->CoolantVHC      = $26 ;
       stkd->Channel->CoolantTIn      = $31 ;

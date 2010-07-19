@@ -10,11 +10,12 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 #ifdef ENABLE_ASSERT
-#  include "material.h"
+#  include <assert.h>
 #endif
+
+#include "material.h"
 
 /******************************************************************************/
 
@@ -71,8 +72,6 @@ void free_materials_list (Material* list)
 
 void print_material (FILE* stream, String_t prefix, Material* material)
 {
-  assert (material) ;
-
   fprintf (stream,
     "%sMaterial %s:\n",                    prefix,
                                            material->Id) ;

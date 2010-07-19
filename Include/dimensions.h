@@ -12,7 +12,8 @@
 #define _TL_DIMENSIONS_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "types.h"
@@ -93,7 +94,7 @@ extern "C" {
 /******************************************************************************/
 
   CellDimension_t
-  get_cell_length (Dimensions *dimensions, GridDimension_t column) ;
+  get_cell_length (Dimensions *dimensions, ColumnIndex_t column) ;
 
   CellDimension_t
   get_cell_width  (Dimensions *dimensions) ;

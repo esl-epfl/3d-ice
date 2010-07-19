@@ -9,43 +9,43 @@
  ******************************************************************************/
 
 #include "conductances.h"
-#include "layer.h"
 
 void
 fill_conductances_solid_cell
 (
-#ifdef DEBUG_FILL_CONDUCTANCES
-  FILE *debug,
-  int row,
-  int column,
-#endif
-  struct Conductances *conductances,
-  Dimensions *dimensions,
-  double cell_length,
-  double cell_width,
-  double cell_height,
-  double thermal_conductivity,
-  int current_layer
+# ifdef PRINT_CONDUCTANCES
+  RowIndex_t             current_row,
+  ColumnIndex_t          current_column,
+# endif
+  Conductances*          conductances,
+  Dimensions*            dimensions,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  ThermalConductivity_t  thermal_conductivity,
+  LayerIndex_t           current_layer
 )
 {
-  enum LayerPosition_t position
+  LayerPosition_t cell_position
     = get_layer_position(dimensions, current_layer) ;
 
   conductances->North = conductances->South
-    = (thermal_conductivity * cell_length * cell_height ) / (cell_width / 2.0) ;
+    = (thermal_conductivity * cell_length * cell_height )
+      / ( cell_width / (CellDimension_t) 2);
 
   conductances->East = conductances->West
-    = (thermal_conductivity * cell_width * cell_height ) / (cell_length / 2.0) ;
+    = (thermal_conductivity * cell_width * cell_height )
+      / (cell_length / (CellDimension_t) 2) ;
 
-  if (position == TL_LAYER_BOTTOM)
+  if (cell_position == TL_LAYER_BOTTOM)
   {
-    conductances->Bottom = 0.0 ;
+    conductances->Bottom = (Conductance_t) 0 ;
 
     conductances->Top
-      = (thermal_conductivity * cell_length * cell_width) / cell_height ;
-
+      = (thermal_conductivity * cell_length * cell_width)
+        / cell_height ;
   }
-  else if (position == TL_LAYER_TOP)
+  else if (cell_position == TL_LAYER_TOP)
   {
 #ifdef TL_NO_CHANNELS
     conductances->Top
@@ -56,35 +56,38 @@ fill_conductances_solid_cell
            );
 
     conductances->Bottom
-      = (thermal_conductivity * cell_length * cell_width) / (cell_height/2.0) ;
+      = (thermal_conductivity * cell_length * cell_width)
+        / (cell_height / (CellDimension_t) 2) ;
 #else
-    conductances->Top = 0.0 ;
+    conductances->Top = (Conductance_t) 0 ;
 
     conductances->Bottom
-      = (thermal_conductivity * cell_length * cell_width) / cell_height ;
+      = (thermal_conductivity * cell_length * cell_width)
+        / cell_height ;
 #endif
   }
   else
   {
     conductances->Top = conductances->Bottom
-     = (thermal_conductivity * cell_length * cell_width) / (cell_height / 2.0) ;
+     = (thermal_conductivity * cell_length * cell_width)
+       / (cell_height / (CellDimension_t) 2);
   }
 
-#ifdef DEBUG_FILL_CONDUCTANCES
-  fprintf (debug,
-    "%p fill_conductances_solid_cell\tl %2d (%d)  r %4d  c %4d" \
-    "\tl %5.2f  w %5.2f h %5.2f\ttc   %.4e"                    \
-    "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
-    conductances, current_layer, position, row, column,
-    cell_length, cell_width, cell_height, thermal_conductivity,
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "solid cell   |  l %2d r %4d c %4d [%6d] | l %5.2f w %5.2f h %5.2f "   \
+                " |  N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+    current_layer, current_row, current_column,
+    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom) ;
+    conductances->West, conductances->Top, conductances->Bottom
+  ) ;
 #endif
-
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
 /*
@@ -109,33 +112,32 @@ fill_conductances_solid_cell
 void
 fill_conductances_liquid_cell
 (
-#ifdef DEBUG_FILL_CONDUCTANCES
-  FILE *debug,
-  int row,
-  int column,
-#endif
-  struct Conductances *conductances,
-  Dimensions *dimensions,
-  double cell_length,
-  double cell_width,
-  double cell_height,
-  double coolant_htc,
-  double coolant_vhc,
-  double flow_rate,
-  int current_layer
+# ifdef PRINT_CONDUCTANCES
+  RowIndex_t             current_row,
+  ColumnIndex_t          current_column,
+# endif
+  Conductances*          conductances,
+  Dimensions*            dimensions,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  CoolantHTC_t           coolant_htc,
+  CoolantVHC_t           coolant_vhc,
+  CoolantFR_t            coolant_fr,
+  LayerIndex_t           current_layer
 )
 {
-  enum LayerPosition_t position
+  enum LayerPosition_t cell_position
     = get_layer_position(dimensions, current_layer) ;
 
-  double C = (coolant_vhc * flow_rate)
+  double C = (coolant_vhc * coolant_fr)
              / (double) ( get_number_of_columns (dimensions) - 1 );
 
-  if (position == TL_LAYER_BOTTOM)
+  if (cell_position == TL_LAYER_BOTTOM)
   {
     fprintf (stderr, "Warning: channel on bottom layer not supported\n") ;
   }
-  else if (position == TL_LAYER_TOP)
+  else if (cell_position == TL_LAYER_TOP)
   {
     fprintf (stderr, "Warning: channel on top layer not supported\n") ;
   }
@@ -149,18 +151,18 @@ fill_conductances_liquid_cell
   conductances->Top = conductances->Bottom
     = coolant_htc * cell_width * cell_length ;
 
-#ifdef DEBUG_FILL_CONDUCTANCES
-  fprintf (debug,
-    "%p fill_conductances_liquid_cell\tl %2d (%d)  r %4d  c %4d" \
-    "\tl %5.2f  w %5.2f  h %5.2f\tlhtc %.4e lsh %.4e"           \
-    "\t N %.5e\t S %.5e\t E %.5e\t W %.5e\t T %.5e\t B %.5e\n",
-    conductances, current_layer, position, row, column,
-    cell_length, cell_width, cell_height, coolant_htc, coolant_vhc,
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "   \
+                " |  N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+    current_layer, current_row, current_column,
+    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
 #endif
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

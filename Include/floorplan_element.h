@@ -12,7 +12,8 @@
 #define _TL_FLOORPLAN_ELEMENT_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include <stdio.h>
