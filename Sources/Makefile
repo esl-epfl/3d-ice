@@ -21,6 +21,7 @@ TL_SOURCES = channel.c                   \
              layer.c                     \
              material.c                  \
              stack_description.c         \
+             heatsink.c                  \
              stack_element.c             \
              system_matrix.c             \
              system_vector.c             \

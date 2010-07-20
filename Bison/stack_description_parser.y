@@ -87,6 +87,8 @@
 %token MM                    "keyword mm"
 %token VOLUMETRIC            "keywork volumetric"
 %token CAPACITY              "keyword capacity"
+%token ENVIRONMENT           "keyword environment"
+%token HEATSINK              "keywork heatsink"
 
 %token <double_v> DVALUE     "float value"
 %token <string>   IDENTIFIER "identifier"
@@ -127,6 +129,7 @@ stack_description_error
 stack_description_file
 
   : materials_list
+    heatsink
     channel
     dies_list
     stack
@@ -176,18 +179,31 @@ material
   ;
 
 /******************************************************************************/
+/******************************* Heatsink *************************************/
+/******************************************************************************/
+
+heatsink
+
+  : /* empty */
+  | HEATSINK ':'
+        HEAT TRANSFER COEFFICIENT DVALUE ';'
+        ENVIRONMENT TEMPERATURE   DVALUE ';'
+    {
+    }
+  ;
+/******************************************************************************/
 /******************************* Channel **************************************/
 /******************************************************************************/
 
 channel
 
   :  CHANNEL ':'
-      HEIGHT DVALUE UM ';'
-      WALL MATERIAL IDENTIFIER ';'
-      COOLANT FLOW RATE DVALUE ';'
-      COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
-      COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'
-      COOLANT INCOMING TEMPERATURE DVALUE ';'
+        HEIGHT DVALUE UM ';'
+        WALL MATERIAL IDENTIFIER ';'
+        COOLANT FLOW RATE DVALUE ';'
+        COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
+        COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'
+        COOLANT INCOMING TEMPERATURE DVALUE ';'
     {
       stkd->Channel = alloc_and_init_channel() ;
 

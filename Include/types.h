@@ -43,6 +43,8 @@ extern "C"
   typedef double CoolantVHC_t ;
   typedef double CoolantFR_t ;
 
+  typedef double HeatsinkHTC_t ;
+
   typedef double Temperature_t ;
   typedef double Time_t ;
 

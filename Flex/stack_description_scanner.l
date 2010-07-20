@@ -115,10 +115,12 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "conductivity"               return CONDUCTIVITY ;
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
+"environment"                return ENVIRONMENT ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
 "flow"                       return FLOW ;
 "heat"                       return HEAT ;
+"heatsink"                   return HEATSINK ;
 "height"                     return HEIGHT ;
 "incoming"                   return INCOMING ;
 "layer"                      return LAYER ;

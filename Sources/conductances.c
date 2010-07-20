@@ -48,12 +48,17 @@ fill_conductances_solid_cell
   else if (cell_position == TL_LAYER_TOP)
   {
 #ifdef TL_NO_CHANNELS
+//    conductances->Top
+//      = 1/ (
+//              1/((thermal_conductivity * cell_length * cell_width) / (cell_height/2.0))
+//              +
+//              1/(1e-07 * cell_length * cell_width)
+//           );
+
     conductances->Top
-      = 1/ (
-              1/((thermal_conductivity * cell_length * cell_width) / (cell_height/2.0))
-              +
-              1/(1e-07 * cell_length * cell_width)
-           );
+      = ((Conductance_t) 2 * thermal_conductivity * cell_length * cell_width)
+        /
+        (cell_height * 1e-07 + (Conductance_t) 2 * thermal_conductivity) ;
 
     conductances->Bottom
       = (thermal_conductivity * cell_length * cell_width)
