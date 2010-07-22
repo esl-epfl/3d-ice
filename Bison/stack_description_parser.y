@@ -106,6 +106,8 @@ stack_description_error
   char             *message
 ) ;
 
+static struct StackElement* tmp_stack_element;
+
 %}
 
 %require     "2.4.1"
@@ -134,6 +136,12 @@ stack_description_file
     dies_list
     stack
     dimensions
+    {
+      if (stkd->Channel == NULL
+          && stkd->HeatSink == NULL)
+        fprintf(stderr,
+                "Warning: both ambient heat sink and channels are absent.\n") ;
+    }
   ;
 
 /******************************************************************************/
@@ -189,6 +197,16 @@ heatsink
         HEAT TRANSFER COEFFICIENT DVALUE ';'
         ENVIRONMENT TEMPERATURE   DVALUE ';'
     {
+      stkd->HeatSink = alloc_and_init_heatsink() ;
+
+      if (stkd->HeatSink == NULL)
+      {
+        stack_description_error(stkd, scanner, "alloc_and_init_heatsink") ;
+        YYABORT ;
+      }
+
+      stkd->HeatSink->HeatTransferC = $6 ;
+      stkd->HeatSink->EnvironmentT  = $10 ;
     }
   ;
 /******************************************************************************/
@@ -197,7 +215,9 @@ heatsink
 
 channel
 
-  :  CHANNEL ':'
+  :  /* empty */
+
+  |  CHANNEL ':'
         HEIGHT DVALUE UM ';'
         WALL MATERIAL IDENTIFIER ';'
         COOLANT FLOW RATE DVALUE ';'
@@ -344,6 +364,12 @@ stack
       stack_elements
     {
       stkd->StackElementsList = $3 ;
+
+      if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+
+        fprintf(stderr,
+                  "Warning: channel as bottom stack element not supported\n") ;
+
     }
   ;
 
@@ -352,6 +378,12 @@ stack_elements
   : stack_element
     {
       $$ = $1 ;
+
+      if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+
+        fprintf(stderr,
+                "Warning: channel as top stack element not supported\n") ;
+
     }
   | stack_elements stack_element
     {
@@ -372,9 +404,9 @@ stack_element
 
   : LAYER IDENTIFIER DVALUE UM IDENTIFIER ';'
     {
-      struct StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
+      tmp_stack_element = $$ = alloc_and_init_stack_element() ;
 
-      if (stack_element == NULL)
+      if (tmp_stack_element == NULL)
       {
         free ($2);
         free ($5) ;
@@ -388,7 +420,7 @@ stack_element
       {
         free ($2);
         free ($5) ;
-        free_stack_element (stack_element) ;
+        free_stack_element (tmp_stack_element) ;
         stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
         YYABORT ;
       }
@@ -401,38 +433,46 @@ stack_element
         free ($2);
         free ($5) ;
         free_layer(layer) ;
-        free_stack_element (stack_element) ;
+        free_stack_element (tmp_stack_element) ;
         stack_description_error(stkd, scanner, "Unknown material id") ;
         YYABORT ;
       }
 
       free($5) ;
 
-      stack_element->Type          = TL_STACK_ELEMENT_LAYER ;
-      stack_element->Pointer.Layer = layer ;
-      stack_element->Id            = $2 ;
-      stack_element->NLayers       = 1 ;
+      tmp_stack_element->Type          = TL_STACK_ELEMENT_LAYER ;
+      tmp_stack_element->Pointer.Layer = layer ;
+      tmp_stack_element->Id            = $2 ;
+      tmp_stack_element->NLayers       = 1 ;
     }
   | CHANNEL IDENTIFIER ';'
     {
-      struct StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
+      if (stkd->Channel == NULL)
+      {
+        free ($2) ;
+        stack_description_error(stkd, scanner,
+                                "Error: channel section not declared") ;
+        YYABORT ;
+      }
 
-      if (stack_element == NULL)
+      tmp_stack_element = $$ = alloc_and_init_stack_element() ;
+
+      if (tmp_stack_element == NULL)
       {
         free ($2) ;
         stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
         YYABORT ;
       }
 
-      stack_element->Type    = TL_STACK_ELEMENT_CHANNEL ;
-      stack_element->Id      = $2 ;
-      stack_element->NLayers = 1 ;
+      tmp_stack_element->Type    = TL_STACK_ELEMENT_CHANNEL ;
+      tmp_stack_element->Id      = $2 ;
+      tmp_stack_element->NLayers = 1 ;
     }
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'
     {
-      struct StackElement *stack_element = $$ = alloc_and_init_stack_element() ;
+      tmp_stack_element = $$ = alloc_and_init_stack_element() ;
 
-      if (stack_element == NULL)
+      if (tmp_stack_element == NULL)
       {
         free ($3) ;
         free ($2) ;
@@ -441,33 +481,33 @@ stack_element
         YYABORT ;
       }
 
-      stack_element->Type        = TL_STACK_ELEMENT_DIE ;
-      stack_element->Id          = $2 ;
-      stack_element->Pointer.Die = find_die_in_list(stkd->DiesList, $3) ;
+      tmp_stack_element->Type        = TL_STACK_ELEMENT_DIE ;
+      tmp_stack_element->Id          = $2 ;
+      tmp_stack_element->Pointer.Die = find_die_in_list(stkd->DiesList, $3) ;
 
-      if (stack_element->Pointer.Die == NULL)
+      if (tmp_stack_element->Pointer.Die == NULL)
       {
         free($3) ;
         free($5) ;
-        free_stack_element(stack_element) ;
+        free_stack_element(tmp_stack_element) ;
         stack_description_error(stkd, scanner, "Unknown die id") ;
         YYABORT ;
       }
 
-      stack_element->NLayers = stack_element->Pointer.Die->NLayers ;
+      tmp_stack_element->NLayers = tmp_stack_element->Pointer.Die->NLayers ;
 
-      stack_element->Floorplan = alloc_and_init_floorplan ();
+      tmp_stack_element->Floorplan = alloc_and_init_floorplan ();
 
-      if (stack_element->Floorplan == NULL)
+      if (tmp_stack_element->Floorplan == NULL)
       {
         free($3) ;
         free($5) ;
-        free_stack_element(stack_element) ;
+        free_stack_element(tmp_stack_element) ;
         stack_description_error(stkd, scanner, "alloc_and_init_floorplan") ;
         YYABORT ;
       }
 
-      stack_element->Floorplan->FileName = $5 ;
+      tmp_stack_element->Floorplan->FileName = $5 ;
 
       free($3) ;
     }

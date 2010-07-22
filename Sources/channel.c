@@ -266,7 +266,7 @@ Capacity_t*       fill_capacities_channel
         get_cell_offset_in_stack (dimensions, current_layer, row, column),
         get_cell_length(dimensions, column), get_cell_width (dimensions),
         channel->Height,
-        channel->Wall->VolHeatCapacity, 
+        channel->Wall->VolHeatCapacity,
         *capacities
       ) ;
 #endif

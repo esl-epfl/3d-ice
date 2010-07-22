@@ -16,7 +16,7 @@
 /******************************************************************************/
 /******************************************************************************/
 
-void init_heatsink (Heatsink* heatsink)
+void init_heatsink (HeatSink* heatsink)
 {
   heatsink->HeatTransferC = 0.0 ;
   heatsink->EnvironmentT  = 0.0 ;
@@ -26,9 +26,9 @@ void init_heatsink (Heatsink* heatsink)
 /******************************************************************************/
 /******************************************************************************/
 
-Heatsink* alloc_and_init_heatsink (void)
+HeatSink* alloc_and_init_heatsink (void)
 {
-  Heatsink* heatsink = (Heatsink*) malloc ( sizeof(Heatsink) ) ;
+  HeatSink* heatsink = (HeatSink*) malloc ( sizeof(HeatSink) ) ;
 
   if (heatsink != NULL) init_heatsink (heatsink) ;
 
@@ -39,7 +39,7 @@ Heatsink* alloc_and_init_heatsink (void)
 /******************************************************************************/
 /******************************************************************************/
 
-void free_heatsink (Heatsink* heatsink)
+void free_heatsink (HeatSink* heatsink)
 {
   free (heatsink) ;
 }
@@ -48,7 +48,7 @@ void free_heatsink (Heatsink* heatsink)
 /******************************************************************************/
 /******************************************************************************/
 
-void print_heatsink (FILE* stream, String_t prefix, Heatsink* heatsink)
+void print_heatsink (FILE* stream, String_t prefix, HeatSink* heatsink)
 {
   fprintf(stream,
     "%sHeatsink\n",                prefix) ;
@@ -57,6 +57,33 @@ void print_heatsink (FILE* stream, String_t prefix, Heatsink* heatsink)
   fprintf(stream,
     "%s  Environment temperature   %.4e\n",  prefix, heatsink->EnvironmentT) ;
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+// void fill_conductances_heatsink
+// (
+//   HeatSink* heatsink,
+//   Layer* layer,
+//   struct Conductances* conductances
+// )
+// {
+//   CellDimension_t cell_length,
+//                   cell_width = get_cell_width(s;
+//
+//
+//       conductances->Top
+//         = ((Conductance_t) 2 * thermal_conductivity * heatsink->HeatTransferC
+//            * cell_length * cell_width)
+//           /
+//           (cell_height * heatsink->HeatTransferC
+//            + (Conductance_t) 2 * thermal_conductivity) ;
+//
+//       conductances->Bottom
+//         = (thermal_conductivity * cell_length * cell_width)
+//           / (cell_height / (CellDimension_t) 2) ;
+// }
 
 /******************************************************************************/
 /******************************************************************************/

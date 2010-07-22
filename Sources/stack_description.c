@@ -33,6 +33,7 @@ init_stack_description
   stkd->MaterialsList      = NULL ;
   stkd->Channel            = NULL ;
   stkd->DiesList           = NULL ;
+  stkd->HeatSink           = NULL ;
   stkd->StackElementsList  = NULL ;
   stkd->Dimensions         = NULL ;
   stkd->PowerValuesChanged = 0    ;
@@ -93,6 +94,7 @@ free_stack_description
   free_materials_list      (stkd->MaterialsList) ;
   free_channel             (stkd->Channel) ;
   free_dies_list           (stkd->DiesList) ;
+  free_heatsink            (stkd->HeatSink) ;
   free_stack_elements_list (stkd->StackElementsList) ;
   free_dimensions          (stkd->Dimensions) ;
   free                     (stkd->FileName) ;
@@ -115,6 +117,7 @@ print_stack_description
   print_materials_list      (stream, prefix, stkd->MaterialsList) ;
   print_channel             (stream, prefix, stkd->Channel);
   print_dies_list           (stream, prefix, stkd->DiesList) ;
+  print_heatsink            (stream, prefix, stkd->HeatSink) ;
 
   fprintf(stream, "%sStack:\n", prefix) ;
 

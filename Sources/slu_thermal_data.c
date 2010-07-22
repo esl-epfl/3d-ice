@@ -200,6 +200,8 @@ slu_fill_thermal_data
   {
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
+//    fill_conductances_heatsink (stkd->HeatSink, tdata->Conductances) ;
+
     fill_capacities_stack_description (stkd, tdata->Capacities,
                                              tdata->delta_time) ;
 

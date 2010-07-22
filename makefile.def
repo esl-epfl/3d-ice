@@ -53,5 +53,5 @@ TL_ARCHIVE = $(TL_LIB)/libThermalLibrary.a
 # SuperLU variables
 ###############################################################################
 
-SLU_MAIN    = /home/enzi/EPFL/SuperLU_4.0
+SLU_MAIN    = $(TL_MAIN)/../SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC

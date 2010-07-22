@@ -19,31 +19,35 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
+#include "conductances.h"
 
 /******************************************************************************
  *                                 "Heatsink"                                 *
  ******************************************************************************/
 
-  struct Heatsink
+  struct HeatSink
   {
-    HeatsinkHTC_t HeatTransferC ; /* The heat transfert coefficent */
+    HeatSinkHTC_t HeatTransferC ; /* The heat transfert coefficent */
 
     Temperature_t EnvironmentT ; /* The temperarute of the environment [K] */
   } ;
 
-  typedef struct Heatsink Heatsink ;
+  typedef struct HeatSink HeatSink ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-  void init_heatsink (Heatsink* heatsink) ;
+  void init_heatsink (HeatSink* heatsink) ;
 
-  Heatsink * alloc_and_init_heatsink (void) ;
+  HeatSink* alloc_and_init_heatsink (void) ;
 
-  void free_heatsink (Heatsink* heatsink) ;
+  void free_heatsink (HeatSink* heatsink) ;
 
-  void print_heatsink (FILE* stream, String_t prefix, Heatsink* heatsink) ;
+  void print_heatsink (FILE* stream, String_t prefix, HeatSink* heatsink) ;
+
+//  void fill_conductances_heatsink (HeatSink* heatsink,
+//                                   struct Conductances* conductances) ;
 
 /******************************************************************************/
 /******************************************************************************/

@@ -25,6 +25,7 @@ extern "C"
 #include "stack_element.h"
 #include "dimensions.h"
 #include "conductances.h"
+#include "heatsink.h"
 
 /******************************************************************************
  *                                                                            *
@@ -46,6 +47,10 @@ extern "C"
     struct Die   *DiesList ;         /* The list of dies available to compose */
                                      /* the 3Dstack                           */
 
+    HeatSink* HeatSink;                   /* Informations about the heat      */
+                                          /* dissipation throught the top     */
+                                          /* surface                          */
+
     struct StackElement *StackElementsList ;
                                           /* The list of stack elements       */
                                           /* componing the 3Dstack            */
@@ -56,6 +61,8 @@ extern "C"
     int PowerValuesChanged ;
 
   } ;
+
+  typedef struct StackDescription StackDescription ;
 
 /******************************************************************************/
 /******************************************************************************/
