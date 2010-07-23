@@ -31,7 +31,7 @@ extern "C"
     CellDimension_t Height ;  /* The heigh of the channel  [um] (1 cell)      */
                               /*                                              */
     CoolantHTC_t CoolantHTC ; /* The heat transfert coefficent of             */
-                              /* the cooling liquid  [ (W * K / um2 ]         */
+                              /* the cooling liquid  [ (W / ( um2 * K ) ]     */
                               /*                                              */
     CoolantVHC_t CoolantVHC ; /* The volumetric heat capacity of              */
                               /* the cooling liquid  [ J / ( um3 * K ) ]      */

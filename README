@@ -1,6 +1,39 @@
 
 1   - Stack Description File.
 
+      The stack description file contains specifications about the physical and
+      geometrical characteristics of the 3DIC to be simulated. 
+
+      The extension of the file is not relevant, meaning that it will be parsed
+      independently from its presence or content.
+
+      Within the file, keywords must be written in low case and all the white
+      spaces belonging to
+
+                            [:space:]
+
+      are skipped (see POSIX character classes). Identifiers (here reported as
+      ID) must match the following expression:
+
+                            [:alpha:] ( _ | [:alnum:] )* .
+
+      Doubles ??? Integers ?
+
+      Comments.
+
+      The stack description file contains six sections:
+
+      --------------------------------------------------------------------------
+      |                                                                        |
+      |  materials                                                             |
+      |  ambient heat sink                                                     |
+      |  channels                                                              |
+      |  dies                                                                  |
+      |  stack                                                                 |
+      |  dimensions                                                            |
+      |                                                                        |
+      --------------------------------------------------------------------------
+
 1.1 - Materials
 
       The first section of the file specifies a list of at least one material. A
@@ -8,17 +41,130 @@
 
       --------------------------------------------------------------------------
       |                                                                        |
-      |  material MATERIAL_ID :                                                |
+      |  material M_ID :                                                       |
       |                                                                        |
-      |      thermal conductivity       1.30e-04 ;                             |
-      |      volumetric heat capacity   1.63e-12 ;                             |
+      |      thermal conductivity     VALUE ;                                  |
+      |      volumetric heat capacity VALUE ;                                  |
       |                                                                        |
       --------------------------------------------------------------------------
 
-      where :
+      where:
 
-      * spaces, new lines and tabulations are skipped ;
-      * keywords are in low case ;
-      * MATERIAL_ID is a unique identifier to refer to this material ;
-      * thermal conductivity is expressed as     [ W / ( um  * K ) ] ;
-      * volumetric heat capacity is expressed as [ J / ( um3 * K ) ] .
+      * M_ID is a unique identifier to refer to this material;
+      * thermal conductivity is expressed as [ W / ( um  * K ) ];
+      * volumetric heat capacity is expressed as [ J / ( um3 * K ) ].
+
+      Materials declared but not used in the following sections will be reported
+      with warning messages into the stderr stream. 
+
+1.2 - Ambient heat sink
+
+      This section specify parameters about the heat exchange through the top
+      surface of the 3DIC stack. All the sides of the chip are modelled as
+      adiabatic, except for the top surface. This section can be omitted to
+      obtain a thermally isolated chip. 
+
+      --------------------------------------------------------------------------
+      |                                                                        |
+      |  ambient heat sink :                                                   |
+      |                                                                        |
+      |      heat transfer coefficient VALUE ;                                 |
+      |      environment temperature VALUE ;                                   |
+      |                                                                        |
+      --------------------------------------------------------------------------
+      
+      where:
+
+      * heat transfer coefficient is expressed as [ W / ( um2 * K ) ];
+      * environment temperature is expressed as [ K ].
+
+1.3 - Channels
+
+      The channel section collects information about the liquid cooling
+      parameters and these values will be shared by all the channel layers
+      declared to compose the 3D stack. This section can be omitted to support
+      the emulation of 3DIC without a liquid cooling system.
+
+      --------------------------------------------------------------------------
+      |                                                                        |
+      |  channel :                                                             |
+      |                                                                        |
+      |      height VALUE um ;                                                 | 
+      |      wall material M_ID ;                                              |
+      |      coolant flow rate VALUE ;                                         |
+      |      coolant heat transfer coefficient VALUE ;                         |
+      |      coolant volumetric heat capacity VALUE ;                          |
+      |      coolant incoming temperature VALUE ;                              |
+      |                                                                        |
+      --------------------------------------------------------------------------
+
+      where:
+
+      * height, expressed in [ um ] corresponds to the height of the channel
+        layer;
+      * ID is the identifier of the material composing the walls (the ID must be
+        previously declared in the materials section);
+      * the coolant flow rate is expressed in [ ml / min ] and it refers to the
+        quantity of coolant per channel layer that crosses the chip;
+      * the coolant heat transfer coefficient is expressed as
+        [ (W / ( um2 * K ) ];
+      * the volumetric heat capacity is expressed as [ J / ( um3 * K ) ];
+      * the incoming temperature is expressed as [ K ].
+
+      If both the ambient heat sink and the channel sections are not declared
+      then the parsing of the file will print a warning message into stderr
+      (why??).
+
+1.4 - Dies
+
+      A die is a group of layers grouped together to form a single unit to be
+      used as a component of the 3D stack. The dies section must contain at
+      least one die element. A die must contain one source (active) layer and
+      zero or more normal layers (inactive). The source layer can be placed at
+      the bottom, in the middle or at the top of the die. 
+
+      --------------------------------------------------------------------------
+      |                                                                        |
+      |  die D_ID :                                                            |
+      |                                                                        |
+      |      layer  VALUE um M_ID ;                                            |
+      |      source VALUE um M_ID ;                                            |
+      |      layer  VALUE um M_ID ;                                            |
+      |                                                                        |
+      --------------------------------------------------------------------------
+
+      where:
+
+      * D_ID is the unique identifier used to refer the declared die;
+      * VALUE is the height of the layer (expressed in [ um ]);
+      * M_ID is the (previously declared) identifier of the material composing
+        the layer.
+
+      The order of the layers within the die reflects the vertical disposition:
+      the first layer declared is the top most layer in the die while the last
+      one is the one at the bottom.X
+
+1.5 - Stack
+
+      This section declare the vertical structure of the stack and it can be
+      defined with three type of elements: dies (previously declared), layers
+      and channels. 
+
+      --------------------------------------------------------------------------
+      |                                                                        |
+      |  stack :                                                               |
+      |                                                                        |
+      |      layer   LL_ID  VALUE um M_ID ;                                    |
+      |      channel CC_ID  ;                                                  |
+      |      die     DD_ID  D_ID floorplan "PATH" ;                            |
+      |                                                                        |
+      --------------------------------------------------------------------------
+
+      where:
+      * LL_ID, CC_ID, DD_ID are identifiers used to name the stack elements and
+        they can be used in the C code to refer to the corresponding element;
+      * M_ID is the identifier of the material composing the declared layer
+        and VALUE is its height ( in [ um ] );
+      * D_ID is the identifier of a die (previously declared) and PATH is a
+        path to a floorplan file. This floorplan will be considered to be placed
+        on the layer inside the die declared with the source keyword.

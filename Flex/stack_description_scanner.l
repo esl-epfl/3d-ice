@@ -146,11 +146,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
                    return DVALUE ;
                  }
 
-{signed_integer} {
-                   yylval->int_v = atoi(yytext) ;
-                   return IVALUE ;
-                 }
-
 {identifier}     {
                    yylval->string = strdup(yytext) ;
                    return IDENTIFIER ;

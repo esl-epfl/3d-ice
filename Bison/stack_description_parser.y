@@ -92,7 +92,6 @@
 
 %token <double_v> DVALUE     "float value"
 %token <string>   IDENTIFIER "identifier"
-%token <int_v>    IVALUE     "integer value"
 %token <string>   PATH       "path to file"
 
 %{
@@ -455,6 +454,13 @@ stack_element
         YYABORT ;
       }
 
+      if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+      {
+        free ($2) ;
+        stack_description_error(stkd, scanner,
+                "Warning: two consecutive channel layers are not supported") ;
+        YYABORT ;
+      }
       tmp_stack_element = $$ = alloc_and_init_stack_element() ;
 
       if (tmp_stack_element == NULL)
