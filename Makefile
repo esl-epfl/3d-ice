@@ -11,12 +11,12 @@
 .PHONY: all clean
 
 all:
-	cd ./Flex    ; make ;
+	cd ./flex    ; make ;
 	cd ./bison   ; make ;
 	cd ./Sources ; make ;
 
 clean:
-	cd ./Flex    ; make clean ;
+	cd ./flex    ; make clean ;
 	cd ./bison   ; make clean ;
 	cd ./Sources ; make clean ;
 
