@@ -13,10 +13,10 @@
 all:
 	cd ./flex    ; make ;
 	cd ./bison   ; make ;
-	cd ./Sources ; make ;
+	cd ./sources ; make ;
 
 clean:
 	cd ./flex    ; make clean ;
 	cd ./bison   ; make clean ;
-	cd ./Sources ; make clean ;
+	cd ./sources ; make clean ;
 
