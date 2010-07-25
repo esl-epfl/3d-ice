@@ -109,7 +109,7 @@ stack_description_error
 ) ;
 
 static struct StackElement* tmp_stack_element;
-
+static int found_die = 0;
 %}
 
 %require     "2.4.1"
@@ -167,7 +167,10 @@ material
       if (material == NULL)
       {
         free ($2) ;
-        stack_description_error (stkd, scanner, "alloc material failed") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc material failed"
+        ) ;
         YYABORT ;
       }
 
@@ -203,7 +206,10 @@ heatsink
 
       if (stkd->HeatSink == NULL)
       {
-        stack_description_error(stkd, scanner, "alloc_and_init_heatsink") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc heatsink failed"
+        ) ;
         YYABORT ;
       }
 
@@ -231,7 +237,10 @@ channel
 
       if (stkd->Channel == NULL)
       {
-        stack_description_error(stkd, scanner, "alloc_and_init_channel") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc channel failed"
+        ) ;
         free ($9) ;
         YYABORT ;
       }
@@ -247,7 +256,10 @@ channel
 
       if (stkd->Channel->Wall == NULL)
       {
-        stack_description_error(stkd, scanner, "Unknown material id") ;
+        stack_description_error
+        (
+          stkd, scanner, "unknown material identifier"
+        ) ;
         free ($9) ;
         YYABORT ;
       }
@@ -279,7 +291,10 @@ die
       if (die == NULL)
       {
         free ($2) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_die") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc die failed"
+        ) ;
         YYABORT ;
       }
 
@@ -337,7 +352,10 @@ layer_content : DVALUE UM IDENTIFIER ';'
       if (layer == NULL)
       {
         free ($3) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc layer failed"
+        ) ;
         YYABORT ;
       }
 
@@ -348,7 +366,10 @@ layer_content : DVALUE UM IDENTIFIER ';'
       {
         free ($3) ;
         free_layer(layer) ;
-        stack_description_error(stkd, scanner, "Unknown material id") ;
+        stack_description_error
+        (
+          stkd, scanner, "unknown material identifier"
+        ) ;
         YYABORT ;
       }
 
@@ -368,10 +389,21 @@ stack
       stkd->StackElementsList = $3 ;
 
       if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
-
-        fprintf(stderr,
-                  "Warning: channel as bottom stack element not supported\n") ;
-
+      {
+        stack_description_error
+        (
+          stkd, scanner, "channel as top stack element not supported"
+        ) ;
+        YYABORT ;
+      }
+      if (found_die == 0)
+      {
+        stack_description_error
+        (
+          stkd, scanner, "die declared but not used"
+        ) ;
+        YYABORT ;
+      }
     }
   ;
 
@@ -379,21 +411,27 @@ stack_elements
 
   : stack_element
     {
-      $$ = $1 ;
-
       if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+      {
+        free_stack_element ($1) ;
+        stack_description_error
+        (
+          stkd, scanner, "channel as top stack element not supported"
+        ) ;
+        YYABORT ;
+      }
 
-        fprintf(stderr,
-                "Warning: channel as top stack element not supported\n") ;
-
+      $$ = $1 ;
     }
   | stack_elements stack_element
     {
       if (find_stack_element_in_list(stkd->StackElementsList, $2->Id) != NULL)
       {
         free_stack_element ($2) ;
-        stack_description_error (stkd, scanner,
-          "stack element id already declared") ;
+        stack_description_error
+        (
+          stkd, scanner, "stack element id already declared"
+        ) ;
         YYABORT ;
       }
 
@@ -412,7 +450,10 @@ stack_element
       {
         free ($2);
         free ($5) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc stack element failed"
+        ) ;
         YYABORT ;
       }
 
@@ -423,7 +464,10 @@ stack_element
         free ($2);
         free ($5) ;
         free_stack_element (tmp_stack_element) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_layer") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc layer failed"
+        ) ;
         YYABORT ;
       }
 
@@ -436,7 +480,10 @@ stack_element
         free ($5) ;
         free_layer(layer) ;
         free_stack_element (tmp_stack_element) ;
-        stack_description_error(stkd, scanner, "Unknown material id") ;
+        stack_description_error
+        (
+          stkd, scanner, "unknown material identifier"
+        ) ;
         YYABORT ;
       }
 
@@ -452,16 +499,20 @@ stack_element
       if (stkd->Channel == NULL)
       {
         free ($2) ;
-        stack_description_error(stkd, scanner,
-                                "Error: channel section not declared") ;
+        stack_description_error
+        (
+          stkd, scanner, "channel used but not declared"
+        ) ;
         YYABORT ;
       }
 
       if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
       {
         free ($2) ;
-        stack_description_error(stkd, scanner,
-                "Warning: two consecutive channel layers are not supported") ;
+        stack_description_error
+        (
+          stkd, scanner, "two consecutive channel layers not supported"
+        ) ;
         YYABORT ;
       }
       tmp_stack_element = $$ = alloc_and_init_stack_element() ;
@@ -469,7 +520,10 @@ stack_element
       if (tmp_stack_element == NULL)
       {
         free ($2) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc stack element failed"
+        ) ;
         YYABORT ;
       }
 
@@ -486,7 +540,10 @@ stack_element
         free ($3) ;
         free ($2) ;
         free ($5) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_stack_element") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc stack element failed"
+        ) ;
         YYABORT ;
       }
 
@@ -499,7 +556,10 @@ stack_element
         free($3) ;
         free($5) ;
         free_stack_element(tmp_stack_element) ;
-        stack_description_error(stkd, scanner, "Unknown die id") ;
+        stack_description_error
+        (
+          stkd, scanner, "unknown die identifier"
+        ) ;
         YYABORT ;
       }
 
@@ -512,13 +572,18 @@ stack_element
         free($3) ;
         free($5) ;
         free_stack_element(tmp_stack_element) ;
-        stack_description_error(stkd, scanner, "alloc_and_init_floorplan") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc floorplan failed"
+        ) ;
         YYABORT ;
       }
 
       tmp_stack_element->Floorplan->FileName = $5 ;
 
       free($3) ;
+
+      found_die = 1 ;
     }
   ;
 
@@ -540,7 +605,10 @@ dimensions
 
       if (stkd->Dimensions == NULL)
       {
-        stack_description_error(stkd, scanner, "alloc_and_init_dimensions") ;
+        stack_description_error
+        (
+          stkd, scanner, "malloc dimensions failed"
+        ) ;
         YYABORT ;
       }
 
@@ -563,13 +631,19 @@ dimensions
 
       if (stkd->Dimensions->Grid.NColumns % 2 == 0)
       {
-        stack_description_error(stkd, scanner, "even number of columns") ;
+        stack_description_error
+        (
+          stkd, scanner, "even number of columns"
+        ) ;
         YYABORT ;
       }
 
       if (stkd->Dimensions->Grid.NColumns < 3)
       {
-        stack_description_error(stkd, scanner, "not enough columns") ;
+        stack_description_error
+        (
+          stkd, scanner, "not enough columns"
+        ) ;
         YYABORT ;
       }
 
