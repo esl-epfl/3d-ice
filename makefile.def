@@ -42,10 +42,10 @@ MVFLAGS = -vf
 ###############################################################################
 
 TL_LIB     = $(TL_MAIN)/Lib
-TL_INCLUDE = $(TL_MAIN)/Include
+TL_INCLUDE = $(TL_MAIN)/include
 TL_SOURCES = $(TL_MAIN)/Sources
-TL_BISON   = $(TL_MAIN)/Bison
-TL_FLEX    = $(TL_MAIN)/Flex
+TL_BISON   = $(TL_MAIN)/bison
+TL_FLEX    = $(TL_MAIN)/flex
 
 TL_ARCHIVE = $(TL_LIB)/libThermalLibrary.a
 
