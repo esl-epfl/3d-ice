@@ -41,7 +41,7 @@ MVFLAGS = -vf
 # Thermal Library variables
 ###############################################################################
 
-TL_LIB     = $(TL_MAIN)/Lib
+TL_LIB     = $(TL_MAIN)/lib
 TL_INCLUDE = $(TL_MAIN)/include
 TL_SOURCES = $(TL_MAIN)/sources
 TL_BISON   = $(TL_MAIN)/bison
