@@ -108,7 +108,7 @@ stack_description_error
   char             *message
 ) ;
 
-static struct StackElement* tmp_stack_element;
+static struct StackElement* tmp_stack_element = NULL;
 static int found_die = 0;
 %}
 
@@ -394,6 +394,9 @@ stack
         (
           stkd, scanner, "channel as top stack element not supported"
         ) ;
+
+        tmp_stack_element = NULL;
+
         YYABORT ;
       }
       if (found_die == 0)
@@ -402,6 +405,9 @@ stack
         (
           stkd, scanner, "die declared but not used"
         ) ;
+
+        found_die = 0 ;
+
         YYABORT ;
       }
     }
