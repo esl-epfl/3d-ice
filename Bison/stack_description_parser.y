@@ -20,7 +20,7 @@
 #include "stack_description.h"
 
 %}
-
+		
 /* The YYSTYPE union used to collect the types of tokens and rules */
 
 %union
@@ -39,6 +39,9 @@
 %destructor { free_layers_list ($$) ;         } <layers>
 %destructor { free_dies_list ($$) ;           } <dies>
 %destructor { free_stack_elements_list ($$) ; } <stack_elements>
+
+%type <double_v> first_cell_dimension
+%type <double_v> last_cell_dimension
 
 %type <material> material
 %type <material> materials_list
@@ -530,8 +533,8 @@ dimensions
       CHIP WIDTH  DVALUE MM ';'
       CELL LENGTH DVALUE UM ';'
       CELL WIDTH  DVALUE UM ';'
-      FIRST CELL LENGTH DVALUE UM ';'
-      LAST  CELL LENGTH DVALUE UM ';'
+      first_cell_dimension
+      last_cell_dimension
     {
       stkd->Dimensions = alloc_and_init_dimensions() ;
 
@@ -545,8 +548,8 @@ dimensions
       stkd->Dimensions->Chip.Width       = $10 * 1000.0 ;
       stkd->Dimensions->Cell.Length      = $15 ;
       stkd->Dimensions->Cell.Width       = $20 ;
-      stkd->Dimensions->Cell.FirstLength = $26 ;
-      stkd->Dimensions->Cell.LastLength  = $32 ;
+      stkd->Dimensions->Cell.FirstLength = ($23 == 0) ? $15 : $23 ;
+      stkd->Dimensions->Cell.LastLength  = ($24 == 0) ? $15 : $24 ;
 
       stkd->Dimensions->Grid.NRows
         = (int) (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
@@ -592,6 +595,18 @@ dimensions
           + (stkd->Dimensions->Grid.NLayers - 1 ) * 2
             * stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns ;
     }
+  ;
+
+first_cell_dimension
+
+  : /* empty */                     { $$ = 0 ;  }
+  | FIRST CELL LENGTH DVALUE UM ';' { $$ = $4 ; }
+  ;
+
+last_cell_dimension
+
+  : /* empty */                    { $$ = 0 ;  }
+  | LAST CELL LENGTH DVALUE UM ';' { $$ = $4 ; }
   ;
 
 %%
