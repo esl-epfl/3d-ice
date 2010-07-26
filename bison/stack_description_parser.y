@@ -629,11 +629,13 @@ dimensions
         = (int) (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
 
       stkd->Dimensions->Grid.NColumns
-        = (int) (( ( stkd->Dimensions->Chip.Length
+        = (int) ( (
+                     stkd->Dimensions->Chip.Length
                      - stkd->Dimensions->Cell.FirstLength
-                     - stkd->Dimensions->Cell.LastLength )
-                   / stkd->Dimensions->Cell.Length )
-                 + 2) ;
+                     - stkd->Dimensions->Cell.LastLength
+                  )
+                  /  stkd->Dimensions->Cell.Length
+                ) + 2 ;
 
       if (stkd->Dimensions->Grid.NColumns % 2 == 0)
       {

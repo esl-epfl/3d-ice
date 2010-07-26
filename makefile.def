@@ -18,7 +18,7 @@ AR      = ar
 ARFLAGS = rsv
 
 CC      = gcc
-CFLAGS  = -MD -g -Wall
+CFLAGS  = -MD -Wall -Wextra 
 #CFLAGS := $(CFLAGS) -DENABLE_ASSERT
 #CFLAGS := $(CFLAGS) -DPRINT_CONDUCTANCES
 #CFLAGS := $(CFLAGS) -DPRINT_CAPACITIES

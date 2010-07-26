@@ -28,17 +28,6 @@ extern "C"
  *                                "Layer"                                     *
  ******************************************************************************/
 
-  enum LayerPosition_t
-  {
-    TL_LAYER_BOTTOM = 0,
-    TL_LAYER_CENTER    ,
-    TL_LAYER_TOP
-  } ;
-
-  typedef enum LayerPosition_t LayerPosition_t;
-
-/******************************************************************************/
-
   struct Layer
   {
     CellDimension_t Height ;        /* The heigh of the layer in um. (1 cell) */
@@ -78,11 +67,6 @@ extern "C"
 /******************************************************************************/
 
   void print_layers_list (FILE* stream, String_t prefix, Layer* list) ;
-
-/******************************************************************************/
-
-  LayerPosition_t
-  get_layer_position (Dimensions* dimensions, LayerIndex_t layer) ;
 
 /******************************************************************************/
 

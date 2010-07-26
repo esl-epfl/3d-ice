@@ -74,28 +74,7 @@ void print_layers_list (FILE* stream, String_t prefix, Layer* list)
 
 /******************************************************************************/
 
-enum LayerPosition_t
-get_layer_position
-(
-  Dimensions* dimensions,
-  LayerIndex_t       layer
-)
-{
-  if (layer == 0)
-
-    return TL_LAYER_BOTTOM ;
-
-  else if (layer == get_number_of_layers(dimensions) - 1)
-
-    return TL_LAYER_TOP ;
-
-  return TL_LAYER_CENTER ;
-}
-
-/******************************************************************************/
-
-Conductances*
-fill_conductances_layer
+Conductances*   fill_conductances_layer
 (
   Layer*        layer,
   Conductances* conductances,
@@ -106,14 +85,34 @@ fill_conductances_layer
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
+  void (*fill_conductances)
   (
-    stderr,
-    "current_layer = %d\tfill_conductances_layer %s\n",
-    current_layer,
-    layer->Material->Id
-  ) ;
+#   ifdef PRINT_CONDUCTANCES
+    Dimensions*            dimensions,
+    LayerIndex_t           current_layer,
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Conductances*          conductances,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    ThermalConductivity_t  thermal_conductivity
+  );
+
+  if (current_layer == 0)
+
+    fill_conductances = &fill_conductances_bottom_solid_cell;
+
+  else if (current_layer == get_number_of_layers(dimensions) - 1)
+
+    fill_conductances = &fill_conductances_top_solid_cell;
+
+  else
+    fill_conductances = &fill_conductances_central_solid_cell;
+
+#ifdef PRINT_CONDUCTANCES
+  fprintf (stderr, "fill_conductances_layer %s\n", layer->Material->Id) ;
 #endif
 
   for
@@ -130,18 +129,17 @@ fill_conductances_layer
       column++, conductances++
     )
 
-      fill_conductances_solid_cell
+      fill_conductances
       (
 #ifdef PRINT_CONDUCTANCES
-        row, column,
+        dimensions,
+        current_layer, row, column,
 #endif
         conductances,
-        dimensions,
         get_cell_length (dimensions, column),
         get_cell_width  (dimensions),
         layer->Height,
-        layer->Material->ThermalConductivity,
-        current_layer
+        layer->Material->ThermalConductivity
       ) ;
 
   return conductances ;

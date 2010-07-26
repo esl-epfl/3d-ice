@@ -40,38 +40,66 @@ extern "C"
 
 /******************************************************************************/
 
-  void
-  fill_conductances_solid_cell
+  void                     fill_conductances_bottom_solid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
+    Dimensions*            dimensions,
+    LayerIndex_t           current_layer,
     RowIndex_t             current_row,
     ColumnIndex_t          current_column,
 #   endif
     Conductances*          conductances,
-    Dimensions*            dimensions,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity,
-    LayerIndex_t           current_layer
+    ThermalConductivity_t  thermal_conductivity
   ) ;
 
-  void
-  fill_conductances_liquid_cell
+  void                     fill_conductances_central_solid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
+    Dimensions*            dimensions,
+    LayerIndex_t           current_layer,
     RowIndex_t             current_row,
     ColumnIndex_t          current_column,
 #   endif
     Conductances*          conductances,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    ThermalConductivity_t  thermal_conductivity
+  ) ;
+
+  void                     fill_conductances_top_solid_cell
+  (
+#   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
+    LayerIndex_t           current_layer,
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Conductances*          conductances,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    ThermalConductivity_t  thermal_conductivity
+  ) ;
+
+  void                     fill_conductances_central_liquid_cell
+  (
+#   ifdef PRINT_CONDUCTANCES
+    LayerIndex_t           current_layer,
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Dimensions*            dimensions,
+    Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     CoolantHTC_t           coolant_htc,
     CoolantVHC_t           coolant_vhc,
-    CoolantFR_t            coolant_fr,
-    LayerIndex_t           current_layer
+    CoolantFR_t            coolant_fr
   ) ;
 
 #ifdef __cplusplus

@@ -126,13 +126,7 @@ fill_conductances_channel
   ColumnIndex_t column ;
 
 #ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
-    "current_layer = %d\tfill_conductances_channel %s\n",
-    current_layer,
-    channel->Wall->Id
-  ) ;
+  fprintf (stderr, "fill_conductances_channel %s\n", channel->Wall->Id) ;
 #endif
 
   for
@@ -151,38 +145,34 @@ fill_conductances_channel
 
       if (column % 2 == 0) // Even -> wall
 
-        fill_conductances_solid_cell
+        fill_conductances_central_solid_cell
         (
 #ifdef PRINT_CONDUCTANCES
-          row,
-          column,
+          dimensions,
+          current_layer, row, column,
 #endif
           conductances,
-          dimensions,
           get_cell_length (dimensions, column),
           get_cell_width  (dimensions),
           channel->Height,
-          channel->Wall->ThermalConductivity,
-          current_layer
+          channel->Wall->ThermalConductivity
         ) ;
 
       else                 // Odd -> channel
 
-        fill_conductances_liquid_cell
+        fill_conductances_central_liquid_cell
         (
 #ifdef PRINT_CONDUCTANCES
-          row,
-          column,
+          current_layer, row, column,
 #endif
-          conductances,
           dimensions,
+          conductances,
           get_cell_length (dimensions, column),
           get_cell_width  (dimensions),
           channel->Height,
           channel->CoolantHTC,
           channel->CoolantVHC,
-          channel->CoolantFR,
-          current_layer
+          channel->CoolantFR
         ) ;
 
   return conductances ;

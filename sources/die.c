@@ -163,13 +163,7 @@ fill_conductances_die
   Layer* layer ;
 
 #ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
-    "current_layer = %d\tfill_conductances_die  %s\n",
-    current_layer,
-    die->Id
-  ) ;
+  fprintf (stderr, "fill_conductances_die   %s\n", die->Id) ;
 #endif
 
   for
