@@ -25,7 +25,7 @@ extern "C"
 #include "stack_element.h"
 #include "dimensions.h"
 #include "conductances.h"
-#include "heatsink.h"
+#include "environment_heat_sink.h"
 
 /******************************************************************************
  *                                                                            *
@@ -47,7 +47,8 @@ extern "C"
     struct Die   *DiesList ;         /* The list of dies available to compose */
                                      /* the 3Dstack                           */
 
-    HeatSink* HeatSink;                   /* Informations about the heat      */
+    EnvironmentHeatSink* EnvironmentHeatSink;
+                                          /* Informations about the heat      */
                                           /* dissipation throught the top     */
                                           /* surface                          */
 
@@ -102,8 +103,9 @@ extern "C"
 
   void
   fill_sources_stack_description       (
-                                        struct StackDescription *stkd,
-                                        double           *sources
+                                        struct StackDescription* stkd,
+                                        Source_t*                sources,
+                                        Conductance_t*           conductances
                                        ) ;
 
   void

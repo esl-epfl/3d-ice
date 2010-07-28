@@ -21,6 +21,7 @@ extern "C"
 #include "layer.h"
 #include "conductances.h"
 #include "floorplan.h"
+#include "environment_heat_sink.h"
 
 /******************************************************************************
  *                                                                            *
@@ -69,10 +70,11 @@ extern "C"
 
   Conductances*   fill_conductances_die
   (
-    struct Die*   die,
-    Conductances* conductances,
-    Dimensions*   dimensions,
-    LayerIndex_t  current_layer
+    struct Die*          die,
+    Conductances*        conductances,
+    Dimensions*          dimensions,
+    EnvironmentHeatSink* environmentheatsink,
+    LayerIndex_t         current_layer
   ) ;
 
   Capacity_t*     fill_capacities_die
@@ -115,6 +117,7 @@ extern "C"
     Dimensions*          dimensions,
     struct Conductances* conductances,
     Capacity_t*          capacities,
+    EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
     int*                 rows,
     int*                 columns,

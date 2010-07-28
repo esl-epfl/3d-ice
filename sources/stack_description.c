@@ -29,14 +29,14 @@ init_stack_description
   struct StackDescription *stkd
 )
 {
-  stkd->FileName           = NULL ;
-  stkd->MaterialsList      = NULL ;
-  stkd->Channel            = NULL ;
-  stkd->DiesList           = NULL ;
-  stkd->HeatSink           = NULL ;
-  stkd->StackElementsList  = NULL ;
-  stkd->Dimensions         = NULL ;
-  stkd->PowerValuesChanged = 0    ;
+  stkd->FileName            = NULL ;
+  stkd->MaterialsList       = NULL ;
+  stkd->Channel             = NULL ;
+  stkd->DiesList            = NULL ;
+  stkd->EnvironmentHeatSink = NULL ;
+  stkd->StackElementsList   = NULL ;
+  stkd->Dimensions          = NULL ;
+  stkd->PowerValuesChanged  = 0    ;
 }
 
 /******************************************************************************/
@@ -91,13 +91,13 @@ free_stack_description
   struct StackDescription *stkd
 )
 {
-  free_materials_list      (stkd->MaterialsList) ;
-  free_channel             (stkd->Channel) ;
-  free_dies_list           (stkd->DiesList) ;
-  free_heatsink            (stkd->HeatSink) ;
-  free_stack_elements_list (stkd->StackElementsList) ;
-  free_dimensions          (stkd->Dimensions) ;
-  free                     (stkd->FileName) ;
+  free_materials_list        (stkd->MaterialsList) ;
+  free_channel               (stkd->Channel) ;
+  free_dies_list             (stkd->DiesList) ;
+  free_environment_heat_sink (stkd->EnvironmentHeatSink) ;
+  free_stack_elements_list   (stkd->StackElementsList) ;
+  free_dimensions            (stkd->Dimensions) ;
+  free                       (stkd->FileName) ;
 }
 
 /******************************************************************************/
@@ -114,15 +114,15 @@ print_stack_description
 {
   fprintf(stream, "%sStack read from file %s\n", prefix, stkd->FileName) ;
 
-  print_materials_list      (stream, prefix, stkd->MaterialsList) ;
-  print_channel             (stream, prefix, stkd->Channel);
-  print_dies_list           (stream, prefix, stkd->DiesList) ;
-  print_heatsink            (stream, prefix, stkd->HeatSink) ;
+  print_materials_list        (stream, prefix, stkd->MaterialsList) ;
+  print_channel               (stream, prefix, stkd->Channel);
+  print_dies_list             (stream, prefix, stkd->DiesList) ;
+  print_environment_heat_sink (stream, prefix, stkd->EnvironmentHeatSink) ;
 
-  fprintf(stream, "%sStack:\n", prefix) ;
+  fprintf (stream, "%sStack:\n", prefix) ;
 
-  print_stack_elements_list (stream, prefix, stkd->StackElementsList) ;
-  print_dimensions          (stream, prefix, stkd->Dimensions) ;
+  print_stack_elements_list   (stream, prefix, stkd->StackElementsList) ;
+  print_dimensions            (stream, prefix, stkd->Dimensions) ;
 }
 
 /******************************************************************************/
@@ -231,6 +231,7 @@ fill_conductances_stack_description
                          stack_element->Pointer.Die,
                          conductances,
                          stkd->Dimensions,
+                         stkd->EnvironmentHeatSink,
                          stack_element->LayersOffset
                        ) ;
         break ;
@@ -242,6 +243,7 @@ fill_conductances_stack_description
                          stack_element->Pointer.Layer,
                          conductances,
                          stkd->Dimensions,
+                         stkd->EnvironmentHeatSink,
                          stack_element->LayersOffset
                        ) ;
         break ;
@@ -250,9 +252,11 @@ fill_conductances_stack_description
 
         conductances = fill_conductances_channel
                        (
+#                        ifdef PRINT_CONDUCTANCES
+                         stack_element->LayersOffset,
+#                        endif
                          stkd->Channel,
-                         conductances, stkd->Dimensions,
-                         stack_element->LayersOffset
+                         conductances, stkd->Dimensions
                        ) ;
         break ;
 
@@ -374,11 +378,14 @@ void                       fill_capacities_stack_description
 void
 fill_sources_stack_description
 (
-  struct StackDescription *stkd,
-  double           *sources
+  struct StackDescription* stkd,
+  Source_t*                sources,
+  Conductance_t*           conductances
 )
 {
-  struct StackElement *stack_element ;
+  struct StackElement* stack_element ;
+  struct StackElement* last_stack_element ;
+  Source_t*            tmp_sources = sources ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -394,43 +401,50 @@ fill_sources_stack_description
 
     stack_element != NULL ;
 
-    stack_element = stack_element->Next
+    last_stack_element = stack_element,
+    stack_element      = stack_element->Next
   )
 
     switch (stack_element->Type)
     {
       case TL_STACK_ELEMENT_DIE :
 
-        sources = fill_sources_die
-                  (
-#                   ifdef PRINT_SOURCES
-                    stack_element->LayersOffset,
-#                   endif
-                    stack_element->Pointer.Die,
-                    stack_element->Floorplan,
-                    sources, stkd->Dimensions) ;
+        tmp_sources = fill_sources_die
+                      (
+#                       ifdef PRINT_SOURCES
+                        stack_element->LayersOffset,
+#                       endif
+                        stack_element->Pointer.Die,
+                        stack_element->Floorplan,
+                        tmp_sources,
+                        stkd->Dimensions
+                      ) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
-        sources = fill_sources_empty_layer
-                  (
-#                   ifdef PRINT_SOURCES
-                    stack_element->LayersOffset,
-                    stack_element->Pointer.Layer,
-#                   endif
-                    sources, stkd->Dimensions) ;
+        tmp_sources = fill_sources_empty_layer
+                      (
+#                       ifdef PRINT_SOURCES
+                        stack_element->LayersOffset,
+                        stack_element->Pointer.Layer,
+#                       endif
+                        tmp_sources,
+                        stkd->Dimensions
+                      ) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        sources = fill_sources_channel
-                  (
-#                   ifdef PRINT_SOURCES
-                    stack_element->LayersOffset,
-#                   endif
-                    stkd->Channel,
-                    sources, stkd->Dimensions) ;
+        tmp_sources = fill_sources_channel
+                      (
+#                       ifdef PRINT_SOURCES
+                        stack_element->LayersOffset,
+#                       endif
+                        stkd->Channel,
+                        tmp_sources,
+                        stkd->Dimensions
+                      ) ;
         break ;
 
       case TL_STACK_ELEMENT_NONE :
@@ -445,6 +459,32 @@ fill_sources_stack_description
         return ;
 
     } /* switch stack_element->Type */
+
+  if (stkd->EnvironmentHeatSink != NULL)
+  {
+    if (last_stack_element->Type == TL_STACK_ELEMENT_DIE)
+
+        add_sources_enviroment_heat_sink
+        (
+          stkd->EnvironmentHeatSink,
+          stkd->Dimensions,
+          sources,
+          conductances,
+          last_stack_element->LayersOffset
+          + last_stack_element->Pointer.Die->NLayers
+        ) ;
+
+    else if (last_stack_element->Type == TL_STACK_ELEMENT_LAYER)
+
+        add_sources_enviroment_heat_sink
+        (
+          stkd->EnvironmentHeatSink,
+          stkd->Dimensions,
+          sources,
+          conductances,
+          last_stack_element->LayersOffset
+        ) ;
+  }
 }
 
 /******************************************************************************/
@@ -600,6 +640,7 @@ fill_crs_system_matrix_stack_description
                 (
                   stack_element->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
+                  stkd->EnvironmentHeatSink,
                   stack_element->LayersOffset,
                   rows, columns, values
                 ) ;
@@ -613,6 +654,7 @@ fill_crs_system_matrix_stack_description
                   stack_element->Pointer.Layer,
 #                 endif
                   stkd->Dimensions, conductances, capacities,
+                  stkd->EnvironmentHeatSink,
                   stack_element->LayersOffset,
                   rows, columns, values
                 ) ;

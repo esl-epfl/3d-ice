@@ -24,9 +24,13 @@ void                     fill_conductances_bottom_solid_cell
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity
+  ThermalConductivity_t  thermal_conductivity,
+  HeatSinkHTC_t          environment_heat_transfer_coefficient
 )
 {
+  // To avoid unused parameter warning message
+  (void) environment_heat_transfer_coefficient;
+
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
       / ( cell_width / (CellDimension_t) 2);
@@ -70,9 +74,13 @@ void                     fill_conductances_central_solid_cell
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity
+  ThermalConductivity_t  thermal_conductivity,
+  HeatSinkHTC_t          environment_heat_transfer_coefficient
 )
 {
+  // To avoid unused parameter warning message
+  (void) environment_heat_transfer_coefficient;
+
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
       / ( cell_width / (CellDimension_t) 2);
@@ -84,31 +92,6 @@ void                     fill_conductances_central_solid_cell
   conductances->Top = conductances->Bottom
     = (thermal_conductivity * cell_length * cell_width )
       / (cell_height / (CellDimension_t) 2);
-
-//  else if (cell_position == TL_LAYER_TOP)
-//  {
-//    if (heatsink == NULL)
-//    {
-//      conductances->Top = (Conductance_t) 0 ;
-//
-//      conductances->Bottom
-//        = (thermal_conductivity * cell_length * cell_width)
-//          / cell_height ;
-//    }
-//    else
-//    {
-//        conductances->Top
-//          = ((Conductance_t) 2 * thermal_conductivity * heatsink->HeatTransferC
-//             * cell_length * cell_width)
-//            /
-//            (cell_height * heatsink->HeatTransferC
-//             + (Conductance_t) 2 * thermal_conductivity) ;
-//
-//        conductances->Bottom
-//          = (thermal_conductivity * cell_length * cell_width)
-//            / (cell_height / (CellDimension_t) 2) ;
-//    }
-//  }
 
 #ifdef PRINT_CONDUCTANCES
   fprintf
@@ -140,9 +123,13 @@ void                     fill_conductances_top_solid_cell
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity
+  ThermalConductivity_t  thermal_conductivity,
+  HeatSinkHTC_t          environment_heat_transfer_coefficient
 )
 {
+  // To avoid unused parameter warning message
+  (void) environment_heat_transfer_coefficient;
+
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
       / ( cell_width / (CellDimension_t) 2);
@@ -161,6 +148,65 @@ void                     fill_conductances_top_solid_cell
   (
     stderr,
     "solid  top     | l %2d r %4d c %4d [%6d] "  \
+                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+    current_layer, current_row, current_column,
+    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    cell_length, cell_width, cell_height,
+    conductances->North, conductances->South, conductances->East,
+    conductances->West, conductances->Top, conductances->Bottom
+  ) ;
+#endif
+}
+
+/******************************************************************************/
+
+void                     fill_conductances_top_solid_cell_ehtc
+(
+# ifdef PRINT_CONDUCTANCES
+  Dimensions*            dimensions,
+  LayerIndex_t           current_layer,
+  RowIndex_t             current_row,
+  ColumnIndex_t          current_column,
+# endif
+  Conductances*          conductances,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  ThermalConductivity_t  thermal_conductivity,
+  HeatSinkHTC_t          environment_heat_transfer_coefficient
+)
+{
+  conductances->North = conductances->South
+    = (thermal_conductivity * cell_length * cell_height )
+      / ( cell_width / (CellDimension_t) 2);
+
+  conductances->East = conductances->West
+    = (thermal_conductivity * cell_width * cell_height )
+      / (cell_length / (CellDimension_t) 2) ;
+
+  conductances->Bottom
+    = (thermal_conductivity * cell_length * cell_width)
+      / (cell_height / (CellDimension_t) 2) ;
+
+  conductances->Top
+    = (
+        (Conductance_t) 2 * thermal_conductivity
+          * environment_heat_transfer_coefficient
+          * cell_length * cell_width
+      )
+      /
+      (
+        cell_height * environment_heat_transfer_coefficient
+        +
+        (Conductance_t) 2 * thermal_conductivity
+      ) ;
+
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "solid top ehtc | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "   \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
@@ -193,7 +239,7 @@ void                     fill_conductances_top_solid_cell
  * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
  */
 
-void                     fill_conductances_central_liquid_cell
+void                     fill_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   LayerIndex_t           current_layer,
@@ -226,7 +272,7 @@ void                     fill_conductances_central_liquid_cell
   fprintf
   (
     stderr,
-    "liquid central | l %2d r %4d c %4d [%6d] "   \
+    "liquid         | l %2d r %4d c %4d [%6d] "   \
                    "| l %5.2f w %5.2f h %5.2f "   \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
@@ -234,6 +280,51 @@ void                     fill_conductances_central_liquid_cell
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
+#endif
+}
+
+/******************************************************************************/
+
+void                     fill_conductances_wall_cell
+(
+# ifdef PRINT_CONDUCTANCES
+  Dimensions*            dimensions,
+  LayerIndex_t           current_layer,
+  RowIndex_t             current_row,
+  ColumnIndex_t          current_column,
+# endif
+  Conductances*          conductances,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  ThermalConductivity_t  thermal_conductivity
+)
+{
+  conductances->North = conductances->South
+    = (thermal_conductivity * cell_length * cell_height )
+      / ( cell_width / (CellDimension_t) 2);
+
+  conductances->East = conductances->West
+    = (thermal_conductivity * cell_width * cell_height )
+      / (cell_length / (CellDimension_t) 2) ;
+
+  conductances->Top = conductances->Bottom
+    = (thermal_conductivity * cell_length * cell_width )
+      / (cell_height / (CellDimension_t) 2);
+
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "wall           | l %2d r %4d c %4d [%6d] "  \
+                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+    current_layer, current_row, current_column,
+    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    cell_length, cell_width, cell_height,
+    conductances->North, conductances->South, conductances->East,
+    conductances->West, conductances->Top, conductances->Bottom
+  ) ;
 #endif
 }
 

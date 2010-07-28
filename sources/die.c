@@ -151,13 +151,13 @@ find_die_in_list
 /******************************************************************************/
 /******************************************************************************/
 
-Conductances*
-fill_conductances_die
+Conductances*          fill_conductances_die
 (
-  struct Die   *die,
-  Conductances *conductances,
-  Dimensions   *dimensions,
-  LayerIndex_t current_layer
+  struct Die*          die,
+  Conductances*        conductances,
+  Dimensions*          dimensions,
+  EnvironmentHeatSink* environmentheatsink,
+  LayerIndex_t         current_layer
 )
 {
   Layer* layer ;
@@ -178,6 +178,7 @@ fill_conductances_die
                      layer,
                      conductances,
                      dimensions,
+                     environmentheatsink,
                      current_layer + layer->LayersOffset
                    ) ;
 
@@ -355,6 +356,7 @@ int                    fill_crs_system_matrix_die
   Dimensions*          dimensions,
   struct Conductances* conductances,
   Capacity_t*          capacities,
+  EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
   int*                 rows,
   int*                 columns,
@@ -396,6 +398,7 @@ int                    fill_crs_system_matrix_die
               layer,
 #             endif
               dimensions, conductances, capacities,
+              environmentheatsink,
               current_layer + layer->LayersOffset,
               rows, columns, values
             ) ;

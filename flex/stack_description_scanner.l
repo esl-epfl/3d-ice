@@ -120,7 +120,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "floorplan"                  return FLOORPLAN ;
 "flow"                       return FLOW ;
 "heat"                       return HEAT ;
-"heatsink"                   return HEATSINK ;
 "height"                     return HEIGHT ;
 "incoming"                   return INCOMING ;
 "layer"                      return LAYER ;
@@ -130,6 +129,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "mm"                         return MM ;
 "on"                         return ON ;
 "rate"                       return RATE ;
+"sink"                       return SINK ;
 "source"                     return SOURCE ;
 "specific"                   return SPECIFIC ;
 "stack"                      return STACK ;

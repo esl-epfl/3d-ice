@@ -76,10 +76,11 @@ void print_layers_list (FILE* stream, String_t prefix, Layer* list)
 
 Conductances*   fill_conductances_layer
 (
-  Layer*        layer,
-  Conductances* conductances,
-  Dimensions*   dimensions,
-  LayerIndex_t  current_layer
+  Layer*               layer,
+  Conductances*        conductances,
+  Dimensions*          dimensions,
+  EnvironmentHeatSink* environmentheatsink,
+  LayerIndex_t         current_layer
 )
 {
   RowIndex_t    row ;
@@ -97,19 +98,29 @@ Conductances*   fill_conductances_layer
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity
+    ThermalConductivity_t  thermal_conductivity,
+    HeatSinkHTC_t          heat_transfer_coefficient
   );
 
   if (current_layer == 0)
-
+  {
     fill_conductances = &fill_conductances_bottom_solid_cell;
-
+  }
   else if (current_layer == get_number_of_layers(dimensions) - 1)
+  {
+    if (environmentheatsink == NULL)
 
-    fill_conductances = &fill_conductances_top_solid_cell;
+      fill_conductances = &fill_conductances_top_solid_cell;
 
+    else
+
+      fill_conductances = &fill_conductances_top_solid_cell_ehtc;
+
+  }
   else
+  {
     fill_conductances = &fill_conductances_central_solid_cell;
+  }
 
 #ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_layer %s\n", layer->Material->Id) ;
@@ -139,7 +150,8 @@ Conductances*   fill_conductances_layer
         get_cell_length (dimensions, column),
         get_cell_width  (dimensions),
         layer->Height,
-        layer->Material->ThermalConductivity
+        layer->Material->ThermalConductivity,
+        environmentheatsink->HeatTransferC
       ) ;
 
   return conductances ;
@@ -223,15 +235,15 @@ Capacity_t*    fill_capacities_layer
 
 /******************************************************************************/
 
-Source_t*           fill_sources_active_layer
+Source_t*              fill_sources_active_layer
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t      current_layer,
-  Layer*            layer,
+  LayerIndex_t         current_layer,
+  Layer*               layer,
 # endif
-  struct Floorplan* floorplan,
-  Source_t*         sources,
-  Dimensions*       dimensions
+  struct Floorplan*    floorplan,
+  Source_t*            sources,
+  Dimensions*          dimensions
 )
 {
   int              row, column ;
@@ -274,7 +286,6 @@ Source_t*           fill_sources_active_layer
 
           = (flp_el->PowerValue * get_cell_top_surface (dimensions, column))
             / flp_el_surface ;
-
 #ifdef PRINT_SOURCES
         fprintf
         (
@@ -297,14 +308,14 @@ Source_t*           fill_sources_active_layer
 
 /******************************************************************************/
 
-Source_t*      fill_sources_empty_layer
+Source_t*              fill_sources_empty_layer
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t current_layer,
-  Layer*       layer,
+  LayerIndex_t         current_layer,
+  Layer*               layer,
 # endif
-  Source_t*    sources,
-  Dimensions*  dimensions
+  Source_t*            sources,
+  Dimensions*          dimensions
 )
 {
 #ifdef PRINT_SOURCES
@@ -385,6 +396,7 @@ int                    fill_crs_system_matrix_layer
   Dimensions*          dimensions,
   struct Conductances* conductances,
   Capacity_t*          capacities,
+  EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
   int*                 rows,
   int*                 columns,
@@ -427,6 +439,7 @@ int                    fill_crs_system_matrix_layer
       added = add_crs_solid_column
               (
                 dimensions, conductances, capacities,
+                environmentheatsink,
                 current_layer, row, column,
                 rows, columns, values
               ) ;

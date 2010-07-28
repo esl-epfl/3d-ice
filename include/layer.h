@@ -23,6 +23,7 @@ extern "C"
 #include "dimensions.h"
 #include "conductances.h"
 #include "floorplan.h"
+#include "environment_heat_sink.h"
 
 /******************************************************************************
  *                                "Layer"                                     *
@@ -70,12 +71,13 @@ extern "C"
 
 /******************************************************************************/
 
-  struct Conductances* fill_conductances_layer
+  struct Conductances*   fill_conductances_layer
   (
-    Layer*        layer,
+    Layer*               layer,
     struct Conductances* conductances,
-    Dimensions*   dimensions,
-    LayerIndex_t  current_layer
+    Dimensions*          dimensions,
+    EnvironmentHeatSink* environmentheatsink,
+    LayerIndex_t         current_layer
   ) ;
 
   Capacity_t*    fill_capacities_layer
@@ -133,6 +135,7 @@ extern "C"
     Dimensions*          dimensions,
     struct Conductances* conductances,
     Capacity_t*          capacities,
+    EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
     int*                 rows,
     int*                 columns,

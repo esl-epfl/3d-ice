@@ -113,13 +113,14 @@ print_channel
 /******************************************************************************/
 /******************************************************************************/
 
-Conductances*
-fill_conductances_channel
+Conductances*     fill_conductances_channel
 (
+# ifdef PRINT_CONDUCTANCES
+  LayerIndex_t    current_layer,
+# endif
   struct Channel* channel,
   Conductances*   conductances,
-  Dimensions*     dimensions,
-  LayerIndex_t    current_layer
+  Dimensions*     dimensions
 )
 {
   RowIndex_t    row ;
@@ -145,7 +146,7 @@ fill_conductances_channel
 
       if (column % 2 == 0) // Even -> wall
 
-        fill_conductances_central_solid_cell
+        fill_conductances_wall_cell
         (
 #ifdef PRINT_CONDUCTANCES
           dimensions,
@@ -160,7 +161,7 @@ fill_conductances_channel
 
       else                 // Odd -> channel
 
-        fill_conductances_central_liquid_cell
+        fill_conductances_liquid_cell
         (
 #ifdef PRINT_CONDUCTANCES
           current_layer, row, column,
@@ -489,6 +490,7 @@ int  fill_crs_system_matrix_channel
          added = add_crs_solid_column
                  (
                    dimensions, conductances, capacities,
+                   NULL,
                    current_layer, row, column,
                    rows, columns, values
                  ) ;

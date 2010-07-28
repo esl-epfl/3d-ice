@@ -222,7 +222,8 @@ slu_fill_thermal_data
       tdata->SLU_Options.Fact = DOFACT ;
 
 
-    fill_sources_stack_description (stkd, tdata->Sources) ;
+    fill_sources_stack_description (stkd, tdata->Sources,
+                                          tdata->Conductances) ;
 
     fill_system_vector (&tdata->SV_B, tdata->Sources,
                                       tdata->Capacities,
@@ -234,7 +235,8 @@ slu_fill_thermal_data
 
   if (stkd->PowerValuesChanged == 1)
   {
-    fill_sources_stack_description (stkd, tdata->Sources) ;
+    fill_sources_stack_description (stkd, tdata->Sources,
+                                          tdata->Conductances) ;
 
     fill_system_vector (&tdata->SV_B, tdata->Sources,
                                       tdata->Capacities,

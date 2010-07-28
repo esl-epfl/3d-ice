@@ -91,7 +91,7 @@
 %token VOLUMETRIC            "keywork volumetric"
 %token CAPACITY              "keyword capacity"
 %token ENVIRONMENT           "keyword environment"
-%token HEATSINK              "keywork heatsink"
+%token SINK                  "keywork sink"
 
 %token <double_v> DVALUE     "float value"
 %token <string>   IDENTIFIER "identifier"
@@ -133,14 +133,14 @@ static int found_die = 0;
 stack_description_file
 
   : materials_list
-    heatsink
+    environment_heat_sink
     channel
     dies_list
     stack
     dimensions
     {
       if (stkd->Channel == NULL
-          && stkd->HeatSink == NULL)
+          && stkd->EnvironmentHeatSink == NULL)
         fprintf(stderr,
                 "Warning: both ambient heat sink and channels are absent.\n") ;
     }
@@ -195,26 +195,26 @@ material
 /******************************* Heatsink *************************************/
 /******************************************************************************/
 
-heatsink
+environment_heat_sink
 
   : /* empty */
-  | HEATSINK ':'
+  | ENVIRONMENT HEAT SINK ':'
         HEAT TRANSFER COEFFICIENT DVALUE ';'
         ENVIRONMENT TEMPERATURE   DVALUE ';'
     {
-      stkd->HeatSink = alloc_and_init_heatsink() ;
+      stkd->EnvironmentHeatSink = alloc_and_init_environment_heat_sink() ;
 
-      if (stkd->HeatSink == NULL)
+      if (stkd->EnvironmentHeatSink == NULL)
       {
         stack_description_error
         (
-          stkd, scanner, "malloc heatsink failed"
+          stkd, scanner, "malloc environment heat sink failed"
         ) ;
         YYABORT ;
       }
 
-      stkd->HeatSink->HeatTransferC = $6 ;
-      stkd->HeatSink->EnvironmentT  = $10 ;
+      stkd->EnvironmentHeatSink->HeatTransferC = $8 ;
+      stkd->EnvironmentHeatSink->EnvironmentT  = $12 ;
     }
   ;
 /******************************************************************************/

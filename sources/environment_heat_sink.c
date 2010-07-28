@@ -10,80 +10,86 @@
 
 #include <stdlib.h>
 
-#include "heatsink.h"
+#include "environment_heat_sink.h"
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-void init_heatsink (HeatSink* heatsink)
+void init_environment_heat_sink (EnvironmentHeatSink* environmentheatsink)
 {
-  heatsink->HeatTransferC = 0.0 ;
-  heatsink->EnvironmentT  = 0.0 ;
+  environmentheatsink->HeatTransferC = 0.0 ;
+  environmentheatsink->EnvironmentT  = 0.0 ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-HeatSink* alloc_and_init_heatsink (void)
+EnvironmentHeatSink* alloc_and_init_environment_heat_sink (void)
 {
-  HeatSink* heatsink = (HeatSink*) malloc ( sizeof(HeatSink) ) ;
+  EnvironmentHeatSink* environmentheatsink
 
-  if (heatsink != NULL) init_heatsink (heatsink) ;
+    = (EnvironmentHeatSink*) malloc ( sizeof(EnvironmentHeatSink) ) ;
 
-  return heatsink ;
+  if (environmentheatsink != NULL)
+
+    init_environment_heat_sink (environmentheatsink) ;
+
+  return environmentheatsink ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-void free_heatsink (HeatSink* heatsink)
+void free_environment_heat_sink (EnvironmentHeatSink* environmentheatsink)
 {
-  free (heatsink) ;
+  free (environmentheatsink) ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-void print_heatsink (FILE* stream, String_t prefix, HeatSink* heatsink)
+void print_environment_heat_sink
+(
+  FILE*                stream,
+  String_t             prefix,
+  EnvironmentHeatSink* environmentheatsink
+)
 {
   fprintf(stream,
-    "%sHeatsink\n",                prefix) ;
+    "%sEnvironment Heat Sink\n",             prefix) ;
   fprintf(stream,
-    "%s  Heat Transfert Coefficent %.5e\n",  prefix, heatsink->HeatTransferC) ;
+    "%s  Heat Transfert Coefficent %.5e\n",  prefix,
+                                             environmentheatsink->HeatTransferC) ;
   fprintf(stream,
-    "%s  Environment temperature   %.4e\n",  prefix, heatsink->EnvironmentT) ;
+    "%s  Environment temperature   %.4e\n",  prefix,
+                                             environmentheatsink->EnvironmentT) ;
 }
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-// void fill_conductances_heatsink
-// (
-//   HeatSink* heatsink,
-//   Layer* layer,
-//   struct Conductances* conductances
-// )
-// {
-//   CellDimension_t cell_length,
-//                   cell_width = get_cell_width(s;
-//
-//
-//       conductances->Top
-//         = ((Conductance_t) 2 * thermal_conductivity * heatsink->HeatTransferC
-//            * cell_length * cell_width)
-//           /
-//           (cell_height * heatsink->HeatTransferC
-//            + (Conductance_t) 2 * thermal_conductivity) ;
-//
-//       conductances->Bottom
-//         = (thermal_conductivity * cell_length * cell_width)
-//           / (cell_height / (CellDimension_t) 2) ;
-// }
+void                   add_sources_enviroment_heat_sink
+(
+  EnvironmentHeatSink* environmentheatsink,
+  Dimensions*          dimensions,
+  Source_t*            sources,
+  Conductances*        conductances,
+  LayerIndex_t         layer
+)
+{
+  int counter   = get_layer_area (dimensions) ;
+  sources      += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
+  conductances += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
+
+  while (counter-- > 0)
+    *sources++ += environmentheatsink->EnvironmentT
+                  * (conductances++)->Top ;
+}
 
 /******************************************************************************/
 /******************************************************************************/

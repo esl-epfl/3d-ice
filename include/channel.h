@@ -68,10 +68,12 @@ extern "C"
 
   Conductances*     fill_conductances_channel
   (
+#   ifdef PRINT_CAPACITIES
+    LayerIndex_t    current_layer
+#   endif
     struct Channel* channel,
     Conductances*   conductances,
-    Dimensions*     dimensions,
-    LayerIndex_t    current_layer
+    Dimensions*     dimensions
   ) ;
 
   Capacity_t*       fill_capacities_channel

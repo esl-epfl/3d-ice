@@ -399,6 +399,7 @@ int                    add_crs_solid_column
   Dimensions*          dimensions,
   struct Conductances* conductances,
   Capacity_t*          capacities,
+  EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
   RowIndex_t           current_row,
   ColumnIndex_t        current_column,
@@ -446,12 +447,12 @@ int                    add_crs_solid_column
       conductances->Top, (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
 #endif
   }
-#ifdef TL_NO_CHANNELS
   else
   {
-    diagonal_value +=  conductances->Top ;
+    if (environmentheatsink != NULL)
+
+      diagonal_value += conductances->Top ;
   }
-#endif
 
   if ( current_row < dimensions->Grid.NRows - 1 )   /* NORTH */
   {
@@ -507,7 +508,10 @@ int                    add_crs_solid_column
 #ifdef stderr_SYSTEM_MATRIX
   fprintf (stderr, "  diagonal\t%d\t ", *(columns-1)) ;
   fgetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "           \n") ;
+  if (environmentheatsink != NULL)
+    fprintf (stderr, "           + ehtc %.5e\n", conductances->Top) ;
+  else
+    fprintf (stderr, "           \n") ;
 #endif
 
   if ( current_column > 0 )   /* WEST */

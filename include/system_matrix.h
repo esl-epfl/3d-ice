@@ -84,6 +84,7 @@ extern "C"
     Dimensions*          dimensions,
     struct Conductances* conductances,
     Capacity_t*          capacities,
+    EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,

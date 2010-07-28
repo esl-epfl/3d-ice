@@ -17,7 +17,6 @@ extern "C"
 #endif
 
 #include "dimensions.h"
-#include "layer.h"
 
 /******************************************************************************
  *                                "Conductances"                              *
@@ -52,7 +51,8 @@ extern "C"
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity
+    ThermalConductivity_t  thermal_conductivity,
+    HeatSinkHTC_t          heat_transfer_coefficient
   ) ;
 
   void                     fill_conductances_central_solid_cell
@@ -67,7 +67,8 @@ extern "C"
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity
+    ThermalConductivity_t  thermal_conductivity,
+    HeatSinkHTC_t          heat_transfer_coefficient
   ) ;
 
   void                     fill_conductances_top_solid_cell
@@ -82,10 +83,42 @@ extern "C"
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
+    ThermalConductivity_t  thermal_conductivity,
+    HeatSinkHTC_t          heat_transfer_coefficient
+  ) ;
+
+  void                     fill_conductances_top_solid_cell_ehtc
+  (
+#   ifdef PRINT_CONDUCTANCES
+    Dimensions*            dimensions,
+    LayerIndex_t           current_layer,
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Conductances*          conductances,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    ThermalConductivity_t  thermal_conductivity,
+    HeatSinkHTC_t          environment_heat_transfer_coefficient
+  ) ;
+
+  void                     fill_conductances_wall_cell
+  (
+#   ifdef PRINT_CONDUCTANCES
+    Dimensions*            dimensions,
+    LayerIndex_t           current_layer,
+    RowIndex_t             current_row,
+    ColumnIndex_t          current_column,
+#   endif
+    Conductances*          conductances,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity
   ) ;
 
-  void                     fill_conductances_central_liquid_cell
+  void                     fill_conductances_liquid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
     LayerIndex_t           current_layer,
