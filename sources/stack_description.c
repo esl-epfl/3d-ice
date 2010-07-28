@@ -114,15 +114,21 @@ print_stack_description
 {
   fprintf(stream, "%sStack read from file %s\n", prefix, stkd->FileName) ;
 
-  print_materials_list        (stream, prefix, stkd->MaterialsList) ;
-  print_channel               (stream, prefix, stkd->Channel);
-  print_dies_list             (stream, prefix, stkd->DiesList) ;
-  print_environment_heat_sink (stream, prefix, stkd->EnvironmentHeatSink) ;
+  print_materials_list (stream, prefix, stkd->MaterialsList) ;
 
-  fprintf (stream, "%sStack:\n", prefix) ;
+  if (stkd->EnvironmentHeatSink != NULL)
 
-  print_stack_elements_list   (stream, prefix, stkd->StackElementsList) ;
-  print_dimensions            (stream, prefix, stkd->Dimensions) ;
+    print_environment_heat_sink (stream, prefix, stkd->EnvironmentHeatSink) ;
+
+  if (stkd->Channel != NULL)
+
+    print_channel (stream, prefix, stkd->Channel);
+
+  print_dies_list (stream, prefix, stkd->DiesList) ;
+
+  print_stack_elements_list (stream, prefix, stkd->StackElementsList) ;
+
+  print_dimensions (stream, prefix, stkd->Dimensions) ;
 }
 
 /******************************************************************************/
@@ -380,7 +386,7 @@ fill_sources_stack_description
 (
   struct StackDescription* stkd,
   Source_t*                sources,
-  Conductance_t*           conductances
+  Conductances*            conductances
 )
 {
   struct StackElement* stack_element ;

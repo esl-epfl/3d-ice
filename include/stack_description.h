@@ -105,7 +105,7 @@ extern "C"
   fill_sources_stack_description       (
                                         struct StackDescription* stkd,
                                         Source_t*                sources,
-                                        Conductance_t*           conductances
+                                        Conductances*            conductances
                                        ) ;
 
   void

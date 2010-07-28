@@ -26,22 +26,11 @@ extern "C"
 
   struct CellDimensions
   {
-    /* The length of the cell if it belongs to the */
-    /* first column in a layer (column 0).         */
-
-    CellDimension_t FirstLength ;
-
-    /* The length of the cell if it belongs to the */
-    /* last column in a layer (column #columns-1). */
-    CellDimension_t LastLength ;
-
-    /* The length of the cell if it belongs to the */
-    /* remaining columns.                          */
-    CellDimension_t Length  ;
-
-    /* The width of every cell.                    */
+    CellDimension_t FirstWallLength ;
+    CellDimension_t LastWallLength ;
+    CellDimension_t WallLength ;
+    CellDimension_t ChannelLength ;
     CellDimension_t Width ;
-
   } ;
 
   typedef struct CellDimensions CellDimensions;
@@ -77,6 +66,8 @@ extern "C"
     CellDimensions Cell;
     GridDimensions Grid;
     ChipDimensions Chip;
+
+    int StackHasChannel ;
   } ;
 
   typedef struct Dimensions Dimensions ;

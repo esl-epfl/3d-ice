@@ -98,10 +98,12 @@ print_stack_elements_list
   struct StackElement *list
 )
 {
+  fprintf (stream, "%sStack:\n", prefix) ;
+
   for ( ; list != NULL ; list = list->Next)
   {
     fprintf (stream,
-      "%s Stackelement (l %-2d)\t%s\t",
+      "%s  Stackelement (l %-2d)\t%s\t",
       prefix, list->LayersOffset, list->Id);
 
     switch (list->Type)

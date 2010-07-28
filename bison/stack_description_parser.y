@@ -40,8 +40,8 @@
 %destructor { free_dies_list ($$) ;           } <dies>
 %destructor { free_stack_elements_list ($$) ; } <stack_elements>
 
-%type <double_v> first_cell_dimension
-%type <double_v> last_cell_dimension
+%type <double_v> first_wall_length
+%type <double_v> last_wall_length
 
 %type <material> material
 %type <material> materials_list
@@ -109,7 +109,12 @@ stack_description_error
 ) ;
 
 static struct StackElement* tmp_stack_element = NULL;
-static int found_die = 0;
+static int found_die = 0 ;
+static int tmp_first_wall_length = 0 ;
+static int tmp_last_wall_length = 0 ;
+static int tmp_wall_length = 0 ;
+static int tmp_channel_length = 0 ;
+
 %}
 
 %require     "2.4.1"
@@ -226,7 +231,11 @@ channel
   :  /* empty */
 
   |  CHANNEL ':'
-        HEIGHT DVALUE UM ';'
+                HEIGHT DVALUE UM ';'
+        CHANNEL LENGTH DVALUE UM ';'
+        WALL    LENGTH DVALUE UM ';'
+        first_wall_length
+        last_wall_length
         WALL MATERIAL IDENTIFIER ';'
         COOLANT FLOW RATE DVALUE ';'
         COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
@@ -241,18 +250,22 @@ channel
         (
           stkd, scanner, "malloc channel failed"
         ) ;
-        free ($9) ;
+        free ($21) ;
         YYABORT ;
       }
 
       stkd->Channel->Height          = $4  ;
-      stkd->Channel->CoolantFR       = ( $14 * 1e+12 ) / 60.0 ;
-      stkd->Channel->CoolantHTC      = $20 ;
-      stkd->Channel->CoolantVHC      = $26 ;
-      stkd->Channel->CoolantTIn      = $31 ;
+      tmp_channel_length             = $9  ;
+      tmp_wall_length                = $14 ;
+      tmp_first_wall_length          = ($17 == 0) ? $14 : $17 ;
+      tmp_last_wall_length           = ($18 == 0) ? $14 : $18 ;
+      stkd->Channel->CoolantFR       = ( $26 * 1e+12 ) / 60.0 ;
+      stkd->Channel->CoolantHTC      = $32 ;
+      stkd->Channel->CoolantVHC      = $38 ;
+      stkd->Channel->CoolantTIn      = $43 ;
       stkd->Channel->FlowRateChanged = 1 ;
       stkd->Channel->Wall
-        = find_material_in_list (stkd->MaterialsList, $9) ;
+        = find_material_in_list (stkd->MaterialsList, $21) ;
 
       if (stkd->Channel->Wall == NULL)
       {
@@ -260,11 +273,11 @@ channel
         (
           stkd, scanner, "unknown material identifier"
         ) ;
-        free ($9) ;
+        free ($21) ;
         YYABORT ;
       }
 
-      free ($9) ;
+      free ($21) ;
     }
   ;
 
@@ -604,8 +617,6 @@ dimensions
       CHIP WIDTH  DVALUE MM ';'
       CELL LENGTH DVALUE UM ';'
       CELL WIDTH  DVALUE UM ';'
-      first_cell_dimension
-      last_cell_dimension
     {
       stkd->Dimensions = alloc_and_init_dimensions() ;
 
@@ -618,39 +629,74 @@ dimensions
         YYABORT ;
       }
 
-      stkd->Dimensions->Chip.Length      = $5  * 1000.0 ;
+      // Set width and NRows
+
       stkd->Dimensions->Chip.Width       = $10 * 1000.0 ;
-      stkd->Dimensions->Cell.Length      = $15 ;
       stkd->Dimensions->Cell.Width       = $20 ;
-      stkd->Dimensions->Cell.FirstLength = ($23 == 0) ? $15 : $23 ;
-      stkd->Dimensions->Cell.LastLength  = ($24 == 0) ? $15 : $24 ;
 
       stkd->Dimensions->Grid.NRows
         = (int) (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
 
-      stkd->Dimensions->Grid.NColumns
-        = (int) ( (
-                     stkd->Dimensions->Chip.Length
-                     - stkd->Dimensions->Cell.FirstLength
-                     - stkd->Dimensions->Cell.LastLength
-                  )
-                  /  stkd->Dimensions->Cell.Length
-                ) + 2 ;
+      // Set length and NColumns
 
-      if (stkd->Dimensions->Grid.NColumns % 2 == 0)
+      stkd->Dimensions->Chip.Length      = $5  * 1000.0 ;
+
+      if (stkd->Channel == NULL)
       {
-        stack_description_error
-        (
-          stkd, scanner, "even number of columns"
-        ) ;
-        YYABORT ;
+        // There are no channels in the stack
+
+        stkd->Dimensions->StackHasChannel  = 0 ;
+
+        stkd->Dimensions->Cell.WallLength = $15 ;
+
+        stkd->Dimensions->Grid.NColumns
+          = (int) stkd->Dimensions->Chip.Length
+                  / stkd->Dimensions->Cell.WallLength ; 
       }
+      else
+      {
+        // There are channels in the stack
+
+        stkd->Dimensions->StackHasChannel = 1 ;
+
+        stkd->Dimensions->Cell.FirstWallLength = tmp_first_wall_length ;
+        stkd->Dimensions->Cell.LastWallLength = tmp_last_wall_length ;
+        stkd->Dimensions->Cell.WallLength = tmp_wall_length ;
+        stkd->Dimensions->Cell.ChannelLength = tmp_channel_length ;
+
+        stkd->Dimensions->Grid.NColumns
+          = 2 * (int) (
+                        (
+                          stkd->Dimensions->Chip.Length
+                          - stkd->Dimensions->Cell.FirstWallLength
+                          - stkd->Dimensions->Cell.LastWallLength
+                          - stkd->Dimensions->Cell.ChannelLength
+                        )
+                        /
+                        ( stkd->Dimensions->Cell.ChannelLength
+                            + stkd->Dimensions->Cell.WallLength
+                        )
+                      )
+                      + 3 ;
+      }
+
+      // Check the number of ciolumns get
 
       if (stkd->Dimensions->Grid.NColumns < 3)
       {
         stack_description_error
         (
           stkd, scanner, "not enough columns"
+        ) ;
+        YYABORT ;
+      }
+
+      if (stkd->Dimensions->StackHasChannel
+          && stkd->Dimensions->Grid.NColumns % 2 == 0)
+      {
+        stack_description_error
+        (
+          stkd, scanner, "using channels with even number of columns"
         ) ;
         YYABORT ;
       }
@@ -679,16 +725,16 @@ dimensions
     }
   ;
 
-first_cell_dimension
+first_wall_length
 
   : /* empty */                     { $$ = 0 ;  }
-  | FIRST CELL LENGTH DVALUE UM ';' { $$ = $4 ; }
+  | FIRST WALL LENGTH DVALUE UM ';' { $$ = $4 ; }
   ;
 
-last_cell_dimension
+last_wall_length
 
   : /* empty */                    { $$ = 0 ;  }
-  | LAST CELL LENGTH DVALUE UM ';' { $$ = $4 ; }
+  | LAST WALL LENGTH DVALUE UM ';' { $$ = $4 ; }
   ;
 
 %%
