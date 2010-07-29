@@ -9,8 +9,8 @@
  ******************************************************************************/
 
 #include "floorplan.h"
-#include "floorplan_parser.h"
-#include "floorplan_scanner.h"
+#include "../bison/floorplan_parser.h"
+#include "../flex/floorplan_scanner.h"
 
 extern
 int

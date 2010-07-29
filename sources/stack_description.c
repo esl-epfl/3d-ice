@@ -9,8 +9,8 @@
  ******************************************************************************/
 
 #include "stack_description.h"
-#include "stack_description_parser.h"
-#include "stack_description_scanner.h"
+#include "../bison/stack_description_parser.h"
+#include "../flex/stack_description_scanner.h"
 #include "layer.h"
 
 extern int  stack_description_parse (struct StackDescription *stkd, yyscan_t scanner) ;

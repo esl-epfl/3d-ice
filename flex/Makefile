@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# Sources/Makefile                                                            #
+# flex/Makefile                                                               #
 #                                                                             #
 # EPFL-STI-IEL-ESL                                                            #
 # Bâtiment ELG, ELG 130                                                       #
@@ -12,22 +12,13 @@ TL_MAIN = ..
 
 include $(TL_MAIN)/makefile.def
 
-all: $(TL_SOURCES)/floorplan_scanner.c         \
-     $(TL_SOURCES)/stack_description_scanner.c
+all: $(TL_FLEX_OBJECTS:.o=.c)
 
-$(TL_SOURCES)/floorplan_scanner.c: floorplan_scanner.l
-	$(LEX) $(LFLAGS) $^
-	@$(MV) $(MVFLAGS) floorplan_scanner.h $(TL_INCLUDE)
-	@$(MV) $(MVFLAGS) floorplan_scanner.c $(TL_SOURCES)
-
-$(TL_SOURCES)/stack_description_scanner.c: stack_description_scanner.l
-	$(LEX) $(LFLAGS) $^
-	@$(MV) $(MVFLAGS) stack_description_scanner.h $(TL_INCLUDE)
-	@$(MV) $(MVFLAGS) stack_description_scanner.c $(TL_SOURCES)
+-include $(TL_FLEX_OBJECTS:.o=.d)
 
 clean:
-	@$(RM) $(RMFLAGS) $(TL_INCLUDE)/floorplan_scanner.h
-	@$(RM) $(RMFLAGS) $(TL_INCLUDE)/stack_description_scanner.h
-	@$(RM) $(RMFLAGS) $(TL_SOURCES)/floorplan_scanner.c
-	@$(RM) $(RMFLAGS) $(TL_SOURCES)/stack_description_scanner.c
+	@$(RM) $(RMFLAGS) $(TL_FLEX_OBJECTS)
+	@$(RM) $(RMFLAGS) $(TL_FLEX_OBJECTS:.o=.c)
+	@$(RM) $(RMFLAGS) $(TL_FLEX_OBJECTS:.o=.h)
+	@$(RM) $(RMFLAGS) $(TL_FLEX_OBJECTS:.o=.d)
 

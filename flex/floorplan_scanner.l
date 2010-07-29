@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "floorplan_parser.h"
+#include "../bison/floorplan_parser.h"
 %}
 
 /* Instructs flex to write a C header-file. This file contains function     */

@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# Sources/Makefile                                                            #
+# sources/Makefile                                                            #
 #                                                                             #
 # EPFL-STI-IEL-ESL                                                            #
 # Bâtiment ELG, ELG 130                                                       #
@@ -12,42 +12,20 @@ TL_MAIN = ..
 
 include $(TL_MAIN)/makefile.def
 
-TL_SOURCES = channel.c                   \
-             conductances.c              \
-             die.c                       \
-             dimensions.c                \
-             floorplan.c                 \
-             floorplan_element.c         \
-             layer.c                     \
-             material.c                  \
-             stack_description.c         \
-             environment_heat_sink.c     \
-             stack_element.c             \
-             system_matrix.c             \
-             system_vector.c             \
-             thermal_data.c              \
-             stack_description_scanner.c \
-             stack_description_parser.c  \
-             floorplan_scanner.c         \
-             floorplan_parser.c
+CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE)
 
-TL_INCLUDES = -I $(TL_INCLUDE) -I $(SLU_INCLUDE)
+CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
+#CFLAGS := $(CFLAGS) -DENABLE_ASSERT
+#CFLAGS := $(CFLAGS) -DPRINT_CONDUCTANCES
+#CFLAGS := $(CFLAGS) -DPRINT_CAPACITIES
+#CFLAGS := $(CFLAGS) -DPRINT_SOURCES
+#CFLAGS := $(CFLAGS) -DPRINT_SYSTEM_MATRIX
 
-all: $(TL_ARCHIVE)
+all: $(TL_SOURCE_OBJECTS)
 
-$(TL_ARCHIVE): $(TL_SOURCES:.c=.o)
-	@$(AR) $(ARFLAGS) $@ $?
-
-%.o : %.c
-	$(CC) $(CFLAGS) $(TL_INCLUDES) -c $< -o $@
-	@cp $*.d $*.dd
-	@sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	     -e '/^$$/ d' -e 's/$$/ :/' < $*.dd >> $*.d
-	@rm -f $*.dd
-
--include $(TL_SOURCES:.c=.d)
+-include $(TL_SOURCE_OBJECTS:.o=.d)
 
 clean:
-	@$(RM) $(RMFLAGS) $(TL_SOURCES:.c=.o)
-	@$(RM) $(RMFLAGS) $(TL_SOURCES:.c=.d)
-	@$(RM) $(RMFLAGS) $(TL_ARCHIVE)
+	@$(RM) $(RMFLAGS) $(TL_SOURCE_OBJECTS)
+	@$(RM) $(RMFLAGS) $(TL_SOURCE_OBJECTS:.o=.d)
+

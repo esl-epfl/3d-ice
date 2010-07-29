@@ -98,7 +98,7 @@
 %token <string>   PATH       "path to file"
 
 %{
-#include "stack_description_scanner.h"
+#include "../flex/stack_description_scanner.h"
 
 void
 stack_description_error

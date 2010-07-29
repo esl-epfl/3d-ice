@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# bison/Makefile                                                              #
+# lib/Makefile                                                                #
 #                                                                             #
 # EPFL-STI-IEL-ESL                                                            #
 # Bâtiment ELG, ELG 130                                                       #
@@ -12,13 +12,13 @@ TL_MAIN = ..
 
 include $(TL_MAIN)/makefile.def
 
-all: $(TL_BISON_OBJECTS:.o=.c)
+all: $(TL_ARCHIVE)
 
--include $(TL_BISON_OBJECTS:.o=.d)
+$(TL_ARCHIVE): $(TL_LIB_OBJECTS)
+	@$(AR) $(ARFLAGS) $@ $?
+
+-include $(TL_LIB_OBJECTS:.o=.d)
 
 clean:
-	@$(RM) $(RMFLAGS) $(TL_BISON_OBJECTS)
-	@$(RM) $(RMFLAGS) $(TL_BISON_OBJECTS:.o=.h)
-	@$(RM) $(RMFLAGS) $(TL_BISON_OBJECTS:.o=.c)
-	@$(RM) $(RMFLAGS) $(TL_BISON_OBJECTS:.o=.d)
+	@$(RM) $(RMFLAGS) $(TL_ARCHIVE)
 

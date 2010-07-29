@@ -26,7 +26,7 @@
 }
 
 %{
-#include "floorplan_scanner.h"
+#include "../flex/floorplan_scanner.h"
 
 void
 floorplan_error (
