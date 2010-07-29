@@ -446,6 +446,7 @@ fill_sources_stack_description
                         tmp_sources,
                         stkd->Dimensions
                       ) ;
+
         break ;
 
       case TL_STACK_ELEMENT_LAYER :

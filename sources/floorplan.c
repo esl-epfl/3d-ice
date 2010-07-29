@@ -32,8 +32,8 @@ init_floorplan
 {
   floorplan->FileName          = NULL ;
   floorplan->NElements         = 0 ;
-  floorplan->NPowerValues      = 0 ;
-  floorplan->CurrentPowerValue = 0 ;
+  floorplan->NTimeSlots        = 0 ;
+  floorplan->CurrentTimeSlot   = 0 ;
   floorplan->ElementsList      = NULL ;
 }
 
@@ -99,6 +99,11 @@ fill_floorplan
   //floorplan_set_debug (1, scanner) ;
 
   result = floorplan_parse (floorplan, dimensions, scanner) ;
+
+  if (result == 0)
+
+    floorplan->NTimeSlots
+      = floorplan->ElementsList->NPowerValues ;
 
   floorplan_lex_destroy (scanner) ;
 

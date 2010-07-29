@@ -35,8 +35,8 @@ extern "C"
 
     int NElements ;     /* The number of floorplan elements in the floorplan  */
 
-    int NPowerValues ;          /* The number of power values in each element */
-    int CurrentPowerValue ;     /* The power value read from the list         */
+    int NTimeSlots ;
+    int CurrentTimeSlot ;       /* The power value read from the list         */
 
     struct FloorplanElement *ElementsList ; /* The list of floorplan elements */
 

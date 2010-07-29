@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "slu_thermal_data.h"
+#include "thermal_data.h"
 
 static
 void
@@ -25,10 +25,10 @@ init_data (double *data, int size, double init_value)
 /******************************************************************************/
 
 int
-slu_init_thermal_data
+init_thermal_data
 (
   struct StackDescription *stkd,
-  struct SLUThermalData   *tdata,
+  struct ThermalData   *tdata,
   enum MatrixStorage_t  storage,
   double           initial_temperature,
   double           delta_time
@@ -156,7 +156,7 @@ temperatures_fail :
 /******************************************************************************/
 
 void
-slu_free_thermal_data (struct SLUThermalData *tdata)
+free_thermal_data (struct ThermalData *tdata)
 {
   if (tdata == NULL) return ;
 
@@ -190,10 +190,10 @@ slu_free_thermal_data (struct SLUThermalData *tdata)
 /******************************************************************************/
 
 int
-slu_fill_thermal_data
+fill_thermal_data
 (
   struct StackDescription *stkd,
-  struct SLUThermalData *tdata
+  struct ThermalData *tdata
 )
 {
   if (stkd->Channel->FlowRateChanged == 1)
@@ -274,9 +274,9 @@ slu_fill_thermal_data
 /******************************************************************************/
 
 int
-slu_solve_system
+solve_system
 (
-  struct SLUThermalData *tdata,
+  struct ThermalData *tdata,
   double         total_time
 )
 {
@@ -323,9 +323,9 @@ slu_solve_system
 /******************************************************************************/
 
 void
-slu_print_system_matrix
+print_system_matrix
 (
-  struct SLUThermalData *tdata
+  struct ThermalData *tdata
 )
 {
   if (tdata->SM_A.Storage == TL_CCS_MATRIX)
@@ -349,9 +349,9 @@ slu_print_system_matrix
 /******************************************************************************/
 
 void
-slu_print_sources
+print_sources
 (
-  struct SLUThermalData *tdata
+  struct ThermalData *tdata
 )
 {
   int counter ;

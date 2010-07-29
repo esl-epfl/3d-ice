@@ -651,7 +651,7 @@ dimensions
 
         stkd->Dimensions->Grid.NColumns
           = (int) stkd->Dimensions->Chip.Length
-                  / stkd->Dimensions->Cell.WallLength ; 
+                  / stkd->Dimensions->Cell.WallLength ;
       }
       else
       {

@@ -285,7 +285,7 @@ Source_t*              fill_sources_active_layer
         sources [get_cell_offset_in_layer (dimensions, row, column)]
 
           = (
-               flp_el->PowerValuesList[floorplan->CurrentPowerValue]
+               flp_el->PowerValuesList[floorplan->CurrentTimeSlot]
                * get_cell_top_surface (dimensions, column)
             )
             /  flp_el_surface ;
@@ -298,7 +298,7 @@ Source_t*              fill_sources_active_layer
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           flp_el->Id,
-          flp_el->PowerValuesList[floorplan->CurrentPowerValue],
+          flp_el->PowerValuesList[floorplan->CurrentCurrentTimeSlot],
           sources [get_cell_offset_in_layer (dimensions, row, column)]
         ) ;
 #endif

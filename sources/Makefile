@@ -25,7 +25,7 @@ TL_SOURCES = channel.c                   \
              stack_element.c             \
              system_matrix.c             \
              system_vector.c             \
-             slu_thermal_data.c          \
+             thermal_data.c              \
              stack_description_scanner.c \
              stack_description_parser.c  \
              floorplan_scanner.c         \

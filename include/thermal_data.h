@@ -1,6 +1,6 @@
 /******************************************************************************
  *                                                                            *
- * Header file "Include/slu_thermal_data.h"                                   *
+ * Header file "Include/thermal_data.h"                                       *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
@@ -8,8 +8,8 @@
  * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
  ******************************************************************************/
 
-#ifndef _TL_SLU_THERMAL_DATA_H_
-#define _TL_SLU_THERMAL_DATA_H_
+#ifndef _TL_THERMAL_DATA_H_
+#define _TL_THERMAL_DATA_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -23,10 +23,10 @@ extern "C"
 #include "slu_ddefs.h"
 
 /******************************************************************************
- * "SLUThermalData"                                                           *
+ *                        "ThermalData"                                       *
  ******************************************************************************/
 
-  struct SLUThermalData
+  struct ThermalData
   {
     double              *Temperatures ;
     double              *Sources ;
@@ -59,31 +59,31 @@ extern "C"
 /******************************************************************************/
 
   int
-  slu_init_thermal_data   (
-                           struct StackDescription *stkd,
-                           struct SLUThermalData   *tdata,
-                           enum MatrixStorage_t  storage,
-                           double           initial_temperature,
-                           double           delta_time
-                          ) ;
+  init_thermal_data   (
+                        struct StackDescription *stkd,
+                        struct ThermalData   *tdata,
+                        enum MatrixStorage_t  storage,
+                        double           initial_temperature,
+                        double           delta_time
+                      ) ;
 
   int
-  slu_fill_thermal_data  (struct StackDescription *stkd, struct SLUThermalData *tdata) ;
+  fill_thermal_data  (struct StackDescription *stkd, struct ThermalData *tdata) ;
 
   void
-  slu_free_thermal_data  (struct SLUThermalData *tdata) ;
+  free_thermal_data  (struct ThermalData *tdata) ;
 
   int
-  slu_solve_system       (struct SLUThermalData *tdata, double total_time) ;
+  solve_system       (struct ThermalData *tdata, double total_time) ;
 
   void
-  slu_print_system_matrix (struct SLUThermalData *tdata) ;
+  print_system_matrix (struct ThermalData *tdata) ;
 
   void
-  slu_print_sources       (struct SLUThermalData *tdata) ;
+  print_sources       (struct ThermalData *tdata) ;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _TL_SLU_THERMAL_DATA_H_ */
+#endif /* _TL_THERMAL_DATA_H_ */
