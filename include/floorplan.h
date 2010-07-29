@@ -35,6 +35,9 @@ extern "C"
 
     int NElements ;     /* The number of floorplan elements in the floorplan  */
 
+    int NPowerValues ;          /* The number of power values in each element */
+    int CurrentPowerValue ;     /* The power value read from the list         */
+
     struct FloorplanElement *ElementsList ; /* The list of floorplan elements */
 
   } ;
@@ -79,18 +82,18 @@ extern "C"
                             Dimensions *dimensions
                            ) ;
 
-  void
-  insert_power_values_floorplan              (
-                                              struct Floorplan *floorplan,
-                                              double    *power_values
-                                             ) ;
+//  void
+//  insert_power_values_floorplan              (
+//                                              struct Floorplan *floorplan,
+//                                              double    *power_values
+//                                             ) ;
 
-  int
-  insert_power_value_floorplan_element       (
-                                               struct Floorplan *floorplan,
-                                               char      *floorplan_element_id,
-                                               double    power_value
-                                             ) ;
+//  int
+//  insert_power_value_floorplan_element       (
+//                                               struct Floorplan *floorplan,
+//                                               char      *floorplan_element_id,
+//                                               double    power_value
+//                                             ) ;
 
   int
   get_max_temperature_floorplan              (

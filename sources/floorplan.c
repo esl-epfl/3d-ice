@@ -30,9 +30,11 @@ init_floorplan
   struct Floorplan *floorplan
 )
 {
-  floorplan->FileName     = NULL ;
-  floorplan->NElements    = 0 ;
-  floorplan->ElementsList = NULL ;
+  floorplan->FileName          = NULL ;
+  floorplan->NElements         = 0 ;
+  floorplan->NPowerValues      = 0 ;
+  floorplan->CurrentPowerValue = 0 ;
+  floorplan->ElementsList      = NULL ;
 }
 
 /******************************************************************************/
@@ -93,6 +95,8 @@ fill_floorplan
   floorplan_lex_init (&scanner) ;
 
   floorplan_set_in (input, scanner) ;
+
+  //floorplan_set_debug (1, scanner) ;
 
   result = floorplan_parse (floorplan, dimensions, scanner) ;
 
@@ -276,46 +280,46 @@ align_to_grid
 /******************************************************************************/
 /******************************************************************************/
 
-void
-insert_power_values_floorplan
-(
-  struct Floorplan *floorplan,
-  double    *power_values
-)
-{
-  struct FloorplanElement *flp_el = floorplan->ElementsList ;
-
-  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
-
-    flp_el->PowerValue = *power_values++ ;
-
-}
+//void
+//insert_power_values_floorplan
+//(
+//  struct Floorplan *floorplan,
+//  double    *power_values
+//)
+//{
+//  struct FloorplanElement *flp_el = floorplan->ElementsList ;
+//
+//  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
+//
+//    flp_el->PowerValue = *power_values++ ;
+//
+//}
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-int
-insert_power_value_floorplan_element
-(
-  struct Floorplan *floorplan,
-  char *floorplan_element_id,
-  double power_value
-)
-{
-  struct FloorplanElement *flp_el = find_floorplan_element_in_list
-                                    (
-                                      floorplan->ElementsList,
-                                      floorplan_element_id
-                                    ) ;
-  if (flp_el == NULL)
-
-    return -3 ;
-
-  flp_el->PowerValue = power_value ;
-
-  return 0 ;
-}
+//int
+//insert_power_value_floorplan_element
+//(
+//  struct Floorplan *floorplan,
+//  char *floorplan_element_id,
+//  double power_value
+//)
+//{
+//  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+//                                    (
+//                                      floorplan->ElementsList,
+//                                      floorplan_element_id
+//                                    ) ;
+//  if (flp_el == NULL)
+//
+//    return -3 ;
+//
+//  flp_el->PowerValue = power_value ;
+//
+//  return 0 ;
+//}
 
 /******************************************************************************/
 /******************************************************************************/

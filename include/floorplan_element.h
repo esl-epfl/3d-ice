@@ -44,7 +44,8 @@ extern "C"
 
     int NE_Column ;               /* The north-east column index              */
 
-    double PowerValue ;           /* The current power value                  */
+    double* PowerValuesList ;     /* The list of power values                 */
+    int NPowerValues ;
 
     struct FloorplanElement *Next ;  /* To collect floorplan elements         */
                                      /* in a linked list                      */
@@ -59,7 +60,7 @@ extern "C"
   init_floorplan_element           (struct FloorplanElement *floorplan_element) ;
 
   struct FloorplanElement *
-  alloc_and_init_floorplan_element (void) ;
+  alloc_and_init_floorplan_element (int n_power_values) ;
 
   void
   free_floorplan_element           (struct FloorplanElement *floorplan_element) ;

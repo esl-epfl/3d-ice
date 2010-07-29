@@ -284,8 +284,12 @@ Source_t*              fill_sources_active_layer
       {
         sources [get_cell_offset_in_layer (dimensions, row, column)]
 
-          = (flp_el->PowerValue * get_cell_top_surface (dimensions, column))
-            / flp_el_surface ;
+          = (
+               flp_el->PowerValuesList[floorplan->CurrentPowerValue]
+               * get_cell_top_surface (dimensions, column)
+            )
+            /  flp_el_surface ;
+
 #ifdef PRINT_SOURCES
         fprintf
         (
@@ -294,7 +298,7 @@ Source_t*              fill_sources_active_layer
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           flp_el->Id,
-          flp_el->PowerValue,
+          flp_el->PowerValuesList[floorplan->CurrentPowerValue],
           sources [get_cell_offset_in_layer (dimensions, row, column)]
         ) ;
 #endif

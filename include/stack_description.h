@@ -89,6 +89,13 @@ extern "C"
                                        ) ;
 
   void
+  print_all_floorplans                 (
+                                        FILE             *stream,
+                                        char             *prefix,
+                                        struct StackDescription *stkd
+                                       ) ;
+
+  void
   fill_conductances_stack_description  (
                                         struct StackDescription *stkd,
                                         struct Conductances     *conductances
@@ -144,25 +151,25 @@ extern "C"
   void
   change_coolant_flow_rate (struct StackDescription *stkd, double flow_rate) ;
 
-  void
-  insert_all_power_values     (struct StackDescription *stkd, double *power_values) ;
+//  void
+//  insert_all_power_values     (struct StackDescription *stkd, double *power_values) ;
 
-  int
-  insert_power_values_in_floorplan
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               double           *power_values
-                              ) ;
+//  int
+//  insert_power_values_in_floorplan
+//                              (
+//                               struct StackDescription *stkd,
+//                               char             *stack_element_id,
+//                               double           *power_values
+//                              ) ;
 
-  int
-  insert_power_value_in_floorplan_element
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               char             *floorplan_element_id,
-                               double           power_value
-                              ) ;
+//  int
+//  insert_power_value_in_floorplan_element
+//                              (
+//                               struct StackDescription *stkd,
+//                               char             *stack_element_id,
+//                               char             *floorplan_element_id,
+//                               double           power_value
+//                              ) ;
 
   int
   get_max_temperature_in_floorplan_element

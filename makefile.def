@@ -18,7 +18,7 @@ AR      = ar
 ARFLAGS = rsv
 
 CC      = gcc
-CFLAGS  = -MD -Wall -Wextra 
+CFLAGS  = -MD -Wall -Wextra -g 
 #CFLAGS := $(CFLAGS) -DENABLE_ASSERT
 #CFLAGS := $(CFLAGS) -DPRINT_CONDUCTANCES
 #CFLAGS := $(CFLAGS) -DPRINT_CAPACITIES
@@ -29,7 +29,7 @@ YACC    = bison
 YFLAGS  = -d
 
 LEX     = flex
-LFLAGS  = 
+LFLAGS  = -d
 
 RM      = rm
 RMFLAGS = -vf

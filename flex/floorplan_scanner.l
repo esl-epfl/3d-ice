@@ -70,7 +70,11 @@
 
 /* Definitions used to simplify the scanner specification */
 
-u_integer      [[:digit:]]+
+u_integer [[:digit:]]+
+s_integer [+-]?[[:digit:]]+
+exponent  [eE]{s_integer}
+double    {s_integer}\.{u_integer}{exponent}?
+
 identifier     [[:alpha:]](\_|[[:alnum:]])*
 
 /* exclusive start conditions to exclude C/C++ like comments in */
@@ -100,6 +104,8 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
 
 "dimension"           return DIMENSION ;
 "position"            return POSITION ;
+"power"               return POWER ;
+"values"              return VALUES ;
 
 {identifier}          {
                         yylval->string = strdup(yytext) ;
@@ -107,8 +113,13 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
                       }
 
 {u_integer}           {
-                        yylval->integer = atoi(yytext) ;
+                        yylval->i_value = atoi(yytext) ;
                         return UIVALUE ;
+                      }
+
+{double}              {
+                        yylval->d_value = atof(yytext) ;
+                        return DVALUE ;
                       }
 
 <ONE_LINE_COMMENT>\n              BEGIN(INITIAL);

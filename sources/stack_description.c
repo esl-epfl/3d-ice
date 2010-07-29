@@ -135,6 +135,27 @@ print_stack_description
 /******************************************************************************/
 /******************************************************************************/
 
+void
+print_all_floorplans
+(
+  FILE             *stream,
+  char             *prefix,
+  struct StackDescription *stkd
+)
+{
+  struct StackElement *stack_element = stkd->StackElementsList ;
+
+  for ( ; stack_element != NULL ; stack_element = stack_element->Next)
+
+    if (stack_element->Type == TL_STACK_ELEMENT_DIE)
+
+      print_floorplan(stream, prefix, stack_element->Floorplan) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
 static
 int
 fill_floorplans (struct StackDescription *stkd)
@@ -761,100 +782,100 @@ change_coolant_flow_rate
 /******************************************************************************/
 /******************************************************************************/
 
-void
-insert_all_power_values
-(
-  struct StackDescription *stkd,
-  double *power_values
-)
-{
-  struct StackElement *stk_el = stkd->StackElementsList;
-
-  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
-  {
-    if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
-    {
-      insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
-      power_values += stk_el->Floorplan->NElements ;
-    }
-  }
-
-  stkd->PowerValuesChanged = 1 ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-int
-insert_power_values_in_floorplan
-(
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  double           *power_values
-)
-{
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-  if (stk_el == NULL)
-
-    return -1 ;
-
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
-      || stk_el->Floorplan == NULL)
-
-    return -2 ;
-
-  insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
-
-  stkd->PowerValuesChanged = 1 ;
-
-  return 0 ;
-}
+//void
+//insert_all_power_values
+//(
+//  struct StackDescription *stkd,
+//  double *power_values
+//)
+//{
+//  struct StackElement *stk_el = stkd->StackElementsList;
+//
+//  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
+//  {
+//    if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
+//    {
+//      insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
+//      power_values += stk_el->Floorplan->NElements ;
+//    }
+//  }
+//
+//  stkd->PowerValuesChanged = 1 ;
+//}
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-int
-insert_power_value_in_floorplan_element
-(
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  char             *floorplan_element_id,
-  double           power_value
-)
-{
-  int result ;
+//int
+//insert_power_values_in_floorplan
+//(
+//  struct StackDescription *stkd,
+//  char             *stack_element_id,
+//  double           *power_values
+//)
+//{
+//  struct StackElement *stk_el = find_stack_element_in_list
+//                                (
+//                                  stkd->StackElementsList,
+//                                  stack_element_id
+//                                ) ;
+//  if (stk_el == NULL)
+//
+//    return -1 ;
+//
+//  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+//      || stk_el->Floorplan == NULL)
+//
+//    return -2 ;
+//
+//  insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
+//
+//  stkd->PowerValuesChanged = 1 ;
+//
+//  return 0 ;
+//}
 
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-  if (stk_el == NULL)
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-    return -1 ;
-
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
-      || stk_el->Floorplan == NULL)
-
-    return -2 ;
-
-  result = insert_power_value_floorplan_element
-           (
-             stk_el->Floorplan,
-             floorplan_element_id,
-             power_value
-           ) ;
-
-  if (result == 0 ) stkd->PowerValuesChanged = 1 ;
-
-  return result ;
-}
+// int
+// insert_power_value_in_floorplan_element
+// (
+//   struct StackDescription *stkd,
+//   char             *stack_element_id,
+//   char             *floorplan_element_id,
+//   double           power_value
+// )
+// {
+//   int result ;
+// 
+//   struct StackElement *stk_el = find_stack_element_in_list
+//                                 (
+//                                   stkd->StackElementsList,
+//                                   stack_element_id
+//                                 ) ;
+//   if (stk_el == NULL)
+// 
+//     return -1 ;
+// 
+//   if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+//       || stk_el->Floorplan == NULL)
+// 
+//     return -2 ;
+// 
+//   result = insert_power_value_floorplan_element
+//            (
+//              stk_el->Floorplan,
+//              floorplan_element_id,
+//              power_value
+//            ) ;
+// 
+//   if (result == 0 ) stkd->PowerValuesChanged = 1 ;
+// 
+//   return result ;
+// }
 
 /******************************************************************************/
 /******************************************************************************/
