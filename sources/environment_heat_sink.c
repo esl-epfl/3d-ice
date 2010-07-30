@@ -18,8 +18,8 @@
 
 void init_environment_heat_sink (EnvironmentHeatSink* environmentheatsink)
 {
-  environmentheatsink->HeatTransferC = 0.0 ;
-  environmentheatsink->EnvironmentT  = 0.0 ;
+  environmentheatsink->EnvironmentHTC = 0.0 ;
+  environmentheatsink->EnvironmentT   = 0.0 ;
 }
 
 /******************************************************************************/
@@ -62,8 +62,8 @@ void print_environment_heat_sink
   fprintf(stream,
     "%sEnvironment Heat Sink\n",             prefix) ;
   fprintf(stream,
-    "%s  Heat Transfert Coefficent %.5e\n",  prefix,
-                                             environmentheatsink->HeatTransferC) ;
+    "%s  Environement HTC %.5e\n",           prefix,
+                                             environmentheatsink->EnvironmentHTC) ;
   fprintf(stream,
     "%s  Environment temperature   %.4e\n",  prefix,
                                              environmentheatsink->EnvironmentT) ;

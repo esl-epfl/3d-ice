@@ -99,7 +99,7 @@ Conductances*   fill_conductances_layer
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    HeatSinkHTC_t          heat_transfer_coefficient
+    EnvironmentHTC_t       environment_heat_transfer_coefficient
   );
 
   if (current_layer == 0)
@@ -151,7 +151,7 @@ Conductances*   fill_conductances_layer
         get_cell_width  (dimensions),
         layer->Height,
         layer->Material->ThermalConductivity,
-        environmentheatsink->HeatTransferC
+        environmentheatsink->EnvironmentHTC
       ) ;
 
   return conductances ;

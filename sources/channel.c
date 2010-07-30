@@ -23,13 +23,15 @@ init_channel
   struct Channel* channel
 )
 {
-  channel->Height           = 0.0  ;
-  channel->CoolantHTC       = 0.0  ;
-  channel->CoolantVHC       = 0.0  ;
-  channel->CoolantTIn       = 0.0  ;
-  channel->CoolantFR        = 0.0  ;
-  channel->FlowRateChanged  = 0    ;
-  channel->Wall             = NULL ;
+  channel->Height             = 0.0  ;
+  channel->CoolantHTCs.Side   = 0.0  ;
+  channel->CoolantHTCs.Top    = 0.0  ;
+  channel->CoolantHTCs.Bottom = 0.0  ;
+  channel->CoolantVHC         = 0.0  ;
+  channel->CoolantTIn         = 0.0  ;
+  channel->CoolantFR          = 0.0  ;
+  channel->FlowRateChanged    = 0    ;
+  channel->Wall               = NULL ;
 }
 
 /******************************************************************************/
@@ -81,8 +83,11 @@ print_channel
     "%s  Height                            %5.2f\n", prefix,
                                                      channel->Height) ;
   fprintf(stream,
-    "%s  Coolant Heat Transfert Coefficent %.5e\n",  prefix,
-                                                     channel->CoolantHTC) ;
+    "%s  Coolant Heat Transfert Coefficents s %.5e t %.5e b %.5e\n",
+                                                  prefix,
+                                                  channel->CoolantHTCs.Side,
+                                                  channel->CoolantHTCs.Top,
+                                                  channel->CoolantHTCs.Bottom) ;
   fprintf(stream,
     "%s  Coolant Volumetric Heat Capacity  %.4e\n",  prefix,
                                                      channel->CoolantVHC) ;
@@ -171,7 +176,7 @@ Conductances*     fill_conductances_channel
           get_cell_length (dimensions, column),
           get_cell_width  (dimensions),
           channel->Height,
-          channel->CoolantHTC,
+          channel->CoolantHTCs,
           channel->CoolantVHC,
           channel->CoolantFR
         ) ;

@@ -18,21 +18,23 @@
 #include "layer.h"
 #include "stack_element.h"
 #include "stack_description.h"
+#include "types.h"
 
 %}
-		
+
 /* The YYSTYPE union used to collect the types of tokens and rules */
 
 %union
 {
    int     int_v ;
    double  double_v ;
-   char    *string ;
+   char*   char_p ;
 
-   struct Material      *material ;
-   struct Die           *die_p ;
-   struct Layer         *layer_p ;
-   struct StackElement  *stack_element_p ;
+   struct Material*      material_p ;
+   struct Die*           die_p ;
+   struct Layer*         layer_p ;
+   struct StackElement*  stack_element_p ;
+   CoolantHTCs_t         coolanthtcs_v ;
 }
 
 %destructor { free($$) ;                      } <string>
@@ -43,8 +45,10 @@
 %type <double_v> first_wall_length
 %type <double_v> last_wall_length
 
-%type <material> material
-%type <material> materials_list
+%type <coolanthtcs_v> coolant_heat_transfer_coefficients
+
+%type <material_p> material
+%type <material_p> materials_list
 
 %type <die_p> die
 %type <die_p> dies_list
@@ -92,10 +96,13 @@
 %token CAPACITY              "keyword capacity"
 %token ENVIRONMENT           "keyword environment"
 %token SINK                  "keywork sink"
+%token SIDE                  "keyword side"
+%token TOP                   "keyword top"
+%token BOTTOM                "keyword bottom"
 
 %token <double_v> DVALUE     "float value"
-%token <string>   IDENTIFIER "identifier"
-%token <string>   PATH       "path to file"
+%token <char_p>   IDENTIFIER "identifier"
+%token <char_p>   PATH       "path to file"
 
 %{
 #include "../flex/stack_description_scanner.h"
@@ -205,7 +212,7 @@ environment_heat_sink
   : /* empty */
   | ENVIRONMENT HEAT SINK ':'
         HEAT TRANSFER COEFFICIENT DVALUE ';'
-        ENVIRONMENT TEMPERATURE   DVALUE ';'
+        TEMPERATURE               DVALUE ';'
     {
       stkd->EnvironmentHeatSink = alloc_and_init_environment_heat_sink() ;
 
@@ -218,8 +225,8 @@ environment_heat_sink
         YYABORT ;
       }
 
-      stkd->EnvironmentHeatSink->HeatTransferC = $8 ;
-      stkd->EnvironmentHeatSink->EnvironmentT  = $12 ;
+      stkd->EnvironmentHeatSink->EnvironmentHTC = $8 ;
+      stkd->EnvironmentHeatSink->EnvironmentT   = $11 ;
     }
   ;
 /******************************************************************************/
@@ -238,7 +245,7 @@ channel
         last_wall_length
         WALL MATERIAL IDENTIFIER ';'
         COOLANT FLOW RATE DVALUE ';'
-        COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
+        coolant_heat_transfer_coefficients
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'
         COOLANT INCOMING TEMPERATURE DVALUE ';'
     {
@@ -260,9 +267,9 @@ channel
       tmp_first_wall_length          = ($17 == 0) ? $14 : $17 ;
       tmp_last_wall_length           = ($18 == 0) ? $14 : $18 ;
       stkd->Channel->CoolantFR       = ( $26 * 1e+12 ) / 60.0 ;
-      stkd->Channel->CoolantHTC      = $32 ;
-      stkd->Channel->CoolantVHC      = $38 ;
-      stkd->Channel->CoolantTIn      = $43 ;
+      stkd->Channel->CoolantHTCs     = $28 ;
+      stkd->Channel->CoolantVHC      = $33 ;
+      stkd->Channel->CoolantTIn      = $38 ;
       stkd->Channel->FlowRateChanged = 1 ;
       stkd->Channel->Wall
         = find_material_in_list (stkd->MaterialsList, $21) ;
@@ -278,6 +285,24 @@ channel
       }
 
       free ($21) ;
+    }
+  ;
+
+coolant_heat_transfer_coefficients
+
+  : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
+    {
+      $$.Side = $5;
+      $$.Top = $5;
+      $$.Bottom = $5;
+    }
+  | COOLANT HEAT TRANSFER COEFFICIENT SIDE   DVALUE ','
+                                      TOP    DVALUE ','
+                                      BOTTOM DVALUE ';'
+    {
+      $$.Side   = $6 ;
+      $$.Top    = $9 ;
+      $$.Bottom = $12;
     }
   ;
 

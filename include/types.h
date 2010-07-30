@@ -43,10 +43,18 @@ extern "C"
   typedef double CoolantVHC_t ;
   typedef double CoolantFR_t ;
 
-  typedef double HeatSinkHTC_t ;
+  typedef double EnvironmentHTC_t ;
 
   typedef double Temperature_t ;
   typedef double Time_t ;
+
+  typedef struct
+  {
+    CoolantHTC_t Side ;
+    CoolantHTC_t Top ;
+    CoolantHTC_t Bottom ;
+
+  } CoolantHTCs_t ;
 
 #ifdef __cplusplus
 }

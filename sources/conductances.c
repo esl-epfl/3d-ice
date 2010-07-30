@@ -25,7 +25,7 @@ void                     fill_conductances_bottom_solid_cell
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
   ThermalConductivity_t  thermal_conductivity,
-  HeatSinkHTC_t          environment_heat_transfer_coefficient
+  EnvironmentHTC_t       environment_heat_transfer_coefficient
 )
 {
   // To avoid unused parameter warning message
@@ -75,7 +75,7 @@ void                     fill_conductances_central_solid_cell
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
   ThermalConductivity_t  thermal_conductivity,
-  HeatSinkHTC_t          environment_heat_transfer_coefficient
+  EnvironmentHTC_t       environment_heat_transfer_coefficient
 )
 {
   // To avoid unused parameter warning message
@@ -124,7 +124,7 @@ void                     fill_conductances_top_solid_cell
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
   ThermalConductivity_t  thermal_conductivity,
-  HeatSinkHTC_t          environment_heat_transfer_coefficient
+  EnvironmentHTC_t       environment_heat_transfer_coefficient
 )
 {
   // To avoid unused parameter warning message
@@ -174,7 +174,7 @@ void                     fill_conductances_top_solid_cell_ehtc
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
   ThermalConductivity_t  thermal_conductivity,
-  HeatSinkHTC_t          environment_heat_transfer_coefficient
+  EnvironmentHTC_t       environment_heat_transfer_coefficient
 )
 {
   conductances->North = conductances->South
@@ -251,7 +251,7 @@ void                     fill_conductances_liquid_cell
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
-  CoolantHTC_t           coolant_htc,
+  CoolantHTCs_t          coolant_htcs,
   CoolantVHC_t           coolant_vhc,
   CoolantFR_t            coolant_fr
 )
@@ -263,10 +263,11 @@ void                     fill_conductances_liquid_cell
   conductances->South = -C ;
 
   conductances->East = conductances->West
-    = coolant_htc * cell_width * cell_height ;
+    = coolant_htcs.Side * cell_width * cell_height ;
 
-  conductances->Top = conductances->Bottom
-    = coolant_htc * cell_width * cell_length ;
+  conductances->Top = coolant_htcs.Top * cell_width * cell_length ;
+
+  conductances->Bottom = coolant_htcs.Bottom * cell_width * cell_length ;
 
 #ifdef PRINT_CONDUCTANCES
   fprintf

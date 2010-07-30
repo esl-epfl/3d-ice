@@ -16,6 +16,7 @@ extern "C"
 {
 #endif
 
+#include "types.h"
 #include "dimensions.h"
 
 /******************************************************************************
@@ -52,7 +53,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    HeatSinkHTC_t          heat_transfer_coefficient
+    EnvironmentHTC_t       environment_heat_transfer_coefficient
   ) ;
 
   void                     fill_conductances_central_solid_cell
@@ -68,7 +69,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    HeatSinkHTC_t          heat_transfer_coefficient
+    EnvironmentHTC_t       environment_heat_transfer_coefficient
   ) ;
 
   void                     fill_conductances_top_solid_cell
@@ -84,7 +85,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    HeatSinkHTC_t          heat_transfer_coefficient
+    EnvironmentHTC_t       environment_heat_transfer_coefficient
   ) ;
 
   void                     fill_conductances_top_solid_cell_ehtc
@@ -100,7 +101,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    HeatSinkHTC_t          environment_heat_transfer_coefficient
+    EnvironmentHTC_t       environment_heat_transfer_coefficient
   ) ;
 
   void                     fill_conductances_wall_cell
@@ -130,7 +131,7 @@ extern "C"
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    CoolantHTC_t           coolant_htc,
+    CoolantHTCs_t          coolant_htcs,
     CoolantVHC_t           coolant_vhc,
     CoolantFR_t            coolant_fr
   ) ;

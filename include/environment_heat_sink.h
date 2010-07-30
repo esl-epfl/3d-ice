@@ -27,9 +27,9 @@ extern "C"
 
   struct EnvironmentHeatSink
   {
-    HeatSinkHTC_t HeatTransferC ; /* The heat transfert coefficent */
+    EnvironmentHTC_t EnvironmentHTC ; /* The heat transfert coefficent */
 
-    Temperature_t EnvironmentT ; /* The temperarute of the environment [K] */
+    Temperature_t EnvironmentT ;   /* The temperarute of the environment [K] */
   } ;
 
   typedef struct EnvironmentHeatSink EnvironmentHeatSink ;
