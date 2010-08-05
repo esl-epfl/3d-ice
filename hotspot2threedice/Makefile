@@ -8,22 +8,17 @@
 # 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch   #
 ###############################################################################
 
-.PHONY: all clean lib hotspot2threedice
+.PHONY: all clean
 
-all: lib hotspot2threedice
-
-lib:
+all: 
 	cd ./flex    ; make ;
 	cd ./bison   ; make ;
 	cd ./sources ; make ;
-	cd ./lib     ; make ;
-
-hotspot2threedice: lib
-	cd ./hotspot2threedice; make ;
+	cd ./bin     ; make ;
 
 clean:
 	cd ./flex              ; make clean ;
 	cd ./bison             ; make clean ;
 	cd ./sources           ; make clean ;
-	cd ./lib               ; make clean ;
-	cd ./hotspot2threedice ; make clean ;
+	cd ./bin               ; make clean ;
+

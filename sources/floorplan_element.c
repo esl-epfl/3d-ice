@@ -76,9 +76,6 @@ alloc_and_init_floorplan_element
 
      floorplan_element->NPowerValues = n_power_values ;
   }
-  else
-
-     return NULL ;
 
   return floorplan_element ;
 }

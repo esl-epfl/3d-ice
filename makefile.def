@@ -39,7 +39,9 @@ TL_SOURCE_OBJECTS = $(TL_SOURCES)/channel.o                   \
                     $(TL_SOURCES)/system_vector.o             \
                     $(TL_SOURCES)/thermal_data.o
 
-TL_LIB_OBJECTS    = $(TL_FLEX_OBJECTS) $(TL_BISON_OBJECTS) $(TL_SOURCE_OBJECTS)
+TL_LIB_OBJECTS    = $(TL_FLEX_OBJECTS)                        \
+                    $(TL_BISON_OBJECTS)                       \
+                    $(TL_SOURCE_OBJECTS)
 
 TL_ARCHIVE        = $(TL_LIB)/libThermalLibrary.a
 
@@ -58,7 +60,7 @@ AR        = ar
 ARFLAGS   = rsv
 
 CC        = gcc
-CFLAGS    = -MD 
+CFLAGS    = -MD -g 
 CINCLUDES = -I $(TL_INCLUDE)
 
 YACC      = bison

@@ -1,0 +1,79 @@
+#############################################################################t#
+#                                                                             #
+# makefile.def                                                                #
+#                                                                             #
+# EPFL-STI-IEL-ESL                                                            #
+# Bâtiment ELG, ELG 130                                                       #
+# Station 11                                                                  #
+# 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch   #
+###############################################################################
+
+#
+# HotSpot2threeD-ICe variables
+###############################################################################
+
+HS2TDICE_INCLUDE = $(HS2TDICE_MAIN)/include
+HS2TDICE_SOURCES = $(HS2TDICE_MAIN)/sources
+HS2TDICE_BISON   = $(HS2TDICE_MAIN)/bison
+HS2TDICE_FLEX    = $(HS2TDICE_MAIN)/flex
+HS2TDICE_BIN     = $(HS2TDICE_MAIN)/bin
+
+HS2TDICE_FLEX_OBJECTS    = $(HS2TDICE_FLEX)/hotspot_flp_scanner.o
+
+HS2TDICE_BISON_OBJECTS   = $(HS2TDICE_BISON)/hotspot_flp_parser.o
+
+HS2TDICE_SOURCES_OBJECTS = $(HS2TDICE_SOURCES)/hotspot2threedice.o
+
+HS2TDICE_EXE_OBJECTS     = $(HS2TDICE_FLEX_OBJECTS)    \
+                           $(HS2TDICE_BISON_OBJECTS)   \
+                           $(HS2TDICE_SOURCES_OBJECTS)
+
+HS2TDICE_EXE             = $(HS2TDICE_BIN)/hotspot2threedice
+
+#
+# 3D-Ice Library variables
+###############################################################################
+
+TDICE_MAIN        = $(HS2TDICE_MAIN)/..
+TDICE_INCLUDE     = $(TDICE_MAIN)/include
+TDICE_LIB         = $(TDICE_MAIN)/lib
+TDICE_LIB_ARCHIVE = $(TDICE_LIB)/libThermalLibrary.a
+
+#
+# Commands and flags
+###############################################################################
+
+CC        = gcc
+CFLAGS    = -MD -g
+CINCLUDES =
+CLIBS     =
+
+YACC      = bison
+YFLAGS    = -d
+
+LEX       = flex
+LFLAGS    =
+
+RM        = rm
+RMFLAGS   = -vf
+
+#
+# Pattern rules
+###############################################################################
+
+%.c: %.y
+	$(YACC) $(YFLAGS) $(notdir $<)
+
+%.c: %.l
+	$(LEX) $(LFLAGS) $(notdir $<)
+
+%.o : %.c
+	$(CC) $(CFLAGS) $(CINCLUDES) -c $< -o $@
+	@cp $*.d $*.dd
+	@sed -e 's/#.*//'       \
+             -e 's/^[^:]*: *//' \
+             -e 's/ *\\$$//'    \
+	     -e '/^$$/ d'       \
+             -e 's/$$/ :/' < $*.dd >> $*.d
+	@rm -f $*.dd
+

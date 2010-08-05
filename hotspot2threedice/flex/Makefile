@@ -1,6 +1,6 @@
 ###############################################################################
 #                                                                             #
-# Makefile                                                                    #
+# flex/Makefile                                                               #
 #                                                                             #
 # EPFL-STI-IEL-ESL                                                            #
 # Bâtiment ELG, ELG 130                                                       #
@@ -8,22 +8,17 @@
 # 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch   #
 ###############################################################################
 
-.PHONY: all clean lib hotspot2threedice
+HS2TDICE_MAIN = ..
 
-all: lib hotspot2threedice
+include $(HS2TDICE_MAIN)/makefile.def
 
-lib:
-	cd ./flex    ; make ;
-	cd ./bison   ; make ;
-	cd ./sources ; make ;
-	cd ./lib     ; make ;
+all: $(HS2TDICE_FLEX_OBJECTS:.o=.c)
 
-hotspot2threedice: lib
-	cd ./hotspot2threedice; make ;
+-include $(HS2TDICE_FLEX_OBJECTS:.o=.d)
 
 clean:
-	cd ./flex              ; make clean ;
-	cd ./bison             ; make clean ;
-	cd ./sources           ; make clean ;
-	cd ./lib               ; make clean ;
-	cd ./hotspot2threedice ; make clean ;
+	@$(RM) $(RMFLAGS) $(HS2TDICE_FLEX_OBJECTS)
+	@$(RM) $(RMFLAGS) $(HS2TDICE_FLEX_OBJECTS:.o=.c)
+	@$(RM) $(RMFLAGS) $(HS2TDICE_FLEX_OBJECTS:.o=.h)
+	@$(RM) $(RMFLAGS) $(HS2TDICE_FLEX_OBJECTS:.o=.d)
+
