@@ -21,6 +21,12 @@ extern int hotspot_flp_parse
   yyscan_t scanner
 ) ;
 
+extern int hotspot_ptrace_parse
+(
+  struct FloorplanElement** flp_list,
+  yyscan_t scanner
+) ;
+
 int main (int argc, char** argv)
 {
   FILE     *input;
@@ -44,7 +50,7 @@ int main (int argc, char** argv)
   hotspot_flp_lex_init (&scanner);
   hotspot_flp_set_in (input, scanner);
 
-  if (hotspot_flp_parse (&flp_list, scanner))
+  if (hotspot_ptrace_parse (&flp_list, scanner))
     fprintf(stderr, "parsing error\n");
 
   hotspot_flp_lex_destroy (scanner);

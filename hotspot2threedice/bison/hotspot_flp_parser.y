@@ -110,4 +110,5 @@ hotspot_flp_error
     hotspot_flp_get_lineno(yyscanner), msg) ;
 
   free_floorplan_elements_list (*flp_el_list) ;
+  *flp_el_list = NULL ;
 }

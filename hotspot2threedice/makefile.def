@@ -18,9 +18,11 @@ HS2TDICE_BISON   = $(HS2TDICE_MAIN)/bison
 HS2TDICE_FLEX    = $(HS2TDICE_MAIN)/flex
 HS2TDICE_BIN     = $(HS2TDICE_MAIN)/bin
 
-HS2TDICE_FLEX_OBJECTS    = $(HS2TDICE_FLEX)/hotspot_flp_scanner.o
+HS2TDICE_FLEX_OBJECTS    = $(HS2TDICE_FLEX)/hotspot_flp_scanner.o    \
+                           $(HS2TDICE_FLEX)/hotspot_ptrace_scanner.o
 
-HS2TDICE_BISON_OBJECTS   = $(HS2TDICE_BISON)/hotspot_flp_parser.o
+HS2TDICE_BISON_OBJECTS   = $(HS2TDICE_BISON)/hotspot_flp_parser.o    \
+                           $(HS2TDICE_BISON)/hotspot_ptrace_parser.o
 
 HS2TDICE_SOURCES_OBJECTS = $(HS2TDICE_SOURCES)/hotspot2threedice.o
 
