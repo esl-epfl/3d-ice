@@ -33,6 +33,7 @@ TL_SOURCE_OBJECTS = $(TL_SOURCES)/channel.o                   \
                     $(TL_SOURCES)/floorplan_element.o         \
                     $(TL_SOURCES)/layer.o                     \
                     $(TL_SOURCES)/material.o                  \
+                    $(TL_SOURCES)/powers_queue.o              \
                     $(TL_SOURCES)/stack_description.o         \
                     $(TL_SOURCES)/stack_element.o             \
                     $(TL_SOURCES)/system_matrix.o             \

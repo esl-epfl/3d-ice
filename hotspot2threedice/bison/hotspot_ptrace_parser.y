@@ -112,32 +112,24 @@ powers_list
       values = 1 ;
       lines = 0 ;
 
-      printf("insert %f @ %d \n", $1, lines) ;
-
       flp_el->PowerValuesList[lines] = $1 ;
     }
   | powers_list DVALUE
     {
       if (values == elements)
       {
-        printf("restart\n") ;
         flp_el = *flp_el_list ;
         values = 1 ;
         lines++;
       }
       else
       {
-        printf("next\n") ;
         flp_el = flp_el->Next ;
         values++ ;
       }
 
-      printf("%d %d\n", lines, size) ;
-
       if (lines == size)
       {
-        printf("resize\n") ;
-
         double* tmp_powers_list
           = (double*) malloc ( 2 * size * sizeof (double) ) ;
 
@@ -161,8 +153,6 @@ powers_list
 
       if (size == lines && flp_el->Next == NULL)
         size *= 2 ;
-
-      printf("insert %f @ %d \n", $2, lines) ;
 
       flp_el->PowerValuesList[lines] = $2 ;
     }

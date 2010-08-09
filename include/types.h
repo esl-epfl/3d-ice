@@ -48,6 +48,8 @@ extern "C"
   typedef double Temperature_t ;
   typedef double Time_t ;
 
+  typedef double Power_t ;
+
   typedef struct
   {
     CoolantHTC_t Side ;
