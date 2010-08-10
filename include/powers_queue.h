@@ -36,6 +36,7 @@ extern "C"
   {
     struct PowerNode* Head ;
     struct PowerNode* Tail ;
+    int Length ;
   } ;
 
   typedef struct PowersQueue PowersQueue ;

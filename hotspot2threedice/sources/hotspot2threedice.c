@@ -60,48 +60,48 @@ int main (int argc, char** argv)
   print_floorplan_elements_list (stdout,"-> ", flp_list) ;
   free_floorplan_elements_list(flp_list);
 
-  PowersQueue* tmp = alloc_and_init_powers_queue();
-
-  if (tmp == NULL)
-  {
-    fprintf(stderr, "memory error\n");
-    return 1;
-  }
-
-  int counter;
-
-  printf("begin ...\n" ) ;
-  print_powers_queue(stdout, "", tmp) ;
-
-  for (counter = 1; counter < 16; counter++)
-  {
-    printf("inserting value %4.1f\n", (Power_t) counter * 2.0 ) ;
-
-    put_into_powers_queue(tmp, (Power_t) counter * 2.0 );
-
-    print_powers_queue(stdout, "->", tmp) ;
-
-    printf("-------------------------------------------\n");
-
-    if (counter % 3 == 0)
-    {
-      printf("removed value %4.1f\n", get_from_powers_queue(tmp));
-      pop_from_powers_queue(tmp) ;
-      print_powers_queue(stdout, "->", tmp) ;
-      printf("-------------------------------------------\n");
-    }
-  }
-
-  while (!is_empty_powers_queue(tmp))
-  {
-    printf("removed value %4.1f\n", get_from_powers_queue(tmp));
-    pop_from_powers_queue(tmp) ;
-    print_powers_queue(stdout, "=>", tmp) ;
-  }
-
-  printf("end ...\n" ) ;
-
-  free_powers_queue(tmp);
+//   PowersQueue* tmp = alloc_and_init_powers_queue();
+// 
+//   if (tmp == NULL)
+//   {
+//     fprintf(stderr, "memory error\n");
+//     return 1;
+//   }
+//
+//   int counter;
+// 
+//   printf("begin ...\n" ) ;
+//   print_powers_queue(stdout, "", tmp) ;
+// 
+//   for (counter = 1; counter < 16; counter++)
+//   {
+//     printf("inserting value %4.1f\n", (Power_t) counter * 2.0 ) ;
+// 
+//     put_into_powers_queue(tmp, (Power_t) counter * 2.0 );
+// 
+//     print_powers_queue(stdout, "->", tmp) ;
+// 
+//     printf("-------------------------------------------\n");
+// 
+//     if (counter % 3 == 0)
+//     {
+//       printf("removed value %4.1f\n", get_from_powers_queue(tmp));
+//       pop_from_powers_queue(tmp) ;
+//       print_powers_queue(stdout, "->", tmp) ;
+//       printf("-------------------------------------------\n");
+//     }
+//   }
+// 
+//   while (!is_empty_powers_queue(tmp))
+//   {
+//     printf("removed value %4.1f\n", get_from_powers_queue(tmp));
+//     pop_from_powers_queue(tmp) ;
+//     print_powers_queue(stdout, "=>", tmp) ;
+//   }
+// 
+//   printf("end ...\n" ) ;
+// 
+//   free_powers_queue(tmp);
 
   return 0 ;
 }
