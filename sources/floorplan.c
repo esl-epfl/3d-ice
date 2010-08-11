@@ -103,7 +103,7 @@ fill_floorplan
   if (result == 0)
 
     floorplan->NTimeSlots
-      = floorplan->ElementsList->NPowerValues ;
+      = floorplan->ElementsList->PowerValues->Length ;
 
   floorplan_lex_destroy (scanner) ;
 

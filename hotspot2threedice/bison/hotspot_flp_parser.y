@@ -78,7 +78,7 @@ floorplan_element
   : IDENTIFIER DVALUE DVALUE DVALUE DVALUE
     {
       struct FloorplanElement *floorplan_element
-        = $$ = alloc_and_init_floorplan_element (0) ;
+        = $$ = alloc_and_init_floorplan_element () ;
 
       if (floorplan_element == NULL)
       {

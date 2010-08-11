@@ -26,24 +26,23 @@ init_floorplan_element
   struct FloorplanElement *floorplan_element
 )
 {
-  floorplan_element->Id         = NULL ;
+  floorplan_element->Id          = NULL ;
 
-  floorplan_element->SW_X       = 0 ;
-  floorplan_element->SW_Y       = 0 ;
+  floorplan_element->SW_X        = 0 ;
+  floorplan_element->SW_Y        = 0 ;
 
-  floorplan_element->Length     = 0 ;
-  floorplan_element->Width      = 0 ;
+  floorplan_element->Length      = 0 ;
+  floorplan_element->Width       = 0 ;
 
-  floorplan_element->SW_Row     = 0 ;
-  floorplan_element->SW_Column  = 0 ;
+  floorplan_element->SW_Row      = 0 ;
+  floorplan_element->SW_Column   = 0 ;
 
-  floorplan_element->NE_Row     = 0 ;
-  floorplan_element->NE_Column  = 0 ;
+  floorplan_element->NE_Row      = 0 ;
+  floorplan_element->NE_Column   = 0 ;
 
-  floorplan_element->PowerValuesList   = NULL ;
-  floorplan_element->NPowerValues      = 0 ;
+  floorplan_element->PowerValues = NULL ;
 
-  floorplan_element->Next       = NULL ;
+  floorplan_element->Next        = NULL ;
 }
 
 /******************************************************************************/
@@ -51,10 +50,7 @@ init_floorplan_element
 /******************************************************************************/
 
 struct FloorplanElement *
-alloc_and_init_floorplan_element
-(
-  int n_power_values
-)
+alloc_and_init_floorplan_element (void)
 {
   struct FloorplanElement *floorplan_element
     = (struct FloorplanElement *) malloc ( sizeof(struct FloorplanElement) );
@@ -62,20 +58,6 @@ alloc_and_init_floorplan_element
   if (floorplan_element != NULL)
 
     init_floorplan_element(floorplan_element) ;
-
-  if (n_power_values > 0)
-  {
-     floorplan_element->PowerValuesList
-       = (double *) malloc ( n_power_values * sizeof (double) );
-
-     if (floorplan_element->PowerValuesList == NULL)
-     {
-       free (floorplan_element) ;
-       return NULL ;
-     }
-
-     floorplan_element->NPowerValues = n_power_values ;
-  }
 
   return floorplan_element ;
 }
@@ -91,7 +73,7 @@ free_floorplan_element
 )
 {
   free (floorplan_element->Id) ;
-  free (floorplan_element->PowerValuesList) ;
+  free_powers_queue (floorplan_element->PowerValues) ;
   free (floorplan_element) ;
 }
 
@@ -132,21 +114,17 @@ print_floorplan_element
     " ( %d , %d ) %d x %d \n",
     floorplan_element->SW_X, floorplan_element->SW_Y,
     floorplan_element->Length, floorplan_element->Width) ;
-  fprintf (stream,
-    "%s  Rows (%d - %d)",
-    prefix, floorplan_element->SW_Row, floorplan_element->NE_Row) ;
-  fprintf (stream,
-    " Columns (%d - %d)\n",
-    floorplan_element->SW_Column, floorplan_element->NE_Column) ;
+//  fprintf (stream,
+//    "%s  Rows (%d - %d)",
+//    prefix, floorplan_element->SW_Row, floorplan_element->NE_Row) ;
+//  fprintf (stream,
+//    " Columns (%d - %d)\n",
+//    floorplan_element->SW_Column, floorplan_element->NE_Column) ;
 
   fprintf (stream,
     "%s  Power values ", prefix) ;
 
-  int index;
-  for (index = 0 ; index < floorplan_element->NPowerValues ; index ++)
-    fprintf(stream, " %.4e ", floorplan_element->PowerValuesList[index]) ;
-
-  fprintf (stream, "\n");
+  print_powers_queue(stream, prefix, floorplan_element->PowerValues) ;
 }
 
 /******************************************************************************/
@@ -164,7 +142,6 @@ print_floorplan_elements_list
   for ( ; list != NULL ; list = list->Next)
 
     print_floorplan_element (stream, prefix, list) ;
-
 }
 
 /******************************************************************************/

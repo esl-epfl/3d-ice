@@ -103,8 +103,8 @@ void pop_from_powers_queue (PowersQueue* queue)
 void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue)
 {
   struct PowerNode* tmp;
-  fprintf(stream, "%s [%d]", prefix, queue->Length);
+  fprintf(stream, "%s [%d] ", prefix, queue->Length);
   for (tmp = queue->Head ; tmp != NULL ; tmp = tmp->Next)
-    fprintf(stream, "%4.1f ", tmp->Value) ;
+    fprintf(stream, "%6.4f ", tmp->Value) ;
   fprintf(stream, "\n");
 }

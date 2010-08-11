@@ -33,10 +33,8 @@ void hotspot_ptrace_error
 ) ;
 
 static struct FloorplanElement* flp_el ;
-static int elements ;
-static int values ;
-static int size = 5 ;
-static int lines ;
+static int flp_el_found ;
+static int values_counter ;
 
 %}
 
@@ -66,13 +64,21 @@ ptraces
 
   : ids_list
     powers_list
+    {
+      if (values_counter != flp_el_found)
+      {
+        perror ("There are missing power values") ;
+        hotspot_flp_error (flp_el_list, scanner, "") ;
+        YYABORT ;
+      }
+    }
   ;
 
 ids_list
 
   : IDENTIFIER
     {
-      *flp_el_list = flp_el = alloc_and_init_floorplan_element (size) ;
+      *flp_el_list = flp_el = alloc_and_init_floorplan_element () ;
 
       if (flp_el == NULL)
       {
@@ -81,13 +87,21 @@ ids_list
         YYABORT ;
       }
 
-      elements = 1 ;
+      flp_el->PowerValues = alloc_and_init_powers_queue () ;
 
+      if (flp_el->PowerValues == NULL)
+      {
+        perror ("alloc_powers_queue") ;
+        hotspot_flp_error (flp_el_list, scanner, "") ;
+        YYABORT ;
+      }
+
+      flp_el_found = 1 ;
       flp_el->Id = $1 ;
     }
   | ids_list IDENTIFIER
     {
-      flp_el->Next = alloc_and_init_floorplan_element (size) ;
+      flp_el->Next = alloc_and_init_floorplan_element () ;
 
       if (flp_el->Next == NULL)
       {
@@ -96,8 +110,16 @@ ids_list
         YYABORT ;
       }
 
-      elements++ ;
+      flp_el->Next->PowerValues = alloc_and_init_powers_queue () ;
 
+      if (flp_el->PowerValues == NULL)
+      {
+        perror ("alloc_powers_queue") ;
+        hotspot_flp_error (flp_el_list, scanner, "") ;
+        YYABORT ;
+      }
+
+      flp_el_found++ ;
       flp_el->Next->Id = $2 ;
 
       flp_el = flp_el->Next ;
@@ -109,52 +131,24 @@ powers_list
   : DVALUE
     {
       flp_el = *flp_el_list ;
-      values = 1 ;
-      lines = 0 ;
+      values_counter = 1 ;
 
-      flp_el->PowerValuesList[lines] = $1 ;
+      put_into_powers_queue(flp_el->PowerValues, $1) ;
     }
   | powers_list DVALUE
     {
-      if (values == elements)
+      if (values_counter == flp_el_found)
       {
         flp_el = *flp_el_list ;
-        values = 1 ;
-        lines++;
+        values_counter = 1 ;
       }
       else
       {
         flp_el = flp_el->Next ;
-        values++ ;
+        values_counter++ ;
       }
 
-      if (lines == size)
-      {
-        double* tmp_powers_list
-          = (double*) malloc ( 2 * size * sizeof (double) ) ;
-
-        if (tmp_powers_list == NULL)
-        {
-          perror ("alloc_tmp_power_list") ;
-          hotspot_ptrace_error (flp_el_list, scanner, "") ;
-          YYABORT ;
-        }
-
-        int index;
-        for (index = 0; index < lines; index++)
-        {
-          tmp_powers_list[index] = flp_el->PowerValuesList[index] ;
-        }
-
-        free(flp_el->PowerValuesList);
-        flp_el->PowerValuesList = tmp_powers_list ;
-        flp_el->NPowerValues = 2 * size ;
-      }
-
-      if (size == lines && flp_el->Next == NULL)
-        size *= 2 ;
-
-      flp_el->PowerValuesList[lines] = $2 ;
+      put_into_powers_queue(flp_el->PowerValues, $2) ;
     }
   ;
 

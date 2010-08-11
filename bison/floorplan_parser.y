@@ -23,6 +23,7 @@
   char                     *string ;
 
   struct FloorplanElement  *p_floorplan_element ;
+  struct PowersQueue       *p_powers_queue ;
 }
 
 %{
@@ -36,14 +37,12 @@ floorplan_error (
                  char const *msg
                 ) ;
 
-static double* powers_list        = NULL ;
-static int     length             = 2 ;
-static int     power_values_found = 0 ;
-static int     first_length_found = 0 ;
+static int first_length_found = 0 ;
 %}
 
 %type <p_floorplan_element> floorplan_element ;
 %type <p_floorplan_element> floorplan_element_list ;
+%type <p_powers_queue>      power_values_list ;
 
 %destructor { free($$) ; } <string>
 
@@ -120,7 +119,7 @@ floorplan_element
       POWER VALUES power_values_list ';'
     {
       struct FloorplanElement *floorplan_element
-        = $$ = alloc_and_init_floorplan_element (power_values_found) ;
+        = $$ = alloc_and_init_floorplan_element ( ) ;
 
       if (floorplan_element == NULL)
       {
@@ -129,30 +128,21 @@ floorplan_element
         YYABORT ;
       }
 
-      floorplan_element->Id     = $1  ;
-      floorplan_element->SW_X   = $4  ;
-      floorplan_element->SW_Y   = $6  ;
-      floorplan_element->Length = $9  ;
-      floorplan_element->Width  = $11 ;
-
-      int index;
-      for (index = 0; index < power_values_found; index++)
-        floorplan_element->PowerValuesList[index] = powers_list[index] ;
+      floorplan_element->Id          = $1  ;
+      floorplan_element->SW_X        = $4  ;
+      floorplan_element->SW_Y        = $6  ;
+      floorplan_element->Length      = $9  ;
+      floorplan_element->Width       = $11 ;
+      floorplan_element->PowerValues = $15 ;
 
       if (first_length_found == 0)
-
-        first_length_found = power_values_found ;
-
+        first_length_found = $15->Length ;
       else
-
-        if (power_values_found < first_length_found)
+        if ($15->Length < first_length_found)
         {
-          power_values_found = 0 ;
           floorplan_error (floorplan, dimensions, scanner, "Missing power value!") ;
           YYABORT ;
         }
-
-      power_values_found = 0 ;
     }
   ;
 
@@ -160,53 +150,30 @@ power_values_list
 
   : DVALUE
     {
+      PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
+
       if (powers_list == NULL)
       {
-        powers_list = (double*) malloc ( length * sizeof (double) ) ;
-        if (powers_list == NULL)
-        {
-          perror ("alloc_power_list") ;
-          floorplan_error (floorplan, dimensions, scanner, "") ;
-          YYABORT ;
-        }
+        perror ("alloc_powers_queue") ;
+        floorplan_error (floorplan, dimensions, scanner, "") ;
+        YYABORT ;
       }
-      powers_list[power_values_found++] = $1 ;
+
+      put_into_powers_queue (powers_list, $1) ;
     }
 
   | power_values_list ',' DVALUE
     {
-      if (power_values_found == length)
-      {
-        length *= 2 ;
-
-        double* tmp_powers_list
-          = (double*) malloc ( length * sizeof (double) ) ;
-
-        if (tmp_powers_list == NULL)
-        {
-          perror ("alloc_tmp_power_list") ;
-          floorplan_error (floorplan, dimensions, scanner, "") ;
-          YYABORT ;
-        }
-
-        int index;
-        for (index = 0; index < power_values_found; index++)
-        {
-          tmp_powers_list[index] = powers_list[index] ;
-        }
-
-        free(powers_list);
-        powers_list = tmp_powers_list ;
-      }
-
       if (first_length_found != 0
-          && first_length_found < power_values_found)
+          && $1->Length + 1 > first_length_found)
 
         fprintf (stderr, "Warning: discarding value %f\n", $3);
 
       else
 
-        powers_list[power_values_found++] = $3 ;
+        put_into_powers_queue ($1, $3) ;
+
+      $$ = $1 ;
     }
   ;
 
