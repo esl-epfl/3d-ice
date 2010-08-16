@@ -78,11 +78,24 @@ extern "C"
                                    ) ;
 
   void
+  print_formatted_floorplan_element (
+                                      FILE *stream,
+                                      struct FloorplanElement *floorplan_element
+                                    ) ;
+
+  void
   print_floorplan_elements_list    (
                                     FILE *stream,
                                     char *prefix,
                                     struct FloorplanElement *list
                                    ) ;
+
+  void
+  print_formatted_floorplan_elements_list
+                                    (
+                                      FILE *stream,
+                                      struct FloorplanElement *list
+                                    ) ;
 
   int
   check_intersection               (

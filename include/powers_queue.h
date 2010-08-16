@@ -59,6 +59,8 @@ extern "C"
 
   void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue) ;
 
+  void print_formatted_powers_queue (FILE* stream, PowersQueue* queue) ;
+
 #ifdef __cplusplus
 }
 #endif

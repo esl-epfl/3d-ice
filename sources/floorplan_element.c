@@ -132,6 +132,28 @@ print_floorplan_element
 /******************************************************************************/
 
 void
+print_formatted_floorplan_element
+(
+  FILE             *stream,
+  struct FloorplanElement *floorplan_element
+)
+{
+  fprintf (stream, "%s:", floorplan_element->Id) ;
+  fprintf (stream, "   position %d, %d ;\n",
+                          floorplan_element->SW_X, floorplan_element->SW_Y);
+  fprintf (stream, "   dimension %d, %d ;\n",
+                          floorplan_element->Length,
+                          floorplan_element->Width) ;
+  fprintf (stream, "   power values ") ;
+  print_formatted_powers_queue(stream, floorplan_element->PowerValues) ;
+  fprintf (stream, "\n") ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
 print_floorplan_elements_list
 (
   FILE *stream,
@@ -142,6 +164,24 @@ print_floorplan_elements_list
   for ( ; list != NULL ; list = list->Next)
 
     print_floorplan_element (stream, prefix, list) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void
+print_formatted_floorplan_elements_list
+(
+  FILE *stream,
+  struct FloorplanElement *list
+)
+{
+  for ( ; list != NULL ; list = list->Next)
+  {
+    print_formatted_floorplan_element (stream, list) ;
+    fprintf(stream, "\n");
+  }
 }
 
 /******************************************************************************/

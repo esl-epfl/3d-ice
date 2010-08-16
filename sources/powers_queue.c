@@ -108,3 +108,13 @@ void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue)
     fprintf(stream, "%6.4f ", tmp->Value) ;
   fprintf(stream, "\n");
 }
+
+/******************************************************************************/
+
+void print_formatted_powers_queue (FILE* stream, PowersQueue* queue)
+{
+  struct PowerNode* tmp;
+  for (tmp = queue->Head ; tmp != NULL ; tmp = tmp->Next)
+    fprintf(stream, "%6.4f ", tmp->Value) ;
+}
+
