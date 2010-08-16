@@ -1,5 +1,4 @@
 /******************************************************************************
- *                                                                            *
  * Header file "3D-ICe/include/channel.h"                                     *
  *                                                                            *
  * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
@@ -17,15 +16,16 @@
  * You should have received a copy of the GNU General Public License along    *
  * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                            *
- *        Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne.       *
- *                            All Rights Reserved.                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
  *                                                                            *
- * Authors: Alessandro Vincenzi, Arvind Sridhar.       threed-ice@esl.epfl.ch *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                                                 *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #ifndef _3DICE_CHANNEL_H_
@@ -77,10 +77,11 @@ extern "C"
 
     Material *Wall ;
 
-    /* 0 = flow rate hasn't changed since last simulation */
-    /* 1 = user used change_flow_rate                     */
+    /* TRUE if the flow has changed since the last simulation */
+    /* FALSE otherwise                                        */
 
     Bool_t FlowRateChanged ;
+
   } ;
 
   typedef struct Channel Channel ;
@@ -105,9 +106,9 @@ extern "C"
 
   Conductances*   fill_conductances_channel
   (
-    #ifdef PRINT_CAPACITIES
+#   ifdef PRINT_CAPACITIES
     LayerIndex_t  current_layer
-    #endif
+#   endif
     Channel*      channel,
     Conductances* conductances,
     Dimensions*   dimensions
@@ -117,9 +118,9 @@ extern "C"
 
   Capacity_t*    fill_capacities_channel
   (
-    #ifdef PRINT_CAPACITIES
+#   ifdef PRINT_CAPACITIES
     LayerIndex_t current_layer,
-    #endif
+#   endif
     Channel*     channel,
     Capacity_t*  capacities,
     Dimensions*  dimensions,
@@ -130,9 +131,9 @@ extern "C"
 
   Source_t*      fill_sources_channel
   (
-    #ifdef PRINT_SOURCES
+#   ifdef PRINT_SOURCES
     LayerIndex_t current_layer,
-    #endif
+#   endif
     Channel*     channel,
     Source_t*    sources,
     Dimensions*  dimensions
@@ -142,9 +143,9 @@ extern "C"
 
   Quantity_t      fill_ccs_system_matrix_channel
   (
-    #ifdef PRINT_SYSTEM_MATRIX
+#   ifdef PRINT_SYSTEM_MATRIX
     Channel*      channel,
-    #endif
+#   endif
     Dimensions*   dimensions,
     Conductances* conductances,
     Capacity_t*   capacities,
@@ -158,9 +159,9 @@ extern "C"
 
   Quantity_t      fill_crs_system_matrix_channel
   (
-    #ifdef PRINT_SYSTEM_MATRIX
+#   ifdef PRINT_SYSTEM_MATRIX
     Channel*      channel,
-    #endif
+#   endif
     Dimensions*   dimensions,
     Conductances* conductances,
     Capacity_t*   capacities,

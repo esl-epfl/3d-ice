@@ -1,31 +1,51 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/conductances.c"                                *
  *                                                                            *
- * Source file "Sources/conductances.c"                                       *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include "conductances.h"
 
 /******************************************************************************/
 
-void                     fill_conductances_bottom_solid_cell
+void                    fill_conductances_bottom_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  Dimensions*            dimensions,
-  LayerIndex_t           current_layer,
-  RowIndex_t             current_row,
-  ColumnIndex_t          current_column,
+  Dimensions*           dimensions,
+  LayerIndex_t          current_layer,
+  RowIndex_t            current_row,
+  ColumnIndex_t         current_column,
 # endif
-  Conductances*          conductances,
-  CellDimension_t        cell_length,
-  CellDimension_t        cell_width,
-  CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity,
-  EnvironmentHTC_t       environment_heat_transfer_coefficient
+  Conductances*         conductances,
+  CellDimension_t       cell_length,
+  CellDimension_t       cell_width,
+  CellDimension_t       cell_height,
+  ThermalConductivity_t thermal_conductivity,
+  EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
   // To avoid unused parameter warning message
@@ -44,38 +64,36 @@ void                     fill_conductances_bottom_solid_cell
   conductances->Top
     = (thermal_conductivity * cell_length * cell_width) / cell_height ;
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
     "solid  bottom  | l %2d r %4d c %4d [%6d] " \
                    "| l %5.2f w %5.2f h %5.2f " \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
-    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom
-  ) ;
-#endif
+    conductances->West, conductances->Top, conductances->Bottom) ;
+# endif
 }
 
 /******************************************************************************/
 
-void                     fill_conductances_central_solid_cell
+void                    fill_conductances_central_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  Dimensions*            dimensions,
-  LayerIndex_t           current_layer,
-  RowIndex_t             current_row,
-  ColumnIndex_t          current_column,
+  Dimensions*           dimensions,
+  LayerIndex_t          current_layer,
+  RowIndex_t            current_row,
+  ColumnIndex_t         current_column,
 # endif
-  Conductances*          conductances,
-  CellDimension_t        cell_length,
-  CellDimension_t        cell_width,
-  CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity,
-  EnvironmentHTC_t       environment_heat_transfer_coefficient
+  Conductances*         conductances,
+  CellDimension_t       cell_length,
+  CellDimension_t       cell_width,
+  CellDimension_t       cell_height,
+  ThermalConductivity_t thermal_conductivity,
+  EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
   // To avoid unused parameter warning message
@@ -93,38 +111,36 @@ void                     fill_conductances_central_solid_cell
     = (thermal_conductivity * cell_length * cell_width )
       / (cell_height / (CellDimension_t) 2);
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
     "solid  central | l %2d r %4d c %4d [%6d] "  \
-                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
-    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom
-  ) ;
-#endif
+    conductances->West, conductances->Top, conductances->Bottom) ;
+# endif
 }
 
 /******************************************************************************/
 
-void                     fill_conductances_top_solid_cell
+void                    fill_conductances_top_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  Dimensions*            dimensions,
-  LayerIndex_t           current_layer,
-  RowIndex_t             current_row,
-  ColumnIndex_t          current_column,
+  Dimensions*           dimensions,
+  LayerIndex_t          current_layer,
+  RowIndex_t            current_row,
+  ColumnIndex_t         current_column,
 # endif
-  Conductances*          conductances,
-  CellDimension_t        cell_length,
-  CellDimension_t        cell_width,
-  CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity,
-  EnvironmentHTC_t       environment_heat_transfer_coefficient
+  Conductances*         conductances,
+  CellDimension_t       cell_length,
+  CellDimension_t       cell_width,
+  CellDimension_t       cell_height,
+  ThermalConductivity_t thermal_conductivity,
+  EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
   // To avoid unused parameter warning message
@@ -143,38 +159,36 @@ void                     fill_conductances_top_solid_cell
 
   conductances->Top = (Conductance_t) 0 ;
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
     "solid  top     | l %2d r %4d c %4d [%6d] "  \
-                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
-    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom
-  ) ;
-#endif
+    conductances->West, conductances->Top, conductances->Bottom) ;
+# endif
 }
 
 /******************************************************************************/
 
-void                     fill_conductances_top_solid_cell_ehtc
+void                    fill_conductances_top_solid_cell_ehtc
 (
 # ifdef PRINT_CONDUCTANCES
-  Dimensions*            dimensions,
-  LayerIndex_t           current_layer,
-  RowIndex_t             current_row,
-  ColumnIndex_t          current_column,
+  Dimensions*           dimensions,
+  LayerIndex_t          current_layer,
+  RowIndex_t            current_row,
+  ColumnIndex_t         current_column,
 # endif
-  Conductances*          conductances,
-  CellDimension_t        cell_length,
-  CellDimension_t        cell_width,
-  CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity,
-  EnvironmentHTC_t       environment_heat_transfer_coefficient
+  Conductances*         conductances,
+  CellDimension_t       cell_length,
+  CellDimension_t       cell_width,
+  CellDimension_t       cell_height,
+  ThermalConductivity_t thermal_conductivity,
+  EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
   conductances->North = conductances->South
@@ -202,20 +216,18 @@ void                     fill_conductances_top_solid_cell_ehtc
         (Conductance_t) 2 * thermal_conductivity
       ) ;
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
     "solid top ehtc | l %2d r %4d c %4d [%6d] "  \
-                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
-    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom
-  ) ;
-#endif
+    conductances->West, conductances->Top, conductances->Bottom) ;
+# endif
 }
 
 /******************************************************************************/
@@ -239,25 +251,25 @@ void                     fill_conductances_top_solid_cell_ehtc
  * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
  */
 
-void                     fill_conductances_liquid_cell
+void              fill_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  LayerIndex_t           current_layer,
-  RowIndex_t             current_row,
-  ColumnIndex_t          current_column,
+  LayerIndex_t    current_layer,
+  RowIndex_t      current_row,
+  ColumnIndex_t   current_column,
 # endif
-  Dimensions*            dimensions,
-  Conductances*          conductances,
-  CellDimension_t        cell_length,
-  CellDimension_t        cell_width,
-  CellDimension_t        cell_height,
-  CoolantHTCs_t          coolant_htcs,
-  CoolantVHC_t           coolant_vhc,
-  CoolantFR_t            coolant_fr
+  Dimensions*     dimensions,
+  Conductances*   conductances,
+  CellDimension_t cell_length,
+  CellDimension_t cell_width,
+  CellDimension_t cell_height,
+  CoolantHTCs_t   coolant_htcs,
+  CoolantVHC_t    coolant_vhc,
+  CoolantFR_t     coolant_fr
 )
 {
-  double C = (coolant_vhc * coolant_fr)
-             / (double) ( get_number_of_columns (dimensions) - 1 );
+  Cconv_t C = (coolant_vhc * coolant_fr)
+              / (double) ( get_number_of_columns (dimensions) - 1 );
 
   conductances->North =  C ;
   conductances->South = -C ;
@@ -269,36 +281,35 @@ void                     fill_conductances_liquid_cell
 
   conductances->Bottom = coolant_htcs.Bottom * cell_width * cell_length ;
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
     "liquid         | l %2d r %4d c %4d [%6d] "   \
                    "| l %5.2f w %5.2f h %5.2f "   \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
-    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
-#endif
+# endif
 }
 
 /******************************************************************************/
 
-void                     fill_conductances_wall_cell
+void                    fill_conductances_wall_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  Dimensions*            dimensions,
-  LayerIndex_t           current_layer,
-  RowIndex_t             current_row,
-  ColumnIndex_t          current_column,
+  Dimensions*           dimensions,
+  LayerIndex_t          current_layer,
+  RowIndex_t            current_row,
+  ColumnIndex_t         current_column,
 # endif
-  Conductances*          conductances,
-  CellDimension_t        cell_length,
-  CellDimension_t        cell_width,
-  CellDimension_t        cell_height,
-  ThermalConductivity_t  thermal_conductivity
+  Conductances*         conductances,
+  CellDimension_t       cell_length,
+  CellDimension_t       cell_width,
+  CellDimension_t       cell_height,
+  ThermalConductivity_t thermal_conductivity
 )
 {
   conductances->North = conductances->South
@@ -313,20 +324,18 @@ void                     fill_conductances_wall_cell
     = (thermal_conductivity * cell_length * cell_width )
       / (cell_height / (CellDimension_t) 2);
 
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
     "wall           | l %2d r %4d c %4d [%6d] "  \
-                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
     current_layer, current_row, current_column,
-    get_cell_offset_in_stack (dimensions, current_layer, current_row, current_column),
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom
-  ) ;
-#endif
+    conductances->West, conductances->Top, conductances->Bottom) ;
+# endif
 }
 
 /******************************************************************************/

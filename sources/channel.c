@@ -1,6 +1,4 @@
-
 /******************************************************************************
- *                                                                            *
  * Source file "3D-ICe/sources/channel.c"                                     *
  *                                                                            *
  * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
@@ -18,15 +16,16 @@
  * You should have received a copy of the GNU General Public License along    *
  * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
  *                                                                            *
- *        Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne.       *
- *                            All Rights Reserved.                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
  *                                                                            *
- * Authors: Alessandro Vincenzi, Arvind Sridhar.       threed-ice@esl.epfl.ch *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                                                 *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -46,7 +45,7 @@ void init_channel (Channel* channel)
   channel->CoolantTIn         = 0.0  ;
   channel->CoolantFR          = 0.0  ;
   channel->Wall               = NULL ;
-  channel->FlowRateChanged    = 0    ;
+  channel->FlowRateChanged    = FALSE ;
 }
 
 /******************************************************************************/
@@ -112,9 +111,9 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 Conductances*   fill_conductances_channel
 (
-  #ifdef PRINT_CAPACITIES
+# ifdef PRINT_CAPACITIES
   LayerIndex_t  current_layer
-  #endif
+# endif
   Channel*      channel,
   Conductances* conductances,
   Dimensions*   dimensions
@@ -123,9 +122,9 @@ Conductances*   fill_conductances_channel
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
-#ifdef PRINT_CONDUCTANCES
+# ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_channel %s\n", channel->Wall->Id) ;
-#endif
+# endif
 
   for
   (
@@ -145,10 +144,10 @@ Conductances*   fill_conductances_channel
 
         fill_conductances_wall_cell
         (
-          #ifdef PRINT_CONDUCTANCES
+#         ifdef PRINT_CONDUCTANCES
           dimensions,
           current_layer, row, column,
-          #endif
+#         endif
           conductances,
           get_cell_length (dimensions, column),
           get_cell_width  (dimensions),
@@ -160,9 +159,9 @@ Conductances*   fill_conductances_channel
 
         fill_conductances_liquid_cell
         (
-          #ifdef PRINT_CONDUCTANCES
+#         ifdef PRINT_CONDUCTANCES
           current_layer, row, column,
-          #endif
+#         endif
           dimensions,
           conductances,
           get_cell_length (dimensions, column),
@@ -182,7 +181,7 @@ Conductances*   fill_conductances_channel
 /* = [ J / (K . sec) ]                     */
 /* = [ W / K ]                             */
 
-static double capacity
+static Capacity_t capacity
 (
   CellDimension_t length,
   CellDimension_t width,
@@ -196,9 +195,9 @@ static double capacity
 
 Capacity_t*    fill_capacities_channel
 (
-  #ifdef PRINT_CAPACITIES
+# ifdef PRINT_CAPACITIES
   LayerIndex_t current_layer,
-  #endif
+# endif
   Channel*     channel,
   Capacity_t*  capacities,
   Dimensions*  dimensions,
@@ -208,11 +207,11 @@ Capacity_t*    fill_capacities_channel
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
-#ifdef PRINT_CAPACITIES
+# ifdef PRINT_CAPACITIES
   fprintf (stderr,
     "current_layer = %d\tfill_capacities_channel %s\n",
     current_layer, channel->Wall->Id) ;
-#endif
+# endif
 
   for
   (
@@ -239,7 +238,7 @@ Capacity_t*    fill_capacities_channel
                         channel->Wall->VolHeatCapacity,
                         delta_time
                       ) ;
-#ifdef PRINT_CAPACITIES
+#       ifdef PRINT_CAPACITIES
         fprintf (stderr,
           "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
                       " |  vhc %.5e --> %.5e\n",
@@ -249,7 +248,7 @@ Capacity_t*    fill_capacities_channel
           channel->Height,
           channel->Wall->VolHeatCapacity,
           *capacities) ;
-#endif
+#       endif
       }
       else                 /* Odd -> liquid */
       {
@@ -261,7 +260,7 @@ Capacity_t*    fill_capacities_channel
                          channel->CoolantVHC,
                          delta_time
                        ) ;
-#ifdef PRINT_CAPACITIES
+#       ifdef PRINT_CAPACITIES
         fprintf (stderr,
           "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
                       " |  vhc %.5e --> %.5e\n",
@@ -270,7 +269,7 @@ Capacity_t*    fill_capacities_channel
           get_cell_length(dimensions, column), get_cell_width (dimensions),
           channel->Height,
           channel->CoolantVHC, *capacities) ;
-#endif
+#       endif
       }
 
   return capacities ;
@@ -280,9 +279,9 @@ Capacity_t*    fill_capacities_channel
 
 Source_t*      fill_sources_channel
 (
-  #ifdef PRINT_SOURCES
+# ifdef PRINT_SOURCES
   LayerIndex_t current_layer,
-  #endif
+# endif
   Channel*     channel,
   Source_t*    sources,
   Dimensions*  dimensions
@@ -291,17 +290,17 @@ Source_t*      fill_sources_channel
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
-  double C = (channel->CoolantVHC * channel->CoolantFR)
-             / (double) ( get_number_of_columns (dimensions) - 1 ) ;
+  Cconv_t C = (channel->CoolantVHC * channel->CoolantFR)
+              / (double) ( get_number_of_columns (dimensions) - 1 ) ;
 
-#ifdef PRINT_SOURCES
+# ifdef PRINT_SOURCES
   fprintf (stderr,
     "current_layer = %d\tfill_sources_channel %s " \
     " C = %.5e = (%.5e * %.5e) / %d \n",
     current_layer, channel->Wall->Id,
     C, channel->CoolantVHC, channel->CoolantFR,
     get_number_of_columns (dimensions) - 1) ;
-#endif
+# endif
 
   for
   (
@@ -322,14 +321,14 @@ Source_t*      fill_sources_channel
       {
         *sources = 2.0 * C * channel->CoolantTIn ;
 
-#ifdef PRINT_SOURCES
+#       ifdef PRINT_SOURCES
         fprintf (stderr,
           "liquid cell  |  l %2d r %4d c %4d [%6d] | %.5e  (Tin = %.2f)\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           *sources,
           channel->CoolantTIn) ;
-#endif
+#       endif
       }
 
   return sources ;
@@ -339,9 +338,9 @@ Source_t*      fill_sources_channel
 
 Quantity_t      fill_ccs_system_matrix_channel
 (
-  #ifdef PRINT_SYSTEM_MATRIX
+# ifdef PRINT_SYSTEM_MATRIX
   Channel*      channel,
-  #endif
+# endif
   Dimensions*   dimensions,
   Conductances* conductances,
   Capacity_t*   capacities,
@@ -355,11 +354,11 @@ Quantity_t      fill_ccs_system_matrix_channel
   ColumnIndex_t column;
   Quantity_t added, tot_added ;
 
-#ifdef PRINT_SYSTEM_MATRIX
+# ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
     "(l %2d) fill_ccs_system_matrix_channel %s \n",
     current_layer, channel->Wall->Id) ;
-#endif
+# endif
 
   for
   (
@@ -407,9 +406,9 @@ Quantity_t      fill_ccs_system_matrix_channel
 
 Quantity_t      fill_crs_system_matrix_channel
 (
-  #ifdef PRINT_SYSTEM_MATRIX
+# ifdef PRINT_SYSTEM_MATRIX
   Channel*      channel,
-  #endif
+# endif
   Dimensions*   dimensions,
   Conductances* conductances,
   Capacity_t*   capacities,
@@ -423,28 +422,24 @@ Quantity_t      fill_crs_system_matrix_channel
   ColumnIndex_t column;
   Quantity_t added, tot_added ;
 
-#ifdef PRINT_SYSTEM_MATRIX
+# ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
     "(l %2d) fill_crs_system_matrix_channel %s \n",
     current_layer, channel->Wall->Id) ;
-#endif
+# endif
 
   for
   (
     tot_added = 0 ,
     row       = 0 ;
-
     row < get_number_of_rows (dimensions) ;
-
     row++
   )
 
     for
     (
       column = 0 ;
-
       column < get_number_of_columns (dimensions) ;
-
       conductances ++ ,
       capacities   ++ ,
       rows         ++ ,

@@ -17,17 +17,21 @@ extern "C"
 #endif
 
   typedef char* String_t ;
+
   typedef int   Bool_t ;
-  typedef int   Quantity_t ;
+
+# define FALSE (0)
+# define TRUE  (!FALSE)
+
+  typedef int    Quantity_t ;
+
+  typedef int    LayerIndex_t ;
+  typedef int    RowIndex_t ;
+  typedef int    ColumnIndex_t ;
 
   typedef double Temperature_t ;
+  typedef double Power_t ;
   typedef double Time_t ;
-
-  /* Indexes */
-
-  typedef int LayerIndex_t ;
-  typedef int RowIndex_t ;
-  typedef int ColumnIndex_t ;
 
   /* Dimensions */
 
@@ -44,13 +48,13 @@ extern "C"
   typedef double Capacity_t ;
   typedef double Source_t ;
 
+  typedef double Cconv_t ;
+
   typedef double CoolantHTC_t ;
   typedef double CoolantVHC_t ;
   typedef double CoolantFR_t ;
 
   typedef double EnvironmentHTC_t ;
-
-  typedef double Power_t ;
 
   typedef struct
   {

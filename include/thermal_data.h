@@ -31,7 +31,7 @@ extern "C"
     double              *Temperatures ;
     double              *Sources ;
     double              *Capacities ;
-    struct Conductances *Conductances ;
+    Conductances* Conductances ;
 
     int    Size ;
     double initial_temperature ,

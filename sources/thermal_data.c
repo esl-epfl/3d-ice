@@ -58,7 +58,7 @@ init_thermal_data
     goto capacities_fail ;
 
   if ( (tdata->Conductances
-         = (struct Conductances *) malloc (sizeof(struct Conductances)*tdata->Size)) == NULL)
+         = (Conductances*) malloc (sizeof(Conductances)*tdata->Size)) == NULL)
 
     goto conductances_fail ;
 

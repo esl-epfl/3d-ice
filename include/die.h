@@ -103,7 +103,7 @@ extern "C"
   (
     struct Die*          die,
     Dimensions*          dimensions,
-    struct Conductances* conductances,
+    Conductances* conductances,
     Capacity_t*          capacities,
     LayerIndex_t         current_layer,
     int*                 columns,
@@ -115,7 +115,7 @@ extern "C"
   (
     struct Die*          die,
     Dimensions*          dimensions,
-    struct Conductances* conductances,
+    Conductances* conductances,
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,

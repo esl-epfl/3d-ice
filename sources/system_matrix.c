@@ -158,7 +158,7 @@ fill_system_matrix
 (
   struct StackDescription *stkd,
   struct SystemMatrix     *matrix,
-  struct Conductances     *conductances,
+  Conductances     *conductances,
   double           *capacities
 )
 {
@@ -198,7 +198,7 @@ fill_system_matrix
 int                    add_ccs_solid_column
 (
   Dimensions*          dimensions,
-  struct Conductances* conductances,
+  Conductances* conductances,
   Capacity_t*          capacities,
   LayerIndex_t         current_layer,
   RowIndex_t           current_row,
@@ -397,7 +397,7 @@ int                    add_ccs_solid_column
 int                    add_crs_solid_column
 (
   Dimensions*          dimensions,
-  struct Conductances* conductances,
+  Conductances* conductances,
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
@@ -600,7 +600,7 @@ int                    add_crs_solid_column
 int                    add_ccs_liquid_column
 (
   Dimensions*          dimensions,
-  struct Conductances* conductances,
+  Conductances* conductances,
   Capacity_t*          capacities,
   LayerIndex_t         current_layer,
   RowIndex_t           current_row,
@@ -782,7 +782,7 @@ int                    add_ccs_liquid_column
 int                    add_crs_liquid_column
 (
   Dimensions*          dimensions,
-  struct Conductances* conductances,
+  Conductances* conductances,
   Capacity_t*          capacities,
   LayerIndex_t         current_layer,
   RowIndex_t           current_row,

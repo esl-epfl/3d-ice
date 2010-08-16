@@ -226,7 +226,7 @@ void
 fill_conductances_stack_description
 (
   struct StackDescription *stkd,
-  struct Conductances     *conductances
+  Conductances     *conductances
 )
 {
   struct StackElement *stack_element ;
@@ -523,7 +523,7 @@ void
 fill_ccs_system_matrix_stack_description
 (
   struct StackDescription *stkd,
-  struct Conductances     *conductances,
+  Conductances     *conductances,
   double           *capacities,
   int              *columns,
   int              *rows,
@@ -622,7 +622,7 @@ void
 fill_crs_system_matrix_stack_description
 (
   struct StackDescription *stkd,
-  struct Conductances     *conductances,
+  Conductances     *conductances,
   double           *capacities,
   int              *rows,
   int              *columns,

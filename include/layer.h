@@ -71,10 +71,10 @@ extern "C"
 
 /******************************************************************************/
 
-  struct Conductances*   fill_conductances_layer
+  Conductances*   fill_conductances_layer
   (
     Layer*               layer,
-    struct Conductances* conductances,
+    Conductances* conductances,
     Dimensions*          dimensions,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer
@@ -119,7 +119,7 @@ extern "C"
     Layer*               layer,
 #   endif
     Dimensions*          dimensions,
-    struct Conductances* conductances,
+    Conductances* conductances,
     Capacity_t*          capacities,
     LayerIndex_t         current_layer,
     int*                 columns,
@@ -133,7 +133,7 @@ extern "C"
     Layer*               layer,
 #   endif
     Dimensions*          dimensions,
-    struct Conductances* conductances,
+    Conductances* conductances,
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,

@@ -339,7 +339,7 @@ int                    fill_ccs_system_matrix_layer
   Layer*               layer,
 # endif
   Dimensions*          dimensions,
-  struct Conductances* conductances,
+  Conductances* conductances,
   Capacity_t*          capacities,
   LayerIndex_t         current_layer,
   int*                 columns,
@@ -398,7 +398,7 @@ int                    fill_crs_system_matrix_layer
   Layer*               layer,
 # endif
   Dimensions*          dimensions,
-  struct Conductances* conductances,
+  Conductances* conductances,
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
