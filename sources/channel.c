@@ -1,11 +1,32 @@
+
 /******************************************************************************
  *                                                                            *
- * Source file "Sources/channel.c"                                            *
+ * Source file "3D-ICe/sources/channel.c"                                     *
+ *                                                                            *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ *        Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne.       *
+ *                            All Rights Reserved.                            *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.       threed-ice@esl.epfl.ch *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                                                 *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -14,14 +35,8 @@
 #include "system_matrix.h"
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-init_channel
-(
-  struct Channel* channel
-)
+void init_channel (Channel* channel)
 {
   channel->Height             = 0.0  ;
   channel->CoolantHTCs.Side   = 0.0  ;
@@ -30,22 +45,15 @@ init_channel
   channel->CoolantVHC         = 0.0  ;
   channel->CoolantTIn         = 0.0  ;
   channel->CoolantFR          = 0.0  ;
-  channel->FlowRateChanged    = 0    ;
   channel->Wall               = NULL ;
+  channel->FlowRateChanged    = 0    ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct Channel *
-alloc_and_init_channel
-(
-  void
-)
+Channel* alloc_and_init_channel (void)
 {
-  struct Channel *channel
-    = (struct Channel *) malloc ( sizeof(struct Channel) ) ;
+  Channel* channel = (Channel*) malloc ( sizeof(Channel) ) ;
 
   if (channel != NULL) init_channel (channel) ;
 
@@ -53,29 +61,15 @@ alloc_and_init_channel
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_channel
-(
-  struct Channel *channel
-)
+void free_channel (Channel* channel)
 {
   free (channel) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_channel
-(
-  FILE    *stream,
-  char    *prefix,
-  struct Channel *channel
-)
+void print_channel (FILE* stream, String_t prefix, Channel* channel)
 {
   fprintf(stream,
     "%sChannel\n",                                   prefix) ;
@@ -115,17 +109,15 @@ print_channel
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-Conductances*     fill_conductances_channel
+Conductances*   fill_conductances_channel
 (
-# ifdef PRINT_CONDUCTANCES
-  LayerIndex_t    current_layer,
-# endif
-  struct Channel* channel,
-  Conductances*   conductances,
-  Dimensions*     dimensions
+  #ifdef PRINT_CAPACITIES
+  LayerIndex_t  current_layer
+  #endif
+  Channel*      channel,
+  Conductances* conductances,
+  Dimensions*   dimensions
 )
 {
   RowIndex_t    row ;
@@ -153,10 +145,10 @@ Conductances*     fill_conductances_channel
 
         fill_conductances_wall_cell
         (
-#ifdef PRINT_CONDUCTANCES
+          #ifdef PRINT_CONDUCTANCES
           dimensions,
           current_layer, row, column,
-#endif
+          #endif
           conductances,
           get_cell_length (dimensions, column),
           get_cell_width  (dimensions),
@@ -168,9 +160,9 @@ Conductances*     fill_conductances_channel
 
         fill_conductances_liquid_cell
         (
-#ifdef PRINT_CONDUCTANCES
+          #ifdef PRINT_CONDUCTANCES
           current_layer, row, column,
-#endif
+          #endif
           dimensions,
           conductances,
           get_cell_length (dimensions, column),
@@ -185,46 +177,41 @@ Conductances*     fill_conductances_channel
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-static
-double
-capacity             /*   ( [um3] . [ J / ( um3 . K ) ]) / [sec]  */
-(                    /* = [ J / (K . sec) ]                       */
-  double length,     /* = [ W / K ]                               */
-  double width,
-  double height,
-  double vhc,
-  double time)
+/* ( [um3] . [ J / ( um3 . K ) ]) / [sec]  */
+/* = [ J / (K . sec) ]                     */
+/* = [ W / K ]                             */
+
+static double capacity
+(
+  CellDimension_t length,
+  CellDimension_t width,
+  CellDimension_t height,
+  CoolantVHC_t    vhc,
+  Time_t          time
+)
 {
   return ((length * width * height) * vhc) / time ;
 }
 
-
-
-Capacity_t*       fill_capacities_channel
+Capacity_t*    fill_capacities_channel
 (
-#ifdef PRINT_CAPACITIES
-  LayerIndex_t    current_layer,
-#endif
-  struct Channel* channel,
-  Capacity_t*     capacities,
-  Dimensions*     dimensions,
-  Time_t          delta_time
+  #ifdef PRINT_CAPACITIES
+  LayerIndex_t current_layer,
+  #endif
+  Channel*     channel,
+  Capacity_t*  capacities,
+  Dimensions*  dimensions,
+  Time_t       delta_time
 )
 {
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
 #ifdef PRINT_CAPACITIES
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "current_layer = %d\tfill_capacities_channel %s\n",
-    current_layer,
-    channel->Wall->Id
-  ) ;
+    current_layer, channel->Wall->Id) ;
 #endif
 
   for
@@ -253,18 +240,15 @@ Capacity_t*       fill_capacities_channel
                         delta_time
                       ) ;
 #ifdef PRINT_CAPACITIES
-      fprintf
-      (
-        stderr,
-        "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "   \
-                    " |  vhc %.5e --> %.5e\n",
-        current_layer, row, column,
-        get_cell_offset_in_stack (dimensions, current_layer, row, column),
-        get_cell_length(dimensions, column), get_cell_width (dimensions),
-        channel->Height,
-        channel->Wall->VolHeatCapacity,
-        *capacities
-      ) ;
+        fprintf (stderr,
+          "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
+                      " |  vhc %.5e --> %.5e\n",
+          current_layer, row, column,
+          get_cell_offset_in_stack (dimensions, current_layer, row, column),
+          get_cell_length(dimensions, column), get_cell_width (dimensions),
+          channel->Height,
+          channel->Wall->VolHeatCapacity,
+          *capacities) ;
 #endif
       }
       else                 /* Odd -> liquid */
@@ -278,17 +262,14 @@ Capacity_t*       fill_capacities_channel
                          delta_time
                        ) ;
 #ifdef PRINT_CAPACITIES
-      fprintf
-      (
-        stderr,
-        "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "   \
-                    " |  vhc %.5e --> %.5e\n",
-        current_layer, row, column,
-        get_cell_offset_in_stack (dimensions, current_layer, row, column),
-        get_cell_length(dimensions, column), get_cell_width (dimensions),
-        channel->Height,
-        channel->CoolantVHC, *capacities
-      ) ;
+        fprintf (stderr,
+          "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
+                      " |  vhc %.5e --> %.5e\n",
+          current_layer, row, column,
+          get_cell_offset_in_stack (dimensions, current_layer, row, column),
+          get_cell_length(dimensions, column), get_cell_width (dimensions),
+          channel->Height,
+          channel->CoolantVHC, *capacities) ;
 #endif
       }
 
@@ -296,24 +277,22 @@ Capacity_t*       fill_capacities_channel
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-Source_t*         fill_sources_channel
+Source_t*      fill_sources_channel
 (
-# ifdef PRINT_SOURCES
-  LayerIndex_t    current_layer,
-# endif
-  struct Channel* channel,
-  Source_t*       sources,
-  Dimensions*     dimensions
+  #ifdef PRINT_SOURCES
+  LayerIndex_t current_layer,
+  #endif
+  Channel*     channel,
+  Source_t*    sources,
+  Dimensions*  dimensions
 )
 {
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
   double C = (channel->CoolantVHC * channel->CoolantFR)
-             / (double) ( get_number_of_columns (dimensions) - 1 );
+             / (double) ( get_number_of_columns (dimensions) - 1 ) ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -344,15 +323,12 @@ Source_t*         fill_sources_channel
         *sources = 2.0 * C * channel->CoolantTIn ;
 
 #ifdef PRINT_SOURCES
-        fprintf
-        (
-          stderr,
+        fprintf (stderr,
           "liquid cell  |  l %2d r %4d c %4d [%6d] | %.5e  (Tin = %.2f)\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           *sources,
-          channel->CoolantTIn
-        ) ;
+          channel->CoolantTIn) ;
 #endif
       }
 
@@ -360,51 +336,43 @@ Source_t*         fill_sources_channel
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int                    fill_ccs_system_matrix_channel
+Quantity_t      fill_ccs_system_matrix_channel
 (
-# ifdef PRINT_SYSTEM_MATRIX
-  struct Channel*      channel,
-# endif
-  Dimensions*          dimensions,
-  struct Conductances* conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  int*                 columns,
-  int*                 rows,
-  double*              values
+  #ifdef PRINT_SYSTEM_MATRIX
+  Channel*      channel,
+  #endif
+  Dimensions*   dimensions,
+  Conductances* conductances,
+  Capacity_t*   capacities,
+  LayerIndex_t  current_layer,
+  int*          columns,
+  int*          rows,
+  double*       values
 )
 {
-  int row, column, added, tot_added ;
+  RowIndex_t row;
+  ColumnIndex_t column;
+  Quantity_t added, tot_added ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "(l %2d) fill_ccs_system_matrix_channel %s \n",
-    current_layer,
-    channel->Wall->Id
-  ) ;
+    current_layer, channel->Wall->Id) ;
 #endif
 
   for
   (
     tot_added = 0 ,
     row       = 0 ;
-
     row < get_number_of_rows (dimensions) ;
-
     row++
   )
 
     for
     (
       column = 0 ;
-
       column < get_number_of_columns (dimensions) ;
-
       conductances ++ ,
       capacities   ++ ,
       columns      ++ ,
@@ -436,33 +404,29 @@ int                    fill_ccs_system_matrix_channel
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int  fill_crs_system_matrix_channel
+Quantity_t      fill_crs_system_matrix_channel
 (
-# ifdef PRINT_SYSTEM_MATRIX
-  struct Channel*      channel,
-# endif
-  Dimensions*  dimensions,
-  struct Conductances* conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  int*                 rows,
-  int*                 columns,
-  double*              values
+  #ifdef PRINT_SYSTEM_MATRIX
+  Channel*      channel,
+  #endif
+  Dimensions*   dimensions,
+  Conductances* conductances,
+  Capacity_t*   capacities,
+  LayerIndex_t  current_layer,
+  int*          rows,
+  int*          columns,
+  double*       values
 )
 {
-  int row, column, added, tot_added ;
+  RowIndex_t row;
+  ColumnIndex_t column;
+  Quantity_t added, tot_added ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "(l %2d) fill_crs_system_matrix_channel %s \n",
-    current_layer,
-    channel->Wall->Id
-  ) ;
+    current_layer, channel->Wall->Id) ;
 #endif
 
   for
@@ -512,6 +476,4 @@ int  fill_crs_system_matrix_channel
   return tot_added ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

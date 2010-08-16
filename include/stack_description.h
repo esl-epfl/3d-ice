@@ -41,7 +41,7 @@ extern "C"
     Material *MaterialsList ;              /* The list of materials componing */
                                            /* the layers and channels         */
 
-    struct Channel *Channel ;      /* The "single" instance of a channel used */
+    Channel *Channel ;      /* The "single" instance of a channel used */
                                    /* to compose the 3d stack                 */
 
     struct Die   *DiesList ;         /* The list of dies available to compose */

@@ -17,6 +17,11 @@ extern "C"
 #endif
 
   typedef char* String_t ;
+  typedef int   Bool_t ;
+  typedef int   Quantity_t ;
+
+  typedef double Temperature_t ;
+  typedef double Time_t ;
 
   /* Indexes */
 
@@ -44,9 +49,6 @@ extern "C"
   typedef double CoolantFR_t ;
 
   typedef double EnvironmentHTC_t ;
-
-  typedef double Temperature_t ;
-  typedef double Time_t ;
 
   typedef double Power_t ;
 
