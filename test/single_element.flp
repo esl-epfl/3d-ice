@@ -1,0 +1,4 @@
+SingleElement :
+  position      0,     0 ;
+  dimension   300, 10000 ;
+  power values 3.0, 0.2 ;

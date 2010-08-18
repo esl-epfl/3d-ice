@@ -1,11 +1,31 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/powers_queue.c"                                *
  *                                                                            *
- * Source file "sources/powers_queue.c"                                       *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -34,7 +54,7 @@ PowersQueue* alloc_and_init_powers_queue (void)
 
 /******************************************************************************/
 
-int is_empty_powers_queue (PowersQueue* queue)
+Bool_t is_empty_powers_queue (PowersQueue* queue)
 {
   return (queue->Length == 0) ;
 }
@@ -54,9 +74,9 @@ void free_powers_queue (PowersQueue* queue)
 
 void put_into_powers_queue (PowersQueue* queue, Power_t power)
 {
-  struct PowerNode* tmp = queue->Tail ;
+  PowerNode* tmp = queue->Tail ;
 
-  queue->Tail = (struct PowerNode*) malloc ( sizeof(struct PowerNode) ) ;
+  queue->Tail = (PowerNode*) malloc ( sizeof(PowerNode) ) ;
 
   if ( queue->Tail == NULL )
   {
@@ -89,7 +109,7 @@ Power_t get_from_powers_queue (PowersQueue* queue)
 
 void pop_from_powers_queue (PowersQueue* queue)
 {
-  struct PowerNode* tmp = queue->Head->Next ;
+  PowerNode* tmp = queue->Head->Next ;
 
   free(queue->Head) ;
 
@@ -102,7 +122,7 @@ void pop_from_powers_queue (PowersQueue* queue)
 
 void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue)
 {
-  struct PowerNode* tmp;
+  PowerNode* tmp;
   fprintf(stream, "%s [%d] ", prefix, queue->Length);
   for (tmp = queue->Head ; tmp != NULL ; tmp = tmp->Next)
     fprintf(stream, "%6.4f ", tmp->Value) ;
@@ -113,8 +133,9 @@ void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue)
 
 void print_formatted_powers_queue (FILE* stream, PowersQueue* queue)
 {
-  struct PowerNode* tmp;
+  PowerNode* tmp;
   for (tmp = queue->Head ; tmp != NULL ; tmp = tmp->Next)
     fprintf(stream, "%6.4f ", tmp->Value) ;
 }
 
+/******************************************************************************/

@@ -19,7 +19,7 @@
   double                   d_value ;
   char                     *string ;
 
-  struct FloorplanElement  *p_floorplan_element ;
+  FloorplanElement  *p_floorplan_element ;
 }
 
 %{
@@ -27,7 +27,7 @@
 
 void hotspot_flp_error
 (
-  struct FloorplanElement** flp_el_list,
+  FloorplanElement** flp_el_list,
   yyscan_t                  yyscanner,
   char const*               msg
 ) ;
@@ -50,7 +50,7 @@ void hotspot_flp_error
 
 %error-verbose
 
-%parse-param { struct FloorplanElement **flp_el_list }
+%parse-param { FloorplanElement **flp_el_list }
 %parse-param { yyscan_t scanner }
 
 %lex-param   { yyscan_t scanner }
@@ -77,7 +77,7 @@ floorplan_element
 
   : IDENTIFIER DVALUE DVALUE DVALUE DVALUE
     {
-      struct FloorplanElement *floorplan_element
+      FloorplanElement *floorplan_element
         = $$ = alloc_and_init_floorplan_element () ;
 
       if (floorplan_element == NULL)
@@ -100,7 +100,7 @@ floorplan_element
 void
 hotspot_flp_error
 (
-  struct FloorplanElement** flp_el_list,
+  FloorplanElement** flp_el_list,
   yyscan_t   yyscanner,
   char const *msg
 )

@@ -1,34 +1,47 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/floorplan.c"                                   *
  *                                                                            *
- * Source file "Source/floorplan.c"                                           *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include "floorplan.h"
 #include "../bison/floorplan_parser.h"
 #include "../flex/floorplan_scanner.h"
 
-extern
-int
-floorplan_parse (
-                 struct Floorplan *floorplan,
-                 Dimensions *dimensions,
-                 yyscan_t scanner
-                ) ;
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-init_floorplan
+extern int floorplan_parse
 (
-  struct Floorplan *floorplan
-)
+  Floorplan*  floorplan,
+  Dimensions* dimensions,
+  yyscan_t    scanner
+) ;
+
+/******************************************************************************/
+
+void init_floorplan (Floorplan* floorplan)
 {
   floorplan->FileName          = NULL ;
   floorplan->NElements         = 0 ;
@@ -38,17 +51,10 @@ init_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct Floorplan *
-alloc_and_init_floorplan
-(
-  void
-)
+Floorplan* alloc_and_init_floorplan (void)
 {
-  struct Floorplan *floorplan
-    = (struct Floorplan *) malloc ( sizeof(struct Floorplan) );
+  Floorplan* floorplan = (Floorplan* ) malloc ( sizeof(Floorplan) );
 
   if (floorplan != NULL) init_floorplan (floorplan) ;
 
@@ -56,14 +62,8 @@ alloc_and_init_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_floorplan
-(
-  struct Floorplan *floorplan
-)
+void free_floorplan (Floorplan* floorplan)
 {
   free_floorplan_elements_list (floorplan->ElementsList) ;
   free (floorplan->FileName) ;
@@ -71,31 +71,22 @@ free_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-fill_floorplan
-(
-  struct Floorplan *floorplan,
-  Dimensions *dimensions
-)
+int fill_floorplan (Floorplan* floorplan, Dimensions* dimensions)
 {
-  FILE     *input ;
+  FILE*    input ;
   int      result ;
   yyscan_t scanner ;
 
   input = fopen (floorplan->FileName, "r") ;
   if(input == NULL)
-    {
-      perror(floorplan->FileName) ;
-      return 1;
-    }
+  {
+    perror(floorplan->FileName) ;
+    return 1;
+  }
 
-  floorplan_lex_init (&scanner) ;
-
-  floorplan_set_in (input, scanner) ;
-
+  floorplan_lex_init  (&scanner) ;
+  floorplan_set_in    (input, scanner) ;
   //floorplan_set_debug (1, scanner) ;
 
   result = floorplan_parse (floorplan, dimensions, scanner) ;
@@ -106,23 +97,14 @@ fill_floorplan
       = floorplan->ElementsList->PowerValues->Length ;
 
   floorplan_lex_destroy (scanner) ;
-
   fclose (input) ;
 
   return result ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_floorplan
-(
-  FILE      *stream,
-  char      *prefix,
-  struct Floorplan *floorplan
-)
+void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan)
 {
   fprintf(stream,
     "%sFloorplan read from file %s\n", prefix, floorplan->FileName) ;
@@ -131,42 +113,36 @@ print_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-check_intersections
+Bool_t check_intersections
 (
-  struct Floorplan        *floorplan,
-  struct FloorplanElement *floorplan_element
+  Floorplan*        floorplan,
+  FloorplanElement* floorplan_element
 )
 {
-  int result = 0 ;
-  struct FloorplanElement *tmp = floorplan->ElementsList ;
+  Bool_t result = FALSE_V ;
+  FloorplanElement* tmp = floorplan->ElementsList ;
 
   for ( ; tmp != NULL; tmp = tmp->Next)
 
-    if (check_intersection (tmp, floorplan_element))
-      {
+    if (check_intersection (tmp, floorplan_element) == TRUE_V)
+    {
         fprintf (stderr,
           "%s: found intersection between %s and %s.\n",
           floorplan->FileName, tmp->Id, floorplan_element->Id) ;
         result ++ ;
-      }
+    }
 
   return result ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-check_location
+Bool_t check_location
 (
-  struct Floorplan        *floorplan,
-  struct FloorplanElement *floorplan_element,
-  Dimensions       *dimensions
+  Floorplan*        floorplan,
+  FloorplanElement* floorplan_element,
+  Dimensions*       dimensions
 )
 {
   if (   (floorplan_element->SW_X <  0)
@@ -179,26 +155,24 @@ check_location
     fprintf (stderr,
       "%s: floorplan element %s is outside of the floorplan.\n",
       floorplan->FileName, floorplan_element->Id) ;
-    return 1 ;
+    return TRUE_V ;
   }
 
-  return 0 ;
+  return FALSE_V ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-align_to_grid
+Bool_t align_to_grid
 (
-  struct Floorplan        *floorplan,
-  struct FloorplanElement *floorplan_element,
-  Dimensions       *dimensions
+  Floorplan*        floorplan,
+  FloorplanElement* floorplan_element,
+  Dimensions*       dimensions
 )
 {
-  double cx, cy ;
-  int column, row ;
+  CellDimension_t cx, cy ;
+  ColumnIndex_t column ;
+  RowIndex_t row ;
 
   // West side
 
@@ -275,24 +249,21 @@ align_to_grid
     fprintf (stderr,
       "%s: no cells belong to floorplan element %s.\n",
       floorplan->FileName, floorplan_element->Id) ;
-    return 1 ;
+    return TRUE_V ;
   }
 
-  return 0 ;
+  return FALSE_V ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-//void
-//insert_power_values_floorplan
+//void insert_power_values_floorplan
 //(
-//  struct Floorplan *floorplan,
-//  double    *power_values
+//  Floorplan* floorplan,
+//  Power_t*   power_values
 //)
 //{
-//  struct FloorplanElement *flp_el = floorplan->ElementsList ;
+//  FloorplanElement* flp_el = floorplan->ElementsList ;
 //
 //  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 //
@@ -304,15 +275,14 @@ align_to_grid
 /******************************************************************************/
 /******************************************************************************/
 
-//int
-//insert_power_value_floorplan_element
+//int insert_power_value_floorplan_element
 //(
-//  struct Floorplan *floorplan,
-//  char *floorplan_element_id,
-//  double power_value
+//  Floorplan* floorplan,
+//  String_t   floorplan_element_id,
+//  Power_t    power_value
 //)
 //{
-//  struct FloorplanElement *flp_el = find_floorplan_element_in_list
+//  FloorplanElement* flp_el = find_floorplan_element_in_list
 //                                    (
 //                                      floorplan->ElementsList,
 //                                      floorplan_element_id
@@ -330,21 +300,20 @@ align_to_grid
 /******************************************************************************/
 /******************************************************************************/
 
-int
-get_max_temperature_floorplan
+int get_max_temperature_floorplan
 (
-  struct Floorplan  *floorplan,
-  char       *floorplan_element_id,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *max_temperature
+  Floorplan*     floorplan,
+  String_t       floorplan_element_id,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* max_temperature
 )
 {
-  struct FloorplanElement *flp_el = find_floorplan_element_in_list
-                                    (
-                                      floorplan->ElementsList,
-                                      floorplan_element_id
-                                    ) ;
+  FloorplanElement* flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
   if (flp_el == NULL)
 
     return -3 ;
@@ -361,24 +330,21 @@ get_max_temperature_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_min_temperature_floorplan
+int get_min_temperature_floorplan
 (
-  struct Floorplan  *floorplan,
-  char       *floorplan_element_id,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *min_temperature
+  Floorplan*     floorplan,
+  String_t       floorplan_element_id,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* min_temperature
 )
 {
-  struct FloorplanElement *flp_el = find_floorplan_element_in_list
-                                    (
-                                      floorplan->ElementsList,
-                                      floorplan_element_id
-                                    ) ;
+  FloorplanElement* flp_el = find_floorplan_element_in_list
+                             (
+                                floorplan->ElementsList,
+                                floorplan_element_id
+                             ) ;
 
   if (flp_el == NULL)
 
@@ -396,24 +362,21 @@ get_min_temperature_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_avg_temperature_floorplan
+int get_avg_temperature_floorplan
 (
-  struct Floorplan  *floorplan,
-  char       *floorplan_element_id,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *avg_temperature
+  Floorplan*     floorplan,
+  String_t       floorplan_element_id,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* avg_temperature
 )
 {
-  struct FloorplanElement *flp_el = find_floorplan_element_in_list
-                                    (
-                                      floorplan->ElementsList,
-                                      floorplan_element_id
-                                    ) ;
+  FloorplanElement* flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
 
   if (flp_el == NULL)
 
@@ -431,26 +394,23 @@ get_avg_temperature_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_min_avg_max_temperatures_floorplan
+int get_min_avg_max_temperatures_floorplan
 (
-  struct Floorplan  *floorplan,
-  char       *floorplan_element_id,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *min_temperature,
-  double     *avg_temperature,
-  double     *max_temperature
+  Floorplan*     floorplan,
+  String_t       floorplan_element_id,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* min_temperature,
+  Temperature_t* avg_temperature,
+  Temperature_t* max_temperature
 )
 {
-  struct FloorplanElement *flp_el = find_floorplan_element_in_list
-                                    (
-                                      floorplan->ElementsList,
-                                      floorplan_element_id
-                                    ) ;
+  FloorplanElement* flp_el = find_floorplan_element_in_list
+                             (
+                               floorplan->ElementsList,
+                               floorplan_element_id
+                             ) ;
 
   if (flp_el == NULL)
 
@@ -468,19 +428,16 @@ get_min_avg_max_temperatures_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_max_temperatures_floorplan
+int get_all_max_temperatures_floorplan
 (
-  struct Floorplan  *floorplan,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *max_temperature
+  Floorplan*     floorplan,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* max_temperature
 )
 {
-  struct FloorplanElement *flp_el = floorplan->ElementsList ;
+  FloorplanElement* flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 
@@ -496,19 +453,16 @@ get_all_max_temperatures_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_min_temperatures_floorplan
+int get_all_min_temperatures_floorplan
 (
-  struct Floorplan  *floorplan,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *min_temperature
+  Floorplan*     floorplan,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* min_temperature
 )
 {
-  struct FloorplanElement *flp_el = floorplan->ElementsList ;
+  FloorplanElement* flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
   {
@@ -525,19 +479,16 @@ get_all_min_temperatures_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_avg_temperatures_floorplan
+int get_all_avg_temperatures_floorplan
 (
-  struct Floorplan  *floorplan,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *avg_temperature
+  Floorplan*     floorplan,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* avg_temperature
 )
 {
-  struct FloorplanElement *flp_el = floorplan->ElementsList ;
+  FloorplanElement* flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 
@@ -553,21 +504,18 @@ get_all_avg_temperatures_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_min_avg_max_temperatures_floorplan
+int get_all_min_avg_max_temperatures_floorplan
 (
-  struct Floorplan  *floorplan,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *min_temperature,
-  double     *avg_temperature,
-  double     *max_temperature
+  Floorplan*     floorplan,
+  Dimensions*    dimensions,
+  Temperature_t* temperatures,
+  Temperature_t* min_temperature,
+  Temperature_t* avg_temperature,
+  Temperature_t* max_temperature
 )
 {
-  struct FloorplanElement *flp_el = floorplan->ElementsList ;
+  FloorplanElement* flp_el = floorplan->ElementsList ;
 
   for ( ; flp_el != NULL ; flp_el = flp_el->Next)
 
@@ -582,6 +530,4 @@ get_all_min_avg_max_temperatures_floorplan
   return 0 ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

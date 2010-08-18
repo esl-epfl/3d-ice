@@ -1,11 +1,31 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/termal_data.c"                                 *
  *                                                                            *
- * Source file "Sources/data.c"                                               *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -13,52 +33,51 @@
 
 #include "thermal_data.h"
 
-static
-void
-init_data (double *data, int size, double init_value)
+/******************************************************************************/
+
+static void init_data (double* data, Quantity_t size, double init_value)
 {
   while (size--) *data++ = init_value ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-init_thermal_data
+int init_thermal_data
 (
-  struct StackDescription *stkd,
-  struct ThermalData   *tdata,
+  StackDescription* stkd,
+  ThermalData*      tdata,
   enum MatrixStorage_t  storage,
-  double           initial_temperature,
-  double           delta_time
+  Temperature_t     initial_temperature,
+  Time_t            delta_time
 )
 {
-  if (tdata == NULL) return 0 ;
-
-  tdata->Size                = stkd->Dimensions->Grid.NCells ;
+  tdata->Size                = get_number_of_cells(stkd->Dimensions) ;
   tdata->initial_temperature = initial_temperature ;
   tdata->delta_time          = delta_time ;
 
   /* Memory allocation */
 
   if ( (tdata->Temperatures
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
+          = (Temperature_t*) malloc ( sizeof(Temperature_t) * tdata->Size )
+       ) == NULL )
 
     goto temperatures_fail ;
 
   if ( (tdata->Sources
-         = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
+          = (Source_t*) malloc ( sizeof(Source_t) * tdata->Size )
+       ) == NULL )
 
     goto sources_fail ;
 
   if ( (tdata->Capacities
-        = (double *) malloc ( sizeof(double) * tdata->Size )) == NULL )
+         = (Capacity_t*) malloc ( sizeof(Capacity_t) * tdata->Size )
+       ) == NULL )
 
     goto capacities_fail ;
 
   if ( (tdata->Conductances
-         = (Conductances*) malloc (sizeof(Conductances)*tdata->Size)) == NULL)
+          = (Conductances*) malloc (sizeof(Conductances)*tdata->Size)
+       ) == NULL)
 
     goto conductances_fail ;
 
@@ -152,11 +171,8 @@ temperatures_fail :
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_thermal_data (struct ThermalData *tdata)
+void free_thermal_data (ThermalData* tdata)
 {
   if (tdata == NULL) return ;
 
@@ -186,21 +202,18 @@ free_thermal_data (struct ThermalData *tdata)
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-fill_thermal_data
+int fill_thermal_data
 (
-  struct StackDescription *stkd,
-  struct ThermalData *tdata
+  StackDescription* stkd,
+  ThermalData*      tdata
 )
 {
-  if (stkd->Channel->FlowRateChanged == 1)
+  if (stkd->Channel->FlowRateChanged == TRUE_V)
   {
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
-//    fill_conductances_heatsink (stkd->HeatSink, tdata->Conductances) ;
+    //fill_conductances_heatsink (stkd->HeatSink, tdata->Conductances) ;
 
     fill_capacities_stack_description (stkd, tdata->Capacities,
                                              tdata->delta_time) ;
@@ -229,11 +242,11 @@ fill_thermal_data
                                       tdata->Capacities,
                                       tdata->Temperatures) ;
 
-    stkd->Channel->FlowRateChanged = 0 ;
-    stkd->PowerValuesChanged = 0 ;
+    stkd->Channel->FlowRateChanged = FALSE_V ;
+    stkd->PowerValuesChanged = FALSE_V ;
   }
 
-  if (stkd->PowerValuesChanged == 1)
+  if (stkd->PowerValuesChanged == TRUE_V)
   {
     fill_sources_stack_description (stkd, tdata->Sources,
                                           tdata->Conductances) ;
@@ -241,6 +254,8 @@ fill_thermal_data
     fill_system_vector (&tdata->SV_B, tdata->Sources,
                                       tdata->Capacities,
                                       tdata->Temperatures) ;
+
+    stkd->PowerValuesChanged = FALSE_V ;
   }
 
   if (tdata->SLU_Options.Fact != FACTORED )
@@ -270,15 +285,8 @@ fill_thermal_data
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-solve_system
-(
-  struct ThermalData *tdata,
-  double         total_time
-)
+int solve_system (ThermalData* tdata, Time_t total_time)
 {
   int counter;
 
@@ -318,56 +326,4 @@ solve_system
   return tdata->SLU_Info ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_system_matrix
-(
-  struct ThermalData *tdata
-)
-{
-  if (tdata->SM_A.Storage == TL_CCS_MATRIX)
-  {
-    print_system_matrix_columns(&tdata->SM_A, "system_ccs_matrix_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "system_ccs_matrix_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "system_ccs_matrix_values.txt") ;
-  }
-  else if (tdata->SM_A.Storage == TL_CRS_MATRIX)
-  {
-    print_system_matrix_columns(&tdata->SM_A, "system_crs_matrix_columns.txt") ;
-    print_system_matrix_rows   (&tdata->SM_A, "system_crs_matrix_rows.txt") ;
-    print_system_matrix_values (&tdata->SM_A, "system_crs_matrix_values.txt") ;
-  }
-  else
-    fprintf (stderr, "Matrix format unknown\n") ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_sources
-(
-  struct ThermalData *tdata
-)
-{
-  int counter ;
-  FILE *file = fopen("source_values.txt", "w") ;
-
-  if (file == NULL) return ;
-
-  for (counter = 0 ; counter < tdata->Size ; counter++ )
-
-    if (tdata->Sources[counter] != 0)
-
-      fprintf (file, "%d\t %.6e\n", counter + 1, tdata->Sources[counter]) ;
-
-  fclose (file) ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

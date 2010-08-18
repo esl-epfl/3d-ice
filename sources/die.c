@@ -1,11 +1,31 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/die.c"                                         *
  *                                                                            *
- * Source file "Sources/die.c"                                                *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -14,14 +34,8 @@
 #include "die.h"
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-init_die
-(
-  struct Die *die
-)
+void init_die (Die* die)
 {
   die->Id          = NULL ;
   die->LayersList  = NULL ;
@@ -31,16 +45,10 @@ init_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct Die *
-alloc_and_init_die
-(
-  void
-)
+Die* alloc_and_init_die (void)
 {
-  struct Die *die = (struct Die *) malloc ( sizeof(struct Die) ) ;
+  Die* die = (Die*) malloc ( sizeof(Die) ) ;
 
   if (die != NULL) init_die (die) ;
 
@@ -48,14 +56,8 @@ alloc_and_init_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_die
-(
-  struct Die *die
-)
+void free_die (Die* die)
 {
   free_layers_list (die->LayersList) ;
   free (die->Id) ;
@@ -63,16 +65,10 @@ free_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_dies_list
-(
-  struct Die *list
-)
+void free_dies_list (Die* list)
 {
-  struct Die *next ;
+  Die* next ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -82,16 +78,8 @@ free_dies_list
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_die
-(
-  FILE       *stream,
-  char       *prefix,
-  struct Die *die
-)
+void print_die (FILE* stream, String_t prefix, Die* die)
 {
   fprintf (stream,
     "%sDie %s:\n",                prefix, die->Id) ;
@@ -101,7 +89,8 @@ print_die
   fprintf (stream,
     "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->LayersOffset);
 
-  char *new_prefix = (char *) malloc (sizeof(char)*(strlen(prefix) + 2));
+  String_t new_prefix = (String_t) malloc (sizeof(char)*(strlen(prefix) + 2));
+  // FIXME typeof(pointed by string)
 
   strcpy (new_prefix, prefix) ;
   strcat (new_prefix, "  ") ;
@@ -112,33 +101,17 @@ print_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_dies_list
-(
-  FILE       *stream,
-  char       *prefix,
-  struct Die *list
-)
+void print_dies_list (FILE* stream, String_t prefix, Die* list)
 {
   for ( ; list != NULL ; list = list->Next)
 
     print_die (stream, prefix, list) ;
-
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct Die *
-find_die_in_list
-(
-  struct Die *list,
-  char       *id
-)
+Die* find_die_in_list (Die* list, String_t id)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -148,12 +121,10 @@ find_die_in_list
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-Conductances*          fill_conductances_die
+Conductances* fill_conductances_die
 (
-  struct Die*          die,
+  Die*                 die,
   Conductances*        conductances,
   Dimensions*          dimensions,
   EnvironmentHeatSink* environmentheatsink,
@@ -162,9 +133,9 @@ Conductances*          fill_conductances_die
 {
   Layer* layer ;
 
-#ifdef PRINT_CONDUCTANCES
+# ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_die   %s\n", die->Id) ;
-#endif
+# endif
 
   for
   (
@@ -186,15 +157,13 @@ Conductances*          fill_conductances_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-Capacity_t*    fill_capacities_die
+Capacity_t* fill_capacities_die
 (
-#ifdef PRINT_CAPACITIES
+# ifdef PRINT_CAPACITIES
   LayerIndex_t current_layer,
-#endif
-  struct Die*  die,
+# endif
+  Die*         die,
   Capacity_t*  capacities,
   Dimensions*  dimensions,
   Time_t       delta_time
@@ -202,15 +171,11 @@ Capacity_t*    fill_capacities_die
 {
   Layer* layer ;
 
-#ifdef PRINT_CAPACITIES
-  fprintf
-  (
-    stderr,
+# ifdef PRINT_CAPACITIES
+  fprintf (stderr,
     "current_layer = %d\tfill_capacities_die %s\n",
-    current_layer,
-    die->Id
-  ) ;
-#endif
+    current_layer, die->Id) ;
+# endif
 
   for
   (
@@ -221,9 +186,9 @@ Capacity_t*    fill_capacities_die
 
     capacities = fill_capacities_layer
                  (
-#ifdef PRINT_CAPACITIES
+#                  ifdef PRINT_CAPACITIES
                    current_layer + layer->LayersOffset,
-#endif
+#                  endif
                    layer,
                    capacities,
                    dimensions,
@@ -234,18 +199,16 @@ Capacity_t*    fill_capacities_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-Source_t*           fill_sources_die
+Source_t* fill_sources_die
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t      current_layer,
+  LayerIndex_t current_layer,
 # endif
-  struct Die*       die,
-  struct Floorplan* floorplan,
-  Source_t*         sources,
-  Dimensions*       dimensions
+  Die*         die,
+  Floorplan*   floorplan,
+  Source_t*    sources,
+  Dimensions*  dimensions
 )
 {
   Layer* layer ;
@@ -294,23 +257,21 @@ Source_t*           fill_sources_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int                    fill_ccs_system_matrix_die
+Quantity_t fill_ccs_system_matrix_die
 (
-  struct Die*          die,
-  Dimensions*          dimensions,
+  Die*          die,
+  Dimensions*   dimensions,
   Conductances* conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  int*                 columns,
-  int*                 rows,
-  double*              values
+  Capacity_t*   capacities,
+  LayerIndex_t  current_layer,
+  int*          columns,
+  int*          rows,
+  double*       values
 )
 {
   Layer* layer ;
-  int tot_added, added ;
+  Quantity_t tot_added, added ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "(l %2d) fill_ccs_system_matrix_die\n", current_layer) ;
@@ -347,14 +308,12 @@ int                    fill_ccs_system_matrix_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int                    fill_crs_system_matrix_die
+Quantity_t fill_crs_system_matrix_die
 (
-  struct Die*          die,
+  Die*                 die,
   Dimensions*          dimensions,
-  Conductances* conductances,
+  Conductances*        conductances,
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
@@ -364,16 +323,11 @@ int                    fill_crs_system_matrix_die
 )
 {
   Layer* layer ;
-  int tot_added, added ;
+  Quantity_t tot_added, added ;
 
-#ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
-    "(l %2d) fill_crs_system_matrix_die\n",
-    current_layer
-  ) ;
-#endif
+# ifdef PRINT_SYSTEM_MATRIX
+  fprintf (stderr, "(l %2d) fill_crs_system_matrix_die\n", current_layer) ;
+# endif
 
   for
   (
@@ -406,6 +360,4 @@ int                    fill_crs_system_matrix_die
   return tot_added ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

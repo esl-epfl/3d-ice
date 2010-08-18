@@ -1,5 +1,5 @@
 ###############################################################################
-# Makefile "hotspot2threedice/bison/Makefile"                                 #
+# Makefile "3D-ICe/test/Makefile"                                             #
 #                                                                             #
 # This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1       #
 #                                                                             #
@@ -28,17 +28,20 @@
 # 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch  #
 ###############################################################################
 
-HS2TDICE_MAIN = ..
+TDICE_MAIN = ..
 
-include $(HS2TDICE_MAIN)/makefile.def
+include $(TDICE_MAIN)/makefile.def
 
-all: $(HS2TDICE_BISON_OBJECTS:.o=.c)
+all: $(TDICE_TEST_EXE)
 
--include $(HS2TDICE_BISON_OBJECTS:.o=.d)
+CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE) 
+CLIBS    = $(TDICE_ARCHIVE) $(SLU_LIBS)
+
+$(TDICE_TEST_EXE): $(TDICE_TEST_EXE:=.o) $(TDICE_LIB_ARCHIVE)
+	$(CC) $(CFLAGS) $^ $(CLIBS) -o $@
 
 clean:
-	@$(RM) $(RMFLAGS) $(HS2TDICE_BISON_OBJECTS)
-	@$(RM) $(RMFLAGS) $(HS2TDICE_BISON_OBJECTS:.o=.h)
-	@$(RM) $(RMFLAGS) $(HS2TDICE_BISON_OBJECTS:.o=.c)
-	@$(RM) $(RMFLAGS) $(HS2TDICE_BISON_OBJECTS:.o=.d)
+	@$(RM) $(RMFLAGS) $(TDICE_TEST_EXE)
+	@$(RM) $(RMFLAGS) $(TDICE_TEST_EXE:=.o)
+	@$(RM) $(RMFLAGS) $(TDICE_TEST_EXE:=.d)
 

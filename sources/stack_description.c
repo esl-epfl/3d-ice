@@ -1,33 +1,48 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/stack_description.c"                           *
  *                                                                            *
- * Source file "Sources/stack_description.c"                                  *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include "stack_description.h"
+#include "layer.h"
 #include "../bison/stack_description_parser.h"
 #include "../flex/stack_description_scanner.h"
-#include "layer.h"
-
-extern int  stack_description_parse (struct StackDescription *stkd, yyscan_t scanner) ;
-static int  fill_floorplans         (struct StackDescription *stkd) ;
-static void align_layers_in_die     (struct StackDescription *stkd) ;
-static void align_stack_elements    (struct StackDescription *stkd) ;
-
 
 /******************************************************************************/
-/******************************************************************************/
+
+extern int  stack_description_parse (StackDescription* stkd, yyscan_t scanner) ;
+static int  fill_floorplans         (StackDescription* stkd) ;
+static void align_layers_in_die     (StackDescription* stkd) ;
+static void align_stack_elements    (StackDescription* stkd) ;
+
 /******************************************************************************/
 
-void
-init_stack_description
-(
-  struct StackDescription *stkd
-)
+void init_stack_description (StackDescription* stkd)
 {
   stkd->FileName            = NULL ;
   stkd->MaterialsList       = NULL ;
@@ -40,17 +55,14 @@ init_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-fill_stack_description
+int fill_stack_description
 (
-  struct StackDescription* stkd ,
-  char *filename
+  StackDescription* stkd,
+  String_t          filename
 )
 {
-  FILE     *input;
+  FILE*    input;
   int      result;
   yyscan_t scanner;
 
@@ -82,14 +94,8 @@ fill_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_stack_description
-(
-  struct StackDescription *stkd
-)
+void free_stack_description (StackDescription* stkd)
 {
   free_materials_list        (stkd->MaterialsList) ;
   free_channel               (stkd->Channel) ;
@@ -101,15 +107,12 @@ free_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_stack_description
+void print_stack_description
 (
-  FILE             *stream,
-  char             *prefix,
-  struct StackDescription *stkd
+  FILE*             stream,
+  String_t          prefix,
+  StackDescription* stkd
 )
 {
   fprintf(stream, "%sStack read from file %s\n", prefix, stkd->FileName) ;
@@ -132,18 +135,15 @@ print_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_all_floorplans
+void print_all_floorplans
 (
-  FILE             *stream,
-  char             *prefix,
-  struct StackDescription *stkd
+  FILE*             stream,
+  String_t          prefix,
+  StackDescription* stkd
 )
 {
-  struct StackElement *stack_element = stkd->StackElementsList ;
+  StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
@@ -153,15 +153,11 @@ print_all_floorplans
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-static
-int
-fill_floorplans (struct StackDescription *stkd)
+static int fill_floorplans (StackDescription* stkd)
 {
   int result = 0 ;
-  struct StackElement *stack_element = stkd->StackElementsList ;
+  StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
@@ -173,20 +169,13 @@ fill_floorplans (struct StackDescription *stkd)
  }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-static
-void
-align_layers_in_die
-(
-  struct StackDescription *stkd
-)
+static void align_layers_in_die (StackDescription* stkd)
 {
   Layer* layer ;
   LayerIndex_t layer_offset ;
 
-  struct Die *die = stkd->DiesList ;
+  Die* die = stkd->DiesList ;
   for ( ; die != NULL ; die = die->Next)
   {
     layer_offset = 0 ;
@@ -199,15 +188,11 @@ align_layers_in_die
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-static
-void
-align_stack_elements (struct StackDescription *stkd)
+static void align_stack_elements (StackDescription* stkd)
 {
   int layer_counter = 0 ;
-  struct StackElement *stack_element = stkd->StackElementsList ;
+  StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
   {
@@ -219,17 +204,14 @@ align_stack_elements (struct StackDescription *stkd)
  }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-fill_conductances_stack_description
+void fill_conductances_stack_description
 (
-  struct StackDescription *stkd,
-  Conductances     *conductances
+  StackDescription* stkd,
+  Conductances*     conductances
 )
 {
-  struct StackElement *stack_element ;
+  StackElement* stack_element ;
 
 #ifdef PRINT_CONDUCTANCES
   fprintf
@@ -306,18 +288,15 @@ fill_conductances_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-
-void                       fill_capacities_stack_description
+void fill_capacities_stack_description
 (
-  struct StackDescription* stkd,
-  Capacity_t*              capacities,
-  Time_t                   delta_time
+  StackDescription* stkd,
+  Capacity_t*       capacities,
+  Time_t            delta_time
 )
 {
-  struct StackElement *stack_element ;
+  StackElement* stack_element ;
 
 #ifdef PRINT_CAPACITIES
   fprintf
@@ -399,20 +378,17 @@ void                       fill_capacities_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-fill_sources_stack_description
+void fill_sources_stack_description
 (
-  struct StackDescription* stkd,
-  Source_t*                sources,
-  Conductances*            conductances
+  StackDescription* stkd,
+  Source_t*         sources,
+  Conductances*     conductances
 )
 {
-  struct StackElement* stack_element ;
-  struct StackElement* last_stack_element ;
-  Source_t*            tmp_sources = sources ;
+  StackElement* stack_element ;
+  StackElement* last_stack_element ;
+  Source_t*     tmp_sources = sources ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -425,9 +401,7 @@ fill_sources_stack_description
   for
   (
     stack_element = stkd->StackElementsList ;
-
     stack_element != NULL ;
-
     last_stack_element = stack_element,
     stack_element      = stack_element->Next
   )
@@ -516,22 +490,19 @@ fill_sources_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-fill_ccs_system_matrix_stack_description
+void fill_ccs_system_matrix_stack_description
 (
-  struct StackDescription *stkd,
-  Conductances     *conductances,
-  double           *capacities,
-  int              *columns,
-  int              *rows,
-  double           *values
+  StackDescription* stkd,
+  Conductances*     conductances,
+  Capacity_t*       capacities,
+  int*              columns,
+  int*              rows,
+  double*           values
 )
 {
-  struct StackElement *stack_element ;
-  int added, area ;
+  StackElement* stack_element ;
+  Quantity_t added, area ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf
@@ -615,22 +586,19 @@ fill_ccs_system_matrix_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-fill_crs_system_matrix_stack_description
+void fill_crs_system_matrix_stack_description
 (
-  struct StackDescription *stkd,
-  Conductances     *conductances,
-  double           *capacities,
-  int              *rows,
-  int              *columns,
-  double           *values
+  StackDescription* stkd,
+  Conductances*     conductances,
+  Capacity_t*       capacities,
+  int*              rows,
+  int*              columns,
+  double*           values
 )
 {
-  struct StackElement *stack_element ;
-  int added, area ;
+  StackElement* stack_element ;
+  Quantity_t added, area ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf
@@ -649,9 +617,7 @@ fill_crs_system_matrix_stack_description
     added         = 0,
     area          = get_layer_area (stkd->Dimensions),
     stack_element = stkd->StackElementsList ;
-
     stack_element != NULL ;
-
     conductances  += area * stack_element->NLayers,
     capacities    += area * stack_element->NLayers,
     rows          += area * stack_element->NLayers,
@@ -716,17 +682,11 @@ fill_crs_system_matrix_stack_description
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_total_number_of_floorplan_elements
-(
-  struct StackDescription *stkd
-)
+Quantity_t get_total_number_of_floorplan_elements (StackDescription* stkd)
 {
-  int total = 0 ;
-  struct StackElement *stk_el = stkd->StackElementsList;
+  Quantity_t total = 0 ;
+  StackElement* stk_el = stkd->StackElementsList;
 
   for ( ; stk_el != NULL ; stk_el = stk_el->Next)
 
@@ -738,21 +698,18 @@ get_total_number_of_floorplan_elements
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_number_of_floorplan_elements_in_floorplan
+Quantity_t get_number_of_floorplan_elements_in_floorplan
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id
+  StackDescription* stkd,
+  String_t          stack_element_id
 )
 {
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -765,32 +722,27 @@ get_number_of_floorplan_elements_in_floorplan
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-change_coolant_flow_rate
+void change_coolant_flow_rate
 (
-  struct StackDescription *stkd,
-  double flow_rate
+  StackDescription* stkd,
+  CoolantFR_t       flow_rate
 )
 {
   stkd->Channel->CoolantFR = ( flow_rate * 1e+12 ) / 60.0 ;
-  stkd->Channel->FlowRateChanged = 1 ;
+  stkd->Channel->FlowRateChanged = TRUE_V ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
 //void
 //insert_all_power_values
 //(
-//  struct StackDescription *stkd,
-//  double *power_values
+//  StackDescription* stkd,
+//  Power_t*          power_values
 //)
 //{
-//  struct StackElement *stk_el = stkd->StackElementsList;
+//  StackElement* stk_el = stkd->StackElementsList;
 //
 //  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
 //  {
@@ -805,19 +757,17 @@ change_coolant_flow_rate
 //}
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 //int
 //insert_power_values_in_floorplan
 //(
-//  struct StackDescription *stkd,
-//  char             *stack_element_id,
-//  double           *power_values
+//  StackDescription* stkd,
+//  String_t          stack_element_id,
+//  Power_t*          power_values
 //)
 //{
-//  struct StackElement *stk_el = find_stack_element_in_list
-//                                (
+//  StackElement* stk_el = find_stack_element_in_list
+//                         (
 //                                  stkd->StackElementsList,
 //                                  stack_element_id
 //                                ) ;
@@ -838,21 +788,19 @@ change_coolant_flow_rate
 //}
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 // int
 // insert_power_value_in_floorplan_element
 // (
-//   struct StackDescription *stkd,
-//   char             *stack_element_id,
-//   char             *floorplan_element_id,
-//   double           power_value
+//   StackDescription* stkd,
+//   String_t          stack_element_id,
+//   String_t          floorplan_element_id,
+//   Power_t           power_value
 // )
 // {
 //   int result ;
 // 
-//   struct StackElement *stk_el = find_stack_element_in_list
+//   StackElement* stk_el = find_stack_element_in_list
 //                                 (
 //                                   stkd->StackElementsList,
 //                                   stack_element_id
@@ -879,26 +827,22 @@ change_coolant_flow_rate
 // }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_max_temperature_in_floorplan_element
+int get_max_temperature_in_floorplan_element
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  char             *floorplan_element_id,
-  double           *temperatures,
-  double           *max_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    max_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -923,30 +867,26 @@ get_max_temperature_in_floorplan_element
            stkd->Dimensions,
            temperatures + offset,
            max_temperature
-         );
+         ) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_min_temperature_in_floorplan_element
+int get_min_temperature_in_floorplan_element
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  char             *floorplan_element_id,
-  double           *temperatures,
-  double           *min_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    min_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -971,30 +911,26 @@ get_min_temperature_in_floorplan_element
            stkd->Dimensions,
            temperatures + offset,
            min_temperature
-         );
+         ) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_avg_temperature_in_floorplan_element
+int get_avg_temperature_in_floorplan_element
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  char             *floorplan_element_id,
-  double           *temperatures,
-  double           *avg_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    avg_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -1019,32 +955,28 @@ get_avg_temperature_in_floorplan_element
            stkd->Dimensions,
            temperatures + offset,
            avg_temperature
-         );
+         ) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_min_avg_max_temperatures_in_floorplan_element
+int get_min_avg_max_temperatures_in_floorplan_element
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  char             *floorplan_element_id,
-  double           *temperatures,
-  double           *min_temperature,
-  double           *avg_temperature,
-  double           *max_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    min_temperature,
+  Temperature_t*    avg_temperature,
+  Temperature_t*    max_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -1071,29 +1003,25 @@ get_min_avg_max_temperatures_in_floorplan_element
            min_temperature,
            avg_temperature,
            max_temperature
-         );
+         ) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_max_temperatures_in_floorplan
+int get_all_max_temperatures_in_floorplan
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  double           *temperatures,
-  double           *max_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    max_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -1117,31 +1045,27 @@ get_all_max_temperatures_in_floorplan
     stkd->Dimensions,
     temperatures + offset,
     max_temperature
-  );
+  ) ;
 
   return 0 ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_min_temperature_in_floorplan
+int get_all_min_temperatures_in_floorplan
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  double           *temperatures,
-  double           *min_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    min_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -1165,31 +1089,27 @@ get_all_min_temperature_in_floorplan
     stkd->Dimensions,
     temperatures + offset,
     min_temperature
-  );
+  ) ;
 
   return 0 ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_avg_temperatures_in_floorplan
+int get_all_avg_temperatures_in_floorplan
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  double           *temperatures,
-  double           *avg_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    avg_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
-
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
   if (stk_el == NULL)
 
     return -1 ;
@@ -1213,32 +1133,29 @@ get_all_avg_temperatures_in_floorplan
     stkd->Dimensions,
     temperatures + offset,
     avg_temperature
-  );
+  ) ;
 
   return 0 ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int
-get_all_min_avg_max_temperatures_in_floorplan
+int get_all_min_avg_max_temperatures_in_floorplan
 (
-  struct StackDescription *stkd,
-  char             *stack_element_id,
-  double           *temperatures,
-  double           *min_temperature,
-  double           *avg_temperature,
-  double           *max_temperature
+  StackDescription* stkd,
+  String_t          stack_element_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    min_temperature,
+  Temperature_t*    avg_temperature,
+  Temperature_t*    max_temperature
 )
 {
-  int offset ;
-  struct StackElement *stk_el = find_stack_element_in_list
-                                (
-                                  stkd->StackElementsList,
-                                  stack_element_id
-                                ) ;
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
 
   if (stk_el == NULL)
 
@@ -1265,11 +1182,9 @@ get_all_min_avg_max_temperatures_in_floorplan
     min_temperature,
     avg_temperature,
     max_temperature
-  );
+  ) ;
 
  return 0 ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

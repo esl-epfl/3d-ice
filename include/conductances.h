@@ -36,14 +36,14 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include "types.h"
 #include "dimensions.h"
 
-/******************************************************************************
- *                                "Conductances"                              *
- ******************************************************************************/
+/******************************************************************************/
 
-  struct Conductances
+  typedef struct
   {
     Conductance_t North;
     Conductance_t South;
@@ -54,13 +54,11 @@ extern "C"
     Conductance_t Top;
     Conductance_t Bottom;
 
-  };
-
-  typedef struct Conductances Conductances;
+  } Conductances ;
 
 /******************************************************************************/
 
-  void                     fill_conductances_bottom_solid_cell
+  void fill_conductances_bottom_solid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
@@ -78,7 +76,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void                     fill_conductances_central_solid_cell
+  void fill_conductances_central_solid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
@@ -96,7 +94,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void                     fill_conductances_top_solid_cell
+  void fill_conductances_top_solid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
@@ -114,7 +112,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void                     fill_conductances_top_solid_cell_ehtc
+  void fill_conductances_top_solid_cell_ehtc
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
@@ -132,7 +130,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void                     fill_conductances_wall_cell
+  void fill_conductances_wall_cell
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
@@ -149,7 +147,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void                     fill_conductances_liquid_cell
+  void fill_conductances_liquid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
     LayerIndex_t           current_layer,

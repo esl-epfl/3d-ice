@@ -1,13 +1,31 @@
 /******************************************************************************
+ * Bison source file "3D-ICe/bison/floorplan_parser.y"                        *
  *                                                                            *
- * Source file "Bison/floorplan_parser.y"                                     *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
  *                                                                            *
- * Compile with "bison -d filename"                                           *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 %{
@@ -22,20 +40,20 @@
   double                   d_value ;
   char                     *string ;
 
-  struct FloorplanElement  *p_floorplan_element ;
-  struct PowersQueue       *p_powers_queue ;
+  FloorplanElement  *p_floorplan_element ;
+  PowersQueue       *p_powers_queue ;
 }
 
 %{
 #include "../flex/floorplan_scanner.h"
 
-void
-floorplan_error (
-                 struct Floorplan *floorplan,
-                 Dimensions* dimensions,
-                 yyscan_t    yyscanner,
-                 char const *msg
-                ) ;
+void floorplan_error
+(
+  Floorplan*  floorplan,
+  Dimensions* dimensions,
+  yyscan_t    yyscanner,
+  char const* msg
+) ;
 
 static int first_length_found = 0 ;
 %}
@@ -63,7 +81,7 @@ static int first_length_found = 0 ;
 
 %error-verbose
 
-%parse-param { struct Floorplan *floorplan }
+%parse-param { Floorplan* floorplan }
 %parse-param { Dimensions* dimensions }
 %parse-param { yyscan_t scanner }
 
@@ -77,8 +95,8 @@ floorplan_element_list
 
   : floorplan_element
     {
-      int tmp_1 = check_location (floorplan, $1, dimensions) ;
-      int tmp_2 = align_to_grid  (floorplan, $1, dimensions) ;
+      Bool_t tmp_1 = check_location (floorplan, $1, dimensions) ;
+      Bool_t tmp_2 = align_to_grid  (floorplan, $1, dimensions) ;
 
       if (tmp_1 || tmp_2)
       {
@@ -93,9 +111,9 @@ floorplan_element_list
     }
   | floorplan_element_list floorplan_element
     {
-      int tmp_1 = check_intersections (floorplan, $2) ;
-      int tmp_2 = check_location      (floorplan, $2, dimensions) ;
-      int tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
+      Bool_t tmp_1 = check_intersections (floorplan, $2) ;
+      Bool_t tmp_2 = check_location      (floorplan, $2, dimensions) ;
+      Bool_t tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
 
       if (tmp_1 || tmp_2 || tmp_3 )
       {
@@ -118,7 +136,7 @@ floorplan_element
       DIMENSION UIVALUE ',' UIVALUE ';'
       POWER VALUES power_values_list ';'
     {
-      struct FloorplanElement *floorplan_element
+      FloorplanElement *floorplan_element
         = $$ = alloc_and_init_floorplan_element ( ) ;
 
       if (floorplan_element == NULL)
@@ -182,7 +200,7 @@ power_values_list
 void
 floorplan_error
 (
-  struct Floorplan  *floorplan,
+  Floorplan  *floorplan,
   Dimensions* dimensions,
   yyscan_t   yyscanner,
   char const *msg

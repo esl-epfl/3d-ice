@@ -19,7 +19,7 @@
   double                   d_value ;
   char                     *string ;
 
-  struct FloorplanElement  *p_floorplan_element ;
+  FloorplanElement  *p_floorplan_element ;
 }
 
 %{
@@ -27,12 +27,12 @@
 
 void hotspot_ptrace_error
 (
-  struct FloorplanElement** flp_el_list,
+  FloorplanElement** flp_el_list,
   yyscan_t                  yyscanner,
   char const*               msg
 ) ;
 
-static struct FloorplanElement* flp_el ;
+static FloorplanElement* flp_el ;
 static int flp_el_found ;
 static int values_counter ;
 
@@ -51,7 +51,7 @@ static int values_counter ;
 
 %error-verbose
 
-%parse-param { struct FloorplanElement **flp_el_list }
+%parse-param { FloorplanElement **flp_el_list }
 %parse-param { yyscan_t scanner }
 
 %lex-param   { yyscan_t scanner }
@@ -157,7 +157,7 @@ powers_list
 void
 hotspot_ptrace_error
 (
-  struct FloorplanElement** flp_el_list,
+  FloorplanElement** flp_el_list,
   yyscan_t   yyscanner,
   char const *msg
 )

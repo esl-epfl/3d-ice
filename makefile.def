@@ -1,57 +1,91 @@
 ###############################################################################
+# Makefile "3D-ICe/makefile.def"                                              #
 #                                                                             #
-# makefile.def                                                                #
+# This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1       #
+#                                                                             #
+# 3D-ICe is free software: you can redistribute it and/or modify it under     #
+# the terms of the GNU General Public License as published by the Free        #
+# Software Foundation, either version 3 of the License, or any later          #
+# version.                                                                    #
+#                                                                             #
+# 3D-ICe is distributed in the hope that it will be useful, but WITHOUT       #
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       #
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for    #
+# more details.                                                               #
+#                                                                             #
+# You should have received a copy of the GNU General Public License along     #
+# with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                   #
+#                                                                             #
+# Copyright (C) 2010,                                                         #
+# Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.     #
+# All Rights Reserved.                                                        #
+#                                                                             #
+# Authors: Alessandro Vincenzi, Arvind Sridhar.                               #
 #                                                                             #
 # EPFL-STI-IEL-ESL                                                            #
 # Bâtiment ELG, ELG 130                                                       #
 # Station 11                                                                  #
-# 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch   #
+# 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch  #
 ###############################################################################
 
 #
 # Thermal Library variables
 ###############################################################################
 
-TL_LIB     = $(TL_MAIN)/lib
-TL_INCLUDE = $(TL_MAIN)/include
-TL_SOURCES = $(TL_MAIN)/sources
-TL_BISON   = $(TL_MAIN)/bison
-TL_FLEX    = $(TL_MAIN)/flex
+LIB_NAME      = threedice
 
-TL_FLEX_OBJECTS   = $(TL_FLEX)/floorplan_scanner.o            \
-                    $(TL_FLEX)/stack_description_scanner.o
+TDICE_INCLUDE = $(TDICE_MAIN)/include
+TDICE_FLEX    = $(TDICE_MAIN)/flex
+TDICE_BISON   = $(TDICE_MAIN)/bison
+TDICE_SOURCES = $(TDICE_MAIN)/sources
+TDICE_LIB     = $(TDICE_MAIN)/lib
+TDICE_TEST    = $(TDICE_MAIN)/test
 
-TL_BISON_OBJECTS  = $(TL_BISON)/floorplan_parser.o            \
-                    $(TL_BISON)/stack_description_parser.o
+TDICE_FLEX_OBJECTS   = $(TDICE_FLEX)/floorplan_scanner.o            \
+                       $(TDICE_FLEX)/stack_description_scanner.o
 
-TL_SOURCE_OBJECTS = $(TL_SOURCES)/channel.o                   \
-                    $(TL_SOURCES)/conductances.o              \
-                    $(TL_SOURCES)/die.o                       \
-                    $(TL_SOURCES)/dimensions.o                \
-                    $(TL_SOURCES)/environment_heat_sink.o     \
-                    $(TL_SOURCES)/floorplan.o                 \
-                    $(TL_SOURCES)/floorplan_element.o         \
-                    $(TL_SOURCES)/layer.o                     \
-                    $(TL_SOURCES)/material.o                  \
-                    $(TL_SOURCES)/powers_queue.o              \
-                    $(TL_SOURCES)/stack_description.o         \
-                    $(TL_SOURCES)/stack_element.o             \
-                    $(TL_SOURCES)/system_matrix.o             \
-                    $(TL_SOURCES)/system_vector.o             \
-                    $(TL_SOURCES)/thermal_data.o
+TDICE_BISON_OBJECTS  = $(TDICE_BISON)/floorplan_parser.o            \
+                       $(TDICE_BISON)/stack_description_parser.o
 
-TL_LIB_OBJECTS    = $(TL_FLEX_OBJECTS)                        \
-                    $(TL_BISON_OBJECTS)                       \
-                    $(TL_SOURCE_OBJECTS)
+TDICE_SOURCE_OBJECTS = $(TDICE_SOURCES)/channel.o                   \
+                       $(TDICE_SOURCES)/conductances.o              \
+                       $(TDICE_SOURCES)/die.o                       \
+                       $(TDICE_SOURCES)/dimensions.o                \
+                       $(TDICE_SOURCES)/environment_heat_sink.o     \
+                       $(TDICE_SOURCES)/floorplan.o                 \
+                       $(TDICE_SOURCES)/floorplan_element.o         \
+                       $(TDICE_SOURCES)/layer.o                     \
+                       $(TDICE_SOURCES)/material.o                  \
+                       $(TDICE_SOURCES)/powers_queue.o              \
+                       $(TDICE_SOURCES)/stack_description.o         \
+                       $(TDICE_SOURCES)/stack_element.o             \
+                       $(TDICE_SOURCES)/system_matrix.o             \
+                       $(TDICE_SOURCES)/system_vector.o             \
+                       $(TDICE_SOURCES)/thermal_data.o
 
-TL_ARCHIVE        = $(TL_LIB)/libThermalLibrary.a
+TDICE_LIB_OBJECTS    = $(TDICE_FLEX_OBJECTS)                        \
+                       $(TDICE_BISON_OBJECTS)                       \
+                       $(TDICE_SOURCE_OBJECTS)
+
+TDICE_ARCHIVE        = $(TDICE_LIB)/lib$(LIB_NAME).a
+
+TDICE_TEST_EXE       = $(TDICE_TEST)/FillThermalData
 
 #
 # SuperLU variables
 ###############################################################################
 
-SLU_MAIN    = $(TL_MAIN)/../EPFL/SuperLU_4.0
+SLU_MAIN    = $(TDICE_MAIN)/../EPFL/SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC
+SLU_LIB     = $(SLU_MAIN)/lib
+SLU_LIBS    = $(SLU_LIB)/libsuperlu_4.0.a $(SLU_LIB)/blas_linux.a
+
+#
+# HotSpot tool variables
+###############################################################################
+
+HST_NAME      = hotspot2threedice
+HST_DIR       = $(TDICE_MAIN)/$(HST_NAME)
 
 #
 # Commands and flags
@@ -62,7 +96,7 @@ ARFLAGS   = rsv
 
 CC        = gcc
 CFLAGS    = -MD -g 
-CINCLUDES = -I $(TL_INCLUDE)
+CINCLUDES = -I $(TDICE_INCLUDE)
 
 YACC      = bison
 YFLAGS    = -d

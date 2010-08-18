@@ -1,40 +1,55 @@
 /******************************************************************************
+ * Bison source file "3D-ICe/bison/stack_description_parser.y"                *
  *                                                                            *
- * Source file "Bison/stack_description_parser.y"                             *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
  *                                                                            *
- * Compile with "bison -d stack_parser.y" to obtain the files                 *
- * "stack_parser.h" and "stack_parser.c".                                     *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 %{
-
 #include "material.h"
 #include "die.h"
 #include "layer.h"
 #include "stack_element.h"
 #include "stack_description.h"
 #include "types.h"
-
 %}
 
 /* The YYSTYPE union used to collect the types of tokens and rules */
 
 %union
 {
-   int     int_v ;
-   double  double_v ;
-   char*   char_p ;
+   int      int_v ;
+   double   double_v ;
+   String_t char_p ;
 
-   struct Material*      material_p ;
-   struct Die*           die_p ;
-   struct Layer*         layer_p ;
-   struct StackElement*  stack_element_p ;
-   CoolantHTCs_t         coolanthtcs_v ;
+   Material*      material_p ;
+   Die*           die_p ;
+   Layer*         layer_p ;
+   StackElement*  stack_element_p ;
+   CoolantHTCs_t  coolanthtcs_v ;
 }
 
 %destructor { free($$) ;                      } <string>
@@ -107,21 +122,19 @@
 %{
 #include "../flex/stack_description_scanner.h"
 
-void
-stack_description_error
+void stack_description_error
 (
-  struct StackDescription *stack  ,
-  yyscan_t         scanner ,
-  char             *message
+  StackDescription* stack,
+  yyscan_t          scanner,
+  String_t          message
 ) ;
 
-static struct StackElement* tmp_stack_element = NULL;
+static StackElement* tmp_stack_element = NULL;
 static int found_die = 0 ;
 static int tmp_first_wall_length = 0 ;
 static int tmp_last_wall_length = 0 ;
 static int tmp_wall_length = 0 ;
 static int tmp_channel_length = 0 ;
-
 %}
 
 %require     "2.4.1"
@@ -130,7 +143,7 @@ static int tmp_channel_length = 0 ;
 
 %pure-parser
 %error-verbose
-%parse-param { struct StackDescription *stkd }
+%parse-param { StackDescription *stkd }
 %parse-param { yyscan_t scanner }
 %lex-param   { yyscan_t scanner }
 
@@ -192,7 +205,8 @@ material
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
-        char *message = (char *) malloc ((26 + strlen($2)) * sizeof (char)) ;
+        String_t message
+          = (String_t) malloc ((26 + strlen($2)) * sizeof (char)) ;
         sprintf (message, "Material %s already declared", $2) ;
         stack_description_error (stkd, scanner, message) ;
 
@@ -229,6 +243,7 @@ environment_heat_sink
       stkd->EnvironmentHeatSink->EnvironmentT   = $11 ;
     }
   ;
+
 /******************************************************************************/
 /******************************* Channel **************************************/
 /******************************************************************************/
@@ -324,7 +339,7 @@ die
        layers_list
     {
       Layer* layer ;
-      struct Die   *die = $$ = alloc_and_init_die() ;
+      Die* die = $$ = alloc_and_init_die() ;
 
       if (die == NULL)
       {
@@ -656,33 +671,34 @@ dimensions
 
       // Set width and NRows
 
-      stkd->Dimensions->Chip.Width       = $10 * 1000.0 ;
-      stkd->Dimensions->Cell.Width       = $20 ;
+      stkd->Dimensions->Chip.Width = $10 * 1000.0 ;
+      stkd->Dimensions->Cell.Width = $20 ;
 
       stkd->Dimensions->Grid.NRows
-        = (int) (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
+        = (GridDimension_t)
+          (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
 
       // Set length and NColumns
 
-      stkd->Dimensions->Chip.Length      = $5  * 1000.0 ;
+      stkd->Dimensions->Chip.Length = $5  * 1000.0 ;
 
       if (stkd->Channel == NULL)
       {
         // There are no channels in the stack
 
-        stkd->Dimensions->StackHasChannel  = 0 ;
+        stkd->Dimensions->StackHasChannel = FALSE_V ;
 
         stkd->Dimensions->Cell.WallLength = $15 ;
 
         stkd->Dimensions->Grid.NColumns
-          = (int) stkd->Dimensions->Chip.Length
-                  / stkd->Dimensions->Cell.WallLength ;
+          = (GridDimension_t)
+            stkd->Dimensions->Chip.Length / stkd->Dimensions->Cell.WallLength ;
       }
       else
       {
         // There are channels in the stack
 
-        stkd->Dimensions->StackHasChannel = 1 ;
+        stkd->Dimensions->StackHasChannel = TRUE_V ;
 
         stkd->Dimensions->Cell.FirstWallLength = tmp_first_wall_length ;
         stkd->Dimensions->Cell.LastWallLength = tmp_last_wall_length ;
@@ -690,19 +706,19 @@ dimensions
         stkd->Dimensions->Cell.ChannelLength = tmp_channel_length ;
 
         stkd->Dimensions->Grid.NColumns
-          = 2 * (int) (
-                        (
-                          stkd->Dimensions->Chip.Length
-                          - stkd->Dimensions->Cell.FirstWallLength
-                          - stkd->Dimensions->Cell.LastWallLength
-                          - stkd->Dimensions->Cell.ChannelLength
-                        )
-                        /
-                        ( stkd->Dimensions->Cell.ChannelLength
-                            + stkd->Dimensions->Cell.WallLength
-                        )
-                      )
-                      + 3 ;
+          = 2 * (GridDimension_t)
+            (
+              (stkd->Dimensions->Chip.Length
+               - stkd->Dimensions->Cell.FirstWallLength
+               - stkd->Dimensions->Cell.LastWallLength
+               - stkd->Dimensions->Cell.ChannelLength
+              )
+              /
+              ( stkd->Dimensions->Cell.ChannelLength
+                + stkd->Dimensions->Cell.WallLength
+              )
+            )
+            + 3 ;
       }
 
       // Check the number of ciolumns get
@@ -726,7 +742,7 @@ dimensions
         YYABORT ;
       }
 
-      struct StackElement *stk_el = stkd->StackElementsList ;
+      StackElement *stk_el = stkd->StackElementsList ;
 
       for ( ; stk_el != NULL ; stk_el = stk_el->Next)
 
@@ -764,12 +780,11 @@ last_wall_length
 
 %%
 
-void
-stack_description_error
+void stack_description_error
 (
-  struct StackDescription *stkd   ,
-  yyscan_t         scanner ,
-  char             *message
+  StackDescription* stkd,
+  yyscan_t          scanner,
+  String_t          message
 )
 {
   fprintf (stack_description_get_out (scanner),

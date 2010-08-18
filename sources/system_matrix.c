@@ -1,8 +1,31 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/system_matrix.c"                               *
  *                                                                            *
- * Source file "Source/build_system_matrix.c"                                 *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
  *                                                                            *
- *                                          -- alessandro.vincenzi@epfl.ch -- *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
+ *                                                                            *
+ * EPFL-STI-IEL-ESL                                                           *
+ * Bâtiment ELG, ELG 130                                                      *
+ * Station 11                                                                 *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -16,12 +39,13 @@
 #define ROW_OFFSET(dim)    (dim->Grid.NColumns)
 #define COLUMN_OFFSET(dim) (1)
 
-int
-alloc_system_matrix
+/******************************************************************************/
+
+int alloc_system_matrix
 (
-  struct SystemMatrix    *matrix,
+  SystemMatrix*   matrix,
   enum MatrixStorage_t storage,
-  int             nvalues,
+  Quantity_t      nvalues,
   int             nnz
 )
 {
@@ -45,14 +69,14 @@ alloc_system_matrix
     return 0 ;
   }
 
-  matrix->Columns = (int *) malloc (sizeof(int) * matrix->columns_size ) ;
+  matrix->Columns = (int*) malloc (sizeof(int) * matrix->columns_size ) ;
 
   if (matrix->Columns == NULL)
   {
     return 0 ;
   }
 
-  matrix->Rows = (int *) malloc (sizeof(int) * matrix->rows_size ) ;
+  matrix->Rows = (int*) malloc (sizeof(int) * matrix->rows_size ) ;
 
   if (matrix->Rows == NULL)
   {
@@ -60,7 +84,7 @@ alloc_system_matrix
     return 0 ;
   }
 
-  matrix->Values = (double *) malloc (sizeof(double) * nnz ) ;
+  matrix->Values = (double*) malloc (sizeof(double) * nnz ) ;
 
   if (matrix->Values == NULL)
   {
@@ -73,10 +97,8 @@ alloc_system_matrix
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void free_system_matrix (struct SystemMatrix *matrix)
+void free_system_matrix (SystemMatrix* matrix)
 {
   free (matrix->Columns) ;
   free (matrix->Rows) ;
@@ -84,82 +106,13 @@ void free_system_matrix (struct SystemMatrix *matrix)
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void print_system_matrix_columns
+void fill_system_matrix
 (
-  struct SystemMatrix *matrix,
-  char *file_name
-)
-{
-  int counter ;
-
-  FILE * file = fopen (file_name, "w") ;
-
-  if (file == NULL) return ;
-
-  for (counter = 0 ; counter < matrix->columns_size ; counter++)
-    fprintf (file, "%d\n", matrix->Columns[counter]);
-
-  fclose (file) ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_system_matrix_rows
-(
-  struct SystemMatrix *matrix,
-  char *file_name
-)
-{
-  int counter ;
-  FILE *file = fopen (file_name, "w") ;
-
-  if (file == NULL) return ;
-
-  for (counter = 0 ; counter < matrix->rows_size ; counter++)
-    fprintf (file, "%d\n", matrix->Rows[counter]);
-
-  fclose (file) ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-print_system_matrix_values
-(
-  struct SystemMatrix *matrix,
-  char *file_name
-)
-{
-  int counter ;
-  FILE *file = fopen (file_name, "w") ;
-
-  if (file == NULL) return ;
-
-  for (counter = 0 ; counter < matrix->NNz ; counter++)
-    fprintf (file, "%.6e\n", matrix->Values[counter]);
-
-  fclose (file) ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-void
-fill_system_matrix
-(
-  struct StackDescription *stkd,
-  struct SystemMatrix     *matrix,
-  Conductances     *conductances,
-  double           *capacities
+  StackDescription* stkd,
+  SystemMatrix*     matrix,
+  Conductances*     conductances,
+  Capacity_t*       capacities
 )
 {
   if (matrix->Storage == TL_CCS_MATRIX)
@@ -192,8 +145,6 @@ fill_system_matrix
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 int                    add_ccs_solid_column
 (
@@ -208,10 +159,10 @@ int                    add_ccs_solid_column
   double*              values
 )
 {
-  double conductance        = 0.0 ;
-  double diagonal_value    = 0.0 ;
-  double *diagonal_pointer = NULL ;
-  int    added             = 0 ;
+  double  conductance        = 0.0 ;
+  double  diagonal_value    = 0.0 ;
+  double* diagonal_pointer = NULL ;
+  int     added             = 0 ;
 
   int current_cell
     = current_layer * LAYER_OFFSET(dimensions)
@@ -391,8 +342,6 @@ int                    add_ccs_solid_column
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 int                    add_crs_solid_column
 (
@@ -408,10 +357,10 @@ int                    add_crs_solid_column
   double*              values
 )
 {
-  double conductance        = 0.0 ;
-  double diagonal_value    = 0.0 ;
-  double *diagonal_pointer = NULL ;
-  int    added             = 0 ;
+  double  conductance        = 0.0 ;
+  double  diagonal_value    = 0.0 ;
+  double* diagonal_pointer = NULL ;
+  int     added             = 0 ;
 
   int current_cell
     = current_layer * LAYER_OFFSET(dimensions)
@@ -594,26 +543,24 @@ int                    add_crs_solid_column
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-int                    add_ccs_liquid_column
+int add_ccs_liquid_column
 (
-  Dimensions*          dimensions,
+  Dimensions*   dimensions,
   Conductances* conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  RowIndex_t           current_row,
-  ColumnIndex_t        current_column,
-  int*                 columns,
-  int*                 rows,
-  double*              values
+  Capacity_t*   capacities,
+  LayerIndex_t  current_layer,
+  RowIndex_t    current_row,
+  ColumnIndex_t current_column,
+  int*          columns,
+  int*          rows,
+  double*       values
 )
 {
-  double conductance        = 0.0 ;
-  double diagonal_value    = 0.0 ;
-  double *diagonal_pointer = NULL ;
-  int    added             = 0 ;
+  double  conductance      = 0.0 ;
+  double  diagonal_value   = 0.0 ;
+  double* diagonal_pointer = NULL ;
+  int     added            = 0 ;
   int current_cell
     = current_layer * LAYER_OFFSET(dimensions)
       + current_row * ROW_OFFSET(dimensions)
@@ -776,8 +723,6 @@ int                    add_ccs_liquid_column
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 int                    add_crs_liquid_column
 (
@@ -792,10 +737,10 @@ int                    add_crs_liquid_column
   double*              values
 )
 {
-  double conductance        = 0.0 ;
-  double diagonal_value    = 0.0 ;
-  double *diagonal_pointer = NULL ;
-  int    added             = 0 ;
+  double  conductance      = 0.0 ;
+  double  diagonal_value   = 0.0 ;
+  double* diagonal_pointer = NULL ;
+  int     added            = 0 ;
   int current_cell
     = current_layer * LAYER_OFFSET(dimensions)
       + current_row * ROW_OFFSET(dimensions)
@@ -957,6 +902,4 @@ int                    add_crs_liquid_column
   return added ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

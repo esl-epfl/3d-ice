@@ -1,15 +1,35 @@
 /******************************************************************************
+ * Header file "3D-ICe/include/floorplan.h"                                   *
  *                                                                            *
- * Header file "Include/floorplan.h"                                          *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
-#ifndef _TL_FLOORPLAN_H_
-#define _TL_FLOORPLAN_H_
+#ifndef _3DICE_FLOORPLAN_H_
+#define _3DICE_FLOORPLAN_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -20,159 +40,182 @@ extern "C"
 #include <stdlib.h>
 #include <string.h>
 
+#include "types.h"
 #include "dimensions.h"
 #include "floorplan_element.h"
 
-/******************************************************************************
- *                                                                            *
- * "Floorplan" : the representation of a single floorplan                     *
- *                                                                            *
- ******************************************************************************/
-
-  struct Floorplan
+  typedef struct
   {
-    char *FileName ;    /* The name of the file scanned to fill the floorplan */
+    /* The name of the file scanned to fill the floorplan */
 
-    int NElements ;     /* The number of floorplan elements in the floorplan  */
+    String_t FileName ;
 
-    int NTimeSlots ;
-    int CurrentTimeSlot ;       /* The power value read from the list         */
+    /* The number of floorplan elements in the floorplan  */
 
-    struct FloorplanElement *ElementsList ; /* The list of floorplan elements */
+    Quantity_t NElements ;
 
-  } ;
+    Quantity_t NTimeSlots ;
+    Quantity_t CurrentTimeSlot ;
 
+    /* The list of floorplan elements */
+
+    FloorplanElement* ElementsList ;
+
+  } Floorplan ;
 
 /******************************************************************************/
+
+  void init_floorplan (Floorplan* floorplan) ;
+
 /******************************************************************************/
+
+  Floorplan* alloc_and_init_floorplan (void) ;
+
 /******************************************************************************/
 
-  void
-  init_floorplan           (struct Floorplan *floorplan) ;
+  void free_floorplan (Floorplan* floorplan) ;
 
-  struct Floorplan *
-  alloc_and_init_floorplan (void) ;
+/******************************************************************************/
 
-  void
-  free_floorplan           (struct Floorplan *floorplan) ;
+  int fill_floorplan (Floorplan* floorplan, Dimensions* dim) ;
 
-  int
-  fill_floorplan           (struct Floorplan *floorplan, Dimensions *dim) ;
+/******************************************************************************/
 
-  void
-  print_floorplan          (FILE *stream, char* prefix, struct Floorplan *floorplan) ;
+  void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan) ;
 
-  int
-  check_intersections      (
-                            struct Floorplan *floorplan,
-                            struct FloorplanElement *floorplan_element
-                           ) ;
+/******************************************************************************/
 
-  int
-  check_location           (
-                            struct Floorplan *floorplan,
-                            struct FloorplanElement *floorplan_element,
-                            Dimensions *dimensions
-                           ) ;
+  Bool_t check_intersections
+  (
+    Floorplan*        floorplan,
+    FloorplanElement* floorplan_element
+  ) ;
 
-  int
-  align_to_grid            (
-                            struct Floorplan *floorplan,
-                            struct FloorplanElement *floorplan_element,
-                            Dimensions *dimensions
-                           ) ;
+/******************************************************************************/
+
+  Bool_t check_location
+  (
+    Floorplan*        floorplan,
+    FloorplanElement* floorplan_element,
+    Dimensions*       dimensions
+  ) ;
+
+/******************************************************************************/
+
+  Bool_t align_to_grid
+  (
+    Floorplan*        floorplan,
+    FloorplanElement* floorplan_element,
+    Dimensions*       dimensions
+  ) ;
+
+/******************************************************************************/
 
 //  void
 //  insert_power_values_floorplan              (
-//                                              struct Floorplan *floorplan,
-//                                              double    *power_values
+//                                              Floorplan* floorplan,
+//                                              Power_t*   power_values
 //                                             ) ;
 
 //  int
 //  insert_power_value_floorplan_element       (
-//                                               struct Floorplan *floorplan,
-//                                               char      *floorplan_element_id,
-//                                               double    power_value
+//                                               Floorplan* floorplan,
+//                                               String_t   floorplan_element_id,
+//                                               Power_t*   power_value
 //                                             ) ;
 
-  int
-  get_max_temperature_floorplan              (
-                                              struct Floorplan  *floorplan,
-                                              char       *floorplan_element_id,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *max_temperature
-                                             );
+/******************************************************************************/
 
-  int
-  get_min_temperature_floorplan              (
-                                              struct Floorplan *floorplan,
-                                              char       *floorplan_element_id,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *min_temperature
-                                             );
-
-  int
-  get_avg_temperature_floorplan              (
-                                              struct Floorplan  *floorplan,
-                                              char       *floorplan_element_id,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *avg_temperature
-                                             );
-
-  int
-  get_min_avg_max_temperatures_floorplan     (
-                                              struct Floorplan  *floorplan,
-                                              char       *floorplan_element_id,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *min_temperature,
-                                              double     *avg_temperature,
-                                              double     *max_temperature
-                                             );
-
-  int
-  get_all_max_temperatures_floorplan         (
-                                              struct Floorplan  *floorplan,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *max_temperature
-                                             );
-
-  int
-  get_all_min_temperatures_floorplan         (
-                                              struct Floorplan  *floorplan,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *min_temperature
-                                             );
-
-  int
-  get_all_avg_temperatures_floorplan         (
-                                              struct Floorplan  *floorplan,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *avg_temperature
-                                             );
-
-  int
-  get_all_min_avg_max_temperatures_floorplan (
-                                              struct Floorplan  *floorplan,
-                                              Dimensions *dimensions,
-                                              double     *temperatures,
-                                              double     *min_temperature,
-                                              double     *avg_temperature,
-                                              double     *max_temperature
-                                             );
+  int get_max_temperature_floorplan
+  (
+    Floorplan*     floorplan,
+    String_t       floorplan_element_id,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* max_temperature
+  );
 
 /******************************************************************************/
+
+  int get_min_temperature_floorplan
+  (
+    Floorplan*     floorplan,
+    String_t       floorplan_element_id,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* min_temperature
+  );
+
 /******************************************************************************/
+
+  int get_avg_temperature_floorplan
+  (
+    Floorplan*     floorplan,
+    String_t       floorplan_element_id,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* avg_temperature
+  );
+
+/******************************************************************************/
+
+  int get_min_avg_max_temperatures_floorplan
+  (
+    Floorplan*     floorplan,
+    String_t       floorplan_element_id,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* min_temperature,
+    Temperature_t* avg_temperature,
+    Temperature_t* max_temperature
+  );
+
+/******************************************************************************/
+
+  int get_all_max_temperatures_floorplan
+  (
+    Floorplan*     floorplan,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* max_temperature
+  );
+
+/******************************************************************************/
+
+  int get_all_min_temperatures_floorplan
+  (
+    Floorplan*     floorplan,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* min_temperature
+  );
+
+/******************************************************************************/
+
+  int get_all_avg_temperatures_floorplan
+  (
+    Floorplan*     floorplan,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* avg_temperature
+  );
+
+/******************************************************************************/
+
+  int get_all_min_avg_max_temperatures_floorplan
+  (
+    Floorplan*     floorplan,
+    Dimensions*    dimensions,
+    Temperature_t* temperatures,
+    Temperature_t* min_temperature,
+    Temperature_t* avg_temperature,
+    Temperature_t* max_temperature
+  );
+
 /******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _TL_FLOORPLAN_H_ */
+#endif /* _3DICE_FLOORPLAN_H_ */

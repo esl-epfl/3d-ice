@@ -36,17 +36,17 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "types.h"
 #include "material.h"
 #include "conductances.h"
 
-/******************************************************************************
- *                                 "Channel"                                  *
- ******************************************************************************/
+/******************************************************************************/
 
-  struct Channel
+  typedef struct
   {
 
     /* The heigh of the channel in [um] (1 cell)    */
@@ -75,16 +75,14 @@ extern "C"
 
     /* The material composing the wall */
 
-    Material *Wall ;
+    Material* Wall ;
 
-    /* TRUE if the flow has changed since the last simulation */
-    /* FALSE otherwise                                        */
+    /* TRUE_V if the flow has changed since the last simulation */
+    /* FALSE_V otherwise                                        */
 
     Bool_t FlowRateChanged ;
 
-  } ;
-
-  typedef struct Channel Channel ;
+  } Channel ;
 
 /******************************************************************************/
 
@@ -104,7 +102,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Conductances*   fill_conductances_channel
+  Conductances* fill_conductances_channel
   (
 #   ifdef PRINT_CAPACITIES
     LayerIndex_t  current_layer
@@ -116,7 +114,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Capacity_t*    fill_capacities_channel
+  Capacity_t* fill_capacities_channel
   (
 #   ifdef PRINT_CAPACITIES
     LayerIndex_t current_layer,
@@ -129,7 +127,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Source_t*      fill_sources_channel
+  Source_t* fill_sources_channel
   (
 #   ifdef PRINT_SOURCES
     LayerIndex_t current_layer,
@@ -141,7 +139,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t      fill_ccs_system_matrix_channel
+  Quantity_t fill_ccs_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
     Channel*      channel,
@@ -157,7 +155,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t      fill_crs_system_matrix_channel
+  Quantity_t fill_crs_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
     Channel*      channel,

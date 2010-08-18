@@ -1,11 +1,31 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/layer.c"                                       *
  *                                                                            *
- * Source file "Sources/layer.c"                                              *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -15,7 +35,7 @@
 
 /******************************************************************************/
 
-void init_layer (Layer *layer)
+void init_layer (Layer* layer)
 {
   layer->Height       = 0.0  ;
   layer->LayersOffset = 0    ;
@@ -43,7 +63,7 @@ void free_layer (Layer* layer)
 
 /******************************************************************************/
 
-void free_layers_list (Layer *list)
+void free_layers_list (Layer* list)
 {
   Layer* next ;
 
@@ -103,11 +123,11 @@ Conductances*   fill_conductances_layer
   );
 
   if (current_layer == 0)
-  {
+
     fill_conductances = &fill_conductances_bottom_solid_cell;
-  }
+
   else if (current_layer == get_number_of_layers(dimensions) - 1)
-  {
+
     if (environmentheatsink == NULL)
 
       fill_conductances = &fill_conductances_top_solid_cell;
@@ -116,11 +136,10 @@ Conductances*   fill_conductances_layer
 
       fill_conductances = &fill_conductances_top_solid_cell_ehtc;
 
-  }
   else
-  {
+
     fill_conductances = &fill_conductances_central_solid_cell;
-  }
+
 
 #ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_layer %s\n", layer->Material->Id) ;
@@ -159,14 +178,19 @@ Conductances*   fill_conductances_layer
 
 /******************************************************************************/
 
-static
-double
-capacity (double l, double w, double h, double s, double t)
+static Capacity_t capacity
+(
+  CellDimension_t   length,
+  CellDimension_t   width,
+  CellDimension_t   height,
+  VolHeatCapacity_t vhc,
+  Time_t            time
+)
 {
-  return (l * w * h * s) / t ;
+  return ((length * width * height) * vhc) / time ;
 }
 
-Capacity_t*    fill_capacities_layer
+Capacity_t* fill_capacities_layer
 (
 #ifdef PRINT_CAPACITIES
   LayerIndex_t current_layer,
@@ -181,13 +205,9 @@ Capacity_t*    fill_capacities_layer
   ColumnIndex_t column ;
 
 #ifdef PRINT_CAPACITIES
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "current_layer = %d\tfill_capacities_layer %s\n",
-    current_layer,
-    layer->Material->Id
-  ) ;
+    current_layer, layer->Material->Id) ;
 #endif
 
   for
@@ -215,10 +235,8 @@ Capacity_t*    fill_capacities_layer
                     ) ;
 
 #ifdef PRINT_CAPACITIES
-      fprintf
-      (
-        stderr,
-        "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "   \
+      fprintf (stderr,
+        "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f " \
                     " |  vhc %.5e --> %.5e\n",
         current_layer, row, column,
         get_cell_offset_in_stack (dimensions, current_layer, row, column),
@@ -235,28 +253,26 @@ Capacity_t*    fill_capacities_layer
 
 /******************************************************************************/
 
-Source_t*              fill_sources_active_layer
+Source_t* fill_sources_active_layer
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t         current_layer,
-  Layer*               layer,
+  LayerIndex_t current_layer,
+  Layer*       layer,
 # endif
-  struct Floorplan*    floorplan,
-  Source_t*            sources,
-  Dimensions*          dimensions
+  Floorplan*   floorplan,
+  Source_t*    sources,
+  Dimensions*  dimensions
 )
 {
-  int              row, column ;
-  double           flp_el_surface ;
-  struct FloorplanElement *flp_el ;
+  RowIndex_t        row ;
+  ColumnIndex_t     column ;
+  CellDimension_t   flp_el_surface ;
+  FloorplanElement* flp_el ;
 
 #ifdef PRINT_SOURCES
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "current_layer = %d\tfill_sources_source_layer   %s\n",
-    current_layer, layer->Material->Id
-  ) ;
+    current_layer, layer->Material->Id) ;
 #endif
 
   for
@@ -286,21 +302,19 @@ Source_t*              fill_sources_active_layer
 
           = (
                get_from_powers_queue(flp_el->PowerValues)
-               * get_cell_top_surface (dimensions, column)
+               * get_cell_length (dimensions, column)
+               * get_cell_width (dimensions)
             )
             /  flp_el_surface ;
 
 #ifdef PRINT_SOURCES
-        fprintf
-        (
-          stderr,
+        fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | %s %.5e -> %.5e\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           flp_el->Id,
           get_from_powers_queue(flp_el->PowerValues),
-          sources [get_cell_offset_in_layer (dimensions, row, column)]
-        ) ;
+          sources [get_cell_offset_in_layer (dimensions, row, column)]) ;
 #endif
 
       }
@@ -312,7 +326,7 @@ Source_t*              fill_sources_active_layer
 
 /******************************************************************************/
 
-Source_t*              fill_sources_empty_layer
+Source_t* fill_sources_empty_layer
 (
 # ifdef PRINT_SOURCES
   LayerIndex_t         current_layer,
@@ -333,7 +347,7 @@ Source_t*              fill_sources_empty_layer
 
 /******************************************************************************/
 
-int                    fill_ccs_system_matrix_layer
+Quantity_t fill_ccs_system_matrix_layer
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Layer*               layer,
@@ -347,16 +361,14 @@ int                    fill_ccs_system_matrix_layer
   double*              values
 )
 {
-  int row, column, added, tot_added ;
+  RowIndex_t row ;
+  ColumnIndex_t column ;
+  Quantity_t added, tot_added ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "(l %2d) fill_ccs_system_matrix_layer %s\n",
-    current_layer,
-    layer->Material->Id
-  ) ;
+    current_layer, layer->Material->Id) ;
 #endif
 
   for
@@ -392,13 +404,13 @@ int                    fill_ccs_system_matrix_layer
 
 /******************************************************************************/
 
-int                    fill_crs_system_matrix_layer
+Quantity_t fill_crs_system_matrix_layer
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Layer*               layer,
 # endif
   Dimensions*          dimensions,
-  Conductances* conductances,
+  Conductances*        conductances,
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
@@ -407,16 +419,14 @@ int                    fill_crs_system_matrix_layer
   double*              values
 )
 {
-  int row, column, added, tot_added ;
+  RowIndex_t row ;
+  ColumnIndex_t column ;
+  Quantity_t added, tot_added ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
+  fprintf (stderr,
     "(l %2d) fill_crs_system_matrix_layer %s\n",
-    current_layer,
-    layer->Material->Id
-  ) ;
+    current_layer, layer->Material->Id) ;
 #endif
 
   for

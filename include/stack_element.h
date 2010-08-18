@@ -1,15 +1,35 @@
 /******************************************************************************
+ * Header file "3D-ICe/include/stack_element.h"                               *
  *                                                                            *
- * Header file "Include/stack_element.h"                                      *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
-#ifndef _TL_STACK_ELEMENT_H_
-#define _TL_STACK_ELEMENT_H_
+#ifndef _3DICE_STACK_ELEMENT_H_
+#define _3DICE_STACK_ELEMENT_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -22,12 +42,6 @@ extern "C"
 #include "die.h"
 #include "floorplan.h"
 
-/******************************************************************************
- *                                                                            *
- * "StackElement" : the representation of a single element composing 3DStack. *
- *                                                                            *
- ******************************************************************************/
-
   enum StackElement_t
   {
     TL_STACK_ELEMENT_NONE = 0,
@@ -38,64 +52,80 @@ extern "C"
 
   union StackElement_p
   {
-    Layer*       Layer ;
-    struct Die   *Die ;
+    Layer* Layer ;
+    Die*   Die ;
   } ;
 
   struct StackElement
   {
-    char *Id ;                /* The id (string) of the stack element         */
+    /* The id (string) of the stack element */
+
+    String_t Id ;
+
+    /* The type of the stack element */
 
     enum StackElement_t Type ;
-                              /* The type of the stack element                */
+
+    /* The pointer to the effective stack element */
+    /* corresponding to the value in Type         */
 
     union StackElement_p Pointer ;
-                              /* The pointer to the effective stack element   */
-                              /* corresponding to the value in Type           */
 
-    int NLayers ;             /* The number of layer composing the stack      */
-                              /* element                                      */
+    /* The number of layer composing the stack element */
 
-    struct Floorplan *Floorplan ;
-                              /* A pointer to a Floorplan. This field is      */
-                              /* used only if Type == TL_STACK_ELEMENT_DIE    */
+    Quantity_t NLayers ;
 
-    int LayersOffset ;        /* The offset (#of layers) counting from the    */
-                              /* first layer in the stack                     */
+    /* A pointer to a Floorplan. This field is   */
+    /* used only if Type == TL_STACK_ELEMENT_DIE */
 
-    struct StackElement *Next ;             /* To collect stack elements in a */
-                                            /* linked list                    */
+    Floorplan* Floorplan ;
+
+    /* The offset (#of layers) counting from the */
+    /* first layer in the stack                  */
+
+    Quantity_t LayersOffset ;
+
+    /* To collect stack elements in a linked list */
+
+    struct StackElement* Next ;
 
   } ;
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-  void
-  init_stack_element         (struct StackElement *stack_element) ;
-
-  struct StackElement *
-  alloc_and_init_stack_element (void) ;
-
-  void
-  free_stack_element         (struct StackElement *stack_element) ;
-
-  void
-  free_stack_elements_list   (struct StackElement *list) ;
-
-  void
-  print_stack_elements_list  (FILE *stream, char *prefix, struct StackElement *list) ;
-
-  struct StackElement *
-  find_stack_element_in_list (struct StackElement *list, char *id) ;
+  typedef struct StackElement StackElement ;
 
 /******************************************************************************/
+
+  void init_stack_element (StackElement* stack_element) ;
+
 /******************************************************************************/
+
+  StackElement* alloc_and_init_stack_element (void) ;
+
+/******************************************************************************/
+
+  void free_stack_element (StackElement* stack_element) ;
+
+/******************************************************************************/
+
+  void free_stack_elements_list (StackElement* list) ;
+
+/******************************************************************************/
+
+  void print_stack_elements_list
+  (
+    FILE*         stream,
+    String_t      prefix,
+    StackElement* list
+  ) ;
+
+/******************************************************************************/
+
+  StackElement* find_stack_element_in_list (StackElement* list, String_t id) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _TL_STACK_ELEMENT_H_ */
+#endif /* _3DICE_STACK_ELEMENT_H_ */

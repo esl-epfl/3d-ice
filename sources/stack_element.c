@@ -1,19 +1,41 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/stack_element.c"                               *
  *                                                                            *
- * Source file "Sources/stack_element.c"                                      *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
 
 #include "stack_element.h"
 
+/******************************************************************************/
+
 void
-init_stack_element (struct StackElement *stack_element)
+init_stack_element (StackElement* stack_element)
 {
   stack_element->Type          = TL_STACK_ELEMENT_NONE ;
   stack_element->Pointer.Layer = NULL ;
@@ -26,17 +48,11 @@ init_stack_element (struct StackElement *stack_element)
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct StackElement *
-alloc_and_init_stack_element
-(
-  void
-)
+StackElement* alloc_and_init_stack_element (void)
 {
-  struct StackElement *stack_element
-    = (struct StackElement *) malloc( sizeof(struct StackElement) ) ;
+  StackElement* stack_element
+    = (StackElement* ) malloc( sizeof(StackElement) ) ;
 
   if (stack_element != NULL) init_stack_element(stack_element) ;
 
@@ -44,14 +60,8 @@ alloc_and_init_stack_element
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_stack_element
-(
-  struct StackElement *stack_element
-)
+void free_stack_element (StackElement* stack_element)
 {
   if (stack_element->Type == TL_STACK_ELEMENT_DIE
       && stack_element->Floorplan != NULL)
@@ -68,34 +78,25 @@ free_stack_element
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-free_stack_elements_list
-(
-  struct StackElement *list
-)
+void free_stack_elements_list (StackElement* list)
 {
-  struct StackElement *next ;
+  StackElement* next ;
 
   for ( ; list != NULL; list = next)
-    {
-      next = list->Next ;
-      free_stack_element (list) ;
-    }
+  {
+    next = list->Next ;
+    free_stack_element (list) ;
+  }
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-void
-print_stack_elements_list
+void print_stack_elements_list
 (
-  FILE                *stream,
-  char                *prefix,
-  struct StackElement *list
+  FILE*         stream,
+  String_t      prefix,
+  StackElement* list
 )
 {
   fprintf (stream, "%sStack:\n", prefix) ;
@@ -142,15 +143,8 @@ print_stack_elements_list
 }
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
-struct StackElement *
-find_stack_element_in_list
-(
-  struct StackElement *list,
-  char                *id
-)
+StackElement*  find_stack_element_in_list (StackElement* list, String_t id)
 {
   for ( ; list != NULL ; list = list->Next)
 
@@ -159,6 +153,4 @@ find_stack_element_in_list
  return list ;
 }
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/

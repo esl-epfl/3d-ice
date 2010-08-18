@@ -32,7 +32,7 @@
 
 /******************************************************************************/
 
-void                    fill_conductances_bottom_solid_cell
+void fill_conductances_bottom_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
@@ -80,7 +80,7 @@ void                    fill_conductances_bottom_solid_cell
 
 /******************************************************************************/
 
-void                    fill_conductances_central_solid_cell
+void fill_conductances_central_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
@@ -127,7 +127,7 @@ void                    fill_conductances_central_solid_cell
 
 /******************************************************************************/
 
-void                    fill_conductances_top_solid_cell
+void fill_conductances_top_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
@@ -175,7 +175,7 @@ void                    fill_conductances_top_solid_cell
 
 /******************************************************************************/
 
-void                    fill_conductances_top_solid_cell_ehtc
+void fill_conductances_top_solid_cell_ehtc
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
@@ -251,7 +251,7 @@ void                    fill_conductances_top_solid_cell_ehtc
  * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
  */
 
-void              fill_conductances_liquid_cell
+void fill_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   LayerIndex_t    current_layer,
@@ -297,7 +297,7 @@ void              fill_conductances_liquid_cell
 
 /******************************************************************************/
 
-void                    fill_conductances_wall_cell
+void fill_conductances_wall_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,

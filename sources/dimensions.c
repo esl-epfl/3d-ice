@@ -1,11 +1,31 @@
 /******************************************************************************
+ * Source file "3D-ICe/sources/dimensions.c"                                  *
  *                                                                            *
- * Source file "Source/dimensions.c"                                          *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -14,7 +34,7 @@
 
 /******************************************************************************/
 
-void init_dimensions (Dimensions *dimensions)
+void init_dimensions (Dimensions* dimensions)
 {
   dimensions->Cell.FirstWallLength = 0.0 ;
   dimensions->Cell.LastWallLength  = 0.0 ;
@@ -32,7 +52,7 @@ void init_dimensions (Dimensions *dimensions)
   dimensions->Chip.Length      = 0.0;
   dimensions->Chip.Width       = 0.0;
 
-  dimensions->StackHasChannel = 0 ;  // No channels
+  dimensions->StackHasChannel = FALSE_V ;
 }
 
 /******************************************************************************/
@@ -48,9 +68,9 @@ Dimensions* alloc_and_init_dimensions (void)
 
 /******************************************************************************/
 
-void print_dimensions (FILE* stream, String_t prefix, Dimensions *dimensions)
+void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
 {
-  if (dimensions->StackHasChannel == 0 )
+  if (dimensions->StackHasChannel == FALSE_V )
 
     fprintf (stream,
       "%sCell dimensions         (l x w) = (%5.2f x %5.2f) um\n",
@@ -82,9 +102,9 @@ void free_dimensions (Dimensions* dimensions)
 
 /******************************************************************************/
 
-CellDimension_t get_cell_length (Dimensions *dimensions, GridDimension_t column)
+CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 {
-  if (!dimensions->StackHasChannel)
+  if (dimensions->StackHasChannel == FALSE_V)
 
     return dimensions->Cell.WallLength ;
 
@@ -109,138 +129,60 @@ CellDimension_t get_cell_length (Dimensions *dimensions, GridDimension_t column)
 
 /******************************************************************************/
 
-CellDimension_t get_cell_width (Dimensions *dimensions)
+CellDimension_t get_cell_width (Dimensions* dimensions)
 {
   return dimensions->Cell.Width;
 }
 
 /******************************************************************************/
 
-GridDimension_t get_number_of_layers (Dimensions *dimensions)
+GridDimension_t get_number_of_layers (Dimensions* dimensions)
 {
   return dimensions->Grid.NLayers ;
 }
 
 /******************************************************************************/
 
-GridDimension_t get_number_of_rows (Dimensions *dimensions)
+GridDimension_t get_number_of_rows (Dimensions* dimensions)
 {
   return dimensions->Grid.NRows ;
 }
 
 /******************************************************************************/
 
-GridDimension_t get_number_of_columns (Dimensions *dimensions)
+GridDimension_t get_number_of_columns (Dimensions* dimensions)
 {
   return dimensions->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
-GridDimension_t get_number_of_cells (Dimensions *dimensions)
+GridDimension_t get_number_of_cells (Dimensions* dimensions)
 {
   return dimensions->Grid.NCells ;
 }
 
 /******************************************************************************/
 
-GridDimension_t get_number_of_non_zeroes (Dimensions *dimensions)
+GridDimension_t get_number_of_non_zeroes (Dimensions* dimensions)
 {
   return dimensions->Grid.NNz ;
 }
 
 /******************************************************************************/
 
-double
-get_cell_top_surface
-(
-  Dimensions *dimensions,
-  int        column
-)
-{
-  return get_cell_length (dimensions, column) * get_cell_width (dimensions) ;
-}
-
-/******************************************************************************/
-
-double
-get_cell_bottom_surface
-(
-  Dimensions *dimensions,
-  int column
-)
-{
-  return get_cell_top_surface (dimensions, column) ;
-}
-
-/******************************************************************************/
-
-double
-get_cell_east_surface
-(
-  Dimensions *dimensions,
-  double     height
-)
-{
-  return height * get_cell_width (dimensions) ;
-}
-
-/******************************************************************************/
-
-double
-get_cell_west_surface
-(
-  Dimensions *dimensions,
-  double     height
-)
-{
-  return get_cell_east_surface (dimensions, height) ;
-}
-
-/******************************************************************************/
-
-double
-get_cell_north_surface
-(
-  Dimensions *dimensions,
-  double     height,
-  int        column
-)
-{
-  return get_cell_length (dimensions, column) * height ;
-}
-/******************************************************************************/
-
-double
-get_cell_south_surface
-(
-  Dimensions *dimensions,
-  double height,
-  int column
-)
-{
-  return get_cell_north_surface (dimensions, height, column) ;
-}
-
-/******************************************************************************/
-
-int
-get_layer_area
-(
-  Dimensions *dimensions
-)
+Quantity_t get_layer_area (Dimensions* dimensions)
 {
   return dimensions->Grid.NRows * dimensions->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
-int
-get_cell_offset_in_layer
+Quantity_t get_cell_offset_in_layer
 (
-  Dimensions *dimensions,
-  int row,
-  int column
+  Dimensions*   dimensions,
+  RowIndex_t    row,
+  ColumnIndex_t column
 )
 {
   return row * get_number_of_columns (dimensions) + column ;
@@ -248,13 +190,12 @@ get_cell_offset_in_layer
 
 /******************************************************************************/
 
-int
-get_cell_offset_in_stack
+Quantity_t get_cell_offset_in_stack
 (
-  Dimensions *dimensions,
-  int layer,
-  int row,
-  int column
+  Dimensions*   dimensions,
+  LayerIndex_t  layer,
+  RowIndex_t    row,
+  ColumnIndex_t column
 )
 {
   return layer * get_layer_area (dimensions)
@@ -263,22 +204,14 @@ get_cell_offset_in_stack
 
 /******************************************************************************/
 
-double
-get_chip_length
-(
-  Dimensions *dimensions
-)
+ChipDimension_t get_chip_length (Dimensions* dimensions)
 {
   return dimensions->Chip.Length ;
 }
 
 /******************************************************************************/
 
-double
-get_chip_width
-(
-  Dimensions *dimensions
-)
+ChipDimension_t get_chip_width (Dimensions* dimensions)
 {
   return dimensions->Chip.Width ;
 }

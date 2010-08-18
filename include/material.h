@@ -1,15 +1,35 @@
 /******************************************************************************
+ * Header file "3D-ICe/include/material.h"                                    *
  *                                                                            *
- * Header file "Include/material.h"                                           *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
-#ifndef _TL_MATERIAL_H_
-#define _TL_MATERIAL_H_
+#ifndef _3DICE_MATERIAL_H_
+#define _3DICE_MATERIAL_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -20,9 +40,7 @@ extern "C"
 
 #include "types.h"
 
-/******************************************************************************
- *                                "Material"                                  *
- ******************************************************************************/
+/******************************************************************************/
 
   struct Material
   {
@@ -46,8 +64,6 @@ extern "C"
 
   typedef struct Material Material;
 
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
   /* Given a valid address of a Material structure,  */
@@ -114,4 +130,4 @@ extern "C"
 }
 #endif
 
-#endif /* _TL_MATERIAL_H_ */
+#endif /* _3DICE_MATERIAL_H_ */

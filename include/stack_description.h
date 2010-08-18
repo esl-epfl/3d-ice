@@ -1,21 +1,40 @@
 /******************************************************************************
+ * Header file "3D-ICe/include/stack_description.h"                           *
  *                                                                            *
- * Header file "Include/stack_descritption.h"                                 *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
-#ifndef _TL_STACK_DESCRIPTION_H_
-#define _TL_STACK_DESCRIPTION_H_
+#ifndef _3DICE_STACK_DESCRIPTION_H_
+#define _3DICE_STACK_DESCRIPTION_H_
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
 
 #include <stdio.h>
 
@@ -27,236 +46,263 @@ extern "C"
 #include "conductances.h"
 #include "environment_heat_sink.h"
 
-/******************************************************************************
- *                                                                            *
- * "StackDescription" : the collection of data concerning a 3Dstack           *
- *                                                                            *
- ******************************************************************************/
+/******************************************************************************/
 
-  struct StackDescription
+  typedef struct
   {
-    char         *FileName ;         /* The name of the file used to fill the */
-                                     /* stack description                     */
+    /* The name of the file used to fill the stack description */
 
-    Material *MaterialsList ;              /* The list of materials componing */
-                                           /* the layers and channels         */
+    String_t FileName ;
 
-    Channel *Channel ;      /* The "single" instance of a channel used */
-                                   /* to compose the 3d stack                 */
+    /* The list of materials componing the layers and channels */
 
-    struct Die   *DiesList ;         /* The list of dies available to compose */
-                                     /* the 3Dstack                           */
+    Material* MaterialsList ;
+
+    /* The (if present) single type of channel used to compose the 3d stack */
+
+    Channel* Channel ;
+
+    /* The list of dies available to compose the 3d stack */
+
+    Die* DiesList ;
+
+    /* Information (if present) about the heat dissipation */
+    /* throught the top surface                            */
 
     EnvironmentHeatSink* EnvironmentHeatSink;
-                                          /* Informations about the heat      */
-                                          /* dissipation throught the top     */
-                                          /* surface                          */
 
-    struct StackElement *StackElementsList ;
-                                          /* The list of stack elements       */
-                                          /* componing the 3Dstack            */
+    /* The list of stack elements componing the 3Dstack */
 
-    Dimensions* Dimensions ;              /* Collection of all the dimensions */
-                                          /* (chip, grid of cells, cell)      */
+    StackElement* StackElementsList ;
 
-    int PowerValuesChanged ;
+    /* Collection of all the dimensions (chip, grid of cells, cell) */
 
-  } ;
+    Dimensions* Dimensions ;
 
-  typedef struct StackDescription StackDescription ;
+    /* TRUE_V if the power values have changed since the last simulation */
+    /* FALSE_V otherwise                                                 */
+
+    Bool_t PowerValuesChanged ;
+
+  } StackDescription ;
 
 /******************************************************************************/
+
+  void init_stack_description (StackDescription* stkd) ;
+
 /******************************************************************************/
+
+  int fill_stack_description (StackDescription* stkd, String_t filename) ;
+
 /******************************************************************************/
 
-  void
-  init_stack_description               (struct StackDescription *stkd) ;
+  void free_stack_description (StackDescription* stkd) ;
 
-  int
-  fill_stack_description               (
-                                        struct StackDescription *stkd,
-                                        char *filename
-                                       ) ;
+/******************************************************************************/
 
-  void
-  free_stack_description               (struct StackDescription *stkd) ;
+  void print_stack_description
+  (
+    FILE*             stream,
+    String_t          prefix,
+    StackDescription* stkd
+  ) ;
 
-  void
-  print_stack_description              (
-                                        FILE             *stream,
-                                        char             *prefix,
-                                        struct StackDescription *stkd
-                                       ) ;
+/******************************************************************************/
 
-  void
-  print_all_floorplans                 (
-                                        FILE             *stream,
-                                        char             *prefix,
-                                        struct StackDescription *stkd
-                                       ) ;
+  void print_all_floorplans
+  (
+    FILE*             stream,
+    String_t          prefix,
+    StackDescription* stkd
+  ) ;
 
-  void
-  fill_conductances_stack_description  (
-                                        struct StackDescription *stkd,
-                                        Conductances     *conductances
-                                       ) ;
+/******************************************************************************/
 
-  void
-  fill_capacities_stack_description    (
-                                        struct StackDescription *stkd,
-                                        double           *capacities,
-                                        double           delta_time
-                                       ) ;
+  void fill_conductances_stack_description
+  (
+    StackDescription* stkd,
+    Conductances*     conductances
+  ) ;
 
-  void
-  fill_sources_stack_description       (
-                                        struct StackDescription* stkd,
-                                        Source_t*                sources,
-                                        Conductances*            conductances
-                                       ) ;
+/******************************************************************************/
 
-  void
-  fill_ccs_system_matrix_stack_description (
-                                            struct StackDescription *stkd,
-                                            Conductances     *conductances,
-                                            double           *capacities,
-                                            int              *columns,
-                                            int              *rows,
-                                            double           *values
-                                           ) ;
+  void fill_capacities_stack_description
+  (
+    StackDescription* stkd,
+    Capacity_t*       capacities,
+    Time_t            delta_time
+  ) ;
 
-  void
-  fill_crs_system_matrix_stack_description (
-                                            struct StackDescription *stkd,
-                                            Conductances     *conductances,
-                                            double           *capacities,
-                                            int              *rows,
-                                            int              *columns,
-                                            double           *values
-                                           ) ;
+/******************************************************************************/
 
-  int
-  get_total_number_of_floorplan_elements
-                              (
-                               struct StackDescription *stkd
-                              ) ;
+  void fill_sources_stack_description
+  (
+    StackDescription* stkd,
+    Source_t*         sources,
+    Conductances*     conductances
+  ) ;
 
-  int
-  get_number_of_floorplan_elements_in_floorplan
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id
-                              ) ;
+/******************************************************************************/
 
-  void
-  change_coolant_flow_rate (struct StackDescription *stkd, double flow_rate) ;
+  void fill_ccs_system_matrix_stack_description
+  (
+    StackDescription* stkd,
+    Conductances*     conductances,
+    Capacity_t*       capacities,
+    int*              columns,
+    int*              rows,
+    double*           values
+  ) ;
+
+/******************************************************************************/
+
+  void fill_crs_system_matrix_stack_description
+  (
+    StackDescription* stkd,
+    Conductances*     conductances,
+    Capacity_t*       capacities,
+    int*              rows,
+    int*              columns,
+    double*           values
+  ) ;
+
+/******************************************************************************/
+
+  Quantity_t get_total_number_of_floorplan_elements
+  (
+    StackDescription* stkd
+  ) ;
+
+/******************************************************************************/
+
+  Quantity_t get_number_of_floorplan_elements_in_floorplan
+  (
+    StackDescription* stkd,
+    String_t stack_element_id
+  ) ;
+
+/******************************************************************************/
+
+  void change_coolant_flow_rate
+  (
+    StackDescription* stkd,
+    CoolantFR_t flow_rate
+  ) ;
+
+/******************************************************************************/
 
 //  void
-//  insert_all_power_values     (struct StackDescription *stkd, double *power_values) ;
+//  insert_all_power_values     (StackDescription* stkd, Power_t* power_values) ;
 
 //  int
 //  insert_power_values_in_floorplan
 //                              (
-//                               struct StackDescription *stkd,
-//                               char             *stack_element_id,
-//                               double           *power_values
+//                               StackDescription* stkd,
+//                               String_t          stack_element_id,
+//                               Power_t*          power_values
 //                              ) ;
 
 //  int
 //  insert_power_value_in_floorplan_element
 //                              (
-//                               struct StackDescription *stkd,
-//                               char             *stack_element_id,
-//                               char             *floorplan_element_id,
-//                               double           power_value
+//                               StackDescription* stkd,
+//                               String_t          stack_element_id,
+//                               String_t          floorplan_element_id,
+//                               Power_t           power_value
 //                              ) ;
 
-  int
-  get_max_temperature_in_floorplan_element
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               char             *floorplan_element_id,
-                               double           *temperatures,
-                               double           *max_temperature
-                              ) ;
+/******************************************************************************/
 
-  int
-  get_min_temperature_in_floorplan_element
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               char             *floorplan_element_id,
-                               double           *temperatures,
-                               double           *min_temperature
-                              ) ;
-
-  int
-  get_avg_temperature_in_floorplan_element
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               char             *floorplan_element_id,
-                               double           *temperatures,
-                               double           *avg_temperature
-                              ) ;
-
-  int
-  get_min_avg_max_temperatures_in_floorplan_element
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               char             *floorplan_element_id,
-                               double           *temperatures,
-                               double           *min_temperature,
-                               double           *avg_temperature,
-                               double           *max_temperature
-                              ) ;
-
-  int
-  get_all_max_temperatures_in_floorplan
-                              (
-                               struct StackDescription *stkd,
-                               char   *stack_element_id,
-                               double *temperatures,
-                               double *max_temperature
-                              ) ;
-
-  int
-  get_all_min_temperatures_in_floorplan
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               double           *temperatures,
-                               double           *min_temperature
-                              ) ;
-
-  int
-  get_all_avg_temperatures_in_floorplan
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               double           *temperatures,
-                               double           *avg_temperature
-                              ) ;
-
-  int
-  get_all_min_avg_max_temperatures_in_floorplan
-                              (
-                               struct StackDescription *stkd,
-                               char             *stack_element_id,
-                               double           *temperatures,
-                               double           *min_temperature,
-                               double           *avg_temperature,
-                               double           *max_temperature
-                              ) ;
+  int get_max_temperature_in_floorplan_element
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    String_t          floorplan_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    max_temperature
+  ) ;
 
 /******************************************************************************/
+
+  int get_min_temperature_in_floorplan_element
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    String_t          floorplan_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    min_temperature
+  ) ;
+
 /******************************************************************************/
+
+  int get_avg_temperature_in_floorplan_element
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    String_t          floorplan_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    avg_temperature
+  ) ;
+
+/******************************************************************************/
+
+  int get_min_avg_max_temperatures_in_floorplan_element
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    String_t          floorplan_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    min_temperature,
+    Temperature_t*    avg_temperature,
+    Temperature_t*    max_temperature
+  ) ;
+
+/******************************************************************************/
+
+  int get_all_max_temperatures_in_floorplan
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    max_temperature
+  ) ;
+
+/******************************************************************************/
+
+  int get_all_min_temperatures_in_floorplan
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    min_temperature
+  ) ;
+
+/******************************************************************************/
+
+  int get_all_avg_temperatures_in_floorplan
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    avg_temperature
+  ) ;
+
+/******************************************************************************/
+
+  int get_all_min_avg_max_temperatures_in_floorplan
+  (
+    StackDescription* stkd,
+    String_t          stack_element_id,
+    Temperature_t*    temperatures,
+    Temperature_t*    min_temperature,
+    Temperature_t*    avg_temperature,
+    Temperature_t*    max_temperature
+  ) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _TL_STACK_DESCRIPTION_H_ */
+#endif /* _3DICE_STACK_DESCRIPTION_H_ */

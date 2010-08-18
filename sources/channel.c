@@ -37,15 +37,15 @@
 
 void init_channel (Channel* channel)
 {
-  channel->Height             = 0.0  ;
-  channel->CoolantHTCs.Side   = 0.0  ;
-  channel->CoolantHTCs.Top    = 0.0  ;
-  channel->CoolantHTCs.Bottom = 0.0  ;
-  channel->CoolantVHC         = 0.0  ;
-  channel->CoolantTIn         = 0.0  ;
-  channel->CoolantFR          = 0.0  ;
+  channel->Height             = 0.0 ;
+  channel->CoolantHTCs.Side   = 0.0 ;
+  channel->CoolantHTCs.Top    = 0.0 ;
+  channel->CoolantHTCs.Bottom = 0.0 ;
+  channel->CoolantVHC         = 0.0 ;
+  channel->CoolantTIn         = 0.0 ;
+  channel->CoolantFR          = 0.0 ;
   channel->Wall               = NULL ;
-  channel->FlowRateChanged    = FALSE ;
+  channel->FlowRateChanged    = FALSE_V ;
 }
 
 /******************************************************************************/
@@ -91,7 +91,7 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
     "%s  Flow Rate                         %.4e\n",  prefix,
                                                      channel->CoolantFR) ;
 
-  Material *wall = channel->Wall ;
+  Material* wall = channel->Wall ;
 
   if (wall != NULL)
   {
@@ -109,7 +109,7 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 /******************************************************************************/
 
-Conductances*   fill_conductances_channel
+Conductances* fill_conductances_channel
 (
 # ifdef PRINT_CAPACITIES
   LayerIndex_t  current_layer
@@ -193,7 +193,7 @@ static Capacity_t capacity
   return ((length * width * height) * vhc) / time ;
 }
 
-Capacity_t*    fill_capacities_channel
+Capacity_t* fill_capacities_channel
 (
 # ifdef PRINT_CAPACITIES
   LayerIndex_t current_layer,
@@ -277,7 +277,7 @@ Capacity_t*    fill_capacities_channel
 
 /******************************************************************************/
 
-Source_t*      fill_sources_channel
+Source_t* fill_sources_channel
 (
 # ifdef PRINT_SOURCES
   LayerIndex_t current_layer,
@@ -336,7 +336,7 @@ Source_t*      fill_sources_channel
 
 /******************************************************************************/
 
-Quantity_t      fill_ccs_system_matrix_channel
+Quantity_t fill_ccs_system_matrix_channel
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Channel*      channel,
@@ -404,7 +404,7 @@ Quantity_t      fill_ccs_system_matrix_channel
 
 /******************************************************************************/
 
-Quantity_t      fill_crs_system_matrix_channel
+Quantity_t fill_crs_system_matrix_channel
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Channel*      channel,

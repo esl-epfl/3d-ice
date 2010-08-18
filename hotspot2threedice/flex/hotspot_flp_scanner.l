@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "floorplan_element.h"
 #include "../bison/hotspot_flp_parser.h"
 %}
 

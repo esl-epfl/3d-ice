@@ -17,13 +17,13 @@
 
 //extern int hotspot_flp_parse
 //(
-//  struct FloorplanElement** flp_list,
+//  FloorplanElement** flp_list,
 //  yyscan_t scanner
 //) ;
 
 extern int hotspot_ptrace_parse
 (
-  struct FloorplanElement** flp_list,
+  FloorplanElement** flp_list,
   yyscan_t scanner
 ) ;
 
@@ -32,7 +32,7 @@ int main (int argc, char** argv)
   FILE     *input;
   yyscan_t scanner;
 
-  struct FloorplanElement* flp_list = NULL;
+  FloorplanElement* flp_list = NULL;
 
   if (argc != 2)
   {

@@ -1,15 +1,35 @@
 /******************************************************************************
+ * Header file "3D-ICe/include/die.h"                                         *
  *                                                                            *
- * Header file "Include/die.h"                                                *
+ * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ *                                                                            *
+ * 3D-ICe is free software: you can redistribute it and/or modify it under    *
+ * the terms of the GNU General Public License as published by the Free       *
+ * Software Foundation, either version 3 of the License, or any later         *
+ * version.                                                                   *
+ *                                                                            *
+ * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * more details.                                                              *
+ *                                                                            *
+ * You should have received a copy of the GNU General Public License along    *
+ * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ *                                                                            *
+ * Copyright (C) 2010,                                                        *
+ * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
+ * All Rights Reserved.                                                       *
+ *                                                                            *
+ * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Bâtiment ELG, ELG 130                                                      *
  * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                    alessandro.vincenzi@epfl.ch  *
+ * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
  ******************************************************************************/
 
-#ifndef _TL_DIE_H_
-#define _TL_DIE_H_
+#ifndef _3DICE_DIE_H_
+#define _3DICE_DIE_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -18,104 +38,126 @@ extern "C"
 
 #include <stdio.h>
 
+#include "types.h"
 #include "layer.h"
 #include "conductances.h"
 #include "floorplan.h"
 #include "environment_heat_sink.h"
 
-/******************************************************************************
- *                                                                            *
- * "Die" : the representation of a single die.                                *
- *                                                                            *
- ******************************************************************************/
+/******************************************************************************/
 
   struct Die
   {
-    char* Id ;                  /* The id (string) of the die                 */
+    /* The id (string) of the die */
 
-    Layer* LayersList ;         /* The list of layers composing the die       */
+    String_t Id ;
 
-    int NLayers ;               /* The number of layer composing the die      */
+    /* The list of layers composing the die (from bottom to top) */
 
-    Layer* SourceLayer ;        /* Pointer to the source layer (in the list)  */
+    Layer* LayersList ;
 
-    struct Die* Next ;          /* To collect dies in a linked list           */
+    /* Pointer to the source layer */
+
+    Layer* SourceLayer ;
+
+    /* The number of layer composing the die */
+
+    Quantity_t NLayers ;
+
+    /* To collect dies in a linked list */
+
+    struct Die* Next ;
 
   } ;
 
+  typedef struct Die Die ;
+
 /******************************************************************************/
+
+  void init_die (Die* die) ;
+
 /******************************************************************************/
+
+  Die* alloc_and_init_die (void) ;
+
 /******************************************************************************/
 
-  void
-  init_die               (struct Die *die) ;
+  void free_die (Die* die) ;
 
-  struct Die *
-  alloc_and_init_die     (void) ;
+/******************************************************************************/
 
-  void
-  free_die               (struct Die *die) ;
+  void free_dies_list (Die* list) ;
 
-  void
-  free_dies_list         (struct Die *list) ;
+/******************************************************************************/
 
-  void
-  print_die              (FILE *stream, char* prefix, struct Die *die) ;
+  void print_die (FILE* stream, String_t prefix, Die* die) ;
 
-  void
-  print_dies_list        (FILE *stream, char* prefix, struct Die *list) ;
+/******************************************************************************/
 
-  struct Die *
-  find_die_in_list       (struct Die *list, char *id) ;
+  void print_dies_list (FILE* stream, String_t prefix, Die* list) ;
 
-  Conductances*   fill_conductances_die
+/******************************************************************************/
+
+  Die* find_die_in_list (Die* list, String_t id) ;
+
+/******************************************************************************/
+
+  Conductances* fill_conductances_die
   (
-    struct Die*          die,
+    Die*                 die,
     Conductances*        conductances,
     Dimensions*          dimensions,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer
   ) ;
 
-  Capacity_t*     fill_capacities_die
+/******************************************************************************/
+
+  Capacity_t* fill_capacities_die
   (
 #   ifdef PRINT_CAPACITIES
     LayerIndex_t  current_layer,
 #   endif
-    struct Die*   die,
+    Die*          die,
     Capacity_t*   capacities,
     Dimensions*   dimensions,
     Time_t        delta_time
   ) ;
 
-  Source_t*           fill_sources_die
+/******************************************************************************/
+
+  Source_t*      fill_sources_die
   (
 #   ifdef PRINT_SOURCES
-    LayerIndex_t      current_layer,
+    LayerIndex_t current_layer,
 #   endif
-    struct Die*       die,
-    struct Floorplan* floorplan,
-    Source_t*         sources,
-    Dimensions*       dimensions
+    Die*         die,
+    Floorplan*   floorplan,
+    Source_t*    sources,
+    Dimensions*  dimensions
   ) ;
 
-  int                    fill_ccs_system_matrix_die
+/******************************************************************************/
+
+  Quantity_t fill_ccs_system_matrix_die
   (
-    struct Die*          die,
-    Dimensions*          dimensions,
+    Die*          die,
+    Dimensions*   dimensions,
     Conductances* conductances,
-    Capacity_t*          capacities,
-    LayerIndex_t         current_layer,
-    int*                 columns,
-    int*                 rows,
-    double*              values
+    Capacity_t*   capacities,
+    LayerIndex_t  current_layer,
+    int*          columns,
+    int*          rows,
+    double*       values
   ) ;
 
-  int                    fill_crs_system_matrix_die
+/******************************************************************************/
+
+  Quantity_t fill_crs_system_matrix_die
   (
-    struct Die*          die,
+    Die*                 die,
     Dimensions*          dimensions,
-    Conductances* conductances,
+    Conductances*        conductances,
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
@@ -125,11 +167,9 @@ extern "C"
   ) ;
 
 /******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _TL_DIE_H_ */
+#endif /* _3DICE_DIE_H_ */
