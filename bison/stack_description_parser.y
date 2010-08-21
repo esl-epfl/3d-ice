@@ -285,7 +285,6 @@ channel
       stkd->Channel->CoolantHTCs     = $28 ;
       stkd->Channel->CoolantVHC      = $33 ;
       stkd->Channel->CoolantTIn      = $38 ;
-      stkd->Channel->FlowRateChanged = 1 ;
       stkd->Channel->Wall
         = find_material_in_list (stkd->MaterialsList, $21) ;
 

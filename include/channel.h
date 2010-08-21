@@ -77,11 +77,6 @@ extern "C"
 
     Material* Wall ;
 
-    /* TRUE_V if the flow has changed since the last simulation */
-    /* FALSE_V otherwise                                        */
-
-    Bool_t FlowRateChanged ;
-
   } Channel ;
 
 /******************************************************************************/

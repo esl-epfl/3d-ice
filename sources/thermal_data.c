@@ -200,75 +200,61 @@ int fill_thermal_data
   ThermalData*      tdata
 )
 {
-  if (stkd->Channel->FlowRateChanged == TRUE_V)
-  {
-    fill_conductances_stack_description (stkd, tdata->Conductances) ;
+  fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
-    fill_capacities_stack_description (stkd, tdata->Capacities,
-                                             tdata->DeltaTime) ;
+  fill_capacities_stack_description (stkd, tdata->Capacities,
+                                           tdata->DeltaTime) ;
 
-    fill_system_matrix
-    (
-      stkd,
-      &tdata->SM_A,
-      tdata->Conductances,
-      tdata->Capacities
-    ) ;
+  fill_system_matrix
+  (
+    stkd,
+    &tdata->SM_A,
+    tdata->Conductances,
+    tdata->Capacities
+  ) ;
 
-    if (tdata->SLU_Options.Fact == FACTORED)
+  fill_sources_stack_description (stkd, tdata->Sources,
+                                        tdata->Conductances) ;
 
-      tdata->SLU_Options.Fact = SamePattern ;
+  fill_system_vector (&tdata->SV_B, tdata->Sources,
+                                    tdata->Capacities,
+                                    tdata->Temperatures) ;
 
-    else
+  get_perm_c (tdata->SLU_Options.ColPerm,
+              &tdata->SLUMatrix_A,
+              tdata->SLU_PermutationMatrixC) ;
 
-      tdata->SLU_Options.Fact = DOFACT ;
+  sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
+               tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
+               &tdata->SLUMatrix_A_Permuted) ;
 
+  dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+          sp_ienv(2), sp_ienv(1), /* relax and panel size */
+          tdata->SLU_Etree,
+          NULL, 0,                /* work and lwork */
+          tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+          &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+          &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
-    fill_sources_stack_description (stkd, tdata->Sources,
-                                          tdata->Conductances) ;
+  tdata->SLU_Options.Fact = FACTORED ;
 
-    fill_system_vector (&tdata->SV_B, tdata->Sources,
-                                      tdata->Capacities,
-                                      tdata->Temperatures) ;
-
-    stkd->Channel->FlowRateChanged = FALSE_V ;
-  }
-
-  if (tdata->SLU_Options.Fact != FACTORED )
-  {
-    get_perm_c (tdata->SLU_Options.ColPerm,
-                &tdata->SLUMatrix_A,
-                tdata->SLU_PermutationMatrixC) ;
-
-    sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
-                 tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
-                 &tdata->SLUMatrix_A_Permuted) ;
-
-    dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
-            sp_ienv(2), sp_ienv(1), /* relax and panel size */
-            tdata->SLU_Etree,
-            NULL, 0,                /* work and lwork */
-            tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-            &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-            &tdata->SLU_Stat, &tdata->SLU_Info) ;
-
-    tdata->SLU_Options.Fact = FACTORED ;
-
-    return tdata->SLU_Info ;
-  }
-
-  return 0 ;
+  return tdata->SLU_Info ;
 }
 
 /******************************************************************************/
 
-int emulate_power_slot (ThermalData* tdata)
+int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
 {
   Time_t time = tdata->SlotTime ;
   int counter;
 
+  printf ("Calling emulate %d ... \n", stkd->RemainingTimeSlots) ;
+
   if (tdata->SLU_Options.Fact == DOFACT)
+  {
+    fprintf (stderr, "System matrix must be factorized\n");
     return 1 ;
+  }
 
   for ( ; time > 0 ; time -= tdata->DeltaTime)
   {
@@ -285,7 +271,10 @@ int emulate_power_slot (ThermalData* tdata)
     ) ;
 
     if (tdata->SLU_Info != 0)
-      break ;
+    {
+      fprintf (stderr, "Error while solving linear system\n");
+      return tdata->SLU_Info ;
+    }
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
       tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
@@ -299,7 +288,13 @@ int emulate_power_slot (ThermalData* tdata)
     ) ;
   }
 
-  return tdata->SLU_Info ;
+  if (--stkd->RemainingTimeSlots == 0)
+    return 1 ;
+  else
+    fill_sources_stack_description (stkd, tdata->Sources,
+                                          tdata->Conductances) ;
+
+  return 0 ;
 }
 
 /******************************************************************************/

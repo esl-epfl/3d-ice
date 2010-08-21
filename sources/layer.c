@@ -319,6 +319,7 @@ Source_t* fill_sources_active_layer
 
       }
 
+    pop_from_powers_queue (flp_el->PowerValues) ;
   }
 
   return sources + get_layer_area (dimensions) ;

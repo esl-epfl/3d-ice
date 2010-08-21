@@ -79,6 +79,10 @@ extern "C"
 
     Dimensions* Dimensions ;
 
+    /* Number of remaining time slots to consume */
+
+    Quantity_t RemainingTimeSlots ;
+
   } StackDescription ;
 
 /******************************************************************************/
@@ -162,14 +166,6 @@ extern "C"
   (
     StackDescription* stkd,
     String_t stack_element_id
-  ) ;
-
-/******************************************************************************/
-
-  void change_coolant_flow_rate
-  (
-    StackDescription* stkd,
-    CoolantFR_t flow_rate
   ) ;
 
 /******************************************************************************/

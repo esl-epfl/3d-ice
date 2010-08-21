@@ -97,7 +97,7 @@ extern "C"
 
 /******************************************************************************/
 
-  int emulate_power_slot (ThermalData* tdata) ;
+  int emulate_time_slot (StackDescription* stkd, ThermalData* tdata) ;
 
 /******************************************************************************/
 

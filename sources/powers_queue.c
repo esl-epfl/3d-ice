@@ -102,7 +102,7 @@ void put_into_powers_queue (PowersQueue* queue, Power_t power)
 
 Power_t get_from_powers_queue (PowersQueue* queue)
 {
-  return queue->Head != NULL ? queue->Head->Value : (Power_t) 0 ; // FIXME
+  return queue->Head->Value ;
 }
 
 /******************************************************************************/

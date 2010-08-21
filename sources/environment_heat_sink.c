@@ -92,13 +92,45 @@ void add_sources_enviroment_heat_sink
   LayerIndex_t         layer
 )
 {
-  Quantity_t counter = get_layer_area (dimensions) ;
-  sources += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
-  conductances += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
+  RowIndex_t    row ;
+  ColumnIndex_t column ;
+  Quantity_t offset = get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
 
-  while (counter-- > 0)
-    *sources++ += environmentheatsink->EnvironmentT
-                  * (conductances++)->Top ;
+#ifdef PRINT_SOURCES
+  fprintf (stderr,
+    "current_layer = %d\tadd_sources_enviroment_heat_sink\n", layer) ;
+#endif
+
+  sources      += offset;
+  conductances += offset ;
+
+  for
+  (
+    row = 0 ;
+    row < get_number_of_rows (dimensions) ;
+    row++
+  )
+
+    for
+    (
+      column = 0 ;
+      column < get_number_of_columns (dimensions) ;
+      column++ ,
+      sources++ ,
+      conductances++
+    )
+    {
+
+      *sources += environmentheatsink->EnvironmentT * conductances->Top ;
+
+#ifdef PRINT_SOURCES
+        fprintf (stderr,
+          "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e -> %.5e\n",
+          layer, row, column,
+          get_cell_offset_in_stack (dimensions, layer, row, column),
+          environmentheatsink->EnvironmentT, conductances->Top, *sources);
+#endif
+    }
 }
 
 /******************************************************************************/

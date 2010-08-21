@@ -69,7 +69,8 @@ TDICE_LIB_OBJECTS    = $(TDICE_FLEX_OBJECTS)                        \
 
 TDICE_ARCHIVE        = $(TDICE_LIB)/lib$(LIB_NAME).a
 
-TDICE_TEST_EXE       = $(TDICE_TEST)/FillThermalData
+TDICE_TEST_EXE       = $(TDICE_TEST)/FillThermalData \
+                       $(TDICE_TEST)/Emulate3DICe	
 
 #
 # SuperLU variables

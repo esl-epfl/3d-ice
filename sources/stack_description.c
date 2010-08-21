@@ -51,6 +51,7 @@ void init_stack_description (StackDescription* stkd)
   stkd->EnvironmentHeatSink = NULL ;
   stkd->StackElementsList   = NULL ;
   stkd->Dimensions          = NULL ;
+  stkd->RemainingTimeSlots  = 0 ;
 }
 
 /******************************************************************************/
@@ -75,13 +76,11 @@ int fill_stack_description
   stkd->FileName = strdup (filename);
 
   stack_description_lex_init (&scanner);
-
   stack_description_set_in (input, scanner);
 
   result = stack_description_parse (stkd, scanner);
 
   stack_description_lex_destroy (scanner);
-
   fclose (input);
 
   if (result == 1) return result ;
@@ -161,8 +160,11 @@ static int fill_floorplans (StackDescription* stkd)
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
     if (stack_element->Type == TL_STACK_ELEMENT_DIE)
-
-      result += fill_floorplan(stack_element->Floorplan, stkd->Dimensions) ;
+    {
+      result += fill_floorplan (stack_element->Floorplan, stkd->Dimensions) ;
+      stkd->RemainingTimeSlots
+        = stack_element->Floorplan->ElementsList->PowerValues->Length ;
+    }
 
   return result ;
  }
@@ -424,15 +426,7 @@ void fill_sources_stack_description
 
       case TL_STACK_ELEMENT_LAYER :
 
-        tmp_sources = fill_sources_empty_layer
-                      (
-#                       ifdef PRINT_SOURCES
-                        stack_element->LayersOffset,
-                        stack_element->Pointer.Layer,
-#                       endif
-                        tmp_sources,
-                        stkd->Dimensions
-                      ) ;
+        tmp_sources += get_layer_area (stkd->Dimensions) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
@@ -622,18 +616,6 @@ Quantity_t get_number_of_floorplan_elements_in_floorplan
     return -2 ;
 
   return stk_el->Floorplan->NElements ;
-}
-
-/******************************************************************************/
-
-void change_coolant_flow_rate
-(
-  StackDescription* stkd,
-  CoolantFR_t       flow_rate
-)
-{
-  stkd->Channel->CoolantFR = ( flow_rate * 1e+12 ) / 60.0 ;
-  stkd->Channel->FlowRateChanged = TRUE_V ;
 }
 
 /******************************************************************************/

@@ -45,7 +45,6 @@ void init_channel (Channel* channel)
   channel->CoolantTIn         = 0.0 ;
   channel->CoolantFR          = 0.0 ;
   channel->Wall               = NULL ;
-  channel->FlowRateChanged    = FALSE_V ;
 }
 
 /******************************************************************************/
