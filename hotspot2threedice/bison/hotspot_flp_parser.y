@@ -11,15 +11,15 @@
  ******************************************************************************/
 
 %{
+#include "floorplan.h"
 #include "floorplan_element.h"
 %}
 
 %union
 {
-  double                   d_value ;
-  char                     *string ;
-
-  FloorplanElement  *p_floorplan_element ;
+  double            d_value ;
+  char*             string ;
+  FloorplanElement* p_floorplan_element ;
 }
 
 %{
@@ -27,9 +27,9 @@
 
 void hotspot_flp_error
 (
-  FloorplanElement** flp_el_list,
-  yyscan_t                  yyscanner,
-  char const*               msg
+  Floorplan*  floorplan,
+  yyscan_t    yyscanner,
+  char const* msg
 ) ;
 
 %}
@@ -50,10 +50,10 @@ void hotspot_flp_error
 
 %error-verbose
 
-%parse-param { FloorplanElement **flp_el_list }
-%parse-param { yyscan_t scanner }
+%parse-param { Floorplan*  floorplan  }
+%parse-param { yyscan_t    scanner    }
 
-%lex-param   { yyscan_t scanner }
+%lex-param   { yyscan_t    scanner    }
 
 %start floorplan_element_list
 
@@ -63,11 +63,21 @@ floorplan_element_list
 
   : floorplan_element
     {
-      *flp_el_list = $1 ;
+      floorplan->ElementsList = $1 ;
+      floorplan->NElements    = 1 ;
       $$ = $1 ;
     }
   | floorplan_element_list floorplan_element
     {
+      if (check_intersections (floorplan, $2) )
+      {
+        free_floorplan_element ($2) ;
+        floorplan_error (floorplan, scanner, "") ;
+        YYABORT ;
+      }
+
+      floorplan->NElements++ ;
+
       $1->Next = $2 ;
       $$ = $2 ;
     }
@@ -83,7 +93,7 @@ floorplan_element
       if (floorplan_element == NULL)
       {
         perror ("alloc_floorplan_element") ;
-        hotspot_flp_error (flp_el_list, scanner, "") ;
+        hotspot_flp_error (floorplan, scanner, "") ;
         YYABORT ;
       }
 
@@ -92,6 +102,10 @@ floorplan_element
       floorplan_element->Length = (int) ($3 * 1.0e6) ;
       floorplan_element->SW_X   = (int) ($4 * 1.0e6) ;
       floorplan_element->SW_Y   = (int) ($5 * 1.0e6) ;
+
+      printf("reading %f %f into %d %d\n", $2, $3, floorplan_element->Width,
+      floorplan_element->Length );
+
     }
   ;
 
@@ -100,15 +114,14 @@ floorplan_element
 void
 hotspot_flp_error
 (
-  FloorplanElement** flp_el_list,
+  Floorplan  *floorplan,
   yyscan_t   yyscanner,
   char const *msg
 )
 {
   fprintf (stderr,
-    "%d: %s\n",
-    hotspot_flp_get_lineno(yyscanner), msg) ;
+    "%s:%d: %s\n",
+    floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
 
-  free_floorplan_elements_list (*flp_el_list) ;
-  *flp_el_list = NULL ;
+  free_floorplan (floorplan) ;
 }

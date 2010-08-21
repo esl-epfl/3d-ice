@@ -81,11 +81,11 @@ static int first_length_found = 0 ;
 
 %error-verbose
 
-%parse-param { Floorplan* floorplan }
+%parse-param { Floorplan*  floorplan  }
 %parse-param { Dimensions* dimensions }
-%parse-param { yyscan_t scanner }
+%parse-param { yyscan_t    scanner    }
 
-%lex-param   { yyscan_t scanner }
+%lex-param   { yyscan_t scanner       }
 
 %start floorplan_element_list
 

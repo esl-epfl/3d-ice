@@ -118,11 +118,11 @@ CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 
   else
 
-    if (column % 2 == 0) // Even -> wall
+    if (column % 2 == 0) /* Even -> wall */
 
       return dimensions->Cell.WallLength ;
 
-    else                 // Odd -> channel
+    else                 /* Odd -> channel */
 
       return dimensions->Cell.ChannelLength ;
 }

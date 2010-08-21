@@ -11,15 +11,15 @@
  ******************************************************************************/
 
 %{
+#include "floorplan.h"
 #include "floorplan_element.h"
 %}
 
 %union
 {
-  double                   d_value ;
-  char                     *string ;
-
-  FloorplanElement  *p_floorplan_element ;
+  double            d_value ;
+  char*             string ;
+  FloorplanElement* p_floorplan_element ;
 }
 
 %{
@@ -27,15 +27,13 @@
 
 void hotspot_ptrace_error
 (
-  FloorplanElement** flp_el_list,
-  yyscan_t                  yyscanner,
-  char const*               msg
+  Floorplan*  floorplan,
+  yyscan_t    yyscanner,
+  char const* msg
 ) ;
 
-static FloorplanElement* flp_el ;
-static int flp_el_found ;
-static int values_counter ;
-
+static int values_counter = 1;
+FloorplanElement* flp_el ;
 %}
 
 %destructor { free($$) ; } <string>
@@ -51,10 +49,10 @@ static int values_counter ;
 
 %error-verbose
 
-%parse-param { FloorplanElement **flp_el_list }
-%parse-param { yyscan_t scanner }
+%parse-param { Floorplan* floorplan }
+%parse-param { yyscan_t   scanner   }
 
-%lex-param   { yyscan_t scanner }
+%lex-param   { yyscan_t   scanner   }
 
 %start ptraces
 
@@ -65,10 +63,10 @@ ptraces
   : ids_list
     powers_list
     {
-      if (values_counter != flp_el_found)
+      if (values_counter != floorplan->NElements)
       {
         perror ("There are missing power values") ;
-        hotspot_flp_error (flp_el_list, scanner, "") ;
+        hotspot_flp_error (floorplan, scanner, "") ;
         YYABORT ;
       }
     }
@@ -76,70 +74,48 @@ ptraces
 
 ids_list
 
-  : IDENTIFIER
+  : /* empty */
+
+  | ids_list IDENTIFIER
     {
-      *flp_el_list = flp_el = alloc_and_init_floorplan_element () ;
+      flp_el = alloc_and_init_floorplan_element () ;
 
       if (flp_el == NULL)
       {
         perror ("alloc_floorplan_element") ;
-        hotspot_flp_error (flp_el_list, scanner, "") ;
+        hotspot_flp_error (floorplan, scanner, "") ;
         YYABORT ;
       }
 
+      flp_el->Id = $2 ;
       flp_el->PowerValues = alloc_and_init_powers_queue () ;
 
       if (flp_el->PowerValues == NULL)
       {
         perror ("alloc_powers_queue") ;
-        hotspot_flp_error (flp_el_list, scanner, "") ;
+        hotspot_flp_error (floorplan, scanner, "") ;
         YYABORT ;
       }
 
-      flp_el_found = 1 ;
-      flp_el->Id = $1 ;
-    }
-  | ids_list IDENTIFIER
-    {
-      flp_el->Next = alloc_and_init_floorplan_element () ;
+      floorplan->NElements++ ;
 
-      if (flp_el->Next == NULL)
-      {
-        perror ("alloc_floorplan_element") ;
-        hotspot_flp_error (flp_el_list, scanner, "") ;
-        YYABORT ;
-      }
+      FloorplanElement* tmp_flp_el = floorplan->ElementsList ;
+      while (tmp_flp_el != NULL)
+        tmp_flp_el  = tmp_flp_el->Next ;
 
-      flp_el->Next->PowerValues = alloc_and_init_powers_queue () ;
-
-      if (flp_el->PowerValues == NULL)
-      {
-        perror ("alloc_powers_queue") ;
-        hotspot_flp_error (flp_el_list, scanner, "") ;
-        YYABORT ;
-      }
-
-      flp_el_found++ ;
-      flp_el->Next->Id = $2 ;
-
-      flp_el = flp_el->Next ;
+      tmp_flp_el = flp_el ;
     }
   ;
 
 powers_list
 
-  : DVALUE
-    {
-      flp_el = *flp_el_list ;
-      values_counter = 1 ;
+  : /* empty */
 
-      put_into_powers_queue(flp_el->PowerValues, $1) ;
-    }
   | powers_list DVALUE
     {
-      if (values_counter == flp_el_found)
+      if (values_counter == floorplan->NElements)
       {
-        flp_el = *flp_el_list ;
+        flp_el = floorplan->ElementsList ;
         values_counter = 1 ;
       }
       else
@@ -157,15 +133,14 @@ powers_list
 void
 hotspot_ptrace_error
 (
-  FloorplanElement** flp_el_list,
-  yyscan_t   yyscanner,
-  char const *msg
+  Floorplan*  floorplan,
+  yyscan_t    yyscanner,
+  char const* msg
 )
 {
   fprintf (stderr,
-    "%d: %s\n",
-    hotspot_flp_get_lineno(yyscanner), msg) ;
+    "%s:%d: %s\n",
+    floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
 
-  free_floorplan_elements_list (*flp_el_list) ;
-  *flp_el_list = NULL ;
+  free_floorplan (floorplan) ;
 }

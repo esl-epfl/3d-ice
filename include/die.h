@@ -139,20 +139,6 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t fill_ccs_system_matrix_die
-  (
-    Die*          die,
-    Dimensions*   dimensions,
-    Conductances* conductances,
-    Capacity_t*   capacities,
-    LayerIndex_t  current_layer,
-    int*          columns,
-    int*          rows,
-    double*       values
-  ) ;
-
-/******************************************************************************/
-
   Quantity_t fill_crs_system_matrix_die
   (
     Die*                 die,
@@ -161,9 +147,9 @@ extern "C"
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
-    int*                 rows,
-    int*                 columns,
-    double*              values
+    RowIndex_t*          rows,
+    ColumnIndex_t*       columns,
+    SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/

@@ -54,9 +54,6 @@ extern "C"
 
     Quantity_t NElements ;
 
-    Quantity_t NTimeSlots ;
-    Quantity_t CurrentTimeSlot ;
-
     /* The list of floorplan elements */
 
     FloorplanElement* ElementsList ;
@@ -108,21 +105,6 @@ extern "C"
     FloorplanElement* floorplan_element,
     Dimensions*       dimensions
   ) ;
-
-/******************************************************************************/
-
-//  void
-//  insert_power_values_floorplan              (
-//                                              Floorplan* floorplan,
-//                                              Power_t*   power_values
-//                                             ) ;
-
-//  int
-//  insert_power_value_floorplan_element       (
-//                                               Floorplan* floorplan,
-//                                               String_t   floorplan_element_id,
-//                                               Power_t*   power_value
-//                                             ) ;
 
 /******************************************************************************/
 

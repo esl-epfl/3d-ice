@@ -40,26 +40,14 @@ extern "C"
 
 /******************************************************************************/
 
-  enum MatrixStorage_t
-  {
-    TL_CCS_MATRIX = 0, TL_CRS_MATRIX
-  } ;
-
-/******************************************************************************/
-
   typedef struct
   {
-    int*    Columns ;
-    int*    Rows ;
-    double* Values ;
+    ColumnIndex_t*       Columns ;
+    RowIndex_t*          Rows ;
+    SystemMatrixValue_t* Values ;
 
     Quantity_t Size ;
     Quantity_t NNz ;
-
-    int columns_size ;
-    int rows_size ;
-
-    enum MatrixStorage_t Storage ;
 
   }  SystemMatrix ;
 
@@ -68,7 +56,6 @@ extern "C"
   int alloc_system_matrix
   (
     SystemMatrix* matrix,
-    enum MatrixStorage_t storage,
     Quantity_t nvalues,
     Quantity_t nnz
   ) ;
@@ -89,21 +76,6 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t add_ccs_solid_column
-  (
-    Dimensions*          dimensions,
-    Conductances* conductances,
-    Capacity_t*          capacities,
-    LayerIndex_t         current_layer,
-    RowIndex_t           current_row,
-    ColumnIndex_t        current_column,
-    int*                 columns,
-    int*                 rows,
-    double*              values
-  ) ;
-
-/******************************************************************************/
-
   Quantity_t add_crs_solid_column
   (
     Dimensions*          dimensions,
@@ -113,24 +85,9 @@ extern "C"
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,
-    int*                 rows,
-    int*                 columns,
-    double*              values
-  ) ;
-
-/******************************************************************************/
-
-  Quantity_t add_ccs_liquid_column
-  (
-    Dimensions*          dimensions,
-    Conductances* conductances,
-    Capacity_t*          capacities,
-    LayerIndex_t         current_layer,
-    RowIndex_t           current_row,
-    ColumnIndex_t        current_column,
-    int*                 columns,
-    int*                 rows,
-    double*              values
+    RowIndex_t*          rows,
+    ColumnIndex_t*       columns,
+    SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/
@@ -143,9 +100,9 @@ extern "C"
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,
-    int*                 rows,
-    int*                 columns,
-    double*              values
+    RowIndex_t*          rows,
+    ColumnIndex_t*       columns,
+    SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/

@@ -282,7 +282,7 @@ Source_t* fill_sources_active_layer
     flp_el  = flp_el->Next
   )
   {
-    flp_el_surface = (double) (flp_el->Length * flp_el->Width) ;
+    flp_el_surface = (CellDimension_t) (flp_el->Length * flp_el->Width) ;
 
     for
     (
@@ -347,63 +347,6 @@ Source_t* fill_sources_empty_layer
 
 /******************************************************************************/
 
-Quantity_t fill_ccs_system_matrix_layer
-(
-# ifdef PRINT_SYSTEM_MATRIX
-  Layer*               layer,
-# endif
-  Dimensions*          dimensions,
-  Conductances* conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  int*                 columns,
-  int*                 rows,
-  double*              values
-)
-{
-  RowIndex_t row ;
-  ColumnIndex_t column ;
-  Quantity_t added, tot_added ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr,
-    "(l %2d) fill_ccs_system_matrix_layer %s\n",
-    current_layer, layer->Material->Id) ;
-#endif
-
-  for
-  (
-    tot_added = 0,
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      conductances ++ ,
-      capacities   ++ ,
-      columns      ++ ,
-      rows         += added ,
-      values       += added ,
-      tot_added    += added ,
-      column       ++
-    )
-
-      added = add_ccs_solid_column
-              (
-                dimensions, conductances, capacities,
-                current_layer, row, column,
-                columns, rows, values
-              ) ;
-
-  return tot_added ;
-}
-
-/******************************************************************************/
-
 Quantity_t fill_crs_system_matrix_layer
 (
 # ifdef PRINT_SYSTEM_MATRIX
@@ -414,9 +357,9 @@ Quantity_t fill_crs_system_matrix_layer
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
-  int*                 rows,
-  int*                 columns,
-  double*              values
+  RowIndex_t*          rows,
+  ColumnIndex_t*       columns,
+  SystemMatrixValue_t* values
 )
 {
   RowIndex_t row ;

@@ -79,11 +79,6 @@ extern "C"
 
     Dimensions* Dimensions ;
 
-    /* TRUE_V if the power values have changed since the last simulation */
-    /* FALSE_V otherwise                                                 */
-
-    Bool_t PowerValuesChanged ;
-
   } StackDescription ;
 
 /******************************************************************************/
@@ -144,26 +139,14 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_ccs_system_matrix_stack_description
-  (
-    StackDescription* stkd,
-    Conductances*     conductances,
-    Capacity_t*       capacities,
-    int*              columns,
-    int*              rows,
-    double*           values
-  ) ;
-
-/******************************************************************************/
-
   void fill_crs_system_matrix_stack_description
   (
-    StackDescription* stkd,
-    Conductances*     conductances,
-    Capacity_t*       capacities,
-    int*              rows,
-    int*              columns,
-    double*           values
+    StackDescription*    stkd,
+    Conductances*        conductances,
+    Capacity_t*          capacities,
+    RowIndex_t*          rows,
+    ColumnIndex_t*       columns,
+    SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/
@@ -188,28 +171,6 @@ extern "C"
     StackDescription* stkd,
     CoolantFR_t flow_rate
   ) ;
-
-/******************************************************************************/
-
-//  void
-//  insert_all_power_values     (StackDescription* stkd, Power_t* power_values) ;
-
-//  int
-//  insert_power_values_in_floorplan
-//                              (
-//                               StackDescription* stkd,
-//                               String_t          stack_element_id,
-//                               Power_t*          power_values
-//                              ) ;
-
-//  int
-//  insert_power_value_in_floorplan_element
-//                              (
-//                               StackDescription* stkd,
-//                               String_t          stack_element_id,
-//                               String_t          floorplan_element_id,
-//                               Power_t           power_value
-//                              ) ;
 
 /******************************************************************************/
 

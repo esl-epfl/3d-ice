@@ -669,7 +669,7 @@ dimensions
         YYABORT ;
       }
 
-      // Set width and NRows
+      /* Set width and NRows */
 
       stkd->Dimensions->Chip.Width = $10 * 1000.0 ;
       stkd->Dimensions->Cell.Width = $20 ;
@@ -678,13 +678,13 @@ dimensions
         = (GridDimension_t)
           (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
 
-      // Set length and NColumns
+      /* Set length and NColumns */
 
       stkd->Dimensions->Chip.Length = $5  * 1000.0 ;
 
       if (stkd->Channel == NULL)
       {
-        // There are no channels in the stack
+        /* There are no channels in the stack */
 
         stkd->Dimensions->StackHasChannel = FALSE_V ;
 
@@ -696,7 +696,7 @@ dimensions
       }
       else
       {
-        // There are channels in the stack
+        /* There are channels in the stack */
 
         stkd->Dimensions->StackHasChannel = TRUE_V ;
 
@@ -721,7 +721,7 @@ dimensions
             + 3 ;
       }
 
-      // Check the number of ciolumns get
+      /* Check the number of ciolumns get */
 
       if (stkd->Dimensions->Grid.NColumns < 3)
       {

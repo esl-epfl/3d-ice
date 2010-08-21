@@ -45,8 +45,6 @@ void init_floorplan (Floorplan* floorplan)
 {
   floorplan->FileName          = NULL ;
   floorplan->NElements         = 0 ;
-  floorplan->NTimeSlots        = 0 ;
-  floorplan->CurrentTimeSlot   = 0 ;
   floorplan->ElementsList      = NULL ;
 }
 
@@ -90,11 +88,6 @@ int fill_floorplan (Floorplan* floorplan, Dimensions* dimensions)
   //floorplan_set_debug (1, scanner) ;
 
   result = floorplan_parse (floorplan, dimensions, scanner) ;
-
-  if (result == 0)
-
-    floorplan->NTimeSlots
-      = floorplan->ElementsList->PowerValues->Length ;
 
   floorplan_lex_destroy (scanner) ;
   fclose (input) ;
@@ -174,7 +167,7 @@ Bool_t align_to_grid
   ColumnIndex_t column ;
   RowIndex_t row ;
 
-  // West side
+  /* West side */
 
   cx = get_cell_length (dimensions, 0) / 2.0 ;
 
@@ -195,7 +188,7 @@ Bool_t align_to_grid
 
   floorplan_element->SW_Column = column ;
 
-  // East side
+  /* East side */
 
   for
   (
@@ -218,7 +211,7 @@ Bool_t align_to_grid
 
   floorplan_element->NE_Column = column - 1 ;
 
-  // South side
+  /* South side */
 
   for
   (
@@ -231,7 +224,7 @@ Bool_t align_to_grid
 
   floorplan_element->SW_Row = row ;
 
-  // North side
+  /* North side */
 
   for
   (
@@ -255,49 +248,6 @@ Bool_t align_to_grid
   return FALSE_V ;
 }
 
-/******************************************************************************/
-
-//void insert_power_values_floorplan
-//(
-//  Floorplan* floorplan,
-//  Power_t*   power_values
-//)
-//{
-//  FloorplanElement* flp_el = floorplan->ElementsList ;
-//
-//  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
-//
-//    flp_el->PowerValue = *power_values++ ;
-//
-//}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
-//int insert_power_value_floorplan_element
-//(
-//  Floorplan* floorplan,
-//  String_t   floorplan_element_id,
-//  Power_t    power_value
-//)
-//{
-//  FloorplanElement* flp_el = find_floorplan_element_in_list
-//                                    (
-//                                      floorplan->ElementsList,
-//                                      floorplan_element_id
-//                                    ) ;
-//  if (flp_el == NULL)
-//
-//    return -3 ;
-//
-//  flp_el->PowerValue = power_value ;
-//
-//  return 0 ;
-//}
-
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
 int get_max_temperature_floorplan

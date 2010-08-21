@@ -140,7 +140,7 @@ Conductances* fill_conductances_channel
       column++, conductances++
     )
 
-      if (column % 2 == 0) // Even -> wall
+      if (column % 2 == 0) /* Even -> wall */
 
         fill_conductances_wall_cell
         (
@@ -155,7 +155,7 @@ Conductances* fill_conductances_channel
           channel->Wall->ThermalConductivity
         ) ;
 
-      else                 // Odd -> channel
+      else                 /* Odd -> channel */
 
         fill_conductances_liquid_cell
         (
@@ -291,7 +291,7 @@ Source_t* fill_sources_channel
   ColumnIndex_t column ;
 
   Cconv_t C = (channel->CoolantVHC * channel->CoolantFR)
-              / (double) ( get_number_of_columns (dimensions) - 1 ) ;
+              / (Cconv_t) ( get_number_of_columns (dimensions) - 1 ) ;
 
 # ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -336,86 +336,18 @@ Source_t* fill_sources_channel
 
 /******************************************************************************/
 
-Quantity_t fill_ccs_system_matrix_channel
-(
-# ifdef PRINT_SYSTEM_MATRIX
-  Channel*      channel,
-# endif
-  Dimensions*   dimensions,
-  Conductances* conductances,
-  Capacity_t*   capacities,
-  LayerIndex_t  current_layer,
-  int*          columns,
-  int*          rows,
-  double*       values
-)
-{
-  RowIndex_t row;
-  ColumnIndex_t column;
-  Quantity_t added, tot_added ;
-
-# ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr,
-    "(l %2d) fill_ccs_system_matrix_channel %s \n",
-    current_layer, channel->Wall->Id) ;
-# endif
-
-  for
-  (
-    tot_added = 0 ,
-    row       = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      conductances ++ ,
-      capacities   ++ ,
-      columns      ++ ,
-      rows         += added ,
-      values       += added ,
-      tot_added    += added ,
-      column       ++
-    )
-
-       if (column % 2 == 0 ) /* Even -> Wall */
-
-         added = add_ccs_solid_column
-                 (
-                   dimensions, conductances, capacities,
-                   current_layer, row, column,
-                   columns, rows, values
-                 ) ;
-
-       else                  /* Odd -> liquid */
-
-         added = add_ccs_liquid_column
-                 (
-                   dimensions, conductances, capacities,
-                   current_layer, row, column,
-                   columns, rows, values
-                 ) ;
-
-  return tot_added ;
-}
-
-/******************************************************************************/
-
 Quantity_t fill_crs_system_matrix_channel
 (
 # ifdef PRINT_SYSTEM_MATRIX
-  Channel*      channel,
+  Channel*             channel,
 # endif
-  Dimensions*   dimensions,
-  Conductances* conductances,
-  Capacity_t*   capacities,
-  LayerIndex_t  current_layer,
-  int*          rows,
-  int*          columns,
-  double*       values
+  Dimensions*          dimensions,
+  Conductances*        conductances,
+  Capacity_t*          capacities,
+  LayerIndex_t         current_layer,
+  RowIndex_t*          rows,
+  ColumnIndex_t*       columns,
+  SystemMatrixValue_t* values
 )
 {
   RowIndex_t row;

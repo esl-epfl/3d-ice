@@ -46,14 +46,15 @@ int init_thermal_data
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  enum MatrixStorage_t  storage,
   Temperature_t     initial_temperature,
-  Time_t            delta_time
+  Time_t            delta_time,
+  Time_t            slot_time
 )
 {
-  tdata->Size                = get_number_of_cells(stkd->Dimensions) ;
-  tdata->initial_temperature = initial_temperature ;
-  tdata->delta_time          = delta_time ;
+  tdata->Size               = get_number_of_cells(stkd->Dimensions) ;
+  tdata->InitialTemperature = initial_temperature ;
+  tdata->DeltaTime          = delta_time ;
+  tdata->SlotTime           = slot_time ;
 
   /* Memory allocation */
 
@@ -96,8 +97,8 @@ int init_thermal_data
 
     goto slu_etree_fail ;
 
-  if ( alloc_system_matrix (&tdata->SM_A, storage,
-                            tdata->Size, stkd->Dimensions->Grid.NNz) == 0)
+  if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
+                            stkd->Dimensions->Grid.NNz) == 0)
     goto sm_a_fail ;
 
   if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
@@ -107,7 +108,8 @@ int init_thermal_data
 
   /* Set initial values */
 
-  init_data (tdata->Temperatures, tdata->Size, initial_temperature) ;
+  init_data (tdata->Temperatures, tdata->Size,
+                                  tdata->InitialTemperature) ;
 
   init_data (tdata->Sources, tdata->Size, 0.0) ;
 
@@ -120,23 +122,12 @@ int init_thermal_data
   tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
   tdata->SLU_Options.DiagPivotThresh = 0.01 ;
 
-  if (storage == TL_CRS_MATRIX)
-
-    dCreate_CompRow_Matrix  /* Matrix A */
-    (
-      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-      tdata->SM_A.Values, tdata->SM_A.Columns, tdata->SM_A.Rows,
-      SLU_NR, SLU_D, SLU_GE
-    ) ;
-
-  else
-
-    dCreate_CompCol_Matrix  /* Matrix A */
-    (
-      &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-      tdata->SM_A.Values, tdata->SM_A.Rows, tdata->SM_A.Columns,
-      SLU_NC, SLU_D, SLU_GE
-    ) ;
+  dCreate_CompRow_Matrix  /* Matrix A */
+  (
+    &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
+    tdata->SM_A.Values, tdata->SM_A.Columns, tdata->SM_A.Rows,
+    SLU_NR, SLU_D, SLU_GE
+  ) ;
 
   dCreate_Dense_Matrix  /* Vector B */
   (
@@ -213,10 +204,8 @@ int fill_thermal_data
   {
     fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
-    //fill_conductances_heatsink (stkd->HeatSink, tdata->Conductances) ;
-
     fill_capacities_stack_description (stkd, tdata->Capacities,
-                                             tdata->delta_time) ;
+                                             tdata->DeltaTime) ;
 
     fill_system_matrix
     (
@@ -243,19 +232,6 @@ int fill_thermal_data
                                       tdata->Temperatures) ;
 
     stkd->Channel->FlowRateChanged = FALSE_V ;
-    stkd->PowerValuesChanged = FALSE_V ;
-  }
-
-  if (stkd->PowerValuesChanged == TRUE_V)
-  {
-    fill_sources_stack_description (stkd, tdata->Sources,
-                                          tdata->Conductances) ;
-
-    fill_system_vector (&tdata->SV_B, tdata->Sources,
-                                      tdata->Capacities,
-                                      tdata->Temperatures) ;
-
-    stkd->PowerValuesChanged = FALSE_V ;
   }
 
   if (tdata->SLU_Options.Fact != FACTORED )
@@ -286,14 +262,15 @@ int fill_thermal_data
 
 /******************************************************************************/
 
-int solve_system (ThermalData* tdata, Time_t total_time)
+int emulate_power_slot (ThermalData* tdata)
 {
+  Time_t time = tdata->SlotTime ;
   int counter;
 
   if (tdata->SLU_Options.Fact == DOFACT)
     return 1 ;
 
-  for ( ; total_time > 0 ; total_time -= tdata->delta_time)
+  for ( ; time > 0 ; time -= tdata->DeltaTime)
   {
     dgstrs
     (
@@ -311,7 +288,6 @@ int solve_system (ThermalData* tdata, Time_t total_time)
       break ;
 
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
-
       tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
 
     fill_system_vector

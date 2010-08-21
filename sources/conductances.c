@@ -48,7 +48,7 @@ void fill_conductances_bottom_solid_cell
   EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
-  // To avoid unused parameter warning message
+  /* To avoid unused parameter warning message */
   (void) environment_heat_transfer_coefficient;
 
   conductances->North = conductances->South
@@ -96,7 +96,7 @@ void fill_conductances_central_solid_cell
   EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
-  // To avoid unused parameter warning message
+  /* To avoid unused parameter warning message */
   (void) environment_heat_transfer_coefficient;
 
   conductances->North = conductances->South
@@ -143,7 +143,7 @@ void fill_conductances_top_solid_cell
   EnvironmentHTC_t      environment_heat_transfer_coefficient
 )
 {
-  // To avoid unused parameter warning message
+  /* To avoid unused parameter warning message */
   (void) environment_heat_transfer_coefficient;
 
   conductances->North = conductances->South
@@ -269,7 +269,7 @@ void fill_conductances_liquid_cell
 )
 {
   Cconv_t C = (coolant_vhc * coolant_fr)
-              / (double) ( get_number_of_columns (dimensions) - 1 );
+              / (Cconv_t) ( get_number_of_columns (dimensions) - 1 );
 
   conductances->North =  C ;
   conductances->South = -C ;

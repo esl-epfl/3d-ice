@@ -51,7 +51,6 @@ void init_stack_description (StackDescription* stkd)
   stkd->EnvironmentHeatSink = NULL ;
   stkd->StackElementsList   = NULL ;
   stkd->Dimensions          = NULL ;
-  stkd->PowerValuesChanged  = 0    ;
 }
 
 /******************************************************************************/
@@ -491,110 +490,14 @@ void fill_sources_stack_description
 
 /******************************************************************************/
 
-void fill_ccs_system_matrix_stack_description
-(
-  StackDescription* stkd,
-  Conductances*     conductances,
-  Capacity_t*       capacities,
-  int*              columns,
-  int*              rows,
-  double*           values
-)
-{
-  StackElement* stack_element ;
-  Quantity_t added, area ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
-    "fill_ccs_system_matrix_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions));
-#endif
-
-  *columns++ = 0 ;
-
-  for
-  (
-    added         = 0,
-    area          = get_layer_area (stkd->Dimensions),
-    stack_element = stkd->StackElementsList ;
-
-    stack_element != NULL ;
-
-    conductances  += area * stack_element->NLayers,
-    capacities    += area * stack_element->NLayers,
-    columns       += area * stack_element->NLayers,
-    rows          += added,
-    values        += added,
-    stack_element  = stack_element->Next
-  )
-
-    switch (stack_element->Type)
-    {
-      case TL_STACK_ELEMENT_DIE :
-
-        added = fill_ccs_system_matrix_die
-                (
-                  stack_element->Pointer.Die, stkd->Dimensions,
-                  conductances, capacities,
-                  stack_element->LayersOffset,
-                  columns, rows, values
-                ) ;
-        break ;
-
-      case TL_STACK_ELEMENT_LAYER :
-
-        added = fill_ccs_system_matrix_layer
-                (
-#                 ifdef PRINT_SYSTEM_MATRIX
-                  stack_element->Pointer.Layer,
-#                 endif
-                  stkd->Dimensions, conductances, capacities,
-                  stack_element->LayersOffset,
-                  columns, rows, values
-                ) ;
-        break ;
-
-      case TL_STACK_ELEMENT_CHANNEL :
-
-        added = fill_ccs_system_matrix_channel
-                (
-#                 ifdef PRINT_SYSTEM_MATRIX
-                  stkd->Channel,
-#                 endif
-                  stkd->Dimensions, conductances, capacities,
-                  stack_element->LayersOffset,
-                  columns, rows, values
-                ) ;
-        break ;
-
-      case TL_STACK_ELEMENT_NONE :
-
-        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stack_element->Type) ;
-        return ;
-
-    } /* switch stack_element->Type */
-}
-
-/******************************************************************************/
-
 void fill_crs_system_matrix_stack_description
 (
-  StackDescription* stkd,
-  Conductances*     conductances,
-  Capacity_t*       capacities,
-  int*              rows,
-  int*              columns,
-  double*           values
+  StackDescription*    stkd,
+  Conductances*        conductances,
+  Capacity_t*          capacities,
+  RowIndex_t*          rows,
+  ColumnIndex_t*       columns,
+  SystemMatrixValue_t* values
 )
 {
   StackElement* stack_element ;
@@ -732,99 +635,6 @@ void change_coolant_flow_rate
   stkd->Channel->CoolantFR = ( flow_rate * 1e+12 ) / 60.0 ;
   stkd->Channel->FlowRateChanged = TRUE_V ;
 }
-
-/******************************************************************************/
-
-//void
-//insert_all_power_values
-//(
-//  StackDescription* stkd,
-//  Power_t*          power_values
-//)
-//{
-//  StackElement* stk_el = stkd->StackElementsList;
-//
-//  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
-//  {
-//    if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
-//    {
-//      insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
-//      power_values += stk_el->Floorplan->NElements ;
-//    }
-//  }
-//
-//  stkd->PowerValuesChanged = 1 ;
-//}
-
-/******************************************************************************/
-
-//int
-//insert_power_values_in_floorplan
-//(
-//  StackDescription* stkd,
-//  String_t          stack_element_id,
-//  Power_t*          power_values
-//)
-//{
-//  StackElement* stk_el = find_stack_element_in_list
-//                         (
-//                                  stkd->StackElementsList,
-//                                  stack_element_id
-//                                ) ;
-//  if (stk_el == NULL)
-//
-//    return -1 ;
-//
-//  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
-//      || stk_el->Floorplan == NULL)
-//
-//    return -2 ;
-//
-//  insert_power_values_floorplan (stk_el->Floorplan, power_values) ;
-//
-//  stkd->PowerValuesChanged = 1 ;
-//
-//  return 0 ;
-//}
-
-/******************************************************************************/
-
-// int
-// insert_power_value_in_floorplan_element
-// (
-//   StackDescription* stkd,
-//   String_t          stack_element_id,
-//   String_t          floorplan_element_id,
-//   Power_t           power_value
-// )
-// {
-//   int result ;
-// 
-//   StackElement* stk_el = find_stack_element_in_list
-//                                 (
-//                                   stkd->StackElementsList,
-//                                   stack_element_id
-//                                 ) ;
-//   if (stk_el == NULL)
-// 
-//     return -1 ;
-// 
-//   if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
-//       || stk_el->Floorplan == NULL)
-// 
-//     return -2 ;
-// 
-//   result = insert_power_value_floorplan_element
-//            (
-//              stk_el->Floorplan,
-//              floorplan_element_id,
-//              power_value
-//            ) ;
-// 
-//   if (result == 0 ) stkd->PowerValuesChanged = 1 ;
-// 
-//   return result ;
-// }
 
 /******************************************************************************/
 

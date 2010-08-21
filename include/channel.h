@@ -139,34 +139,18 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t fill_ccs_system_matrix_channel
-  (
-#   ifdef PRINT_SYSTEM_MATRIX
-    Channel*      channel,
-#   endif
-    Dimensions*   dimensions,
-    Conductances* conductances,
-    Capacity_t*   capacities,
-    LayerIndex_t  current_layer,
-    int*          columns,
-    int*          rows,
-    double*       values
-  ) ;
-
-/******************************************************************************/
-
   Quantity_t fill_crs_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
-    Channel*      channel,
+    Channel*             channel,
 #   endif
-    Dimensions*   dimensions,
-    Conductances* conductances,
-    Capacity_t*   capacities,
-    LayerIndex_t  current_layer,
-    int*          rows,
-    int*          columns,
-    double*       values
+    Dimensions*          dimensions,
+    Conductances*        conductances,
+    Capacity_t*          capacities,
+    LayerIndex_t         current_layer,
+    RowIndex_t*          rows,
+    ColumnIndex_t*       columns,
+    SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/

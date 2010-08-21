@@ -32,7 +32,7 @@ TDICE_MAIN = .
 
 include $(TDICE_MAIN)/makefile.def
 
-.PHONY: all clean lib hotspot2threedice
+.PHONY: all clean lib
 
 all: lib hotspot2threedice test
 

@@ -19,7 +19,7 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
-  init_thermal_data  (&stkd, &tdata, TL_CRS_MATRIX, 300.00, 0.1) ;
+  init_thermal_data  (&stkd, &tdata, 300.00, 0.1, 1.0) ;
 
   fill_thermal_data (&stkd, &tdata) ;
 

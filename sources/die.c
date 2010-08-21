@@ -222,9 +222,7 @@ Source_t* fill_sources_die
   for
   (
     layer = die->LayersList ;
-
     layer != NULL ;
-
     layer = layer->Next
   )
 
@@ -258,57 +256,6 @@ Source_t* fill_sources_die
 
 /******************************************************************************/
 
-Quantity_t fill_ccs_system_matrix_die
-(
-  Die*          die,
-  Dimensions*   dimensions,
-  Conductances* conductances,
-  Capacity_t*   capacities,
-  LayerIndex_t  current_layer,
-  int*          columns,
-  int*          rows,
-  double*       values
-)
-{
-  Layer* layer ;
-  Quantity_t tot_added, added ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "(l %2d) fill_ccs_system_matrix_die\n", current_layer) ;
-#endif
-
-  for
-  (
-    added     = 0 ,
-    tot_added = 0 ,
-    layer     = die->LayersList ;
-
-    layer != NULL ;
-
-    conductances  += get_layer_area (dimensions) ,
-    capacities    += get_layer_area (dimensions) ,
-    columns       += get_layer_area (dimensions) ,
-    rows          += added ,
-    values        += added ,
-    tot_added     += added ,
-    layer          = layer->Next
-  )
-
-    added = fill_ccs_system_matrix_layer
-            (
-#             ifdef PRINT_SYSTEM_MATRIX
-              layer,
-#             endif
-              dimensions, conductances, capacities,
-              current_layer + layer->LayersOffset,
-              columns, rows, values
-            ) ;
-
-  return tot_added ;
-}
-
-/******************************************************************************/
-
 Quantity_t fill_crs_system_matrix_die
 (
   Die*                 die,
@@ -317,9 +264,9 @@ Quantity_t fill_crs_system_matrix_die
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
-  int*                 rows,
-  int*                 columns,
-  double*              values
+  RowIndex_t*          rows,
+  ColumnIndex_t*       columns,
+  SystemMatrixValue_t* values
 )
 {
   Layer* layer ;

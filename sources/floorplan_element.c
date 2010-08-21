@@ -297,7 +297,7 @@ void get_avg_temperature_floorplan_element
 {
   RowIndex_t    row ;
   ColumnIndex_t column ;
-  double counter = 0.0 ;
+  Quantity_t counter = 0 ;
 
   *avg_temperature = 0.0 ;
 
@@ -319,7 +319,7 @@ void get_avg_temperature_floorplan_element
       *avg_temperature
         += temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
 
-  *avg_temperature /= counter ;
+  *avg_temperature /= (Temperature_t) counter ;
 }
 
 /******************************************************************************/
@@ -336,7 +336,7 @@ void get_min_avg_max_temperatures_floorplan_element
 {
   RowIndex_t    row    = floorplan_element->SW_Row ;
   ColumnIndex_t column = floorplan_element->SW_Column ;
-  double counter = 0.0 ;
+  Quantity_t counter = 0 ;
   Temperature_t temp ;
 
   *max_temperature = *min_temperature
@@ -367,7 +367,7 @@ void get_min_avg_max_temperatures_floorplan_element
       *avg_temperature += temp ;
     }
 
-  *avg_temperature /= counter ;
+  *avg_temperature /= (Temperature_t) counter ;
 }
 
 /******************************************************************************/

@@ -49,6 +49,7 @@ extern "C"
   typedef double Power_t ;
   typedef double Time_t ;
   typedef double SystemVectorValue_t ;
+  typedef double SystemMatrixValue_t ;
   typedef double CellDimension_t ;
   typedef int    GridDimension_t ;
   typedef double ChipDimension_t ;

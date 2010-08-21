@@ -52,8 +52,10 @@ extern "C"
     Conductances*  Conductances ;
 
     Quantity_t    Size ;
-    Temperature_t initial_temperature ;
-    Time_t        delta_time ;
+    Temperature_t InitialTemperature ;
+
+    Time_t        DeltaTime ;
+    Time_t        SlotTime ;
 
     SystemMatrix SM_A ;
     SystemVector SV_B ;
@@ -80,9 +82,9 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    enum MatrixStorage_t  storage,
     Temperature_t     initial_temperature,
-    Time_t            delta_time
+    Time_t            delta_time,
+    Time_t            slot_time
   ) ;
 
 /******************************************************************************/
@@ -95,7 +97,7 @@ extern "C"
 
 /******************************************************************************/
 
-  int solve_system (ThermalData* tdata, Time_t total_time) ;
+  int emulate_power_slot (ThermalData* tdata) ;
 
 /******************************************************************************/
 
