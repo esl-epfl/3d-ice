@@ -256,7 +256,7 @@ Source_t* fill_sources_die
 
 /******************************************************************************/
 
-Quantity_t fill_crs_system_matrix_die
+Quantity_t fill_system_matrix_die
 (
   Die*                 die,
   Dimensions*          dimensions,
@@ -264,8 +264,8 @@ Quantity_t fill_crs_system_matrix_die
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
-  RowIndex_t*          rows,
-  ColumnIndex_t*       columns,
+  RowIndex_t*          row_offsets,
+  ColumnIndex_t*       column_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -273,7 +273,7 @@ Quantity_t fill_crs_system_matrix_die
   Quantity_t tot_added, added ;
 
 # ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "(l %2d) fill_crs_system_matrix_die\n", current_layer) ;
+  fprintf (stderr, "(l %2d) fill_system_matrix_die\n", current_layer) ;
 # endif
 
   for
@@ -284,16 +284,16 @@ Quantity_t fill_crs_system_matrix_die
 
     layer != NULL ;
 
-    conductances  += get_layer_area (dimensions) ,
-    capacities    += get_layer_area (dimensions) ,
-    rows          += get_layer_area (dimensions) ,
-    columns       += added ,
-    values        += added ,
-    tot_added     += added ,
-    layer          = layer->Next
+    conductances   += get_layer_area (dimensions) ,
+    capacities     += get_layer_area (dimensions) ,
+    row_offsets    += get_layer_area (dimensions) ,
+    column_indices += added ,
+    values         += added ,
+    tot_added      += added ,
+    layer           = layer->Next
   )
 
-    added = fill_crs_system_matrix_layer
+    added = fill_system_matrix_layer
             (
 #             ifdef PRINT_SYSTEM_MATRIX
               layer,
@@ -301,7 +301,7 @@ Quantity_t fill_crs_system_matrix_die
               dimensions, conductances, capacities,
               environmentheatsink,
               current_layer + layer->LayersOffset,
-              rows, columns, values
+              row_offsets, column_indices, values
             ) ;
 
   return tot_added ;

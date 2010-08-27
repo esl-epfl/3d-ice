@@ -99,8 +99,8 @@ extern "C"
 
   Conductances* fill_conductances_channel
   (
-#   ifdef PRINT_CAPACITIES
-    LayerIndex_t  current_layer
+#   ifdef PRINT_CONDUCTANCES
+    LayerIndex_t  current_layer,
 #   endif
     Channel*      channel,
     Conductances* conductances,
@@ -134,7 +134,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t fill_crs_system_matrix_channel
+  Quantity_t fill_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
     Channel*             channel,
@@ -143,8 +143,8 @@ extern "C"
     Conductances*        conductances,
     Capacity_t*          capacities,
     LayerIndex_t         current_layer,
-    RowIndex_t*          rows,
-    ColumnIndex_t*       columns,
+    RowIndex_t*          row_offsets,
+    ColumnIndex_t*       column_indices,
     SystemMatrixValue_t* values
   ) ;
 

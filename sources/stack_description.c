@@ -192,7 +192,7 @@ static void align_layers_in_die (StackDescription* stkd)
 
 static void align_stack_elements (StackDescription* stkd)
 {
-  int layer_counter = 0 ;
+  Quantity_t layer_counter = 0 ;
   StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
@@ -484,13 +484,13 @@ void fill_sources_stack_description
 
 /******************************************************************************/
 
-void fill_crs_system_matrix_stack_description
+void fill_system_matrix_stack_description
 (
   StackDescription*    stkd,
   Conductances*        conductances,
   Capacity_t*          capacities,
-  RowIndex_t*          rows,
-  ColumnIndex_t*       columns,
+  RowIndex_t*          row_offsets,
+  ColumnIndex_t*       column_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -501,45 +501,45 @@ void fill_crs_system_matrix_stack_description
   fprintf
   (
     stderr,
-    "fill_crs_system_matrix_stack_description ( l %d r %d c %d )\n",
+    "fill_system_matrix_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions));
 #endif
 
-  *rows++ = 0 ;
+  *row_offsets++ = 0 ;
 
   for
   (
-    added         = 0,
-    area          = get_layer_area (stkd->Dimensions),
-    stack_element = stkd->StackElementsList ;
-    stack_element != NULL ;
-    conductances  += area * stack_element->NLayers,
-    capacities    += area * stack_element->NLayers,
-    rows          += area * stack_element->NLayers,
-    columns       += added,
-    values        += added,
-    stack_element  = stack_element->Next
+    added           = 0,
+    area            = get_layer_area (stkd->Dimensions),
+    stack_element   = stkd->StackElementsList ;
+    stack_element  != NULL ;
+    conductances   += area * stack_element->NLayers,
+    capacities     += area * stack_element->NLayers,
+    row_offsets    += area * stack_element->NLayers,
+    column_indices += added,
+    values         += added,
+    stack_element   = stack_element->Next
   )
 
     switch (stack_element->Type)
     {
       case TL_STACK_ELEMENT_DIE :
 
-        added = fill_crs_system_matrix_die
+        added = fill_system_matrix_die
                 (
                   stack_element->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
                   stkd->EnvironmentHeatSink,
                   stack_element->LayersOffset,
-                  rows, columns, values
+                  row_offsets, column_indices, values
                 ) ;
         break ;
 
       case TL_STACK_ELEMENT_LAYER :
 
-        added = fill_crs_system_matrix_layer
+        added = fill_system_matrix_layer
                 (
 #                 ifdef PRINT_SYSTEM_MATRIX
                   stack_element->Pointer.Layer,
@@ -547,20 +547,20 @@ void fill_crs_system_matrix_stack_description
                   stkd->Dimensions, conductances, capacities,
                   stkd->EnvironmentHeatSink,
                   stack_element->LayersOffset,
-                  rows, columns, values
+                  row_offsets, column_indices, values
                 ) ;
         break ;
 
       case TL_STACK_ELEMENT_CHANNEL :
 
-        added = fill_crs_system_matrix_channel
+        added = fill_system_matrix_channel
                 (
 #                 ifdef PRINT_SYSTEM_MATRIX
                   stkd->Channel,
 #                 endif
                   stkd->Dimensions, conductances, capacities,
                   stack_element->LayersOffset,
-                  rows, columns, values
+                  row_offsets, column_indices, values
                 ) ;
         break ;
 
@@ -980,3 +980,61 @@ int get_all_min_avg_max_temperatures_in_floorplan
 }
 
 /******************************************************************************/
+
+int print_thermal_map
+(
+  StackDescription* stkd,
+  Temperature_t*    temperatures,
+  String_t          stack_element_id,
+  String_t          file_name
+)
+{
+  FILE* output_file ;
+  RowIndex_t row;
+  ColumnIndex_t column ;
+  Quantity_t layer_offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
+  if (stk_el == NULL)
+    return -1 ;
+
+  output_file = fopen (file_name, "w") ;
+  if (output_file == NULL)
+  {
+    perror (file_name) ;
+    return -2 ;
+  }
+
+  layer_offset = stk_el->LayersOffset ;
+
+  if (stk_el->Type == TL_STACK_ELEMENT_DIE)
+    layer_offset += stk_el->Pointer.Die->SourceLayer->LayersOffset ;
+
+  temperatures
+    += get_cell_offset_in_stack (stkd->Dimensions, layer_offset, 0, 0) ;
+
+  for
+  (
+    row = 0 ;
+    row < get_number_of_rows (stkd->Dimensions) ;
+    row++
+  )
+  {
+    for
+    (
+      column = 0 ;
+      column < get_number_of_columns (stkd->Dimensions) ;
+      column++, temperatures++
+    )
+      fprintf(output_file, "%7.3f  ", *temperatures) ;
+
+    fprintf(output_file, "\n") ;
+  }
+
+  fclose (output_file) ;
+
+  return 0 ;
+}

@@ -306,8 +306,8 @@ coolant_heat_transfer_coefficients
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
-      $$.Side = $5;
-      $$.Top = $5;
+      $$.Side   = $5;
+      $$.Top    = $5;
       $$.Bottom = $5;
     }
   | COOLANT HEAT TRANSFER COEFFICIENT SIDE   DVALUE ','

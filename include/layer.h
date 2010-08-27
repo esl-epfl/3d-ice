@@ -143,7 +143,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t fill_crs_system_matrix_layer
+  Quantity_t fill_system_matrix_layer
   (
 #   ifdef PRINT_SYSTEM_MATRIX
     Layer*               layer,
@@ -153,8 +153,8 @@ extern "C"
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
-    RowIndex_t*          rows,
-    ColumnIndex_t*       columns,
+    RowIndex_t*          row_offsets,
+    ColumnIndex_t*       column_indices,
     SystemMatrixValue_t* values
   ) ;
 

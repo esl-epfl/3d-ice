@@ -42,8 +42,19 @@ extern "C"
 
   typedef struct
   {
-    ColumnIndex_t*       Columns ;
-    RowIndex_t*          Rows ;
+    /* Compressed Row Storage (CRS):                           */
+    /* the matrix stores non zero values as sequences of rows. */
+
+    /* Storage for the column indices */
+
+    ColumnIndex_t*       ColumnIndices ;
+
+    /* Storage for the row offsets. */
+
+    RowIndex_t*          RowOffsets ;
+
+    /* Storage for the nonzero entries. */
+
     SystemMatrixValue_t* Values ;
 
     Quantity_t Size ;
@@ -62,37 +73,27 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_system_matrix
-  (
-    StackDescription* stkd,
-    SystemMatrix*     matrix,
-    Conductances*     conductances,
-    Capacity_t*       capacities
-  ) ;
-
-/******************************************************************************/
-
   void free_system_matrix (SystemMatrix* matrix) ;
 
 /******************************************************************************/
 
-  Quantity_t add_crs_solid_column
+  Quantity_t add_solid_row
   (
     Dimensions*          dimensions,
-    Conductances* conductances,
+    Conductances*        conductances,
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,
-    RowIndex_t*          rows,
-    ColumnIndex_t*       columns,
+    RowIndex_t*          row_offsets,
+    ColumnIndex_t*       column_indices,
     SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/
 
-  Quantity_t add_crs_liquid_column
+  Quantity_t add_liquid_row
   (
     Dimensions*          dimensions,
     Conductances* conductances,
@@ -100,8 +101,8 @@ extern "C"
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,
-    RowIndex_t*          rows,
-    ColumnIndex_t*       columns,
+    RowIndex_t*          row_offsets,
+    ColumnIndex_t*       column_indices,
     SystemMatrixValue_t* values
   ) ;
 

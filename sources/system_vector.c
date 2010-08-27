@@ -29,6 +29,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "system_vector.h"
 
@@ -58,9 +59,18 @@ void fill_system_vector
   int count ;
   SystemVectorValue_t* value = vector->Values ;
 
-  for(count = 0 ; count < vector->Size ; count++)
+#ifdef PRINT_SYSTEM_VECTOR
+    fprintf (stderr, "fill_system_vector\n");
+#endif
 
+  for(count = 0 ; count < vector->Size ; count++)
+  {
     *value++ = *source++ + *capacity++ * *temperature++ ;
+#ifdef PRINT_SYSTEM_VECTOR
+    fprintf (stderr, "[%5d] b %.5e = s %.5e + c %.5e * t %5.2f\n",
+      count, *(value-1), *(source-1), *(capacity-1), *(temperature-1)) ;
+#endif
+  }
 }
 
 /******************************************************************************/

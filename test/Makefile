@@ -32,16 +32,18 @@ TDICE_MAIN = ..
 
 include $(TDICE_MAIN)/makefile.def
 
-all: $(TDICE_TEST_EXE)
+all: FillThermalData Emulate3DICe
 
 CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE) 
 CLIBS    = $(TDICE_ARCHIVE) $(SLU_LIBS)
 
-$(TDICE_TEST_EXE): $(TDICE_LIB_ARCHIVE)
+FillThermalData: $(TDICE_LIB_ARCHIVE)
 	$(CC) $(CFLAGS) $@.c $(CINCLUDES) $(CLIBS) -o $@
 
-clean:
-	@$(RM) $(RMFLAGS) $(TDICE_TEST_EXE)
-	@$(RM) $(RMFLAGS) $(TDICE_TEST_EXE:=.o)
-	@$(RM) $(RMFLAGS) $(TDICE_TEST_EXE:=.d)
+Emulate3DICe: $(TDICE_LIB_ARCHIVE)
+	$(CC) $(CFLAGS) $@.c $(CINCLUDES) $(CLIBS) -o $@
 
+
+clean:
+	@$(RM) $(RMFLAGS) FillThermalData
+	@$(RM) $(RMFLAGS) Emulate3DICe

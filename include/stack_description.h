@@ -143,13 +143,13 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_crs_system_matrix_stack_description
+  void fill_system_matrix_stack_description
   (
     StackDescription*    stkd,
     Conductances*        conductances,
     Capacity_t*          capacities,
-    RowIndex_t*          rows,
-    ColumnIndex_t*       columns,
+    RowIndex_t*          row_offsets,
+    ColumnIndex_t*       column_indices,
     SystemMatrixValue_t* values
   ) ;
 
@@ -254,6 +254,16 @@ extern "C"
     Temperature_t*    min_temperature,
     Temperature_t*    avg_temperature,
     Temperature_t*    max_temperature
+  ) ;
+
+/******************************************************************************/
+
+  int print_thermal_map
+  (
+    StackDescription* stkd,
+    Temperature_t*    temperatures,
+    String_t          stack_element_id,
+    String_t          file_name
   ) ;
 
 /******************************************************************************/

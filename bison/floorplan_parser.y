@@ -206,9 +206,9 @@ floorplan_error
   char const *msg
 )
 {
-  fprintf (stderr,
-    "%s:%d: %s\n",
-    floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
+  fprintf (stderr, "%s:%d: %s\n", floorplan->FileName,
+                                  floorplan_get_lineno(yyscanner),
+                                  msg) ;
 
   get_chip_length (dimensions) ;  // FIXME
 

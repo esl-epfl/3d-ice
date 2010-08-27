@@ -170,7 +170,8 @@ Conductances*   fill_conductances_layer
         get_cell_width  (dimensions),
         layer->Height,
         layer->Material->ThermalConductivity,
-        environmentheatsink->EnvironmentHTC
+        environmentheatsink == NULL ? (EnvironmentHTC_t) 0
+                                    : environmentheatsink->EnvironmentHTC
       ) ;
 
   return conductances ;
@@ -237,12 +238,12 @@ Capacity_t* fill_capacities_layer
 #ifdef PRINT_CAPACITIES
       fprintf (stderr,
         "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f " \
-                    " |  vhc %.5e --> %.5e\n",
+                    " |  vhc %.5e delta %.5e --> %.5e\n",
         current_layer, row, column,
         get_cell_offset_in_stack (dimensions, current_layer, row, column),
         get_cell_length(dimensions, column),
         get_cell_width (dimensions),
-        layer->Height, layer->Material->VolHeatCapacity,
+        layer->Height, layer->Material->VolHeatCapacity, delta_time,
         *capacities
       ) ;
 #endif
@@ -348,7 +349,7 @@ Source_t* fill_sources_empty_layer
 
 /******************************************************************************/
 
-Quantity_t fill_crs_system_matrix_layer
+Quantity_t fill_system_matrix_layer
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Layer*               layer,
@@ -358,8 +359,8 @@ Quantity_t fill_crs_system_matrix_layer
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
-  RowIndex_t*          rows,
-  ColumnIndex_t*       columns,
+  RowIndex_t*          row_offsets,
+  ColumnIndex_t*       column_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -369,7 +370,7 @@ Quantity_t fill_crs_system_matrix_layer
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
-    "(l %2d) fill_crs_system_matrix_layer %s\n",
+    "(l %2d) fill_system_matrix_layer %s\n",
     current_layer, layer->Material->Id) ;
 #endif
 
@@ -385,21 +386,21 @@ Quantity_t fill_crs_system_matrix_layer
     (
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
-      conductances ++ ,
-      capacities   ++ ,
-      rows         ++ ,
-      columns      += added ,
-      values       += added ,
-      tot_added    += added ,
-      column       ++
+      conductances   ++ ,
+      capacities     ++ ,
+      row_offsets    ++ ,
+      column_indices += added ,
+      values         += added ,
+      tot_added      += added ,
+      column         ++
     )
 
-      added = add_crs_solid_column
+      added = add_solid_row
               (
                 dimensions, conductances, capacities,
                 environmentheatsink,
                 current_layer, row, column,
-                rows, columns, values
+                row_offsets, column_indices, values
               ) ;
 
   return tot_added ;

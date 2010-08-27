@@ -110,8 +110,8 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 Conductances* fill_conductances_channel
 (
-# ifdef PRINT_CAPACITIES
-  LayerIndex_t  current_layer
+# ifdef PRINT_CONDUCTANCES
+  LayerIndex_t  current_layer,
 # endif
   Channel*      channel,
   Conductances* conductances,
@@ -240,13 +240,12 @@ Capacity_t* fill_capacities_channel
 #       ifdef PRINT_CAPACITIES
         fprintf (stderr,
           "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  vhc %.5e --> %.5e\n",
+                      " |  vhc %.5e delta %.5e --> %.5e\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           get_cell_length(dimensions, column), get_cell_width (dimensions),
           channel->Height,
-          channel->Wall->VolHeatCapacity,
-          *capacities) ;
+          channel->Wall->VolHeatCapacity, delta_time, *capacities) ;
 #       endif
       }
       else                 /* Odd -> liquid */
@@ -262,12 +261,12 @@ Capacity_t* fill_capacities_channel
 #       ifdef PRINT_CAPACITIES
         fprintf (stderr,
           "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  vhc %.5e --> %.5e\n",
+                      " |  vhc %.5e delta %.5e --> %.5e\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           get_cell_length(dimensions, column), get_cell_width (dimensions),
           channel->Height,
-          channel->CoolantVHC, *capacities) ;
+          channel->CoolantVHC, delta_time, *capacities) ;
 #       endif
       }
 
@@ -335,7 +334,7 @@ Source_t* fill_sources_channel
 
 /******************************************************************************/
 
-Quantity_t fill_crs_system_matrix_channel
+Quantity_t fill_system_matrix_channel
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Channel*             channel,
@@ -344,8 +343,8 @@ Quantity_t fill_crs_system_matrix_channel
   Conductances*        conductances,
   Capacity_t*          capacities,
   LayerIndex_t         current_layer,
-  RowIndex_t*          rows,
-  ColumnIndex_t*       columns,
+  RowIndex_t*          row_offsets,
+  ColumnIndex_t*       column_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -355,7 +354,7 @@ Quantity_t fill_crs_system_matrix_channel
 
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
-    "(l %2d) fill_crs_system_matrix_channel %s \n",
+    "(l %2d) fill_system_matrix_channel %s \n",
     current_layer, channel->Wall->Id) ;
 # endif
 
@@ -371,32 +370,32 @@ Quantity_t fill_crs_system_matrix_channel
     (
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
-      conductances ++ ,
-      capacities   ++ ,
-      rows         ++ ,
-      columns      += added ,
-      values       += added ,
-      tot_added    += added ,
-      column       ++
+      conductances   ++ ,
+      capacities     ++ ,
+      row_offsets    ++ ,
+      column_indices += added ,
+      values         += added ,
+      tot_added      += added ,
+      column         ++
     )
 
        if (column % 2 == 0 ) /* Even -> Wall */
 
-         added = add_crs_solid_column
+         added = add_solid_row
                  (
                    dimensions, conductances, capacities,
                    NULL,
                    current_layer, row, column,
-                   rows, columns, values
+                   row_offsets, column_indices, values
                  ) ;
 
        else                  /* Odd -> liquid */
 
-         added = add_crs_liquid_column
+         added = add_liquid_row
                  (
                    dimensions, conductances, capacities,
                    current_layer, row, column,
-                   rows, columns, values
+                   row_offsets, column_indices, values
                  ) ;
 
   return tot_added ;

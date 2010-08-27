@@ -119,6 +119,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "/*"                         BEGIN(MULTIPLE_LINE_COMMENT) ;
 
 ":"                          return yytext[0] ;
+","                          return yytext[0] ;
 ";"                          return yytext[0] ;
 
 "bottom"                     return BOTTOM ;

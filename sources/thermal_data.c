@@ -125,7 +125,7 @@ int init_thermal_data
   dCreate_CompRow_Matrix  /* Matrix A */
   (
     &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-    tdata->SM_A.Values, tdata->SM_A.Columns, tdata->SM_A.Rows,
+    tdata->SM_A.Values, tdata->SM_A.ColumnIndices, tdata->SM_A.RowOffsets,
     SLU_NR, SLU_D, SLU_GE
   ) ;
 
@@ -205,12 +205,10 @@ int fill_thermal_data
   fill_capacities_stack_description (stkd, tdata->Capacities,
                                            tdata->DeltaTime) ;
 
-  fill_system_matrix
+  fill_system_matrix_stack_description
   (
-    stkd,
-    &tdata->SM_A,
-    tdata->Conductances,
-    tdata->Capacities
+    stkd, tdata->Conductances, tdata->Capacities,
+    tdata->SM_A.RowOffsets,    tdata->SM_A.ColumnIndices, tdata->SM_A.Values
   ) ;
 
   fill_sources_stack_description (stkd, tdata->Sources,
@@ -247,8 +245,6 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
 {
   Time_t time = tdata->SlotTime ;
   int counter;
-
-  printf ("Calling emulate %d ... \n", stkd->RemainingTimeSlots) ;
 
   if (tdata->SLU_Options.Fact == DOFACT)
   {

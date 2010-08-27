@@ -51,18 +51,18 @@ int alloc_system_matrix
   matrix->Size    = nvalues ;
   matrix->NNz     = nnz ;
 
-  matrix->Columns
-    = (ColumnIndex_t*) malloc (sizeof(ColumnIndex_t) * nnz ) ;
-
-  if (matrix->Columns == NULL)
-    return 0 ;
-
-  matrix->Rows
+  matrix->RowOffsets
     = (RowIndex_t*) malloc (sizeof(RowIndex_t) * nvalues + 1 ) ;
 
-  if (matrix->Rows == NULL)
+  if (matrix->RowOffsets == NULL)
+    return 0 ;
+
+  matrix->ColumnIndices
+    = (ColumnIndex_t*) malloc (sizeof(ColumnIndex_t) * nnz ) ;
+
+  if (matrix->ColumnIndices == NULL)
   {
-    free (matrix->Columns) ;
+    free (matrix->RowOffsets) ;
     return 0 ;
   }
 
@@ -71,8 +71,8 @@ int alloc_system_matrix
 
   if (matrix->Values == NULL)
   {
-    free (matrix->Columns) ;
-    free (matrix->Rows) ;
+    free (matrix->ColumnIndices) ;
+    free (matrix->RowOffsets) ;
     return 0 ;
   }
 
@@ -83,35 +83,14 @@ int alloc_system_matrix
 
 void free_system_matrix (SystemMatrix* matrix)
 {
-  free (matrix->Columns) ;
-  free (matrix->Rows) ;
+  free (matrix->ColumnIndices) ;
+  free (matrix->RowOffsets) ;
   free (matrix->Values) ;
 }
 
 /******************************************************************************/
 
-void fill_system_matrix
-(
-  StackDescription* stkd,
-  SystemMatrix*     matrix,
-  Conductances*     conductances,
-  Capacity_t*       capacities
-)
-{
-  fill_crs_system_matrix_stack_description
-  (
-    stkd,
-    conductances,
-    capacities,
-    matrix->Rows,
-    matrix->Columns,
-    matrix->Values
-  ) ;
-}
-
-/******************************************************************************/
-
-Quantity_t add_crs_solid_column
+Quantity_t add_solid_row
 (
   Dimensions*          dimensions,
   Conductances*        conductances,
@@ -120,8 +99,8 @@ Quantity_t add_crs_solid_column
   LayerIndex_t         current_layer,
   RowIndex_t           current_row,
   ColumnIndex_t        current_column,
-  RowIndex_t*          rows,
-  ColumnIndex_t*       columns,
+  RowIndex_t*          row_offsets,
+  ColumnIndex_t*       column_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -138,15 +117,148 @@ Quantity_t add_crs_solid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
   fprintf (stderr,
-    "add_crs_solid_column  (l %2d r %5d c %5d) -> %5d\n",
+    "add_solid_row   l %2d r %4d c %4d [%6d]\n",
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
-  *rows = *(rows - 1) ;
+  *row_offsets = *(row_offsets - 1) ;
 
-  if ( current_layer < dimensions->Grid.NLayers - 1) /* TOP */
+  if ( current_layer > 0 )   /* BOTTOM */
   {
-    *columns++ = current_cell + LAYER_OFFSET(dimensions) ;
+    *column_indices++ = current_cell - LAYER_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->Bottom,
+                           (conductances - LAYER_OFFSET(dimensions))->Top) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+    "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
+    *(column_indices-1), *(values-1),
+    conductances->Bottom, (conductances - LAYER_OFFSET(dimensions))->Top) ;
+#endif
+  }
+
+  /* SOUTH */
+
+  if ( current_row > 0 )
+  {
+    *column_indices++ = current_cell - ROW_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->South,
+                           (conductances - ROW_OFFSET(dimensions))->North) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  south   \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->South, (conductances - ROW_OFFSET(dimensions))->North) ;
+#endif
+  }
+
+  /* WEST */
+
+  if ( current_column > 0 )
+  {
+    *column_indices++ = current_cell - COLUMN_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->West,
+                           (conductances - COLUMN_OFFSET(dimensions))->East) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  west    \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->West, (conductances - COLUMN_OFFSET(dimensions))->East) ;
+#endif
+  }
+
+  /* DIAGONAL */
+
+  *column_indices++ = current_cell ;
+  *values           = *capacities ;
+  diagonal_pointer  = values++ ;
+
+  (*row_offsets)++ ;
+  added ++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf (stderr, "  diagonal\t%d\t ", *(column_indices-1)) ;
+  fgetpos (stderr, &diag_fposition) ;
+  if (environmentheatsink != NULL)
+    fprintf (stderr, "           + ehtc %.5e\n", conductances->Top) ;
+  else
+    fprintf (stderr, "           \n") ;
+#endif
+
+  /* EAST */
+
+  if ( current_column < dimensions->Grid.NColumns - 1 )
+  {
+    *column_indices++ = current_cell + COLUMN_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->East,
+                           (conductances + COLUMN_OFFSET(dimensions))->West) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added ++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  east    \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->East, (conductances + COLUMN_OFFSET(dimensions))->West) ;
+#endif
+  }
+
+  /* NORTH */
+
+  if ( current_row < dimensions->Grid.NRows - 1 )
+  {
+    *column_indices++ = current_cell + ROW_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->North,
+                           (conductances + ROW_OFFSET(dimensions))->South) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  north   \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->North, (conductances + ROW_OFFSET(dimensions))->South) ;
+#endif
+  }
+
+  /* TOP */
+
+  if ( current_layer < dimensions->Grid.NLayers - 1)
+  {
+    *column_indices++ = current_cell + LAYER_OFFSET(dimensions) ;
 
     conductance = PARALLEL (conductances->Top,
                            (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
@@ -154,13 +266,13 @@ Quantity_t add_crs_solid_column
     *values++       = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*rows)++ ;
+    (*row_offsets)++ ;
     added++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  top     \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
+      *(column_indices-1), *(values-1),
       conductances->Top, (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
 #endif
   }
@@ -169,129 +281,6 @@ Quantity_t add_crs_solid_column
     if (environmentheatsink != NULL)
 
       diagonal_value += conductances->Top ;
-  }
-
-  if ( current_row < dimensions->Grid.NRows - 1 )   /* NORTH */
-  {
-    *columns++ = current_cell + ROW_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->North,
-                           (conductances + ROW_OFFSET(dimensions))->South) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  north   \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->North, (conductances + ROW_OFFSET(dimensions))->South) ;
-#endif
-  }
-
-  if ( current_column < dimensions->Grid.NColumns - 1 )   /* EAST */
-  {
-    *columns++ = current_cell + COLUMN_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->East,
-                           (conductances + COLUMN_OFFSET(dimensions))->West) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added ++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  east    \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->East, (conductances + COLUMN_OFFSET(dimensions))->West) ;
-#endif
-  }
-
-  /* DIAGONAL */
-
-  *columns++       = current_cell ;
-  *values          = *capacities ;
-  diagonal_pointer = values++ ;
-
-  (*rows)++ ;
-  added ++ ;
-
-#ifdef stderr_SYSTEM_MATRIX
-  fprintf (stderr, "  diagonal\t%d\t ", *(columns-1)) ;
-  fgetpos (stderr, &diag_fposition) ;
-  if (environmentheatsink != NULL)
-    fprintf (stderr, "           + ehtc %.5e\n", conductances->Top) ;
-  else
-    fprintf (stderr, "           \n") ;
-#endif
-
-  if ( current_column > 0 )   /* WEST */
-  {
-    *columns++ = current_cell - COLUMN_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->West,
-                           (conductances - COLUMN_OFFSET(dimensions))->East) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  west    \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->West, (conductances - COLUMN_OFFSET(dimensions))->East) ;
-#endif
-  }
-
-  if ( current_row > 0 )   /* SOUTH */
-  {
-    *columns++ = current_cell - ROW_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->South,
-                           (conductances - ROW_OFFSET(dimensions))->North) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  south   \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->South, (conductances - ROW_OFFSET(dimensions))->North) ;
-#endif
-  }
-
-  if ( current_layer > 0 )   /* BOTTOM */
-  {
-    *columns++ = current_cell - LAYER_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->Bottom,
-                           (conductances - LAYER_OFFSET(dimensions))->Top) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added++;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->Bottom, (conductances - LAYER_OFFSET(dimensions))->Top) ;
-#endif
   }
 
   /* DIAGONAL ELEMENT */
@@ -304,7 +293,7 @@ Quantity_t add_crs_solid_column
   fprintf (stderr, "%.5e", *diagonal_pointer) ;
   fsetpos (stderr, &last_fpos) ;
 
-  fprintf (stderr, "  %d (+%d)\n", *rows, added) ;
+  fprintf (stderr, "  %d (+%d)\n", *row_offsets, added) ;
 #endif
 
   return added ;
@@ -312,7 +301,7 @@ Quantity_t add_crs_solid_column
 
 /******************************************************************************/
 
-Quantity_t add_crs_liquid_column
+Quantity_t add_liquid_row
 (
   Dimensions*          dimensions,
   Conductances*        conductances,
@@ -320,8 +309,8 @@ Quantity_t add_crs_liquid_column
   LayerIndex_t         current_layer,
   RowIndex_t           current_row,
   ColumnIndex_t        current_column,
-  RowIndex_t*          rows,
-  ColumnIndex_t*       columns,
+  RowIndex_t*          row_offsets,
+  ColumnIndex_t*       column_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -338,121 +327,17 @@ Quantity_t add_crs_liquid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
   fprintf (stderr,
-    "add_crs_liquid_column  (l %2d r %5d c %5d) -> %5d\n",
+    "add_liquid_row  l %2d r %4d c %4d [%6d]\n",
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
-  *rows = *(rows - 1) ;
+  *row_offsets = *(row_offsets - 1) ;
 
-  if ( current_layer < dimensions->Grid.NLayers - 1)  /* TOP */
+  /* BOTTOM */
+
+  if ( current_layer > 0 )
   {
-    *columns++ = current_cell + LAYER_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->Top,
-                           (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added++;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  top     \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->Top, (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
-#endif
-  }
-
-  if ( current_row < dimensions->Grid.NRows - 1 )   /* NORTH */
-  {
-    *columns++ = current_cell + ROW_OFFSET(dimensions) ;
-    *values++  = conductances->North ; /* == -C */
-
-    (*rows)++ ;
-    added ++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  north   \t%d\t%.5e\n", *(columns-1), *(values-1)) ;
-#endif
-  }
-
-  if ( current_column < dimensions->Grid.NColumns - 1 )    /* EAST */
-  {
-    *columns++ = current_cell + COLUMN_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->East,
-                           (conductances + COLUMN_OFFSET(dimensions))->West) ;
-
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
-
-    (*rows)++ ;
-    added++;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  east    \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->East, (conductances + COLUMN_OFFSET(dimensions))->West) ;
-#endif
-  }
-
-  /* DIAGONAL */
-
-  *columns++       = current_cell ;
-  *values          = *capacities ;
-  diagonal_pointer = values++ ;
-
-  (*rows)++ ;
-  added++;
-
-#ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "  diagonal\t%d\t ", *(columns-1)) ;
-  fgetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "           \n") ;
-#endif
-
-  if ( current_column > 0 )   /* WEST */
-  {
-    *columns++ = current_cell - COLUMN_OFFSET(dimensions) ;
-
-    conductance = PARALLEL (conductances->West,
-                           (conductances - COLUMN_OFFSET(dimensions))->East) ;
-
-    *values++        = -conductance ;
-    diagonal_value  +=  conductance ;
-
-    (*rows)++ ;
-    added++;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  west    \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
-      conductances->West, (conductances - COLUMN_OFFSET(dimensions))->East) ;
-#endif
-  }
-
-  if ( current_row > 0 )   /* SOUTH */
-  {
-    *columns++ = current_cell - ROW_OFFSET(dimensions) ;
-    *values++  = conductances->South ; /* == (C) */
-
-    (*rows)++ ;
-    added++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-      "  south   \t%d\t%.5e\n", *(columns-1), *(values-1)) ;
-#endif
-  }
-
-  if ( current_layer > 0 )   /* BOTTOM */
-  {
-    *columns++ = current_cell - LAYER_OFFSET(dimensions) ;
+    *column_indices++ = current_cell - LAYER_OFFSET(dimensions) ;
 
     conductance = PARALLEL (conductances->Bottom,
                            (conductances - LAYER_OFFSET(dimensions))->Top) ;
@@ -460,14 +345,130 @@ Quantity_t add_crs_liquid_column
     *values++       = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*rows)++ ;
+    (*row_offsets)++ ;
     added++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
-      *(columns-1), *(values-1),
+      *(column_indices-1), *(values-1),
       conductances->Bottom, (conductances - LAYER_OFFSET(dimensions))->Top) ;
+#endif
+  }
+
+  /* SOUTH */
+
+  if ( current_row > 0 )
+  {
+    *column_indices++ = current_cell - ROW_OFFSET(dimensions) ;
+    *values++  = conductances->South ; /* == (C) */
+
+    (*row_offsets)++ ;
+    added++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  south   \t%d\t%.5e\n", *(column_indices-1), *(values-1)) ;
+#endif
+  }
+
+  /* WEST */
+
+  if ( current_column > 0 )
+  {
+    *column_indices++ = current_cell - COLUMN_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->West,
+                           (conductances - COLUMN_OFFSET(dimensions))->East) ;
+
+    *values++        = -conductance ;
+    diagonal_value  +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  west    \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->West, (conductances - COLUMN_OFFSET(dimensions))->East) ;
+#endif
+  }
+
+  /* DIAGONAL */
+
+  *column_indices++ = current_cell ;
+  *values           = *capacities ;
+  diagonal_pointer  = values++ ;
+
+  (*row_offsets)++ ;
+  added++;
+
+#ifdef PRINT_SYSTEM_MATRIX
+  fprintf (stderr, "  diagonal\t%d\t", *(column_indices-1)) ;
+  fgetpos (stderr, &diag_fposition) ;
+  fprintf (stderr, "           \n") ;
+#endif
+
+  /* EAST */
+
+  if ( current_column < dimensions->Grid.NColumns - 1 )
+  {
+    *column_indices++ = current_cell + COLUMN_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->East,
+                           (conductances + COLUMN_OFFSET(dimensions))->West) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  east    \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->East, (conductances + COLUMN_OFFSET(dimensions))->West) ;
+#endif
+  }
+
+  /* NORTH */
+
+  if ( current_row < dimensions->Grid.NRows - 1 )
+  {
+    *column_indices++ = current_cell + ROW_OFFSET(dimensions) ;
+    *values++  = conductances->North ; /* == -C */
+
+    (*row_offsets)++ ;
+    added ++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  north   \t%d\t%.5e\n", *(column_indices-1), *(values-1)) ;
+#endif
+  }
+
+  /* TOP */
+
+  if ( current_layer < dimensions->Grid.NLayers - 1)
+  {
+    *column_indices++ = current_cell + LAYER_OFFSET(dimensions) ;
+
+    conductance = PARALLEL (conductances->Top,
+                           (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
+
+    *values++       = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*row_offsets)++ ;
+    added++;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+      "  top     \t%d\t%.5e = %.5e || %.5e\n",
+      *(column_indices-1), *(values-1),
+      conductances->Top, (conductances + LAYER_OFFSET(dimensions))->Bottom) ;
 #endif
   }
 
@@ -485,7 +486,7 @@ Quantity_t add_crs_liquid_column
   fprintf (stderr, "%.5e", *diagonal_pointer) ;
   fsetpos (stderr, &last_fpos) ;
 
-  fprintf (stderr, "  %d (+%d)\n", *rows, added) ;
+  fprintf (stderr, "  %d (+%d)\n", *row_offsets, added) ;
 #endif
 
   return added ;
