@@ -1,31 +1,35 @@
 /******************************************************************************
- * Source file "3D-ICe/sources/termal_data.c"                                 *
+ * Bison source file "3D-ICE/bison/floorplan_parser.y"                        *
  *                                                                            *
- * This file is part of 3D-ICe (http://esl.epfl.ch/3D-ICe), revision 0.1      *
+ * This file is part of 3D-ICE 1.0 (beta).                                    *
  *                                                                            *
- * 3D-ICe is free software: you can redistribute it and/or modify it under    *
- * the terms of the GNU General Public License as published by the Free       *
- * Software Foundation, either version 3 of the License, or any later         *
+ * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
+ * the terms of the  GNU General  Public  License as  published by  the  Free *
+ * Software  Foundation, either  version  3  of  the License,  or  any  later *
  * version.                                                                   *
  *                                                                            *
- * 3D-ICe is distributed in the hope that it will be useful, but WITHOUT      *
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or      *
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for   *
+ * 3D-ICE is  distributed  in the hope  that it will  be useful, but  WITHOUT *
+ * ANY  WARRANTY; without  even the  implied warranty  of MERCHANTABILITY  or *
+ * FITNESS  FOR A PARTICULAR  PURPOSE. See the GNU General Public License for *
  * more details.                                                              *
  *                                                                            *
- * You should have received a copy of the GNU General Public License along    *
- * with 3D-ICe.  If not, see <http://www.gnu.org/licenses/>.                  *
+ * You should have  received a copy of  the GNU General  Public License along *
+ * with 3D-ICe. If not, see <http://www.gnu.org/licenses/>.                   *
  *                                                                            *
- * Copyright (C) 2010,                                                        *
- * Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne.    *
- * All Rights Reserved.                                                       *
+ *                             Copyright (C) 2010                             *
+ *   Embedded Systems Laboratory - Ecole Polytechnique Federale de Lausanne   *
+ *                            All Rights Reserved.                            *
  *                                                                            *
- * Authors: Alessandro Vincenzi, Arvind Sridhar.                              *
+ * Authors: Arvind Sridhar                                                    *
+ *          Alessandro Vincenzi                                               *
+ *          Martino Ruggiero                                                  *
+ *          Thomas Brunschwiler                                               *
+ *          David Atienza                                                     *
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
- * Bâtiment ELG, ELG 130                                                      *
- * Station 11                                                                 *
- * 1015 Lausanne, Switzerland                          threed-ice@esl.epfl.ch *
+ * Batiment ELG, ELG 130                                                      *
+ * Station 11                                          threed-ice@esl.epfl.ch *
+ * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -211,6 +215,11 @@ int fill_thermal_data
     tdata->SM_A.RowOffsets,    tdata->SM_A.ColumnIndices, tdata->SM_A.Values
   ) ;
 
+//   if (tdata->SLU_Options.Fact == FACTORED)
+//     tdata->SLU_Options.Fact = SamePattern ;
+//   else
+//     tdata->SLU_Options.Fact = DOFACT ;
+
   fill_sources_stack_description (stkd, tdata->Sources,
                                         tdata->Conductances) ;
 
@@ -218,25 +227,30 @@ int fill_thermal_data
                                     tdata->Capacities,
                                     tdata->Temperatures) ;
 
-  get_perm_c (tdata->SLU_Options.ColPerm,
-              &tdata->SLUMatrix_A,
-              tdata->SLU_PermutationMatrixC) ;
+//   if (tdata->SLU_Options.Fact != FACTORED )
+//   {
+//     get_perm_c (tdata->SLU_Options.ColPerm,
+//                 &tdata->SLUMatrix_A,
+//                 tdata->SLU_PermutationMatrixC) ;
+// 
+//     sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
+//                  tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
+//                  &tdata->SLUMatrix_A_Permuted) ;
+// 
+//     dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+//             sp_ienv(2), sp_ienv(1), /* relax and panel size */
+//             tdata->SLU_Etree,
+//             NULL, 0,                /* work and lwork */
+//             tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+//             &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+//             &tdata->SLU_Stat, &tdata->SLU_Info) ;
+// 
+//     tdata->SLU_Options.Fact = FACTORED ;
+// 
+//     return tdata->SLU_Info ;
+//   }
 
-  sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
-               tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
-               &tdata->SLUMatrix_A_Permuted) ;
-
-  dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
-          sp_ienv(2), sp_ienv(1), /* relax and panel size */
-          tdata->SLU_Etree,
-          NULL, 0,                /* work and lwork */
-          tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-          &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-          &tdata->SLU_Stat, &tdata->SLU_Info) ;
-
-  tdata->SLU_Options.Fact = FACTORED ;
-
-  return tdata->SLU_Info ;
+  return 0 ;
 }
 
 /******************************************************************************/
@@ -246,25 +260,35 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
   Time_t time = tdata->SlotTime ;
   int counter;
 
-  if (tdata->SLU_Options.Fact == DOFACT)
-  {
-    fprintf (stderr, "System matrix must be factorized\n");
-    return 1 ;
-  }
+//  if (tdata->SLU_Options.Fact == DOFACT)
+//  {
+//    fprintf (stderr, "System matrix must be factorized\n");
+//    return 1 ;
+//  }
 
   for ( ; time > 0 ; time -= tdata->DeltaTime)
   {
-    dgstrs
-    (
-      NOTRANS,
-      &tdata->SLUMatrix_L,
-      &tdata->SLUMatrix_U,
-      tdata->SLU_PermutationMatrixC,
-      tdata->SLU_PermutationMatrixR,
-      &tdata->SLUMatrix_B,
-      &tdata->SLU_Stat,
-      &tdata->SLU_Info
-    ) ;
+//     dgstrs
+//     (
+//       NOTRANS,
+//       &tdata->SLUMatrix_L,
+//       &tdata->SLUMatrix_U,
+//       tdata->SLU_PermutationMatrixC,
+//       tdata->SLU_PermutationMatrixR,
+//       &tdata->SLUMatrix_B,
+//       &tdata->SLU_Stat,
+//       &tdata->SLU_Info
+//     ) ;
+
+   dgssv(&tdata->SLU_Options,
+         &tdata->SLUMatrix_A,
+         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+         &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+         &tdata->SLUMatrix_B,
+         &tdata->SLU_Stat, &tdata->SLU_Info);
+
+    printf ("%8.4f -- %8.4f\n", tdata->Temperatures[get_cell_offset_in_stack (stkd->Dimensions, 0, 50, 1)],
+                                tdata->Temperatures[get_cell_offset_in_stack (stkd->Dimensions, 4, 50, 1)]) ;
 
     if (tdata->SLU_Info != 0)
     {
