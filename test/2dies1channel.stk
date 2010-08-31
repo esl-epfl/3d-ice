@@ -1,0 +1,47 @@
+material silicon :
+   thermal conductivity       1.30e-4 ;
+   volumetric heat capacity   1.63566e-12 ;
+
+channel:
+
+   height 100.0 um ;
+
+   channel length  50.0 um ;
+   wall    length  50.0 um ; 
+
+   first wall length  25.0 um ;
+   last  wall length  25.0 um ; 
+
+   wall material silicon ;
+
+   coolant flow rate                        0.48 ;
+   coolant heat transfer coefficient side   2.7132e-08,
+                                     top    5.7132e-08,
+                                     bottom 4.7132e-08 ;
+   coolant volumetric heat capacity         4.172638e-12 ;
+   coolant incoming temperature           300.0 ;
+
+die bottomdie :
+
+   layer 48.0 um silicon ;
+   source  2.0 um silicon ;
+
+die topdie :
+	
+   source 2.0 um silicon;
+   layer 48.0 um silicon;
+
+stack:
+
+   die     die2     topdie    floorplan "four_elements.flp" ;
+   channel channel1 ;
+   die     die1     bottomdie floorplan "single_element.flp" ;
+
+dimensions :
+
+  chip length 00.1 mm ;
+  chip width  10.1 mm ;
+
+  cell length  50.0 um ;
+  cell width  100.0 um ;
+
