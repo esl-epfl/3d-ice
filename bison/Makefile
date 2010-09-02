@@ -32,17 +32,16 @@
  # 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE #
  ##############################################################################
 
-TDICE_MAIN = ..
+3DICE_MAIN = ..
 
-include $(TDICE_MAIN)/makefile.def
+include $(3DICE_MAIN)/makefile.def
 
-all: $(TDICE_BISON_OBJECTS:.o=.c)
+all: $(3DICE_BISON_C)
 
--include $(TDICE_BISON_OBJECTS:.o=.d)
+-include $(3DICE_BISON_D)
 
 clean:
-	@$(RM) $(RMFLAGS) $(TDICE_BISON_OBJECTS)
-	@$(RM) $(RMFLAGS) $(TDICE_BISON_OBJECTS:.o=.h)
-	@$(RM) $(RMFLAGS) $(TDICE_BISON_OBJECTS:.o=.c)
-	@$(RM) $(RMFLAGS) $(TDICE_BISON_OBJECTS:.o=.d)
-
+	@$(RM) $(RMFLAGS) $(3DICE_BISON_O)
+	@$(RM) $(RMFLAGS) $(3DICE_BISON_H)
+	@$(RM) $(RMFLAGS) $(3DICE_BISON_C)
+	@$(RM) $(RMFLAGS) $(3DICE_BISON_D)

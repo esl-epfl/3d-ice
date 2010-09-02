@@ -32,22 +32,25 @@
  # 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE #
  ##############################################################################
 
-TDICE_MAIN = ..
+3DICE_MAIN = ..
 
-include $(TDICE_MAIN)/makefile.def
+include $(3DICE_MAIN)/makefile.def
 
 all: FillThermalData Emulate3DICe
 
-CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE) 
-CLIBS    = $(TDICE_ARCHIVE) $(SLU_LIBS)
+CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE)
+CLIBS    = $(3DICE_LIB_A) $(SLU_LIBS)
 
-FillThermalData: $(TDICE_LIB_ARCHIVE)
-	$(CC) $(CFLAGS) $@.c $(CINCLUDES) $(CLIBS) -o $@
+FillThermalData: FillThermalData.o
+	$(CC) $< $(CLIBS) -o $@
 
-Emulate3DICe: $(TDICE_LIB_ARCHIVE)
-	$(CC) $(CFLAGS) $@.c $(CINCLUDES) $(CLIBS) -o $@
-
+Emulate3DICe: Emulate3DICe.o
+	$(CC) $< $(CLIBS) -o $@
 
 clean:
 	@$(RM) $(RMFLAGS) FillThermalData
+	@$(RM) $(RMFLAGS) FillThermalData.o
+	@$(RM) $(RMFLAGS) FillThermalData.d
 	@$(RM) $(RMFLAGS) Emulate3DICe
+	@$(RM) $(RMFLAGS) Emulate3DICe.o
+	@$(RM) $(RMFLAGS) Emulate3DICe.d

@@ -32,66 +32,108 @@
  # 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE #
  ##############################################################################
 
-#
-# Thermal Library variables
-###############################################################################
+ #
+ # Thermal Library variables
+ ##############################################################################
 
-LIB_NAME      = threedice
+3DICE_LIBNAME   = 3D-ICE
+3DICE_VERSION   = 1.0-beta
 
-TDICE_INCLUDE = $(TDICE_MAIN)/include
-TDICE_FLEX    = $(TDICE_MAIN)/flex
-TDICE_BISON   = $(TDICE_MAIN)/bison
-TDICE_SOURCES = $(TDICE_MAIN)/sources
-TDICE_LIB     = $(TDICE_MAIN)/lib
-TDICE_TEST    = $(TDICE_MAIN)/test
+3DICE_INCLUDE   = $(3DICE_MAIN)/include
+3DICE_FLEX      = $(3DICE_MAIN)/flex
+3DICE_BISON     = $(3DICE_MAIN)/bison
+3DICE_SOURCES   = $(3DICE_MAIN)/sources
+3DICE_LIB       = $(3DICE_MAIN)/lib
+3DICE_TEST      = $(3DICE_MAIN)/test
 
-TDICE_FLEX_OBJECTS   = $(TDICE_FLEX)/floorplan_scanner.o            \
-                       $(TDICE_FLEX)/stack_description_scanner.o
+3DICE_FLEX_L    = $(3DICE_FLEX)/floorplan_scanner.l         \
+                  $(3DICE_FLEX)/stack_description_scanner.l
+3DICE_FLEX_C    = $(3DICE_FLEX_L:.l=.c)
+3DICE_FLEX_H    = $(3DICE_FLEX_L:.l=.h)
+3DICE_FLEX_O    = $(3DICE_FLEX_L:.l=.o)
+3DICE_FLEX_D    = $(3DICE_FLEX_L:.l=.d)
 
-TDICE_BISON_OBJECTS  = $(TDICE_BISON)/floorplan_parser.o            \
-                       $(TDICE_BISON)/stack_description_parser.o
+3DICE_BISON_Y   = $(3DICE_BISON)/floorplan_parser.y         \
+                  $(3DICE_BISON)/stack_description_parser.y
+3DICE_BISON_C   = $(3DICE_BISON_Y:.y=.c)
+3DICE_BISON_H   = $(3DICE_BISON_Y:.y=.h)
+3DICE_BISON_O   = $(3DICE_BISON_Y:.y=.o)
+3DICE_BISON_D   = $(3DICE_BISON_Y:.y=.d)
 
-TDICE_SOURCE_OBJECTS = $(TDICE_SOURCES)/channel.o                   \
-                       $(TDICE_SOURCES)/conductances.o              \
-                       $(TDICE_SOURCES)/die.o                       \
-                       $(TDICE_SOURCES)/dimensions.o                \
-                       $(TDICE_SOURCES)/environment_heat_sink.o     \
-                       $(TDICE_SOURCES)/floorplan.o                 \
-                       $(TDICE_SOURCES)/floorplan_element.o         \
-                       $(TDICE_SOURCES)/layer.o                     \
-                       $(TDICE_SOURCES)/material.o                  \
-                       $(TDICE_SOURCES)/powers_queue.o              \
-                       $(TDICE_SOURCES)/stack_description.o         \
-                       $(TDICE_SOURCES)/stack_element.o             \
-                       $(TDICE_SOURCES)/system_matrix.o             \
-                       $(TDICE_SOURCES)/system_vector.o             \
-                       $(TDICE_SOURCES)/thermal_data.o
+3DICE_INCLUDE_H = $(3DICE_INCLUDE)/channel.h                \
+                  $(3DICE_INCLUDE)/conductances.h           \
+                  $(3DICE_INCLUDE)/die.h                    \
+                  $(3DICE_INCLUDE)/dimensions.h             \
+                  $(3DICE_INCLUDE)/environment_heat_sink.h  \
+                  $(3DICE_INCLUDE)/floorplan_element.h      \
+                  $(3DICE_INCLUDE)/floorplan.h              \
+                  $(3DICE_INCLUDE)/layer.h                  \
+                  $(3DICE_INCLUDE)/material.h               \
+                  $(3DICE_INCLUDE)/powers_queue.h           \
+                  $(3DICE_INCLUDE)/stack_description.h      \
+                  $(3DICE_INCLUDE)/stack_element.h          \
+                  $(3DICE_INCLUDE)/system_matrix.h          \
+                  $(3DICE_INCLUDE)/system_vector.h          \
+                  $(3DICE_INCLUDE)/thermal_data.h           \
+                  $(3DICE_INCLUDE)/types.h
 
-TDICE_LIB_OBJECTS    = $(TDICE_FLEX_OBJECTS)                        \
-                       $(TDICE_BISON_OBJECTS)                       \
-                       $(TDICE_SOURCE_OBJECTS)
+3DICE_SOURCES_C = $(3DICE_SOURCES)/channel.c                \
+                  $(3DICE_SOURCES)/conductances.c           \
+                  $(3DICE_SOURCES)/die.c                    \
+                  $(3DICE_SOURCES)/dimensions.c             \
+                  $(3DICE_SOURCES)/environment_heat_sink.c  \
+                  $(3DICE_SOURCES)/floorplan_element.c      \
+                  $(3DICE_SOURCES)/floorplan.c              \
+                  $(3DICE_SOURCES)/layer.c                  \
+                  $(3DICE_SOURCES)/material.c               \
+                  $(3DICE_SOURCES)/powers_queue.c           \
+                  $(3DICE_SOURCES)/stack_description.c      \
+                  $(3DICE_SOURCES)/stack_element.c          \
+                  $(3DICE_SOURCES)/system_matrix.c          \
+                  $(3DICE_SOURCES)/system_vector.c          \
+                  $(3DICE_SOURCES)/thermal_data.c
 
-TDICE_ARCHIVE        = $(TDICE_LIB)/lib$(LIB_NAME).a
+3DICE_SOURCES_O = $(3DICE_SOURCES_C:.c=.o)
+3DICE_SOURCES_D = $(3DICE_SOURCES_C:.c=.d)
 
-#
-# SuperLU variables
-###############################################################################
+3DICE_LIB_A     = $(3DICE_LIB)/lib$(3DICE_LIBNAME)-$(3DICE_VERSION).a
 
-SLU_MAIN    = $(TDICE_MAIN)/../EPFL/SuperLU_4.0
+3DICE_LIB_O     = $(3DICE_FLEX_O) $(3DICE_BISON_O) $(3DICE_SOURCES_O)
+
+3DICE_ALL_FILES = $(3DICE_BISON_Y)            \
+                  $(3DICE_BISON)/Makefile     \
+                  $(3DICE_FLEX_L)             \
+                  $(3DICE_FLEX)/Makefile      \
+                  $(3DICE_INCLUDE_H)          \
+                  $(3DICE_LIB)                \
+                  $(3DICE_LIB)/Makefile       \
+                  $(3DICE_SOURCES_C)          \
+                  $(3DICE_SOURCES_C)/Makefile \
+                  Makefile.def                \
+                  Makefile                    \
+                  COPYING                     \
+                  README
+
+ #
+ # SuperLU variables
+ ##############################################################################
+
+SLU_MAIN    = $(HOME)/SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
-SLU_LIBS    = $(SLU_LIB)/libsuperlu_4.0.a $(SLU_LIB)/blas_linux.a
+SLU_LIBS    = -L $(SLU_LIB) -l superlu_4.0 -l blas
+#SLU_LIBS    = -L $(SLU_LIB) -l superlu_4.0 -L /usr/lib64 -l blas
 
-#
-# Commands and flags
-###############################################################################
+ #
+ # Commands and flags
+ ##############################################################################
 
 AR        = ar
 ARFLAGS   = rsv
 
 CC        = gcc
-CFLAGS    = -MD -g 
-CINCLUDES = -I $(TDICE_INCLUDE)
+CFLAGS    = -MD -g
+CINCLUDES = -I $(3DICE_INCLUDE)
 
 YACC      = bison
 YFLAGS    = -d
@@ -102,9 +144,9 @@ LFLAGS    =
 RM        = rm
 RMFLAGS   = -vf
 
-#
-# Pattern rules
-###############################################################################
+ #
+ # Pattern rules
+ ##############################################################################
 
 %.c: %.y
 	$(YACC) $(YFLAGS) $(notdir $<)
@@ -121,4 +163,3 @@ RMFLAGS   = -vf
 	     -e '/^$$/ d'       \
              -e 's/$$/ :/' < $*.dd >> $*.d
 	@rm -f $*.dd
-

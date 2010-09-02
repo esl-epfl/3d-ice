@@ -33,17 +33,15 @@
  ##############################################################################
 
 
-TDICE_MAIN = ..
+3DICE_MAIN = ..
 
-include $(TDICE_MAIN)/makefile.def
+include $(3DICE_MAIN)/makefile.def
 
-all: $(TDICE_ARCHIVE)
+all: $(3DICE_LIB_A)
 
-$(TDICE_ARCHIVE): $(TDICE_LIB_OBJECTS)
+$(3DICE_LIB_A): $(3DICE_LIB_O)
 	@$(AR) $(ARFLAGS) $@ $?
 
--include $(TDICE_LIB_OBJECTS:.o=.d)
-
 clean:
-	@$(RM) $(RMFLAGS) $(TDICE_ARCHIVE)
+	@$(RM) $(RMFLAGS) $(3DICE_LIB_A)
 

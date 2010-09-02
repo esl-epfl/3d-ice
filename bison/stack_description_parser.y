@@ -141,7 +141,6 @@ static int tmp_wall_length = 0 ;
 static int tmp_channel_length = 0 ;
 %}
 
-%require     "2.4.1"
 %name-prefix "stack_description_"
 %output      "stack_description_parser.c"
 

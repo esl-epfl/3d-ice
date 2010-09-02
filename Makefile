@@ -32,28 +32,27 @@
  # 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE #
  ##############################################################################
 
-TDICE_MAIN = .
+3DICE_MAIN = .
 
-include $(TDICE_MAIN)/makefile.def
+include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all clean lib
+.PHONY: all lib test clean
 
 all: lib test
 
 lib:
-	cd $(TDICE_FLEX)    ; make ;
-	cd $(TDICE_BISON)   ; make ;
-	cd $(TDICE_SOURCES) ; make ;
-	cd $(TDICE_LIB)     ; make ;
+	cd $(3DICE_FLEX)    ; make ;
+	cd $(3DICE_BISON)   ; make ;
+	cd $(3DICE_SOURCES) ; make ;
+	cd $(3DICE_LIB)     ; make ;
 
 test: lib
-	cd $(TDICE_TEST) ; make ;
+	cd $(3DICE_TEST) ; make ;
 
 clean:
-	cd $(TDICE_FLEX)       ; make clean ;
-	cd $(TDICE_BISON)      ; make clean ;
-	cd $(TDICE_SOURCES)    ; make clean ;
-	cd $(TDICE_LIB)        ; make clean ;
-	cd $(HST_DIR)          ; make clean ;
-	cd $(TDICE_TEST)       ; make clean ;
+	cd $(3DICE_FLEX)       ; make clean ;
+	cd $(3DICE_BISON)      ; make clean ;
+	cd $(3DICE_SOURCES)    ; make clean ;
+	cd $(3DICE_LIB)        ; make clean ;
+	cd $(3DICE_TEST)       ; make clean ;
 

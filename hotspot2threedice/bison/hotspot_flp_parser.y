@@ -42,7 +42,6 @@ void hotspot_flp_error
 %token <d_value> DVALUE        "double value"
 %token <string>  IDENTIFIER    "identifier"
 
-%require     "2.4.1"
 %name-prefix "hotspot_flp_"
 %output      "hotspot_flp_parser.c"
 

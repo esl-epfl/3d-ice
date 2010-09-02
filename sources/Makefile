@@ -32,9 +32,9 @@
  # 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE #
  ##############################################################################
 
-TDICE_MAIN = ..
+3DICE_MAIN = ..
 
-include $(TDICE_MAIN)/makefile.def
+include $(3DICE_MAIN)/makefile.def
 
 CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE)
 
@@ -45,11 +45,11 @@ CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
 #CFLAGS := $(CFLAGS) -DPRINT_SYSTEM_MATRIX
 #CFLAGS := $(CFLAGS) -DPRINT_SYSTEM_VECTOR
 
-all: $(TDICE_SOURCE_OBJECTS)
+all: $(3DICE_SOURCES_O)
 
--include $(TDICE_SOURCE_OBJECTS:.o=.d)
+-include $(3DICE_SOURCES_D)
 
 clean:
-	@$(RM) $(RMFLAGS) $(TDICE_SOURCE_OBJECTS)
-	@$(RM) $(RMFLAGS) $(TDICE_SOURCE_OBJECTS:.o=.d)
+	@$(RM) $(RMFLAGS) $(3DICE_SOURCES_O)
+	@$(RM) $(RMFLAGS) $(3DICE_SOURCES_D)
 

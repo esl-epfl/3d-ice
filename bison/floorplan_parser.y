@@ -77,7 +77,6 @@ static int first_length_found = 0 ;
 %token <d_value> DVALUE        "double value"
 %token <string>  IDENTIFIER    "identifier"
 
-%require     "2.4.1"
 %name-prefix "floorplan_"
 %output      "floorplan_parser.c"
 
