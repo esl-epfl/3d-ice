@@ -53,7 +53,7 @@ the choice done above when compiling SuperLU. You can then compile 3D-ICE with:
   # make
 
 Togeter with the library archive you will also get few examples (executables) in
-the ./example folder that will show how to use 3D-ICE.
+the ./examples folder that will show how to use 3D-ICE.
 
 --------------------------------------------------------------------------------
 4   - Stack Description File.

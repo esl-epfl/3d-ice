@@ -44,7 +44,7 @@
 3DICE_BISON     = $(3DICE_MAIN)/bison
 3DICE_SOURCES   = $(3DICE_MAIN)/sources
 3DICE_LIB       = $(3DICE_MAIN)/lib
-3DICE_TEST      = $(3DICE_MAIN)/test
+3DICE_EXAMPLES  = $(3DICE_MAIN)/examples
 
 3DICE_FLEX_L    = $(3DICE_FLEX)/floorplan_scanner.l         \
                   $(3DICE_FLEX)/stack_description_scanner.l
