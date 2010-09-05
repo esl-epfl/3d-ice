@@ -64,18 +64,18 @@ main(int argc, char** argv)
   cell1 = get_cell_offset_in_stack (stkd.Dimensions, 0, 50, 1) ;
   cell2 = get_cell_offset_in_stack (stkd.Dimensions, 4, 50, 1) ;
 
-//  do {
-//    printf ("%d: %8.4f -- %d:%8.4f\n", tdata.Temperatures[cell1],
-//                                       tdata.Temperatures[cell2]) ;
-//  } while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
+  do {
+    printf ("%8.4f -- %8.4f\n", tdata.Temperatures[cell1],
+                                tdata.Temperatures[cell2]) ;
+  } while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
 
-  while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
+//  while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
 
 //  printf ("%d: %8.4f -- %d:%8.4f\n", cell1, tdata.Temperatures[cell1],
 //                                     cell2, tdata.Temperatures[cell2]) ;
 
 //  int count ;
-//  for (count = 0; count < tdata.Size ; count ++)
+//        for (count = 0; count < tdata.Size ; count ++)
 //    fprintf(stdout, "%.6e\n", tdata.Temperatures[count]);
 
 //  for (count = 0; count < tdata.SM_A.NNz ; count ++)

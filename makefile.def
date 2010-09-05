@@ -118,7 +118,7 @@
  # SuperLU variables
  ##############################################################################
 
-SLU_MAIN    = $(HOME)/SuperLU_4.0
+SLU_MAIN    = $(HOME)/EPFL/SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 SLU_LIBS    = -L $(SLU_LIB) -l superlu_4.0 -l blas

@@ -287,9 +287,6 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
          &tdata->SLUMatrix_B,
          &tdata->SLU_Stat, &tdata->SLU_Info);
 
-    printf ("%8.4f -- %8.4f\n", tdata->Temperatures[get_cell_offset_in_stack (stkd->Dimensions, 0, 50, 1)],
-                                tdata->Temperatures[get_cell_offset_in_stack (stkd->Dimensions, 4, 50, 1)]) ;
-
     if (tdata->SLU_Info != 0)
     {
       fprintf (stderr, "Error while solving linear system\n");
