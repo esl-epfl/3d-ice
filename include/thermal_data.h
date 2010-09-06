@@ -58,8 +58,9 @@ extern "C"
     Quantity_t    Size ;
     Temperature_t InitialTemperature ;
 
-    Time_t        DeltaTime ;
-    Time_t        SlotTime ;
+    Time_t CurrentTime ;
+    Time_t DeltaTime ;
+    Time_t SlotTime ;
 
     SystemMatrix SM_A ;
     SystemVector SV_B ;
@@ -102,6 +103,10 @@ extern "C"
 /******************************************************************************/
 
   int emulate_time_slot (StackDescription* stkd, ThermalData* tdata) ;
+
+/******************************************************************************/
+
+  Time_t get_current_time(ThermalData* tdata) ;
 
 /******************************************************************************/
 

@@ -57,8 +57,10 @@ int init_thermal_data
 {
   tdata->Size               = get_number_of_cells(stkd->Dimensions) ;
   tdata->InitialTemperature = initial_temperature ;
-  tdata->DeltaTime          = delta_time ;
-  tdata->SlotTime           = slot_time ;
+
+  tdata->DeltaTime   = delta_time ;
+  tdata->SlotTime    = slot_time ;
+  tdata->CurrentTime = 0.0 ;
 
   /* Memory allocation */
 
@@ -257,7 +259,13 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
    return 1 ;
  }
 
-  for ( ; time > 0 ; time -= tdata->DeltaTime)
+  for
+  (
+    ;
+    time > 0 ;
+    time               -= tdata->DeltaTime,
+    tdata->CurrentTime += tdata->DeltaTime
+  )
   {
     dgstrs
     (
@@ -306,3 +314,8 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
 }
 
 /******************************************************************************/
+
+Time_t get_current_time(ThermalData* tdata)
+{
+  return tdata->CurrentTime ;
+}

@@ -32,6 +32,8 @@
  * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
  ******************************************************************************/
 
+#include <stdlib.h>
+
 #include "stack_description.h"
 #include "thermal_data.h"
 
@@ -40,8 +42,6 @@ main(int argc, char** argv)
 {
   StackDescription stkd  ;
   ThermalData      tdata ;
-
-  int cell1, cell2;
 
   if (argc != 2)
   {
@@ -53,37 +53,48 @@ main(int argc, char** argv)
   if (fill_stack_description (&stkd, argv[1]) != 0)
     return EXIT_FAILURE ;
 
-  //print_all_floorplans (stdout, "Before  ", &stkd) ;
-
   init_thermal_data  (&stkd, &tdata, 300.00, 0.002, 0.020) ;
   fill_thermal_data  (&stkd, &tdata) ;
 
-  //print_dimensions (stdout, "dim: ",     stkd.Dimensions) ;
-  //print_channel    (stdout, "channel: ", stkd.Channel) ;
+  // Alloc memory to store 1 temperature value for each floorplan element
+  // in the give floorplan
 
-  cell1 = get_cell_offset_in_stack (stkd.Dimensions, 0, 50, 1) ;
-  cell2 = get_cell_offset_in_stack (stkd.Dimensions, 4, 50, 1) ;
+  Quantity_t counter;
+  Quantity_t nfloorplanelements
+    = get_number_of_floorplan_elements_in_floorplan (&stkd, "die2") ;
+
+  if (nfloorplanelements < 0)
+  {
+    printf ("no element die2 found\n") ;
+    free_thermal_data      (&tdata) ;
+    free_stack_description (&stkd) ;
+  }
+
+  Temperature_t* max_results
+    = malloc (sizeof(Temperature_t) * nfloorplanelements) ;
+
+  if (max_results == NULL)
+  {
+    printf ("alloc memory failed\n") ;
+    free_thermal_data      (&tdata) ;
+    free_stack_description (&stkd) ;
+  }
 
   do {
-    printf ("%8.4f -- %8.4f\n", tdata.Temperatures[cell1],
-                                tdata.Temperatures[cell2]) ;
+
+    get_all_max_temperatures_in_floorplan (&stkd, "die2",
+                                           tdata.Temperatures, max_results) ;
+
+    printf("%5.3fs  ", get_current_time(&tdata)) ;
+
+    for (counter = 0; counter < nfloorplanelements; counter++)
+      printf("%7.3f  ", max_results[counter]) ;
+    printf("\n") ;
+
   } while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
 
-//  while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
-
-//  printf ("%d: %8.4f -- %d:%8.4f\n", cell1, tdata.Temperatures[cell1],
-//                                     cell2, tdata.Temperatures[cell2]) ;
-
-//  int count ;
-//        for (count = 0; count < tdata.Size ; count ++)
-//    fprintf(stdout, "%.6e\n", tdata.Temperatures[count]);
-
-//  for (count = 0; count < tdata.SM_A.NNz ; count ++)
-//    fprintf(stdout, "%.6e\n", tdata.SM_A.Values[count]);
-
-  //print_all_floorplans (stdout, "After  ", &stkd) ;
-
-  free_thermal_data (&tdata) ;
+  free                   (max_results) ;
+  free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;
