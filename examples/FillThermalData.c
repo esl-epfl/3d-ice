@@ -54,9 +54,43 @@ main(int argc, char** argv)
   init_thermal_data  (&stkd, &tdata, 300.00, 0.002, 0.020) ;
   fill_thermal_data  (&stkd, &tdata) ;
 
-//  int count ;
-//  for (count = 0; count < tdata.SV_B.Size ; count ++)
-//    fprintf(stdout, "%.5e\n", tdata.SV_B.Values[count]);
+//   int row, column, counter;
+//   FILE* file;
+//
+//   file = fopen("RowOffsets.txt", "w") ;
+//   for (counter = 0 ; counter < tdata.SM_A.Size + 1; counter++)
+//     fprintf(file, "%d\n", tdata.SM_A.RowOffsets[counter]) ;
+//   fclose(file);
+//
+//   file = fopen("ColumnIndices.txt", "w") ;
+//   for (counter = 0 ; counter < tdata.SM_A.NNz; counter++)
+//     fprintf(file, "%d\n", tdata.SM_A.ColumnIndices[counter]) ;
+//   fclose(file);
+//
+//   file = fopen("Values.txt", "w") ;
+//   for (counter = 0 ; counter < tdata.SM_A.NNz; counter++)
+//     fprintf(file, "%5e\n", tdata.SM_A.Values[counter]) ;
+//   fclose(file);
+//
+//   file = fopen("Matrix.txt", "w") ;
+//
+//   for (row = 0 ; row < tdata.SM_A.Size; row++)
+//   {
+//     counter = tdata.SM_A.RowOffsets[row] ;
+//
+//     for (column = 0; column < tdata.SM_A.Size ; column++)
+//
+//       if (column == tdata.SM_A.ColumnIndices[counter])
+//       {
+//         fprintf (file, "%+.3e ", tdata.SM_A.Values[column]);
+//         counter++;
+//       }
+//       else
+//         fprintf (file, "%+.3e ", 0.0);
+//
+//     fprintf (file,"\n");
+//   }
+//   fclose(file);
 
   free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;

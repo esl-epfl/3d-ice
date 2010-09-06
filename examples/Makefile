@@ -39,12 +39,12 @@ include $(3DICE_MAIN)/makefile.def
 all: FillThermalData Emulate3DICe
 
 CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE)
-CLIBS    = $(3DICE_LIB_A) $(SLU_LIBS)
+CLIBS = $(3DICE_LIB_A) $(SLU_LIBS)
 
-FillThermalData: FillThermalData.o
+FillThermalData: FillThermalData.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
-Emulate3DICe: Emulate3DICe.o
+Emulate3DICe: Emulate3DICe.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
 clean:
