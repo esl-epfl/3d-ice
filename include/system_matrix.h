@@ -46,16 +46,16 @@ extern "C"
 
   typedef struct
   {
-    /* Compressed Row Storage (CRS):                           */
-    /* the matrix stores non zero values as sequences of rows. */
+    /* Compressed Column Storage (CCS):                           */
+    /* the matrix stores non zero values as sequences of Columns. */
 
-    /* Storage for the column indices */
+    /* Storage for the column pointers */
 
-    ColumnIndex_t*       ColumnIndices ;
+    ColumnIndex_t*       ColumnPointers ;
 
-    /* Storage for the row offsets. */
+    /* Storage for the row indices. */
 
-    RowIndex_t*          RowOffsets ;
+    RowIndex_t*          RowIndices ;
 
     /* Storage for the nonzero entries. */
 
@@ -81,7 +81,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t add_solid_row
+  Quantity_t add_solid_column
   (
     Dimensions*          dimensions,
     Conductances*        conductances,
@@ -90,14 +90,14 @@ extern "C"
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,
-    RowIndex_t*          row_offsets,
-    ColumnIndex_t*       column_indices,
+    ColumnIndex_t*       column_pointers,
+    RowIndex_t*          row_indices,
     SystemMatrixValue_t* values
   ) ;
 
 /******************************************************************************/
 
-  Quantity_t add_liquid_row
+  Quantity_t add_liquid_column
   (
     Dimensions*          dimensions,
     Conductances* conductances,
@@ -105,8 +105,8 @@ extern "C"
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,
     ColumnIndex_t        current_column,
-    RowIndex_t*          row_offsets,
-    ColumnIndex_t*       column_indices,
+    ColumnIndex_t*       column_pointers,
+    RowIndex_t*          row_indices,
     SystemMatrixValue_t* values
   ) ;
 

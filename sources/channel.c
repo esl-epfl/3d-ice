@@ -347,8 +347,8 @@ Quantity_t fill_system_matrix_channel
   Conductances*        conductances,
   Capacity_t*          capacities,
   LayerIndex_t         current_layer,
-  RowIndex_t*          row_offsets,
-  ColumnIndex_t*       column_indices,
+  ColumnIndex_t*       column_pointers,
+  RowIndex_t*          row_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -374,32 +374,32 @@ Quantity_t fill_system_matrix_channel
     (
       column = 0 ;
       column < get_number_of_columns (dimensions) ;
-      conductances   ++ ,
-      capacities     ++ ,
-      row_offsets    ++ ,
-      column_indices += added ,
-      values         += added ,
-      tot_added      += added ,
-      column         ++
+      conductances    ++ ,
+      capacities      ++ ,
+      column_pointers ++ ,
+      row_indices     += added ,
+      values          += added ,
+      tot_added       += added ,
+      column          ++
     )
 
        if (column % 2 == 0 ) /* Even -> Wall */
 
-         added = add_solid_row
+         added = add_solid_column
                  (
                    dimensions, conductances, capacities,
                    NULL,
                    current_layer, row, column,
-                   row_offsets, column_indices, values
+                   column_pointers, row_indices, values
                  ) ;
 
        else                  /* Odd -> liquid */
 
-         added = add_liquid_row
+         added = add_liquid_column
                  (
                    dimensions, conductances, capacities,
                    current_layer, row, column,
-                   row_offsets, column_indices, values
+                   column_pointers, row_indices, values
                  ) ;
 
   return tot_added ;

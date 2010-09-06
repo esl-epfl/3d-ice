@@ -152,7 +152,7 @@ extern "C"
     StackDescription*    stkd,
     Conductances*        conductances,
     Capacity_t*          capacities,
-    RowIndex_t*          row_offsets,
+    RowIndex_t*          row_pointers,
     ColumnIndex_t*       column_indices,
     SystemMatrixValue_t* values
   ) ;

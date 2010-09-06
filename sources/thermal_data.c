@@ -124,13 +124,14 @@ int init_thermal_data
   tdata->SLU_Options.Equil           = NO ;
   tdata->SLU_Options.SymmetricMode   = YES ;
   tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
+  tdata->SLU_Options.RowPerm         = NOROWPERM ;
   tdata->SLU_Options.DiagPivotThresh = 0.01 ;
 
-  dCreate_CompRow_Matrix  /* Matrix A */
+  dCreate_CompCol_Matrix  /* Matrix A */
   (
     &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-    tdata->SM_A.Values, tdata->SM_A.ColumnIndices, tdata->SM_A.RowOffsets,
-    SLU_NR, SLU_D, SLU_GE
+    tdata->SM_A.Values, tdata->SM_A.RowIndices, tdata->SM_A.ColumnPointers,
+    SLU_NC, SLU_D, SLU_GE
   ) ;
 
   dCreate_Dense_Matrix  /* Vector B */
@@ -212,13 +213,8 @@ int fill_thermal_data
   fill_system_matrix_stack_description
   (
     stkd, tdata->Conductances, tdata->Capacities,
-    tdata->SM_A.RowOffsets,    tdata->SM_A.ColumnIndices, tdata->SM_A.Values
+    tdata->SM_A.ColumnPointers, tdata->SM_A.RowIndices, tdata->SM_A.Values
   ) ;
-
-//   if (tdata->SLU_Options.Fact == FACTORED)
-//     tdata->SLU_Options.Fact = SamePattern ;
-//   else
-//     tdata->SLU_Options.Fact = DOFACT ;
 
   fill_sources_stack_description (stkd, tdata->Sources,
                                         tdata->Conductances) ;
@@ -227,30 +223,25 @@ int fill_thermal_data
                                     tdata->Capacities,
                                     tdata->Temperatures) ;
 
-//   if (tdata->SLU_Options.Fact != FACTORED )
-//   {
-//     get_perm_c (tdata->SLU_Options.ColPerm,
-//                 &tdata->SLUMatrix_A,
-//                 tdata->SLU_PermutationMatrixC) ;
-// 
-//     sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
-//                  tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
-//                  &tdata->SLUMatrix_A_Permuted) ;
-// 
-//     dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
-//             sp_ienv(2), sp_ienv(1), /* relax and panel size */
-//             tdata->SLU_Etree,
-//             NULL, 0,                /* work and lwork */
-//             tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-//             &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-//             &tdata->SLU_Stat, &tdata->SLU_Info) ;
-// 
-//     tdata->SLU_Options.Fact = FACTORED ;
-// 
-//     return tdata->SLU_Info ;
-//   }
+  get_perm_c (tdata->SLU_Options.ColPerm,
+              &tdata->SLUMatrix_A,
+              tdata->SLU_PermutationMatrixC) ;
 
-  return 0 ;
+  sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
+               tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
+               &tdata->SLUMatrix_A_Permuted) ;
+
+  dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+          sp_ienv(2), sp_ienv(1), /* relax and panel size */
+          tdata->SLU_Etree,
+          NULL, 0,                /* work and lwork */
+          tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+          &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+          &tdata->SLU_Stat, &tdata->SLU_Info) ;
+
+  tdata->SLU_Options.Fact = FACTORED ;
+
+  return tdata->SLU_Info ;
 }
 
 /******************************************************************************/
@@ -260,32 +251,32 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
   Time_t time = tdata->SlotTime ;
   int counter;
 
-//  if (tdata->SLU_Options.Fact == DOFACT)
-//  {
-//    fprintf (stderr, "System matrix must be factorized\n");
-//    return 1 ;
-//  }
+ if (tdata->SLU_Options.Fact == DOFACT)
+ {
+   fprintf (stderr, "System matrix must be factorized\n");
+   return 1 ;
+ }
 
   for ( ; time > 0 ; time -= tdata->DeltaTime)
   {
-//     dgstrs
-//     (
-//       NOTRANS,
-//       &tdata->SLUMatrix_L,
-//       &tdata->SLUMatrix_U,
-//       tdata->SLU_PermutationMatrixC,
-//       tdata->SLU_PermutationMatrixR,
-//       &tdata->SLUMatrix_B,
-//       &tdata->SLU_Stat,
-//       &tdata->SLU_Info
-//     ) ;
+    dgstrs
+    (
+      NOTRANS,
+      &tdata->SLUMatrix_L,
+      &tdata->SLUMatrix_U,
+      tdata->SLU_PermutationMatrixC,
+      tdata->SLU_PermutationMatrixR,
+      &tdata->SLUMatrix_B,
+      &tdata->SLU_Stat,
+      &tdata->SLU_Info
+    ) ;
 
-   dgssv(&tdata->SLU_Options,
-         &tdata->SLUMatrix_A,
-         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-         &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-         &tdata->SLUMatrix_B,
-         &tdata->SLU_Stat, &tdata->SLU_Info);
+//    dgssv(&tdata->SLU_Options,
+//          &tdata->SLUMatrix_A,
+//          tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+//          &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+//          &tdata->SLUMatrix_B,
+//          &tdata->SLU_Stat, &tdata->SLU_Info);
 
     if (tdata->SLU_Info != 0)
     {

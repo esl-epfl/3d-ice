@@ -109,7 +109,7 @@
                   $(3DICE_LIB)/Makefile       \
                   $(3DICE_SOURCES_C)          \
                   $(3DICE_SOURCES_C)/Makefile \
-                  Makefile.def                \
+                  makefile.def                \
                   Makefile                    \
                   COPYING                     \
                   README
@@ -118,7 +118,7 @@
  # SuperLU variables
  ##############################################################################
 
-SLU_MAIN    = $(HOME)/EPFL/SuperLU_4.0
+SLU_MAIN    = $(HOME)/SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 SLU_LIBS    = -L $(SLU_LIB) -l superlu_4.0 -l blas
@@ -132,7 +132,7 @@ AR        = ar
 ARFLAGS   = rsv
 
 CC        = gcc
-CFLAGS    = -MD -g
+CFLAGS    = -MD -O3
 CINCLUDES = -I $(3DICE_INCLUDE)
 
 YACC      = bison

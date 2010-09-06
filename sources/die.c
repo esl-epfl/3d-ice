@@ -268,8 +268,8 @@ Quantity_t fill_system_matrix_die
   Capacity_t*          capacities,
   EnvironmentHeatSink* environmentheatsink,
   LayerIndex_t         current_layer,
-  RowIndex_t*          row_offsets,
-  ColumnIndex_t*       column_indices,
+  ColumnIndex_t*       column_pointers,
+  RowIndex_t*          row_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -288,13 +288,13 @@ Quantity_t fill_system_matrix_die
 
     layer != NULL ;
 
-    conductances   += get_layer_area (dimensions) ,
-    capacities     += get_layer_area (dimensions) ,
-    row_offsets    += get_layer_area (dimensions) ,
-    column_indices += added ,
-    values         += added ,
-    tot_added      += added ,
-    layer           = layer->Next
+    conductances    += get_layer_area (dimensions) ,
+    capacities      += get_layer_area (dimensions) ,
+    column_pointers += get_layer_area (dimensions) ,
+    row_indices     += added ,
+    values          += added ,
+    tot_added       += added ,
+    layer            = layer->Next
   )
 
     added = fill_system_matrix_layer
@@ -305,7 +305,7 @@ Quantity_t fill_system_matrix_die
               dimensions, conductances, capacities,
               environmentheatsink,
               current_layer + layer->LayersOffset,
-              row_offsets, column_indices, values
+              column_pointers, row_indices, values
             ) ;
 
   return tot_added ;

@@ -391,9 +391,9 @@ void fill_sources_stack_description
   Conductances*     conductances
 )
 {
-  StackElement* stack_element ;
-  StackElement* last_stack_element ;
-  Source_t*     tmp_sources = sources ;
+  StackElement* stack_element      = NULL ;
+  StackElement* last_stack_element = NULL;
+  Source_t*     tmp_sources        = sources ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -493,8 +493,8 @@ void fill_system_matrix_stack_description
   StackDescription*    stkd,
   Conductances*        conductances,
   Capacity_t*          capacities,
-  RowIndex_t*          row_offsets,
-  ColumnIndex_t*       column_indices,
+  ColumnIndex_t*       column_pointers,
+  RowIndex_t*          row_indices,
   SystemMatrixValue_t* values
 )
 {
@@ -511,20 +511,20 @@ void fill_system_matrix_stack_description
     get_number_of_columns (stkd->Dimensions));
 #endif
 
-  *row_offsets++ = 0 ;
+  *column_pointers++ = 0 ;
 
   for
   (
-    added           = 0,
-    area            = get_layer_area (stkd->Dimensions),
-    stack_element   = stkd->StackElementsList ;
-    stack_element  != NULL ;
-    conductances   += area * stack_element->NLayers,
-    capacities     += area * stack_element->NLayers,
-    row_offsets    += area * stack_element->NLayers,
-    column_indices += added,
-    values         += added,
-    stack_element   = stack_element->Next
+    added            = 0,
+    area             = get_layer_area (stkd->Dimensions),
+    stack_element    = stkd->StackElementsList ;
+    stack_element   != NULL ;
+    conductances    += area * stack_element->NLayers,
+    capacities      += area * stack_element->NLayers,
+    column_pointers += area * stack_element->NLayers,
+    row_indices     += added,
+    values          += added,
+    stack_element    = stack_element->Next
   )
 
     switch (stack_element->Type)
@@ -537,7 +537,7 @@ void fill_system_matrix_stack_description
                   conductances, capacities,
                   stkd->EnvironmentHeatSink,
                   stack_element->LayersOffset,
-                  row_offsets, column_indices, values
+                  column_pointers, row_indices, values
                 ) ;
         break ;
 
@@ -551,7 +551,7 @@ void fill_system_matrix_stack_description
                   stkd->Dimensions, conductances, capacities,
                   stkd->EnvironmentHeatSink,
                   stack_element->LayersOffset,
-                  row_offsets, column_indices, values
+                  column_pointers, row_indices, values
                 ) ;
         break ;
 
@@ -564,7 +564,7 @@ void fill_system_matrix_stack_description
 #                 endif
                   stkd->Dimensions, conductances, capacities,
                   stack_element->LayersOffset,
-                  row_offsets, column_indices, values
+                  column_pointers, row_indices, values
                 ) ;
         break ;
 

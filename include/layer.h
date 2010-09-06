@@ -157,8 +157,8 @@ extern "C"
     Capacity_t*          capacities,
     EnvironmentHeatSink* environmentheatsink,
     LayerIndex_t         current_layer,
-    RowIndex_t*          row_offsets,
-    ColumnIndex_t*       column_indices,
+    ColumnIndex_t*       column_pointers,
+    RowIndex_t*          row_indices,
     SystemMatrixValue_t* values
   ) ;
 

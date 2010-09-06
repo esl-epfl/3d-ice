@@ -36,7 +36,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib test clean
+.PHONY: all lib examples clean
 
 all: lib examples
 
@@ -48,6 +48,9 @@ lib:
 
 examples: lib
 	cd $(3DICE_EXAMPLES) ; make ;
+
+archive:
+	tar cvzf ../$(3DICE_LIBNAME)-$(3DICE_VERSION).tar.gz $(3DICE_ALL_FILES)
 
 clean:
 	cd $(3DICE_FLEX)       ; make clean ;
