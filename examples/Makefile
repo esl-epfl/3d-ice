@@ -41,8 +41,12 @@ all: FillThermalData Emulate3DICe
 CINCLUDES := $(CINCLUDES) -I $(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS)
 
+-include FillThermalData.d
+
 FillThermalData: FillThermalData.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
+
+-include Emulate3DICe.d
 
 Emulate3DICe: Emulate3DICe.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@

@@ -53,12 +53,12 @@ main(int argc, char** argv)
   if (fill_stack_description (&stkd, argv[1]) != 0)
     return EXIT_FAILURE ;
 
-  init_thermal_data  (&stkd, &tdata, 300.00, 0.002, 0.020) ;
-  fill_thermal_data  (&stkd, &tdata) ;
+  init_thermal_data  (&tdata, &stkd, 300.00, 0.002, 0.020) ;
+  fill_thermal_data  (&tdata, &stkd) ;
 
   // Alloc memory to store 1 temperature value for each floorplan element
   // in the give floorplan
-
+  //
   Quantity_t counter;
   Quantity_t nfloorplanelements
     = get_number_of_floorplan_elements_in_floorplan (&stkd, "die2") ;
@@ -80,6 +80,9 @@ main(int argc, char** argv)
     free_stack_description (&stkd) ;
   }
 
+  // Consume all time slots printing time by time the max temperature
+  // for every floorplan element in die "die2"
+  //
   do {
 
     get_all_max_temperatures_in_floorplan (&stkd, "die2",
@@ -91,7 +94,7 @@ main(int argc, char** argv)
       printf("%7.3f  ", max_results[counter]) ;
     printf("\n") ;
 
-  } while (emulate_time_slot (&stkd, &tdata) == 0 ) ;
+  } while (emulate_time_slot (&tdata, &stkd) == 0 ) ;
 
   free                   (max_results) ;
   free_thermal_data      (&tdata) ;

@@ -48,8 +48,8 @@ static void init_data (double* data, Quantity_t size, double init_value)
 
 int init_thermal_data
 (
-  StackDescription* stkd,
   ThermalData*      tdata,
+  StackDescription* stkd,
   Temperature_t     initial_temperature,
   Time_t            delta_time,
   Time_t            slot_time
@@ -170,41 +170,10 @@ temperatures_fail :
 
 /******************************************************************************/
 
-void free_thermal_data (ThermalData* tdata)
-{
-  if (tdata == NULL) return ;
-
-  free (tdata->Temperatures) ;
-  free (tdata->Sources) ;
-  free (tdata->Capacities) ;
-  free (tdata->Conductances) ;
-
-  free (tdata->SLU_PermutationMatrixR) ;
-  free (tdata->SLU_PermutationMatrixC) ;
-  free (tdata->SLU_Etree) ;
-
-  StatFree (&tdata->SLU_Stat) ;
-
-  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
-  free_system_matrix        (&tdata->SM_A) ;
-
-  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
-  free_system_vector        (&tdata->SV_B) ;
-
-  if (tdata->SLU_Options.Fact != DOFACT )
-  {
-    Destroy_CompCol_Permuted (&tdata->SLUMatrix_A_Permuted) ;
-    Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L) ;
-    Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U) ;
-  }
-}
-
-/******************************************************************************/
-
 int fill_thermal_data
 (
-  StackDescription* stkd,
-  ThermalData*      tdata
+  ThermalData*      tdata,
+  StackDescription* stkd
 )
 {
   fill_conductances_stack_description (stkd, tdata->Conductances) ;
@@ -248,7 +217,38 @@ int fill_thermal_data
 
 /******************************************************************************/
 
-int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
+void free_thermal_data (ThermalData* tdata)
+{
+  if (tdata == NULL) return ;
+
+  free (tdata->Temperatures) ;
+  free (tdata->Sources) ;
+  free (tdata->Capacities) ;
+  free (tdata->Conductances) ;
+
+  free (tdata->SLU_PermutationMatrixR) ;
+  free (tdata->SLU_PermutationMatrixC) ;
+  free (tdata->SLU_Etree) ;
+
+  StatFree (&tdata->SLU_Stat) ;
+
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
+  free_system_matrix        (&tdata->SM_A) ;
+
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
+  free_system_vector        (&tdata->SV_B) ;
+
+  if (tdata->SLU_Options.Fact != DOFACT )
+  {
+    Destroy_CompCol_Permuted (&tdata->SLUMatrix_A_Permuted) ;
+    Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L) ;
+    Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U) ;
+  }
+}
+
+/******************************************************************************/
+
+int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
 {
   Time_t time = tdata->SlotTime ;
   int counter;
@@ -259,13 +259,7 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
    return 1 ;
  }
 
-  for
-  (
-    ;
-    time > 0 ;
-    time               -= tdata->DeltaTime,
-    tdata->CurrentTime += tdata->DeltaTime
-  )
+  for ( ; time > 0 ; time -= tdata->DeltaTime)
   {
     dgstrs
     (
@@ -279,13 +273,6 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
       &tdata->SLU_Info
     ) ;
 
-//    dgssv(&tdata->SLU_Options,
-//          &tdata->SLUMatrix_A,
-//          tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-//          &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-//          &tdata->SLUMatrix_B,
-//          &tdata->SLU_Stat, &tdata->SLU_Info);
-
     if (tdata->SLU_Info != 0)
     {
       fprintf (stderr, "Error while solving linear system\n");
@@ -295,7 +282,7 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
     for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
       tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
 
-    fill_system_vector
+    fill_system_vector // FIXME: both calls aren't redundant ?
     (
       &tdata->SV_B,
       tdata->Sources,
@@ -304,11 +291,23 @@ int emulate_time_slot (StackDescription* stkd, ThermalData* tdata)
     ) ;
   }
 
+  tdata->CurrentTime += tdata->SlotTime ;
+
   if (--stkd->RemainingTimeSlots == 0)
     return 1 ;
   else
+  {
     fill_sources_stack_description (stkd, tdata->Sources,
                                           tdata->Conductances) ;
+
+    fill_system_vector // FIXME: both calls aren't redundant ?
+    (
+      &tdata->SV_B,
+      tdata->Sources,
+      tdata->Capacities,
+      tdata->Temperatures
+    ) ;
+  }
 
   return 0 ;
 }

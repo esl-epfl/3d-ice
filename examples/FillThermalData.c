@@ -51,8 +51,8 @@ main(int argc, char** argv)
   if (fill_stack_description (&stkd, argv[1]) != 0)
     return EXIT_FAILURE ;
 
-  init_thermal_data  (&stkd, &tdata, 300.00, 0.002, 0.020) ;
-  fill_thermal_data  (&stkd, &tdata) ;
+  init_thermal_data  (&tdata, &stkd, 300.00, 0.002, 0.020) ;
+  fill_thermal_data  (&tdata, &stkd) ;
 
   free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
