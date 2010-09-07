@@ -55,9 +55,7 @@ int init_thermal_data
   Time_t            slot_time
 )
 {
-  tdata->Size               = get_number_of_cells(stkd->Dimensions) ;
-  tdata->InitialTemperature = initial_temperature ;
-
+  tdata->Size        = get_number_of_cells(stkd->Dimensions) ;
   tdata->DeltaTime   = delta_time ;
   tdata->SlotTime    = slot_time ;
   tdata->CurrentTime = 0.0 ;
@@ -84,7 +82,7 @@ int init_thermal_data
 
   if ( (tdata->Conductances
           = (Conductances*) malloc (sizeof(Conductances)*tdata->Size)
-       ) == NULL)
+       ) == NULL )
 
     goto conductances_fail ;
 
@@ -104,10 +102,11 @@ int init_thermal_data
     goto slu_etree_fail ;
 
   if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
-                            stkd->Dimensions->Grid.NNz) == 0)
+                            get_number_of_non_zeroes(stkd->Dimensions)) == 0 )
     goto sm_a_fail ;
 
   if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
+
     goto sv_b_fail ;
 
   StatInit (&tdata->SLU_Stat) ;
@@ -115,7 +114,7 @@ int init_thermal_data
   /* Set initial values */
 
   init_data (tdata->Temperatures, tdata->Size,
-                                  tdata->InitialTemperature) ;
+                                  initial_temperature) ;
 
   init_data (tdata->Sources, tdata->Size, 0.0) ;
 
@@ -143,7 +142,7 @@ int init_thermal_data
     SLU_DN, SLU_D, SLU_GE
   );
 
-  return 1 ;
+  return 0 ;
 
   /* Free if malloc errors */
 
@@ -165,7 +164,7 @@ sources_fail :
   free (tdata->Temperatures) ;
 temperatures_fail :
 
-  return 0 ;
+  return 1 ;
 }
 
 /******************************************************************************/

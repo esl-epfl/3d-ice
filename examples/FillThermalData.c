@@ -41,20 +41,48 @@ main(int argc, char** argv)
   StackDescription stkd ;
   ThermalData      tdata ;
 
+  // Checks if there is the argument file to process
+
   if (argc != 2)
   {
     fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
     return EXIT_FAILURE;
   }
 
+  // Init StackDescription
+
   init_stack_description (&stkd) ;
+
+  // Fill StackDescription using the argument file
+
   if (fill_stack_description (&stkd, argv[1]) != 0)
+
     return EXIT_FAILURE ;
 
-  init_thermal_data  (&tdata, &stkd, 300.00, 0.002, 0.020) ;
-  fill_thermal_data  (&tdata, &stkd) ;
+  // Init thermal data
 
-  free_thermal_data      (&tdata) ;
+  if (init_thermal_data (&tdata, &stkd, 300.00, 0.002, 0.020) != 0)
+  {
+    free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
+  }
+
+  // Fill thermal data using the stack description data
+
+  if (fill_thermal_data  (&tdata, &stkd) != 0)
+  {
+    free_thermal_data (&tdata) ;
+    free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
+  }
+
+  //
+  // Here we can do something ... emulating? printing info ??
+  //
+
+  // Free all the data
+
+  free_thermal_data (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;

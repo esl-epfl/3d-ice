@@ -43,22 +43,44 @@ main(int argc, char** argv)
   StackDescription stkd  ;
   ThermalData      tdata ;
 
+  // Checks if there is the argument file to process
+
   if (argc != 2)
   {
     fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
     return EXIT_FAILURE;
   }
 
+  // Init StackDescription
+
   init_stack_description (&stkd) ;
+
+  // Fill StackDescription using the argument file
+
   if (fill_stack_description (&stkd, argv[1]) != 0)
+
     return EXIT_FAILURE ;
 
-  init_thermal_data  (&tdata, &stkd, 300.00, 0.002, 0.020) ;
-  fill_thermal_data  (&tdata, &stkd) ;
+  // Init thermal data
+
+  if (init_thermal_data (&tdata, &stkd, 300.00, 0.002, 0.020) != 0)
+  {
+    free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
+  }
+
+  // Fill thermal data using the stack description data
+
+  if (fill_thermal_data  (&tdata, &stkd) != 0)
+  {
+    free_thermal_data (&tdata) ;
+    free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
+  }
 
   // Alloc memory to store 1 temperature value for each floorplan element
-  // in the give floorplan
-  //
+  // in the floorplan on die "die2"
+
   Quantity_t counter;
   Quantity_t nfloorplanelements
     = get_number_of_floorplan_elements_in_floorplan (&stkd, "die2") ;
@@ -66,7 +88,7 @@ main(int argc, char** argv)
   if (nfloorplanelements < 0)
   {
     printf ("no element die2 found\n") ;
-    free_thermal_data      (&tdata) ;
+    free_thermal_data (&tdata) ;
     free_stack_description (&stkd) ;
   }
 
@@ -76,13 +98,13 @@ main(int argc, char** argv)
   if (max_results == NULL)
   {
     printf ("alloc memory failed\n") ;
-    free_thermal_data      (&tdata) ;
+    free_thermal_data (&tdata) ;
     free_stack_description (&stkd) ;
   }
 
   // Consume all time slots printing time by time the max temperature
-  // for every floorplan element in die "die2"
-  //
+  // for every floorplan element composing die "die2"
+
   do {
 
     get_all_max_temperatures_in_floorplan (&stkd, "die2",
@@ -96,8 +118,10 @@ main(int argc, char** argv)
 
   } while (emulate_time_slot (&tdata, &stkd) == 0 ) ;
 
-  free                   (max_results) ;
-  free_thermal_data      (&tdata) ;
+  // free all data
+
+  free (max_results) ;
+  free_thermal_data (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;

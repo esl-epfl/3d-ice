@@ -50,20 +50,32 @@ extern "C"
 
   typedef struct
   {
+    /* The following pointers point to memory used to store, for every cell  */
+    /* in the 3D grid (temperature, source of power, capacity and            */
+    /* conductances)                                                         */
+
     Temperature_t* Temperatures ;
     Source_t*      Sources ;
     Capacity_t*    Capacities ;
     Conductances*  Conductances ;
 
+    /* The number of cells in the 3D grid to be emulated */
+
     Quantity_t    Size ;
-    Temperature_t InitialTemperature ;
+
+    /* Time Values */
 
     Time_t CurrentTime ;
     Time_t DeltaTime ;
     Time_t SlotTime ;
 
+    /* The matrix A and the right hand side vector B representin the linear */
+    /* system                                                               */
+
     SystemMatrix SM_A ;
     SystemVector SV_B ;
+
+    /* Data used to interface with SuperLU */
 
     SuperMatrix SLUMatrix_A ,
                 SLUMatrix_A_Permuted ,
