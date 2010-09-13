@@ -74,7 +74,7 @@ int fill_stack_description
   if(input == NULL)
   {
     perror(filename);
-    return 1;
+    return -1;
   }
 
   stkd->FileName = strdup (filename);
@@ -158,19 +158,23 @@ void print_all_floorplans
 
 static int fill_floorplans (StackDescription* stkd)
 {
-  int result = 0 ;
+  int result = 0;
   StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
     if (stack_element->Type == TL_STACK_ELEMENT_DIE)
     {
-      result += fill_floorplan (stack_element->Floorplan, stkd->Dimensions) ;
+      result = fill_floorplan (stack_element->Floorplan, stkd->Dimensions) ;
+
+      if (result == 1)
+        return 1 ;
+
       stkd->RemainingTimeSlots
         = stack_element->Floorplan->ElementsList->PowerValues->Length ;
     }
 
-  return result ;
+  return 0 ;
  }
 
 /******************************************************************************/
@@ -584,32 +588,16 @@ void fill_system_matrix_stack_description
 
 /******************************************************************************/
 
-Quantity_t get_total_number_of_floorplan_elements (StackDescription* stkd)
-{
-  Quantity_t total = 0 ;
-  StackElement* stk_el = stkd->StackElementsList;
-
-  for ( ; stk_el != NULL ; stk_el = stk_el->Next)
-
-    if (stk_el->Type == TL_STACK_ELEMENT_DIE && stk_el->Floorplan != NULL)
-
-      total += stk_el->Floorplan->NElements ;
-
-  return total ;
-}
-
-/******************************************************************************/
-
-Quantity_t get_number_of_floorplan_elements_in_floorplan
+Quantity_t get_number_of_floorplan_elements_of_floorplan
 (
   StackDescription* stkd,
-  String_t          stack_element_id
+  String_t          floorplan_id
 )
 {
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -624,10 +612,17 @@ Quantity_t get_number_of_floorplan_elements_in_floorplan
 
 /******************************************************************************/
 
-int get_max_temperature_in_floorplan_element
+Quantity_t get_number_of_channel_outlets (StackDescription* stkd)
+{
+  return (get_number_of_columns(stkd->Dimensions) - 2) / 2 ;
+}
+
+/******************************************************************************/
+
+int get_max_temperature_of_floorplan_element
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   String_t          floorplan_element_id,
   Temperature_t*    temperatures,
   Temperature_t*    max_temperature
@@ -637,7 +632,7 @@ int get_max_temperature_in_floorplan_element
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -668,10 +663,10 @@ int get_max_temperature_in_floorplan_element
 
 /******************************************************************************/
 
-int get_min_temperature_in_floorplan_element
+int get_min_temperature_of_floorplan_element
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   String_t          floorplan_element_id,
   Temperature_t*    temperatures,
   Temperature_t*    min_temperature
@@ -681,7 +676,7 @@ int get_min_temperature_in_floorplan_element
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -712,10 +707,10 @@ int get_min_temperature_in_floorplan_element
 
 /******************************************************************************/
 
-int get_avg_temperature_in_floorplan_element
+int get_avg_temperature_of_floorplan_element
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   String_t          floorplan_element_id,
   Temperature_t*    temperatures,
   Temperature_t*    avg_temperature
@@ -725,7 +720,7 @@ int get_avg_temperature_in_floorplan_element
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -756,10 +751,10 @@ int get_avg_temperature_in_floorplan_element
 
 /******************************************************************************/
 
-int get_min_avg_max_temperatures_in_floorplan_element
+int get_min_avg_max_temperatures_of_floorplan_element
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   String_t          floorplan_element_id,
   Temperature_t*    temperatures,
   Temperature_t*    min_temperature,
@@ -771,7 +766,7 @@ int get_min_avg_max_temperatures_in_floorplan_element
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -804,10 +799,53 @@ int get_min_avg_max_temperatures_in_floorplan_element
 
 /******************************************************************************/
 
-int get_all_max_temperatures_in_floorplan
+int get_temperature_of_channel_outlet
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          channel_id,
+  ColumnIndex_t     outlet_number,
+  Temperature_t*    temperatures,
+  Temperature_t*    outlet_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           channel_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TL_STACK_ELEMENT_CHANNEL)
+
+    return -2 ;
+
+  if (   outlet_number < 0
+      || outlet_number > get_number_of_channel_outlets (stkd) )
+
+    return -3 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset,
+             get_number_of_rows(stkd->Dimensions) - 1,
+             (outlet_number * 2) + 1
+           ) ;
+
+  *outlet_temperature = temperatures [ offset ] ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_max_temperatures_of_floorplan
+(
+  StackDescription* stkd,
+  String_t          floorplan_id,
   Temperature_t*    temperatures,
   Temperature_t*    max_temperature
 )
@@ -816,7 +854,7 @@ int get_all_max_temperatures_in_floorplan
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -848,10 +886,10 @@ int get_all_max_temperatures_in_floorplan
 
 /******************************************************************************/
 
-int get_all_min_temperatures_in_floorplan
+int get_all_min_temperatures_of_floorplan
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   Temperature_t*    temperatures,
   Temperature_t*    min_temperature
 )
@@ -860,7 +898,7 @@ int get_all_min_temperatures_in_floorplan
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -892,10 +930,10 @@ int get_all_min_temperatures_in_floorplan
 
 /******************************************************************************/
 
-int get_all_avg_temperatures_in_floorplan
+int get_all_avg_temperatures_of_floorplan
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   Temperature_t*    temperatures,
   Temperature_t*    avg_temperature
 )
@@ -904,7 +942,7 @@ int get_all_avg_temperatures_in_floorplan
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
   if (stk_el == NULL)
 
@@ -936,10 +974,10 @@ int get_all_avg_temperatures_in_floorplan
 
 /******************************************************************************/
 
-int get_all_min_avg_max_temperatures_in_floorplan
+int get_all_min_avg_max_temperatures_of_floorplan
 (
   StackDescription* stkd,
-  String_t          stack_element_id,
+  String_t          floorplan_id,
   Temperature_t*    temperatures,
   Temperature_t*    min_temperature,
   Temperature_t*    avg_temperature,
@@ -950,7 +988,7 @@ int get_all_min_avg_max_temperatures_in_floorplan
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
-                           stack_element_id
+                           floorplan_id
                          ) ;
 
   if (stk_el == NULL)
@@ -981,6 +1019,50 @@ int get_all_min_avg_max_temperatures_in_floorplan
   ) ;
 
  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_temperatures_of_channel_outlets
+(
+  StackDescription* stkd,
+  String_t          channel_id,
+  Temperature_t*    temperatures,
+  Temperature_t*    outlet_temperature
+)
+{
+  Quantity_t offset ;
+  ColumnIndex_t column ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           channel_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TL_STACK_ELEMENT_CHANNEL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions, stk_el->LayersOffset,
+             get_number_of_rows(stkd->Dimensions) - 1, 0
+           ) ;
+
+  for
+  (
+    column = 0 ;
+    column < get_number_of_columns (stkd->Dimensions) ;
+    column++
+  )
+    if (column % 2 != 0) /* Odd -> liquid */
+
+    *outlet_temperature++ = temperatures[offset + column] ;
+
+  return 0 ;
 }
 
 /******************************************************************************/

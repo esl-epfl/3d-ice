@@ -59,6 +59,8 @@ extern "C"
     Capacity_t*    Capacities ;
     Conductances*  Conductances ;
 
+    Temperature_t InitialTemperature ;
+
     /* The number of cells in the 3D grid to be emulated */
 
     Quantity_t    Size ;
@@ -96,7 +98,7 @@ extern "C"
 /******************************************************************************/
 
   /* Given a valid address of a ThermalData structure, sets all its  fields */
-  /* using the actual parameters and allocs memory.                         */
+  /* using the actual parameters.                                           */
   /*                                                                        */
   /* tdata               The address of the ThermalData structure to init   */
   /*                                                                        */
@@ -112,13 +114,8 @@ extern "C"
   /* slot_time           the length [seconds] of each time slot, i.e. for   */
   /*                     how long power values read from the floorplans are */
   /*                     injected into the 3D-IC grid of cells              */
-  /*                                                                        */
-  /* Returns                                                                */
-  /* 0 if there have been any error in memory allocation and a message will */
-  /*   be printed into stderr,                                              */
-  /* 1 otherwise, i.e. tdata has been initialized with success              */
 
-  int init_thermal_data
+  void init_thermal_data
   (
     ThermalData*      tdata,
     StackDescription* stkd,
@@ -130,7 +127,7 @@ extern "C"
 /******************************************************************************/
 
   /* Given the address of a ThermalData structure previously initialized,   */
-  /* fills all the memory reading the structure of the 3D-IC from a         */
+  /* allocs memory and fills it reading the structure of the 3D-IC from     */
   /* StackDescription structure. Also performs the factorization of the     */
   /* matrix used to emulate heat dissipation.                               */
   /*                                                                        */
@@ -140,8 +137,9 @@ extern "C"
   /* B has been filled using the first power value for each floorplan       */
   /* element.                                                               */
   /*                                                                        */
-  /* Returns 0 if success, !0 otherwise (factorization error). Please see   */
-  /* the "output" field of the function "dgstrf" in SuperLU                 */
+  /* Returns 0 if success, -1 if memory allocation error, >0 otherwise      */
+  /* (factorization error). Please see the "output" field of the function   */
+  /* "dgstrf" in SuperLU                                                    */
 
   int fill_thermal_data  (ThermalData* tdata, StackDescription* stkd) ;
 
@@ -153,14 +151,13 @@ extern "C"
 
 /******************************************************************************/
 
-
   /* Iteratively consume a time slot emulating heat injection and           */
   /* dissipation. At the end of the call, the 3DIC has the thermal state    */
   /* (temperature array) corresponding to the end of the time slot while    */
   /*  the RHS vector B is already filled with the power values read, if     */
   /* any, from the following time slot.                                     */
   /*                                                                        */
-  /* Returns 0 if the emulation succedes, 1 if the time slots are over or   */
+  /* Returns 0 if the emulation succeeded, 1 if the time slots are over or  */
   /* <0 if there have been a problem with the computation of the solution   */
   /* of the linear system. See the "info" prameter of "dgstrs" in SuperLU.  */
 
@@ -168,7 +165,7 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Gives the time, in [seconds], sum of the time slots emulated */
+  /* Gives the time, in [seconds], sum of the time slots emulated           */
 
   Time_t get_current_time (ThermalData* tdata) ;
 

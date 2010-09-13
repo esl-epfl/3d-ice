@@ -61,13 +61,11 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
+  print_dimensions (stdout, "dim: ", stkd.Dimensions) ;
+
   // Init thermal data
 
-  if (init_thermal_data (&tdata, &stkd, 300.00, 0.002, 0.020) != 0)
-  {
-    free_stack_description (&stkd) ;
-    return EXIT_FAILURE ;
-  }
+  init_thermal_data (&tdata, &stkd, 300.00, 0.002, 0.020) ;
 
   // Fill thermal data using the stack description data
 
@@ -83,7 +81,7 @@ main(int argc, char** argv)
 
   Quantity_t counter;
   Quantity_t nfloorplanelements
-    = get_number_of_floorplan_elements_in_floorplan (&stkd, "die2") ;
+    = get_number_of_floorplan_elements_of_floorplan (&stkd, "die2") ;
 
   if (nfloorplanelements < 0)
   {
@@ -103,20 +101,56 @@ main(int argc, char** argv)
   }
 
   // Consume all time slots printing time by time the max temperature
-  // for every floorplan element composing die "die2"
+  // for every floorplan element composing die "die2" and the temperature
+  // of the liquid leaving the channel layer at the first channel.
+
+  Temperature_t outlet;
 
   do {
 
-    get_all_max_temperatures_in_floorplan (&stkd, "die2",
-                                           tdata.Temperatures, max_results) ;
+    // get max temperatures
+
+    if ( get_all_max_temperatures_of_floorplan
+         (
+           &stkd, "die2",
+           tdata.Temperatures, max_results
+         ) != 0 )
+    {
+      printf ("error getting max temps\n") ;
+      break ;
+    }
+
+    // get outlet temperature
+
+    if ( get_temperature_of_channel_outlet
+         (
+           &stkd, "channel1", 0,
+           tdata.Temperatures, &outlet
+         ) != 0 )
+    {
+      printf ("error getting oultet temp\n") ;
+      break ;
+    }
+
+
+    // Print results
 
     printf("%5.3fs  ", get_current_time(&tdata)) ;
-
     for (counter = 0; counter < nfloorplanelements; counter++)
       printf("%7.3f  ", max_results[counter]) ;
-    printf("\n") ;
+    printf("  %7.3f\n", outlet) ;
 
   } while (emulate_time_slot (&tdata, &stkd) == 0 ) ;
+
+  // At the end of emulation, creates the thermal map of the channel layer
+
+  if ( print_thermal_map
+       (
+         &stkd, tdata.Temperatures,
+         "channel1", "channel1_map.txt"
+       ) != 0 )
+
+      printf ("error chanel thermal map\n") ;
 
   // free all data
 

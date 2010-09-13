@@ -39,6 +39,36 @@
 
 /******************************************************************************/
 
+extern void fill_conductances_stack_description
+(
+  StackDescription* stkd,
+  Conductances*     conductances
+) ;
+
+extern void fill_capacities_stack_description
+(
+  StackDescription* stkd,
+  Capacity_t*       capacities,
+  Time_t            delta_time
+) ;
+
+extern void fill_sources_stack_description
+(
+  StackDescription* stkd,
+  Source_t*         sources,
+  Conductances*     conductances
+) ;
+
+extern void fill_system_matrix_stack_description
+(
+  StackDescription*    stkd,
+  Conductances*        conductances,
+  Capacity_t*          capacities,
+  RowIndex_t*          row_pointers,
+  ColumnIndex_t*       column_indices,
+  SystemMatrixValue_t* values
+) ;
+
 static void init_data (double* data, Quantity_t size, double init_value)
 {
   while (size--) *data++ = init_value ;
@@ -46,7 +76,7 @@ static void init_data (double* data, Quantity_t size, double init_value)
 
 /******************************************************************************/
 
-int init_thermal_data
+void init_thermal_data
 (
   ThermalData*      tdata,
   StackDescription* stkd,
@@ -60,63 +90,18 @@ int init_thermal_data
   tdata->SlotTime    = slot_time ;
   tdata->CurrentTime = 0.0 ;
 
-  /* Memory allocation */
+  tdata->InitialTemperature = initial_temperature ;
 
-  if ( (tdata->Temperatures
-          = (Temperature_t*) malloc ( sizeof(Temperature_t) * tdata->Size )
-       ) == NULL )
+  tdata->Temperatures = NULL ;
+  tdata->Sources      = NULL ;
+  tdata->Capacities   = NULL ;
+  tdata->Conductances = NULL ;
 
-    goto temperatures_fail ;
-
-  if ( (tdata->Sources
-          = (Source_t*) malloc ( sizeof(Source_t) * tdata->Size )
-       ) == NULL )
-
-    goto sources_fail ;
-
-  if ( (tdata->Capacities
-         = (Capacity_t*) malloc ( sizeof(Capacity_t) * tdata->Size )
-       ) == NULL )
-
-    goto capacities_fail ;
-
-  if ( (tdata->Conductances
-          = (Conductances*) malloc (sizeof(Conductances)*tdata->Size)
-       ) == NULL )
-
-    goto conductances_fail ;
-
-  if ( (tdata->SLU_PermutationMatrixR
-         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
-
-    goto slu_perm_r_fail ;
-
-  if ( (tdata->SLU_PermutationMatrixC
-    = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
-
-    goto slu_perm_c_fail ;
-
-  if ( (tdata->SLU_Etree
-         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
-
-    goto slu_etree_fail ;
-
-  if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
-                            get_number_of_non_zeroes(stkd->Dimensions)) == 0 )
-    goto sm_a_fail ;
-
-  if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
-
-    goto sv_b_fail ;
+  tdata->SLU_PermutationMatrixR = NULL ;
+  tdata->SLU_PermutationMatrixC = NULL ;
+  tdata->SLU_Etree              = NULL ;
 
   StatInit (&tdata->SLU_Stat) ;
-
-  /* Set initial values */
-
-  init_data (tdata->Temperatures, tdata->Size,
-                                  initial_temperature) ;
-
-  init_data (tdata->Sources, tdata->Size, 0.0) ;
 
   set_default_options (&tdata->SLU_Options) ;
 
@@ -127,44 +112,6 @@ int init_thermal_data
   tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
   tdata->SLU_Options.RowPerm         = NOROWPERM ;
   tdata->SLU_Options.DiagPivotThresh = 0.01 ;
-
-  dCreate_CompCol_Matrix  /* Matrix A */
-  (
-    &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-    tdata->SM_A.Values, tdata->SM_A.RowIndices, tdata->SM_A.ColumnPointers,
-    SLU_NC, SLU_D, SLU_GE
-  ) ;
-
-  dCreate_Dense_Matrix  /* Vector B */
-  (
-    &tdata->SLUMatrix_B, tdata->Size, 1,
-    tdata->SV_B.Values, tdata->Size,
-    SLU_DN, SLU_D, SLU_GE
-  );
-
-  return 0 ;
-
-  /* Free if malloc errors */
-
-sv_b_fail :
-  free_system_matrix (&tdata->SM_A) ;
-sm_a_fail :
-  free (tdata->SLU_Etree) ;
-slu_etree_fail :
-  free (tdata->SLU_PermutationMatrixR);
-slu_perm_c_fail :
-  free (tdata->SLU_PermutationMatrixR) ;
-slu_perm_r_fail :
-  free (tdata->Conductances) ;
-conductances_fail :
-  free (tdata->Capacities) ;
-capacities_fail :
-  free (tdata->Sources) ;
-sources_fail :
-  free (tdata->Temperatures) ;
-temperatures_fail :
-
-  return 1 ;
 }
 
 /******************************************************************************/
@@ -175,10 +122,55 @@ int fill_thermal_data
   StackDescription* stkd
 )
 {
+  /* Alloc and set temperatures */
+
+  if ( (tdata->Temperatures
+         = (Temperature_t*) malloc ( sizeof(Temperature_t) * tdata->Size )
+       ) == NULL )
+
+    goto temperatures_fail ;
+
+  init_data (tdata->Temperatures, tdata->Size, tdata->InitialTemperature) ;
+
+  /* Alloc and set conductances */
+
+  if ( (tdata->Conductances
+         = (Conductances*) malloc (sizeof(Conductances)*tdata->Size)
+       ) == NULL )
+
+    goto conductances_fail ;
+
   fill_conductances_stack_description (stkd, tdata->Conductances) ;
 
+  /* Alloc and set capacities */
+
+  if ( (tdata->Capacities
+         = (Capacity_t*) malloc ( sizeof(Capacity_t) * tdata->Size )
+      ) == NULL )
+
+     goto capacities_fail ;
+
   fill_capacities_stack_description (stkd, tdata->Capacities,
-                                           tdata->DeltaTime) ;
+                                     tdata->DeltaTime) ;
+
+  /* Alloc and set sources */
+
+  if ( (tdata->Sources
+         = (Source_t*) malloc ( sizeof(Source_t) * tdata->Size )
+       ) == NULL )
+
+    goto sources_fail ;
+
+  init_data (tdata->Sources, tdata->Size, 0.0) ;
+
+  fill_sources_stack_description (stkd, tdata->Sources,
+                                  tdata->Conductances) ;
+
+  /* Alloc and set system matrix */
+
+  if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
+                            get_number_of_non_zeroes(stkd->Dimensions)) == 0 )
+    goto sm_a_fail ;
 
   fill_system_matrix_stack_description
   (
@@ -186,12 +178,47 @@ int fill_thermal_data
     tdata->SM_A.ColumnPointers, tdata->SM_A.RowIndices, tdata->SM_A.Values
   ) ;
 
-  fill_sources_stack_description (stkd, tdata->Sources,
-                                        tdata->Conductances) ;
+  dCreate_CompCol_Matrix
+  (
+    &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
+    tdata->SM_A.Values, tdata->SM_A.RowIndices, tdata->SM_A.ColumnPointers,
+    SLU_NC, SLU_D, SLU_GE
+  ) ;
+
+  /* Alloc and set system vector */
+
+  if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
+
+    goto sv_b_fail ;
 
   fill_system_vector (&tdata->SV_B, tdata->Sources,
                                     tdata->Capacities,
                                     tdata->Temperatures) ;
+
+  dCreate_Dense_Matrix  /* Vector B */
+  (
+    &tdata->SLUMatrix_B, tdata->Size, 1,
+    tdata->SV_B.Values, tdata->Size,
+    SLU_DN, SLU_D, SLU_GE
+  );
+
+  /* Alloc SLU memory */
+
+  if ( (tdata->SLU_PermutationMatrixR
+         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+
+    goto slu_perm_r_fail ;
+
+  if ( (tdata->SLU_PermutationMatrixC
+         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+
+    goto slu_perm_c_fail ;
+
+  if ( (tdata->SLU_Etree
+         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+
+    goto slu_etree_fail ;
+
 
   get_perm_c (tdata->SLU_Options.ColPerm,
               &tdata->SLUMatrix_A,
@@ -212,6 +239,29 @@ int fill_thermal_data
   tdata->SLU_Options.Fact = FACTORED ;
 
   return tdata->SLU_Info ;
+
+  /* Free if malloc errors */
+
+slu_etree_fail :
+  free (tdata->SLU_PermutationMatrixC);
+slu_perm_c_fail :
+  free (tdata->SLU_PermutationMatrixR) ;
+slu_perm_r_fail :
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
+  free_system_vector        (&tdata->SV_B) ;
+sv_b_fail :
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
+  free_system_matrix (&tdata->SM_A) ;
+sm_a_fail :
+  free (tdata->Sources) ;
+sources_fail :
+  free (tdata->Capacities) ;
+capacities_fail :
+  free (tdata->Conductances) ;
+conductances_fail :
+  free (tdata->Temperatures) ;
+temperatures_fail :
+  return -1 ;
 }
 
 /******************************************************************************/
