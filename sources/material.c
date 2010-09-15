@@ -42,6 +42,7 @@
 void init_material (Material* material)
 {
   material->Id                  = NULL ;
+  material->Used                = 0 ;
   material->VolHeatCapacity     = 0.0  ;
   material->ThermalConductivity = 0.0  ;
   material->Next                = NULL ;

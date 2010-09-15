@@ -52,6 +52,10 @@ extern "C"
 
     String_t Id ;
 
+    /* For parsing purpose */
+
+    Quantity_t Used ;
+
     /* The volume-specific heat capacity [ J / ( um3 * K ) ] */
 
     VolHeatCapacity_t VolHeatCapacity ;

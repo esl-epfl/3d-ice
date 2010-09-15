@@ -33,6 +33,8 @@
  ******************************************************************************/
 
 %{
+#include "math.h"
+
 #include "material.h"
 #include "die.h"
 #include "layer.h"
@@ -45,9 +47,9 @@
 
 %union
 {
-   int      int_v ;
-   double   double_v ;
-   String_t char_p ;
+   unsigned int uint_v ;
+   double       double_v ;
+   String_t     char_p ;
 
    Material*      material_p ;
    Die*           die_p ;
@@ -56,13 +58,9 @@
    CoolantHTCs_t  coolanthtcs_v ;
 }
 
-%destructor { free($$) ;                      } <string>
-%destructor { free_layers_list ($$) ;         } <layers>
-%destructor { free_dies_list ($$) ;           } <dies>
-%destructor { free_stack_elements_list ($$) ; } <stack_elements>
-
-%type <double_v> first_wall_length
-%type <double_v> last_wall_length
+%type <uint_v> cell_length
+%type <uint_v> first_wall_length
+%type <uint_v> last_wall_length
 
 %type <coolanthtcs_v> coolant_heat_transfer_coefficients
 
@@ -101,7 +99,6 @@
 %token THERMAL               "keyword thermal"
 %token CONDUCTIVITY          "keyword conductivity"
 %token HEIGHT                "keyword height"
-%token UM                    "keyword um"
 %token WALL                  "keyword wall"
 %token COOLANT               "keyword coolant"
 %token TRANSFER              "keyword transfer"
@@ -110,7 +107,6 @@
 %token LENGTH                "keyword length"
 %token FLOORPLAN             "keyword floorplan"
 %token STACK                 "keyword stack"
-%token MM                    "keyword mm"
 %token VOLUMETRIC            "keywork volumetric"
 %token CAPACITY              "keyword capacity"
 %token ENVIRONMENT           "keyword environment"
@@ -119,9 +115,15 @@
 %token TOP                   "keyword top"
 %token BOTTOM                "keyword bottom"
 
+%token <uint_v>   IVALUE     "unsigned int value"
 %token <double_v> DVALUE     "float value"
 %token <char_p>   IDENTIFIER "identifier"
 %token <char_p>   PATH       "path to file"
+
+%destructor { free($$) ;                      } <char_p>
+%destructor { free_layers_list ($$) ;         } <layers>
+%destructor { free_dies_list ($$) ;           } <dies>
+%destructor { free_stack_elements_list ($$) ; } <stack_elements>
 
 %{
 #include "../flex/stack_description_scanner.h"
@@ -133,8 +135,10 @@ void stack_description_error
   String_t          message
 ) ;
 
-static StackElement* tmp_stack_element = NULL;
-static int found_die = 0 ;
+static enum StackElement_t last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+static int found_die     = 0 ;
+static int found_channel = 0 ;
+
 static int tmp_first_wall_length = 0 ;
 static int tmp_last_wall_length = 0 ;
 static int tmp_wall_length = 0 ;
@@ -163,14 +167,55 @@ stack_description_file
   : materials_list
     environment_heat_sink
     channel
+    {
+      if (stkd->Channel == NULL && stkd->EnvironmentHeatSink == NULL)
+
+        fprintf(stderr,
+                "Warning: both ambient heat sink and channels are absent.\n") ;
+
+    }
     dies_list
     stack
     dimensions
     {
-      if (stkd->Channel == NULL
-          && stkd->EnvironmentHeatSink == NULL)
-        fprintf(stderr,
-                "Warning: both ambient heat sink and channels are absent.\n") ;
+      //
+      // Checks if all the materials are used
+      //
+
+      Material* tmp ;
+      for (tmp = stkd->MaterialsList ; tmp != NULL ; tmp = tmp->Next)
+        if (tmp->Used == 0)
+          fprintf(stderr,
+                  "Warning: material %s declared but not used\n", tmp->Id) ;
+
+      //
+      // Counts the number of layers
+      //
+
+      StackElement *stk_el = stkd->StackElementsList ;
+      for ( ; stk_el != NULL ; stk_el = stk_el->Next)
+        stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
+
+      //
+      // Evaluate the number of cells and nonzeroe elements
+      //
+
+      stkd->Dimensions->Grid.NCells
+        = stkd->Dimensions->Grid.NLayers
+          * stkd->Dimensions->Grid.NRows
+          * stkd->Dimensions->Grid.NColumns ;
+
+      stkd->Dimensions->Grid.NNz
+        =   stkd->Dimensions->Grid.NLayers
+            * (
+                  stkd->Dimensions->Grid.NRows
+                  * (3 * stkd->Dimensions->Grid.NColumns - 2)
+                + 2 * stkd->Dimensions->Grid.NColumns
+                  * (stkd->Dimensions->Grid.NRows - 1)
+              )
+          + (stkd->Dimensions->Grid.NLayers - 1 ) * 2
+            * stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns ;
+
     }
   ;
 
@@ -202,21 +247,23 @@ material
         YYABORT ;
       }
 
-      material->Id                  = $2 ;
-      material->ThermalConductivity = $6 ;
-      material->VolHeatCapacity     = $11 ;
-
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
         String_t message
           = (String_t) malloc ((26 + strlen($2)) * sizeof (char)) ;
         sprintf (message, "Material %s already declared", $2) ;
-        stack_description_error (stkd, scanner, message) ;
 
+        free ($2) ;
         free_material (material) ;
+        stack_description_error (stkd, scanner, message) ;
         free (message) ;
         YYABORT ;
       }
+
+      material->Id                  = $2 ;
+      material->ThermalConductivity = $6 ;
+      material->VolHeatCapacity     = $11 ;
+
     }
   ;
 
@@ -256,9 +303,9 @@ channel
   :  /* empty */
 
   |  CHANNEL ':'
-                HEIGHT DVALUE UM ';'
-        CHANNEL LENGTH DVALUE UM ';'
-        WALL    LENGTH DVALUE UM ';'
+        HEIGHT IVALUE ';'
+        CHANNEL LENGTH IVALUE ';'
+        WALL    LENGTH IVALUE ';'
         first_wall_length
         last_wall_length
         WALL MATERIAL IDENTIFIER ';'
@@ -271,37 +318,41 @@ channel
 
       if (stkd->Channel == NULL)
       {
+        free ($18) ;
         stack_description_error
         (
           stkd, scanner, "malloc channel failed"
         ) ;
-        free ($21) ;
         YYABORT ;
       }
 
       stkd->Channel->Height          = $4  ;
-      tmp_channel_length             = $9  ;
-      tmp_wall_length                = $14 ;
-      tmp_first_wall_length          = ($17 == 0) ? $14 : $17 ;
-      tmp_last_wall_length           = ($18 == 0) ? $14 : $18 ;
-      stkd->Channel->CoolantFR       = ( $26 * 1e+12 ) / 60.0 ;
-      stkd->Channel->CoolantHTCs     = $28 ;
-      stkd->Channel->CoolantVHC      = $33 ;
-      stkd->Channel->CoolantTIn      = $38 ;
+
+      tmp_channel_length             = $8  ;
+      tmp_wall_length                = $12 ;
+      tmp_first_wall_length          = ($14 == 0) ? $12 : $14 ;
+      tmp_last_wall_length           = ($15 == 0) ? $12 : $15 ;
+
+      stkd->Channel->CoolantFR       = ( $23 * 1e+12 ) / 60.0 ;
+      stkd->Channel->CoolantHTCs     = $25 ;
+      stkd->Channel->CoolantVHC      = $30 ;
+      stkd->Channel->CoolantTIn      = $35 ;
       stkd->Channel->Wall
-        = find_material_in_list (stkd->MaterialsList, $21) ;
+        = find_material_in_list (stkd->MaterialsList, $18) ;
 
       if (stkd->Channel->Wall == NULL)
       {
+        free ($18) ;
         stack_description_error
         (
           stkd, scanner, "unknown material identifier"
         ) ;
-        free ($21) ;
         YYABORT ;
       }
 
-      free ($21) ;
+      stkd->Channel->Wall->Used++ ;
+
+      free ($18) ;
     }
   ;
 
@@ -346,10 +397,30 @@ die
       if (die == NULL)
       {
         free ($2) ;
+        free_layers_list ($4) ;
+        free_layer ($5) ;
+        free_layers_list ($6) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc die failed"
         ) ;
+        YYABORT ;
+      }
+
+      if (find_die_in_list(stkd->DiesList, $2) != NULL)
+      {
+        String_t message
+          = (String_t) malloc ((21 + strlen($2)) * sizeof (char)) ;
+        sprintf (message, "Die %s already declared", $2) ;
+
+        free ($2) ;
+        free_layers_list ($4) ;
+        free_layer ($5) ;
+        free_layers_list ($6) ;
+        free_die (die) ;
+        stack_description_error (stkd, scanner, message) ;
+        free (message) ;
         YYABORT ;
       }
 
@@ -399,14 +470,14 @@ layer         : LAYER  layer_content { $$ = $2 ; } ;
 
 source_layer  : SOURCE layer_content { $$ = $2 ; } ;
 
-layer_content : DVALUE UM IDENTIFIER ';'
+layer_content : IVALUE IDENTIFIER ';'
 
     {
       Layer* layer = $$ = alloc_and_init_layer() ;
 
       if (layer == NULL)
       {
-        free ($3) ;
+        free ($2) ;
         stack_description_error
         (
           stkd, scanner, "malloc layer failed"
@@ -415,11 +486,11 @@ layer_content : DVALUE UM IDENTIFIER ';'
       }
 
       layer->Height   = $1 ;
-      layer->Material = find_material_in_list(stkd->MaterialsList, $3) ;
+      layer->Material = find_material_in_list(stkd->MaterialsList, $2) ;
 
       if (layer->Material == NULL)
       {
-        free ($3) ;
+        free ($2) ;
         free_layer(layer) ;
         stack_description_error
         (
@@ -428,7 +499,9 @@ layer_content : DVALUE UM IDENTIFIER ';'
         YYABORT ;
       }
 
-      free ($3) ;
+      layer->Material->Used++ ;
+
+      free ($2) ;
     }
   ;
 
@@ -441,30 +514,58 @@ stack
   : STACK ':'
       stack_elements
     {
+      //
+      // After parsing with success the list of stack elements ...
+      //
+
       stkd->StackElementsList = $3 ;
 
-      if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+      if (last_stack_element == TDICE_STACK_ELEMENT_CHANNEL)
       {
+        // Reset for the next parsing ...
+        last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+        found_die          = 0 ;
+        found_channel      = 0 ;
+
         stack_description_error
         (
-          stkd, scanner, "channel as top stack element not supported"
+          stkd, scanner, "channel as bottom stack element not supported"
         ) ;
-
-        tmp_stack_element = NULL;
-
         YYABORT ;
       }
+
       if (found_die == 0)
       {
+        // Reset for the next parsing ...
+        last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+        found_die          = 0 ;
+        found_channel      = 0 ;
+
         stack_description_error
         (
-          stkd, scanner, "die declared but not used"
+          stkd, scanner, "there must be at least one die in the stack section"
         ) ;
-
-        found_die = 0 ;
-
         YYABORT ;
       }
+
+      if (found_channel == 0 && stkd->Channel != NULL)
+      {
+        // Reset for the next parsing ...
+        last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+        found_die          = 0 ;
+        found_channel      = 0 ;
+
+        stack_description_error
+        (
+          stkd, scanner, "channel section declared but not used"
+        ) ;
+        YYABORT ;
+      }
+
+      // Reset for the next parsing ...
+      last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+      found_die          = 0 ;
+      found_channel      = 0 ;
     }
   ;
 
@@ -472,7 +573,11 @@ stack_elements
 
   : stack_element
     {
-      if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+      //
+      // After parsing with success the first stack element ...
+      //
+
+      if (last_stack_element == TDICE_STACK_ELEMENT_CHANNEL)
       {
         free_stack_element ($1) ;
         stack_description_error
@@ -486,13 +591,20 @@ stack_elements
     }
   | stack_elements stack_element
     {
-      if (find_stack_element_in_list(stkd->StackElementsList, $2->Id) != NULL)
+      //
+      // After parsing with success all the other stack elements ...
+      //
+
+      if (find_stack_element_in_list($1, $2->Id) != NULL)
       {
+        String_t message
+          = (String_t) malloc ((31 + strlen($2->Id)) * sizeof (char)) ;
+        sprintf (message, "Stack element %s already declared", $2->Id) ;
+
         free_stack_element ($2) ;
-        stack_description_error
-        (
-          stkd, scanner, "stack element id already declared"
-        ) ;
+        free_stack_elements_list ($1) ;
+        stack_description_error (stkd, scanner, message) ;
+        free (message) ;
         YYABORT ;
       }
 
@@ -503,14 +615,18 @@ stack_elements
 
 stack_element
 
-  : LAYER IDENTIFIER DVALUE UM IDENTIFIER ';'
+  : LAYER IDENTIFIER IVALUE IDENTIFIER ';'
     {
-      tmp_stack_element = $$ = alloc_and_init_stack_element() ;
+      //
+      // After parsing with success a layer ...
+      //
 
-      if (tmp_stack_element == NULL)
+      StackElement* stack_element = $$ = alloc_and_init_stack_element() ;
+
+      if (stack_element == NULL)
       {
-        free ($2);
-        free ($5) ;
+        free ($2) ;
+        free ($4) ;
         stack_description_error
         (
           stkd, scanner, "malloc stack element failed"
@@ -523,8 +639,8 @@ stack_element
       if (layer == NULL)
       {
         free ($2);
-        free ($5) ;
-        free_stack_element (tmp_stack_element) ;
+        free ($4) ;
+        free_stack_element (stack_element) ;
         stack_description_error
         (
           stkd, scanner, "malloc layer failed"
@@ -533,14 +649,14 @@ stack_element
       }
 
       layer->Height   = $3 ;
-      layer->Material = find_material_in_list(stkd->MaterialsList, $5) ;
+      layer->Material = find_material_in_list(stkd->MaterialsList, $4) ;
 
       if (layer->Material == NULL)
       {
         free ($2);
-        free ($5) ;
+        free ($4) ;
+        free_stack_element (stack_element) ;
         free_layer(layer) ;
-        free_stack_element (tmp_stack_element) ;
         stack_description_error
         (
           stkd, scanner, "unknown material identifier"
@@ -548,26 +664,34 @@ stack_element
         YYABORT ;
       }
 
-      free($5) ;
+      layer->Material->Used++ ;
 
-      tmp_stack_element->Type          = TL_STACK_ELEMENT_LAYER ;
-      tmp_stack_element->Pointer.Layer = layer ;
-      tmp_stack_element->Id            = $2 ;
-      tmp_stack_element->NLayers       = 1 ;
+      free($4) ;
+
+      stack_element->Type          = TDICE_STACK_ELEMENT_LAYER ;
+      stack_element->Pointer.Layer = layer ;
+      stack_element->Id            = $2 ;
+      stack_element->NLayers       = 1 ;
+
+      last_stack_element = TDICE_STACK_ELEMENT_LAYER ;
     }
   | CHANNEL IDENTIFIER ';'
     {
+      //
+      // After parsing with success a layer ...
+      //
+
       if (stkd->Channel == NULL)
       {
         free ($2) ;
         stack_description_error
         (
-          stkd, scanner, "channel used but not declared"
+          stkd, scanner, "channel used in stack but not declared"
         ) ;
         YYABORT ;
       }
 
-      if (tmp_stack_element->Type == TL_STACK_ELEMENT_CHANNEL)
+      if (last_stack_element == TDICE_STACK_ELEMENT_CHANNEL)
       {
         free ($2) ;
         stack_description_error
@@ -576,9 +700,10 @@ stack_element
         ) ;
         YYABORT ;
       }
-      tmp_stack_element = $$ = alloc_and_init_stack_element() ;
 
-      if (tmp_stack_element == NULL)
+      StackElement* stack_element = $$ = alloc_and_init_stack_element() ;
+
+      if (stack_element == NULL)
       {
         free ($2) ;
         stack_description_error
@@ -588,18 +713,25 @@ stack_element
         YYABORT ;
       }
 
-      tmp_stack_element->Type    = TL_STACK_ELEMENT_CHANNEL ;
-      tmp_stack_element->Id      = $2 ;
-      tmp_stack_element->NLayers = 1 ;
+      stack_element->Type    = TDICE_STACK_ELEMENT_CHANNEL ;
+      stack_element->Id      = $2 ;
+      stack_element->NLayers = 1 ;
+
+      found_channel = 1 ;
+      last_stack_element = TDICE_STACK_ELEMENT_CHANNEL ;
     }
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'
     {
-      tmp_stack_element = $$ = alloc_and_init_stack_element() ;
+      //
+      // After parsing with success a die ...
+      //
 
-      if (tmp_stack_element == NULL)
+      StackElement* stack_element = $$ = alloc_and_init_stack_element() ;
+
+      if (stack_element == NULL)
       {
-        free ($3) ;
         free ($2) ;
+        free ($3) ;
         free ($5) ;
         stack_description_error
         (
@@ -608,15 +740,15 @@ stack_element
         YYABORT ;
       }
 
-      tmp_stack_element->Type        = TL_STACK_ELEMENT_DIE ;
-      tmp_stack_element->Id          = $2 ;
-      tmp_stack_element->Pointer.Die = find_die_in_list(stkd->DiesList, $3) ;
+      stack_element->Type        = TDICE_STACK_ELEMENT_DIE ;
+      stack_element->Id          = $2 ;
+      stack_element->Pointer.Die = find_die_in_list(stkd->DiesList, $3) ;
 
-      if (tmp_stack_element->Pointer.Die == NULL)
+      if (stack_element->Pointer.Die == NULL)
       {
         free($3) ;
         free($5) ;
-        free_stack_element(tmp_stack_element) ;
+        free_stack_element (stack_element) ;
         stack_description_error
         (
           stkd, scanner, "unknown die identifier"
@@ -624,15 +756,14 @@ stack_element
         YYABORT ;
       }
 
-      tmp_stack_element->NLayers = tmp_stack_element->Pointer.Die->NLayers ;
+      stack_element->NLayers = stack_element->Pointer.Die->NLayers ;
+      stack_element->Floorplan = alloc_and_init_floorplan ();
 
-      tmp_stack_element->Floorplan = alloc_and_init_floorplan ();
-
-      if (tmp_stack_element->Floorplan == NULL)
+      if (stack_element->Floorplan == NULL)
       {
         free($3) ;
         free($5) ;
-        free_stack_element(tmp_stack_element) ;
+        free_stack_element (stack_element) ;
         stack_description_error
         (
           stkd, scanner, "malloc floorplan failed"
@@ -640,11 +771,12 @@ stack_element
         YYABORT ;
       }
 
-      tmp_stack_element->Floorplan->FileName = $5 ;
+      stack_element->Floorplan->FileName = $5 ;
 
       free($3) ;
 
       found_die = 1 ;
+      last_stack_element = TDICE_STACK_ELEMENT_DIE ;
     }
   ;
 
@@ -655,11 +787,27 @@ stack_element
 dimensions
 
   : DIMENSIONS ':'
-      CHIP LENGTH DVALUE MM ';'
-      CHIP WIDTH  DVALUE MM ';'
-      CELL LENGTH DVALUE UM ';'
-      CELL WIDTH  DVALUE UM ';'
+      CHIP LENGTH IVALUE ',' WIDTH IVALUE ';'
+      CELL cell_length       WIDTH IVALUE ';'
     {
+      if (stkd->Channel == NULL && $11 == 0)
+      {
+        stack_description_error
+        (
+          stkd, scanner, "cell length must be declared"
+        ) ;
+        YYABORT ;
+      }
+
+      if (stkd->Channel != NULL && $11 != 0)
+      {
+        stack_description_error
+        (
+          stkd, scanner, "cell length must not be declared"
+        ) ;
+        YYABORT ;
+      }
+
       stkd->Dimensions = alloc_and_init_dimensions() ;
 
       if (stkd->Dimensions == NULL)
@@ -671,18 +819,18 @@ dimensions
         YYABORT ;
       }
 
-      /* Set width and NRows */
+      /* Set widths and NRows */
 
-      stkd->Dimensions->Chip.Width = $10 * 1000.0 ;
-      stkd->Dimensions->Cell.Width = $20 ;
+      stkd->Dimensions->Chip.Width  = (ChipDimension_t) $8 ;
+      stkd->Dimensions->Cell.Width  = (CellDimension_t) $13 ;
 
       stkd->Dimensions->Grid.NRows
         = (GridDimension_t)
           (stkd->Dimensions->Chip.Width / stkd->Dimensions->Cell.Width) ;
 
-      /* Set length and NColumns */
+      /* Set lengths and NColumns */
 
-      stkd->Dimensions->Chip.Length = $5  * 1000.0 ;
+      stkd->Dimensions->Chip.Length = (ChipDimension_t) $5 ;
 
       if (stkd->Channel == NULL)
       {
@@ -690,11 +838,11 @@ dimensions
 
         stkd->Dimensions->StackHasChannel = FALSE_V ;
 
-        stkd->Dimensions->Cell.WallLength = $15 ;
+        stkd->Dimensions->Cell.Length = (CellDimension_t) $11 ;
 
         stkd->Dimensions->Grid.NColumns
           = (GridDimension_t)
-            stkd->Dimensions->Chip.Length / stkd->Dimensions->Cell.WallLength ;
+            stkd->Dimensions->Chip.Length / stkd->Dimensions->Cell.Length ;
       }
       else
       {
@@ -703,82 +851,65 @@ dimensions
         stkd->Dimensions->StackHasChannel = TRUE_V ;
 
         stkd->Dimensions->Cell.FirstWallLength = tmp_first_wall_length ;
-        stkd->Dimensions->Cell.LastWallLength = tmp_last_wall_length ;
-        stkd->Dimensions->Cell.WallLength = tmp_wall_length ;
-        stkd->Dimensions->Cell.ChannelLength = tmp_channel_length ;
+        stkd->Dimensions->Cell.LastWallLength  = tmp_last_wall_length ;
+        stkd->Dimensions->Cell.WallLength      = tmp_wall_length ;
+        stkd->Dimensions->Cell.ChannelLength   = tmp_channel_length ;
 
-        stkd->Dimensions->Grid.NColumns
-          = 2 * (GridDimension_t)
-            (
-              (stkd->Dimensions->Chip.Length
-               - stkd->Dimensions->Cell.FirstWallLength
-               - stkd->Dimensions->Cell.LastWallLength
-               - stkd->Dimensions->Cell.ChannelLength
-              )
-              /
-              ( stkd->Dimensions->Cell.ChannelLength
-                + stkd->Dimensions->Cell.WallLength
-              )
-            )
-            + 3 ;
+        CellDimension_t ratio
+         = (stkd->Dimensions->Chip.Length
+            - stkd->Dimensions->Cell.FirstWallLength
+            - stkd->Dimensions->Cell.LastWallLength
+            - stkd->Dimensions->Cell.ChannelLength
+           )
+           /
+           ( stkd->Dimensions->Cell.ChannelLength
+             + stkd->Dimensions->Cell.WallLength
+           ) ;
+
+        if ( ratio - (int) ratio != 0)
+        {
+          stack_description_error
+          (
+            stkd, scanner, "cell dimensions does not fit the chip length correctly"
+          ) ;
+          YYABORT ;
+        }
+
+        stkd->Dimensions->Grid.NColumns = 2 * ratio + 3 ;
+
+        if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
+        {
+          stack_description_error
+          (
+            stkd, scanner, "colum number must be odd when channel is declared"
+          ) ;
+          YYABORT ;
+        }
+
+        /* Check the number of ciolumns get */
+
+        if (stkd->Dimensions->Grid.NColumns < 3)
+        {
+          stack_description_error (stkd, scanner, "not enough columns") ;
+          YYABORT ;
+        }
       }
-
-      /* Check the number of ciolumns get */
-
-      if (stkd->Dimensions->Grid.NColumns < 3)
-      {
-        stack_description_error
-        (
-          stkd, scanner, "not enough columns"
-        ) ;
-        YYABORT ;
-      }
-
-      if (stkd->Dimensions->StackHasChannel
-          && stkd->Dimensions->Grid.NColumns % 2 == 0)
-      {
-        stack_description_error
-        (
-          stkd, scanner, "using channels with even number of columns"
-        ) ;
-        YYABORT ;
-      }
-
-      StackElement *stk_el = stkd->StackElementsList ;
-
-      for ( ; stk_el != NULL ; stk_el = stk_el->Next)
-
-        stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
-
-      stkd->Dimensions->Grid.NCells
-        = stkd->Dimensions->Grid.NLayers
-          * stkd->Dimensions->Grid.NRows
-          * stkd->Dimensions->Grid.NColumns ;
-
-      stkd->Dimensions->Grid.NNz
-        =   stkd->Dimensions->Grid.NLayers
-            * (
-                  stkd->Dimensions->Grid.NRows
-                  * (3 * stkd->Dimensions->Grid.NColumns - 2)
-                + 2 * stkd->Dimensions->Grid.NColumns
-                  * (stkd->Dimensions->Grid.NRows - 1)
-              )
-          + (stkd->Dimensions->Grid.NLayers - 1 ) * 2
-            * stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns ;
     }
   ;
 
 first_wall_length
-
-  : /* empty */                     { $$ = 0 ;  }
-  | FIRST WALL LENGTH DVALUE UM ';' { $$ = $4 ; }
+  : /* empty */                  { $$ = 0 ;  }
+  | FIRST WALL LENGTH IVALUE ';' { $$ = $4 ; }
   ;
 
 last_wall_length
-
-  : /* empty */                    { $$ = 0 ;  }
-  | LAST WALL LENGTH DVALUE UM ';' { $$ = $4 ; }
+  : /* empty */                 { $$ = 0 ;  }
+  | LAST WALL LENGTH IVALUE ';' { $$ = $4 ; }
   ;
+
+cell_length
+  : /* empty */       { $$ = 0    }
+  | LENGTH IVALUE ',' { $$ = $2 ; }
 
 %%
 
@@ -789,10 +920,13 @@ void stack_description_error
   String_t          message
 )
 {
-  fprintf (stack_description_get_out (scanner),
-    "%s:%d: %s\n", stkd->FileName,
-                   stack_description_get_lineno (scanner),
-                   message) ;
-
+  fprintf
+  (
+    stack_description_get_out (scanner),
+    "%s:%d: %s\n",
+    stkd->FileName,
+    stack_description_get_lineno (scanner),
+    message
+  ) ;
   free_stack_description (stkd) ;
 }

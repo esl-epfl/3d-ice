@@ -46,6 +46,7 @@ void init_dimensions (Dimensions* dimensions)
   dimensions->Cell.ChannelLength   = 0.0 ;
 
   dimensions->Cell.Width           = 0.0 ;
+  dimensions->Cell.Length          = 0.0 ;
 
   dimensions->Grid.NLayers     = 0 ;
   dimensions->Grid.NRows       = 0 ;
@@ -74,27 +75,30 @@ Dimensions* alloc_and_init_dimensions (void)
 
 void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
 {
+  fprintf (stream,
+    "%sGrid dimensions      (L x R x C) = (%d x %d x %d) -> %d nonzeroes\n",
+    prefix, dimensions->Grid.NLayers,  dimensions->Grid.NRows,
+            dimensions->Grid.NColumns, dimensions->Grid.NNz);
+
+  fprintf (stream,
+    "%sChip dimensions          (L x W) = (%5.0f x %5.0f) um\n",
+    prefix, dimensions->Chip.Length, dimensions->Chip.Width);
+
   if (dimensions->StackHasChannel == FALSE_V )
 
     fprintf (stream,
-      "%sCell dimensions         (l x w) = (%5.2f x %5.2f) um\n",
-      prefix, dimensions->Cell.WallLength, dimensions->Cell.Width) ;
+      "%sCell dimensions          (l x w) = (%.0f x %.0f) um\n",
+      prefix, dimensions->Cell.Length, dimensions->Cell.Width) ;
 
   else
 
     fprintf (stream,
-      "%sCell dimensions (f, c, w, l) x w = (%5.2f, %5.2f, %5.2f, %5.2f) x %5.2f um\n",
-      prefix, dimensions->Cell.FirstWallLength, dimensions->Cell.ChannelLength,
-              dimensions->Cell.WallLength, dimensions->Cell.LastWallLength,
+      "%sCell dimensions (f, c, w, l) x w = (%.0f, %.0f, %.0f, %.0f) x %.0f um\n",
+      prefix, dimensions->Cell.FirstWallLength,
+              dimensions->Cell.ChannelLength,
+              dimensions->Cell.WallLength,
+              dimensions->Cell.LastWallLength,
               dimensions->Cell.Width) ;
-
-  fprintf (stream,
-    "%sGrid dimensions     (L x R x C) = (%d x %d x %d) -> %d nonzeroes\n",
-    prefix, dimensions->Grid.NLayers,  dimensions->Grid.NRows,
-            dimensions->Grid.NColumns, dimensions->Grid.NNz);
-  fprintf (stream,
-    "%sChip dimensions         (L x W) = (%5.2f x %5.2f) mm\n",
-    prefix, dimensions->Chip.Length / 1000.0, dimensions->Chip.Width / 1000.0);
 }
 
 /******************************************************************************/
@@ -110,7 +114,7 @@ CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 {
   if (dimensions->StackHasChannel == FALSE_V)
 
-    return dimensions->Cell.WallLength ;
+    return dimensions->Cell.Length ;
 
   if (column == 0)
 
@@ -122,7 +126,7 @@ CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 
   else
 
-    if (column % 2 == 0) /* Even -> wall */
+    if ((column & 1) == 0) /* Even -> wall */
 
       return dimensions->Cell.WallLength ;
 

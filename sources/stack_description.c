@@ -149,21 +149,21 @@ void print_all_floorplans
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
-    if (stack_element->Type == TL_STACK_ELEMENT_DIE)
+    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
 
       print_floorplan(stream, prefix, stack_element->Floorplan) ;
 }
 
 /******************************************************************************/
 
-static int fill_floorplans (StackDescription* stkd)
+int fill_floorplans (StackDescription* stkd)
 {
   int result = 0;
   StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
-    if (stack_element->Type == TL_STACK_ELEMENT_DIE)
+    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
     {
       result = fill_floorplan (stack_element->Floorplan, stkd->Dimensions) ;
 
@@ -242,7 +242,7 @@ void fill_conductances_stack_description
 
     switch (stack_element->Type)
     {
-      case TL_STACK_ELEMENT_DIE :
+      case TDICE_STACK_ELEMENT_DIE :
 
         conductances = fill_conductances_die
                        (
@@ -254,7 +254,7 @@ void fill_conductances_stack_description
                        ) ;
         break ;
 
-      case TL_STACK_ELEMENT_LAYER :
+      case TDICE_STACK_ELEMENT_LAYER :
 
         conductances = fill_conductances_layer
                        (
@@ -266,7 +266,7 @@ void fill_conductances_stack_description
                        ) ;
         break ;
 
-      case TL_STACK_ELEMENT_CHANNEL :
+      case TDICE_STACK_ELEMENT_CHANNEL :
 
         conductances = fill_conductances_channel
                        (
@@ -278,7 +278,7 @@ void fill_conductances_stack_description
                        ) ;
         break ;
 
-      case TL_STACK_ELEMENT_NONE :
+      case TDICE_STACK_ELEMENT_NONE :
 
         fprintf (stderr, "Error! Found stack element with unset type\n") ;
         return ;
@@ -326,7 +326,7 @@ void fill_capacities_stack_description
   )
     switch (stack_element->Type)
     {
-      case TL_STACK_ELEMENT_DIE :
+      case TDICE_STACK_ELEMENT_DIE :
 
         capacities = fill_capacities_die
                      (
@@ -340,7 +340,7 @@ void fill_capacities_stack_description
                      ) ;
         break ;
 
-      case TL_STACK_ELEMENT_LAYER :
+      case TDICE_STACK_ELEMENT_LAYER :
 
         capacities = fill_capacities_layer
                      (
@@ -354,7 +354,7 @@ void fill_capacities_stack_description
                      ) ;
         break ;
 
-      case TL_STACK_ELEMENT_CHANNEL :
+      case TDICE_STACK_ELEMENT_CHANNEL :
 
         capacities = fill_capacities_channel
                      (
@@ -368,7 +368,7 @@ void fill_capacities_stack_description
                      ) ;
         break ;
 
-      case TL_STACK_ELEMENT_NONE :
+      case TDICE_STACK_ELEMENT_NONE :
 
         fprintf (stderr, "Error! Found stack element with unset type\n") ;
         return ;
@@ -417,7 +417,7 @@ void fill_sources_stack_description
 
     switch (stack_element->Type)
     {
-      case TL_STACK_ELEMENT_DIE :
+      case TDICE_STACK_ELEMENT_DIE :
 
         tmp_sources = fill_sources_die
                       (
@@ -432,12 +432,12 @@ void fill_sources_stack_description
 
         break ;
 
-      case TL_STACK_ELEMENT_LAYER :
+      case TDICE_STACK_ELEMENT_LAYER :
 
         tmp_sources += get_layer_area (stkd->Dimensions) ;
         break ;
 
-      case TL_STACK_ELEMENT_CHANNEL :
+      case TDICE_STACK_ELEMENT_CHANNEL :
 
         tmp_sources = fill_sources_channel
                       (
@@ -450,7 +450,7 @@ void fill_sources_stack_description
                       ) ;
         break ;
 
-      case TL_STACK_ELEMENT_NONE :
+      case TDICE_STACK_ELEMENT_NONE :
 
         fprintf (stderr,  "Error! Found stack element with unset type\n") ;
         return ;
@@ -465,7 +465,7 @@ void fill_sources_stack_description
 
   if (stkd->EnvironmentHeatSink != NULL)
   {
-    if (last_stack_element->Type == TL_STACK_ELEMENT_DIE)
+    if (last_stack_element->Type == TDICE_STACK_ELEMENT_DIE)
 
         add_sources_enviroment_heat_sink
         (
@@ -477,7 +477,7 @@ void fill_sources_stack_description
           + last_stack_element->Pointer.Die->NLayers
         ) ;
 
-    else if (last_stack_element->Type == TL_STACK_ELEMENT_LAYER)
+    else if (last_stack_element->Type == TDICE_STACK_ELEMENT_LAYER)
 
         add_sources_enviroment_heat_sink
         (
@@ -533,7 +533,7 @@ void fill_system_matrix_stack_description
 
     switch (stack_element->Type)
     {
-      case TL_STACK_ELEMENT_DIE :
+      case TDICE_STACK_ELEMENT_DIE :
 
         added = fill_system_matrix_die
                 (
@@ -545,7 +545,7 @@ void fill_system_matrix_stack_description
                 ) ;
         break ;
 
-      case TL_STACK_ELEMENT_LAYER :
+      case TDICE_STACK_ELEMENT_LAYER :
 
         added = fill_system_matrix_layer
                 (
@@ -559,7 +559,7 @@ void fill_system_matrix_stack_description
                 ) ;
         break ;
 
-      case TL_STACK_ELEMENT_CHANNEL :
+      case TDICE_STACK_ELEMENT_CHANNEL :
 
         added = fill_system_matrix_channel
                 (
@@ -572,7 +572,7 @@ void fill_system_matrix_stack_description
                 ) ;
         break ;
 
-      case TL_STACK_ELEMENT_NONE :
+      case TDICE_STACK_ELEMENT_NONE :
 
         fprintf (stderr,  "Error! Found stack element with unset type\n") ;
         return ;
@@ -603,7 +603,7 @@ Quantity_t get_number_of_floorplan_elements_of_floorplan
 
     return -1 ;
 
-  if (stk_el->Type != TL_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+  if (stk_el->Type != TDICE_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
 
     return -2 ;
 
@@ -638,7 +638,7 @@ int get_max_temperature_of_floorplan_element
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -682,7 +682,7 @@ int get_min_temperature_of_floorplan_element
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -726,7 +726,7 @@ int get_avg_temperature_of_floorplan_element
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -772,7 +772,7 @@ int get_min_avg_max_temperatures_of_floorplan_element
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -818,7 +818,7 @@ int get_temperature_of_channel_outlet
 
     return -1 ;
 
-  if (stk_el->Type != TL_STACK_ELEMENT_CHANNEL)
+  if (stk_el->Type != TDICE_STACK_ELEMENT_CHANNEL)
 
     return -2 ;
 
@@ -860,7 +860,7 @@ int get_all_max_temperatures_of_floorplan
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -904,7 +904,7 @@ int get_all_min_temperatures_of_floorplan
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -948,7 +948,7 @@ int get_all_avg_temperatures_of_floorplan
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -995,7 +995,7 @@ int get_all_min_avg_max_temperatures_of_floorplan
 
     return -1 ;
 
-  if (   stk_el->Type      != TL_STACK_ELEMENT_DIE
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
       || stk_el->Floorplan == NULL)
 
     return -2 ;
@@ -1042,7 +1042,7 @@ int get_all_temperatures_of_channel_outlets
 
     return -1 ;
 
-  if (stk_el->Type != TL_STACK_ELEMENT_CHANNEL)
+  if (stk_el->Type != TDICE_STACK_ELEMENT_CHANNEL)
 
     return -2 ;
 
@@ -1058,7 +1058,7 @@ int get_all_temperatures_of_channel_outlets
     column < get_number_of_columns (stkd->Dimensions) ;
     column++
   )
-    if (column % 2 != 0) /* Odd -> liquid */
+    if ((column & 1) != 0) /* Odd -> liquid */
 
     *outlet_temperature++ = temperatures[offset + column] ;
 
@@ -1096,7 +1096,7 @@ int print_thermal_map
 
   layer_offset = stk_el->LayersOffset ;
 
-  if (stk_el->Type == TL_STACK_ELEMENT_DIE)
+  if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
     layer_offset += stk_el->Pointer.Die->SourceLayer->LayersOffset ;
 
   temperatures

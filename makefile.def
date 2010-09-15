@@ -121,8 +121,8 @@
 SLU_MAIN    = $(HOME)/SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
-SLU_LIBS    = -L $(SLU_LIB) -l superlu_4.0 -l blas
-#SLU_LIBS    = -L $(SLU_LIB) -l superlu_4.0 -L /usr/lib64 -l blas
+SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_4.0 -lblas
+#SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_4.0 -L/usr/lib64 -lblas
 
  #
  # Commands and flags
@@ -132,8 +132,8 @@ AR        = ar
 ARFLAGS   = rsv
 
 CC        = gcc
-CFLAGS    = -MD -O3
-CINCLUDES = -I $(3DICE_INCLUDE)
+CFLAGS    = -MD -g
+CINCLUDES = -I$(3DICE_INCLUDE)
 
 YACC      = bison
 YFLAGS    = -d

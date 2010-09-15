@@ -147,7 +147,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "last"                       return LAST ;
 "length"                     return LENGTH ;
 "material"                   return MATERIAL ;
-"mm"                         return MM ;
 "on"                         return ON ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;
@@ -159,27 +158,31 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "thermal"                    return THERMAL ;
 "top"                        return TOP ;
 "transfer"                   return TRANSFER ;
-"um"                         return UM ;
 "volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
 
-{double}         {
-                   yylval->double_v = atof(yytext) ;
-                   return DVALUE ;
-                 }
+{unsigned_integer} {
+                     yylval->uint_v = atoi(yytext) ;
+                     return IVALUE ;
+                   }
 
-{identifier}     {
-                   yylval->char_p = strdup(yytext) ;
-                   return IDENTIFIER ;
-                 }
+{double}           {
+                     yylval->double_v = atof(yytext) ;
+                     return DVALUE ;
+                   }
 
-{path}           {
-                   int n = strlen(yytext) - 2 ;
-                   yylval->char_p = (char *) malloc (sizeof(char) * n) ;
-                   strncpy (yylval->char_p, yytext+1, n) ;
-                   return PATH;
-                 }
+{identifier}       {
+                     yylval->char_p = strdup(yytext) ;
+                     return IDENTIFIER ;
+                   }
+
+{path}             {
+                     int n = strlen(yytext) - 2 ;
+                     yylval->char_p = (char *) malloc (sizeof(char) * n) ;
+                     strncpy (yylval->char_p, yytext+1, n) ;
+                     return PATH;
+                   }
 
 <ONE_LINE_COMMENT>\n              BEGIN(INITIAL);
 <ONE_LINE_COMMENT>.               ;

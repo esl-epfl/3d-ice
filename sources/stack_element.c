@@ -41,7 +41,7 @@
 void
 init_stack_element (StackElement* stack_element)
 {
-  stack_element->Type          = TL_STACK_ELEMENT_NONE ;
+  stack_element->Type          = TDICE_STACK_ELEMENT_NONE ;
   stack_element->Pointer.Layer = NULL ;
   stack_element->Pointer.Die   = NULL ;
   stack_element->Floorplan     = NULL ;
@@ -67,12 +67,12 @@ StackElement* alloc_and_init_stack_element (void)
 
 void free_stack_element (StackElement* stack_element)
 {
-  if (stack_element->Type == TL_STACK_ELEMENT_DIE
+  if (stack_element->Type == TDICE_STACK_ELEMENT_DIE
       && stack_element->Floorplan != NULL)
 
     free_floorplan (stack_element->Floorplan) ;
 
-  else if (stack_element->Type == TL_STACK_ELEMENT_LAYER
+  else if (stack_element->Type == TDICE_STACK_ELEMENT_LAYER
            && stack_element->Pointer.Layer != NULL)
 
     free_layer (stack_element->Pointer.Layer) ;
@@ -113,26 +113,26 @@ void print_stack_elements_list
 
     switch (list->Type)
     {
-      case TL_STACK_ELEMENT_NONE :
+      case TDICE_STACK_ELEMENT_NONE :
 
         fprintf (stream, "NO TYPE\n") ;
         break ;
 
-      case TL_STACK_ELEMENT_DIE :
+      case TDICE_STACK_ELEMENT_DIE :
 
         fprintf (stream,
           "die     (%s) %s \n",
           list->Pointer.Die->Id, list->Floorplan->FileName) ;
         break ;
 
-      case TL_STACK_ELEMENT_LAYER :
+      case TDICE_STACK_ELEMENT_LAYER :
 
         fprintf (stream,
           "layer   (%s) %5.2f um\n",
           list->Pointer.Layer->Material->Id, list->Pointer.Layer->Height) ;
         break ;
 
-      case TL_STACK_ELEMENT_CHANNEL :
+      case TDICE_STACK_ELEMENT_CHANNEL :
 
         fprintf (stream,
           "channel\n") ;

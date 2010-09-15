@@ -1,16 +1,25 @@
-material silicon :
+material silicon : 
    thermal conductivity       1.30e-4 ;
    volumetric heat capacity   1.63566e-12 ;
 
+//material silicon :
+//   thermal conductivity      1.45e-04 ;
+//   volumetric heat  capacity 1.34e-12 ;
+
+//environment heat sink :
+//  heat transfer coefficient 15.0e-9 ;
+//  temperature               300.0 ;
+
+
 channel:
 
-   height 100.0 um ;
+   height 100 ;
 
-   channel length  50.0 um ;
-   wall    length  50.0 um ; 
+   channel length  50 ;
+   wall    length  50 ; 
 
-   first wall length  25.0 um ;
-   last  wall length  25.0 um ; 
+   first wall length  25 ;
+   last  wall length  25 ; 
 
    wall material silicon ;
 
@@ -21,15 +30,16 @@ channel:
    coolant volumetric heat capacity         4.172638e-12 ;
    coolant incoming temperature           300.0 ;
 
+
 die bottomdie :
 
-   layer 48.0 um silicon ;
-   source  2.0 um silicon ;
+   layer  48 silicon ;
+   source  2 silicon ;
 
 die topdie :
 	
-   source 2.0 um silicon;
-   layer 48.0 um silicon;
+   source  2 silicon;
+   layer  48 silicon;
 
 stack:
 
@@ -39,9 +49,7 @@ stack:
 
 dimensions :
 
-  chip length 00.1 mm ;
-  chip width  10.1 mm ;
-
-  cell length  50.0 um ;
-  cell width  100.0 um ;
+  chip length 100 , width  10100 ;
+  cell              width    100 ;
+//  cell length  10 , width    100 ;
 

@@ -143,7 +143,7 @@ Conductances* fill_conductances_channel
       column++, conductances++
     )
 
-      if (column % 2 == 0) /* Even -> wall */
+      if ((column & 1) == 0) /* Even -> wall */
 
         fill_conductances_wall_cell
         (
@@ -231,7 +231,7 @@ Capacity_t* fill_capacities_channel
       capacities++
     )
 
-      if (column % 2 == 0 ) /* Even -> Wall */
+      if ((column & 1) == 0 ) /* Even -> Wall */
       {
         *capacities = capacity
                       (
@@ -319,7 +319,7 @@ Source_t* fill_sources_channel
       sources++
     )
 
-      if (row == 0 && column % 2 != 0) /* Only first row and odd columns */
+      if (row == 0 && (column & 1) != 0) /* Only first row and odd columns */
       {
         *sources = 2.0 * C * channel->CoolantTIn ;
 
@@ -383,7 +383,7 @@ Quantity_t fill_system_matrix_channel
       column          ++
     )
 
-       if (column % 2 == 0 ) /* Even -> Wall */
+       if ((column & 1) == 0 ) /* Even -> Wall */
 
          added = add_solid_column
                  (

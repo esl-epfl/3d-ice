@@ -59,6 +59,8 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
+  print_stack_description (stdout, "", &stkd) ;
+
   // Init thermal data
 
   init_thermal_data (&tdata, &stkd, 300.00, 0.002, 0.020) ;

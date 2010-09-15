@@ -47,10 +47,13 @@ extern "C"
   typedef struct
   {
     CellDimension_t FirstWallLength ;
-    CellDimension_t LastWallLength ;
     CellDimension_t WallLength ;
+    CellDimension_t LastWallLength ;
+
     CellDimension_t ChannelLength ;
+
     CellDimension_t Width ;
+    CellDimension_t Length ;
 
   } CellDimensions ;
 
