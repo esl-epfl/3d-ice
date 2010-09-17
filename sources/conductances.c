@@ -36,6 +36,39 @@
 
 /******************************************************************************/
 
+/*
+ * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
+ *
+ * FlowRatePerChannel [ um3 / sec ] = FlowRate             [ um3 / sec ]
+ *                                    / #ChannelColumns    [ ]
+ *
+ * CoolantVelocity      [ m / sec ] = FlowRatePerChannel   [ um3 / sec ]
+ *                                    * ( 1 / Ay )         [   1 / um2 ]
+ *
+ * Cconv         [ J / ( K . sec) ]  = CoolantVHC          [ J / ( um3 . K ) ]
+ *                                     * CoolantVelocity   [ m / sec ]
+ *                                     * ( Ay / 2 )        [ um2 ]
+ * [ J / ( K . sec) ] = [ W / K ]
+ *
+ * CoolantVelocity = FlowRate / (#ChannelColumns * Ay )
+ *
+ * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
+ */
+
+Cconv_t get_c_conv
+(
+  ColumnIndex_t number_of_columns,
+  CoolantVHC_t  coolant_vhc,
+  CoolantFR_t   coolant_fr
+)
+{
+  return (coolant_vhc * coolant_fr)
+         /
+         (Cconv_t) (number_of_columns - 1 );
+}
+
+/******************************************************************************/
+
 void fill_conductances_bottom_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
@@ -236,25 +269,6 @@ void fill_conductances_top_solid_cell_ehtc
 
 /******************************************************************************/
 
-/*
- * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
- *
- * FlowRatePerChannel [ um3 / sec ] = FlowRate             [ um3 / sec ]
- *                                    / #ChannelColumns    [ ]
- *
- * CoolantVelocity      [ m / sec ] = FlowRatePerChannel   [ um3 / sec ]
- *                                    * ( 1 / Ay )         [   1 / um2 ]
- *
- * Cconv         [ J / ( K . sec) ]  = CoolantVHC          [ J / ( um3 . K ) ]
- *                                     * CoolantVelocity   [ m / sec ]
- *                                     * ( Ay / 2 )        [ um2 ]
- * [ J / ( K . sec) ] = [ W / K ]
- *
- * CoolantVelocity = FlowRate / (#ChannelColumns * Ay )
- *
- * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
- */
-
 void fill_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
@@ -272,8 +286,8 @@ void fill_conductances_liquid_cell
   CoolantFR_t     coolant_fr
 )
 {
-  Cconv_t C = (coolant_vhc * coolant_fr)
-              / (Cconv_t) ( get_number_of_columns (dimensions) - 1 );
+  Cconv_t C = get_c_conv (get_number_of_columns (dimensions),
+                          coolant_vhc, coolant_fr) ;
 
   conductances->North =  C ;
   conductances->South = -C ;

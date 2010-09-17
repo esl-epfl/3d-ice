@@ -36,6 +36,7 @@
 #include <stdio.h>
 
 #include "thermal_data.h"
+#include "supermatrix.h"
 
 /******************************************************************************/
 
@@ -79,16 +80,18 @@ static void init_data (double* data, Quantity_t size, double init_value)
 void init_thermal_data
 (
   ThermalData*      tdata,
-  StackDescription* stkd,
   Temperature_t     initial_temperature,
-  Time_t            delta_time,
+  Time_t            step_time,
   Time_t            slot_time
 )
 {
-  tdata->Size        = get_number_of_cells(stkd->Dimensions) ;
-  tdata->DeltaTime   = delta_time ;
-  tdata->SlotTime    = slot_time ;
-  tdata->CurrentTime = 0.0 ;
+  tdata->Size = 0 ;
+
+  tdata->StepTime = step_time ;
+  tdata->SlotTime = slot_time ;
+
+  tdata->CurrentTime      = 0.0 ;
+  tdata->CurrentSlotLimit = slot_time ;
 
   tdata->InitialTemperature = initial_temperature ;
 
@@ -122,6 +125,8 @@ int fill_thermal_data
   StackDescription* stkd
 )
 {
+  tdata->Size = get_number_of_cells(stkd->Dimensions) ;
+
   /* Alloc and set temperatures */
 
   if ( (tdata->Temperatures
@@ -151,7 +156,7 @@ int fill_thermal_data
      goto capacities_fail ;
 
   fill_capacities_stack_description (stkd, tdata->Capacities,
-                                     tdata->DeltaTime) ;
+                                     tdata->StepTime) ;
 
   /* Alloc and set sources */
 
@@ -297,18 +302,85 @@ void free_thermal_data (ThermalData* tdata)
 
 /******************************************************************************/
 
+int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
+{
+  int counter;
+//  static int solved = 0 ;
+
+  if (tdata->SLU_Options.Fact != FACTORED)
+  {
+    fprintf (stderr, "call fill_thermal_data before emulating\n");
+    return -1 ;
+  }
+
+  dgstrs
+  (
+    NOTRANS,
+    &tdata->SLUMatrix_L,
+    &tdata->SLUMatrix_U,
+    tdata->SLU_PermutationMatrixC,
+    tdata->SLU_PermutationMatrixR,
+    &tdata->SLUMatrix_B,
+    &tdata->SLU_Stat,
+    &tdata->SLU_Info
+  ) ;
+
+  if (tdata->SLU_Info < 0)
+  {
+    fprintf (stderr, "Error while solving linear system\n");
+    return tdata->SLU_Info ;
+  }
+
+//  printf("solved step %d\n", ++solved);
+
+  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+    tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
+
+  fill_system_vector
+  (
+    &tdata->SV_B,
+    tdata->Sources,
+    tdata->Capacities,
+    tdata->Temperatures
+  ) ;
+
+  tdata->CurrentTime += tdata->StepTime ;
+
+  if ( get_number_of_remaining_power_values(stkd) == 0)
+    return 1 ;
+
+  if (tdata->CurrentTime == tdata->CurrentSlotLimit)
+  {
+    fill_sources_stack_description (stkd, tdata->Sources,
+                                          tdata->Conductances) ;
+
+    fill_system_vector
+    (
+      &tdata->SV_B,
+      tdata->Sources,
+      tdata->Capacities,
+      tdata->Temperatures
+    ) ;
+  }
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
 int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
 {
-  Time_t time = tdata->SlotTime ;
-  int counter;
+//  Temperature_t* tmp = NULL ;
+//  DNformat* Xstore   = (DNformat *) tdata->SLUMatrix_B.Store ;
+//  static int solved  = 0 ;
 
- if (tdata->SLU_Options.Fact == DOFACT)
- {
-   fprintf (stderr, "System matrix must be factorized\n");
-   return 1 ;
- }
+  if (tdata->SLU_Options.Fact != FACTORED)
+  {
+    fprintf (stderr, "call fill_thermal_data before emulating\n");
+    return -1 ;
+  }
 
-  for ( ; time > 0 ; time -= tdata->DeltaTime)
+  while ( tdata->CurrentTime < tdata->CurrentSlotLimit )
   {
     dgstrs
     (
@@ -322,41 +394,51 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
       &tdata->SLU_Info
     ) ;
 
-    if (tdata->SLU_Info != 0)
+    if (tdata->SLU_Info < 0)
     {
       fprintf (stderr, "Error while solving linear system\n");
       return tdata->SLU_Info ;
     }
 
-    for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
-      tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
+//    printf("solved slot %d\n", ++solved);
 
-    fill_system_vector // FIXME: both calls aren't redundant ?
+
+    memcpy (tdata->Temperatures, tdata->SV_B.Values,
+            tdata->SV_B.Size * sizeof (Temperature_t)) ;
+
+//    tmp                 = tdata->Temperatures ;
+//    tdata->Temperatures = tdata->SV_B.Values ;
+//    tdata->SV_B.Values  = tmp ;
+//    Xstore->nzval =       tmp ;
+
+    fill_system_vector
     (
       &tdata->SV_B,
       tdata->Sources,
       tdata->Capacities,
       tdata->Temperatures
     ) ;
+
+    tdata->CurrentTime += tdata->StepTime ;
+
   }
 
-  tdata->CurrentTime += tdata->SlotTime ;
+  tdata->CurrentSlotLimit += tdata->SlotTime ;
 
-  if (--stkd->RemainingTimeSlots == 0)
+  if ( get_number_of_remaining_power_values(stkd) == 0)
+
     return 1 ;
-  else
-  {
-    fill_sources_stack_description (stkd, tdata->Sources,
-                                          tdata->Conductances) ;
 
-    fill_system_vector // FIXME: both calls aren't redundant ?
-    (
-      &tdata->SV_B,
-      tdata->Sources,
-      tdata->Capacities,
-      tdata->Temperatures
-    ) ;
-  }
+  fill_sources_stack_description (stkd, tdata->Sources,
+                                        tdata->Conductances) ;
+
+  fill_system_vector
+  (
+    &tdata->SV_B,
+    tdata->Sources,
+    tdata->Capacities,
+    tdata->Temperatures
+  ) ;
 
   return 0 ;
 }

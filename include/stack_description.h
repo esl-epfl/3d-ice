@@ -83,10 +83,6 @@ extern "C"
 
     Dimensions* Dimensions ;
 
-    /* Number of remaining time slots to consume */
-
-    Quantity_t RemainingTimeSlots ;
-
   } StackDescription ;
 
 /******************************************************************************/
@@ -150,6 +146,12 @@ extern "C"
     String_t          prefix,
     StackDescription* stkd
   ) ;
+
+/******************************************************************************/
+
+  /* Return the number of remaining power values (so time slot) to consume */
+
+  Quantity_t get_number_of_remaining_power_values (StackDescription* stkd) ;
 
 /******************************************************************************/
 

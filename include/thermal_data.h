@@ -67,9 +67,11 @@ extern "C"
 
     /* Time Values */
 
-    Time_t CurrentTime ;
-    Time_t DeltaTime ;
+    Time_t StepTime ;
     Time_t SlotTime ;
+
+    Time_t CurrentTime ;
+    Time_t CurrentSlotLimit ;
 
     /* The matrix A and the right hand side vector B representin the linear */
     /* system                                                               */
@@ -102,25 +104,22 @@ extern "C"
   /*                                                                        */
   /* tdata               The address of the ThermalData structure to init   */
   /*                                                                        */
-  /* stkd                The address of a StackDescription structure        */
-  /*                     already filled with data from a .stk file          */
-  /*                                                                        */
   /* initial_temperature The initial temperature [K] for all the thermal    */
   /*                     cells of the 3D grid                               */
   /*                                                                        */
-  /* delta_time          The unity of time [seconds] used for each time     */
+  /* step_time           The unity of time [seconds] used for each time     */
   /*                     step during the thermal emulation                  */
   /*                                                                        */
   /* slot_time           the length [seconds] of each time slot, i.e. for   */
   /*                     how long power values read from the floorplans are */
-  /*                     injected into the 3D-IC grid of cells              */
+  /*                     injected into the 3D-IC grid of cells. Every slot  */
+  /*                     of time is divided into steps (step_time)          */
 
   void init_thermal_data
   (
     ThermalData*      tdata,
-    StackDescription* stkd,
     Temperature_t     initial_temperature,
-    Time_t            delta_time,
+    Time_t            step_time,
     Time_t            slot_time
   ) ;
 
@@ -151,15 +150,27 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Iteratively consume a time slot emulating heat injection and           */
-  /* dissipation. At the end of the call, the 3DIC has the thermal state    */
-  /* (temperature array) corresponding to the end of the time slot while    */
-  /*  the RHS vector B is already filled with the power values read, if     */
-  /* any, from the following time slot.                                     */
+  /* Consumes a time step emulating heat injection and dissipation.         */
   /*                                                                        */
-  /* Returns 0 if the emulation succeeded, 1 if the time slots are over or  */
-  /* <0 if there have been a problem with the computation of the solution   */
-  /* of the linear system. See the "info" prameter of "dgstrs" in SuperLU.  */
+  /* Returns                                                                */
+  /*   0 if the emulation succeeded,                                        */
+  /*   1 if the time reached the end of a time slot,                        */
+  /*  <0 if there have been a problem with the computation of the solution  */
+  /*     of the linear system. See the "info" prameter of "dgstrs" in       */
+  /*     SuperLU.                                                           */
+
+  int emulate_time_step (ThermalData* tdata, StackDescription* stkd) ;
+
+/******************************************************************************/
+
+  /* Consumes a time slot emulating heat injection and dissipation.         */
+  /*                                                                        */
+  /* Returns                                                                */
+  /*   0 if the emulation succeeded,                                        */
+  /*   1 if the time slots are over                                         */
+  /*  <0 if there have been a problem with the computation of the solution  */
+  /*     of the linear system. See the "info" prameter of "dgstrs"          */
+  /*     in SuperLU.                                                        */
 
   int emulate_time_slot (ThermalData* tdata, StackDescription* stkd) ;
 

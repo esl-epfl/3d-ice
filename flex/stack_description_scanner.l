@@ -162,9 +162,9 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
 
-{unsigned_integer} {
-                     yylval->uint_v = atoi(yytext) ;
-                     return IVALUE ;
+{signed_integer}   {
+                     yylval->double_v = atof(yytext) ;
+                     return DVALUE ;
                    }
 
 {double}           {

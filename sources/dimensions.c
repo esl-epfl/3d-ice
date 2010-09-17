@@ -77,23 +77,23 @@ void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
 {
   fprintf (stream,
     "%sGrid dimensions      (L x R x C) = (%d x %d x %d) -> %d nonzeroes\n",
-    prefix, dimensions->Grid.NLayers,  dimensions->Grid.NRows,
-            dimensions->Grid.NColumns, dimensions->Grid.NNz);
+    prefix, get_number_of_layers(dimensions), get_number_of_rows(dimensions),
+            get_number_of_columns(dimensions), dimensions->Grid.NNz);
 
   fprintf (stream,
-    "%sChip dimensions          (L x W) = (%5.0f x %5.0f) um\n",
+    "%sChip dimensions          (L x W) = (%.2f x %.2f) um\n",
     prefix, dimensions->Chip.Length, dimensions->Chip.Width);
 
   if (dimensions->StackHasChannel == FALSE_V )
 
     fprintf (stream,
-      "%sCell dimensions          (l x w) = (%.0f x %.0f) um\n",
+      "%sCell dimensions          (l x w) = (%.2f x %.2f) um\n",
       prefix, dimensions->Cell.Length, dimensions->Cell.Width) ;
 
   else
 
     fprintf (stream,
-      "%sCell dimensions (f, c, w, l) x w = (%.0f, %.0f, %.0f, %.0f) x %.0f um\n",
+      "%sCell dimensions (f, c, w, l) x w = (%.2f, %.2f, %.2f, %.2f) x %.2f um\n",
       prefix, dimensions->Cell.FirstWallLength,
               dimensions->Cell.ChannelLength,
               dimensions->Cell.WallLength,
@@ -109,6 +109,8 @@ void free_dimensions (Dimensions* dimensions)
 }
 
 /******************************************************************************/
+
+extern Bool_t is_channel_column (ColumnIndex_t column) ;
 
 CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 {
@@ -126,13 +128,13 @@ CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 
   else
 
-    if ((column & 1) == 0) /* Even -> wall */
-
-      return dimensions->Cell.WallLength ;
-
-    else                 /* Odd -> channel */
+    if (is_channel_column(column) == TRUE_V)
 
       return dimensions->Cell.ChannelLength ;
+
+    else
+
+      return dimensions->Cell.WallLength ;
 }
 
 /******************************************************************************/

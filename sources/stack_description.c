@@ -55,7 +55,6 @@ void init_stack_description (StackDescription* stkd)
   stkd->EnvironmentHeatSink = NULL ;
   stkd->StackElementsList   = NULL ;
   stkd->Dimensions          = NULL ;
-  stkd->RemainingTimeSlots  = 0 ;
 }
 
 /******************************************************************************/
@@ -158,21 +157,15 @@ void print_all_floorplans
 
 int fill_floorplans (StackDescription* stkd)
 {
-  int result = 0;
   StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
 
     if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
-    {
-      result = fill_floorplan (stack_element->Floorplan, stkd->Dimensions) ;
 
-      if (result == 1)
+      if (fill_floorplan (stack_element->Floorplan, stkd->Dimensions) == 1)
+
         return 1 ;
-
-      stkd->RemainingTimeSlots
-        = stack_element->Floorplan->ElementsList->PowerValues->Length ;
-    }
 
   return 0 ;
  }
@@ -584,6 +577,19 @@ void fill_system_matrix_stack_description
         return ;
 
     } /* stack_element->Type */
+}
+
+/******************************************************************************/
+
+Quantity_t get_number_of_remaining_power_values (StackDescription* stkd)
+{
+  StackElement* stk_el = stkd->StackElementsList ;
+  while (stk_el != NULL && stk_el->Type != TDICE_STACK_ELEMENT_DIE)
+    stk_el = stk_el->Next;
+
+  // if stk_el == NULL then BUG !!!
+
+  return stk_el->Floorplan->ElementsList->PowerValues->Length ;
 }
 
 /******************************************************************************/
@@ -1058,7 +1064,7 @@ int get_all_temperatures_of_channel_outlets
     column < get_number_of_columns (stkd->Dimensions) ;
     column++
   )
-    if ((column & 1) != 0) /* Odd -> liquid */
+    if (is_channel_column(column) == TRUE_V)
 
     *outlet_temperature++ = temperatures[offset + column] ;
 

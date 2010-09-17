@@ -63,7 +63,7 @@ main(int argc, char** argv)
 
   // Init thermal data
 
-  init_thermal_data (&tdata, &stkd, 300.00, 0.002, 0.020) ;
+  init_thermal_data (&tdata, 300.00, 0.002, 0.020) ;
 
   // Fill thermal data using the stack description data
 

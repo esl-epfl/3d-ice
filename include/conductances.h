@@ -62,6 +62,15 @@ extern "C"
 
 /******************************************************************************/
 
+  Cconv_t get_c_conv
+  (
+    ColumnIndex_t num_column,
+    CoolantVHC_t  coolant_vhc,
+    CoolantFR_t   coolant_fr
+  ) ;
+
+/******************************************************************************/
+
   void fill_conductances_bottom_solid_cell
   (
 #   ifdef PRINT_CONDUCTANCES

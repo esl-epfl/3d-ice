@@ -112,6 +112,15 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 /******************************************************************************/
 
+Bool_t is_channel_column (Quantity_t column)
+{
+  // First bit is 0 -> even number -> wall -> FALSE -> 0
+  // First bit is 1 -> odd number -> channel -> TRUE -> 1
+  return column & 1 ;
+}
+
+/******************************************************************************/
+
 Conductances* fill_conductances_channel
 (
 # ifdef PRINT_CONDUCTANCES
@@ -143,22 +152,7 @@ Conductances* fill_conductances_channel
       column++, conductances++
     )
 
-      if ((column & 1) == 0) /* Even -> wall */
-
-        fill_conductances_wall_cell
-        (
-#         ifdef PRINT_CONDUCTANCES
-          dimensions,
-          current_layer, row, column,
-#         endif
-          conductances,
-          get_cell_length (dimensions, column),
-          get_cell_width  (dimensions),
-          channel->Height,
-          channel->Wall->ThermalConductivity
-        ) ;
-
-      else                 /* Odd -> channel */
+      if (is_channel_column(column) == TRUE_V)
 
         fill_conductances_liquid_cell
         (
@@ -173,6 +167,21 @@ Conductances* fill_conductances_channel
           channel->CoolantHTCs,
           channel->CoolantVHC,
           channel->CoolantFR
+        ) ;
+
+      else
+
+        fill_conductances_wall_cell
+        (
+#         ifdef PRINT_CONDUCTANCES
+          dimensions,
+          current_layer, row, column,
+#         endif
+          conductances,
+          get_cell_length (dimensions, column),
+          get_cell_width  (dimensions),
+          channel->Height,
+          channel->Wall->ThermalConductivity
         ) ;
 
   return conductances ;
@@ -231,28 +240,7 @@ Capacity_t* fill_capacities_channel
       capacities++
     )
 
-      if ((column & 1) == 0 ) /* Even -> Wall */
-      {
-        *capacities = capacity
-                      (
-                        get_cell_length (dimensions, column),
-                        get_cell_width (dimensions),
-                        channel->Height,
-                        channel->Wall->VolHeatCapacity,
-                        delta_time
-                      ) ;
-#       ifdef PRINT_CAPACITIES
-        fprintf (stderr,
-          "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  vhc %.5e delta %.5e --> %.5e\n",
-          current_layer, row, column,
-          get_cell_offset_in_stack (dimensions, current_layer, row, column),
-          get_cell_length(dimensions, column), get_cell_width (dimensions),
-          channel->Height,
-          channel->Wall->VolHeatCapacity, delta_time, *capacities) ;
-#       endif
-      }
-      else                 /* Odd -> liquid */
+      if (is_channel_column(column) == TRUE_V )
       {
         *capacities  = capacity
                        (
@@ -271,6 +259,27 @@ Capacity_t* fill_capacities_channel
           get_cell_length(dimensions, column), get_cell_width (dimensions),
           channel->Height,
           channel->CoolantVHC, delta_time, *capacities) ;
+#       endif
+      }
+      else
+      {
+        *capacities = capacity
+                      (
+                        get_cell_length (dimensions, column),
+                        get_cell_width (dimensions),
+                        channel->Height,
+                        channel->Wall->VolHeatCapacity,
+                        delta_time
+                      ) ;
+#       ifdef PRINT_CAPACITIES
+        fprintf (stderr,
+          "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
+                      " |  vhc %.5e delta %.5e --> %.5e\n",
+          current_layer, row, column,
+          get_cell_offset_in_stack (dimensions, current_layer, row, column),
+          get_cell_length(dimensions, column), get_cell_width (dimensions),
+          channel->Height,
+          channel->Wall->VolHeatCapacity, delta_time, *capacities) ;
 #       endif
       }
 
@@ -292,16 +301,13 @@ Source_t* fill_sources_channel
   RowIndex_t    row ;
   ColumnIndex_t column ;
 
-  Cconv_t C = (channel->CoolantVHC * channel->CoolantFR)
-              / (Cconv_t) ( get_number_of_columns (dimensions) - 1 ) ;
+  Cconv_t C = get_c_conv(get_number_of_columns (dimensions),
+                         channel->CoolantVHC, channel->CoolantFR) ;
 
 # ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tfill_sources_channel %s " \
-    " C = %.5e = (%.5e * %.5e) / %d \n",
-    current_layer, channel->Wall->Id,
-    C, channel->CoolantVHC, channel->CoolantFR,
-    get_number_of_columns (dimensions) - 1) ;
+    "current_layer = %d\tfill_sources_channel %s  C = %.5e\n",
+    current_layer, channel->Wall->Id, C) ;
 # endif
 
   for
@@ -319,7 +325,7 @@ Source_t* fill_sources_channel
       sources++
     )
 
-      if (row == 0 && (column & 1) != 0) /* Only first row and odd columns */
+      if (row == 0 && is_channel_column(column) == TRUE_V)
       {
         *sources = 2.0 * C * channel->CoolantTIn ;
 
@@ -383,21 +389,21 @@ Quantity_t fill_system_matrix_channel
       column          ++
     )
 
-       if ((column & 1) == 0 ) /* Even -> Wall */
+       if (is_channel_column(column) == TRUE_V )
+
+         added = add_liquid_column
+                 (
+                   dimensions, conductances, capacities,
+                   current_layer, row, column,
+                   column_pointers, row_indices, values
+                 ) ;
+
+       else
 
          added = add_solid_column
                  (
                    dimensions, conductances, capacities,
                    NULL,
-                   current_layer, row, column,
-                   column_pointers, row_indices, values
-                 ) ;
-
-       else                  /* Odd -> liquid */
-
-         added = add_liquid_column
-                 (
-                   dimensions, conductances, capacities,
                    current_layer, row, column,
                    column_pointers, row_indices, values
                  ) ;

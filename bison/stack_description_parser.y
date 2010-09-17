@@ -47,7 +47,6 @@
 
 %union
 {
-   unsigned int uint_v ;
    double       double_v ;
    String_t     char_p ;
 
@@ -58,9 +57,9 @@
    CoolantHTCs_t  coolanthtcs_v ;
 }
 
-%type <uint_v> cell_length
-%type <uint_v> first_wall_length
-%type <uint_v> last_wall_length
+%type <double_v> cell_length
+%type <double_v> first_wall_length
+%type <double_v> last_wall_length
 
 %type <coolanthtcs_v> coolant_heat_transfer_coefficients
 
@@ -115,7 +114,6 @@
 %token TOP                   "keyword top"
 %token BOTTOM                "keyword bottom"
 
-%token <uint_v>   IVALUE     "unsigned int value"
 %token <double_v> DVALUE     "float value"
 %token <char_p>   IDENTIFIER "identifier"
 %token <char_p>   PATH       "path to file"
@@ -201,20 +199,21 @@ stack_description_file
       //
 
       stkd->Dimensions->Grid.NCells
-        = stkd->Dimensions->Grid.NLayers
-          * stkd->Dimensions->Grid.NRows
-          * stkd->Dimensions->Grid.NColumns ;
+        = get_number_of_layers(stkd->Dimensions)
+          * get_number_of_rows(stkd->Dimensions)
+          * get_number_of_columns(stkd->Dimensions) ;
 
       stkd->Dimensions->Grid.NNz
-        =   stkd->Dimensions->Grid.NLayers
+        =   get_number_of_layers(stkd->Dimensions)
             * (
-                  stkd->Dimensions->Grid.NRows
-                  * (3 * stkd->Dimensions->Grid.NColumns - 2)
-                + 2 * stkd->Dimensions->Grid.NColumns
-                  * (stkd->Dimensions->Grid.NRows - 1)
+                  get_number_of_rows(stkd->Dimensions)
+                  * (3 * get_number_of_columns(stkd->Dimensions) - 2)
+                + 2 * get_number_of_columns(stkd->Dimensions)
+                  * (get_number_of_rows(stkd->Dimensions) - 1)
               )
-          + (stkd->Dimensions->Grid.NLayers - 1 ) * 2
-            * stkd->Dimensions->Grid.NRows * stkd->Dimensions->Grid.NColumns ;
+          + (get_number_of_layers(stkd->Dimensions) - 1 ) * 2
+            * get_number_of_rows(stkd->Dimensions)
+            * get_number_of_columns(stkd->Dimensions) ;
 
     }
   ;
@@ -303,9 +302,9 @@ channel
   :  /* empty */
 
   |  CHANNEL ':'
-        HEIGHT IVALUE ';'
-        CHANNEL LENGTH IVALUE ';'
-        WALL    LENGTH IVALUE ';'
+        HEIGHT DVALUE ';'
+        CHANNEL LENGTH DVALUE ';'
+        WALL    LENGTH DVALUE ';'
         first_wall_length
         last_wall_length
         WALL MATERIAL IDENTIFIER ';'
@@ -470,7 +469,7 @@ layer         : LAYER  layer_content { $$ = $2 ; } ;
 
 source_layer  : SOURCE layer_content { $$ = $2 ; } ;
 
-layer_content : IVALUE IDENTIFIER ';'
+layer_content : DVALUE IDENTIFIER ';'
 
     {
       Layer* layer = $$ = alloc_and_init_layer() ;
@@ -615,7 +614,7 @@ stack_elements
 
 stack_element
 
-  : LAYER IDENTIFIER IVALUE IDENTIFIER ';'
+  : LAYER IDENTIFIER DVALUE IDENTIFIER ';'
     {
       //
       // After parsing with success a layer ...
@@ -787,8 +786,8 @@ stack_element
 dimensions
 
   : DIMENSIONS ':'
-      CHIP LENGTH IVALUE ',' WIDTH IVALUE ';'
-      CELL cell_length       WIDTH IVALUE ';'
+      CHIP LENGTH DVALUE ',' WIDTH DVALUE ';'
+      CELL cell_length       WIDTH DVALUE ';'
     {
       if (stkd->Channel == NULL && $11 == 0)
       {
@@ -899,17 +898,17 @@ dimensions
 
 first_wall_length
   : /* empty */                  { $$ = 0 ;  }
-  | FIRST WALL LENGTH IVALUE ';' { $$ = $4 ; }
+  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ; }
   ;
 
 last_wall_length
   : /* empty */                 { $$ = 0 ;  }
-  | LAST WALL LENGTH IVALUE ';' { $$ = $4 ; }
+  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ; }
   ;
 
 cell_length
   : /* empty */       { $$ = 0    }
-  | LENGTH IVALUE ',' { $$ = $2 ; }
+  | LENGTH DVALUE ',' { $$ = $2 ; }
 
 %%
 
