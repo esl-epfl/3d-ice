@@ -72,6 +72,7 @@ main(int argc, char** argv)
 
   if (fill_thermal_data  (&tdata, &stkd) != 0)
   {
+    fprintf(stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
@@ -143,6 +144,10 @@ main(int argc, char** argv)
 
   }
 
+  fprintf (stdout, "emulation took %.3f sec\n",
+           ( (double)clock() - Time ) / CLOCKS_PER_SEC );
+
+
   // At the end of emulation, creates the thermal map of the channel layer
 
   if ( print_thermal_map
@@ -152,10 +157,6 @@ main(int argc, char** argv)
        ) != 0 )
 
       printf ("error chanel thermal map\n") ;
-
-
-  fprintf (stdout, "emulation took %.3f sec\n",
-           ( (double)clock() - Time ) / CLOCKS_PER_SEC );
 
   // free all data
 

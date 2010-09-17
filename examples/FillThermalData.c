@@ -69,6 +69,7 @@ main(int argc, char** argv)
 
   if (fill_thermal_data  (&tdata, &stkd) != 0)
   {
+    fprintf (stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;

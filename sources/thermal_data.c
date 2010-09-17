@@ -36,7 +36,6 @@
 #include <stdio.h>
 
 #include "thermal_data.h"
-#include "supermatrix.h"
 
 /******************************************************************************/
 
@@ -241,7 +240,8 @@ int fill_thermal_data
           &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
           &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
-  tdata->SLU_Options.Fact = FACTORED ;
+  if (tdata->SLU_Info == 0)
+    tdata->SLU_Options.Fact = FACTORED ;
 
   return tdata->SLU_Info ;
 
@@ -273,8 +273,6 @@ temperatures_fail :
 
 void free_thermal_data (ThermalData* tdata)
 {
-  if (tdata == NULL) return ;
-
   free (tdata->Temperatures) ;
   free (tdata->Sources) ;
   free (tdata->Capacities) ;
@@ -370,10 +368,6 @@ int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
 
 int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
 {
-//  Temperature_t* tmp = NULL ;
-//  DNformat* Xstore   = (DNformat *) tdata->SLUMatrix_B.Store ;
-//  static int solved  = 0 ;
-
   if (tdata->SLU_Options.Fact != FACTORED)
   {
     fprintf (stderr, "call fill_thermal_data before emulating\n");
@@ -400,16 +394,8 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
       return tdata->SLU_Info ;
     }
 
-//    printf("solved slot %d\n", ++solved);
-
-
     memcpy (tdata->Temperatures, tdata->SV_B.Values,
             tdata->SV_B.Size * sizeof (Temperature_t)) ;
-
-//    tmp                 = tdata->Temperatures ;
-//    tdata->Temperatures = tdata->SV_B.Values ;
-//    tdata->SV_B.Values  = tmp ;
-//    Xstore->nzval =       tmp ;
 
     fill_system_vector
     (

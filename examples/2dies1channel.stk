@@ -43,15 +43,13 @@ die topdie :
 
 stack:
 
-   die     die3     bottomdie floorplan "single_element.flp" ;
-   channel channel2 ;
    die     die2     topdie    floorplan "four_elements.flp" ;
    channel channel1 ;
    die     die1     bottomdie floorplan "single_element.flp" ;
 
 dimensions :
 
-  chip length 10100 , width  10100 ;
-  cell                width     75 ;
+  chip length 100 , width  10100 ;
+  cell              width    100 ;
 //  cell length  10 , width    100 ;
 
