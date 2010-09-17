@@ -134,7 +134,16 @@ int fill_thermal_data
 
     goto temperatures_fail ;
 
+  /* Set Temperatures and SLU vector B */
+
   init_data (tdata->Temperatures, tdata->Size, tdata->InitialTemperature) ;
+
+  dCreate_Dense_Matrix  /* Vector B */
+  (
+    &tdata->SLUMatrix_B, tdata->Size, 1,
+    tdata->Temperatures, tdata->Size,
+    SLU_DN, SLU_D, SLU_GE
+  );
 
   /* Alloc and set conductances */
 
@@ -189,23 +198,6 @@ int fill_thermal_data
     SLU_NC, SLU_D, SLU_GE
   ) ;
 
-  /* Alloc and set system vector */
-
-  if ( alloc_system_vector (&tdata->SV_B, tdata->Size) == 0 )
-
-    goto sv_b_fail ;
-
-  fill_system_vector (&tdata->SV_B, tdata->Sources,
-                                    tdata->Capacities,
-                                    tdata->Temperatures) ;
-
-  dCreate_Dense_Matrix  /* Vector B */
-  (
-    &tdata->SLUMatrix_B, tdata->Size, 1,
-    tdata->SV_B.Values, tdata->Size,
-    SLU_DN, SLU_D, SLU_GE
-  );
-
   /* Alloc SLU memory */
 
   if ( (tdata->SLU_PermutationMatrixR
@@ -252,9 +244,6 @@ slu_etree_fail :
 slu_perm_c_fail :
   free (tdata->SLU_PermutationMatrixR) ;
 slu_perm_r_fail :
-  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
-  free_system_vector        (&tdata->SV_B) ;
-sv_b_fail :
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
   free_system_matrix (&tdata->SM_A) ;
 sm_a_fail :
@@ -264,6 +253,7 @@ sources_fail :
 capacities_fail :
   free (tdata->Conductances) ;
 conductances_fail :
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
   free (tdata->Temperatures) ;
 temperatures_fail :
   return -1 ;
@@ -288,7 +278,6 @@ void free_thermal_data (ThermalData* tdata)
   free_system_matrix        (&tdata->SM_A) ;
 
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
-  free_system_vector        (&tdata->SV_B) ;
 
   if (tdata->SLU_Options.Fact != DOFACT )
   {
@@ -302,7 +291,7 @@ void free_thermal_data (ThermalData* tdata)
 
 int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
 {
-  int counter;
+//  int counter;
 //  static int solved = 0 ;
 
   if (tdata->SLU_Options.Fact != FACTORED)
@@ -331,16 +320,16 @@ int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
 
 //  printf("solved step %d\n", ++solved);
 
-  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
-    tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
+//  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
+//    tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
 
-  fill_system_vector
-  (
-    &tdata->SV_B,
-    tdata->Sources,
-    tdata->Capacities,
-    tdata->Temperatures
-  ) ;
+//  fill_system_vector
+//  (
+//    &tdata->SV_B,
+//    tdata->Sources,
+//    tdata->Capacities,
+//    tdata->Temperatures
+//  ) ;
 
   tdata->CurrentTime += tdata->StepTime ;
 
@@ -352,13 +341,13 @@ int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
     fill_sources_stack_description (stkd, tdata->Sources,
                                           tdata->Conductances) ;
 
-    fill_system_vector
-    (
-      &tdata->SV_B,
-      tdata->Sources,
-      tdata->Capacities,
-      tdata->Temperatures
-    ) ;
+//    fill_system_vector
+//   (
+//      &tdata->SV_B,
+//      tdata->Sources,
+//      tdata->Capacities,
+//      tdata->Temperatures
+//    ) ;
   }
 
   return 0 ;
@@ -368,6 +357,8 @@ int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
 
 int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
 {
+  int count ;
+
   if (tdata->SLU_Options.Fact != FACTORED)
   {
     fprintf (stderr, "call fill_thermal_data before emulating\n");
@@ -376,6 +367,15 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
 
   while ( tdata->CurrentTime < tdata->CurrentSlotLimit )
   {
+    // Evaluate coefficents of system vector B
+    // B[i] = Source[i] * Capacity[i] * Temperature[i] ;
+
+    for(count = 0 ; count < tdata->Size ; count++)
+
+      tdata->Temperatures[count]
+        = tdata->Sources[count] + tdata->Capacities[count]
+                                  * tdata->Temperatures[count] ;
+
     dgstrs
     (
       NOTRANS,
@@ -394,17 +394,6 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
       return tdata->SLU_Info ;
     }
 
-    memcpy (tdata->Temperatures, tdata->SV_B.Values,
-            tdata->SV_B.Size * sizeof (Temperature_t)) ;
-
-    fill_system_vector
-    (
-      &tdata->SV_B,
-      tdata->Sources,
-      tdata->Capacities,
-      tdata->Temperatures
-    ) ;
-
     tdata->CurrentTime += tdata->StepTime ;
 
   }
@@ -417,15 +406,6 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
 
   fill_sources_stack_description (stkd, tdata->Sources,
                                         tdata->Conductances) ;
-
-  fill_system_vector
-  (
-    &tdata->SV_B,
-    tdata->Sources,
-    tdata->Capacities,
-    tdata->Temperatures
-  ) ;
-
   return 0 ;
 }
 

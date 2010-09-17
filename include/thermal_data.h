@@ -43,7 +43,6 @@ extern "C"
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
-#include "system_vector.h"
 #include "slu_ddefs.h"
 
 /******************************************************************************/
@@ -73,11 +72,12 @@ extern "C"
     Time_t CurrentTime ;
     Time_t CurrentSlotLimit ;
 
-    /* The matrix A and the right hand side vector B representin the linear */
-    /* system                                                               */
+    /* The matrix A representing the linear system */
+    /* for the right hand vector B, we use the Temperatures array, since the */
+    /* SuperLU routine used to solve the linear system overwrite the B       */
+    /* (made with coefficents) with the result (temperatures).               */
 
     SystemMatrix SM_A ;
-    SystemVector SV_B ;
 
     /* Data used to interface with SuperLU */
 

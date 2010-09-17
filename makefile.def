@@ -90,7 +90,6 @@
                   $(3DICE_SOURCES)/stack_description.c      \
                   $(3DICE_SOURCES)/stack_element.c          \
                   $(3DICE_SOURCES)/system_matrix.c          \
-                  $(3DICE_SOURCES)/system_vector.c          \
                   $(3DICE_SOURCES)/thermal_data.c
 
 3DICE_SOURCES_O = $(3DICE_SOURCES_C:.c=.o)
