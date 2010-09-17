@@ -159,7 +159,7 @@ extern "C"
   /*     of the linear system. See the "info" prameter of "dgstrs" in       */
   /*     SuperLU.                                                           */
 
-  int emulate_time_step (ThermalData* tdata, StackDescription* stkd) ;
+  int emulate_step (ThermalData* tdata, StackDescription* stkd) ;
 
 /******************************************************************************/
 
@@ -172,7 +172,7 @@ extern "C"
   /*     of the linear system. See the "info" prameter of "dgstrs"          */
   /*     in SuperLU.                                                        */
 
-  int emulate_time_slot (ThermalData* tdata, StackDescription* stkd) ;
+  int emulate_slot (ThermalData* tdata, StackDescription* stkd) ;
 
 /******************************************************************************/
 

@@ -289,16 +289,22 @@ void free_thermal_data (ThermalData* tdata)
 
 /******************************************************************************/
 
-int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
+int emulate_step (ThermalData* tdata, StackDescription* stkd)
 {
-//  int counter;
-//  static int solved = 0 ;
+  int count;
 
   if (tdata->SLU_Options.Fact != FACTORED)
   {
     fprintf (stderr, "call fill_thermal_data before emulating\n");
     return -1 ;
   }
+
+  for(count = 0 ; count < tdata->Size ; count++)
+
+    tdata->Temperatures[count]
+
+      = tdata->Sources[count] + tdata->Capacities[count]
+                                * tdata->Temperatures[count] ;
 
   dgstrs
   (
@@ -318,36 +324,18 @@ int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
     return tdata->SLU_Info ;
   }
 
-//  printf("solved step %d\n", ++solved);
-
-//  for (counter = 0 ; counter < tdata->SV_B.Size ; counter++)
-//    tdata->Temperatures[counter] = tdata->SV_B.Values[counter] ;
-
-//  fill_system_vector
-//  (
-//    &tdata->SV_B,
-//    tdata->Sources,
-//    tdata->Capacities,
-//    tdata->Temperatures
-//  ) ;
-
   tdata->CurrentTime += tdata->StepTime ;
 
-  if ( get_number_of_remaining_power_values(stkd) == 0)
-    return 1 ;
-
-  if (tdata->CurrentTime == tdata->CurrentSlotLimit)
+  if (tdata->CurrentTime >= tdata->CurrentSlotLimit)
   {
+    if ( get_number_of_remaining_power_values(stkd) == 0)
+
+      return 1 ;
+
+    tdata->CurrentSlotLimit += tdata->SlotTime ;
+
     fill_sources_stack_description (stkd, tdata->Sources,
                                           tdata->Conductances) ;
-
-//    fill_system_vector
-//   (
-//      &tdata->SV_B,
-//      tdata->Sources,
-//      tdata->Capacities,
-//      tdata->Temperatures
-//    ) ;
   }
 
   return 0 ;
@@ -355,7 +343,7 @@ int emulate_time_step (ThermalData* tdata, StackDescription* stkd)
 
 /******************************************************************************/
 
-int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
+int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 {
   int count ;
 
@@ -373,6 +361,7 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
     for(count = 0 ; count < tdata->Size ; count++)
 
       tdata->Temperatures[count]
+
         = tdata->Sources[count] + tdata->Capacities[count]
                                   * tdata->Temperatures[count] ;
 
@@ -395,17 +384,17 @@ int emulate_time_slot (ThermalData* tdata, StackDescription* stkd)
     }
 
     tdata->CurrentTime += tdata->StepTime ;
-
   }
-
-  tdata->CurrentSlotLimit += tdata->SlotTime ;
 
   if ( get_number_of_remaining_power_values(stkd) == 0)
 
     return 1 ;
 
+  tdata->CurrentSlotLimit += tdata->SlotTime ;
+
   fill_sources_stack_description (stkd, tdata->Sources,
                                         tdata->Conductances) ;
+
   return 0 ;
 }
 

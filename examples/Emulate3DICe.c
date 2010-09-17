@@ -109,7 +109,8 @@ main(int argc, char** argv)
   Temperature_t outlet;
   clock_t Time = clock();
 
-  while (emulate_time_slot (&tdata, &stkd) == 0)
+  //while (emulate_step (&tdata, &stkd) == 0)
+  while (emulate_slot (&tdata, &stkd) == 0)
   {
     // get max temperatures
 
