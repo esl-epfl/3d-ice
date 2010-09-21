@@ -28,8 +28,8 @@
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Batiment ELG, ELG 130                                                      *
- * Station 11                                          threed-ice@esl.epfl.ch *
- * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
+ * Station 11                                           3d-ice@listes.epfl.ch *
+ * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
 #ifndef _3DICE_POWERSQUEUE_H_

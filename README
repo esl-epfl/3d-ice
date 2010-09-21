@@ -28,12 +28,15 @@
  #                                                                            #
  # EPFL-STI-IEL-ESL                                                           #
  # Bstiment ELG, ELG 130                                                      #
- # Station 11                                          threed-ice@esl.epfl.ch #
- # 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE #
+ # Station 11                                           3d-ice@listes.epfl.ch #
+ # 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
-
-Description of the tool ...
+3D-ICE stands for "3D Interlayer Cooling Emulator". It is a Linux  based Thermal
+Emulator Library  written in C, which can perform  transient thermal analyses of
+vertically  stacked 3D integrated  circuits with  inter-tier Microchannel Liquid
+Cooling. It is based on Compact Transient Thermal Modeling (CTTM) of solids and
+liquids.
 
 # 1 - Dependencies
 ################################################################################
@@ -46,8 +49,8 @@ The 3D-ICE library has been written and developed using:
 
 Please make sure that  these tools are installed on your system before compiling
 and  that the  corresponding  variables in makefile.def point to the  respective
-binary file. To use 3D-ICE, you must also downlad the SuperLU library, available
-at "http://crd.lbl.gov/~xiaoye/SuperLU/".
+binary  files. To  use 3D-ICE, you  must also  downlad and  compile the  SuperLU
+library, available at "http://crd.lbl.gov/~xiaoye/SuperLU/".
 
 # 2 - Compile SuperLU
 ################################################################################
@@ -88,8 +91,17 @@ the choice done above when compiling SuperLU. You can then compile 3D-ICE with:
   $ cd 3D-ICE
   $ make
 
+
+
 # 4 - Using the library.
 ################################################################################
+
+3D-ICE  accepts  the  physical description  of the 3D-IC stack  in the form of a
+simple  and  easy-to-understand  text  file called  the  "Stack Descriptor". The
+thermal  power  distribution of the individual dies can be given to 3D-ICE using
+"Floorplan" text file. There are  a  multitude of functions that enable the user
+to print  thermal maps  of  individual dies, temperature  evolution  at a single
+floorplan element against time etc.
 
 Together with the library sources you will also have an example that show how to
 use 3D-ICE to emulate a 3D chip. See files in the ./examples folder.
@@ -100,7 +112,7 @@ Include stack_description.h and thermal_data.h ....
 # 5 - Stack Description File.
 ################################################################################
 
-The stack  description file (*.stk)  specifics all the physical and  geometrical
+The "Stack Descriptor" file (*.stk)  specifics all the physical and  geometrical
 characteristics  of  the 3D-IC  to simulate. The  extension  of the  file is not
 relevant, meaning  that  it will  be parsed  independently from  its presence or
 content.
@@ -111,20 +123,15 @@ belonging to
       [:space:]
 
 are  skipped  (see POSIX  character classes).  Identifiers (here reported as ID)
-must match the following expression:
+must match the following regular expression:
 
-      [:alpha:] ( _ | [:alnum:] )* .
+      [a-zA-Z] ( _ | [a-zA-Z0-9] )*
 
-Unsigned integers, here reported as IVALUE, must belong to:
+Floating points values, reported as DVALUE, must belong to
 
-      [[:digit:]]+
+      [+-]? [0-9]+ ( \. [0-9]+ ( [eE] [+-]? [0-9]+ )? )?
 
-while floating points values, reported as DVALUE, must belong to
-
-      {signed_integer}\.{unsigned_integer}{exponent}?.
-
-Note that the decimal part  between  the dot  and the exponent must be inserted.
-Please refers to the flex sources in 3D-ICE/flex for more details.
+For more details please refers to the flex sources in 3D-ICE/flex.
 
 It is also  possible, as in C or Java, to  comment all  the remaining characters
 until the end of the line ( // ) or to suppress an entire block ( /* ... */ ).
@@ -185,11 +192,11 @@ There is only one channel section since all the channel layers interlayed in the
 the emulation of 3D-IC without a liquid cooling system (solid only).
 
       channel :
-         height IVALUE ;
-         channel length IVALUE ;
-         wall    length IVALUE ;
-         { first wall length IVALUE ; }
-         { last  wall length IVALUE ; }
+         height DVALUE ;
+         channel length DVALUE ;
+         wall    length DVALUE ;
+         ( first wall length DVALUE ; )?
+         ( last  wall length DVALUE ; )?
          wall material MATERIAL_ID  ;
          coolant flow rate DVALUE ;
          coolant heat transfer coefficient [ DVALUE | SIDE DVALUE ,
@@ -207,9 +214,9 @@ where:
   end with walls.
 - First and last wall length, in [ um ], are optional properties that represents
   the length of  the west-most (the first) and  east-most (the last)  walls. The
-  brackets { } are not part of the syntax  but they are used to indicate that it
-  is an optional  declaration. If one  of the two (or both) is not declared, the
-  corresponding dimension will be set using the length of the wall.
+  brackets ( ) and ? are not part of  the syntax but  they are used to  indicate
+  that  it is  an optional  declaration.  If one  of the  two  (or both) is  not
+  declared, the corresponding dimension will be set using the length of the wall.
 - MATERIAL_ID is the identifier of the material composing the walls (the id must
   be previously declared in the materials section).
 - The coolant flow rate is expressed in [ ml / min ] and it refers to the volume
@@ -236,18 +243,18 @@ contain one source (active) layer and zero or more normal layers (inactive). The
 source layer can be placed at the bottom, in the middle or at the top.
 
       die DIE_ID :
-         { layer  IVALUE MATERIAL_ID ; }
-           source IVALUE MATERIAL_ID ;
-         { layer  IVALUE MATERIAL_ID ; }
+         ( layer  DVALUE MATERIAL_ID ; )*
+           source DVALUE MATERIAL_ID ;
+         ( layer  DVALUE MATERIAL_ID ; )*
 
 where:
 
 - DIE_ID is the unique identifier used to refer to the declared die;
-- IVALUE is the height of the layer, in [ um ];
+- DVALUE is the height of the layer, in [ um ];
 - MATERIAL_ID is the previously  declared identifier  of the material  composing
   the layer.
 
-In this context, the  brackets { } refer to  zero or  more instances of a layer.
+In this context, the symbols ( ) * refer to  zero or  more instances of a layer.
 The order of the  layers within the die reflects the vertical disposition in the
 emulated chip: the first layer declared is the top  most layer in the die  while
 the last one is the one at the bottom (closer to the mainboard).
@@ -260,16 +267,16 @@ to compose the 3D chip can be: dies (previously declared), layers and channels.
 These three elements can be declared as:
 
   stack :
-      { layer   LL_ID  IVALUE MATERIAL_ID ; }
-      { channel CC_ID  ; }
-      { die     DD_ID  DIE_ID floorplan "PATH" ; }
+      ( layer   LL_ID  DVALUE MATERIAL_ID ; )*
+      ( channel CC_ID ; )*
+      ( die     DD_ID  DIE_ID floorplan "PATH" ; )*
 
 where:
 - LL_ID, CC_ID, DD_ID are  identifiers used  to name the stack elements and they
   can be  used in the C code to refer to the corresponding element. They must be
   unique;
 - MATERIAL_ID is the identifier of the material composing the declared layer and
-  IVALUE is its height in [ um ];
+  DVALUE is its height in [ um ];
 - DIE_ID is the  identifier of a  die (previously declared) and PATH is the path
   to the floorplan file. This floorplan will be placed  on the layer  inside the
   die  declared  with  the  source  keyword. The  floorplan  files  declare  the
@@ -278,8 +285,9 @@ where:
   simulation they have a different  behavior (different power values), then they
   (the 2 dies) must be declared in the stack with two different floorplan files.
 
-The brackets { and } indicate that there must be zero or more  instances of  the
-same line but the final sequence must satisfy the following constrains:
+The symbols (, ) and * indicate that there must be zero or more instances of the
+same line. For the sake of simplicity, the above grammar describing the stack
+section but the final sequence must satisfy the following constrains:
 
 - there must be at least one die
 - it cannot begin or finish with a channel
@@ -304,8 +312,8 @@ The last section  of the stk file declares the dimensions  in [ um ] of the chip
 and of the thermal cells as reported:
 
       DIMENSIONS ':'
-         CHIP   LENGTH IVALUE ','   WIDTH IVALUE ';'
-         CELL { LENGTH IVALUE ',' } WIDTH IVALUE ';'
+         CHIP   LENGTH DVALUE ','   WIDTH DVALUE ';'
+         CELL { LENGTH DVALUE ',' } WIDTH DVALUE ';'
 
 The  brackets { and } indicate  that that the cell length can be omitted. In our
 model  all the  cells in  different layers but in the  same column must have the

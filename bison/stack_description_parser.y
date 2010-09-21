@@ -28,8 +28,8 @@
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Batiment ELG, ELG 130                                                      *
- * Station 11                                          threed-ice@esl.epfl.ch *
- * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
+ * Station 11                                           3d-ice@listes.epfl.ch *
+ * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
 %{
@@ -57,7 +57,6 @@
    CoolantHTCs_t  coolanthtcs_v ;
 }
 
-%type <double_v> cell_length
 %type <double_v> first_wall_length
 %type <double_v> last_wall_length
 
@@ -341,11 +340,13 @@ channel
 
       if (stkd->Channel->Wall == NULL)
       {
+        String_t message
+          = (String_t) malloc ((18 + strlen($18)) * sizeof (char)) ;
+        sprintf (message, "Unknown material %s", $18) ;
+
+        stack_description_error (stkd, scanner, message) ;
         free ($18) ;
-        stack_description_error
-        (
-          stkd, scanner, "unknown material identifier"
-        ) ;
+        free (message) ;
         YYABORT ;
       }
 
@@ -489,12 +490,13 @@ layer_content : DVALUE IDENTIFIER ';'
 
       if (layer->Material == NULL)
       {
+        String_t message
+          = (String_t) malloc ((18 + strlen($2)) * sizeof (char)) ;
+        sprintf (message, "Unknown material %s", $2) ;
+
         free ($2) ;
+        free (message) ;
         free_layer(layer) ;
-        stack_description_error
-        (
-          stkd, scanner, "unknown material identifier"
-        ) ;
         YYABORT ;
       }
 
@@ -548,18 +550,8 @@ stack
       }
 
       if (found_channel == 0 && stkd->Channel != NULL)
-      {
-        // Reset for the next parsing ...
-        last_stack_element = TDICE_STACK_ELEMENT_NONE ;
-        found_die          = 0 ;
-        found_channel      = 0 ;
 
-        stack_description_error
-        (
-          stkd, scanner, "channel section declared but not used"
-        ) ;
-        YYABORT ;
-      }
+        fprintf (stderr, "channel section declared but not used") ;
 
       // Reset for the next parsing ...
       last_stack_element = TDICE_STACK_ELEMENT_NONE ;
@@ -652,14 +644,17 @@ stack_element
 
       if (layer->Material == NULL)
       {
+        String_t message
+          = (String_t) malloc ((18 + strlen($4)) * sizeof (char)) ;
+        sprintf (message, "Unknown material %s", $4) ;
+
+        stack_description_error (stkd, scanner, message) ;
+
         free ($2);
         free ($4) ;
+        free (message) ;
         free_stack_element (stack_element) ;
         free_layer(layer) ;
-        stack_description_error
-        (
-          stkd, scanner, "unknown material identifier"
-        ) ;
         YYABORT ;
       }
 
@@ -745,13 +740,16 @@ stack_element
 
       if (stack_element->Pointer.Die == NULL)
       {
+        String_t message
+          = (String_t) malloc ((13 + strlen($3)) * sizeof (char)) ;
+        sprintf (message, "Unknown die %s", $3) ;
+
+        stack_description_error (stkd, scanner, message) ;
+
         free($3) ;
         free($5) ;
+        free(message) ;
         free_stack_element (stack_element) ;
-        stack_description_error
-        (
-          stkd, scanner, "unknown die identifier"
-        ) ;
         YYABORT ;
       }
 
@@ -787,26 +785,8 @@ dimensions
 
   : DIMENSIONS ':'
       CHIP LENGTH DVALUE ',' WIDTH DVALUE ';'
-      CELL cell_length       WIDTH DVALUE ';'
+      CELL LENGTH DVALUE ',' WIDTH DVALUE ';'
     {
-      if (stkd->Channel == NULL && $11 == 0)
-      {
-        stack_description_error
-        (
-          stkd, scanner, "cell length must be declared"
-        ) ;
-        YYABORT ;
-      }
-
-      if (stkd->Channel != NULL && $11 != 0)
-      {
-        stack_description_error
-        (
-          stkd, scanner, "cell length must not be declared"
-        ) ;
-        YYABORT ;
-      }
-
       stkd->Dimensions = alloc_and_init_dimensions() ;
 
       if (stkd->Dimensions == NULL)
@@ -821,7 +801,7 @@ dimensions
       /* Set widths and NRows */
 
       stkd->Dimensions->Chip.Width  = (ChipDimension_t) $8 ;
-      stkd->Dimensions->Cell.Width  = (CellDimension_t) $13 ;
+      stkd->Dimensions->Cell.Width  = (CellDimension_t) $15 ;
 
       stkd->Dimensions->Grid.NRows
         = (GridDimension_t)
@@ -830,14 +810,13 @@ dimensions
       /* Set lengths and NColumns */
 
       stkd->Dimensions->Chip.Length = (ChipDimension_t) $5 ;
+      stkd->Dimensions->Cell.Length = (CellDimension_t) $12 ;
 
       if (stkd->Channel == NULL)
       {
         /* There are no channels in the stack */
 
         stkd->Dimensions->StackHasChannel = FALSE_V ;
-
-        stkd->Dimensions->Cell.Length = (CellDimension_t) $11 ;
 
         stkd->Dimensions->Grid.NColumns
           = (GridDimension_t)
@@ -905,10 +884,6 @@ last_wall_length
   : /* empty */                 { $$ = 0 ;  }
   | LAST WALL LENGTH DVALUE ';' { $$ = $4 ; }
   ;
-
-cell_length
-  : /* empty */       { $$ = 0    }
-  | LENGTH DVALUE ',' { $$ = $2 ; }
 
 %%
 

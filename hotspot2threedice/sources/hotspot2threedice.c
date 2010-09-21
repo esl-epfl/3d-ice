@@ -68,20 +68,20 @@ int main (int argc, char** argv)
   fclose (file) ;
 
 //   /* Open ptrace file */
-// 
-//   file = fopen (argv[2], "r") ; 
+//
+//   file = fopen (argv[2], "r") ;
 //   if (file == NULL)
 //   {
 //     perror (argv[2]) ;
 //     free_floorplan (&flp_floorplan) ;
 //     return 1 ;
 //   }
-// 
+//
 //   /* parse ptrace file */
-// 
+//
 //   hotspot_ptrace_lex_init (&scanner) ;
 //   hotspot_ptrace_set_in (file, scanner) ;
-// 
+//
 //   if (hotspot_ptrace_parse (&ptrace_floorplan, scanner))
 //   {
 //     fprintf(stderr, "parsing error\n") ;
@@ -90,8 +90,8 @@ int main (int argc, char** argv)
 //   }
 //   hotspot_ptrace_lex_destroy (scanner) ;
 //   fclose (file) ;
-// 
-// 
+//
+//
 //   free_floorplan (&flp_floorplan) ;
 //   free_floorplan (&ptrace_floorplan) ;
 

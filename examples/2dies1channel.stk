@@ -2,14 +2,9 @@ material silicon :
    thermal conductivity       1.30e-4 ;
    volumetric heat capacity   1.63566e-12 ;
 
-//material silicon :
-//   thermal conductivity      1.45e-04 ;
-//   volumetric heat  capacity 1.34e-12 ;
-
 //environment heat sink :
 //  heat transfer coefficient 15.0e-9 ;
 //  temperature               300.0 ;
-
 
 channel:
 
@@ -50,6 +45,5 @@ stack:
 dimensions :
 
   chip length 100 , width  10100 ;
-  cell              width    100 ;
-//  cell length  10 , width    100 ;
+  cell length  10 , width    100 ;
 

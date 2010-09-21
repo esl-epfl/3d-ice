@@ -28,8 +28,8 @@
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Batiment ELG, ELG 130                                                      *
- * Station 11                                          threed-ice@esl.epfl.ch *
- * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
+ * Station 11                                           3d-ice@listes.epfl.ch *
+ * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -105,12 +105,12 @@ main(int argc, char** argv)
   // Consume all time slots printing time by time the max temperature
   // for every floorplan element composing die "die2" and the temperature
   // of the liquid leaving the channel layer at the first channel.
+  // The do { } while () ; loop prints the temperatures at all the time points.
 
   Temperature_t outlet;
   clock_t Time = clock();
 
-  //while (emulate_step (&tdata, &stkd) == 0)
-  while (emulate_slot (&tdata, &stkd) == 0)
+  do
   {
     // get max temperatures
 
@@ -142,12 +142,12 @@ main(int argc, char** argv)
     for (counter = 0; counter < nfloorplanelements; counter++)
       printf("%7.3f  ", max_results[counter]) ;
     printf("  %7.3f\n", outlet) ;
-
   }
+  //while (emulate_slot (&tdata, &stkd) != 1) ;
+  while (emulate_step (&tdata, &stkd) != 2) ;
 
   fprintf (stdout, "emulation took %.3f sec\n",
            ( (double)clock() - Time ) / CLOCKS_PER_SEC );
-
 
   // At the end of emulation, creates the thermal map of the channel layer
 

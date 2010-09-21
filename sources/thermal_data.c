@@ -28,8 +28,8 @@
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Batiment ELG, ELG 130                                                      *
- * Station 11                                          threed-ice@esl.epfl.ch *
- * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
+ * Station 11                                           3d-ice@listes.epfl.ch *
+ * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
 #include <stdlib.h>
@@ -90,7 +90,7 @@ void init_thermal_data
   tdata->SlotTime = slot_time ;
 
   tdata->CurrentTime      = 0.0 ;
-  tdata->CurrentSlotLimit = slot_time ;
+  tdata->CurrentSlotLimit = 0.0 ; //slot_time ;
 
   tdata->InitialTemperature = initial_temperature ;
 
@@ -175,9 +175,6 @@ int fill_thermal_data
     goto sources_fail ;
 
   init_data (tdata->Sources, tdata->Size, 0.0) ;
-
-  fill_sources_stack_description (stkd, tdata->Sources,
-                                  tdata->Conductances) ;
 
   /* Alloc and set system matrix */
 
@@ -299,6 +296,21 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
     return -1 ;
   }
 
+  if (tdata->CurrentTime >= tdata->CurrentSlotLimit)
+  {
+    if (get_number_of_remaining_power_values(stkd) == 0)
+
+      return 1 ;
+
+    fill_sources_stack_description (stkd, tdata->Sources, tdata->Conductances) ;
+
+    tdata->CurrentSlotLimit += tdata->SlotTime ;
+
+    if (tdata->CurrentTime != 0.0)
+
+      return 2 ;
+  }
+
   for(count = 0 ; count < tdata->Size ; count++)
 
     tdata->Temperatures[count]
@@ -326,18 +338,6 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 
   tdata->CurrentTime += tdata->StepTime ;
 
-  if (tdata->CurrentTime >= tdata->CurrentSlotLimit)
-  {
-    if ( get_number_of_remaining_power_values(stkd) == 0)
-
-      return 1 ;
-
-    tdata->CurrentSlotLimit += tdata->SlotTime ;
-
-    fill_sources_stack_description (stkd, tdata->Sources,
-                                          tdata->Conductances) ;
-  }
-
   return 0 ;
 }
 
@@ -351,6 +351,17 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
   {
     fprintf (stderr, "call fill_thermal_data before emulating\n");
     return -1 ;
+  }
+
+  if (tdata->CurrentTime >= tdata->CurrentSlotLimit)
+  {
+    if ( get_number_of_remaining_power_values(stkd) == 0)
+
+      return 1 ;
+
+    fill_sources_stack_description (stkd, tdata->Sources, tdata->Conductances) ;
+
+    tdata->CurrentSlotLimit += tdata->SlotTime ;
   }
 
   while ( tdata->CurrentTime < tdata->CurrentSlotLimit )
@@ -385,15 +396,6 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
     tdata->CurrentTime += tdata->StepTime ;
   }
-
-  if ( get_number_of_remaining_power_values(stkd) == 0)
-
-    return 1 ;
-
-  tdata->CurrentSlotLimit += tdata->SlotTime ;
-
-  fill_sources_stack_description (stkd, tdata->Sources,
-                                        tdata->Conductances) ;
 
   return 0 ;
 }

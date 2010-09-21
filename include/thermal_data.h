@@ -28,8 +28,8 @@
  *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
  * Batiment ELG, ELG 130                                                      *
- * Station 11                                          threed-ice@esl.epfl.ch *
- * 1015 Lausanne, Switzerland                       http://esl.epfl.ch/3D-ICE *
+ * Station 11                                           3d-ice@listes.epfl.ch *
+ * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
 #ifndef _3DICE_THERMAL_DATA_H_
@@ -73,11 +73,12 @@ extern "C"
     Time_t CurrentSlotLimit ;
 
     /* The matrix A representing the linear system */
-    /* for the right hand vector B, we use the Temperatures array, since the */
-    /* SuperLU routine used to solve the linear system overwrite the B       */
-    /* (made with coefficents) with the result (temperatures).               */
 
     SystemMatrix SM_A ;
+
+    /* The right hand vector B is represented by the Temperatures array,     */
+    /* since the SuperLU routine used to solve the linear system overwrites  */
+    /* the B rhs vector with the result (temperatures).                      */
 
     /* Data used to interface with SuperLU */
 
@@ -127,18 +128,21 @@ extern "C"
 
   /* Given the address of a ThermalData structure previously initialized,   */
   /* allocs memory and fills it reading the structure of the 3D-IC from     */
-  /* StackDescription structure. Also performs the factorization of the     */
-  /* matrix used to emulate heat dissipation.                               */
+  /* StackDescription structure.                                            */
   /*                                                                        */
-  /* After using this function, the 3DIC represented by the data stored in  */
-  /* tdata is ready be emulated. It means that the linear system (the       */
-  /* matrix and the right hand side vector) is ready to be solved. The RHS  */
-  /* B has been filled using the first power value for each floorplan       */
-  /* element.                                                               */
+  /* At the end of the function, tdata.Temperatures will be filled with the */
+  /* initial temperature while tdata.Sources will be filled with zeroes.    */
+  /* tdata.Conductances and tdata.Capacities are filled with the            */
+  /* corresponding values. In case of success, the matrix tdata.SM_A will   */
+  /* be filled and factored (see fields related to the usage of SuperLU).   */
+  /* The right hand side vector is not stored since we use the Temperature  */
+  /* array for this purpose                                                 */
   /*                                                                        */
-  /* Returns 0 if success, -1 if memory allocation error, >0 otherwise      */
-  /* (factorization error). Please see the "output" field of the function   */
-  /* "dgstrf" in SuperLU                                                    */
+  /* Returns                                                                */
+  /*   0 if success,                                                        */
+  /*  -1 if memory allocation error,                                        */
+  /*  >0 otherwise (factorization error). Please see the "output" field of  */
+  /*     the function "dgstrf" in SuperLU                                   */
 
   int fill_thermal_data  (ThermalData* tdata, StackDescription* stkd) ;
 
@@ -153,8 +157,10 @@ extern "C"
   /* Consumes a time step emulating heat injection and dissipation.         */
   /*                                                                        */
   /* Returns                                                                */
+  /*  -1 if the tdata.SM_A hasn't been factored before                      */
   /*   0 if the emulation succeeded,                                        */
-  /*   1 if the time reached the end of a time slot,                        */
+  /*   1 if the time slots are over,                                        */
+  /*   2 if the time reached the end of a time slot,                        */
   /*  <0 if there have been a problem with the computation of the solution  */
   /*     of the linear system. See the "info" prameter of "dgstrs" in       */
   /*     SuperLU.                                                           */
@@ -166,6 +172,7 @@ extern "C"
   /* Consumes a time slot emulating heat injection and dissipation.         */
   /*                                                                        */
   /* Returns                                                                */
+  /*  -1 if the tdata.SM_A hasn't been factored before                      */
   /*   0 if the emulation succeeded,                                        */
   /*   1 if the time slots are over                                         */
   /*  <0 if there have been a problem with the computation of the solution  */
