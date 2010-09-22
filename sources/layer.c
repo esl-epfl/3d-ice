@@ -241,14 +241,13 @@ Capacity_t* fill_capacities_layer
 
 #ifdef PRINT_CAPACITIES
       fprintf (stderr,
-        "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f " \
-                    " |  vhc %.5e delta %.5e --> %.5e\n",
+          "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f " \
+                      " |  %.5e [capacity] = (l x w x h x %.5e [        vhc]) / %.5e [delta] |\n",
         current_layer, row, column,
         get_cell_offset_in_stack (dimensions, current_layer, row, column),
         get_cell_length(dimensions, column),
         get_cell_width (dimensions),
-        layer->Height, layer->Material->VolHeatCapacity, delta_time,
-        *capacities
+        layer->Height, *capacities, layer->Material->VolHeatCapacity, delta_time
       ) ;
 #endif
     }
@@ -314,12 +313,15 @@ Source_t* fill_sources_active_layer
 
 #ifdef PRINT_SOURCES
         fprintf (stderr,
-          "solid  cell  |  l %2d r %4d c %4d [%6d] | %s %.5e -> %.5e\n",
+          "solid  cell  | l %2d r %4d c %4d [%6d] "
+                       "| l %5.2f w %5.2f "  \
+                       "| %.5e [source] = (%.5e [W] * l * w) / %.5e | %s\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
-          flp_el->Id,
-          get_from_powers_queue(flp_el->PowerValues),
-          sources [get_cell_offset_in_layer (dimensions, row, column)]) ;
+          get_cell_length (dimensions, column), get_cell_width (dimensions),
+          sources [get_cell_offset_in_layer (dimensions, row, column)],
+          get_from_powers_queue(flp_el->PowerValues), flp_el_surface,
+          flp_el->Id) ;
 #endif
 
       }

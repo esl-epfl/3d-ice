@@ -141,7 +141,7 @@ Quantity_t add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-    "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
+    "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
     *(row_indices-1), *(values-1),
     conductances->Bottom, (conductances - get_layer_area(dimensions))->Top) ;
 #endif
@@ -164,7 +164,7 @@ Quantity_t add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  south   \t%d\t%.5e = %.5e || %.5e\n",
+      "  south   \t%d\t%.5e = %.5e (S) || %.5e (N)\n",
       *(row_indices-1), *(values-1),
       conductances->South, (conductances - get_number_of_columns(dimensions))->North) ;
 #endif
@@ -187,7 +187,7 @@ Quantity_t add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  west    \t%d\t%.5e = %.5e || %.5e\n",
+      "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
       *(row_indices-1), *(values-1),
       conductances->West, (conductances - 1)->East) ;
 #endif
@@ -206,9 +206,10 @@ Quantity_t add_solid_column
   fprintf (stderr, "  diagonal\t%d\t ", *(row_indices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
   if (environmentheatsink != NULL)
-    fprintf (stderr, "           + ehtc %.5e\n", conductances->Top) ;
+    fprintf (stderr, "            ( + %.5e [capacity] + %.5e [ehtc N])\n",
+             *capacities, conductances->Top) ;
   else
-    fprintf (stderr, "           \n") ;
+    fprintf (stderr, "            ( + %.5e [capacity] )\n", *capacities) ;
 #endif
 
   /* EAST */
@@ -228,7 +229,7 @@ Quantity_t add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  east    \t%d\t%.5e = %.5e || %.5e\n",
+      "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
       *(row_indices-1), *(values-1),
       conductances->East, (conductances + 1)->West) ;
 #endif
@@ -251,7 +252,7 @@ Quantity_t add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  north   \t%d\t%.5e = %.5e || %.5e\n",
+      "  north   \t%d\t%.5e = %.5e (N) || %.5e (S)\n",
       *(row_indices-1), *(values-1),
       conductances->North, (conductances + get_number_of_columns(dimensions))->South) ;
 #endif
@@ -274,7 +275,7 @@ Quantity_t add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  top     \t%d\t%.5e = %.5e || %.5e\n",
+      "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
       *(row_indices-1), *(values-1),
       conductances->Top, (conductances + get_layer_area(dimensions))->Bottom) ;
 #endif
@@ -353,7 +354,7 @@ Quantity_t add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  bottom  \t%d\t%.5e = %.5e || %.5e\n",
+      "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
       *(row_indices-1), *(values-1),
       conductances->Bottom, (conductances - get_layer_area(dimensions))->Top) ;
 #endif
@@ -371,7 +372,7 @@ Quantity_t add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  south   \t%d\t%.5e\n", *(row_indices-1), *(values-1)) ;
+      "  south   \t%d\t%.5e (N)\n", *(row_indices-1), *(values-1)) ;
 #endif
   }
 
@@ -392,7 +393,7 @@ Quantity_t add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  west    \t%d\t%.5e = %.5e || %.5e\n",
+      "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
       *(row_indices-1), *(values-1),
       conductances->West, (conductances - 1)->East) ;
 #endif
@@ -410,7 +411,7 @@ Quantity_t add_liquid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "  diagonal\t%d\t", *(row_indices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "           \n") ;
+  fprintf (stderr, "            ( + %.5e [capacity] )\n", *capacities) ;
 #endif
 
   /* EAST */
@@ -430,7 +431,7 @@ Quantity_t add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  east    \t%d\t%.5e = %.5e || %.5e\n",
+      "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
       *(row_indices-1), *(values-1),
       conductances->East, (conductances + 1)->West) ;
 #endif
@@ -448,7 +449,7 @@ Quantity_t add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  north   \t%d\t%.5e\n", *(row_indices-1), *(values-1)) ;
+      "  north   \t%d\t%.5e (S)\n", *(row_indices-1), *(values-1)) ;
 #endif
   }
 
@@ -469,7 +470,7 @@ Quantity_t add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  top     \t%d\t%.5e = %.5e || %.5e\n",
+      "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
       *(row_indices-1), *(values-1),
       conductances->Top, (conductances + get_layer_area(dimensions))->Bottom) ;
 #endif

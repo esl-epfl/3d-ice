@@ -61,7 +61,7 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  print_stack_description (stdout, "", &stkd) ;
+  // print_stack_description (stdout, "", &stkd) ;
 
   // Init thermal data
 
@@ -81,7 +81,9 @@ main(int argc, char** argv)
   // Here we can do something ... emulating? printing info ??
   //
 
-  print_all_floorplans(stdout, "", &stkd);
+  emulate_step(&tdata, &stkd) ;
+
+  // print_all_floorplans(stdout, "", &stkd);
 
   // Free all the data
 

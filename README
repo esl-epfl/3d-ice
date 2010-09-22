@@ -91,22 +91,68 @@ the choice done above when compiling SuperLU. You can then compile 3D-ICE with:
   $ cd 3D-ICE
   $ make
 
+For debugging purpose, several pre-processing options can be enabled to directly
+check the values computed during the set up of all the data before the effective
+thermal simulation. These options can be activated uncommenting the corresponding
+line in the file 3D-ICE/sources/Makefile and running the make command again (run
+the make clean command before building). As a consequence, messages will be
+redirected to stderr. The FillThermalData executable in the 3D-ICE/examples
+folder has been created to observe the result of this debug process. Since every
+option prints a line for every thermal cell in the grid (see ??), we suggest to
+redirect at the command line the stderr stream to a specific file and observe it
+at the end of the exectuion.
+
+The available options are:
+
+PRINT_CONDUCTANCES
+for every cell, prints the id of the cell (layer, row  column, index), its
+dimensions and the 6 conductances. The id of the material related to the cell 
+and the C (conv ???) constant (in case of liquid cells) are also printed (see
+the first line for every layer).
+
+PRINT_CAPACITIES 
+for every cell, prints the id of the cell (layer, row  column, index), its
+dimensions and its capacity, together with the parameters used to evaluate it
+(vhc and delta). The id of the material related to the cell is also printed
+(see the first line for every layer).
+
+PRINT_SYSTEM_MATRIX
+prints the content of the system matrix while it is filled. For every column
+in the matrix (i.e. for every cell in the grid) prints the id of the cell
+(layer, row, column, index) and the list of the nonzero coefficents indicating
+a contact between its neighbourgs. For every neighbour, it prints its id (the
+row in the matrix) and the resulting coefficent, together with the conductances
+and the capacity used to evaluate it.
+
+PRINT_SOURCES
+for every cell in a source layer, prints the id of the
+cell (layer, row, column, index), its dimensions and the source value, together
+with the values used to evaluate it (floorplan power value, surface and id).
+For every channel inlet (the first cell in a channel column), it prints
+the cell id (layer, row, column, index) and the source value, together with the
+parameters used to evaluate it (inlet temperature and C constant). Please remaind
+that these debugging informations will be printed every time that the power
+values related to the floorplans are read at the beginning of a time slot.
 
 
 # 4 - Using the library.
 ################################################################################
 
-3D-ICE  accepts  the  physical description  of the 3D-IC stack  in the form of a
-simple  and  easy-to-understand  text  file called  the  "Stack Descriptor". The
-thermal  power  distribution of the individual dies can be given to 3D-ICE using
-"Floorplan" text file. There are  a  multitude of functions that enable the user
-to print  thermal maps  of  individual dies, temperature  evolution  at a single
-floorplan element against time etc.
-
 Together with the library sources you will also have an example that show how to
 use 3D-ICE to emulate a 3D chip. See files in the ./examples folder.
 
 Include stack_description.h and thermal_data.h ....
+
+3D-ICE  accepts  the  physical description  of the 3D-IC stack  in the form of a
+simple  and  easy-to-understand  text  file called  the  "Stack Descriptor".
+
+The
+thermal  power  distribution of the individual dies can be given to 3D-ICE using
+"Floorplan" text file.
+
+There are  a  multitude of functions that enable the user
+to print  thermal maps  of  individual dies, temperature  evolution  at a single
+floorplan element against time etc.
 
 
 # 5 - Stack Description File.

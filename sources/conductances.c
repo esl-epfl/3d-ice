@@ -105,7 +105,7 @@ void fill_conductances_bottom_solid_cell
   fprintf (stderr,
     "solid  bottom  | l %2d r %4d c %4d [%6d] " \
                    "| l %5.2f w %5.2f h %5.2f " \
-                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
     current_layer, current_row, current_column,
     get_cell_offset_in_stack (dimensions,
                               current_layer, current_row, current_column),
@@ -152,7 +152,7 @@ void fill_conductances_central_solid_cell
   fprintf (stderr,
     "solid  central | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
-                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
     current_layer, current_row, current_column,
     get_cell_offset_in_stack (dimensions,
                               current_layer, current_row, current_column),
@@ -200,7 +200,7 @@ void fill_conductances_top_solid_cell
   fprintf (stderr,
     "solid  top     | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
-                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
     current_layer, current_row, current_column,
     get_cell_offset_in_stack (dimensions,
                               current_layer, current_row, current_column),
@@ -257,7 +257,7 @@ void fill_conductances_top_solid_cell_ehtc
   fprintf (stderr,
     "solid top ehtc | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
-                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
     current_layer, current_row, current_column,
     get_cell_offset_in_stack (dimensions,
                               current_layer, current_row, current_column),
@@ -303,13 +303,14 @@ void fill_conductances_liquid_cell
   fprintf (stderr,
     "liquid         | l %2d r %4d c %4d [%6d] "   \
                    "| l %5.2f w %5.2f h %5.2f "   \
-                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e "
+                   "| C = %e\n",
     current_layer, current_row, current_column,
     get_cell_offset_in_stack (dimensions,
                               current_layer, current_row, current_column),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
-    conductances->West, conductances->Top, conductances->Bottom) ;
+    conductances->West, conductances->Top, conductances->Bottom, C) ;
 # endif
 }
 
@@ -346,7 +347,7 @@ void fill_conductances_wall_cell
   fprintf (stderr,
     "wall           | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
-                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e\n",
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
     current_layer, current_row, current_column,
     get_cell_offset_in_stack (dimensions,
                               current_layer, current_row, current_column),

@@ -253,12 +253,11 @@ Capacity_t* fill_capacities_channel
 #       ifdef PRINT_CAPACITIES
         fprintf (stderr,
           "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  vhc %.5e delta %.5e --> %.5e\n",
+                      " |  %.5e [capacity] = (l x w x h x %.5e [coolant vhc]) / %.5e [delta] |\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           get_cell_length(dimensions, column), get_cell_width (dimensions),
-          channel->Height,
-          channel->CoolantVHC, delta_time, *capacities) ;
+          channel->Height, *capacities, channel->CoolantVHC, delta_time) ;
 #       endif
       }
       else
@@ -274,12 +273,11 @@ Capacity_t* fill_capacities_channel
 #       ifdef PRINT_CAPACITIES
         fprintf (stderr,
           "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  vhc %.5e delta %.5e --> %.5e\n",
+                      " |  %.5e [capacity] = (l x w x h x %.5e [wall    vhc]) / %.5e [delta] |\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
           get_cell_length(dimensions, column), get_cell_width (dimensions),
-          channel->Height,
-          channel->Wall->VolHeatCapacity, delta_time, *capacities) ;
+          channel->Height, *capacities, channel->Wall->VolHeatCapacity, delta_time) ;
 #       endif
       }
 
@@ -306,8 +304,8 @@ Source_t* fill_sources_channel
 
 # ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tfill_sources_channel %s  C = %.5e\n",
-    current_layer, channel->Wall->Id, C) ;
+    "current_layer = %d\tfill_sources_channel %s\n",
+    current_layer, channel->Wall->Id) ;
 # endif
 
   for
@@ -331,11 +329,11 @@ Source_t* fill_sources_channel
 
 #       ifdef PRINT_SOURCES
         fprintf (stderr,
-          "liquid cell  |  l %2d r %4d c %4d [%6d] | %.5e  (Tin = %.2f)\n",
+          "liquid cell  | l %2d r %4d c %4d [%6d] "
+          "| %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
           current_layer, row, column,
           get_cell_offset_in_stack (dimensions, current_layer, row, column),
-          *sources,
-          channel->CoolantTIn) ;
+          *sources, channel->CoolantTIn, C) ;
 #       endif
       }
 
