@@ -81,6 +81,8 @@ main(int argc, char** argv)
   // Here we can do something ... emulating? printing info ??
   //
 
+  print_all_floorplans(stdout, "", &stkd);
+
   // Free all the data
 
   free_thermal_data (&tdata) ;

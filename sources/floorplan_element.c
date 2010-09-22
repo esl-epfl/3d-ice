@@ -108,21 +108,16 @@ void print_floorplan_element
   FloorplanElement* floorplan_element
 )
 {
-  fprintf (stream,
-    "%sFloorplan Element %s",  prefix, floorplan_element->Id) ;
-  fprintf (stream,
-    " ( %f , %f ) %f x %f \n",
+  fprintf (stream, "%sFloorplan Element %s",  prefix, floorplan_element->Id) ;
+  fprintf (stream, " ( %.1f , %.1f ) %.1f x %.1f \n",
     floorplan_element->SW_X, floorplan_element->SW_Y,
     floorplan_element->Length, floorplan_element->Width) ;
-//  fprintf (stream,
-//    "%s  Rows (%d - %d)",
-//    prefix, floorplan_element->SW_Row, floorplan_element->NE_Row) ;
-//  fprintf (stream,
-//    " Columns (%d - %d)\n",
-//    floorplan_element->SW_Column, floorplan_element->NE_Column) ;
+  fprintf (stream, "%s  Rows (%d - %d)",
+    prefix, floorplan_element->SW_Row, floorplan_element->NE_Row) ;
+  fprintf (stream, " Columns (%d - %d)\n",
+    floorplan_element->SW_Column, floorplan_element->NE_Column) ;
 
-  fprintf (stream,
-    "%s  Power values ", prefix) ;
+  fprintf (stream,    "%s  Power values ", prefix) ;
 
   print_powers_queue(stream, prefix, floorplan_element->PowerValues) ;
 }
@@ -136,9 +131,9 @@ void print_formatted_floorplan_element
 )
 {
   fprintf (stream, "%s:", floorplan_element->Id) ;
-  fprintf (stream, "   position %f, %f ;\n",
+  fprintf (stream, "   position %.1f, %.1f ;\n",
                           floorplan_element->SW_X, floorplan_element->SW_Y);
-  fprintf (stream, "   dimension %f, %f ;\n",
+  fprintf (stream, "   dimension %.1f, %.1f ;\n",
                           floorplan_element->Length,
                           floorplan_element->Width) ;
   fprintf (stream, "   power values ") ;
