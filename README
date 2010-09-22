@@ -311,18 +311,53 @@ last declare the element closer to the board (bottom-most).
 The last section  of the stk file declares the dimensions  in [ um ] of the chip
 and of the thermal cells as reported:
 
-      DIMENSIONS ':'
-         CHIP   LENGTH DVALUE ','   WIDTH DVALUE ';'
-         CELL { LENGTH DVALUE ',' } WIDTH DVALUE ';'
+      dimensions :
+         chip   length DVALUE , width DVALUE ;
+         cell   length DVALUE , width DVALUE ;
 
-The  brackets { and } indicate  that that the cell length can be omitted. In our
-model  all the  cells in  different layers but in the  same column must have the
-same length. Therefore the cell length must be specified or not according to the
-presence/absence of the  channels in the 3D chip. If the  channel section is not
-present  then the cell length must be specified otherwise it must be omitted. In
-the latter case the lengths of the cells  are set using  the declarations of the
-channel section  but the resulting number of columns must be odd and bigger than
-three. Moreover, their sum must match the total length of the chip.
+... See arvind's file
 
-# 5 - The FloorplanFiles
+# 5 - The Floorplan File
 ################################################################################
+
+Every die in the stack must be related to a "Floorplan File" (*.flp), which
+contains the list of the functional blocks (cores, caches, memories, etc) that
+belongs to the simulated IC. Every functional block, here called Floorplan
+Element, is described as a rectangle with a name, a position and a dimension
+and a list of power values seen as source of heat. These component are considered
+to be placed on the layer of the related die declared as "source" layer (see ???).
+
+Every floorplan element in the floorplan file can be declared with the following
+syntax:
+
+  IDENTIFIER :
+      position  UIVALUE , UIVALUE ;
+      dimension UIVALUE , UIVALUE ;
+      power values DVALUE ( , DVALUE )* ;
+
+where
+
+- IDENTIFIER is the unique identifier used to name the floorplan element. This
+  string must be unique within the floorplan file it belongs to but it can be
+  used on a different file.
+- position, expressed in [ um ] is the (x,y) coordinate of the south-west corner
+  of the floorplan element
+- dimension indicates the size of the element as the (length, width) dimensions
+  of the rectangle used to model it
+- DVALUE is the power consumption, expressed in [ W ]. Power values are declared
+  as a comma-separated list with at least one element.
+
+During the parsing of the Floorplan File, the values describing the elements are
+checked to verify that all the elements are inside the chip and that they do
+not overlap. Then, they will be placed on the grid of cells as (where the cell
+center is).
+
+The number of power values inserted for each floorplan element, instead, must be
+constant. The C function fill_stack_description parses the stack description
+first and then parses all the Floorplan Files starting from the bottom most
+die in the stack. Therefore, the number of power values declared in the first
+floorplan element in that die will be used as a reference to check all the others
+elements. Power values in excess will be discarded and reported with a warning
+message while the lack of them will be considered as an error. This is done to
+guarantee that all the floorplan elements in all the floorplan files can inject
+heat in the 3D-chip for at least the same amount of time.

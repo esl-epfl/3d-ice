@@ -54,35 +54,35 @@ extern "C"
 
     /* The south-west X position [um] */
 
-    int SW_X ;
+    CellDimension_t SW_X ;
 
     /* The south-west Y position [um] */
 
-    int SW_Y ;
+    CellDimension_t SW_Y ;
 
     /* The length of the floorplan element [um] */
 
-    int Length ;
+    CellDimension_t Length ;
 
     /* The width of the floorplan element [um] */
 
-    int Width ;
+    CellDimension_t Width ;
 
     /* The south-west row index */
 
-    int SW_Row ;
+    RowIndex_t SW_Row ;
 
     /* The south-west column index */
 
-    int SW_Column ;
+    ColumnIndex_t SW_Column ;
 
     /* The north-east row index */
 
-    int NE_Row ;
+    RowIndex_t NE_Row ;
 
     /* The north-east column index */
 
-    int NE_Column ;
+    ColumnIndex_t NE_Column ;
 
     /* The list of power values */
 

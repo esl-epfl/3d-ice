@@ -40,7 +40,6 @@
 
 %union
 {
-  int                      i_value ;
   double                   d_value ;
   char                     *string ;
 
@@ -73,7 +72,7 @@ static int first_length_found = 0 ;
 %token POWER      "keyword power"
 %token VALUES     "keyword values"
 
-%token <i_value> UIVALUE       "integer value"
+//%token <i_value> UIVALUE       "integer value"
 %token <d_value> DVALUE        "double value"
 %token <string>  IDENTIFIER    "identifier"
 
@@ -114,6 +113,19 @@ floorplan_element_list
     }
   | floorplan_element_list floorplan_element
     {
+      if (find_floorplan_element_in_list($1, $2->Id) != NULL)
+      {
+        String_t message
+          = (String_t) malloc ((37 + strlen($2->Id)) * sizeof (char)) ;
+        sprintf (message, "Floorplan element %s already declared", $2->Id) ;
+
+        free_floorplan_element ($2) ;
+        floorplan_error (floorplan, dimensions, scanner, message) ;
+        free (message) ;
+        YYABORT ;
+      }
+
+
       Bool_t tmp_1 = check_intersections (floorplan, $2) ;
       Bool_t tmp_2 = check_location      (floorplan, $2, dimensions) ;
       Bool_t tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
@@ -124,10 +136,9 @@ floorplan_element_list
         floorplan_error (floorplan, dimensions, scanner, "") ;
         YYABORT ;
       }
+
       $1->Next = $2 ;
-
       floorplan->NElements++ ;
-
       $$ = $2 ;
     }
   ;
@@ -135,8 +146,8 @@ floorplan_element_list
 floorplan_element
 
   : IDENTIFIER ':'
-      POSITION  UIVALUE ',' UIVALUE ';'
-      DIMENSION UIVALUE ',' UIVALUE ';'
+      POSITION  DVALUE ',' DVALUE ';'
+      DIMENSION DVALUE ',' DVALUE ';'
       POWER VALUES power_values_list ';'
     {
       FloorplanElement *floorplan_element
@@ -188,7 +199,8 @@ power_values_list
       if (first_length_found != 0
           && $1->Length + 1 > first_length_found)
 
-        fprintf (stderr, "Warning: discarding value %f\n", $3);
+        fprintf (stderr, "%s:%d: Warning: discarding value %f\n",
+                 floorplan->FileName, floorplan_get_lineno(scanner), $3);
 
       else
 

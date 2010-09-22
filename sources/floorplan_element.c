@@ -46,11 +46,11 @@ void init_floorplan_element (FloorplanElement* floorplan_element)
 {
   floorplan_element->Id          = NULL ;
 
-  floorplan_element->SW_X        = 0 ;
-  floorplan_element->SW_Y        = 0 ;
+  floorplan_element->SW_X        = 0.0 ;
+  floorplan_element->SW_Y        = 0.0 ;
 
-  floorplan_element->Length      = 0 ;
-  floorplan_element->Width       = 0 ;
+  floorplan_element->Length      = 0.0 ;
+  floorplan_element->Width       = 0.0 ;
 
   floorplan_element->SW_Row      = 0 ;
   floorplan_element->SW_Column   = 0 ;
@@ -111,7 +111,7 @@ void print_floorplan_element
   fprintf (stream,
     "%sFloorplan Element %s",  prefix, floorplan_element->Id) ;
   fprintf (stream,
-    " ( %d , %d ) %d x %d \n",
+    " ( %f , %f ) %f x %f \n",
     floorplan_element->SW_X, floorplan_element->SW_Y,
     floorplan_element->Length, floorplan_element->Width) ;
 //  fprintf (stream,
@@ -136,9 +136,9 @@ void print_formatted_floorplan_element
 )
 {
   fprintf (stream, "%s:", floorplan_element->Id) ;
-  fprintf (stream, "   position %d, %d ;\n",
+  fprintf (stream, "   position %f, %f ;\n",
                           floorplan_element->SW_X, floorplan_element->SW_Y);
-  fprintf (stream, "   dimension %d, %d ;\n",
+  fprintf (stream, "   dimension %f, %f ;\n",
                           floorplan_element->Length,
                           floorplan_element->Width) ;
   fprintf (stream, "   power values ") ;

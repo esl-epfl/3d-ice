@@ -135,9 +135,9 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
                         return IDENTIFIER ;
                       }
 
-{u_integer}           {
-                        yylval->i_value = atoi(yytext) ;
-                        return UIVALUE ;
+{s_integer}           {
+                        yylval->d_value = atof(yytext) ;
+                        return DVALUE ;
                       }
 
 {double}              {
