@@ -1073,6 +1073,33 @@ int get_all_temperatures_of_channel_outlets
 
 /******************************************************************************/
 
+int get_cell_temperature
+(
+  StackDescription* stkd,
+  Temperature_t*    temperatures,
+  LayerIndex_t      layer,
+  RowIndex_t        row,
+  ColumnIndex_t     column,
+  Temperature_t*    cell_temperature
+)
+{
+  GridDimension_t id = get_cell_offset_in_stack
+                       (
+                         stkd->Dimensions,
+                         layer, row, column
+                       );
+
+  if (id < 0 || id > get_number_of_cells(stkd->Dimensions))
+
+    return -1;
+
+  *cell_temperature = temperatures [ id ] ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
 int print_thermal_map
 (
   StackDescription* stkd,

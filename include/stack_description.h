@@ -489,6 +489,25 @@ extern "C"
 
 /******************************************************************************/
 
+  /* Get the themperature of a given thermal cell                            */
+  /*                                                                         */
+  /* Returns:                                                                */
+  /*   0 if the cell exists                                                  */
+  /*  -1 if the cell does not exist                                          */
+  /*  -2 if there has been an error when opening the file file_name          */
+
+  int get_cell_temperature
+  (
+    StackDescription* stkd,
+    Temperature_t*    temperatures,
+    LayerIndex_t      layer,
+    RowIndex_t        row,
+    ColumnIndex_t     column,
+    Temperature_t*    cell_temperature
+  ) ;
+
+/******************************************************************************/
+
   /* Given the address of a StackDescrption structure and the array of       */
   /* temperatures, print to file_name the thermal map of stack_element_id.   */
   /* stack_element_id is the id given to one of the stack element composing  */
