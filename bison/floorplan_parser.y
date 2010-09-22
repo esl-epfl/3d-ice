@@ -119,8 +119,8 @@ floorplan_element_list
           = (String_t) malloc ((37 + strlen($2->Id)) * sizeof (char)) ;
         sprintf (message, "Floorplan element %s already declared", $2->Id) ;
 
-        free_floorplan_element ($2) ;
         floorplan_error (floorplan, dimensions, scanner, message) ;
+        free_floorplan_element ($2) ;
         free (message) ;
         YYABORT ;
       }
@@ -226,6 +226,4 @@ floorplan_error
                                   msg) ;
 
   get_chip_length (dimensions) ;  // FIXME
-
-  free_floorplan (floorplan) ;
 }

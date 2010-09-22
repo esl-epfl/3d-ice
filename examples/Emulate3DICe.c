@@ -59,9 +59,10 @@ main(int argc, char** argv)
   // Fill StackDescription using the argument file
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
-
+  {
+    free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
-
+  }
   // print_dimensions (stdout, "dim: ", stkd.Dimensions) ;
 
   // Init thermal data
@@ -90,6 +91,7 @@ main(int argc, char** argv)
     printf ("no element die2 found\n") ;
     free_thermal_data (&tdata) ;
     free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
   }
 
   Temperature_t* max_results
@@ -98,8 +100,9 @@ main(int argc, char** argv)
   if (max_results == NULL)
   {
     printf ("alloc memory failed\n") ;
-    free_thermal_data (&tdata) ;
+    free_thermal_data      (&tdata) ;
     free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
   }
 
   // Consume all time slots printing time by time the max temperature
@@ -161,8 +164,8 @@ main(int argc, char** argv)
 
   // free all data
 
-  free (max_results) ;
-  free_thermal_data (&tdata) ;
+  free                   (max_results) ;
+  free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS;

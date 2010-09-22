@@ -56,8 +56,10 @@ main(int argc, char** argv)
   // Fill StackDescription using the argument file
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
-
+  {
+    free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
+  }
 
   print_stack_description (stdout, "", &stkd) ;
 
