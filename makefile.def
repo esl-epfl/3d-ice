@@ -99,20 +99,6 @@
 
 3DICE_LIB_O     = $(3DICE_FLEX_O) $(3DICE_BISON_O) $(3DICE_SOURCES_O)
 
-3DICE_ALL_FILES = $(3DICE_BISON_Y)            \
-                  $(3DICE_BISON)/Makefile     \
-                  $(3DICE_FLEX_L)             \
-                  $(3DICE_FLEX)/Makefile      \
-                  $(3DICE_INCLUDE_H)          \
-                  $(3DICE_LIB)                \
-                  $(3DICE_LIB)/Makefile       \
-                  $(3DICE_SOURCES_C)          \
-                  $(3DICE_SOURCES_C)/Makefile \
-                  makefile.def                \
-                  Makefile                    \
-                  COPYING                     \
-                  README
-
  #
  # SuperLU variables
  ##############################################################################
