@@ -197,6 +197,16 @@ Bool_t align_to_grid
 
   floorplan_element->NE_Column = column - 1;
 
+  /* Effective length */
+
+  for
+  (
+    column =  floorplan_element->SW_Column ;
+    column <= floorplan_element->NE_Column ;
+    column ++
+  )
+    floorplan_element->EffectiveLength += get_cell_length (dimensions, column) ;
+
   /* South side */
 
   cy  = (get_cell_width (dimensions) / 2.0);
@@ -219,6 +229,12 @@ Bool_t align_to_grid
   }
 
   floorplan_element->NE_Row = row - 1 ;
+
+  /* Effective width */
+
+  floorplan_element->EffectiveWidth =
+    get_cell_width (dimensions)
+    * (floorplan_element->NE_Row - floorplan_element->SW_Row + 1) ;
 
   if (floorplan_element->NE_Row - floorplan_element->SW_Row == 0
       && floorplan_element->NE_Column - floorplan_element->SW_Column == 0)

@@ -44,23 +44,26 @@
 
 void init_floorplan_element (FloorplanElement* floorplan_element)
 {
-  floorplan_element->Id          = NULL ;
+  floorplan_element->Id              = NULL ;
 
-  floorplan_element->SW_X        = 0.0 ;
-  floorplan_element->SW_Y        = 0.0 ;
+  floorplan_element->SW_X            = 0.0 ;
+  floorplan_element->SW_Y            = 0.0 ;
 
-  floorplan_element->Length      = 0.0 ;
-  floorplan_element->Width       = 0.0 ;
+  floorplan_element->Length          = 0.0 ;
+  floorplan_element->Width           = 0.0 ;
 
-  floorplan_element->SW_Row      = 0 ;
-  floorplan_element->SW_Column   = 0 ;
+  floorplan_element->EffectiveLength = 0.0 ;
+  floorplan_element->EffectiveWidth  = 0.0 ;
 
-  floorplan_element->NE_Row      = 0 ;
-  floorplan_element->NE_Column   = 0 ;
+  floorplan_element->SW_Row          = 0 ;
+  floorplan_element->SW_Column       = 0 ;
 
-  floorplan_element->PowerValues = NULL ;
+  floorplan_element->NE_Row          = 0 ;
+  floorplan_element->NE_Column       = 0 ;
 
-  floorplan_element->Next        = NULL ;
+  floorplan_element->PowerValues     = NULL ;
+
+  floorplan_element->Next            = NULL ;
 }
 
 /******************************************************************************/

@@ -286,7 +286,8 @@ Source_t* fill_sources_active_layer
     flp_el  = flp_el->Next
   )
   {
-    flp_el_surface = (CellDimension_t) (flp_el->Length * flp_el->Width) ;
+    flp_el_surface
+      = (CellDimension_t) (flp_el->EffectiveLength * flp_el->EffectiveWidth) ;
 
     for
     (
@@ -297,8 +298,8 @@ Source_t* fill_sources_active_layer
 
       for
       (
-        column = flp_el->SW_Column ;
-        column < flp_el->NE_Column ;
+        column =  flp_el->SW_Column ;
+        column <= flp_el->NE_Column ;
         column++
       )
       {

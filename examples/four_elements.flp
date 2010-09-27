@@ -3,14 +3,14 @@ Background1 :
   position       0,    0 ;
   dimension   5000, 5000 ;
 
-  power values 12.5, 12.5, 12.5, 12.5, 12.5 ;
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
 
 Hotspot1 :
 
   position    5000,    0 ;
   dimension   5000, 5000 ;
 
-  power values 25.0, 25.0, 25.0, 25.0, 25.0 ;
+  power values 25.0, 22.0, 24.0, 28.5, 25.0 ;
 
 
 Hotspot2 :
@@ -18,7 +18,7 @@ Hotspot2 :
   position       0, 5000 ;
   dimension   5000, 5000 ;
 
-  power values 25.0, 25.0, 25.0, 25.0, 25.0 ;
+  power values 25.0, 22.0, 24.0, 28.5, 25.0 ;
 
 
 Background2 :
@@ -26,5 +26,5 @@ Background2 :
   position    5000, 5000 ;
   dimension   5000, 5000 ;
 
-  power values 12.5, 12.5, 12.5, 12.5, 12.5 ;
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
 

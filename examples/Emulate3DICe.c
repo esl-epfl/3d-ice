@@ -56,6 +56,8 @@ main(int argc, char** argv)
   // Init StackDescription and parse the input file
   ////////////////////////////////////////////////////////////////////////////
 
+  fprintf (stdout, "Preparing stk data ...\n");
+
   init_stack_description (&stkd) ;
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
@@ -66,6 +68,8 @@ main(int argc, char** argv)
 
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
+
+  fprintf (stdout, "Preparing thermal data ...\n");
 
   init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
 
@@ -110,7 +114,7 @@ main(int argc, char** argv)
   // The do { } while () ; loop prints the temperatures at all the time points.
   ////////////////////////////////////////////////////////////////////////////
 
-  Temperature_t outlet;
+  Temperature_t outlet, cell1, cell2 ;
   clock_t Time = clock();
 
   do
@@ -135,15 +139,27 @@ main(int argc, char** argv)
       break ;
     }
 
+    if ( get_cell_temperature (&stkd, &tdata, 2, 11, 4, &cell1) != 0 )
+    {
+      printf ("error getting cell1 temp\n") ;
+      break ;
+    }
+
+    if ( get_cell_temperature (&stkd, &tdata, 6, 34, 84, &cell2) != 0 )
+    {
+      printf ("error getting cell2 temp\n") ;
+      break ;
+    }
+
     // Print results
 
     printf("%5.3fs  ", get_current_time(&tdata)) ;
     for (counter = 0; counter < nfloorplanelements; counter++)
       printf("%7.3f  ", max_results[counter]) ;
-    printf("  %7.3f\n", outlet) ;
+    printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;
   }
-  while (emulate_slot (&tdata, &stkd) != 1) ;
-  //while (emulate_step (&tdata, &stkd) != 2) ;
+  while (emulate_step (&tdata, &stkd) != 1) ;
+  // while (emulate_slot (&tdata, &stkd) != 1) ;
 
   fprintf (stdout, "emulation took %.3f sec\n",
            ( (double)clock() - Time ) / CLOCKS_PER_SEC );

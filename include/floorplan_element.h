@@ -68,6 +68,16 @@ extern "C"
 
     CellDimension_t Width ;
 
+    /* The length of the floorplan element [um] */
+    /* considering the distribution of cells    */
+
+    CellDimension_t EffectiveLength ;
+
+    /* The width of the floorplan element [um] */
+    /* considering the distribution of cells    */
+
+    CellDimension_t EffectiveWidth ;
+
     /* The south-west row index */
 
     RowIndex_t SW_Row ;
