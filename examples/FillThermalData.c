@@ -41,19 +41,19 @@ main(int argc, char** argv)
   StackDescription stkd ;
   ThermalData      tdata ;
 
-  // Checks if there is the argument file to process
+  // Checks if there are the all the arguments
+  ////////////////////////////////////////////////////////////////////////////
 
-  if (argc != 2)
+  if (argc != 4)
   {
-    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
+    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]);
     return EXIT_FAILURE;
   }
 
-  // Init StackDescription
+  // Init StackDescription and parse the input file
+  ////////////////////////////////////////////////////////////////////////////
 
   init_stack_description (&stkd) ;
-
-  // Fill StackDescription using the argument file
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
   {
@@ -61,13 +61,10 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  // print_stack_description (stdout, "", &stkd) ;
+  // Init thermal data and fill it using the StackDescription
+  ////////////////////////////////////////////////////////////////////////////
 
-  // Init thermal data
-
-  init_thermal_data (&tdata, 300.00, 0.002, 0.020) ;
-
-  // Fill thermal data using the stack description data
+  init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
 
   if (fill_thermal_data  (&tdata, &stkd) != 0)
   {
@@ -77,15 +74,16 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  //
   // Here we can do something ... emulating? printing info ??
-  //
-
-  emulate_step(&tdata, &stkd) ;
+  ////////////////////////////////////////////////////////////////////////////
 
   // print_all_floorplans(stdout, "", &stkd);
 
-  // Free all the data
+  // This is to consume a power value (to see the effect of PRINT_SOURCES
+  emulate_step(&tdata, &stkd) ;
+
+  // free all data
+  ////////////////////////////////////////////////////////////////////////////
 
   free_thermal_data (&tdata) ;
   free_stack_description (&stkd) ;

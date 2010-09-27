@@ -87,21 +87,20 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Given a valid address of a StackDescription structure, sets all its    */
-  /* fields to a default value                                              */
+  /* Sets all the fields of stkd to a default value                         */
 
   void init_stack_description (StackDescription* stkd) ;
 
 /******************************************************************************/
 
-  /* Given a valid address of a StackDescription structure and the path of  */
-  /* a .stk file, parses the file and fills the stkd structure              */
+  /* Fills the stkd structure parsing the *.stk file                        */
   /*                                                                        */
   /* Returns:                                                               */
-  /*  0 if the parsing succeeds                                             */
+  /*                                                                        */
   /* -1 if the .stk file does not exist                                     */
+  /*  0 if the parsing succeeds                                             */
   /*  1 if there is an error in the .stk file or in one of the .flp files   */
-  /*      cited in it (message printed to stderr).                          */
+  /*       used in it (message printed to stderr).                          */
   /*                                                                        */
   /* Note: The function parses the .stk file first and then all the .flp    */
   /* files related to the floorplans following the order used in the stack  */
@@ -112,7 +111,7 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Frees all the memory used by the given StackDescription structure      */
+  /* Frees all the memory                                                   */
 
   void free_stack_description (StackDescription* stkd) ;
 
@@ -120,11 +119,11 @@ extern "C"
 
   /* Print on stream (stdout, stderr or a given opened output file) all the */
   /* data related to the stkd structure previously filled. Prefix is a      */
-  /* string (it can be empty as "") prined as prefix at the beginning of    */
+  /* string (it can be empty as "") printed as prefix at the beginning of   */
   /* every line.                                                            */
   /*                                                                        */
   /* To print the content of only one of the fields of stkd, use the        */
-  /* printing function in the corresponding header file (see material.h)    */
+  /* printing function in the corresponding header file                     */
 
   void print_stack_description
   (
@@ -149,24 +148,25 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Return the number of remaining power values (so time slot) to consume */
+  /* Returns the number of remaining power values (time slots) to emulate   */
 
   Quantity_t get_number_of_remaining_power_values (StackDescription* stkd) ;
 
 /******************************************************************************/
 
-  /* Given a StackDescription address and the id (string) of a floorplan,   */
-  /* it returns the number of all the floorplan elements in that floorplan. */
-  /* As floorplan id, we refer to the stack element id given to the die it  */
-  /* belongs to.                                                            */
+  /* Given a StackDescription and the id (string) of a floorplan, returns   */
+  /* the number of all the floorplan elements in that floorplan.            */
+  /* The floorplan_id, is the string used to name the die stack element it  */
+  /* belongs to (refers to the the .stk file used to fill stkd)             */
   /*                                                                        */
   /* Returns:                                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs */
-  /*     to a die but the floorplan itself does not exist                   */
-  /*  >= 0 the number of floorplan elements in floorplan_id                 */
+  /*                                                                        */
+  /*   -1 if the stack element id floorplan_id does not exist               */
+  /*   -2 if floorplan_id exists but it is not the id of a die or it        */
+  /*      belongs to a die but the floorplan itself does not exist          */
+  /* >= 0 the number of floorplan elements in floorplan_id                  */
 
-  Quantity_t get_number_of_floorplan_elements_of_floorplan
+  Quantity_t get_number_of_floorplan_elements
   (
     StackDescription* stkd,
     String_t floorplan_id
@@ -174,361 +174,11 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Given a StackDescription address, returns the number of channels       */
-  /* (the number of channels is the same for every channel layer)           */
+  /* Given a StackDescription, returns the number of channels outlets in a  */
+  /* channel layer (the number of channels is the number of liquid columns  */
+  /* and it is the same for every channel layer)                            */
 
   Quantity_t get_number_of_channel_outlets (StackDescription* stkd) ;
-
-/******************************************************************************/
-
-  /* Get the maximum temperature of a given floorplan element                */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* floorplan_element_id  the id of the floorplan element                   */
-  /* temperatures          the address of the array temperature to access    */
-  /* max_temperature       the address where the max temperature will be     */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the ids are correct                                         */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the floorplan itself does not exist                    */
-  /*  -3 if floorplan_id exists but floorplan_element_id do not              */
-
-  int get_max_temperature_of_floorplan_element
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the minimum temperature of a given floorplan element                */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* floorplan_element_id  the id of the floorplan element                   */
-  /* temperatures          the address of the array temperature to access    */
-  /* min_temperature       the address where the min temperature will be     */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the ids are correct                                         */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the floorplan itself does not exist                    */
-  /*  -3 if floorplan_id exists but floorplan_element_id do not              */
-
-  int get_min_temperature_of_floorplan_element
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    min_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the average temperature of a given floorplan element                */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* floorplan_element_id  the id of the floorplan element                   */
-  /* temperatures          the address of the array temperature to access    */
-  /* avg_temperature       the address where the avg temperature will be     */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the ids are correct                                         */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the floorplan itself does not exist                    */
-  /*  -3 if floorplan_id exists but floorplan_element_id do not              */
-
-  int get_avg_temperature_of_floorplan_element
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    avg_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the minimum, average and maximum temperature of a given floorplan   */
-  /* element                                                                 */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* floorplan_element_id  the id of the floorplan element                   */
-  /* temperatures          the address of the array temperature to access    */
-  /* min_temperature       the address where the min temperature will be     */
-  /*                       written                                           */
-  /* avg_temperature       the address where the avg temperature will be     */
-  /*                       written                                           */
-  /* max_temperature       the address where the max temperature will be     */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the ids are correct                                         */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the floorplan itself does not exist                    */
-  /*  -3 if floorplan_id exists but floorplan_element_id do not              */
-
-  int get_min_avg_max_temperatures_of_floorplan_element
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    min_temperature,
-    Temperature_t*    avg_temperature,
-    Temperature_t*    max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the temperature of the liquid when leaving the specific outlet of   */
-  /* a specific channel layer                                                */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* channel_id            the id of the channel (the stack element id)      */
-  /* outlet_number         the id (number) of the outlet. It must be an      */
-  /*                       integer between 0 (the west most channel) and the */
-  /*                       number of channels.                               */
-  /* temperatures          the address of the array temperature to access    */
-  /* outlet_temperature    the address where the temperature of the liquid   */
-  /*                       will be written                                   */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the id of the channel and the outlet are correct            */
-  /*  -1 if the stack element id channel_id does not exist                   */
-  /*  -2 if channel_id exists but it does not refer to a channel layer       */
-  /*  -3 if channel_id exists but outlet_number does not refer to a channel  */
-
-  int get_temperature_of_channel_outlet
-  (
-    StackDescription* stkd,
-    String_t          channel_id,
-    ColumnIndex_t     outlet_number,
-    Temperature_t*    temperatures,
-    Temperature_t*    outlet_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the maximum temperature of all the floorplan element in a floorplan */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* temperatures          the address of the array temperature to access    */
-  /* max_temperature       the address where the max temperatures will be    */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the floorplan itself does not exist                    */
-  /*                                                                         */
-  /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
-  /* max_temperatures (i.e. the memory must be allocated before calling this */
-  /* function). Temperatures will be written following the same order of     */
-  /* declaration found in the corresponding .flp file (max_temperature[0] is */
-  /* the maximum temperature of the first floorplan element found in the     */
-  /* file).                                                                  */
-
-  int get_all_max_temperatures_of_floorplan
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the minimum temperature of all the floorplan element in a floorplan */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* temperatures          the address of the array temperature to access    */
-  /* min_temperature       the address where the min temperatures will be    */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the Floorplan itself does not exist                    */
-  /*                                                                         */
-  /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
-  /* min_temperatures (i.e. the memory must be allocated before calling this */
-  /* function). Temperatures will be written following the same order of     */
-  /* declaration found in the corresponding .flp file (max_temperature[0] is */
-  /* the minimum temperature of the first floorplan element found in the     */
-  /* file).                                                                  */
-
-  int get_all_min_temperatures_of_floorplan
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    min_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the average temperature of all the floorplan element in a floorplan */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* temperatures          the address of the array temperature to access    */
-  /* avg_temperature       the address where the avg temperatures will be    */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the Floorplan itself does not exist                    */
-  /*                                                                         */
-  /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
-  /* avg_temperatures (i.e. the memory must be allocated before calling this */
-  /* function). Temperatures will be written following the same order of     */
-  /* declaration found in the corresponding .flp file (max_temperature[0] is */
-  /* the average temperature of the first floorplan element found in the     */
-  /* file).                                                                  */
-
-  int get_all_avg_temperatures_of_floorplan
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    avg_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the minimum, average and maximum temperature of all the floorplan   */
-  /* element in a floorplan                                                  */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* temperatures          the address of the array temperature to access    */
-  /* min_temperature       the address where the min temperatures will be    */
-  /*                       written                                           */
-  /* avg_temperature       the address where the avg temperatures will be    */
-  /*                       written                                           */
-  /* max_temperature       the address where the max temperatures will be    */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the Floorplan itself does not exist                    */
-  /*                                                                         */
-  /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
-  /* min_temperatures, avg_temperatures, etc. (i.e. the memory must be       */
-  /* allocated before calling this function). Temperatures will be written   */
-  /* following the same order of declaration found in the corresponding .flp */
-  /* file (min_temperature[0] is the minimum temperature of the first        */
-  /* floorplan element found in the file, etc...).                           */
-
-  int get_all_min_avg_max_temperatures_of_floorplan
-  (
-    StackDescription* stkd,
-    String_t          floorplan_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    min_temperature,
-    Temperature_t*    avg_temperature,
-    Temperature_t*    max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the temperature of the liquid when leaving all the outlets of a     */
-  /* specific channel layer                                                  */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* channel_id            the id of the channel (the stack element id)      */
-  /* temperatures          the address of the array temperature to access    */
-  /* outlet_temperatures   the address where the temperatures of the liquid  */
-  /*                       will be written                                   */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the id of the channel and the outlet are correct            */
-  /*  -1 if the stack element id channel_id does not exist                   */
-  /*  -2 if channel_id exists but it does not refer to a channel layer       */
-  /*                                                                         */
-  /* If a channel layer has n channels, then the function will access n      */
-  /* elements of type Temperature_t starting from outlet_temperature (i.e.   */
-  /* the memory must be allocated before calling). The temperatures are      */
-  /* written following the west -> east order.                               */
-
-  int get_all_temperatures_of_channel_outlets
-  (
-    StackDescription* stkd,
-    String_t          channel_id,
-    Temperature_t*    temperatures,
-    Temperature_t*    outlet_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the themperature of a given thermal cell                            */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the cell exists                                                  */
-  /*  -1 if the cell does not exist                                          */
-  /*  -2 if there has been an error when opening the file file_name          */
-
-  int get_cell_temperature
-  (
-    StackDescription* stkd,
-    Temperature_t*    temperatures,
-    LayerIndex_t      layer,
-    RowIndex_t        row,
-    ColumnIndex_t     column,
-    Temperature_t*    cell_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Given the address of a StackDescrption structure and the array of       */
-  /* temperatures, print to file_name the thermal map of stack_element_id.   */
-  /* stack_element_id is the id given to one of the stack element composing  */
-  /* the 3D stack. If it refers to a die, the active source layer will be    */
-  /* printed.                                                                */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if there has been an error when opening the file file_name          */
-  /*                                                                         */
-  /* The thermal map is printex as a matrix with get_number_of_columns ()    */
-  /* columns and get_number_of_rows () rows.                                 */
-
-  int print_thermal_map
-  (
-    StackDescription* stkd,
-    Temperature_t*    temperatures,
-    String_t          stack_element_id,
-    String_t          file_name
-  ) ;
 
 /******************************************************************************/
 

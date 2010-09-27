@@ -80,8 +80,8 @@ void init_thermal_data
 (
   ThermalData*      tdata,
   Temperature_t     initial_temperature,
-  Time_t            step_time,
-  Time_t            slot_time
+  Time_t            slot_time,
+  Time_t            step_time
 )
 {
   tdata->Size = 0 ;
@@ -90,7 +90,7 @@ void init_thermal_data
   tdata->SlotTime = slot_time ;
 
   tdata->CurrentTime      = 0.0 ;
-  tdata->CurrentSlotLimit = 0.0 ; //slot_time ;
+  tdata->CurrentSlotLimit = 0.0 ;
 
   tdata->InitialTemperature = initial_temperature ;
 
@@ -286,6 +286,13 @@ void free_thermal_data (ThermalData* tdata)
 
 /******************************************************************************/
 
+Time_t get_current_time(ThermalData* tdata)
+{
+  return tdata->CurrentTime ;
+}
+
+/******************************************************************************/
+
 int emulate_step (ThermalData* tdata, StackDescription* stkd)
 {
   int count;
@@ -366,9 +373,6 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
   while ( tdata->CurrentTime < tdata->CurrentSlotLimit )
   {
-    // Evaluate coefficents of system vector B
-    // B[i] = Source[i] * Capacity[i] * Temperature[i] ;
-
     for(count = 0 ; count < tdata->Size ; count++)
 
       tdata->Temperatures[count]
@@ -402,7 +406,537 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
 /******************************************************************************/
 
-Time_t get_current_time(ThermalData* tdata)
+int get_max_temperature_of_floorplan_element
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    max_temperature
+)
 {
-  return tdata->CurrentTime ;
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  return get_max_temperature_floorplan
+         (
+           stk_el->Floorplan,
+           floorplan_element_id,
+           stkd->Dimensions,
+           tdata->Temperatures + offset,
+           max_temperature
+         ) ;
+}
+
+/******************************************************************************/
+
+int get_min_temperature_of_floorplan_element
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    min_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  return get_min_temperature_floorplan
+         (
+           stk_el->Floorplan,
+           floorplan_element_id,
+           stkd->Dimensions,
+           tdata->Temperatures + offset,
+           min_temperature
+         ) ;
+}
+
+/******************************************************************************/
+
+int get_avg_temperature_of_floorplan_element
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    avg_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  return get_avg_temperature_floorplan
+         (
+           stk_el->Floorplan,
+           floorplan_element_id,
+           stkd->Dimensions,
+           tdata->Temperatures + offset,
+           avg_temperature
+         ) ;
+}
+
+/******************************************************************************/
+
+int get_min_avg_max_temperatures_of_floorplan_element
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  String_t          floorplan_element_id,
+  Temperature_t*    min_temperature,
+  Temperature_t*    avg_temperature,
+  Temperature_t*    max_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  return get_min_avg_max_temperatures_floorplan
+         (
+           stk_el->Floorplan,
+           floorplan_element_id,
+           stkd->Dimensions,
+           tdata->Temperatures + offset,
+           min_temperature,
+           avg_temperature,
+           max_temperature
+         ) ;
+}
+
+/******************************************************************************/
+
+int get_temperature_of_channel_outlet
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          channel_id,
+  ColumnIndex_t     outlet_number,
+  Temperature_t*    outlet_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           channel_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TDICE_STACK_ELEMENT_CHANNEL)
+
+    return -2 ;
+
+  if (   outlet_number < 0
+      || outlet_number > get_number_of_channel_outlets (stkd) )
+
+    return -3 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset,
+             get_number_of_rows(stkd->Dimensions) - 1,
+             (outlet_number * 2) + 1
+           ) ;
+
+  *outlet_temperature = tdata->Temperatures [ offset ] ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_max_temperatures_of_floorplan
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  Temperature_t*    max_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  get_all_max_temperatures_floorplan
+  (
+    stk_el->Floorplan,
+    stkd->Dimensions,
+    tdata->Temperatures + offset,
+    max_temperature
+  ) ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_min_temperatures_of_floorplan
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  Temperature_t*    min_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  get_all_min_temperatures_floorplan
+  (
+    stk_el->Floorplan,
+    stkd->Dimensions,
+    tdata->Temperatures + offset,
+    min_temperature
+  ) ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_avg_temperatures_of_floorplan
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  Temperature_t*    avg_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  get_all_avg_temperatures_floorplan
+  (
+    stk_el->Floorplan,
+    stkd->Dimensions,
+    tdata->Temperatures + offset,
+    avg_temperature
+  ) ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_min_avg_max_temperatures_of_floorplan
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          floorplan_id,
+  Temperature_t*    min_temperature,
+  Temperature_t*    avg_temperature,
+  Temperature_t*    max_temperature
+)
+{
+  Quantity_t offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           floorplan_id
+                         ) ;
+
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
+      || stk_el->Floorplan == NULL)
+
+    return -2 ;
+
+  offset = get_cell_offset_in_stack
+           (
+             stkd->Dimensions,
+             stk_el->LayersOffset
+             + stk_el->Pointer.Die->SourceLayer->LayersOffset,
+             0, 0
+           ) ;
+
+  get_all_min_avg_max_temperatures_floorplan
+  (
+    stk_el->Floorplan,
+    stkd->Dimensions,
+    tdata->Temperatures + offset,
+    min_temperature,
+    avg_temperature,
+    max_temperature
+  ) ;
+
+ return 0 ;
+}
+
+/******************************************************************************/
+
+int get_all_temperatures_of_channel_outlets
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          channel_id,
+  Temperature_t*    outlet_temperature
+)
+{
+  ColumnIndex_t column ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           channel_id
+                         ) ;
+  if (stk_el == NULL)
+
+    return -1 ;
+
+  if (stk_el->Type != TDICE_STACK_ELEMENT_CHANNEL)
+
+    return -2 ;
+
+  Temperature_t* temperature_offset
+    = tdata->Temperatures
+      + get_cell_offset_in_stack
+        (
+          stkd->Dimensions, stk_el->LayersOffset,
+          get_number_of_rows(stkd->Dimensions) - 1, 0
+        ) ;
+
+  for
+  (
+    column = 0 ;
+    column < get_number_of_columns (stkd->Dimensions) ;
+    column++
+  )
+    if (is_channel_column(column) == TRUE_V)
+
+    *outlet_temperature++ = *temperature_offset++ ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int get_cell_temperature
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  LayerIndex_t      layer,
+  RowIndex_t        row,
+  ColumnIndex_t     column,
+  Temperature_t*    cell_temperature
+)
+{
+  GridDimension_t id = get_cell_offset_in_stack
+                       (
+                         stkd->Dimensions,
+                         layer, row, column
+                       );
+
+  if (id < 0 || id > get_number_of_cells(stkd->Dimensions))
+
+    return -1;
+
+  *cell_temperature = tdata->Temperatures [ id ] ;
+
+  return 0 ;
+}
+
+/******************************************************************************/
+
+int print_thermal_map
+(
+  StackDescription* stkd,
+  ThermalData*      tdata,
+  String_t          stack_element_id,
+  String_t          file_name
+)
+{
+  FILE* output_file ;
+  RowIndex_t row;
+  ColumnIndex_t column ;
+  Quantity_t layer_offset ;
+  StackElement* stk_el = find_stack_element_in_list
+                         (
+                           stkd->StackElementsList,
+                           stack_element_id
+                         ) ;
+  if (stk_el == NULL)
+    return -1 ;
+
+  output_file = fopen (file_name, "w") ;
+  if (output_file == NULL)
+  {
+    perror (file_name) ;
+    return -2 ;
+  }
+
+  layer_offset = stk_el->LayersOffset ;
+
+  if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
+    layer_offset += stk_el->Pointer.Die->SourceLayer->LayersOffset ;
+
+  Temperature_t* temperature_offset
+    = tdata->Temperatures
+      + get_cell_offset_in_stack (stkd->Dimensions, layer_offset, 0, 0) ;
+
+  for
+  (
+    row = 0 ;
+    row < get_number_of_rows (stkd->Dimensions) ;
+    row++
+  )
+  {
+    for
+    (
+      column = 0 ;
+      column < get_number_of_columns (stkd->Dimensions) ;
+      column++, temperature_offset++
+    )
+      fprintf(output_file, "%7.3f  ", *temperature_offset) ;
+
+    fprintf(output_file, "\n") ;
+  }
+
+  fclose (output_file) ;
+
+  return 0 ;
 }

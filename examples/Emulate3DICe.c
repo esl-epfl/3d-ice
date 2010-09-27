@@ -44,34 +44,32 @@ main(int argc, char** argv)
   StackDescription stkd  ;
   ThermalData      tdata ;
 
-  // Checks if there is the argument file to process
+  // Checks if there are the all the arguments
+  ////////////////////////////////////////////////////////////////////////////
 
-  if (argc != 2)
+  if (argc != 4)
   {
-    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]);
+    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]);
     return EXIT_FAILURE;
   }
 
-  // Init StackDescription
+  // Init StackDescription and parse the input file
+  ////////////////////////////////////////////////////////////////////////////
 
   init_stack_description (&stkd) ;
-
-  // Fill StackDescription using the argument file
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
   {
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
   }
-  // print_dimensions (stdout, "dim: ", stkd.Dimensions) ;
 
-  // Init thermal data
+  // Init thermal data and fill it using the StackDescription
+  ////////////////////////////////////////////////////////////////////////////
 
-  init_thermal_data (&tdata, 300.00, 0.002, 0.020) ;
+  init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
 
-  // Fill thermal data using the stack description data
-
-  if (fill_thermal_data  (&tdata, &stkd) != 0)
+  if (fill_thermal_data (&tdata, &stkd) != 0)
   {
     fprintf(stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
@@ -81,10 +79,11 @@ main(int argc, char** argv)
 
   // Alloc memory to store 1 temperature value for each floorplan element
   // in the floorplan on die "die2"
+  ////////////////////////////////////////////////////////////////////////////
 
   Quantity_t counter;
   Quantity_t nfloorplanelements
-    = get_number_of_floorplan_elements_of_floorplan (&stkd, "die2") ;
+    = get_number_of_floorplan_elements (&stkd, "die2") ;
 
   if (nfloorplanelements < 0)
   {
@@ -109,6 +108,7 @@ main(int argc, char** argv)
   // for every floorplan element composing die "die2" and the temperature
   // of the liquid leaving the channel layer at the first channel.
   // The do { } while () ; loop prints the temperatures at all the time points.
+  ////////////////////////////////////////////////////////////////////////////
 
   Temperature_t outlet;
   clock_t Time = clock();
@@ -117,11 +117,9 @@ main(int argc, char** argv)
   {
     // get max temperatures
 
-    if ( get_all_max_temperatures_of_floorplan
-         (
-           &stkd, "die2",
-           tdata.Temperatures, max_results
-         ) != 0 )
+    if ( get_all_max_temperatures_of_floorplan (&stkd, &tdata,
+                                                "die2", max_results)
+         != 0 )
     {
       printf ("error getting max temps\n") ;
       break ;
@@ -129,11 +127,9 @@ main(int argc, char** argv)
 
     // get outlet temperature
 
-    if ( get_temperature_of_channel_outlet
-         (
-           &stkd, "channel1", 0,
-           tdata.Temperatures, &outlet
-         ) != 0 )
+    if ( get_temperature_of_channel_outlet (&stkd, &tdata,
+                                            "channel1", 0, &outlet)
+         != 0 )
     {
       printf ("error getting oultet temp\n") ;
       break ;
@@ -146,23 +142,21 @@ main(int argc, char** argv)
       printf("%7.3f  ", max_results[counter]) ;
     printf("  %7.3f\n", outlet) ;
   }
-  //while (emulate_slot (&tdata, &stkd) != 1) ;
-  while (emulate_step (&tdata, &stkd) != 2) ;
+  while (emulate_slot (&tdata, &stkd) != 1) ;
+  //while (emulate_step (&tdata, &stkd) != 2) ;
 
   fprintf (stdout, "emulation took %.3f sec\n",
            ( (double)clock() - Time ) / CLOCKS_PER_SEC );
 
   // At the end of emulation, creates the thermal map of the channel layer
+  ////////////////////////////////////////////////////////////////////////////
 
-  if ( print_thermal_map
-       (
-         &stkd, tdata.Temperatures,
-         "channel1", "channel1_map.txt"
-       ) != 0 )
+  if ( print_thermal_map (&stkd, &tdata, "channel1", "channel1_map.txt") != 0 )
 
       printf ("error chanel thermal map\n") ;
 
   // free all data
+  ////////////////////////////////////////////////////////////////////////////
 
   free                   (max_results) ;
   free_thermal_data      (&tdata) ;
