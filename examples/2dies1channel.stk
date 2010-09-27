@@ -1,6 +1,10 @@
 material silicon : 
-   thermal conductivity       1.30e-4 ;
-   volumetric heat capacity   1.63566e-12 ;
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.63566e-12 ;
+
+material beol:
+   thermal conductivity	    2.25e-6;
+   volumetric heat capacity 2.1745e-12;
 
 //environment heat sink :
 //  heat transfer coefficient 15.0e-9 ;
@@ -18,7 +22,7 @@ channel:
 
    wall material silicon ;
 
-   coolant flow rate                        0.48 ;
+   coolant flow rate                        48.0 ;
    coolant heat transfer coefficient side   2.7132e-08,
                                      top    5.7132e-08,
                                      bottom 4.7132e-08 ;
@@ -27,23 +31,24 @@ channel:
 
 
 die bottomdie :
-
-   layer  48 silicon ;
-   source  2 silicon ;
-
+	layer 	 12	beol;
+	source	  2	silicon ;
+	layer	 48	silicon;
+	layer	100	silicon ;
+	
 die topdie :
 	
-   source  2 silicon;
-   layer  48 silicon;
+	source	 2	silicon ;
+	layer	48	silicon;
 
 stack:
 
    die     die2     topdie    floorplan "four_elements.flp" ;
    channel channel1 ;
-   die     die1     bottomdie floorplan "single_element.flp" ;
+   die     die1     bottomdie floorplan "four_elements.flp" ;
 
 dimensions :
 
-  chip length 100 , width  10100 ;
-  cell length  10 , width    100 ;
+  chip length 10000 , width  10000 ;
+  cell length    50 , width    200 ;
 
