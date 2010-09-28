@@ -38,6 +38,7 @@
 
 3DICE_LIBNAME   = 3D-ICE
 3DICE_VERSION   = 1.0
+3DICE_RELEASE   = $(3DICE_LIBNAME)-$(3DICE_VERSION)
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include
 3DICE_FLEX      = $(3DICE_MAIN)/flex
@@ -60,22 +61,6 @@
 3DICE_BISON_O   = $(3DICE_BISON_Y:.y=.o)
 3DICE_BISON_D   = $(3DICE_BISON_Y:.y=.d)
 
-3DICE_INCLUDE_H = $(3DICE_INCLUDE)/channel.h                \
-                  $(3DICE_INCLUDE)/conductances.h           \
-                  $(3DICE_INCLUDE)/conventional_heat_sink.h \
-                  $(3DICE_INCLUDE)/die.h                    \
-                  $(3DICE_INCLUDE)/dimensions.h             \
-                  $(3DICE_INCLUDE)/floorplan_element.h      \
-                  $(3DICE_INCLUDE)/floorplan.h              \
-                  $(3DICE_INCLUDE)/layer.h                  \
-                  $(3DICE_INCLUDE)/material.h               \
-                  $(3DICE_INCLUDE)/powers_queue.h           \
-                  $(3DICE_INCLUDE)/stack_description.h      \
-                  $(3DICE_INCLUDE)/stack_element.h          \
-                  $(3DICE_INCLUDE)/system_matrix.h          \
-                  $(3DICE_INCLUDE)/thermal_data.h           \
-                  $(3DICE_INCLUDE)/types.h
-
 3DICE_SOURCES_C = $(3DICE_SOURCES)/channel.c                \
                   $(3DICE_SOURCES)/conductances.c           \
                   $(3DICE_SOURCES)/conventional_heat_sink.c \
@@ -94,7 +79,7 @@
 3DICE_SOURCES_O = $(3DICE_SOURCES_C:.c=.o)
 3DICE_SOURCES_D = $(3DICE_SOURCES_C:.c=.d)
 
-3DICE_LIB_A     = $(3DICE_LIB)/lib$(3DICE_LIBNAME)-$(3DICE_VERSION).a
+3DICE_LIB_A     = $(3DICE_LIB)/lib$(3DICE_RELEASE).a
 
 3DICE_LIB_O     = $(3DICE_FLEX_O) $(3DICE_BISON_O) $(3DICE_SOURCES_O)
 
