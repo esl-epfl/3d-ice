@@ -1,7 +1,7 @@
  ##############################################################################
  # Makefile "3D-ICE/Makefile"                                                 #
  #                                                                            #
- # This file is part of 3D-ICE 1.0 (beta).                                    #
+ # This file is part of 3D-ICE, version 1.0 .                                 #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -36,7 +36,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib examples clean
+.PHONY: all lib examples clean archive
 
 all: lib examples
 
@@ -48,6 +48,29 @@ lib:
 
 examples: lib
 	cd $(3DICE_EXAMPLES) ; make ;
+
+archive:
+	@cd .. ; tar cpzfv $(3DICE_LIBNAME)-$(3DICE_VERSION).tar.gz    \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_BISON))/Makefile \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_BISON_Y))        \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/CHANGELOG                            \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/COPYING                              \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/doc/3D-ICE-User_Guide.pdf            \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/doc/3D-ICE-ICCAD2010.pdf             \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/examples/2dies1channel.stk           \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/examples/Emulate3DICe.c              \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/examples/FillThermalData.c           \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/examples/four_elements.flp           \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/examples/Makefile                    \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_FLEX))/Makefile  \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_FLEX_L))         \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_INCLUDE_H))      \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_LIB))/Makefile   \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/Makefile                             \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/makefile.def                         \
+	$(3DICE_LIBNAME)-$(3DICE_VERSION)/README                               \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_SOURCES))/Makefile  \
+	$(subst ./,$(3DICE_LIBNAME)-$(3DICE_VERSION)/,$(3DICE_SOURCES_C))	
 
 clean:
 	cd $(3DICE_FLEX)       ; make clean ;

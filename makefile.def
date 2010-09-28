@@ -1,7 +1,7 @@
  ##############################################################################
  # Makefile "3D-ICE/makefile.def"                                             #
  #                                                                            #
- # This file is part of 3D-ICE 1.0 (beta).                                    #
+ # This file is part of 3D-ICE, version 1.0 .                                 #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -37,7 +37,7 @@
  ##############################################################################
 
 3DICE_LIBNAME   = 3D-ICE
-3DICE_VERSION   = 1.0-beta
+3DICE_VERSION   = 1.0
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include
 3DICE_FLEX      = $(3DICE_MAIN)/flex
@@ -73,7 +73,6 @@
                   $(3DICE_INCLUDE)/stack_description.h      \
                   $(3DICE_INCLUDE)/stack_element.h          \
                   $(3DICE_INCLUDE)/system_matrix.h          \
-                  $(3DICE_INCLUDE)/system_vector.h          \
                   $(3DICE_INCLUDE)/thermal_data.h           \
                   $(3DICE_INCLUDE)/types.h
 
@@ -148,3 +147,4 @@ RMFLAGS   = -vf
 	     -e '/^$$/ d'       \
              -e 's/$$/ :/' < $*.dd >> $*.d
 	@rm -f $*.dd
+
