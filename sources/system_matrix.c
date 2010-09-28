@@ -93,16 +93,16 @@ void free_system_matrix (SystemMatrix* matrix)
 
 Quantity_t add_solid_column
 (
-  Dimensions*          dimensions,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  EnvironmentHeatSink* environmentheatsink,
-  LayerIndex_t         current_layer,
-  RowIndex_t           current_row,
-  ColumnIndex_t        current_column,
-  ColumnIndex_t*       column_pointers,
-  RowIndex_t*          row_indices,
-  SystemMatrixValue_t* values
+  Dimensions*           dimensions,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  ConventionalHeatSink* conventionalheatsink,
+  LayerIndex_t          current_layer,
+  RowIndex_t            current_row,
+  ColumnIndex_t         current_column,
+  ColumnIndex_t*        column_pointers,
+  RowIndex_t*           row_indices,
+  SystemMatrixValue_t*  values
 )
 {
   Conductance_t        conductance      = 0.0 ;
@@ -282,7 +282,7 @@ Quantity_t add_solid_column
   }
   else
   {
-    if (environmentheatsink != NULL)
+    if (conventionalheatsink != NULL)
 
       diagonal_value += conductances->Top ;
   }

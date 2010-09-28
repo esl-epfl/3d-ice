@@ -32,109 +32,69 @@
  * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#ifndef _3DICE_CONVENTIONAL_HEAT_SINK_H_
+#define _3DICE_CONVENTIONAL_HEAT_SINK_H_
 
-#include "environment_heat_sink.h"
-
-/******************************************************************************/
-
-void init_environment_heat_sink (EnvironmentHeatSink* environmentheatsink)
+#ifdef __cplusplus
+extern "C"
 {
-  environmentheatsink->EnvironmentHTC = 0.0 ;
-  environmentheatsink->EnvironmentT   = 0.0 ;
-}
-
-/******************************************************************************/
-
-EnvironmentHeatSink* alloc_and_init_environment_heat_sink (void)
-{
-  EnvironmentHeatSink* environmentheatsink
-
-    = (EnvironmentHeatSink*) malloc ( sizeof(EnvironmentHeatSink) ) ;
-
-  if (environmentheatsink != NULL)
-
-    init_environment_heat_sink (environmentheatsink) ;
-
-  return environmentheatsink ;
-}
-
-/******************************************************************************/
-
-void free_environment_heat_sink (EnvironmentHeatSink* environmentheatsink)
-{
-  free (environmentheatsink) ;
-}
-
-/******************************************************************************/
-
-void print_environment_heat_sink
-(
-  FILE*                stream,
-  String_t             prefix,
-  EnvironmentHeatSink* environmentheatsink
-)
-{
-  fprintf(stream,
-    "%sEnvironment Heat Sink\n",            prefix) ;
-  fprintf(stream,
-    "%s  Environement HTC %.5e\n",          prefix,
-                                            environmentheatsink->EnvironmentHTC) ;
-  fprintf(stream,
-    "%s  Environment temperature   %.4e\n", prefix,
-                                            environmentheatsink->EnvironmentT) ;
-}
-
-/******************************************************************************/
-
-void add_sources_enviroment_heat_sink
-(
-  EnvironmentHeatSink* environmentheatsink,
-  Dimensions*          dimensions,
-  Source_t*            sources,
-  Conductances*        conductances,
-  LayerIndex_t         layer
-)
-{
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
-  Quantity_t offset = get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
-
-#ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "current_layer = %d\tadd_sources_enviroment_heat_sink\n", layer) ;
 #endif
 
-  sources      += offset;
-  conductances += offset ;
+#include <stdio.h>
 
-  for
+#include "types.h"
+#include "conductances.h"
+
+/******************************************************************************/
+
+  typedef struct
+  {
+    /* The heat transfert coefficent */
+
+    AmbientHTC_t AmbientHTC ;
+
+    /* The temperarute of the environment in [K] */
+
+    Temperature_t AmbientTemperature ;
+
+  } ConventionalHeatSink ;
+
+/******************************************************************************/
+
+  void init_environment_heat_sink (ConventionalHeatSink* conventionalheatsink) ;
+
+/******************************************************************************/
+
+  ConventionalHeatSink* alloc_and_init_conventional_heat_sink (void) ;
+
+/******************************************************************************/
+
+  void free_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink) ;
+
+/******************************************************************************/
+
+  void print_conventional_heat_sink
   (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++ ,
-      sources++ ,
-      conductances++
-    )
-    {
-
-      *sources += environmentheatsink->EnvironmentT * conductances->Top ;
-
-#ifdef PRINT_SOURCES
-        fprintf (stderr,
-          "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e -> %.5e\n",
-          layer, row, column,
-          get_cell_offset_in_stack (dimensions, layer, row, column),
-          environmentheatsink->EnvironmentT, conductances->Top, *sources);
-#endif
-    }
-}
+    FILE*                 stream,
+    String_t              prefix,
+    ConventionalHeatSink* conventionalheatsink
+  ) ;
 
 /******************************************************************************/
+
+  void add_sources_conventional_heat_sink
+  (
+    ConventionalHeatSink* conventionalheatsink,
+    Dimensions*           dimensions,
+    Source_t*             sources,
+    Conductances*         conductances,
+    LayerIndex_t          layer
+  ) ;
+
+/******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _3DICE_CONVENTIONAL_HEAT_SINK_H_ */

@@ -82,11 +82,11 @@ void fill_conductances_bottom_solid_cell
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
   ThermalConductivity_t thermal_conductivity,
-  EnvironmentHTC_t      environment_heat_transfer_coefficient
+  AmbientHTC_t          ambient_htc
 )
 {
   /* To avoid unused parameter warning message */
-  (void) environment_heat_transfer_coefficient;
+  (void) ambient_htc ;
 
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
@@ -130,11 +130,11 @@ void fill_conductances_central_solid_cell
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
   ThermalConductivity_t thermal_conductivity,
-  EnvironmentHTC_t      environment_heat_transfer_coefficient
+  AmbientHTC_t          ambient_htc
 )
 {
   /* To avoid unused parameter warning message */
-  (void) environment_heat_transfer_coefficient;
+  (void) ambient_htc ;
 
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
@@ -177,11 +177,11 @@ void fill_conductances_top_solid_cell
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
   ThermalConductivity_t thermal_conductivity,
-  EnvironmentHTC_t      environment_heat_transfer_coefficient
+  AmbientHTC_t          ambient_htc
 )
 {
   /* To avoid unused parameter warning message */
-  (void) environment_heat_transfer_coefficient;
+  (void) ambient_htc ;
 
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
@@ -225,7 +225,7 @@ void fill_conductances_top_solid_cell_ehtc
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
   ThermalConductivity_t thermal_conductivity,
-  EnvironmentHTC_t      environment_heat_transfer_coefficient
+  AmbientHTC_t          ambient_htc
 )
 {
   conductances->North = conductances->South
@@ -243,12 +243,11 @@ void fill_conductances_top_solid_cell_ehtc
   conductances->Top
     = (
         (Conductance_t) 2 * thermal_conductivity
-          * environment_heat_transfer_coefficient
-          * cell_length * cell_width
+          * ambient_htc * cell_length * cell_width
       )
       /
       (
-        cell_height * environment_heat_transfer_coefficient
+        cell_height * ambient_htc
         +
         (Conductance_t) 2 * thermal_conductivity
       ) ;

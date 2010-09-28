@@ -84,7 +84,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    EnvironmentHTC_t       environment_heat_transfer_coefficient
+    AmbientHTC_t           ambient_htc
   ) ;
 
 /******************************************************************************/
@@ -102,7 +102,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    EnvironmentHTC_t       environment_heat_transfer_coefficient
+    AmbientHTC_t           ambient_htc
   ) ;
 
 /******************************************************************************/
@@ -120,7 +120,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    EnvironmentHTC_t       environment_heat_transfer_coefficient
+    AmbientHTC_t           ambient_htc
   ) ;
 
 /******************************************************************************/
@@ -138,7 +138,7 @@ extern "C"
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    EnvironmentHTC_t       environment_heat_transfer_coefficient
+    AmbientHTC_t           ambient_htc
   ) ;
 
 /******************************************************************************/

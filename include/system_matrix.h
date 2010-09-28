@@ -83,16 +83,16 @@ extern "C"
 
   Quantity_t add_solid_column
   (
-    Dimensions*          dimensions,
-    Conductances*        conductances,
-    Capacity_t*          capacities,
-    EnvironmentHeatSink* environmentheatsink,
-    LayerIndex_t         current_layer,
-    RowIndex_t           current_row,
-    ColumnIndex_t        current_column,
-    ColumnIndex_t*       column_pointers,
-    RowIndex_t*          row_indices,
-    SystemMatrixValue_t* values
+    Dimensions*           dimensions,
+    Conductances*         conductances,
+    Capacity_t*           capacities,
+    ConventionalHeatSink* conventionalheatsink,
+    LayerIndex_t          current_layer,
+    RowIndex_t            current_row,
+    ColumnIndex_t         current_column,
+    ColumnIndex_t*        column_pointers,
+    RowIndex_t*           row_indices,
+    SystemMatrixValue_t*  values
   ) ;
 
 /******************************************************************************/
@@ -100,7 +100,7 @@ extern "C"
   Quantity_t add_liquid_column
   (
     Dimensions*          dimensions,
-    Conductances* conductances,
+    Conductances*        conductances,
     Capacity_t*          capacities,
     LayerIndex_t         current_layer,
     RowIndex_t           current_row,

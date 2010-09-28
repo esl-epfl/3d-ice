@@ -48,7 +48,7 @@ extern "C"
 #include "stack_element.h"
 #include "dimensions.h"
 #include "conductances.h"
-#include "environment_heat_sink.h"
+#include "conventional_heat_sink.h"
 
 /******************************************************************************/
 
@@ -73,7 +73,7 @@ extern "C"
     /* Information (if present) about the heat dissipation */
     /* throught the top surface                            */
 
-    EnvironmentHeatSink* EnvironmentHeatSink;
+    ConventionalHeatSink* ConventionalHeatSink;
 
     /* The list of stack elements componing the 3Dstack */
 

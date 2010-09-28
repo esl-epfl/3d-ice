@@ -126,17 +126,18 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 ","                          return yytext[0] ;
 ";"                          return yytext[0] ;
 
+"ambient"                    return AMBIENT ;
 "bottom"                     return BOTTOM ;
 "capacity"                   return CAPACITY ;
 "cell"                       return CELL ;
 "channel"                    return CHANNEL ;
 "chip"                       return CHIP ;
 "coefficient"                return COEFFICIENT ;
+"conventional"               return CONVENTIONAL ;
 "coolant"                    return COOLANT ;
 "conductivity"               return CONDUCTIVITY ;
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
-"environment"                return ENVIRONMENT ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
 "flow"                       return FLOW ;

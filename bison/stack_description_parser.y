@@ -77,6 +77,7 @@
 %type <stack_element_p> stack_element
 %type <stack_element_p> stack_elements
 
+%token AMBIENT               "keyword ambient"
 %token CHANNEL               "keyword channel"
 %token CHIP                  "keyword chip"
 %token CELL                  "keyword cell"
@@ -107,7 +108,7 @@
 %token STACK                 "keyword stack"
 %token VOLUMETRIC            "keywork volumetric"
 %token CAPACITY              "keyword capacity"
-%token ENVIRONMENT           "keyword environment"
+%token CONVENTIONAL          "keyword conventional"
 %token SINK                  "keywork sink"
 %token SIDE                  "keyword side"
 %token TOP                   "keyword top"
@@ -165,7 +166,7 @@ stack_description_file
     environment_heat_sink
     channel
     {
-      if (stkd->Channel == NULL && stkd->EnvironmentHeatSink == NULL)
+      if (stkd->Channel == NULL && stkd->ConventionalHeatSink == NULL)
 
         fprintf(stderr,
                 "Warning: both ambient heat sink and channels are absent.\n") ;
@@ -272,13 +273,13 @@ material
 environment_heat_sink
 
   : /* empty */
-  | ENVIRONMENT HEAT SINK ':'
+  | CONVENTIONAL HEAT SINK ':'
         HEAT TRANSFER COEFFICIENT DVALUE ';'
-        TEMPERATURE               DVALUE ';'
+        AMBIENT TEMPERATURE       DVALUE ';'
     {
-      stkd->EnvironmentHeatSink = alloc_and_init_environment_heat_sink() ;
+      stkd->ConventionalHeatSink = alloc_and_init_conventional_heat_sink() ;
 
-      if (stkd->EnvironmentHeatSink == NULL)
+      if (stkd->ConventionalHeatSink == NULL)
       {
         stack_description_error
         (
@@ -287,8 +288,8 @@ environment_heat_sink
         YYABORT ;
       }
 
-      stkd->EnvironmentHeatSink->EnvironmentHTC = $8 ;
-      stkd->EnvironmentHeatSink->EnvironmentT   = $11 ;
+      stkd->ConventionalHeatSink->AmbientHTC = $8 ;
+      stkd->ConventionalHeatSink->AmbientTemperature = $12 ;
     }
   ;
 

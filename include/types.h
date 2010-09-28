@@ -65,7 +65,7 @@ extern "C"
   typedef double CoolantHTC_t ;
   typedef double CoolantVHC_t ;
   typedef double CoolantFR_t ;
-  typedef double EnvironmentHTC_t ;
+  typedef double AmbientHTC_t ;
 
   typedef struct
   {

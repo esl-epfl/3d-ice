@@ -128,11 +128,11 @@ Die* find_die_in_list (Die* list, String_t id)
 
 Conductances* fill_conductances_die
 (
-  Die*                 die,
-  Conductances*        conductances,
-  Dimensions*          dimensions,
-  EnvironmentHeatSink* environmentheatsink,
-  LayerIndex_t         current_layer
+  Die*                  die,
+  Conductances*         conductances,
+  Dimensions*           dimensions,
+  ConventionalHeatSink* conventionalheatsink,
+  LayerIndex_t          current_layer
 )
 {
   Layer* layer ;
@@ -153,7 +153,7 @@ Conductances* fill_conductances_die
                      layer,
                      conductances,
                      dimensions,
-                     environmentheatsink,
+                     conventionalheatsink,
                      current_layer + layer->LayersOffset
                    ) ;
 
@@ -262,15 +262,15 @@ Source_t* fill_sources_die
 
 Quantity_t fill_system_matrix_die
 (
-  Die*                 die,
-  Dimensions*          dimensions,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  EnvironmentHeatSink* environmentheatsink,
-  LayerIndex_t         current_layer,
-  ColumnIndex_t*       column_pointers,
-  RowIndex_t*          row_indices,
-  SystemMatrixValue_t* values
+  Die*                  die,
+  Dimensions*           dimensions,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  ConventionalHeatSink* conventionalheatsink,
+  LayerIndex_t          current_layer,
+  ColumnIndex_t*        column_pointers,
+  RowIndex_t*           row_indices,
+  SystemMatrixValue_t*  values
 )
 {
   Layer* layer ;
@@ -303,7 +303,7 @@ Quantity_t fill_system_matrix_die
               layer,
 #             endif
               dimensions, conductances, capacities,
-              environmentheatsink,
+              conventionalheatsink,
               current_layer + layer->LayersOffset,
               column_pointers, row_indices, values
             ) ;

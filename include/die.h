@@ -46,7 +46,7 @@ extern "C"
 #include "layer.h"
 #include "conductances.h"
 #include "floorplan.h"
-#include "environment_heat_sink.h"
+#include "conventional_heat_sink.h"
 
 /******************************************************************************/
 
@@ -108,11 +108,11 @@ extern "C"
 
   Conductances* fill_conductances_die
   (
-    Die*                 die,
-    Conductances*        conductances,
-    Dimensions*          dimensions,
-    EnvironmentHeatSink* environmentheatsink,
-    LayerIndex_t         current_layer
+    Die*                  die,
+    Conductances*         conductances,
+    Dimensions*           dimensions,
+    ConventionalHeatSink* conventionalheatsink,
+    LayerIndex_t          current_layer
   ) ;
 
 /******************************************************************************/
@@ -145,15 +145,15 @@ extern "C"
 
   Quantity_t fill_system_matrix_die
   (
-    Die*                 die,
-    Dimensions*          dimensions,
-    Conductances*        conductances,
-    Capacity_t*          capacities,
-    EnvironmentHeatSink* environmentheatsink,
-    LayerIndex_t         current_layer,
-    ColumnIndex_t*       column_pointers,
-    RowIndex_t*          row_indices,
-    SystemMatrixValue_t* values
+    Die*                  die,
+    Dimensions*           dimensions,
+    Conductances*         conductances,
+    Capacity_t*           capacities,
+    ConventionalHeatSink* conventionalheatsink,
+    LayerIndex_t          current_layer,
+    ColumnIndex_t*        column_pointers,
+    RowIndex_t*           row_indices,
+    SystemMatrixValue_t*  values
   ) ;
 
 /******************************************************************************/

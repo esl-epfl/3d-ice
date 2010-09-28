@@ -48,13 +48,13 @@ static void align_stack_elements    (StackDescription* stkd) ;
 
 void init_stack_description (StackDescription* stkd)
 {
-  stkd->FileName            = NULL ;
-  stkd->MaterialsList       = NULL ;
-  stkd->Channel             = NULL ;
-  stkd->DiesList            = NULL ;
-  stkd->EnvironmentHeatSink = NULL ;
-  stkd->StackElementsList   = NULL ;
-  stkd->Dimensions          = NULL ;
+  stkd->FileName             = NULL ;
+  stkd->MaterialsList        = NULL ;
+  stkd->Channel              = NULL ;
+  stkd->DiesList             = NULL ;
+  stkd->ConventionalHeatSink = NULL ;
+  stkd->StackElementsList    = NULL ;
+  stkd->Dimensions           = NULL ;
 }
 
 /******************************************************************************/
@@ -98,13 +98,13 @@ int fill_stack_description
 
 void free_stack_description (StackDescription* stkd)
 {
-  free_materials_list        (stkd->MaterialsList) ;
-  free_channel               (stkd->Channel) ;
-  free_dies_list             (stkd->DiesList) ;
-  free_environment_heat_sink (stkd->EnvironmentHeatSink) ;
-  free_stack_elements_list   (stkd->StackElementsList) ;
-  free_dimensions            (stkd->Dimensions) ;
-  free                       (stkd->FileName) ;
+  free_materials_list         (stkd->MaterialsList) ;
+  free_channel                (stkd->Channel) ;
+  free_dies_list              (stkd->DiesList) ;
+  free_conventional_heat_sink (stkd->ConventionalHeatSink) ;
+  free_stack_elements_list    (stkd->StackElementsList) ;
+  free_dimensions             (stkd->Dimensions) ;
+  free                        (stkd->FileName) ;
 }
 
 /******************************************************************************/
@@ -120,9 +120,9 @@ void print_stack_description
 
   print_materials_list (stream, prefix, stkd->MaterialsList) ;
 
-  if (stkd->EnvironmentHeatSink != NULL)
+  if (stkd->ConventionalHeatSink != NULL)
 
-    print_environment_heat_sink (stream, prefix, stkd->EnvironmentHeatSink) ;
+    print_conventional_heat_sink (stream, prefix, stkd->ConventionalHeatSink) ;
 
   if (stkd->Channel != NULL)
 
@@ -242,7 +242,7 @@ void fill_conductances_stack_description
                          stack_element->Pointer.Die,
                          conductances,
                          stkd->Dimensions,
-                         stkd->EnvironmentHeatSink,
+                         stkd->ConventionalHeatSink,
                          stack_element->LayersOffset
                        ) ;
         break ;
@@ -254,7 +254,7 @@ void fill_conductances_stack_description
                          stack_element->Pointer.Layer,
                          conductances,
                          stkd->Dimensions,
-                         stkd->EnvironmentHeatSink,
+                         stkd->ConventionalHeatSink,
                          stack_element->LayersOffset
                        ) ;
         break ;
@@ -456,13 +456,13 @@ void fill_sources_stack_description
 
     } /* switch stack_element->Type */
 
-  if (stkd->EnvironmentHeatSink != NULL)
+  if (stkd->ConventionalHeatSink != NULL)
   {
     if (last_stack_element->Type == TDICE_STACK_ELEMENT_DIE)
 
-        add_sources_enviroment_heat_sink
+        add_sources_conventional_heat_sink
         (
-          stkd->EnvironmentHeatSink,
+          stkd->ConventionalHeatSink,
           stkd->Dimensions,
           sources,
           conductances,
@@ -472,9 +472,9 @@ void fill_sources_stack_description
 
     else if (last_stack_element->Type == TDICE_STACK_ELEMENT_LAYER)
 
-        add_sources_enviroment_heat_sink
+        add_sources_conventional_heat_sink
         (
-          stkd->EnvironmentHeatSink,
+          stkd->ConventionalHeatSink,
           stkd->Dimensions,
           sources,
           conductances,
@@ -532,7 +532,7 @@ void fill_system_matrix_stack_description
                 (
                   stack_element->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
-                  stkd->EnvironmentHeatSink,
+                  stkd->ConventionalHeatSink,
                   stack_element->LayersOffset,
                   column_pointers, row_indices, values
                 ) ;
@@ -546,7 +546,7 @@ void fill_system_matrix_stack_description
                   stack_element->Pointer.Layer,
 #                 endif
                   stkd->Dimensions, conductances, capacities,
-                  stkd->EnvironmentHeatSink,
+                  stkd->ConventionalHeatSink,
                   stack_element->LayersOffset,
                   column_pointers, row_indices, values
                 ) ;

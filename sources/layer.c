@@ -100,11 +100,11 @@ void print_layers_list (FILE* stream, String_t prefix, Layer* list)
 
 Conductances*   fill_conductances_layer
 (
-  Layer*               layer,
-  Conductances*        conductances,
-  Dimensions*          dimensions,
-  EnvironmentHeatSink* environmentheatsink,
-  LayerIndex_t         current_layer
+  Layer*                layer,
+  Conductances*         conductances,
+  Dimensions*           dimensions,
+  ConventionalHeatSink* conventionalheatsink,
+  LayerIndex_t          current_layer
 )
 {
   RowIndex_t    row ;
@@ -123,7 +123,7 @@ Conductances*   fill_conductances_layer
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
     ThermalConductivity_t  thermal_conductivity,
-    EnvironmentHTC_t       environment_heat_transfer_coefficient
+    AmbientHTC_t           ambient_htc
   );
 
   if (current_layer == 0)
@@ -132,7 +132,7 @@ Conductances*   fill_conductances_layer
 
   else if (current_layer == get_number_of_layers(dimensions) - 1)
 
-    if (environmentheatsink == NULL)
+    if (conventionalheatsink == NULL)
 
       fill_conductances = &fill_conductances_top_solid_cell;
 
@@ -174,8 +174,8 @@ Conductances*   fill_conductances_layer
         get_cell_width  (dimensions),
         layer->Height,
         layer->Material->ThermalConductivity,
-        environmentheatsink == NULL ? (EnvironmentHTC_t) 0
-                                    : environmentheatsink->EnvironmentHTC
+        conventionalheatsink == NULL ? (AmbientHTC_t) 0
+                                     : conventionalheatsink->AmbientHTC
       ) ;
 
   return conductances ;
@@ -359,16 +359,16 @@ Source_t* fill_sources_empty_layer
 Quantity_t fill_system_matrix_layer
 (
 # ifdef PRINT_SYSTEM_MATRIX
-  Layer*               layer,
+  Layer*                layer,
 # endif
-  Dimensions*          dimensions,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  EnvironmentHeatSink* environmentheatsink,
-  LayerIndex_t         current_layer,
-  ColumnIndex_t*       column_pointers,
-  RowIndex_t*          row_indices,
-  SystemMatrixValue_t* values
+  Dimensions*           dimensions,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  ConventionalHeatSink* conventionalheatsink,
+  LayerIndex_t          current_layer,
+  ColumnIndex_t*        column_pointers,
+  RowIndex_t*           row_indices,
+  SystemMatrixValue_t*  values
 )
 {
   RowIndex_t row ;
@@ -405,7 +405,7 @@ Quantity_t fill_system_matrix_layer
       added = add_solid_column
               (
                 dimensions, conductances, capacities,
-                environmentheatsink,
+                conventionalheatsink,
                 current_layer, row, column,
                 column_pointers, row_indices, values
               ) ;
