@@ -26,10 +26,13 @@
  *          Thomas Brunschwiler                                               *
  *          David Atienza                                                     *
  *                                                                            *
+ * For any comment, suggestion or request  about 3D-ICE, please  register and *
+ * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *                                                                            *
+ *                                                                            *
  * EPFL-STI-IEL-ESL                                                           *
- * Batiment ELG, ELG 130                                                      *
- * Station 11                                           3d-ice@listes.epfl.ch *
- * 1015 Lausanne, Switzerland                  http://esl.epfl.ch/3d-ice.html *
+ * Batiment ELG, ELG 130                Mail : 3d-ice@listes.epfl.ch          *
+ * Station 11                                  (SUBSCRIPTION IS NECESSARY)    *
+ * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
 #include "stack_description.h"
