@@ -1,6 +1,4 @@
  ##############################################################################
- # Makefile "3D-ICE/flex/Makefile"                                            #
- #                                                                            #
  # This file is part of 3D-ICE, version 1.0 .                                 #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
