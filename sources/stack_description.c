@@ -390,8 +390,6 @@ void fill_sources_stack_description
 )
 {
   StackElement* stack_element      = NULL ;
-  StackElement* last_stack_element = NULL;
-  Source_t*     tmp_sources        = sources ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -405,7 +403,6 @@ void fill_sources_stack_description
   (
     stack_element = stkd->StackElementsList ;
     stack_element != NULL ;
-    last_stack_element = stack_element,
     stack_element      = stack_element->Next
   )
 
@@ -413,35 +410,45 @@ void fill_sources_stack_description
     {
       case TDICE_STACK_ELEMENT_DIE :
 
-        tmp_sources = fill_sources_die
-                      (
-#                       ifdef PRINT_SOURCES
-                        stack_element->LayersOffset,
-#                       endif
-                        stack_element->Pointer.Die,
-                        stack_element->Floorplan,
-                        tmp_sources,
-                        stkd->Dimensions
-                      ) ;
+        sources = fill_sources_die
+                  (
+                    stack_element->LayersOffset,
+                    stack_element->Pointer.Die,
+                    stkd->ConventionalHeatSink,
+                    conductances,
+                    stack_element->Floorplan,
+                    sources,
+                    stkd->Dimensions
+                  ) ;
 
         break ;
 
       case TDICE_STACK_ELEMENT_LAYER :
 
-        tmp_sources += get_layer_area (stkd->Dimensions) ;
+        sources = fill_sources_empty_layer
+                  (
+#                   ifdef PRINT_SOURCES
+                    stack_element->Pointer.Layer,
+#                   endif
+                    stack_element->LayersOffset,
+                    stkd->ConventionalHeatSink,
+                    conductances,
+                    sources,
+                    stkd->Dimensions
+                  ) ;
         break ;
 
       case TDICE_STACK_ELEMENT_CHANNEL :
 
-        tmp_sources = fill_sources_channel
-                      (
-#                       ifdef PRINT_SOURCES
-                        stack_element->LayersOffset,
-#                       endif
-                        stkd->Channel,
-                        tmp_sources,
-                        stkd->Dimensions
-                      ) ;
+        sources = fill_sources_channel
+                  (
+#                   ifdef PRINT_SOURCES
+                    stack_element->LayersOffset,
+#                   endif
+                    stkd->Channel,
+                    sources,
+                    stkd->Dimensions
+                  ) ;
         break ;
 
       case TDICE_STACK_ELEMENT_NONE :
@@ -456,32 +463,6 @@ void fill_sources_stack_description
         return ;
 
     } /* switch stack_element->Type */
-
-  if (stkd->ConventionalHeatSink != NULL)
-  {
-    if (last_stack_element->Type == TDICE_STACK_ELEMENT_DIE)
-
-        add_sources_conventional_heat_sink
-        (
-          stkd->ConventionalHeatSink,
-          stkd->Dimensions,
-          sources,
-          conductances,
-          last_stack_element->LayersOffset
-          + last_stack_element->Pointer.Die->NLayers
-        ) ;
-
-    else if (last_stack_element->Type == TDICE_STACK_ELEMENT_LAYER)
-
-        add_sources_conventional_heat_sink
-        (
-          stkd->ConventionalHeatSink,
-          stkd->Dimensions,
-          sources,
-          conductances,
-          last_stack_element->LayersOffset
-        ) ;
-  }
 }
 
 /******************************************************************************/

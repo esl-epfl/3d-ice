@@ -261,12 +261,14 @@ Capacity_t* fill_capacities_layer
 Source_t* fill_sources_active_layer
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t current_layer,
-  Layer*       layer,
+  Layer*                layer,
 # endif
-  Floorplan*   floorplan,
-  Source_t*    sources,
-  Dimensions*  dimensions
+  LayerIndex_t          current_layer,
+  ConventionalHeatSink* conventionalheatsink,
+  Conductances*         conductances,
+  Floorplan*            floorplan,
+  Source_t*             sources,
+  Dimensions*           dimensions
 )
 {
   RowIndex_t        row ;
@@ -331,6 +333,18 @@ Source_t* fill_sources_active_layer
     pop_from_powers_queue (flp_el->PowerValues) ;
   }
 
+  if ( current_layer == (get_number_of_layers(dimensions) - 1)
+       && conventionalheatsink != NULL )
+
+    add_sources_conventional_heat_sink
+    (
+      conventionalheatsink,
+      dimensions,
+      sources,
+      conductances,
+      current_layer
+    ) ;
+
   return sources + get_layer_area (dimensions) ;
 }
 
@@ -339,11 +353,13 @@ Source_t* fill_sources_active_layer
 Source_t* fill_sources_empty_layer
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t         current_layer,
-  Layer*               layer,
+  Layer*                layer,
 # endif
-  Source_t*            sources,
-  Dimensions*          dimensions
+  LayerIndex_t          current_layer,
+  ConventionalHeatSink* conventionalheatsink,
+  Conductances*         conductances,
+  Source_t*             sources,
+  Dimensions*           dimensions
 )
 {
 #ifdef PRINT_SOURCES
@@ -351,6 +367,18 @@ Source_t* fill_sources_empty_layer
     "current_layer = %d\tfill_sources_empty_layer    %s\n",
     current_layer, layer->Material->Id) ;
 #endif
+
+  if ( current_layer == (get_number_of_layers(dimensions) - 1)
+       && conventionalheatsink != NULL )
+
+    fill_sources_conventional_heat_sink
+    (
+      conventionalheatsink,
+      dimensions,
+      sources,
+      conductances,
+      current_layer
+    ) ;
 
   return sources + get_layer_area (dimensions) ;
 }

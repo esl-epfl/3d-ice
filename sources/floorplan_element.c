@@ -240,7 +240,7 @@ void get_max_temperature_floorplan_element
     for
     (
       column = floorplan_element->SW_Column ;
-      column < floorplan_element->NE_Column ;
+      column <= floorplan_element->NE_Column ;
       column++
     )
       *max_temperature
@@ -277,7 +277,7 @@ void get_min_temperature_floorplan_element
     for
     (
       column = floorplan_element->SW_Column ;
-      column < floorplan_element->NE_Column ;
+      column <= floorplan_element->NE_Column ;
       column++
     )
       *min_temperature
@@ -314,7 +314,7 @@ void get_avg_temperature_floorplan_element
     for
     (
       column = floorplan_element->SW_Column ;
-      column < floorplan_element->NE_Column ;
+      column <= floorplan_element->NE_Column ;
       column++,
       counter++
     )
@@ -357,7 +357,7 @@ void get_min_avg_max_temperatures_floorplan_element
     for
     (
       column = floorplan_element->SW_Column ;
-      column < floorplan_element->NE_Column ;
+      column <= floorplan_element->NE_Column ;
       column++, counter++
     )
     {

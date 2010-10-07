@@ -553,7 +553,7 @@ stack
 
       if (found_channel == 0 && stkd->Channel != NULL)
 
-        fprintf (stderr, "channel section declared but not used") ;
+        fprintf (stderr, "Warning: channel section declared but not used\n") ;
 
       // Reset for the next parsing ...
       last_stack_element = TDICE_STACK_ELEMENT_NONE ;

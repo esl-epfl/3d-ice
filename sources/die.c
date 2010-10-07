@@ -207,16 +207,16 @@ Capacity_t* fill_capacities_die
 
 Source_t* fill_sources_die
 (
-# ifdef PRINT_SOURCES
-  LayerIndex_t current_layer,
-# endif
-  Die*         die,
-  Floorplan*   floorplan,
-  Source_t*    sources,
-  Dimensions*  dimensions
+  LayerIndex_t          current_layer,
+  Die*                  die,
+  ConventionalHeatSink* conventionalheatsink,
+  Conductances*         conductances,
+  Floorplan*            floorplan,
+  Source_t*             sources,
+  Dimensions*           dimensions
 )
 {
-  Layer* layer ;
+  Layer* layer = NULL ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -236,9 +236,11 @@ Source_t* fill_sources_die
       sources = fill_sources_active_layer
                 (
 #                 ifdef PRINT_SOURCES
-                  current_layer + layer->LayersOffset,
                   layer,
 #                 endif
+                  current_layer + layer->LayersOffset,
+                  conventionalheatsink,
+                  conductances,
                   floorplan,
                   sources,
                   dimensions
@@ -249,9 +251,11 @@ Source_t* fill_sources_die
       sources = fill_sources_empty_layer
                 (
 #                 ifdef PRINT_SOURCES
-                  current_layer + layer->LayersOffset,
                   layer,
 #                 endif
+                  current_layer + layer->LayersOffset,
+                  conventionalheatsink,
+                  conductances,
                   sources,
                   dimensions
                 ) ;

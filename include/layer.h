@@ -126,12 +126,14 @@ extern "C"
   Source_t* fill_sources_active_layer
   (
 #   ifdef PRINT_SOURCES
-    LayerIndex_t      current_layer,
-    Layer*            layer,
+    Layer*                layer,
 #   endif
-    Floorplan*        floorplan,
-    Source_t*         sources,
-    Dimensions*       dimensions
+    LayerIndex_t          current_layer,
+    ConventionalHeatSink* conventionalheatsink,
+    Conductances*         conductances,
+    Floorplan*            floorplan,
+    Source_t*             sources,
+    Dimensions*           dimensions
   ) ;
 
 /******************************************************************************/
@@ -139,11 +141,13 @@ extern "C"
   Source_t* fill_sources_empty_layer
   (
 #   ifdef PRINT_SOURCES
-    LayerIndex_t current_layer,
-    Layer*       layer,
+    Layer*                layer,
 #   endif
-    Source_t*    sources,
-    Dimensions*  dimensions
+    LayerIndex_t          current_layer,
+    ConventionalHeatSink* conventionalheatsink,
+    Conductances*         conductances,
+    Source_t*             sources,
+    Dimensions*           dimensions
   ) ;
 
 /******************************************************************************/

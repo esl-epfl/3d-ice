@@ -83,6 +83,17 @@ extern "C"
 
 /******************************************************************************/
 
+  void fill_sources_conventional_heat_sink
+  (
+    ConventionalHeatSink* conventionalheatsink,
+    Dimensions*           dimensions,
+    Source_t*             sources,
+    Conductances*         conductances,
+    LayerIndex_t          layer
+  ) ;
+
+/******************************************************************************/
+
   void add_sources_conventional_heat_sink
   (
     ConventionalHeatSink* conventionalheatsink,

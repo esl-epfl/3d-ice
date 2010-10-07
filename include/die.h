@@ -131,15 +131,15 @@ extern "C"
 
 /******************************************************************************/
 
-  Source_t*      fill_sources_die
+  Source_t*               fill_sources_die
   (
-#   ifdef PRINT_SOURCES
-    LayerIndex_t current_layer,
-#   endif
-    Die*         die,
-    Floorplan*   floorplan,
-    Source_t*    sources,
-    Dimensions*  dimensions
+    LayerIndex_t          current_layer,
+    Die*                  die,
+    ConventionalHeatSink* conventionalheatsink,
+    Conductances*         conductances,
+    Floorplan*            floorplan,
+    Source_t*             sources,
+    Dimensions*           dimensions
   ) ;
 
 /******************************************************************************/
