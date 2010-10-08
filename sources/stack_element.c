@@ -43,13 +43,13 @@
 void
 init_stack_element (StackElement* stack_element)
 {
-  stack_element->Type          = TDICE_STACK_ELEMENT_NONE ;
+  stack_element->Type          = STACKELEMENT_I ;
   stack_element->Pointer.Layer = NULL ;
   stack_element->Pointer.Die   = NULL ;
   stack_element->Floorplan     = NULL ;
-  stack_element->Id            = NULL ;
-  stack_element->NLayers       = 0 ;
-  stack_element->LayersOffset  = 0 ;
+  stack_element->Id            = STRING_I ;
+  stack_element->NLayers       = GRIDDIMENSION_I ;
+  stack_element->LayersOffset  = GRIDDIMENSION_I ;
   stack_element->Next          = NULL ;
 }
 
@@ -87,7 +87,7 @@ void free_stack_element (StackElement* stack_element)
 
 void free_stack_elements_list (StackElement* list)
 {
-  StackElement* next ;
+  StackElement* next = NULL ;
 
   for ( ; list != NULL; list = next)
   {

@@ -50,9 +50,9 @@ extern int floorplan_parse
 
 void init_floorplan (Floorplan* floorplan)
 {
-  floorplan->FileName          = NULL ;
-  floorplan->NElements         = 0 ;
-  floorplan->ElementsList      = NULL ;
+  floorplan->FileName     = STRING_I   ;
+  floorplan->NElements    = QUANTITY_I ;
+  floorplan->ElementsList = NULL       ;
 }
 
 /******************************************************************************/
@@ -170,9 +170,10 @@ Bool_t align_to_grid
   Dimensions*       dimensions
 )
 {
-  CellDimension_t cx, cy ;
-  GridDimension_t column ;
-  GridDimension_t row ;
+  CellDimension_t cx     = CELLDIMENSION_I ;
+  CellDimension_t cy     = CELLDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
 
   /* West side */
 

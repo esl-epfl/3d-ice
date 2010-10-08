@@ -59,6 +59,10 @@ extern "C"
 
     String_t Id ;
 
+    /* The number of layer composing the die */
+
+    GridDimension_t NLayers ;
+
     /* The list of layers composing the die (from bottom to top) */
 
     Layer* LayersList ;
@@ -66,10 +70,6 @@ extern "C"
     /* Pointer to the source layer */
 
     Layer* SourceLayer ;
-
-    /* The number of layer composing the die */
-
-    GridDimension_t NLayers ;
 
     /* To collect dies in a linked list */
 

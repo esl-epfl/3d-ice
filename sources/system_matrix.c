@@ -106,12 +106,12 @@ Quantity_t add_solid_column
   SystemMatrixValue_t*  values
 )
 {
-  Conductance_t        conductance      = 0.0 ;
-  SystemMatrixValue_t  diagonal_value   = 0.0 ;
+  SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
+  SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
   SystemMatrixValue_t* diagonal_pointer = NULL ;
-  Quantity_t           added            = 0 ;
+  Quantity_t           added            = QUANTITY_I ;
 
-  GridDimension_t current_cell
+  GridDimension_t      current_cell
     = get_cell_offset_in_stack (dimensions, current_layer,
                                             current_row,
                                             current_column) ;
@@ -319,12 +319,12 @@ Quantity_t add_liquid_column
   SystemMatrixValue_t*  values
 )
 {
-  Conductance_t        conductance      = 0.0 ;
-  SystemMatrixValue_t  diagonal_value   = 0.0 ;
+  SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
+  SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
   SystemMatrixValue_t* diagonal_pointer = NULL ;
-  Quantity_t           added            = 0 ;
+  Quantity_t           added            = QUANTITY_I ;
 
-  GridDimension_t current_cell
+  GridDimension_t      current_cell
     = get_cell_offset_in_stack (dimensions, current_layer,
                                             current_row,
                                             current_column) ;

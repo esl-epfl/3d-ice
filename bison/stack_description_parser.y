@@ -48,14 +48,13 @@
 
 %union
 {
-   double       double_v ;
-   String_t     char_p ;
-
-   Material*      material_p ;
-   Die*           die_p ;
-   Layer*         layer_p ;
-   StackElement*  stack_element_p ;
-   CoolantHTCs_t  coolanthtcs_v ;
+   double        double_v ;
+   String_t      char_p ;
+   Material*     material_p ;
+   Die*          die_p ;
+   Layer*        layer_p ;
+   StackElement* stack_element_p ;
+   CoolantHTCs_t coolanthtcs_v ;
 }
 
 %type <double_v> first_wall_length
@@ -115,7 +114,7 @@
 %token TOP                   "keyword top"
 %token BOTTOM                "keyword bottom"
 
-%token <double_v> DVALUE     "float value"
+%token <double_v> DVALUE     "double value"
 %token <char_p>   IDENTIFIER "identifier"
 %token <char_p>   PATH       "path to file"
 
@@ -134,14 +133,13 @@ void stack_description_error
   String_t          message
 ) ;
 
-static StackElement_t last_stack_element = TDICE_STACK_ELEMENT_NONE ;
-static int found_die     = 0 ;
-static int found_channel = 0 ;
-
-static int tmp_first_wall_length = 0 ;
-static int tmp_last_wall_length = 0 ;
-static int tmp_wall_length = 0 ;
-static int tmp_channel_length = 0 ;
+static StackElement_t  last_stack_element    = STACKELEMENT_I ;
+static Bool_t          found_die             = FALSE_V ;
+static Bool_t          found_channel         = FALSE_V ;
+static CellDimension_t tmp_first_wall_length = CELLDIMENSION_I ;
+static CellDimension_t tmp_last_wall_length  = CELLDIMENSION_I ;
+static CellDimension_t tmp_wall_length       = CELLDIMENSION_I ;
+static CellDimension_t tmp_channel_length    = CELLDIMENSION_I ;
 %}
 
 %name-prefix "stack_description_"
@@ -330,8 +328,8 @@ channel
 
       tmp_channel_length             = $8  ;
       tmp_wall_length                = $12 ;
-      tmp_first_wall_length          = ($14 == 0) ? $12 : $14 ;
-      tmp_last_wall_length           = ($15 == 0) ? $12 : $15 ;
+      tmp_first_wall_length          = ($14 > 0.0) ? $14 : $12 ;
+      tmp_last_wall_length           = ($15 > 0.0) ? $15 : $12 ;
 
       stkd->Channel->CoolantFR       = ( $23 * 1e+12 ) / 60.0 ;
       stkd->Channel->CoolantHTCs     = $25 ;
@@ -527,8 +525,8 @@ stack
       {
         // Reset for the next parsing ...
         last_stack_element = TDICE_STACK_ELEMENT_NONE ;
-        found_die          = 0 ;
-        found_channel      = 0 ;
+        found_die          = FALSE_V ;
+        found_channel      = FALSE_V ;
 
         stack_description_error
         (
@@ -537,12 +535,12 @@ stack
         YYABORT ;
       }
 
-      if (found_die == 0)
+      if (found_die == FALSE_V)
       {
         // Reset for the next parsing ...
         last_stack_element = TDICE_STACK_ELEMENT_NONE ;
-        found_die          = 0 ;
-        found_channel      = 0 ;
+        found_die          = FALSE_V ;
+        found_channel      = FALSE_V ;
 
         stack_description_error
         (
@@ -551,14 +549,14 @@ stack
         YYABORT ;
       }
 
-      if (found_channel == 0 && stkd->Channel != NULL)
+      if (found_channel == FALSE_V && stkd->Channel != NULL)
 
         fprintf (stderr, "Warning: channel section declared but not used\n") ;
 
       // Reset for the next parsing ...
       last_stack_element = TDICE_STACK_ELEMENT_NONE ;
-      found_die          = 0 ;
-      found_channel      = 0 ;
+      found_die          = FALSE_V ;
+      found_channel      = FALSE_V ;
     }
   ;
 
@@ -713,7 +711,7 @@ stack_element
       stack_element->Id      = $2 ;
       stack_element->NLayers = 1 ;
 
-      found_channel = 1 ;
+      found_channel = TRUE_V ;
       last_stack_element = TDICE_STACK_ELEMENT_CHANNEL ;
     }
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'
@@ -774,7 +772,7 @@ stack_element
 
       free($3) ;
 
-      found_die = 1 ;
+      found_die = TRUE_V ;
       last_stack_element = TDICE_STACK_ELEMENT_DIE ;
     }
   ;
@@ -878,13 +876,13 @@ dimensions
   ;
 
 first_wall_length
-  : /* empty */                  { $$ = 0 ;  }
-  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ; }
+  : /* empty */                  { $$ = 0.0 ; }
+  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ;  }
   ;
 
 last_wall_length
-  : /* empty */                 { $$ = 0 ;  }
-  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ; }
+  : /* empty */                 { $$ = 0.0 ; }
+  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ;  }
   ;
 
 %%

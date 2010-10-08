@@ -42,10 +42,10 @@
 
 void init_layer (Layer* layer)
 {
-  layer->Height       = 0.0  ;
-  layer->LayersOffset = 0    ;
-  layer->Material     = NULL ;
-  layer->Next         = NULL ;
+  layer->Height       = CELLDIMENSION_I ;
+  layer->LayersOffset = GRIDDIMENSION_I ;
+  layer->Material     = NULL            ;
+  layer->Next         = NULL            ;
 }
 
 /******************************************************************************/
@@ -70,7 +70,7 @@ void free_layer (Layer* layer)
 
 void free_layers_list (Layer* list)
 {
-  Layer* next ;
+  Layer* next = NULL ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -108,8 +108,8 @@ Conductances*   fill_conductances_layer
   GridDimension_t       current_layer
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
   void (*fill_conductances)
   (
@@ -207,8 +207,8 @@ Capacity_t* fill_capacities_layer
   Time_t          delta_time
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
 #ifdef PRINT_CAPACITIES
   fprintf (stderr,
@@ -271,10 +271,10 @@ Source_t* fill_sources_active_layer
   Dimensions*           dimensions
 )
 {
-  GridDimension_t   row ;
-  GridDimension_t   column ;
-  CellDimension_t   flp_el_surface ;
-  FloorplanElement* flp_el ;
+  GridDimension_t   row            = GRIDDIMENSION_I ;
+  GridDimension_t   column         = GRIDDIMENSION_I ;
+  CellDimension_t   flp_el_surface = CELLDIMENSION_I ;
+  FloorplanElement* flp_el         = NULL ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -400,9 +400,10 @@ Quantity_t fill_system_matrix_layer
   SystemMatrixValue_t*  values
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
-  Quantity_t added, tot_added ;
+  GridDimension_t row       = GRIDDIMENSION_I ;
+  GridDimension_t column    = GRIDDIMENSION_I ;
+  Quantity_t      added     = QUANTITY_I      ;
+  Quantity_t      tot_added = QUANTITY_I      ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
@@ -412,7 +413,6 @@ Quantity_t fill_system_matrix_layer
 
   for
   (
-    tot_added = 0,
     row = 0 ;
     row < get_number_of_rows (dimensions) ;
     row++

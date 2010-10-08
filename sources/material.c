@@ -42,10 +42,10 @@
 
 void init_material (Material* material)
 {
-  material->Id                  = NULL ;
-  material->Used                = 0 ;
-  material->VolHeatCapacity     = 0.0  ;
-  material->ThermalConductivity = 0.0  ;
+  material->Id                  = STRING_I   ;
+  material->Used                = QUANTITY_I ;
+  material->VolHeatCapacity     = SOLIDVHC_I ;
+  material->ThermalConductivity = SOLIDTC_I  ;
   material->Next                = NULL ;
 }
 
@@ -72,7 +72,7 @@ void free_material (Material* material)
 
 void free_materials_list (Material* list)
 {
-  Material* next ;
+  Material* next = NULL ;
 
   for ( ; list != NULL ; list = next)
   {

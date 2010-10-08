@@ -41,22 +41,22 @@
 
 void init_dimensions (Dimensions* dimensions)
 {
-  dimensions->Cell.FirstWallLength = 0.0 ;
-  dimensions->Cell.LastWallLength  = 0.0 ;
-  dimensions->Cell.WallLength      = 0.0 ;
-  dimensions->Cell.ChannelLength   = 0.0 ;
+  dimensions->Cell.FirstWallLength = CELLDIMENSION_I ;
+  dimensions->Cell.LastWallLength  = CELLDIMENSION_I ;
+  dimensions->Cell.WallLength      = CELLDIMENSION_I ;
+  dimensions->Cell.ChannelLength   = CELLDIMENSION_I ;
 
-  dimensions->Cell.Width           = 0.0 ;
-  dimensions->Cell.Length          = 0.0 ;
+  dimensions->Cell.Width           = CELLDIMENSION_I ;
+  dimensions->Cell.Length          = CELLDIMENSION_I ;
 
-  dimensions->Grid.NLayers     = 0 ;
-  dimensions->Grid.NRows       = 0 ;
-  dimensions->Grid.NColumns    = 0 ;
-  dimensions->Grid.NCells      = 0 ;
-  dimensions->Grid.NNz         = 0 ;
+  dimensions->Grid.NLayers     = GRIDDIMENSION_I ;
+  dimensions->Grid.NRows       = GRIDDIMENSION_I ;
+  dimensions->Grid.NColumns    = GRIDDIMENSION_I ;
+  dimensions->Grid.NCells      = GRIDDIMENSION_I ;
+  dimensions->Grid.NNz         = GRIDDIMENSION_I ;
 
-  dimensions->Chip.Length      = 0.0;
-  dimensions->Chip.Width       = 0.0;
+  dimensions->Chip.Length      = CHIPDIMENSION_I ;
+  dimensions->Chip.Width       = CHIPDIMENSION_I ;
 
   dimensions->StackHasChannel = FALSE_V ;
 }

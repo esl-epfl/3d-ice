@@ -132,17 +132,17 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
 "values"              return VALUES ;
 
 {identifier}          {
-                        yylval->string = strdup(yytext) ;
+                        yylval->identifier = strdup(yytext) ;
                         return IDENTIFIER ;
                       }
 
 {s_integer}           {
-                        yylval->d_value = atof(yytext) ;
+                        yylval->power_value = atof(yytext) ;
                         return DVALUE ;
                       }
 
 {double}              {
-                        yylval->d_value = atof(yytext) ;
+                        yylval->power_value = atof(yytext) ;
                         return DVALUE ;
                       }
 

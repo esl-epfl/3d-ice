@@ -41,8 +41,8 @@
 
 void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
 {
-  conventionalheatsink->AmbientHTC = 0.0 ;
-  conventionalheatsink->AmbientTemperature = 0.0 ;
+  conventionalheatsink->AmbientHTC         = AMBIENTHTC_I  ;
+  conventionalheatsink->AmbientTemperature = TEMPERATURE_I ;
 }
 
 /******************************************************************************/
@@ -94,8 +94,8 @@ void fill_sources_conventional_heat_sink
   GridDimension_t       layer
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -142,8 +142,8 @@ void add_sources_conventional_heat_sink
   GridDimension_t       layer
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,

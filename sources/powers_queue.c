@@ -41,9 +41,9 @@
 
 void init_powers_queue (PowersQueue* queue)
 {
-  queue->Head = NULL ;
-  queue->Tail = NULL ;
-  queue->Length = 0 ;
+  queue->Head   = NULL       ;
+  queue->Tail   = NULL       ;
+  queue->Length = QUANTITY_I ;
 }
 
 /******************************************************************************/
@@ -127,7 +127,7 @@ void pop_from_powers_queue (PowersQueue* queue)
 
 void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue)
 {
-  PowerNode* tmp;
+  PowerNode* tmp = NULL ;
   fprintf(stream, "%s [%d] ", prefix, queue->Length);
   for (tmp = queue->Head ; tmp != NULL ; tmp = tmp->Next)
     fprintf(stream, "%6.4f ", tmp->Value) ;
@@ -138,7 +138,7 @@ void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue)
 
 void print_formatted_powers_queue (FILE* stream, PowersQueue* queue)
 {
-  PowerNode* tmp;
+  PowerNode* tmp = NULL ;
   for (tmp = queue->Head ; tmp != NULL ; tmp = tmp->Next)
     fprintf(stream, "%6.4f ", tmp->Value) ;
 }

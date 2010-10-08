@@ -41,8 +41,8 @@
 
 %union
 {
-  double                   d_value ;
-  char                     *string ;
+  Power_t  power_value ;
+  String_t identifier  ;
 
   FloorplanElement  *p_floorplan_element ;
   PowersQueue       *p_powers_queue ;
@@ -59,23 +59,22 @@ void floorplan_error
   char const* msg
 ) ;
 
-static int first_length_found = 0 ;
+static Quantity_t first_queue_length = QUANTITY_I ;
 %}
 
 %type <p_floorplan_element> floorplan_element ;
 %type <p_floorplan_element> floorplan_element_list ;
 %type <p_powers_queue>      power_values_list ;
 
-%destructor { free($$) ; } <string>
+%destructor { free($$) ; } <identifier>
 
 %token POSITION   "keyword position"
 %token DIMENSION  "keyword dimension"
 %token POWER      "keyword power"
 %token VALUES     "keyword values"
 
-//%token <i_value> UIVALUE       "integer value"
-%token <d_value> DVALUE        "double value"
-%token <string>  IDENTIFIER    "identifier"
+%token <power_value> DVALUE     "double value"
+%token <identifier>  IDENTIFIER "identifier"
 
 %name-prefix "floorplan_"
 %output      "floorplan_parser.c"
@@ -168,10 +167,10 @@ floorplan_element
       floorplan_element->Width       = $11 ;
       floorplan_element->PowerValues = $15 ;
 
-      if (first_length_found == 0)
-        first_length_found = $15->Length ;
+      if (first_queue_length == 0)
+        first_queue_length = $15->Length ;
       else
-        if ($15->Length < first_length_found)
+        if ($15->Length < first_queue_length)
         {
           floorplan_error (floorplan, dimensions, scanner, "Missing power value!") ;
           YYABORT ;
@@ -197,8 +196,8 @@ power_values_list
 
   | power_values_list ',' DVALUE
     {
-      if (first_length_found != 0
-          && $1->Length + 1 > first_length_found)
+      if (first_queue_length != 0
+          && $1->Length + 1 > first_queue_length)
 
         fprintf (stderr, "%s:%d: Warning: discarding value %f\n",
                  floorplan->FileName, floorplan_get_lineno(scanner), $3);

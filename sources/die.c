@@ -42,11 +42,11 @@
 
 void init_die (Die* die)
 {
-  die->Id          = NULL ;
-  die->LayersList  = NULL ;
-  die->NLayers     = 0    ;
-  die->SourceLayer = NULL ;
-  die->Next        = NULL ;
+  die->Id          = STRING_I        ;
+  die->NLayers     = GRIDDIMENSION_I ;
+  die->LayersList  = NULL            ;
+  die->SourceLayer = NULL            ;
+  die->Next        = NULL            ;
 }
 
 /******************************************************************************/
@@ -73,7 +73,7 @@ void free_die (Die* die)
 
 void free_dies_list (Die* list)
 {
-  Die* next ;
+  Die* next = NULL ;
 
   for ( ; list != NULL ; list = next)
   {
@@ -136,7 +136,7 @@ Conductances* fill_conductances_die
   GridDimension_t       current_layer
 )
 {
-  Layer* layer ;
+  Layer* layer = NULL ;
 
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_die   %s\n", die->Id) ;
@@ -174,7 +174,7 @@ Capacity_t* fill_capacities_die
   Time_t          delta_time
 )
 {
-  Layer* layer ;
+  Layer* layer = NULL ;
 
 # ifdef PRINT_CAPACITIES
   fprintf (stderr,
@@ -278,8 +278,9 @@ Quantity_t fill_system_matrix_die
   SystemMatrixValue_t*  values
 )
 {
-  Layer* layer ;
-  Quantity_t tot_added, added ;
+  Layer*     layer     = NULL ;
+  Quantity_t tot_added = QUANTITY_I ;
+  Quantity_t added     = QUANTITY_I ;
 
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "(l %2d) fill_system_matrix_die\n", current_layer) ;
@@ -287,8 +288,6 @@ Quantity_t fill_system_matrix_die
 
   for
   (
-    added     = 0 ,
-    tot_added = 0 ,
     layer     = die->LayersList ;
 
     layer != NULL ;

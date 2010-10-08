@@ -49,7 +49,7 @@ static void align_stack_elements    (StackDescription* stkd) ;
 
 void init_stack_description (StackDescription* stkd)
 {
-  stkd->FileName             = NULL ;
+  stkd->FileName             = STRING_I ;
   stkd->MaterialsList        = NULL ;
   stkd->Channel              = NULL ;
   stkd->DiesList             = NULL ;
@@ -175,10 +175,10 @@ int fill_floorplans (StackDescription* stkd)
 
 static void align_layers_in_die (StackDescription* stkd)
 {
-  Layer*          layer ;
-  GridDimension_t layer_offset ;
+  Layer*          layer        = NULL ;
+  GridDimension_t layer_offset = GRIDDIMENSION_I ;
+  Die*            die          = stkd->DiesList ;
 
-  Die* die = stkd->DiesList ;
   for ( ; die != NULL ; die = die->Next)
   {
     layer_offset = 0 ;
@@ -194,8 +194,8 @@ static void align_layers_in_die (StackDescription* stkd)
 
 static void align_stack_elements (StackDescription* stkd)
 {
-  GridDimension_t layer_counter = 0 ;
-  StackElement* stack_element = stkd->StackElementsList ;
+  GridDimension_t layer_counter = GRIDDIMENSION_I ;
+  StackElement*   stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
   {
@@ -214,7 +214,7 @@ void fill_conductances_stack_description
   Conductances*     conductances
 )
 {
-  StackElement* stack_element ;
+  StackElement* stack_element = NULL ;
 
 #ifdef PRINT_CONDUCTANCES
   fprintf
@@ -299,7 +299,7 @@ void fill_capacities_stack_description
   Time_t            delta_time
 )
 {
-  StackElement* stack_element ;
+  StackElement* stack_element = NULL ;
 
 #ifdef PRINT_CAPACITIES
   fprintf
@@ -389,7 +389,7 @@ void fill_sources_stack_description
   Conductances*     conductances
 )
 {
-  StackElement* stack_element      = NULL ;
+  StackElement* stack_element = NULL ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -477,8 +477,9 @@ void fill_system_matrix_stack_description
   SystemMatrixValue_t*  values
 )
 {
-  StackElement* stack_element ;
-  Quantity_t added, area ;
+  StackElement* stack_element = NULL ;
+  Quantity_t    added         = QUANTITY_I ;
+  Quantity_t    area          = get_layer_area (stkd->Dimensions) ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf
@@ -490,12 +491,10 @@ void fill_system_matrix_stack_description
     get_number_of_columns (stkd->Dimensions));
 #endif
 
-  *column_pointers++ = 0 ;
+  *column_pointers++ = SYSTEMMATRIXCOLUMN_I ;
 
   for
   (
-    added            = 0,
-    area             = get_layer_area (stkd->Dimensions),
     stack_element    = stkd->StackElementsList ;
     stack_element   != NULL ;
     conductances    += area * stack_element->NLayers,
@@ -602,7 +601,7 @@ Quantity_t get_number_of_floorplan_elements
 
 Quantity_t get_number_of_channel_outlets (StackDescription* stkd)
 {
-  return (get_number_of_columns(stkd->Dimensions) - 2) / 2 ;
+  return (get_number_of_columns(stkd->Dimensions) - 2) / (Quantity_t) 2 ;
 }
 
 /******************************************************************************/

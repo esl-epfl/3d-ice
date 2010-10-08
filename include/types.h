@@ -41,96 +41,142 @@ extern "C"
 {
 #endif
 
-# define FALSE_V (0)
-# define TRUE_V  (!FALSE_V)
+/******************************************************************************/
+
+  /* Boolean value */
+
+  typedef int Bool_t ;
+# define      FALSE_V (0)
+# define      TRUE_V  (!FALSE_V)
 
   /* Quantity */
 
   typedef int Quantity_t ;
+# define      QUANTITY_I 0
 
   /* String */
 
   typedef char* String_t ;
+# define        STRING_I NULL
 
-  /* Solid volumetric heat capacity */
-
-  typedef double SolidVHC_t ;
-
-  /* Solid thermal conductivity */
-
-  typedef double SolidTC_t ;
-
-  /* Grid dimension (number and index of layer, row, column) */
-
-  typedef int GridDimension_t ;
-
-  /* Cell dimension (for cell length, height, width) */
-
-  typedef double CellDimension_t ;
-
-  /* Chip dimension (for chip length, width) */
-
-# define ChipDimension_t CellDimension_t
-
-  /* Capacity */
-
-  typedef double Capacity_t ;
-
-  /* Source */
-
-  typedef double Source_t ;
-
-  /* Temperature */
-
-  typedef double Temperature_t ;
-
-  /* Power */
-
-  typedef double Power_t ;
-
-  /* Ambient heat transfer coefficient */
-
-  typedef double AmbientHTC_t ;
-
-  /* Time */
-
-  typedef double Time_t ;
+/******************************************************************************/
 
   /* Conductance */
 
   typedef double Conductance_t ;
+# define         CONDUCTANCE_I 0.0
+
+  /* Capacity */
+
+  typedef double Capacity_t ;
+# define         CAPACITY_I 0.0
+
+  /* Source */
+
+  typedef double Source_t ;
+# define         SOURCE_I 0.0
+
+  /* Power */
+
+  typedef double Power_t ;
+# define         POWER_I 0.0
+
+  /* Temperature */
+
+  typedef double Temperature_t ;
+# define         TEMPERATURE_I 0.0
+
+  /* Time */
+
+  typedef double Time_t ;
+# define         TIME_I 0.0
+
+/******************************************************************************/
+
+  /* Solid volumetric heat capacity */
+
+  typedef double SolidVHC_t ;
+# define         SOLIDVHC_I 0.0
+
+  /* Solid thermal conductivity */
+
+  typedef double SolidTC_t ;
+# define         SOLIDTC_I 0.0
+
+/******************************************************************************/
+
+  /* Ambient heat transfer coefficient */
+
+  typedef double AmbientHTC_t ;
+# define         AMBIENTHTC_I 0.0
+
+/******************************************************************************/
 
   /* Coolant heat transfer coefficient */
 
   typedef double CoolantHTC_t ;
+# define         COOLANTHTC_I 0.0
+
+  /* The collection of the coolant heat transfer coefficient */
+
+  typedef struct
+  {
+    CoolantHTC_t Side ;
+    CoolantHTC_t Top ;
+    CoolantHTC_t Bottom ;
+
+  } CoolantHTCs_t ;
 
   /* Coolant volumetric heat capacity */
 
   typedef double CoolantVHC_t ;
+# define         COOLANTVHC_I 0.0
 
   /* Coolant flow rate */
 
   typedef double CoolantFR_t ;
+# define         COOLANTFR_I 0.0
 
   /* C convection coefficient */
 
   typedef double Cconv_t ;
+# define         CCONV_I 0.0
 
-  /* boolean Value */
+/******************************************************************************/
 
-  typedef int Bool_t ;
+  /* Grid dimension (number and index of layer, row, column) */
+
+  typedef int GridDimension_t ;
+# define      GRIDDIMENSION_I 0
+
+  /* Cell dimension (for cell length, height, width) */
+
+  typedef double CellDimension_t ;
+# define         CELLDIMENSION_I 0.0
+
+  /* Chip dimension (for chip length, width) */
+
+# define ChipDimension_t CellDimension_t
+# define CHIPDIMENSION_I CELLDIMENSION_I
+
+/******************************************************************************/
 
   /* System matrix coefficients */
 
   typedef double SystemMatrixValue_t ;
+# define         SYSTEMMATRIXVALUE_I 0.0
 
   /* System matrix column indexes */
 
   typedef int SystemMatrixColumn_t ;
+# define      SYSTEMMATRIXCOLUMN_I 0
 
   /* System matrix row indexes */
 
   typedef int SystemMatrixRow_t ;
+# define      SYSTEMMATRIXROW_I 0
+
+/******************************************************************************/
 
   /* The type of a stack element */
 
@@ -143,16 +189,9 @@ extern "C"
   } ;
 
   typedef enum StackElement_t StackElement_t ;
+# define                      STACKELEMENT_I TDICE_STACK_ELEMENT_NONE
 
-  /* The collection of the coolant heat transfer coefficient */
-
-  typedef struct
-  {
-    CoolantHTC_t Side ;
-    CoolantHTC_t Top ;
-    CoolantHTC_t Bottom ;
-
-  } CoolantHTCs_t ;
+/******************************************************************************/
 
 #ifdef __cplusplus
 }

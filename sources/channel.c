@@ -42,14 +42,14 @@
 
 void init_channel (Channel* channel)
 {
-  channel->Height             = 0.0 ;
-  channel->CoolantHTCs.Side   = 0.0 ;
-  channel->CoolantHTCs.Top    = 0.0 ;
-  channel->CoolantHTCs.Bottom = 0.0 ;
-  channel->CoolantVHC         = 0.0 ;
-  channel->CoolantTIn         = 0.0 ;
-  channel->CoolantFR          = 0.0 ;
-  channel->Wall               = NULL ;
+  channel->Height             = CELLDIMENSION_I ;
+  channel->CoolantHTCs.Side   = COOLANTHTC_I    ;
+  channel->CoolantHTCs.Top    = COOLANTHTC_I    ;
+  channel->CoolantHTCs.Bottom = COOLANTHTC_I    ;
+  channel->CoolantVHC         = COOLANTVHC_I    ;
+  channel->CoolantTIn         = TEMPERATURE_I   ;
+  channel->CoolantFR          = COOLANTFR_I     ;
+  channel->Wall               = NULL            ;
 }
 
 /******************************************************************************/
@@ -132,8 +132,8 @@ Conductances* fill_conductances_channel
   Dimensions*     dimensions
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_channel %s\n", channel->Wall->Id) ;
@@ -217,8 +217,8 @@ Capacity_t* fill_capacities_channel
   Time_t          delta_time
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
 # ifdef PRINT_CAPACITIES
   fprintf (stderr,
@@ -297,8 +297,8 @@ Source_t* fill_sources_channel
   Dimensions*     dimensions
 )
 {
-  GridDimension_t row ;
-  GridDimension_t column ;
+  GridDimension_t row    = GRIDDIMENSION_I ;
+  GridDimension_t column = GRIDDIMENSION_I ;
 
   Cconv_t C = get_c_conv(get_number_of_columns (dimensions),
                          channel->CoolantVHC, channel->CoolantFR) ;
@@ -357,9 +357,10 @@ Quantity_t fill_system_matrix_channel
   SystemMatrixValue_t*  values
 )
 {
-  GridDimension_t row;
-  GridDimension_t column;
-  Quantity_t added, tot_added ;
+  GridDimension_t row       = GRIDDIMENSION_I ;
+  GridDimension_t column    = GRIDDIMENSION_I ;
+  Quantity_t      added     = QUANTITY_I      ;
+  Quantity_t      tot_added = QUANTITY_I      ;
 
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
@@ -369,7 +370,6 @@ Quantity_t fill_system_matrix_channel
 
   for
   (
-    tot_added = 0 ,
     row       = 0 ;
     row < get_number_of_rows (dimensions) ;
     row++
