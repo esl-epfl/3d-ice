@@ -42,10 +42,10 @@
 
 void init_material (Material* material)
 {
-  material->Id                  = STRING_I   ;
+  material->Id                  = STRING_I ;
   material->Used                = QUANTITY_I ;
   material->VolHeatCapacity     = SOLIDVHC_I ;
-  material->ThermalConductivity = SOLIDTC_I  ;
+  material->ThermalConductivity = SOLIDTC_I ;
   material->Next                = NULL ;
 }
 

@@ -31,15 +31,15 @@ channel:
 
 
 die bottomdie :
-	layer 	 12	beol;
+	layer 	 12	beol ;
 	source	  2	silicon ;
-	layer	 48	silicon;
+	layer	 48	silicon ;
 	layer	100	silicon ;
 	
 die topdie :
 	
 	source	 2	silicon ;
-	layer	48	silicon;
+	layer	48	silicon ;
 
 stack:
 

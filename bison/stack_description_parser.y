@@ -324,9 +324,9 @@ channel
         YYABORT ;
       }
 
-      stkd->Channel->Height          = $4  ;
+      stkd->Channel->Height          = $4 ;
 
-      tmp_channel_length             = $8  ;
+      tmp_channel_length             = $8 ;
       tmp_wall_length                = $12 ;
       tmp_first_wall_length          = ($14 > 0.0) ? $14 : $12 ;
       tmp_last_wall_length           = ($15 > 0.0) ? $15 : $12 ;
@@ -360,9 +360,9 @@ coolant_heat_transfer_coefficients
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
-      $$.Side   = $5;
-      $$.Top    = $5;
-      $$.Bottom = $5;
+      $$.Side   = $5 ;
+      $$.Top    = $5 ;
+      $$.Bottom = $5 ;
     }
   | COOLANT HEAT TRANSFER COEFFICIENT SIDE   DVALUE ','
                                       TOP    DVALUE ','
@@ -370,7 +370,7 @@ coolant_heat_transfer_coefficients
     {
       $$.Side   = $6 ;
       $$.Top    = $9 ;
-      $$.Bottom = $12;
+      $$.Bottom = $12 ;
     }
   ;
 
@@ -629,7 +629,7 @@ stack_element
 
       if (layer == NULL)
       {
-        free ($2);
+        free ($2) ;
         free ($4) ;
         free_stack_element (stack_element) ;
         stack_description_error
@@ -650,7 +650,7 @@ stack_element
 
         stack_description_error (stkd, scanner, message) ;
 
-        free ($2);
+        free ($2) ;
         free ($4) ;
         free (message) ;
         free_stack_element (stack_element) ;
@@ -754,7 +754,7 @@ stack_element
       }
 
       stack_element->NLayers = stack_element->Pointer.Die->NLayers ;
-      stack_element->Floorplan = alloc_and_init_floorplan ();
+      stack_element->Floorplan = alloc_and_init_floorplan () ;
 
       if (stack_element->Floorplan == NULL)
       {

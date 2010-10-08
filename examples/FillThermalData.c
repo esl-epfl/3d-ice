@@ -47,8 +47,8 @@ main(int argc, char** argv)
 
   if (argc != 4)
   {
-    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]);
-    return EXIT_FAILURE;
+    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]) ;
+    return EXIT_FAILURE ;
   }
 
   // Init StackDescription and parse the input file
@@ -78,7 +78,7 @@ main(int argc, char** argv)
   // Here we can do something ... emulating? printing info ??
   ////////////////////////////////////////////////////////////////////////////
 
-  // print_all_floorplans(stdout, "", &stkd);
+  // print_all_floorplans(stdout, "", &stkd) ;
 
   // This is to consume a power value (to see the effect of PRINT_SOURCES
   emulate_step(&tdata, &stkd) ;
@@ -89,5 +89,5 @@ main(int argc, char** argv)
   free_thermal_data (&tdata) ;
   free_stack_description (&stkd) ;
 
-  return EXIT_SUCCESS;
+  return EXIT_SUCCESS ;
 }

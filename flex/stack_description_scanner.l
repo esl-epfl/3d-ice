@@ -183,12 +183,12 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
                      int n = strlen(yytext) - 2 ;
                      yylval->char_p = (char *) malloc (sizeof(char) * n) ;
                      strncpy (yylval->char_p, yytext+1, n) ;
-                     return PATH;
+                     return PATH ;
                    }
 
-<ONE_LINE_COMMENT>\n              BEGIN(INITIAL);
+<ONE_LINE_COMMENT>\n              BEGIN(INITIAL) ;
 <ONE_LINE_COMMENT>.               ;
-<MULTIPLE_LINE_COMMENT>"*/"       BEGIN(INITIAL);
+<MULTIPLE_LINE_COMMENT>"*/"       BEGIN(INITIAL) ;
 <MULTIPLE_LINE_COMMENT>[^*\n]+    ;
 <MULTIPLE_LINE_COMMENT>"*"[^/]    ;
 <MULTIPLE_LINE_COMMENT>\n         ;

@@ -65,11 +65,11 @@ void init_dimensions (Dimensions* dimensions)
 
 Dimensions* alloc_and_init_dimensions (void)
 {
-  Dimensions* dimensions = (Dimensions*) malloc (sizeof (Dimensions));
+  Dimensions* dimensions = (Dimensions*) malloc (sizeof (Dimensions)) ;
 
-  if (dimensions != NULL) init_dimensions (dimensions);
+  if (dimensions != NULL) init_dimensions (dimensions) ;
 
-  return dimensions;
+  return dimensions ;
 }
 
 /******************************************************************************/
@@ -79,11 +79,11 @@ void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
   fprintf (stream,
     "%sGrid dimensions      (L x R x C) = (%d x %d x %d) -> %d nonzeroes\n",
     prefix, get_number_of_layers(dimensions), get_number_of_rows(dimensions),
-            get_number_of_columns(dimensions), dimensions->Grid.NNz);
+            get_number_of_columns(dimensions), dimensions->Grid.NNz) ;
 
   fprintf (stream,
     "%sChip dimensions          (L x W) = (%.2f x %.2f) um\n",
-    prefix, dimensions->Chip.Length, dimensions->Chip.Width);
+    prefix, dimensions->Chip.Length, dimensions->Chip.Width) ;
 
   if (dimensions->StackHasChannel == FALSE_V )
 
@@ -106,7 +106,7 @@ void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
 
 void free_dimensions (Dimensions* dimensions)
 {
-  free (dimensions);
+  free (dimensions) ;
 }
 
 /******************************************************************************/
@@ -142,7 +142,7 @@ CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 
 CellDimension_t get_cell_width (Dimensions* dimensions)
 {
-  return dimensions->Cell.Width;
+  return dimensions->Cell.Width ;
 }
 
 /******************************************************************************/

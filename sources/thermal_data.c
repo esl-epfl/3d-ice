@@ -144,7 +144,7 @@ int fill_thermal_data
     &tdata->SLUMatrix_B, tdata->Size, 1,
     tdata->Temperatures, tdata->Size,
     SLU_DN, SLU_D, SLU_GE
-  );
+  ) ;
 
   /* Alloc and set conductances */
 
@@ -238,7 +238,7 @@ int fill_thermal_data
   /* Free if malloc errors */
 
 slu_etree_fail :
-  free (tdata->SLU_PermutationMatrixC);
+  free (tdata->SLU_PermutationMatrixC) ;
 slu_perm_c_fail :
   free (tdata->SLU_PermutationMatrixR) ;
 slu_perm_r_fail :
@@ -251,7 +251,7 @@ sources_fail :
 capacities_fail :
   free (tdata->Conductances) ;
 conductances_fail :
-  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
   free (tdata->Temperatures) ;
 temperatures_fail :
   return -1 ;
@@ -275,7 +275,7 @@ void free_thermal_data (ThermalData* tdata)
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
   free_system_matrix        (&tdata->SM_A) ;
 
-  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B);
+  Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
 
   if (tdata->SLU_Options.Fact != DOFACT )
   {
@@ -296,11 +296,11 @@ Time_t get_current_time(ThermalData* tdata)
 
 int emulate_step (ThermalData* tdata, StackDescription* stkd)
 {
-  int count;
+  int count ;
 
   if (tdata->SLU_Options.Fact != FACTORED)
   {
-    fprintf (stderr, "call fill_thermal_data before emulating\n");
+    fprintf (stderr, "call fill_thermal_data before emulating\n") ;
     return -1 ;
   }
 
@@ -340,7 +340,7 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 
   if (tdata->SLU_Info < 0)
   {
-    fprintf (stderr, "Error while solving linear system\n");
+    fprintf (stderr, "Error while solving linear system\n") ;
     return tdata->SLU_Info ;
   }
 
@@ -357,7 +357,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
   if (tdata->SLU_Options.Fact != FACTORED)
   {
-    fprintf (stderr, "call fill_thermal_data before emulating\n");
+    fprintf (stderr, "call fill_thermal_data before emulating\n") ;
     return -1 ;
   }
 
@@ -395,7 +395,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
     if (tdata->SLU_Info < 0)
     {
-      fprintf (stderr, "Error while solving linear system\n");
+      fprintf (stderr, "Error while solving linear system\n") ;
       return tdata->SLU_Info ;
     }
 
@@ -870,12 +870,12 @@ int get_cell_temperature
                        (
                          stkd->Dimensions,
                          layer, row, column
-                       );
+                       ) ;
 
   if (id < (GridDimension_t) 0
       || id > get_number_of_cells(stkd->Dimensions))
 
-    return -1;
+    return -1 ;
 
   *cell_temperature = tdata->Temperatures [ id ] ;
 

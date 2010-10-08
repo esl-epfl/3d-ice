@@ -50,14 +50,14 @@ extern "C"
 
   typedef struct
   {
-    Conductance_t North;
-    Conductance_t South;
+    Conductance_t North ;
+    Conductance_t South ;
 
-    Conductance_t East;
-    Conductance_t West;
+    Conductance_t East ;
+    Conductance_t West ;
 
-    Conductance_t Top;
-    Conductance_t Bottom;
+    Conductance_t Top ;
+    Conductance_t Bottom ;
 
   } Conductances ;
 

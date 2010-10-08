@@ -66,26 +66,26 @@ int fill_stack_description
   String_t          filename
 )
 {
-  FILE*    input;
-  int      result;
-  yyscan_t scanner;
+  FILE*    input ;
+  int      result ;
+  yyscan_t scanner ;
 
-  input = fopen (filename, "r");
+  input = fopen (filename, "r") ;
   if(input == NULL)
   {
-    perror(filename);
-    return -1;
+    perror(filename) ;
+    return -1 ;
   }
 
-  stkd->FileName = strdup (filename);
+  stkd->FileName = strdup (filename) ;
 
-  stack_description_lex_init (&scanner);
-  stack_description_set_in (input, scanner);
+  stack_description_lex_init (&scanner) ;
+  stack_description_set_in (input, scanner) ;
 
-  result = stack_description_parse (stkd, scanner);
+  result = stack_description_parse (stkd, scanner) ;
 
-  stack_description_lex_destroy (scanner);
-  fclose (input);
+  stack_description_lex_destroy (scanner) ;
+  fclose (input) ;
 
   if (result == 1) return result ;
 
@@ -127,7 +127,7 @@ void print_stack_description
 
   if (stkd->Channel != NULL)
 
-    print_channel (stream, prefix, stkd->Channel);
+    print_channel (stream, prefix, stkd->Channel) ;
 
   print_dies_list (stream, prefix, stkd->DiesList) ;
 
@@ -309,7 +309,7 @@ void fill_capacities_stack_description
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions)
-  );
+  ) ;
 #endif
 
   for
@@ -396,7 +396,7 @@ void fill_sources_stack_description
     "fill_sources_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions));
+    get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
   for
@@ -488,7 +488,7 @@ void fill_system_matrix_stack_description
     "fill_system_matrix_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions));
+    get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
   *column_pointers++ = SYSTEMMATRIXCOLUMN_I ;
@@ -566,7 +566,7 @@ Quantity_t get_number_of_remaining_power_values (StackDescription* stkd)
 {
   StackElement* stk_el = stkd->StackElementsList ;
   while (stk_el != NULL && stk_el->Type != TDICE_STACK_ELEMENT_DIE)
-    stk_el = stk_el->Next;
+    stk_el = stk_el->Next ;
 
   // if stk_el == NULL then BUG !!!
 

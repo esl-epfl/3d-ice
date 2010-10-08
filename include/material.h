@@ -73,7 +73,7 @@ extern "C"
 
   };
 
-  typedef struct Material Material;
+  typedef struct Material Material ;
 
 /******************************************************************************/
 

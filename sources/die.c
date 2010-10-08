@@ -42,11 +42,11 @@
 
 void init_die (Die* die)
 {
-  die->Id          = STRING_I        ;
+  die->Id          = STRING_I ;
   die->NLayers     = GRIDDIMENSION_I ;
-  die->LayersList  = NULL            ;
-  die->SourceLayer = NULL            ;
-  die->Next        = NULL            ;
+  die->LayersList  = NULL ;
+  die->SourceLayer = NULL ;
+  die->Next        = NULL ;
 }
 
 /******************************************************************************/
@@ -89,12 +89,12 @@ void print_die (FILE* stream, String_t prefix, Die* die)
   fprintf (stream,
     "%sDie %s:\n",                prefix, die->Id) ;
   fprintf (stream,
-    "%s  Number of layers  %d\n", prefix, die->NLayers);
+    "%s  Number of layers  %d\n", prefix, die->NLayers) ;
 
   fprintf (stream,
-    "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->LayersOffset);
+    "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->LayersOffset) ;
 
-  String_t new_prefix = (String_t) malloc (sizeof(char)*(strlen(prefix) + 2));
+  String_t new_prefix = (String_t) malloc (sizeof(char)*(strlen(prefix) + 2)) ;
   // FIXME typeof(pointed by string)
 
   strcpy (new_prefix, prefix) ;
@@ -144,7 +144,7 @@ Conductances* fill_conductances_die
 
   for
   (
-    layer =  die->LayersList;
+    layer =  die->LayersList ;
     layer != NULL ;
     layer = layer->Next
   )

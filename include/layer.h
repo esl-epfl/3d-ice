@@ -73,7 +73,7 @@ extern "C"
     struct Layer* Next ;
   } ;
 
-  typedef struct Layer Layer;
+  typedef struct Layer Layer ;
 
 /******************************************************************************/
 

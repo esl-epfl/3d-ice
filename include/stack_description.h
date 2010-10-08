@@ -76,7 +76,7 @@ extern "C"
     /* Information (if present) about the heat dissipation */
     /* throught the top surface                            */
 
-    ConventionalHeatSink* ConventionalHeatSink;
+    ConventionalHeatSink* ConventionalHeatSink ;
 
     /* The list of stack elements componing the 3Dstack */
 

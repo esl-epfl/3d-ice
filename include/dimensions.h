@@ -87,9 +87,9 @@ extern "C"
 
   typedef struct
   {
-    CellDimensions Cell;
-    GridDimensions Grid;
-    ChipDimensions Chip;
+    CellDimensions Cell ;
+    GridDimensions Grid ;
+    ChipDimensions Chip ;
 
     Bool_t StackHasChannel ;
 

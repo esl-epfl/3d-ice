@@ -43,13 +43,13 @@
 void init_channel (Channel* channel)
 {
   channel->Height             = CELLDIMENSION_I ;
-  channel->CoolantHTCs.Side   = COOLANTHTC_I    ;
-  channel->CoolantHTCs.Top    = COOLANTHTC_I    ;
-  channel->CoolantHTCs.Bottom = COOLANTHTC_I    ;
-  channel->CoolantVHC         = COOLANTVHC_I    ;
-  channel->CoolantTIn         = TEMPERATURE_I   ;
-  channel->CoolantFR          = COOLANTFR_I     ;
-  channel->Wall               = NULL            ;
+  channel->CoolantHTCs.Side   = COOLANTHTC_I ;
+  channel->CoolantHTCs.Top    = COOLANTHTC_I ;
+  channel->CoolantHTCs.Bottom = COOLANTHTC_I ;
+  channel->CoolantVHC         = COOLANTVHC_I ;
+  channel->CoolantTIn         = TEMPERATURE_I ;
+  channel->CoolantFR          = COOLANTFR_I ;
+  channel->Wall               = NULL ;
 }
 
 /******************************************************************************/
@@ -359,8 +359,8 @@ Quantity_t fill_system_matrix_channel
 {
   GridDimension_t row       = GRIDDIMENSION_I ;
   GridDimension_t column    = GRIDDIMENSION_I ;
-  Quantity_t      added     = QUANTITY_I      ;
-  Quantity_t      tot_added = QUANTITY_I      ;
+  Quantity_t      added     = QUANTITY_I ;
+  Quantity_t      tot_added = QUANTITY_I ;
 
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,

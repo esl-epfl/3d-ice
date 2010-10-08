@@ -146,9 +146,9 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
                         return DVALUE ;
                       }
 
-<ONE_LINE_COMMENT>\n              BEGIN(INITIAL);
+<ONE_LINE_COMMENT>\n              BEGIN(INITIAL) ;
 <ONE_LINE_COMMENT>.               ;
-<MULTIPLE_LINE_COMMENT>"*/"       BEGIN(INITIAL);
+<MULTIPLE_LINE_COMMENT>"*/"       BEGIN(INITIAL) ;
 <MULTIPLE_LINE_COMMENT>[^*\n]+    ;
 <MULTIPLE_LINE_COMMENT>"*"[^/]    ;
 <MULTIPLE_LINE_COMMENT>\n         ;

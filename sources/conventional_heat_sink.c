@@ -41,7 +41,7 @@
 
 void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
 {
-  conventionalheatsink->AmbientHTC         = AMBIENTHTC_I  ;
+  conventionalheatsink->AmbientHTC         = AMBIENTHTC_I ;
   conventionalheatsink->AmbientTemperature = TEMPERATURE_I ;
 }
 
@@ -126,7 +126,7 @@ void fill_sources_conventional_heat_sink
           "solid  cell  |  l %2d r %4d c %4d [%6d] | = %f * %.5e = %.5e\n",
           layer, row, column,
           get_cell_offset_in_stack (dimensions, layer, row, column),
-          conventionalheatsink->AmbientTemperature, conductances->Top, *sources);
+          conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
 #endif
     }
 }
@@ -174,7 +174,7 @@ void add_sources_conventional_heat_sink
           "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
           layer, row, column,
           get_cell_offset_in_stack (dimensions, layer, row, column),
-          conventionalheatsink->AmbientTemperature, conductances->Top, *sources);
+          conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
 #endif
     }
 }

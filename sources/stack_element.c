@@ -89,7 +89,7 @@ void free_stack_elements_list (StackElement* list)
 {
   StackElement* next = NULL ;
 
-  for ( ; list != NULL; list = next)
+  for ( ; list != NULL ; list = next)
   {
     next = list->Next ;
     free_stack_element (list) ;
@@ -111,7 +111,7 @@ void print_stack_elements_list
   {
     fprintf (stream,
       "%s  Stackelement (l %-2d)\t%s\t",
-      prefix, list->LayersOffset, list->Id);
+      prefix, list->LayersOffset, list->Id) ;
 
     switch (list->Type)
     {

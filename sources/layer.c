@@ -44,8 +44,8 @@ void init_layer (Layer* layer)
 {
   layer->Height       = CELLDIMENSION_I ;
   layer->LayersOffset = GRIDDIMENSION_I ;
-  layer->Material     = NULL            ;
-  layer->Next         = NULL            ;
+  layer->Material     = NULL ;
+  layer->Next         = NULL ;
 }
 
 /******************************************************************************/
@@ -125,25 +125,25 @@ Conductances*   fill_conductances_layer
     CellDimension_t        cell_height,
     SolidTC_t              thermal_conductivity,
     AmbientHTC_t           ambient_htc
-  );
+  ) ;
 
   if (current_layer == 0)
 
-    fill_conductances = &fill_conductances_bottom_solid_cell;
+    fill_conductances = &fill_conductances_bottom_solid_cell ;
 
   else if (current_layer == get_number_of_layers(dimensions) - 1)
 
     if (conventionalheatsink == NULL)
 
-      fill_conductances = &fill_conductances_top_solid_cell;
+      fill_conductances = &fill_conductances_top_solid_cell ;
 
     else
 
-      fill_conductances = &fill_conductances_top_solid_cell_ehtc;
+      fill_conductances = &fill_conductances_top_solid_cell_ehtc ;
 
   else
 
-    fill_conductances = &fill_conductances_central_solid_cell;
+    fill_conductances = &fill_conductances_central_solid_cell ;
 
 
 #ifdef PRINT_CONDUCTANCES
@@ -402,8 +402,8 @@ Quantity_t fill_system_matrix_layer
 {
   GridDimension_t row       = GRIDDIMENSION_I ;
   GridDimension_t column    = GRIDDIMENSION_I ;
-  Quantity_t      added     = QUANTITY_I      ;
-  Quantity_t      tot_added = QUANTITY_I      ;
+  Quantity_t      added     = QUANTITY_I ;
+  Quantity_t      tot_added = QUANTITY_I ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,

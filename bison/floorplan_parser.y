@@ -42,7 +42,7 @@
 %union
 {
   Power_t  power_value ;
-  String_t identifier  ;
+  String_t identifier ;
 
   FloorplanElement  *p_floorplan_element ;
   PowersQueue       *p_powers_queue ;
@@ -160,10 +160,10 @@ floorplan_element
         YYABORT ;
       }
 
-      floorplan_element->Id          = $1  ;
-      floorplan_element->SW_X        = $4  ;
-      floorplan_element->SW_Y        = $6  ;
-      floorplan_element->Length      = $9  ;
+      floorplan_element->Id          = $1 ;
+      floorplan_element->SW_X        = $4 ;
+      floorplan_element->SW_Y        = $6 ;
+      floorplan_element->Length      = $9 ;
       floorplan_element->Width       = $11 ;
       floorplan_element->PowerValues = $15 ;
 
@@ -200,7 +200,7 @@ power_values_list
           && $1->Length + 1 > first_queue_length)
 
         fprintf (stderr, "%s:%d: Warning: discarding value %f\n",
-                 floorplan->FileName, floorplan_get_lineno(scanner), $3);
+                 floorplan->FileName, floorplan_get_lineno(scanner), $3) ;
 
       else
 

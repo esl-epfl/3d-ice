@@ -42,7 +42,7 @@
 int
 main(int argc, char** argv)
 {
-  StackDescription stkd  ;
+  StackDescription stkd ;
   ThermalData      tdata ;
 
   // Checks if there are the all the arguments
@@ -50,14 +50,14 @@ main(int argc, char** argv)
 
   if (argc != 4)
   {
-    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]);
-    return EXIT_FAILURE;
+    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]) ;
+    return EXIT_FAILURE ;
   }
 
   // Init StackDescription and parse the input file
   ////////////////////////////////////////////////////////////////////////////
 
-  fprintf (stdout, "Preparing stk data ...\n");
+  fprintf (stdout, "Preparing stk data ...\n") ;
 
   init_stack_description (&stkd) ;
 
@@ -70,7 +70,7 @@ main(int argc, char** argv)
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
 
-  fprintf (stdout, "Preparing thermal data ...\n");
+  fprintf (stdout, "Preparing thermal data ...\n") ;
 
   init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
 
@@ -86,7 +86,7 @@ main(int argc, char** argv)
   // in the floorplan on die "die2"
   ////////////////////////////////////////////////////////////////////////////
 
-  Quantity_t counter;
+  Quantity_t counter ;
   Quantity_t nfloorplanelements
     = get_number_of_floorplan_elements (&stkd, "die2") ;
 
@@ -116,7 +116,7 @@ main(int argc, char** argv)
   ////////////////////////////////////////////////////////////////////////////
 
   Temperature_t outlet, cell1, cell2 ;
-  clock_t Time = clock();
+  clock_t Time = clock() ;
 
   do
   {
@@ -155,7 +155,7 @@ main(int argc, char** argv)
     // Print results
 
     printf("%5.3fs  ", get_current_time(&tdata)) ;
-    for (counter = 0; counter < nfloorplanelements; counter++)
+    for (counter = 0 ; counter < nfloorplanelements ; counter++)
       printf("%7.3f  ", max_results[counter]) ;
     printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;
   }
@@ -163,7 +163,7 @@ main(int argc, char** argv)
   // while (emulate_slot (&tdata, &stkd) != 1) ;
 
   fprintf (stdout, "emulation took %.3f sec\n",
-           ( (double)clock() - Time ) / CLOCKS_PER_SEC );
+           ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
 
   // At the end of emulation, creates the thermal map of the channel layer
   ////////////////////////////////////////////////////////////////////////////
@@ -179,5 +179,5 @@ main(int argc, char** argv)
   free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
 
-  return EXIT_SUCCESS;
+  return EXIT_SUCCESS ;
 }

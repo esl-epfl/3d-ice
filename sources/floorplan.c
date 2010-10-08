@@ -50,16 +50,16 @@ extern int floorplan_parse
 
 void init_floorplan (Floorplan* floorplan)
 {
-  floorplan->FileName     = STRING_I   ;
+  floorplan->FileName     = STRING_I ;
   floorplan->NElements    = QUANTITY_I ;
-  floorplan->ElementsList = NULL       ;
+  floorplan->ElementsList = NULL ;
 }
 
 /******************************************************************************/
 
 Floorplan* alloc_and_init_floorplan (void)
 {
-  Floorplan* floorplan = (Floorplan* ) malloc ( sizeof(Floorplan) );
+  Floorplan* floorplan = (Floorplan* ) malloc ( sizeof(Floorplan) ) ;
 
   if (floorplan != NULL) init_floorplan (floorplan) ;
 
@@ -87,7 +87,7 @@ int fill_floorplan (Floorplan* floorplan, Dimensions* dimensions)
   if(input == NULL)
   {
     perror(floorplan->FileName) ;
-    return 1;
+    return 1 ;
   }
 
   floorplan_lex_init  (&scanner) ;
@@ -123,7 +123,7 @@ Bool_t check_intersections
   Bool_t result = FALSE_V ;
   FloorplanElement* tmp = floorplan->ElementsList ;
 
-  for ( ; tmp != NULL; tmp = tmp->Next)
+  for ( ; tmp != NULL ; tmp = tmp->Next)
 
     if (check_intersection (tmp, floorplan_element) == TRUE_V)
     {
@@ -199,7 +199,7 @@ Bool_t align_to_grid
    column ++ ;
   }
 
-  floorplan_element->NE_Column = column - 1;
+  floorplan_element->NE_Column = column - 1 ;
 
   /* Effective length */
 
@@ -213,7 +213,7 @@ Bool_t align_to_grid
 
   /* South side */
 
-  cy  = (get_cell_width (dimensions) / 2.0);
+  cy  = (get_cell_width (dimensions) / 2.0) ;
   row = 0 ;
 
   while ( cy < floorplan_element->SW_Y )
@@ -278,7 +278,7 @@ int get_max_temperature_floorplan
     dimensions,
     temperatures,
     max_temperature
-  );
+  ) ;
 
   return 0 ;
 }
@@ -310,7 +310,7 @@ int get_min_temperature_floorplan
     dimensions,
     temperatures,
     min_temperature
-  );
+  ) ;
 
   return 0 ;
 }
@@ -342,7 +342,7 @@ int get_avg_temperature_floorplan
     dimensions,
     temperatures,
     avg_temperature
-  );
+  ) ;
 
   return 0 ;
 }
@@ -376,7 +376,7 @@ int get_min_avg_max_temperatures_floorplan
     dimensions,
     temperatures,
     min_temperature, avg_temperature, max_temperature
-  );
+  ) ;
 
   return 0 ;
 }
@@ -401,7 +401,7 @@ int get_all_max_temperatures_floorplan
       dimensions,
       temperatures,
       max_temperature++
-    );
+    ) ;
 
   return 0 ;
 }
@@ -426,7 +426,7 @@ int get_all_min_temperatures_floorplan
       dimensions,
       temperatures,
       min_temperature++
-    );
+    ) ;
   }
 
   return 0 ;
@@ -452,7 +452,7 @@ int get_all_avg_temperatures_floorplan
       dimensions,
       temperatures,
       avg_temperature++
-    );
+    ) ;
 
   return 0 ;
 }
@@ -479,7 +479,7 @@ int get_all_min_avg_max_temperatures_floorplan
       dimensions,
       temperatures,
       min_temperature++, avg_temperature++, max_temperature++
-    );
+    ) ;
 
   return 0 ;
 }

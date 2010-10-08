@@ -65,7 +65,7 @@ Cconv_t get_c_conv
 {
   return (coolant_vhc * coolant_fr)
          /
-         (Cconv_t) (number_of_columns - 1 );
+         (Cconv_t) (number_of_columns - 1 ) ;
 }
 
 /******************************************************************************/
@@ -91,7 +91,7 @@ void fill_conductances_bottom_solid_cell
 
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
-      / ( cell_width / (CellDimension_t) 2);
+      / ( cell_width / (CellDimension_t) 2) ;
 
   conductances->East = conductances->West
     = (thermal_conductivity * cell_width * cell_height )
@@ -139,7 +139,7 @@ void fill_conductances_central_solid_cell
 
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
-      / ( cell_width / (CellDimension_t) 2);
+      / ( cell_width / (CellDimension_t) 2) ;
 
   conductances->East = conductances->West
     = (thermal_conductivity * cell_width * cell_height )
@@ -147,7 +147,7 @@ void fill_conductances_central_solid_cell
 
   conductances->Top = conductances->Bottom
     = (thermal_conductivity * cell_length * cell_width )
-      / (cell_height / (CellDimension_t) 2);
+      / (cell_height / (CellDimension_t) 2) ;
 
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr,
@@ -186,7 +186,7 @@ void fill_conductances_top_solid_cell
 
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
-      / ( cell_width / (CellDimension_t) 2);
+      / ( cell_width / (CellDimension_t) 2) ;
 
   conductances->East = conductances->West
     = (thermal_conductivity * cell_width * cell_height )
@@ -231,7 +231,7 @@ void fill_conductances_top_solid_cell_ehtc
 {
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
-      / ( cell_width / (CellDimension_t) 2);
+      / ( cell_width / (CellDimension_t) 2) ;
 
   conductances->East = conductances->West
     = (thermal_conductivity * cell_width * cell_height )
@@ -333,7 +333,7 @@ void fill_conductances_wall_cell
 {
   conductances->North = conductances->South
     = (thermal_conductivity * cell_length * cell_height )
-      / ( cell_width / (CellDimension_t) 2);
+      / ( cell_width / (CellDimension_t) 2) ;
 
   conductances->East = conductances->West
     = (thermal_conductivity * cell_width * cell_height )
@@ -341,7 +341,7 @@ void fill_conductances_wall_cell
 
   conductances->Top = conductances->Bottom
     = (thermal_conductivity * cell_length * cell_width )
-      / (cell_height / (CellDimension_t) 2);
+      / (cell_height / (CellDimension_t) 2) ;
 
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr,

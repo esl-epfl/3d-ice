@@ -122,7 +122,7 @@ extern "C"
     Dimensions*    dimensions,
     Temperature_t* temperatures,
     Temperature_t* max_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -133,7 +133,7 @@ extern "C"
     Dimensions*    dimensions,
     Temperature_t* temperatures,
     Temperature_t* min_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -144,7 +144,7 @@ extern "C"
     Dimensions*    dimensions,
     Temperature_t* temperatures,
     Temperature_t* avg_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -157,7 +157,7 @@ extern "C"
     Temperature_t* min_temperature,
     Temperature_t* avg_temperature,
     Temperature_t* max_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -167,7 +167,7 @@ extern "C"
     Dimensions*    dimensions,
     Temperature_t* temperatures,
     Temperature_t* max_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -177,7 +177,7 @@ extern "C"
     Dimensions*    dimensions,
     Temperature_t* temperatures,
     Temperature_t* min_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -187,7 +187,7 @@ extern "C"
     Dimensions*    dimensions,
     Temperature_t* temperatures,
     Temperature_t* avg_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 
@@ -199,7 +199,7 @@ extern "C"
     Temperature_t* min_temperature,
     Temperature_t* avg_temperature,
     Temperature_t* max_temperature
-  );
+  ) ;
 
 /******************************************************************************/
 

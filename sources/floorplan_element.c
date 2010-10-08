@@ -72,7 +72,7 @@ void init_floorplan_element (FloorplanElement* floorplan_element)
 FloorplanElement* alloc_and_init_floorplan_element (void)
 {
   FloorplanElement* floorplan_element
-    = (FloorplanElement* ) malloc ( sizeof(FloorplanElement) );
+    = (FloorplanElement* ) malloc ( sizeof(FloorplanElement) ) ;
 
   if (floorplan_element != NULL)
 
@@ -136,7 +136,7 @@ void print_formatted_floorplan_element
 {
   fprintf (stream, "%s:", floorplan_element->Id) ;
   fprintf (stream, "   position %.1f, %.1f ;\n",
-                          floorplan_element->SW_X, floorplan_element->SW_Y);
+                          floorplan_element->SW_X, floorplan_element->SW_Y) ;
   fprintf (stream, "   dimension %.1f, %.1f ;\n",
                           floorplan_element->Length,
                           floorplan_element->Width) ;
@@ -170,7 +170,7 @@ void print_formatted_floorplan_elements_list
   for ( ; list != NULL ; list = list->Next)
   {
     print_formatted_floorplan_element (stream, list) ;
-    fprintf(stream, "\n");
+    fprintf(stream, "\n") ;
   }
 }
 
