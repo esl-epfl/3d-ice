@@ -37,6 +37,7 @@
 #include <stdio.h>
 
 #include "thermal_data.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -847,7 +848,7 @@ int get_all_temperatures_of_channel_outlets
     column < get_number_of_columns (stkd->Dimensions) ;
     column++
   )
-    if (is_channel_column(column) == TRUE_V)
+    if (IS_CHANNEL_COLUMN(column) == TRUE_V)
 
     *outlet_temperature++ = *temperature_offset++ ;
 

@@ -37,9 +37,8 @@
 #include <stdio.h>
 
 #include "conductances.h"
+#include "macros.h"
 #include "system_matrix.h"
-
-#define PARALLEL(x,y)      ( (x * y) / ( x + y) )
 
 /******************************************************************************/
 

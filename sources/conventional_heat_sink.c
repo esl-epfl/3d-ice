@@ -36,6 +36,7 @@
 #include <stdlib.h>
 
 #include "conventional_heat_sink.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -94,9 +95,6 @@ void fill_sources_conventional_heat_sink
   GridDimension_t       layer
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
 #ifdef PRINT_SOURCES
   fprintf (stderr,
     "current_layer = %d\tadd_sources_conventional_heat_sink\n", layer) ;
@@ -104,21 +102,9 @@ void fill_sources_conventional_heat_sink
 
   conductances += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++ ,
-      sources++ ,
-      conductances++
-    )
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
     {
       *sources = (conventionalheatsink->AmbientTemperature * conductances->Top) ;
 #ifdef PRINT_SOURCES
@@ -128,7 +114,12 @@ void fill_sources_conventional_heat_sink
           get_cell_offset_in_stack (dimensions, layer, row, column),
           conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
 #endif
-    }
+      sources++ ;
+      conductances++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
+
 }
 
 /******************************************************************************/
@@ -142,9 +133,6 @@ void add_sources_conventional_heat_sink
   GridDimension_t       layer
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
 #ifdef PRINT_SOURCES
   fprintf (stderr,
     "current_layer = %d\tadd_sources_conventional_heat_sink\n", layer) ;
@@ -152,21 +140,9 @@ void add_sources_conventional_heat_sink
 
   conductances += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++ ,
-      sources++ ,
-      conductances++
-    )
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
     {
       *sources = (conventionalheatsink->AmbientTemperature * conductances->Top) ;
 #ifdef PRINT_SOURCES
@@ -176,7 +152,12 @@ void add_sources_conventional_heat_sink
           get_cell_offset_in_stack (dimensions, layer, row, column),
           conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
 #endif
-    }
+      sources++ ;
+      conductances++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
+
 }
 
 /******************************************************************************/

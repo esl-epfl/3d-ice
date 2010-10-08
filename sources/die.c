@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "die.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -73,13 +74,7 @@ void free_die (Die* die)
 
 void free_dies_list (Die* list)
 {
-  Die* next = NULL ;
-
-  for ( ; list != NULL ; list = next)
-  {
-    next = list->Next ;
-    free_die(list) ;
-  }
+  FREE_LIST (Die, list, free_die) ;
 }
 
 /******************************************************************************/
@@ -109,20 +104,20 @@ void print_die (FILE* stream, String_t prefix, Die* die)
 
 void print_dies_list (FILE* stream, String_t prefix, Die* list)
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (Die, die, list)
 
-    print_die (stream, prefix, list) ;
+    print_die (stream, prefix, die) ;
 }
 
 /******************************************************************************/
 
 Die* find_die_in_list (Die* list, String_t id)
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (Die, die, list)
 
-    if (strcmp(list->Id, id) == 0) break ;
+    if (strcmp(die->Id, id) == 0) break ;
 
-  return list ;
+  return die ;
 }
 
 /******************************************************************************/
@@ -136,19 +131,12 @@ Conductances* fill_conductances_die
   GridDimension_t       current_layer
 )
 {
-  Layer* layer = NULL ;
-
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_die   %s\n", die->Id) ;
 # endif
 
-  for
-  (
-    layer =  die->LayersList ;
-    layer != NULL ;
-    layer = layer->Next
-  )
-
+  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  {
     conductances = fill_conductances_layer
                    (
                      layer,
@@ -157,6 +145,8 @@ Conductances* fill_conductances_die
                      conventionalheatsink,
                      current_layer + layer->LayersOffset
                    ) ;
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
 
   return conductances ;
 }
@@ -174,21 +164,14 @@ Capacity_t* fill_capacities_die
   Time_t          delta_time
 )
 {
-  Layer* layer = NULL ;
-
 # ifdef PRINT_CAPACITIES
   fprintf (stderr,
     "current_layer = %d\tfill_capacities_die %s\n",
     current_layer, die->Id) ;
 # endif
 
-  for
-  (
-    layer = die->LayersList ;
-    layer != NULL ;
-    layer = layer->Next
-  )
-
+  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  {
     capacities = fill_capacities_layer
                  (
 #                  ifdef PRINT_CAPACITIES
@@ -199,6 +182,8 @@ Capacity_t* fill_capacities_die
                    dimensions,
                    delta_time
                  ) ;
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
 
   return capacities ;
 }
@@ -216,21 +201,14 @@ Source_t* fill_sources_die
   Dimensions*           dimensions
 )
 {
-  Layer* layer = NULL ;
-
 #ifdef PRINT_SOURCES
   fprintf (stderr,
     "current_layer = %d\tfill_sources_die %s floorplan %s\n",
     current_layer, die->Id, floorplan->FileName) ;
 #endif
 
-  for
-  (
-    layer = die->LayersList ;
-    layer != NULL ;
-    layer = layer->Next
-  )
-
+  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  {
     if ( die->SourceLayer == layer )
 
       sources = fill_sources_active_layer
@@ -260,6 +238,8 @@ Source_t* fill_sources_die
                   dimensions
                 ) ;
 
+  } // FOR_EVERY_ELEMENT_IN_LIST
+
   return sources ;
 }
 
@@ -278,7 +258,6 @@ Quantity_t fill_system_matrix_die
   SystemMatrixValue_t*  values
 )
 {
-  Layer*     layer     = NULL ;
   Quantity_t tot_added = QUANTITY_I ;
   Quantity_t added     = QUANTITY_I ;
 
@@ -286,21 +265,8 @@ Quantity_t fill_system_matrix_die
   fprintf (stderr, "(l %2d) fill_system_matrix_die\n", current_layer) ;
 # endif
 
-  for
-  (
-    layer     = die->LayersList ;
-
-    layer != NULL ;
-
-    conductances    += get_layer_area (dimensions) ,
-    capacities      += get_layer_area (dimensions) ,
-    column_pointers += get_layer_area (dimensions) ,
-    row_indices     += added ,
-    values          += added ,
-    tot_added       += added ,
-    layer            = layer->Next
-  )
-
+  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  {
     added = fill_system_matrix_layer
             (
 #             ifdef PRINT_SYSTEM_MATRIX
@@ -311,6 +277,15 @@ Quantity_t fill_system_matrix_die
               current_layer + layer->LayersOffset,
               column_pointers, row_indices, values
             ) ;
+
+    conductances    += get_layer_area (dimensions) ;
+    capacities      += get_layer_area (dimensions) ;
+    column_pointers += get_layer_area (dimensions) ;
+    row_indices     += added ;
+    values          += added ;
+    tot_added       += added ;
+
+  }  // FOR_EVERY_ELEMENT_IN_LIST
 
   return tot_added ;
 }

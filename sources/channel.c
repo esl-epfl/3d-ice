@@ -36,6 +36,7 @@
 #include <stdlib.h>
 
 #include "channel.h"
+#include "macros.h"
 #include "system_matrix.h"  // FIXME
 
 /******************************************************************************/
@@ -113,15 +114,6 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 /******************************************************************************/
 
-Bool_t is_channel_column (GridDimension_t column)
-{
-  // First bit is 0 -> even number -> wall -> FALSE -> 0
-  // First bit is 1 -> odd number -> channel -> TRUE -> 1
-  return column & 1 ;
-}
-
-/******************************************************************************/
-
 Conductances* fill_conductances_channel
 (
 # ifdef PRINT_CONDUCTANCES
@@ -132,28 +124,15 @@ Conductances* fill_conductances_channel
   Dimensions*     dimensions
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_channel %s\n", channel->Wall->Id) ;
 # endif
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++, conductances++
-    )
-
-      if (is_channel_column(column) == TRUE_V)
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
+      if (IS_CHANNEL_COLUMN(column))
 
         fill_conductances_liquid_cell
         (
@@ -185,6 +164,11 @@ Conductances* fill_conductances_channel
           channel->Wall->ThermalConductivity
         ) ;
 
+      conductances++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
+
   return conductances ;
 }
 
@@ -193,18 +177,6 @@ Conductances* fill_conductances_channel
 /* ( [um3] . [ J / ( um3 . K ) ]) / [sec]  */
 /* = [ J / (K . sec) ]                     */
 /* = [ W / K ]                             */
-
-static Capacity_t capacity
-(
-  CellDimension_t length,
-  CellDimension_t width,
-  CellDimension_t height,
-  CoolantVHC_t    vhc,
-  Time_t          time
-)
-{
-  return ((length * width * height) * vhc) / time ;
-}
 
 Capacity_t* fill_capacities_channel
 (
@@ -217,33 +189,19 @@ Capacity_t* fill_capacities_channel
   Time_t          delta_time
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
 # ifdef PRINT_CAPACITIES
   fprintf (stderr,
     "current_layer = %d\tfill_capacities_channel %s\n",
     current_layer, channel->Wall->Id) ;
 # endif
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++,
-      capacities++
-    )
-
-      if (is_channel_column(column) == TRUE_V )
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
+      if (IS_CHANNEL_COLUMN(column))
       {
-        *capacities  = capacity
+        *capacities  = CAPACITY
                        (
                          get_cell_length(dimensions, column),
                          get_cell_width (dimensions),
@@ -263,7 +221,7 @@ Capacity_t* fill_capacities_channel
       }
       else
       {
-        *capacities = capacity
+        *capacities = CAPACITY
                       (
                         get_cell_length (dimensions, column),
                         get_cell_width (dimensions),
@@ -282,6 +240,11 @@ Capacity_t* fill_capacities_channel
 #       endif
       }
 
+      capacities++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
+
   return capacities ;
 }
 
@@ -297,11 +260,8 @@ Source_t* fill_sources_channel
   Dimensions*     dimensions
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
-  Cconv_t C = get_c_conv(get_number_of_columns (dimensions),
-                         channel->CoolantVHC, channel->CoolantFR) ;
+  Cconv_t C = CCONV(get_number_of_columns (dimensions),
+                    channel->CoolantVHC, channel->CoolantFR) ;
 
 # ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -309,22 +269,11 @@ Source_t* fill_sources_channel
     current_layer, channel->Wall->Id) ;
 # endif
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++,
-      sources++
-    )
-
-      if (row == 0 && is_channel_column(column) == TRUE_V)
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
+      if (IS_FIRST_ROW(row) && IS_CHANNEL_COLUMN(column))
       {
         *sources = 2.0 * C * channel->CoolantTIn ;
 
@@ -337,6 +286,11 @@ Source_t* fill_sources_channel
           *sources, channel->CoolantTIn, C) ;
 #       endif
       }
+
+      sources++ ;
+
+    } // FOR_EVERY_COLUMN
+  }  // FOR_EVERY_ROW
 
   return sources ;
 }
@@ -357,10 +311,8 @@ Quantity_t fill_system_matrix_channel
   SystemMatrixValue_t*  values
 )
 {
-  GridDimension_t row       = GRIDDIMENSION_I ;
-  GridDimension_t column    = GRIDDIMENSION_I ;
-  Quantity_t      added     = QUANTITY_I ;
-  Quantity_t      tot_added = QUANTITY_I ;
+  Quantity_t added     = QUANTITY_I ;
+  Quantity_t tot_added = QUANTITY_I ;
 
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
@@ -368,27 +320,11 @@ Quantity_t fill_system_matrix_channel
     current_layer, channel->Wall->Id) ;
 # endif
 
-  for
-  (
-    row       = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      conductances    ++ ,
-      capacities      ++ ,
-      column_pointers ++ ,
-      row_indices     += added ,
-      values          += added ,
-      tot_added       += added ,
-      column          ++
-    )
-
-       if (is_channel_column(column) == TRUE_V )
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
+       if (IS_CHANNEL_COLUMN(column))
 
          added = add_liquid_column
                  (
@@ -406,6 +342,16 @@ Quantity_t fill_system_matrix_channel
                    current_layer, row, column,
                    column_pointers, row_indices, values
                  ) ;
+
+      conductances    ++ ;
+      capacities      ++ ;
+      column_pointers ++ ;
+      row_indices     += added ;
+      values          += added ;
+      tot_added       += added ;
+
+    } // FOR_EVERY_COLUMN
+  }  // FOR_EVERY_ROW
 
   return tot_added ;
 }

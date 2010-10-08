@@ -36,6 +36,7 @@
 #include <stdlib.h>
 
 #include "dimensions.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -111,25 +112,23 @@ void free_dimensions (Dimensions* dimensions)
 
 /******************************************************************************/
 
-extern Bool_t is_channel_column (GridDimension_t column) ;
-
 CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 {
-  if (dimensions->StackHasChannel == FALSE_V)
+  if (!dimensions->StackHasChannel)
 
     return dimensions->Cell.Length ;
 
-  if (column == 0)
+  if (IS_FIRST_COLUMN(column))
 
     return dimensions->Cell.FirstWallLength ;
 
-  else if (column == get_number_of_columns (dimensions) - 1)
+  else if (IS_LAST_COLUMN(column, dimensions))
 
     return dimensions->Cell.LastWallLength ;
 
   else
 
-    if (is_channel_column(column) == TRUE_V)
+    if (IS_CHANNEL_COLUMN(column))
 
       return dimensions->Cell.ChannelLength ;
 

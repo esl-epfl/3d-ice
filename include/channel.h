@@ -102,10 +102,6 @@ extern "C"
 
 /******************************************************************************/
 
-  Bool_t is_channel_column (GridDimension_t column) ;
-
-/******************************************************************************/
-
   Conductances* fill_conductances_channel
   (
 #   ifdef PRINT_CONDUCTANCES

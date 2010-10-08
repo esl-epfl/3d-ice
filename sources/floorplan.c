@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include "floorplan.h"
+#include "macros.h"
 #include "../bison/floorplan_parser.h"
 #include "../flex/floorplan_scanner.h"
 
@@ -121,19 +122,20 @@ Bool_t check_intersections
 )
 {
   Bool_t result = FALSE_V ;
-  FloorplanElement* tmp = floorplan->ElementsList ;
 
-  for ( ; tmp != NULL ; tmp = tmp->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
+                             flp_el,
+                             floorplan->ElementsList)
 
-    if (check_intersection (tmp, floorplan_element) == TRUE_V)
+    if (check_intersection (flp_el, floorplan_element) == TRUE_V)
     {
         fprintf (stderr,
           "%s: found intersection between %s and %s.\n",
-          floorplan->FileName, tmp->Id, floorplan_element->Id) ;
+          floorplan->FileName, flp_el->Id, floorplan_element->Id) ;
         result ++ ;
     }
 
-  return result ;
+  return result ;  // FIXME
 }
 
 /******************************************************************************/
@@ -203,7 +205,7 @@ Bool_t align_to_grid
 
   /* Effective length */
 
-  for
+  for  // FIXME WITH MACRO
   (
     column =  floorplan_element->SW_Column ;
     column <= floorplan_element->NE_Column ;
@@ -391,9 +393,9 @@ int get_all_max_temperatures_floorplan
   Temperature_t* max_temperature
 )
 {
-  FloorplanElement* flp_el = floorplan->ElementsList ;
-
-  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
+                             flp_el,
+                             floorplan->ElementsList)
 
     get_max_temperature_floorplan_element
     (
@@ -416,10 +418,10 @@ int get_all_min_temperatures_floorplan
   Temperature_t* min_temperature
 )
 {
-  FloorplanElement* flp_el = floorplan->ElementsList ;
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
+                             flp_el,
+                             floorplan->ElementsList)
 
-  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
-  {
     get_min_temperature_floorplan_element
     (
       flp_el,
@@ -427,7 +429,6 @@ int get_all_min_temperatures_floorplan
       temperatures,
       min_temperature++
     ) ;
-  }
 
   return 0 ;
 }
@@ -442,9 +443,9 @@ int get_all_avg_temperatures_floorplan
   Temperature_t* avg_temperature
 )
 {
-  FloorplanElement* flp_el = floorplan->ElementsList ;
-
-  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
+                             flp_el,
+                             floorplan->ElementsList)
 
     get_avg_temperature_floorplan_element
     (
@@ -469,9 +470,9 @@ int get_all_min_avg_max_temperatures_floorplan
   Temperature_t* max_temperature
 )
 {
-  FloorplanElement* flp_el = floorplan->ElementsList ;
-
-  for ( ; flp_el != NULL ; flp_el = flp_el->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
+                             flp_el,
+                             floorplan->ElementsList)
 
     get_min_avg_max_temperatures_floorplan_element
     (

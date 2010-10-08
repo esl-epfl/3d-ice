@@ -37,9 +37,7 @@
 #include <stdlib.h>
 
 #include "floorplan_element.h"
-
-#define MAX(a,b)  (((a) > (b)) ? (a) : (b))
-#define MIN(a,b)  (((a) < (b)) ? (a) : (b))
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -94,13 +92,7 @@ void free_floorplan_element (FloorplanElement* floorplan_element)
 
 void free_floorplan_elements_list (FloorplanElement* list)
 {
-  FloorplanElement* next = NULL ;
-
-  for ( ; list != NULL ; list = next)
-  {
-    next = list->Next ;
-    free_floorplan_element (list) ;
-  }
+  FREE_LIST (FloorplanElement, list, free_floorplan_element) ;
 }
 
 /******************************************************************************/
@@ -154,9 +146,9 @@ void print_floorplan_elements_list
   FloorplanElement* list
 )
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, list)
 
-    print_floorplan_element (stream, prefix, list) ;
+    print_floorplan_element (stream, prefix, flp_el) ;
 }
 
 /******************************************************************************/
@@ -182,11 +174,11 @@ FloorplanElement* find_floorplan_element_in_list
   String_t          id
 )
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, list)
 
-    if (strcmp (list->Id, id) == 0) break ;
+    if (strcmp (flp_el->Id, id) == 0) break ;
 
-  return list ;
+  return flp_el ;
 }
 
 /******************************************************************************/
@@ -224,31 +216,30 @@ void get_max_temperature_floorplan_element
   Temperature_t*    max_temperature
 )
 {
-  GridDimension_t row    = floorplan_element->SW_Row ;
-  GridDimension_t column = floorplan_element->SW_Column ;
-
-  *max_temperature
-    = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
-
-  for
-  (
-    ;
-   row <= floorplan_element->NE_Row ;
-   row++
-  )
-
-    for
+  *max_temperature = temperatures
+  [
+    get_cell_offset_in_layer
     (
-      column = floorplan_element->SW_Column ;
-      column <= floorplan_element->NE_Column ;
-      column++
+      dimensions,
+      FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element),
+      FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element)
     )
-      *max_temperature
-        = MAX
-          (
-            temperatures [get_cell_offset_in_layer (dimensions, row, column)],
-            *max_temperature
-          ) ;
+  ] ;
+
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  {
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    {
+
+      *max_temperature = MAX
+      (
+        temperatures [get_cell_offset_in_layer (dimensions, row, column)],
+        *max_temperature
+      ) ;
+
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
+
 }
 
 /******************************************************************************/
@@ -261,31 +252,30 @@ void get_min_temperature_floorplan_element
   Temperature_t*    min_temperature
 )
 {
-  GridDimension_t row    = floorplan_element->SW_Row ;
-  GridDimension_t column = floorplan_element->SW_Column ;
-
-  *min_temperature
-    = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
-
-  for
-  (
-    ;
-    row <= floorplan_element->NE_Row ;
-    row++
-  )
-
-    for
+  *min_temperature = temperatures
+  [
+    get_cell_offset_in_layer
     (
-      column = floorplan_element->SW_Column ;
-      column <= floorplan_element->NE_Column ;
-      column++
+      dimensions,
+      FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element),
+      FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element)
     )
-      *min_temperature
-        = MIN
-          (
-            temperatures [get_cell_offset_in_layer (dimensions, row, column)],
-            *min_temperature
-          ) ;
+  ] ;
+
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  {
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    {
+
+      *min_temperature = MIN
+      (
+        temperatures [get_cell_offset_in_layer (dimensions, row, column)],
+        *min_temperature
+      ) ;
+
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
+
 }
 
 /******************************************************************************/
@@ -298,29 +288,22 @@ void get_avg_temperature_floorplan_element
   Temperature_t*    avg_temperature
 )
 {
-  GridDimension_t row     = floorplan_element->SW_Row ;
-  GridDimension_t column  = floorplan_element->SW_Column ;
-  Quantity_t      counter = QUANTITY_I ;
+  Quantity_t counter = QUANTITY_I ;
 
   *avg_temperature = TEMPERATURE_I ;
 
-  for
-  (
-    row =  floorplan_element->SW_Row ;
-    row <= floorplan_element->NE_Row ;
-    row++
-  )
-
-    for
-    (
-      column = floorplan_element->SW_Column ;
-      column <= floorplan_element->NE_Column ;
-      column++,
-      counter++
-    )
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  {
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    {
 
       *avg_temperature
         += temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
+
+      counter++ ;
+
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 
   *avg_temperature /= (Temperature_t) counter ;
 }
@@ -337,38 +320,36 @@ void get_min_avg_max_temperatures_floorplan_element
   Temperature_t*    max_temperature
 )
 {
-  GridDimension_t row     = floorplan_element->SW_Row ;
-  GridDimension_t column  = floorplan_element->SW_Column ;
-  Quantity_t      counter = QUANTITY_I ;
-  Temperature_t   temp    = TEMPERATURE_I ;
-
-  *max_temperature = *min_temperature
-    = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
+  Quantity_t    counter = QUANTITY_I ;
+  Temperature_t tmp     = TEMPERATURE_I ;
 
   *avg_temperature = TEMPERATURE_I ;
-
-  for
-  (
-    ;
-    row <= floorplan_element->NE_Row ;
-    row++
-  )
-
-    for
+  *max_temperature = *min_temperature = temperatures
+  [
+    get_cell_offset_in_layer
     (
-      column = floorplan_element->SW_Column ;
-      column <= floorplan_element->NE_Column ;
-      column++, counter++
+      dimensions,
+      FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element),
+      FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element)
     )
+  ] ;
+
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  {
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
     {
-      temp = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
+      tmp = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
 
-      *max_temperature = MAX (temp, *max_temperature) ;
+      *max_temperature = MAX (tmp, *max_temperature) ;
 
-      *min_temperature = MIN (temp, *min_temperature) ;
+      *min_temperature = MIN (tmp, *min_temperature) ;
 
-      *avg_temperature += temp ;
-    }
+      *avg_temperature += tmp ;
+
+      counter++ ;
+
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 
   *avg_temperature /= (Temperature_t) counter ;
 }
