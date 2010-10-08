@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0 .                                 *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -206,7 +206,7 @@ Quantity_t add_solid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "  diagonal\t%d\t ", *(row_indices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
-  if (environmentheatsink != NULL)
+  if (conventionalheatsink != NULL)
     fprintf (stderr, "            ( + %.5e [capacity] + %.5e [ehtc N])\n",
              *capacities, conductances->Top) ;
   else
