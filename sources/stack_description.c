@@ -175,8 +175,8 @@ int fill_floorplans (StackDescription* stkd)
 
 static void align_layers_in_die (StackDescription* stkd)
 {
-  Layer* layer ;
-  LayerIndex_t layer_offset ;
+  Layer*          layer ;
+  GridDimension_t layer_offset ;
 
   Die* die = stkd->DiesList ;
   for ( ; die != NULL ; die = die->Next)
@@ -194,7 +194,7 @@ static void align_layers_in_die (StackDescription* stkd)
 
 static void align_stack_elements (StackDescription* stkd)
 {
-  Quantity_t layer_counter = 0 ;
+  GridDimension_t layer_counter = 0 ;
   StackElement* stack_element = stkd->StackElementsList ;
 
   for ( ; stack_element != NULL ; stack_element = stack_element->Next)
@@ -469,12 +469,12 @@ void fill_sources_stack_description
 
 void fill_system_matrix_stack_description
 (
-  StackDescription*    stkd,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  ColumnIndex_t*       column_pointers,
-  RowIndex_t*          row_indices,
-  SystemMatrixValue_t* values
+  StackDescription*     stkd,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  SystemMatrixColumn_t* column_pointers,
+  SystemMatrixRow_t*    row_indices,
+  SystemMatrixValue_t*  values
 )
 {
   StackElement* stack_element ;

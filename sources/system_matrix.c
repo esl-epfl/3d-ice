@@ -54,13 +54,13 @@ int alloc_system_matrix
   matrix->NNz     = nnz ;
 
   matrix->RowIndices
-    = (RowIndex_t*) malloc (sizeof(RowIndex_t) * nnz ) ;
+    = (SystemMatrixRow_t*) malloc (sizeof(SystemMatrixRow_t) * nnz ) ;
 
   if (matrix->RowIndices == NULL)
     return 0 ;
 
   matrix->ColumnPointers
-    = (ColumnIndex_t*) malloc (sizeof(ColumnIndex_t) * nvalues + 1 ) ;
+    = (SystemMatrixColumn_t*) malloc (sizeof(SystemMatrixColumn_t) * nvalues + 1 ) ;
 
   if (matrix->ColumnPointers == NULL)
   {
@@ -98,11 +98,11 @@ Quantity_t add_solid_column
   Conductances*         conductances,
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
-  LayerIndex_t          current_layer,
-  RowIndex_t            current_row,
-  ColumnIndex_t         current_column,
-  ColumnIndex_t*        column_pointers,
-  RowIndex_t*           row_indices,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
+  SystemMatrixColumn_t* column_pointers,
+  SystemMatrixRow_t*    row_indices,
   SystemMatrixValue_t*  values
 )
 {
@@ -111,10 +111,10 @@ Quantity_t add_solid_column
   SystemMatrixValue_t* diagonal_pointer = NULL ;
   Quantity_t           added            = 0 ;
 
-  Quantity_t current_cell = get_cell_offset_in_stack (dimensions,
-                                                      current_layer,
-                                                      current_row,
-                                                      current_column) ;
+  GridDimension_t current_cell
+    = get_cell_offset_in_stack (dimensions, current_layer,
+                                            current_row,
+                                            current_column) ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
@@ -308,15 +308,15 @@ Quantity_t add_solid_column
 
 Quantity_t add_liquid_column
 (
-  Dimensions*          dimensions,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  RowIndex_t           current_row,
-  ColumnIndex_t        current_column,
-  ColumnIndex_t*       column_pointers,
-  RowIndex_t*          row_indices,
-  SystemMatrixValue_t* values
+  Dimensions*           dimensions,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
+  SystemMatrixColumn_t* column_pointers,
+  SystemMatrixRow_t*    row_indices,
+  SystemMatrixValue_t*  values
 )
 {
   Conductance_t        conductance      = 0.0 ;
@@ -324,10 +324,10 @@ Quantity_t add_liquid_column
   SystemMatrixValue_t* diagonal_pointer = NULL ;
   Quantity_t           added            = 0 ;
 
-  Quantity_t current_cell = get_cell_offset_in_stack (dimensions,
-                                                      current_layer,
-                                                      current_row,
-                                                      current_column) ;
+  GridDimension_t current_cell
+    = get_cell_offset_in_stack (dimensions, current_layer,
+                                            current_row,
+                                            current_column) ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;

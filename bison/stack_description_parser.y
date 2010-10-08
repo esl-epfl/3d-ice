@@ -134,7 +134,7 @@ void stack_description_error
   String_t          message
 ) ;
 
-static enum StackElement_t last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+static StackElement_t last_stack_element = TDICE_STACK_ELEMENT_NONE ;
 static int found_die     = 0 ;
 static int found_channel = 0 ;
 
@@ -487,7 +487,7 @@ layer_content : DVALUE IDENTIFIER ';'
         YYABORT ;
       }
 
-      layer->Height   = $1 ;
+      layer->Height   = (CellDimension_t) $1 ;
       layer->Material = find_material_in_list(stkd->MaterialsList, $2) ;
 
       if (layer->Material == NULL)
@@ -641,7 +641,7 @@ stack_element
         YYABORT ;
       }
 
-      layer->Height   = $3 ;
+      layer->Height   = (CellDimension_t) $3 ;
       layer->Material = find_material_in_list(stkd->MaterialsList, $4) ;
 
       if (layer->Material == NULL)

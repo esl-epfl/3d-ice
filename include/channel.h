@@ -102,18 +102,18 @@ extern "C"
 
 /******************************************************************************/
 
-  Bool_t is_channel_column (ColumnIndex_t column) ;
+  Bool_t is_channel_column (GridDimension_t column) ;
 
 /******************************************************************************/
 
   Conductances* fill_conductances_channel
   (
 #   ifdef PRINT_CONDUCTANCES
-    LayerIndex_t  current_layer,
+    GridDimension_t current_layer,
 #   endif
-    Channel*      channel,
-    Conductances* conductances,
-    Dimensions*   dimensions
+    Channel*        channel,
+    Conductances*   conductances,
+    Dimensions*     dimensions
   ) ;
 
 /******************************************************************************/
@@ -121,12 +121,12 @@ extern "C"
   Capacity_t* fill_capacities_channel
   (
 #   ifdef PRINT_CAPACITIES
-    LayerIndex_t current_layer,
+    GridDimension_t current_layer,
 #   endif
-    Channel*     channel,
-    Capacity_t*  capacities,
-    Dimensions*  dimensions,
-    Time_t       delta_time
+    Channel*        channel,
+    Capacity_t*     capacities,
+    Dimensions*     dimensions,
+    Time_t          delta_time
   ) ;
 
 /******************************************************************************/
@@ -134,11 +134,11 @@ extern "C"
   Source_t* fill_sources_channel
   (
 #   ifdef PRINT_SOURCES
-    LayerIndex_t current_layer,
+    GridDimension_t current_layer,
 #   endif
-    Channel*     channel,
-    Source_t*    sources,
-    Dimensions*  dimensions
+    Channel*        channel,
+    Source_t*       sources,
+    Dimensions*     dimensions
   ) ;
 
 /******************************************************************************/
@@ -146,15 +146,15 @@ extern "C"
   Quantity_t fill_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
-    Channel*             channel,
+    Channel*              channel,
 #   endif
-    Dimensions*          dimensions,
-    Conductances*        conductances,
-    Capacity_t*          capacities,
-    LayerIndex_t         current_layer,
-    ColumnIndex_t*       column_pointers,
-    RowIndex_t*          row_indices,
-    SystemMatrixValue_t* values
+    Dimensions*           dimensions,
+    Conductances*         conductances,
+    Capacity_t*           capacities,
+    GridDimension_t       current_layer,
+    SystemMatrixColumn_t* column_pointers,
+    SystemMatrixRow_t*    row_indices,
+    SystemMatrixValue_t*  values
   ) ;
 
 /******************************************************************************/

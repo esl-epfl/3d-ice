@@ -91,11 +91,11 @@ void fill_sources_conventional_heat_sink
   Dimensions*           dimensions,
   Source_t*             sources,
   Conductances*         conductances,
-  LayerIndex_t          layer
+  GridDimension_t       layer
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -139,11 +139,11 @@ void add_sources_conventional_heat_sink
   Dimensions*           dimensions,
   Source_t*             sources,
   Conductances*         conductances,
-  LayerIndex_t          layer
+  GridDimension_t       layer
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,

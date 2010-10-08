@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "stack_element.h"
 

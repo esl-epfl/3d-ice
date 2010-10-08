@@ -224,8 +224,8 @@ void get_max_temperature_floorplan_element
   Temperature_t*    max_temperature
 )
 {
-  RowIndex_t    row    = floorplan_element->SW_Row ;
-  ColumnIndex_t column = floorplan_element->SW_Column ;
+  GridDimension_t row    = floorplan_element->SW_Row ;
+  GridDimension_t column = floorplan_element->SW_Column ;
 
   *max_temperature
     = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
@@ -261,8 +261,8 @@ void get_min_temperature_floorplan_element
   Temperature_t*    min_temperature
 )
 {
-  RowIndex_t    row    = floorplan_element->SW_Row ;
-  ColumnIndex_t column = floorplan_element->SW_Column ;
+  GridDimension_t row    = floorplan_element->SW_Row ;
+  GridDimension_t column = floorplan_element->SW_Column ;
 
   *min_temperature
     = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
@@ -298,8 +298,8 @@ void get_avg_temperature_floorplan_element
   Temperature_t*    avg_temperature
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
   Quantity_t counter = 0 ;
 
   *avg_temperature = 0.0 ;
@@ -337,8 +337,8 @@ void get_min_avg_max_temperatures_floorplan_element
   Temperature_t*    max_temperature
 )
 {
-  RowIndex_t    row    = floorplan_element->SW_Row ;
-  ColumnIndex_t column = floorplan_element->SW_Column ;
+  GridDimension_t row    = floorplan_element->SW_Row ;
+  GridDimension_t column = floorplan_element->SW_Column ;
   Quantity_t counter = 0 ;
   Temperature_t temp ;
 

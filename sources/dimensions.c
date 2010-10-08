@@ -111,7 +111,7 @@ void free_dimensions (Dimensions* dimensions)
 
 /******************************************************************************/
 
-extern Bool_t is_channel_column (ColumnIndex_t column) ;
+extern Bool_t is_channel_column (GridDimension_t column) ;
 
 CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 {
@@ -175,25 +175,25 @@ GridDimension_t get_number_of_cells (Dimensions* dimensions)
 
 /******************************************************************************/
 
-GridDimension_t get_number_of_non_zeroes (Dimensions* dimensions)
+Quantity_t get_number_of_non_zeroes (Dimensions* dimensions)
 {
   return dimensions->Grid.NNz ;
 }
 
 /******************************************************************************/
 
-Quantity_t get_layer_area (Dimensions* dimensions)
+GridDimension_t get_layer_area (Dimensions* dimensions)
 {
   return dimensions->Grid.NRows * dimensions->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
-Quantity_t get_cell_offset_in_layer
+GridDimension_t get_cell_offset_in_layer
 (
-  Dimensions*   dimensions,
-  RowIndex_t    row,
-  ColumnIndex_t column
+  Dimensions*     dimensions,
+  GridDimension_t row,
+  GridDimension_t column
 )
 {
   return row * get_number_of_columns (dimensions) + column ;
@@ -201,12 +201,12 @@ Quantity_t get_cell_offset_in_layer
 
 /******************************************************************************/
 
-Quantity_t get_cell_offset_in_stack
+GridDimension_t get_cell_offset_in_stack
 (
-  Dimensions*   dimensions,
-  LayerIndex_t  layer,
-  RowIndex_t    row,
-  ColumnIndex_t column
+  Dimensions*     dimensions,
+  GridDimension_t layer,
+  GridDimension_t row,
+  GridDimension_t column
 )
 {
   return layer * get_layer_area (dimensions)

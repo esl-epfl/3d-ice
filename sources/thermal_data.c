@@ -62,12 +62,12 @@ extern void fill_sources_stack_description
 
 extern void fill_system_matrix_stack_description
 (
-  StackDescription*    stkd,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  RowIndex_t*          row_pointers,
-  ColumnIndex_t*       column_indices,
-  SystemMatrixValue_t* values
+  StackDescription*     stkd,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  SystemMatrixColumn_t* column_indices,
+  SystemMatrixRow_t*    row_pointers,
+  SystemMatrixValue_t*  values
 ) ;
 
 static void init_data (double* data, Quantity_t size, double init_value)
@@ -125,7 +125,7 @@ int fill_thermal_data
   StackDescription* stkd
 )
 {
-  tdata->Size = get_number_of_cells(stkd->Dimensions) ;
+  tdata->Size = (Quantity_t) get_number_of_cells(stkd->Dimensions) ;
 
   /* Alloc and set temperatures */
 
@@ -416,7 +416,7 @@ int get_max_temperature_of_floorplan_element
   Temperature_t*    max_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -460,7 +460,7 @@ int get_min_temperature_of_floorplan_element
   Temperature_t*    min_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -504,7 +504,7 @@ int get_avg_temperature_of_floorplan_element
   Temperature_t*    avg_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -550,7 +550,7 @@ int get_min_avg_max_temperatures_of_floorplan_element
   Temperature_t*    max_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -592,11 +592,11 @@ int get_temperature_of_channel_outlet
   StackDescription* stkd,
   ThermalData*      tdata,
   String_t          channel_id,
-  ColumnIndex_t     outlet_number,
+  GridDimension_t   outlet_number,
   Temperature_t*    outlet_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -638,7 +638,7 @@ int get_all_max_temperatures_of_floorplan
   Temperature_t*    max_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -682,7 +682,7 @@ int get_all_min_temperatures_of_floorplan
   Temperature_t*    min_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -726,7 +726,7 @@ int get_all_avg_temperatures_of_floorplan
   Temperature_t*    avg_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -772,7 +772,7 @@ int get_all_min_avg_max_temperatures_of_floorplan
   Temperature_t*    max_temperature
 )
 {
-  Quantity_t offset ;
+  GridDimension_t offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -819,7 +819,7 @@ int get_all_temperatures_of_channel_outlets
   Temperature_t*    outlet_temperature
 )
 {
-  ColumnIndex_t column ;
+  GridDimension_t column ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,
@@ -860,9 +860,9 @@ int get_cell_temperature
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  LayerIndex_t      layer,
-  RowIndex_t        row,
-  ColumnIndex_t     column,
+  GridDimension_t   layer,
+  GridDimension_t   row,
+  GridDimension_t   column,
   Temperature_t*    cell_temperature
 )
 {
@@ -872,7 +872,8 @@ int get_cell_temperature
                          layer, row, column
                        );
 
-  if (id < 0 || id > get_number_of_cells(stkd->Dimensions))
+  if (id < (GridDimension_t) 0
+      || id > get_number_of_cells(stkd->Dimensions))
 
     return -1;
 
@@ -892,9 +893,9 @@ int print_thermal_map
 )
 {
   FILE* output_file ;
-  RowIndex_t row;
-  ColumnIndex_t column ;
-  Quantity_t layer_offset ;
+  GridDimension_t row;
+  GridDimension_t column ;
+  GridDimension_t layer_offset ;
   StackElement* stk_el = find_stack_element_in_list
                          (
                            stkd->StackElementsList,

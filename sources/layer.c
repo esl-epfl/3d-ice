@@ -105,25 +105,25 @@ Conductances*   fill_conductances_layer
   Conductances*         conductances,
   Dimensions*           dimensions,
   ConventionalHeatSink* conventionalheatsink,
-  LayerIndex_t          current_layer
+  GridDimension_t       current_layer
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
   void (*fill_conductances)
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity,
+    SolidTC_t              thermal_conductivity,
     AmbientHTC_t           ambient_htc
   );
 
@@ -189,7 +189,7 @@ static Capacity_t capacity
   CellDimension_t   length,
   CellDimension_t   width,
   CellDimension_t   height,
-  VolHeatCapacity_t vhc,
+  SolidVHC_t        vhc,
   Time_t            time
 )
 {
@@ -199,16 +199,16 @@ static Capacity_t capacity
 Capacity_t* fill_capacities_layer
 (
 #ifdef PRINT_CAPACITIES
-  LayerIndex_t current_layer,
+  GridDimension_t current_layer,
 #endif
-  Layer*       layer,
-  Capacity_t*  capacities,
-  Dimensions*  dimensions,
-  Time_t       delta_time
+  Layer*          layer,
+  Capacity_t*     capacities,
+  Dimensions*     dimensions,
+  Time_t          delta_time
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
 #ifdef PRINT_CAPACITIES
   fprintf (stderr,
@@ -263,7 +263,7 @@ Source_t* fill_sources_active_layer
 # ifdef PRINT_SOURCES
   Layer*                layer,
 # endif
-  LayerIndex_t          current_layer,
+  GridDimension_t       current_layer,
   ConventionalHeatSink* conventionalheatsink,
   Conductances*         conductances,
   Floorplan*            floorplan,
@@ -271,8 +271,8 @@ Source_t* fill_sources_active_layer
   Dimensions*           dimensions
 )
 {
-  RowIndex_t        row ;
-  ColumnIndex_t     column ;
+  GridDimension_t   row ;
+  GridDimension_t   column ;
   CellDimension_t   flp_el_surface ;
   FloorplanElement* flp_el ;
 
@@ -355,7 +355,7 @@ Source_t* fill_sources_empty_layer
 # ifdef PRINT_SOURCES
   Layer*                layer,
 # endif
-  LayerIndex_t          current_layer,
+  GridDimension_t       current_layer,
   ConventionalHeatSink* conventionalheatsink,
   Conductances*         conductances,
   Source_t*             sources,
@@ -394,14 +394,14 @@ Quantity_t fill_system_matrix_layer
   Conductances*         conductances,
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
-  LayerIndex_t          current_layer,
-  ColumnIndex_t*        column_pointers,
-  RowIndex_t*           row_indices,
+  GridDimension_t       current_layer,
+  SystemMatrixColumn_t* column_pointers,
+  SystemMatrixRow_t*    row_indices,
   SystemMatrixValue_t*  values
 )
 {
-  RowIndex_t row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
   Quantity_t added, tot_added ;
 
 #ifdef PRINT_SYSTEM_MATRIX

@@ -41,25 +41,15 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "layer.h"
 #include "die.h"
 #include "floorplan.h"
 
-  enum StackElement_t
-  {
-    TDICE_STACK_ELEMENT_NONE = 0,
-    TDICE_STACK_ELEMENT_LAYER   ,
-    TDICE_STACK_ELEMENT_CHANNEL ,
-    TDICE_STACK_ELEMENT_DIE
-  } ;
-
-  union StackElement_p
-  {
-    Layer* Layer ;
-    Die*   Die ;
-  } ;
+/******************************************************************************/
 
   struct StackElement
   {
@@ -69,16 +59,21 @@ extern "C"
 
     /* The type of the stack element */
 
-    enum StackElement_t Type ;
+    StackElement_t Type ;
 
     /* The pointer to the effective stack element */
     /* corresponding to the value in Type         */
 
-    union StackElement_p Pointer ;
+    union {
+
+      Layer* Layer ;
+      Die*   Die ;
+
+    } Pointer ;
 
     /* The number of layer composing the stack element */
 
-    Quantity_t NLayers ;
+    GridDimension_t NLayers ;
 
     /* A pointer to a Floorplan. This field is   */
     /* used only if Type == TL_STACK_ELEMENT_DIE */
@@ -88,7 +83,7 @@ extern "C"
     /* The offset (#of layers) counting from the */
     /* first layer in the stack                  */
 
-    Quantity_t LayersOffset ;
+    GridDimension_t LayersOffset ;
 
     /* To collect stack elements in a linked list */
 

@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include "stack_description.h"
 
 /******************************************************************************/
@@ -52,11 +54,11 @@ extern "C"
 
     /* Storage for the column pointers */
 
-    ColumnIndex_t*       ColumnPointers ;
+    SystemMatrixColumn_t* ColumnPointers ;
 
     /* Storage for the row indices. */
 
-    RowIndex_t*          RowIndices ;
+    SystemMatrixRow_t* RowIndices ;
 
     /* Storage for the nonzero entries. */
 
@@ -72,8 +74,8 @@ extern "C"
   int alloc_system_matrix
   (
     SystemMatrix* matrix,
-    Quantity_t nvalues,
-    Quantity_t nnz
+    Quantity_t    nvalues,
+    Quantity_t    nnz
   ) ;
 
 /******************************************************************************/
@@ -88,11 +90,11 @@ extern "C"
     Conductances*         conductances,
     Capacity_t*           capacities,
     ConventionalHeatSink* conventionalheatsink,
-    LayerIndex_t          current_layer,
-    RowIndex_t            current_row,
-    ColumnIndex_t         current_column,
-    ColumnIndex_t*        column_pointers,
-    RowIndex_t*           row_indices,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrixColumn_t* column_pointers,
+    SystemMatrixRow_t*    row_indices,
     SystemMatrixValue_t*  values
   ) ;
 
@@ -100,15 +102,15 @@ extern "C"
 
   Quantity_t add_liquid_column
   (
-    Dimensions*          dimensions,
-    Conductances*        conductances,
-    Capacity_t*          capacities,
-    LayerIndex_t         current_layer,
-    RowIndex_t           current_row,
-    ColumnIndex_t        current_column,
-    ColumnIndex_t*       column_pointers,
-    RowIndex_t*          row_indices,
-    SystemMatrixValue_t* values
+    Dimensions*           dimensions,
+    Conductances*         conductances,
+    Capacity_t*           capacities,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrixColumn_t* column_pointers,
+    SystemMatrixRow_t*    row_indices,
+    SystemMatrixValue_t*  values
   ) ;
 
 /******************************************************************************/

@@ -63,11 +63,11 @@ extern "C"
 
 /******************************************************************************/
 
-  Cconv_t get_c_conv
+  Cconv_t           get_c_conv
   (
-    ColumnIndex_t num_column,
-    CoolantVHC_t  coolant_vhc,
-    CoolantFR_t   coolant_fr
+    GridDimension_t num_column,
+    CoolantVHC_t    coolant_vhc,
+    CoolantFR_t     coolant_fr
   ) ;
 
 /******************************************************************************/
@@ -76,15 +76,15 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity,
+    SolidTC_t              thermal_conductivity,
     AmbientHTC_t           ambient_htc
   ) ;
 
@@ -94,15 +94,15 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity,
+    SolidTC_t              thermal_conductivity,
     AmbientHTC_t           ambient_htc
   ) ;
 
@@ -112,15 +112,15 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity,
+    SolidTC_t              thermal_conductivity,
     AmbientHTC_t           ambient_htc
   ) ;
 
@@ -130,15 +130,15 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity,
+    SolidTC_t              thermal_conductivity,
     AmbientHTC_t           ambient_htc
   ) ;
 
@@ -148,15 +148,15 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    ThermalConductivity_t  thermal_conductivity
+    SolidTC_t              thermal_conductivity
   ) ;
 
 /******************************************************************************/
@@ -164,9 +164,9 @@ extern "C"
   void fill_conductances_liquid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
-    LayerIndex_t           current_layer,
-    RowIndex_t             current_row,
-    ColumnIndex_t          current_column,
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
 #   endif
     Dimensions*            dimensions,
     Conductances*          conductances,

@@ -133,7 +133,7 @@ Conductances* fill_conductances_die
   Conductances*         conductances,
   Dimensions*           dimensions,
   ConventionalHeatSink* conventionalheatsink,
-  LayerIndex_t          current_layer
+  GridDimension_t       current_layer
 )
 {
   Layer* layer ;
@@ -166,12 +166,12 @@ Conductances* fill_conductances_die
 Capacity_t* fill_capacities_die
 (
 # ifdef PRINT_CAPACITIES
-  LayerIndex_t current_layer,
+  GridDimension_t current_layer,
 # endif
-  Die*         die,
-  Capacity_t*  capacities,
-  Dimensions*  dimensions,
-  Time_t       delta_time
+  Die*            die,
+  Capacity_t*     capacities,
+  Dimensions*     dimensions,
+  Time_t          delta_time
 )
 {
   Layer* layer ;
@@ -207,7 +207,7 @@ Capacity_t* fill_capacities_die
 
 Source_t* fill_sources_die
 (
-  LayerIndex_t          current_layer,
+  GridDimension_t       current_layer,
   Die*                  die,
   ConventionalHeatSink* conventionalheatsink,
   Conductances*         conductances,
@@ -272,9 +272,9 @@ Quantity_t fill_system_matrix_die
   Conductances*         conductances,
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
-  LayerIndex_t          current_layer,
-  ColumnIndex_t*        column_pointers,
-  RowIndex_t*           row_indices,
+  GridDimension_t       current_layer,
+  SystemMatrixColumn_t* column_pointers,
+  SystemMatrixRow_t*    row_indices,
   SystemMatrixValue_t*  values
 )
 {

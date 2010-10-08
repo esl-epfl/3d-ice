@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.1 .                               *
+ * This file is part of 3D-ICE, version 1.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -44,29 +44,107 @@ extern "C"
 # define FALSE_V (0)
 # define TRUE_V  (!FALSE_V)
 
-  typedef char*  String_t ;
-  typedef int    Bool_t ;
-  typedef int    Quantity_t ;
-  typedef int    LayerIndex_t ;
-  typedef int    RowIndex_t ;
-  typedef int    ColumnIndex_t ;
-  typedef double Temperature_t ;
-  typedef double Power_t ;
-  typedef double Time_t ;
-  typedef double SystemMatrixValue_t ;
+  /* Quantity */
+
+  typedef int Quantity_t ;
+
+  /* String */
+
+  typedef char* String_t ;
+
+  /* Solid volumetric heat capacity */
+
+  typedef double SolidVHC_t ;
+
+  /* Solid thermal conductivity */
+
+  typedef double SolidTC_t ;
+
+  /* Grid dimension (number and index of layer, row, column) */
+
+  typedef int GridDimension_t ;
+
+  /* Cell dimension (for cell length, height, width) */
+
   typedef double CellDimension_t ;
-  typedef int    GridDimension_t ;
-  typedef double ChipDimension_t ;
-  typedef double VolHeatCapacity_t ;
-  typedef double ThermalConductivity_t;
-  typedef double Conductance_t ;
+
+  /* Chip dimension (for chip length, width) */
+
+# define ChipDimension_t CellDimension_t
+
+  /* Capacity */
+
   typedef double Capacity_t ;
+
+  /* Source */
+
   typedef double Source_t ;
-  typedef double Cconv_t ;
-  typedef double CoolantHTC_t ;
-  typedef double CoolantVHC_t ;
-  typedef double CoolantFR_t ;
+
+  /* Temperature */
+
+  typedef double Temperature_t ;
+
+  /* Power */
+
+  typedef double Power_t ;
+
+  /* Ambient heat transfer coefficient */
+
   typedef double AmbientHTC_t ;
+
+  /* Time */
+
+  typedef double Time_t ;
+
+  /* Conductance */
+
+  typedef double Conductance_t ;
+
+  /* Coolant heat transfer coefficient */
+
+  typedef double CoolantHTC_t ;
+
+  /* Coolant volumetric heat capacity */
+
+  typedef double CoolantVHC_t ;
+
+  /* Coolant flow rate */
+
+  typedef double CoolantFR_t ;
+
+  /* C convection coefficient */
+
+  typedef double Cconv_t ;
+
+  /* boolean Value */
+
+  typedef int Bool_t ;
+
+  /* System matrix coefficients */
+
+  typedef double SystemMatrixValue_t ;
+
+  /* System matrix column indexes */
+
+  typedef int SystemMatrixColumn_t ;
+
+  /* System matrix row indexes */
+
+  typedef int SystemMatrixRow_t ;
+
+  /* The type of a stack element */
+
+  enum StackElement_t
+  {
+    TDICE_STACK_ELEMENT_NONE = 0,
+    TDICE_STACK_ELEMENT_LAYER   ,
+    TDICE_STACK_ELEMENT_CHANNEL ,
+    TDICE_STACK_ELEMENT_DIE
+  } ;
+
+  typedef enum StackElement_t StackElement_t ;
+
+  /* The collection of the coolant heat transfer coefficient */
 
   typedef struct
   {

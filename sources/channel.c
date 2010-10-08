@@ -36,7 +36,7 @@
 #include <stdlib.h>
 
 #include "channel.h"
-#include "system_matrix.h"
+#include "system_matrix.h"  // FIXME
 
 /******************************************************************************/
 
@@ -113,7 +113,7 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 /******************************************************************************/
 
-Bool_t is_channel_column (Quantity_t column)
+Bool_t is_channel_column (GridDimension_t column)
 {
   // First bit is 0 -> even number -> wall -> FALSE -> 0
   // First bit is 1 -> odd number -> channel -> TRUE -> 1
@@ -125,15 +125,15 @@ Bool_t is_channel_column (Quantity_t column)
 Conductances* fill_conductances_channel
 (
 # ifdef PRINT_CONDUCTANCES
-  LayerIndex_t  current_layer,
+  GridDimension_t current_layer,
 # endif
-  Channel*      channel,
-  Conductances* conductances,
-  Dimensions*   dimensions
+  Channel*        channel,
+  Conductances*   conductances,
+  Dimensions*     dimensions
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
 # ifdef PRINT_CONDUCTANCES
   fprintf (stderr, "fill_conductances_channel %s\n", channel->Wall->Id) ;
@@ -209,16 +209,16 @@ static Capacity_t capacity
 Capacity_t* fill_capacities_channel
 (
 # ifdef PRINT_CAPACITIES
-  LayerIndex_t current_layer,
+  GridDimension_t current_layer,
 # endif
-  Channel*     channel,
-  Capacity_t*  capacities,
-  Dimensions*  dimensions,
-  Time_t       delta_time
+  Channel*        channel,
+  Capacity_t*     capacities,
+  Dimensions*     dimensions,
+  Time_t          delta_time
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
 # ifdef PRINT_CAPACITIES
   fprintf (stderr,
@@ -290,15 +290,15 @@ Capacity_t* fill_capacities_channel
 Source_t* fill_sources_channel
 (
 # ifdef PRINT_SOURCES
-  LayerIndex_t current_layer,
+  GridDimension_t current_layer,
 # endif
-  Channel*     channel,
-  Source_t*    sources,
-  Dimensions*  dimensions
+  Channel*        channel,
+  Source_t*       sources,
+  Dimensions*     dimensions
 )
 {
-  RowIndex_t    row ;
-  ColumnIndex_t column ;
+  GridDimension_t row ;
+  GridDimension_t column ;
 
   Cconv_t C = get_c_conv(get_number_of_columns (dimensions),
                          channel->CoolantVHC, channel->CoolantFR) ;
@@ -346,19 +346,19 @@ Source_t* fill_sources_channel
 Quantity_t fill_system_matrix_channel
 (
 # ifdef PRINT_SYSTEM_MATRIX
-  Channel*             channel,
+  Channel*              channel,
 # endif
-  Dimensions*          dimensions,
-  Conductances*        conductances,
-  Capacity_t*          capacities,
-  LayerIndex_t         current_layer,
-  ColumnIndex_t*       column_pointers,
-  RowIndex_t*          row_indices,
-  SystemMatrixValue_t* values
+  Dimensions*           dimensions,
+  Conductances*         conductances,
+  Capacity_t*           capacities,
+  GridDimension_t       current_layer,
+  SystemMatrixColumn_t* column_pointers,
+  SystemMatrixRow_t*    row_indices,
+  SystemMatrixValue_t*  values
 )
 {
-  RowIndex_t row;
-  ColumnIndex_t column;
+  GridDimension_t row;
+  GridDimension_t column;
   Quantity_t added, tot_added ;
 
 # ifdef PRINT_SYSTEM_MATRIX

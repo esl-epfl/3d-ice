@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "types.h"
@@ -89,7 +91,7 @@ extern "C"
     Dimensions*           dimensions,
     Source_t*             sources,
     Conductances*         conductances,
-    LayerIndex_t          layer
+    GridDimension_t       layer
   ) ;
 
 /******************************************************************************/
@@ -100,7 +102,7 @@ extern "C"
     Dimensions*           dimensions,
     Source_t*             sources,
     Conductances*         conductances,
-    LayerIndex_t          layer
+    GridDimension_t       layer
   ) ;
 
 /******************************************************************************/

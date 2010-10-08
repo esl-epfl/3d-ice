@@ -58,9 +58,9 @@
 
 Cconv_t get_c_conv
 (
-  ColumnIndex_t number_of_columns,
-  CoolantVHC_t  coolant_vhc,
-  CoolantFR_t   coolant_fr
+  GridDimension_t number_of_columns,
+  CoolantVHC_t    coolant_vhc,
+  CoolantFR_t     coolant_fr
 )
 {
   return (coolant_vhc * coolant_fr)
@@ -74,15 +74,15 @@ void fill_conductances_bottom_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  LayerIndex_t          current_layer,
-  RowIndex_t            current_row,
-  ColumnIndex_t         current_column,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
-  ThermalConductivity_t thermal_conductivity,
+  SolidTC_t             thermal_conductivity,
   AmbientHTC_t          ambient_htc
 )
 {
@@ -122,15 +122,15 @@ void fill_conductances_central_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  LayerIndex_t          current_layer,
-  RowIndex_t            current_row,
-  ColumnIndex_t         current_column,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
-  ThermalConductivity_t thermal_conductivity,
+  SolidTC_t             thermal_conductivity,
   AmbientHTC_t          ambient_htc
 )
 {
@@ -169,15 +169,15 @@ void fill_conductances_top_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  LayerIndex_t          current_layer,
-  RowIndex_t            current_row,
-  ColumnIndex_t         current_column,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
-  ThermalConductivity_t thermal_conductivity,
+  SolidTC_t             thermal_conductivity,
   AmbientHTC_t          ambient_htc
 )
 {
@@ -217,15 +217,15 @@ void fill_conductances_top_solid_cell_ehtc
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  LayerIndex_t          current_layer,
-  RowIndex_t            current_row,
-  ColumnIndex_t         current_column,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
-  ThermalConductivity_t thermal_conductivity,
+  SolidTC_t             thermal_conductivity,
   AmbientHTC_t          ambient_htc
 )
 {
@@ -272,9 +272,9 @@ void fill_conductances_top_solid_cell_ehtc
 void fill_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  LayerIndex_t    current_layer,
-  RowIndex_t      current_row,
-  ColumnIndex_t   current_column,
+  GridDimension_t current_layer,
+  GridDimension_t current_row,
+  GridDimension_t current_column,
 # endif
   Dimensions*     dimensions,
   Conductances*   conductances,
@@ -320,15 +320,15 @@ void fill_conductances_wall_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  LayerIndex_t          current_layer,
-  RowIndex_t            current_row,
-  ColumnIndex_t         current_column,
+  GridDimension_t       current_layer,
+  GridDimension_t       current_row,
+  GridDimension_t       current_column,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
   CellDimension_t       cell_width,
   CellDimension_t       cell_height,
-  ThermalConductivity_t thermal_conductivity
+  SolidTC_t             thermal_conductivity
 )
 {
   conductances->North = conductances->South

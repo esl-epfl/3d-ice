@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "types.h"
@@ -59,11 +61,11 @@ extern "C"
 
     /* The volume-specific heat capacity [ J / ( um3 * K ) ] */
 
-    VolHeatCapacity_t VolHeatCapacity ;
+    SolidVHC_t VolHeatCapacity ;
 
     /* The thermal conductivity [ W / ( um * K ) ] */
 
-    ThermalConductivity_t ThermalConductivity ;
+    SolidTC_t ThermalConductivity ;
 
     /* To collect materials in a linked list */
 

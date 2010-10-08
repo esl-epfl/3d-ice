@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "types.h"
@@ -58,13 +60,13 @@ extern "C"
 
     CellDimension_t Height ;
 
+    /* The offset (#of layers) counting from the first layer in the die */
+
+    GridDimension_t LayersOffset ;
+
     /* The material composing the layer */
 
     Material* Material ;
-
-    /* The offset (#of layers) counting from the first layer in the die */
-
-    LayerIndex_t LayersOffset ;
 
     /* To collect layers in a linked list */
 
@@ -105,7 +107,7 @@ extern "C"
     Conductances*         conductances,
     Dimensions*           dimensions,
     ConventionalHeatSink* conventionalheatsink,
-    LayerIndex_t          current_layer
+    GridDimension_t       current_layer
   ) ;
 
 /******************************************************************************/
@@ -113,12 +115,12 @@ extern "C"
   Capacity_t* fill_capacities_layer
   (
 #   ifdef PRINT_CAPACITIES
-    LayerIndex_t current_layer,
+    GridDimension_t current_layer,
 #   endif
-    Layer*       layer,
-    Capacity_t*  capacities,
-    Dimensions*  dimensions,
-    Time_t       delta_time
+    Layer*          layer,
+    Capacity_t*     capacities,
+    Dimensions*     dimensions,
+    Time_t          delta_time
   ) ;
 
 /******************************************************************************/
@@ -128,7 +130,7 @@ extern "C"
 #   ifdef PRINT_SOURCES
     Layer*                layer,
 #   endif
-    LayerIndex_t          current_layer,
+    GridDimension_t       current_layer,
     ConventionalHeatSink* conventionalheatsink,
     Conductances*         conductances,
     Floorplan*            floorplan,
@@ -143,7 +145,7 @@ extern "C"
 #   ifdef PRINT_SOURCES
     Layer*                layer,
 #   endif
-    LayerIndex_t          current_layer,
+    GridDimension_t       current_layer,
     ConventionalHeatSink* conventionalheatsink,
     Conductances*         conductances,
     Source_t*             sources,
@@ -161,9 +163,9 @@ extern "C"
     Conductances*         conductances,
     Capacity_t*           capacities,
     ConventionalHeatSink* conventionalheatsink,
-    LayerIndex_t          current_layer,
-    ColumnIndex_t*        column_pointers,
-    RowIndex_t*           row_indices,
+    GridDimension_t       current_layer,
+    SystemMatrixColumn_t* column_pointers,
+    SystemMatrixRow_t*    row_indices,
     SystemMatrixValue_t*  values
   ) ;
 

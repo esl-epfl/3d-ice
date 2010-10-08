@@ -41,13 +41,15 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "types.h"
 #include "dimensions.h"
 #include "floorplan_element.h"
+
+/******************************************************************************/
 
   typedef struct
   {

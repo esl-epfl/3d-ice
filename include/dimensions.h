@@ -41,9 +41,13 @@ extern "C"
 {
 #endif
 
-#include "types.h"
+/******************************************************************************/
 
 #include <stdio.h>
+
+#include "types.h"
+
+/******************************************************************************/
 
   typedef struct
   {
@@ -111,7 +115,7 @@ extern "C"
 /******************************************************************************/
 
   CellDimension_t
-  get_cell_length (Dimensions* dimensions, ColumnIndex_t column) ;
+  get_cell_length (Dimensions* dimensions, GridDimension_t column) ;
 
   CellDimension_t
   get_cell_width  (Dimensions* dimensions) ;
@@ -126,25 +130,25 @@ extern "C"
 
   GridDimension_t get_number_of_cells      (Dimensions* dimensions) ;
 
-  GridDimension_t get_number_of_non_zeroes (Dimensions* dimensions) ;
+  Quantity_t get_number_of_non_zeroes (Dimensions* dimensions) ;
 
 /******************************************************************************/
 
-  Quantity_t get_layer_area (Dimensions* dimensions) ;
+  GridDimension_t get_layer_area (Dimensions* dimensions) ;
 
-  Quantity_t get_cell_offset_in_layer
+  GridDimension_t   get_cell_offset_in_layer
   (
-    Dimensions*   dimensions,
-    RowIndex_t    row,
-    ColumnIndex_t column
+    Dimensions*     dimensions,
+    GridDimension_t row,
+    GridDimension_t column
   ) ;
 
-  Quantity_t get_cell_offset_in_stack
+  GridDimension_t   get_cell_offset_in_stack
   (
-    Dimensions*   dimensions,
-    LayerIndex_t  layer,
-    RowIndex_t    row,
-    ColumnIndex_t column
+    Dimensions*     dimensions,
+    GridDimension_t layer,
+    GridDimension_t row,
+    GridDimension_t column
   ) ;
 
 /******************************************************************************/

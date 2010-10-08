@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include "conductances.h"
 #include "stack_description.h"
 #include "system_matrix.h"
@@ -57,6 +59,8 @@ extern "C"
     Source_t*      Sources ;
     Capacity_t*    Capacities ;
     Conductances*  Conductances ;
+
+    /* The initial (homogeneous) temperature of the chip (every cell) */
 
     Temperature_t InitialTemperature ;
 
@@ -332,7 +336,7 @@ extern "C"
     StackDescription* stkd,
     ThermalData*      tdata,
     String_t          channel_id,
-    ColumnIndex_t     outlet_number,
+    GridDimension_t   outlet_number,
     Temperature_t*    outlet_temperature
   ) ;
 
@@ -513,9 +517,9 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    LayerIndex_t      layer,
-    RowIndex_t        row,
-    ColumnIndex_t     column,
+    GridDimension_t   layer,
+    GridDimension_t   row,
+    GridDimension_t   column,
     Temperature_t*    cell_temperature
   ) ;
 

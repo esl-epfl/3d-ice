@@ -41,11 +41,15 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "types.h"
 #include "dimensions.h"
 #include "powers_queue.h"
+
+/******************************************************************************/
 
   struct FloorplanElement
   {
@@ -81,19 +85,19 @@ extern "C"
 
     /* The south-west row index */
 
-    RowIndex_t SW_Row ;
+    GridDimension_t SW_Row ;
 
     /* The south-west column index */
 
-    ColumnIndex_t SW_Column ;
+    GridDimension_t SW_Column ;
 
     /* The north-east row index */
 
-    RowIndex_t NE_Row ;
+    GridDimension_t NE_Row ;
 
     /* The north-east column index */
 
-    ColumnIndex_t NE_Column ;
+    GridDimension_t NE_Column ;
 
     /* The list of power values */
 

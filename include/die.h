@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
 #include <stdio.h>
 
 #include "types.h"
@@ -67,7 +69,7 @@ extern "C"
 
     /* The number of layer composing the die */
 
-    Quantity_t NLayers ;
+    GridDimension_t NLayers ;
 
     /* To collect dies in a linked list */
 
@@ -113,7 +115,7 @@ extern "C"
     Conductances*         conductances,
     Dimensions*           dimensions,
     ConventionalHeatSink* conventionalheatsink,
-    LayerIndex_t          current_layer
+    GridDimension_t       current_layer
   ) ;
 
 /******************************************************************************/
@@ -121,19 +123,19 @@ extern "C"
   Capacity_t* fill_capacities_die
   (
 #   ifdef PRINT_CAPACITIES
-    LayerIndex_t  current_layer,
+    GridDimension_t current_layer,
 #   endif
-    Die*          die,
-    Capacity_t*   capacities,
-    Dimensions*   dimensions,
-    Time_t        delta_time
+    Die*            die,
+    Capacity_t*     capacities,
+    Dimensions*     dimensions,
+    Time_t          delta_time
   ) ;
 
 /******************************************************************************/
 
   Source_t*               fill_sources_die
   (
-    LayerIndex_t          current_layer,
+    GridDimension_t       current_layer,
     Die*                  die,
     ConventionalHeatSink* conventionalheatsink,
     Conductances*         conductances,
@@ -151,9 +153,9 @@ extern "C"
     Conductances*         conductances,
     Capacity_t*           capacities,
     ConventionalHeatSink* conventionalheatsink,
-    LayerIndex_t          current_layer,
-    ColumnIndex_t*        column_pointers,
-    RowIndex_t*           row_indices,
+    GridDimension_t       current_layer,
+    SystemMatrixColumn_t* column_pointers,
+    SystemMatrixRow_t*    row_indices,
     SystemMatrixValue_t*  values
   ) ;
 

@@ -37,6 +37,8 @@
 #include "../bison/floorplan_parser.h"
 #include "../flex/floorplan_scanner.h"
 
+/******************************************************************************/
+
 extern int floorplan_parse
 (
   Floorplan*  floorplan,
@@ -169,8 +171,8 @@ Bool_t align_to_grid
 )
 {
   CellDimension_t cx, cy ;
-  ColumnIndex_t column ;
-  RowIndex_t row ;
+  GridDimension_t column ;
+  GridDimension_t row ;
 
   /* West side */
 
