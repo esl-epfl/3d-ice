@@ -247,6 +247,73 @@ void fill_conductances_stack_description
 
 /******************************************************************************/
 
+void update_conductances_stack_description
+(
+  StackDescription* stkd,
+  Conductances*     conductances
+)
+{
+#ifdef PRINT_CONDUCTANCES
+  fprintf
+  (
+    stderr,
+    "update_conductances_stack_description ( l %d r %d c %d )\n",
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions)
+  ) ;
+#endif
+
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    switch (stk_el->Type)
+    {
+      case TDICE_STACK_ELEMENT_DIE :
+
+        conductances += get_layer_area (stkd->Dimensions)
+                        * (stk_el->Pointer.Die->NLayers);
+        break ;
+
+      case TDICE_STACK_ELEMENT_LAYER :
+
+        conductances += get_layer_area (stkd->Dimensions) ;
+        break ;
+
+      case TDICE_STACK_ELEMENT_CHANNEL :
+
+        conductances = update_conductances_channel
+                       (
+#                        ifdef PRINT_CONDUCTANCES
+                         stk_el->LayersOffset,
+#                        endif
+                         stkd->Channel,
+                         conductances,
+                         stkd->Dimensions
+                       ) ;
+        break ;
+
+      case TDICE_STACK_ELEMENT_NONE :
+
+        fprintf (stderr, "Error! Found stack element with unset type\n") ;
+        return ;
+
+      default :
+
+        fprintf
+        (
+          stderr,
+          "Error! Unknown stack element type %d\n",
+          stk_el->Type
+        ) ;
+        return ;
+
+    } /* switch stk_el->Type */
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
+}
+
+/******************************************************************************/
+
 void fill_capacities_stack_description
 (
   StackDescription* stkd,
@@ -381,6 +448,66 @@ void fill_sources_stack_description
                     sources,
                     stkd->Dimensions
                   ) ;
+        break ;
+
+      case TDICE_STACK_ELEMENT_CHANNEL :
+
+        sources = fill_sources_channel
+                  (
+#                   ifdef PRINT_SOURCES
+                    stk_el->LayersOffset,
+#                   endif
+                    stkd->Channel,
+                    sources,
+                    stkd->Dimensions
+                  ) ;
+        break ;
+
+      case TDICE_STACK_ELEMENT_NONE :
+
+        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+        return ;
+
+      default :
+
+        fprintf (stderr, "Error! Unknown stack element type %d\n",
+          stk_el->Type) ;
+        return ;
+
+    } /* switch stk_el->Type */
+  } // FOR_EVERY_ELEMENT_IN_LIST
+}
+
+/******************************************************************************/
+
+void update_sources_stack_description
+(
+  StackDescription* stkd,
+  Source_t*         sources
+)
+{
+#ifdef PRINT_SOURCES
+  fprintf (stderr,
+    "update_sources_stack_description ( l %d r %d c %d )\n",
+    get_number_of_layers  (stkd->Dimensions),
+    get_number_of_rows    (stkd->Dimensions),
+    get_number_of_columns (stkd->Dimensions)) ;
+#endif
+
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    switch (stk_el->Type)
+    {
+      case TDICE_STACK_ELEMENT_DIE :
+
+        sources += get_layer_area (stkd->Dimensions)
+                   * (stk_el->Pointer.Die->NLayers) ;
+
+        break ;
+
+      case TDICE_STACK_ELEMENT_LAYER :
+
+        sources += get_layer_area (stkd->Dimensions) ;
         break ;
 
       case TDICE_STACK_ELEMENT_CHANNEL :

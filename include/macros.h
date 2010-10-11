@@ -150,8 +150,6 @@ extern "C"
 /******************************************************************************/
 
 /*
- * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
- *
  * FlowRatePerChannel [ um3 / sec ] = FlowRate             [ um3 / sec ]
  *                                    / #ChannelColumns    [ ]
  *
@@ -177,6 +175,12 @@ extern "C"
              )
 
 /******************************************************************************/
+
+ /*
+  * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
+  */
+
+# define CONVERT_COOLANT_FLOW_RATE(fr) ( fr * 1e+12 ) / 60.0
 
 #ifdef __cplusplus
 }

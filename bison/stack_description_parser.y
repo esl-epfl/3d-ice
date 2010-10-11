@@ -333,7 +333,7 @@ channel
       tmp_first_wall_length          = ($14 > 0.0) ? $14 : $12 ;
       tmp_last_wall_length           = ($15 > 0.0) ? $15 : $12 ;
 
-      stkd->Channel->CoolantFR       = ( $23 * 1e+12 ) / 60.0 ;
+      stkd->Channel->CoolantFR       = CONVERT_COOLANT_FLOW_RATE($23) ;
       stkd->Channel->CoolantHTCs     = $25 ;
       stkd->Channel->CoolantVHC      = $30 ;
       stkd->Channel->CoolantTIn      = $35 ;

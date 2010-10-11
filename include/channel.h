@@ -114,6 +114,18 @@ extern "C"
 
 /******************************************************************************/
 
+  Conductances* update_conductances_channel
+  (
+#   ifdef PRINT_CONDUCTANCES
+    GridDimension_t current_layer,
+#   endif
+    Channel*        channel,
+    Conductances*   conductances,
+    Dimensions*     dimensions
+  ) ;
+
+/******************************************************************************/
+
   Capacity_t* fill_capacities_channel
   (
 #   ifdef PRINT_CAPACITIES

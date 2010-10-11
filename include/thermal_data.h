@@ -197,6 +197,28 @@ extern "C"
 
 /******************************************************************************/
 
+  /* Change the flow rate.                                                  */
+  /*                                                                        */
+  /* Sets the new value and then upadte the north and south conductances in */
+  /* all (and only) the liquid cells, re-fill the system matrix A and       */
+  /* update only the (channel) inlet source values.                         */
+  /* Then, it re-factor the System matrix.                                  */
+  /*                                                                        */
+  /* Returns                                                                */
+  /*                                                                        */
+  /*  0 if success,                                                         */
+  /* >0 otherwise (factorization error). Please see the "output" field of   */
+  /*     the function "dgstrf" in SuperLU                                   */
+
+  int change_coolant_flow_rate
+  (
+    ThermalData*      tdata,
+    StackDescription* stkd,
+    CoolantFR_t       new_coolant_fr
+  ) ;
+
+/******************************************************************************/
+
   /* Get the maximum temperature of a given floorplan element                */
   /*                                                                         */
   /* stkd                  the StackDescription structure to query           */

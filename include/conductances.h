@@ -171,6 +171,22 @@ extern "C"
 
 /******************************************************************************/
 
+  void update_conductances_liquid_cell
+  (
+#   ifdef PRINT_CONDUCTANCES
+    GridDimension_t        current_layer,
+    GridDimension_t        current_row,
+    GridDimension_t        current_column,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+#   endif
+    Dimensions*            dimensions,
+    Conductances*          conductances,
+    CoolantVHC_t           coolant_vhc,
+    CoolantFR_t            coolant_fr
+  ) ;
+
 #ifdef __cplusplus
 }
 #endif

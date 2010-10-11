@@ -125,7 +125,7 @@ Conductances* fill_conductances_channel
 )
 {
 # ifdef PRINT_CONDUCTANCES
-  fprintf (stderr, "fill_conductances_channel %s\n", channel->Wall->Id) ;
+  fprintf (stderr, "fill_conductances_channel %s\n", conductances, channel->Wall->Id) ;
 # endif
 
   FOR_EVERY_ROW (row, dimensions)
@@ -162,6 +162,50 @@ Conductances* fill_conductances_channel
           get_cell_width  (dimensions),
           channel->Height,
           channel->Wall->ThermalConductivity
+        ) ;
+
+      conductances++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
+
+  return conductances ;
+}
+
+/******************************************************************************/
+
+Conductances* update_conductances_channel
+(
+# ifdef PRINT_CONDUCTANCES
+  GridDimension_t current_layer,
+# endif
+  Channel*        channel,
+  Conductances*   conductances,
+  Dimensions*     dimensions
+)
+{
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr, "update_conductances_channel %s\n", conductances, channel->Wall->Id) ;
+# endif
+
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
+      if (IS_CHANNEL_COLUMN(column))
+
+        update_conductances_liquid_cell
+        (
+#         ifdef PRINT_CONDUCTANCES
+          current_layer, row, column,
+          get_cell_length (dimensions, column),
+          get_cell_width  (dimensions),
+          channel->Height,
+#         endif
+          dimensions,
+          conductances,
+          channel->CoolantVHC,
+          channel->CoolantFR
         ) ;
 
       conductances++ ;

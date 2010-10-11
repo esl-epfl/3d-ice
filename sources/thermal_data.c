@@ -47,6 +47,12 @@ extern void fill_conductances_stack_description
   Conductances*     conductances
 ) ;
 
+extern void update_conductances_stack_description
+(
+  StackDescription* stkd,
+  Conductances*     conductances
+) ;
+
 extern void fill_capacities_stack_description
 (
   StackDescription* stkd,
@@ -59,6 +65,12 @@ extern void fill_sources_stack_description
   StackDescription* stkd,
   Source_t*         sources,
   Conductances*     conductances
+) ;
+
+extern void update_sources_stack_description
+(
+  StackDescription* stkd,
+  Source_t*         sources
 ) ;
 
 extern void fill_system_matrix_stack_description
@@ -404,6 +416,52 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
   }
 
   return 0 ;
+}
+
+/******************************************************************************/
+
+int change_coolant_flow_rate
+(
+  ThermalData*      tdata,
+  StackDescription* stkd,
+  CoolantFR_t       new_coolant_fr
+)
+{
+  stkd->Channel->CoolantFR = CONVERT_COOLANT_FLOW_RATE(new_coolant_fr) ;
+
+  update_conductances_stack_description (stkd, tdata->Conductances) ;
+
+  fill_system_matrix_stack_description
+  (
+    stkd, tdata->Conductances, tdata->Capacities,
+    tdata->SM_A.ColumnPointers, tdata->SM_A.RowIndices, tdata->SM_A.Values
+  ) ;
+
+  tdata->SLU_Options.Fact = SamePattern ;
+
+  get_perm_c (tdata->SLU_Options.ColPerm,
+              &tdata->SLUMatrix_A,
+              tdata->SLU_PermutationMatrixC) ;
+
+  sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
+               tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
+               &tdata->SLUMatrix_A_Permuted) ;
+
+  dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+          sp_ienv(2), sp_ienv(1), /* relax and panel size */
+          tdata->SLU_Etree,
+          NULL, 0,                /* work and lwork */
+          tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+          &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+          &tdata->SLU_Stat, &tdata->SLU_Info) ;
+
+
+  update_sources_stack_description (stkd, tdata->Sources) ;
+
+  if (tdata->SLU_Info == 0)
+    tdata->SLU_Options.Fact = FACTORED ;
+
+  return tdata->SLU_Info ;
 }
 
 /******************************************************************************/

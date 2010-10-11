@@ -284,6 +284,45 @@ void fill_conductances_liquid_cell
 
 /******************************************************************************/
 
+void update_conductances_liquid_cell
+(
+# ifdef PRINT_CONDUCTANCES
+  GridDimension_t current_layer,
+  GridDimension_t current_row,
+  GridDimension_t current_column,
+  CellDimension_t cell_length,
+  CellDimension_t cell_width,
+  CellDimension_t cell_height,
+# endif
+  Dimensions*     dimensions,
+  Conductances*   conductances,
+  CoolantVHC_t    coolant_vhc,
+  CoolantFR_t     coolant_fr
+)
+{
+  Cconv_t C = CCONV (get_number_of_columns (dimensions),
+                     coolant_vhc, coolant_fr) ;
+
+  conductances->North =  C ;
+  conductances->South = -C ;
+
+# ifdef PRINT_CONDUCTANCES
+  fprintf (stderr,
+    "liquid         | l %2d r %4d c %4d [%6d] "   \
+                   "| l %5.2f w %5.2f h %5.2f "   \
+                   "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e "
+                   "| C = %e\n",
+    current_layer, current_row, current_column,
+    get_cell_offset_in_stack (dimensions,
+                              current_layer, current_row, current_column),
+    cell_length, cell_width, cell_height,
+    conductances->North, conductances->South, conductances->East,
+    conductances->West, conductances->Top, conductances->Bottom, C) ;
+# endif
+}
+
+/******************************************************************************/
+
 void fill_conductances_wall_cell
 (
 # ifdef PRINT_CONDUCTANCES
