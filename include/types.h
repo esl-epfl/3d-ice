@@ -53,11 +53,13 @@ extern "C"
 
   typedef int Quantity_t ;
 # define      QUANTITY_I 0
+# define      QUANTITY_F "%d"
 
   /* String */
 
   typedef char* String_t ;
 # define        STRING_I NULL
+# define        STRING_F "%s"
 
 /******************************************************************************/
 
@@ -65,31 +67,37 @@ extern "C"
 
   typedef double Conductance_t ;
 # define         CONDUCTANCE_I 0.0
+# define         CONDUCTANCE_F "% .4e"
 
   /* Capacity */
 
   typedef double Capacity_t ;
 # define         CAPACITY_I 0.0
+# define         CAPACITY_F "%.4e"
 
   /* Source */
 
   typedef double Source_t ;
 # define         SOURCE_I 0.0
+# define         SOURCE_F "%.4e"
 
   /* Power */
 
   typedef double Power_t ;
 # define         POWER_I 0.0
+# define         POWER_F "%.2f"
 
   /* Temperature */
 
   typedef double Temperature_t ;
 # define         TEMPERATURE_I 0.0
+# define         TEMPERATURE_F "%.2f"
 
   /* Time */
 
   typedef double Time_t ;
 # define         TIME_I 0.0
+# define         TIME_F "%.3d"
 
 /******************************************************************************/
 
@@ -97,11 +105,13 @@ extern "C"
 
   typedef double SolidVHC_t ;
 # define         SOLIDVHC_I 0.0
+# define         SOLIDVHC_F "%.4e"
 
   /* Solid thermal conductivity */
 
   typedef double SolidTC_t ;
 # define         SOLIDTC_I 0.0
+# define         SOLIDTC_F "%.4e"
 
 /******************************************************************************/
 
@@ -109,6 +119,7 @@ extern "C"
 
   typedef double AmbientHTC_t ;
 # define         AMBIENTHTC_I 0.0
+# define         AMBIENTHTC_F "%.4e"
 
 /******************************************************************************/
 
@@ -116,6 +127,7 @@ extern "C"
 
   typedef double CoolantHTC_t ;
 # define         COOLANTHTC_I 0.0
+# define         COOLANTHTC_F "%.4e"
 
   /* The collection of the coolant heat transfer coefficient */
 
@@ -131,16 +143,19 @@ extern "C"
 
   typedef double CoolantVHC_t ;
 # define         COOLANTVHC_I 0.0
+# define         COOLANTVHC_F "%.4e"
 
   /* Coolant flow rate */
 
   typedef double CoolantFR_t ;
 # define         COOLANTFR_I 0.0
+# define         COOLANTFR_F "%.4e"
 
   /* C convection coefficient */
 
   typedef double Cconv_t ;
 # define         CCONV_I 0.0
+# define         CCONV_F "%.4e"
 
 /******************************************************************************/
 
@@ -148,16 +163,19 @@ extern "C"
 
   typedef int GridDimension_t ;
 # define      GRIDDIMENSION_I 0
+# define      GRIDDIMENSION_F "%d"
 
   /* Cell dimension (for cell length, height, width) */
 
   typedef double CellDimension_t ;
 # define         CELLDIMENSION_I 0.0
+# define         CELLDIMENSION_F "%d"
 
   /* Chip dimension (for chip length, width) */
 
 # define ChipDimension_t CellDimension_t
 # define CHIPDIMENSION_I CELLDIMENSION_I
+# define CHIPDIMENSION_F CELLDIMENSION_F
 
 /******************************************************************************/
 
@@ -165,16 +183,19 @@ extern "C"
 
   typedef double SystemMatrixValue_t ;
 # define         SYSTEMMATRIXVALUE_I 0.0
+# define         SYSTEMMATRIXVALUE_F "%.4e"
 
   /* System matrix column indexes */
 
   typedef int SystemMatrixColumn_t ;
 # define      SYSTEMMATRIXCOLUMN_I 0
+# define      SYSTEMMATRIXCOLUMN_F "%d"
 
   /* System matrix row indexes */
 
   typedef int SystemMatrixRow_t ;
 # define      SYSTEMMATRIXROW_I 0
+# define      SYSTEMMATRIXROW_F "%d"
 
 /******************************************************************************/
 
