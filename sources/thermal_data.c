@@ -820,7 +820,6 @@ int get_all_temperatures_of_channel_outlets
   Temperature_t*    outlet_temperature
 )
 {
-  GridDimension_t column             = GRIDDIMENSION_I ;
   Temperature_t*  temperature_offset = NULL ;
   StackElement*   stk_el             = find_stack_element_in_list
                                        (
@@ -842,12 +841,9 @@ int get_all_temperatures_of_channel_outlets
                            get_number_of_rows(stkd->Dimensions) - 1, 0
                          ) ;
 
-  for
-  (
-    column = 0 ;
-    column < get_number_of_columns (stkd->Dimensions) ;
-    column++
-  )
+
+  FOR_EVERY_COLUMN (column, stkd->Dimensions)
+
     if (IS_CHANNEL_COLUMN(column) == TRUE_V)
 
     *outlet_temperature++ = *temperature_offset++ ;
@@ -894,8 +890,6 @@ int print_thermal_map
 )
 {
   FILE*           output_file ;
-  GridDimension_t row          = GRIDDIMENSION_I ;
-  GridDimension_t column       = GRIDDIMENSION_I ;
   GridDimension_t layer_offset = GRIDDIMENSION_I ;
   StackElement*   stk_el       = find_stack_element_in_list
                                  (
@@ -921,21 +915,13 @@ int print_thermal_map
     = tdata->Temperatures
       + get_cell_offset_in_stack (stkd->Dimensions, layer_offset, 0, 0) ;
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (stkd->Dimensions) ;
-    row++
-  )
+  FOR_EVERY_ROW (row, stkd->Dimensions)
   {
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (stkd->Dimensions) ;
-      column++, temperature_offset++
-    )
+    FOR_EVERY_COLUMN (column, stkd->Dimensions)
+    {
       fprintf(output_file, "%7.3f  ", *temperature_offset) ;
-
+      temperature_offset++ ;
+    }
     fprintf(output_file, "\n") ;
   }
 

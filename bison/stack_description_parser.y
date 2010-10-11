@@ -36,6 +36,7 @@
 %{
 #include "math.h"
 
+#include "macros.h"
 #include "material.h"
 #include "die.h"
 #include "layer.h"
@@ -179,18 +180,19 @@ stack_description_file
       // Checks if all the materials are used
       //
 
-      Material* tmp ;
-      for (tmp = stkd->MaterialsList ; tmp != NULL ; tmp = tmp->Next)
-        if (tmp->Used == 0)
-          fprintf(stderr,
-                  "Warning: material %s declared but not used\n", tmp->Id) ;
+      FOR_EVERY_ELEMENT_IN_LIST (Material, material, stkd->MaterialsList)
+
+        if (material->Used == 0)
+
+          fprintf(stderr, "Warning: material %s declared but not used\n",
+                  material->Id) ;
 
       //
       // Counts the number of layers
       //
 
-      StackElement *stk_el = stkd->StackElementsList ;
-      for ( ; stk_el != NULL ; stk_el = stk_el->Next)
+      FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+
         stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
 
       //

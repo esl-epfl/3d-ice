@@ -205,13 +205,11 @@ Bool_t align_to_grid
 
   /* Effective length */
 
-  for  // FIXME WITH MACRO
-  (
-    column =  floorplan_element->SW_Column ;
-    column <= floorplan_element->NE_Column ;
-    column ++
-  )
-    floorplan_element->EffectiveLength += get_cell_length (dimensions, column) ;
+  FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+  {
+    floorplan_element->EffectiveLength
+      += get_cell_length (dimensions, column_index) ;
+  }
 
   /* South side */
 
@@ -239,8 +237,8 @@ Bool_t align_to_grid
   /* Effective width */
 
   floorplan_element->EffectiveWidth =
-    get_cell_width (dimensions)
-    * (floorplan_element->NE_Row - floorplan_element->SW_Row + 1) ;
+    get_cell_width (dimensions) * (floorplan_element->NE_Row
+                                   - floorplan_element->SW_Row + 1) ;
 
   if (floorplan_element->NE_Row - floorplan_element->SW_Row == 0
       && floorplan_element->NE_Column - floorplan_element->SW_Column == 0)

@@ -159,9 +159,9 @@ void print_formatted_floorplan_elements_list
   FloorplanElement* list
 )
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, list)
   {
-    print_formatted_floorplan_element (stream, list) ;
+    print_formatted_floorplan_element (stream, flp_el) ;
     fprintf(stream, "\n") ;
   }
 }

@@ -36,6 +36,7 @@
 #include <stdlib.h>
 
 #include "layer.h"
+#include "macros.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
@@ -70,13 +71,7 @@ void free_layer (Layer* layer)
 
 void free_layers_list (Layer* list)
 {
-  Layer* next = NULL ;
-
-  for ( ; list != NULL ; list = next)
-  {
-      next = list->Next ;
-      free_layer (list) ;
-  }
+  FREE_LIST (Layer, list, free_layer) ;
 }
 
 /******************************************************************************/
@@ -92,9 +87,9 @@ void print_layer (FILE* stream, String_t prefix, Layer* layer)
 
 void print_layers_list (FILE* stream, String_t prefix, Layer* list)
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, list)
 
-    print_layer (stream, prefix, list) ;
+    print_layer (stream, prefix, layer) ;
 }
 
 /******************************************************************************/
@@ -108,9 +103,6 @@ Conductances*   fill_conductances_layer
   GridDimension_t       current_layer
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
   void (*fill_conductances)
   (
 #   ifdef PRINT_CONDUCTANCES
@@ -150,20 +142,10 @@ Conductances*   fill_conductances_layer
   fprintf (stderr, "fill_conductances_layer %s\n", layer->Material->Id) ;
 #endif
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++, conductances++
-    )
-
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
       fill_conductances
       (
 #ifdef PRINT_CONDUCTANCES
@@ -179,22 +161,15 @@ Conductances*   fill_conductances_layer
                                      : conventionalheatsink->AmbientHTC
       ) ;
 
+      conductances++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
+
   return conductances ;
 }
 
 /******************************************************************************/
-
-static Capacity_t capacity
-(
-  CellDimension_t   length,
-  CellDimension_t   width,
-  CellDimension_t   height,
-  SolidVHC_t        vhc,
-  Time_t            time
-)
-{
-  return ((length * width * height) * vhc) / time ;
-}
 
 Capacity_t* fill_capacities_layer
 (
@@ -207,31 +182,17 @@ Capacity_t* fill_capacities_layer
   Time_t          delta_time
 )
 {
-  GridDimension_t row    = GRIDDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-
 #ifdef PRINT_CAPACITIES
   fprintf (stderr,
     "current_layer = %d\tfill_capacities_layer %s\n",
     current_layer, layer->Material->Id) ;
 #endif
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      column++,
-      capacities++
-    )
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
     {
-      *capacities = capacity
+      *capacities = CAPACITY
                     (
                       get_cell_length (dimensions, column),
                       get_cell_width (dimensions),
@@ -251,7 +212,11 @@ Capacity_t* fill_capacities_layer
         layer->Height, *capacities, layer->Material->VolHeatCapacity, delta_time
       ) ;
 #endif
-    }
+
+      capacities++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
 
   return capacities ;
 }
@@ -271,10 +236,8 @@ Source_t* fill_sources_active_layer
   Dimensions*           dimensions
 )
 {
-  GridDimension_t   row            = GRIDDIMENSION_I ;
-  GridDimension_t   column         = GRIDDIMENSION_I ;
-  CellDimension_t   flp_el_surface = CELLDIMENSION_I ;
-  FloorplanElement* flp_el         = NULL ;
+  CellDimension_t flp_el_surface = CELLDIMENSION_I ;
+  Power_t         power          = POWER_I ;
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
@@ -282,36 +245,22 @@ Source_t* fill_sources_active_layer
     current_layer, layer->Material->Id) ;
 #endif
 
-  for
-  (
-    flp_el  = floorplan->ElementsList ;
-    flp_el != NULL ;
-    flp_el  = flp_el->Next
-  )
+  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, floorplan->ElementsList)
   {
     flp_el_surface
       = (CellDimension_t) (flp_el->EffectiveLength * flp_el->EffectiveWidth) ;
 
-    for
-    (
-      row = flp_el->SW_Row ;
-      row <= flp_el->NE_Row ;
-      row++
-    )
+    power = get_from_powers_queue(flp_el->PowerValues) ;
 
-      for
-      (
-        column =  flp_el->SW_Column ;
-        column <= flp_el->NE_Column ;
-        column++
-      )
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, flp_el)
+    {
+      FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, flp_el)
       {
         sources [get_cell_offset_in_layer (dimensions, row, column)]
 
           = (
-               get_from_powers_queue(flp_el->PowerValues)
-               * get_cell_length (dimensions, column)
-               * get_cell_width (dimensions)
+               power * get_cell_length (dimensions, column)
+                     * get_cell_width (dimensions)
             )
             /  flp_el_surface ;
 
@@ -328,10 +277,12 @@ Source_t* fill_sources_active_layer
           flp_el->Id) ;
 #endif
 
-      }
+      } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 
     pop_from_powers_queue (flp_el->PowerValues) ;
-  }
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
 
   if ( current_layer == (get_number_of_layers(dimensions) - 1)
        && conventionalheatsink != NULL )
@@ -400,8 +351,6 @@ Quantity_t fill_system_matrix_layer
   SystemMatrixValue_t*  values
 )
 {
-  GridDimension_t row       = GRIDDIMENSION_I ;
-  GridDimension_t column    = GRIDDIMENSION_I ;
   Quantity_t      added     = QUANTITY_I ;
   Quantity_t      tot_added = QUANTITY_I ;
 
@@ -411,25 +360,10 @@ Quantity_t fill_system_matrix_layer
     current_layer, layer->Material->Id) ;
 #endif
 
-  for
-  (
-    row = 0 ;
-    row < get_number_of_rows (dimensions) ;
-    row++
-  )
-
-    for
-    (
-      column = 0 ;
-      column < get_number_of_columns (dimensions) ;
-      conductances    ++ ,
-      capacities      ++ ,
-      column_pointers ++ ,
-      row_indices     += added ,
-      values          += added ,
-      tot_added       += added ,
-      column          ++
-    )
+  FOR_EVERY_ROW (row, dimensions)
+  {
+    FOR_EVERY_COLUMN (column, dimensions)
+    {
 
       added = add_solid_column
               (
@@ -438,6 +372,17 @@ Quantity_t fill_system_matrix_layer
                 current_layer, row, column,
                 column_pointers, row_indices, values
               ) ;
+
+
+      conductances    ++ ;
+      capacities      ++ ;
+      column_pointers ++ ;
+      row_indices     += added ;
+      values          += added ;
+      tot_added       += added ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
 
   return tot_added ;
 }

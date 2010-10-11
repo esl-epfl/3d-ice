@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "stack_element.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -87,13 +88,7 @@ void free_stack_element (StackElement* stack_element)
 
 void free_stack_elements_list (StackElement* list)
 {
-  StackElement* next = NULL ;
-
-  for ( ; list != NULL ; list = next)
-  {
-    next = list->Next ;
-    free_stack_element (list) ;
-  }
+  FREE_LIST (StackElement, list, free_stack_element) ;
 }
 
 /******************************************************************************/
@@ -107,13 +102,13 @@ void print_stack_elements_list
 {
   fprintf (stream, "%sStack:\n", prefix) ;
 
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, list)
   {
     fprintf (stream,
       "%s  Stackelement (l %-2d)\t%s\t",
-      prefix, list->LayersOffset, list->Id) ;
+      prefix, stk_el->LayersOffset, stk_el->Id) ;
 
-    switch (list->Type)
+    switch (stk_el->Type)
     {
       case TDICE_STACK_ELEMENT_NONE :
 
@@ -124,14 +119,14 @@ void print_stack_elements_list
 
         fprintf (stream,
           "die     (%s) %s \n",
-          list->Pointer.Die->Id, list->Floorplan->FileName) ;
+          stk_el->Pointer.Die->Id, stk_el->Floorplan->FileName) ;
         break ;
 
       case TDICE_STACK_ELEMENT_LAYER :
 
         fprintf (stream,
           "layer   (%s) %5.2f um\n",
-          list->Pointer.Layer->Material->Id, list->Pointer.Layer->Height) ;
+          stk_el->Pointer.Layer->Material->Id, stk_el->Pointer.Layer->Height) ;
         break ;
 
       case TDICE_STACK_ELEMENT_CHANNEL :
@@ -142,21 +137,23 @@ void print_stack_elements_list
 
       default :
 
-        fprintf (stream, "Error! Unknown type %d\n", list->Type) ;
+        fprintf (stream, "Error! Unknown type %d\n", stk_el->Type) ;
         break ;
     }
-  }
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
+
 }
 
 /******************************************************************************/
 
 StackElement*  find_stack_element_in_list (StackElement* list, String_t id)
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, list)
 
-    if (strcmp(list->Id, id) == 0)  break ;
+    if (strcmp(stk_el->Id, id) == 0)  break ;
 
- return list ;
+ return stk_el ;
 }
 
 /******************************************************************************/

@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "material.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -72,13 +73,7 @@ void free_material (Material* material)
 
 void free_materials_list (Material* list)
 {
-  Material* next = NULL ;
-
-  for ( ; list != NULL ; list = next)
-  {
-      next = list->Next ;
-      free_material (list) ;
-  }
+  FREE_LIST (Material, list, free_material) ;
 }
 
 /******************************************************************************/
@@ -100,20 +95,20 @@ void print_material (FILE* stream, String_t prefix, Material* material)
 
 void print_materials_list (FILE* stream, String_t prefix, Material* list)
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (Material, material, list)
 
-    print_material (stream, prefix, list) ;
+    print_material (stream, prefix, material) ;
 }
 
 /******************************************************************************/
 
 Material* find_material_in_list (Material* list, String_t id)
 {
-  for ( ; list != NULL ; list = list->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (Material, material, list)
 
-    if (strcmp (list->Id, id) == 0) break ;
+    if (strcmp (material->Id, id) == 0) break ;
 
-  return list ;
+  return material ;
 }
 
 /******************************************************************************/

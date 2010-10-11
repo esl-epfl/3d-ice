@@ -126,7 +126,7 @@ Quantity_t add_solid_column
 
   /* BOTTOM */
 
-  if ( current_layer > 0 )
+  if ( ! IS_FIRST_LAYER(current_layer) )
   {
     *row_indices++ = current_cell - get_layer_area(dimensions) ;
 
@@ -149,7 +149,7 @@ Quantity_t add_solid_column
 
   /* SOUTH */
 
-  if ( current_row > 0 )
+  if ( ! IS_FIRST_ROW(current_row) )
   {
     *row_indices++ = current_cell - get_number_of_columns(dimensions) ;
 
@@ -172,7 +172,7 @@ Quantity_t add_solid_column
 
   /* WEST */
 
-  if ( current_column > 0 )
+  if ( ! IS_FIRST_COLUMN(current_column) )
   {
     *row_indices++ = current_cell - 1 ;
 
@@ -214,7 +214,7 @@ Quantity_t add_solid_column
 
   /* EAST */
 
-  if ( current_column < get_number_of_columns(dimensions) - 1 )
+  if ( ! IS_LAST_COLUMN(current_column, dimensions) )
   {
     *row_indices++ = current_cell + 1 ;
 
@@ -237,7 +237,7 @@ Quantity_t add_solid_column
 
   /* NORTH */
 
-  if ( current_row < get_number_of_rows(dimensions) - 1 )
+  if ( ! IS_LAST_ROW(current_row, dimensions) )
   {
     *row_indices++ = current_cell + get_number_of_columns(dimensions) ;
 
@@ -260,7 +260,7 @@ Quantity_t add_solid_column
 
   /* TOP */
 
-  if ( current_layer < get_number_of_layers(dimensions) - 1)
+  if ( ! IS_LAST_LAYER(current_layer, dimensions) )
   {
     *row_indices++ = current_cell + get_layer_area(dimensions) ;
 
@@ -339,7 +339,7 @@ Quantity_t add_liquid_column
 
   /* BOTTOM */
 
-  if ( current_layer > 0 )
+  if ( ! IS_FIRST_LAYER(current_layer) )
   {
     *row_indices++ = current_cell - get_layer_area(dimensions) ;
 
@@ -362,7 +362,7 @@ Quantity_t add_liquid_column
 
   /* SOUTH */
 
-  if ( current_row > 0 )
+  if ( ! IS_FIRST_ROW(current_row) )
   {
     *row_indices++ = current_cell - get_number_of_columns(dimensions) ;
     *values++  = conductances->North ; /* == (C) */
@@ -378,7 +378,7 @@ Quantity_t add_liquid_column
 
   /* WEST */
 
-  if ( current_column > 0 )
+  if ( ! IS_FIRST_COLUMN(current_column) )
   {
     *row_indices++ = current_cell - 1 ;
 
@@ -416,7 +416,7 @@ Quantity_t add_liquid_column
 
   /* EAST */
 
-  if ( current_column < get_number_of_columns(dimensions) - 1 )
+  if ( ! IS_LAST_COLUMN(current_column, dimensions) )
   {
     *row_indices++ = current_cell + 1 ;
 
@@ -439,7 +439,7 @@ Quantity_t add_liquid_column
 
   /* NORTH */
 
-  if ( current_row < get_number_of_rows(dimensions) - 1 )
+  if ( ! IS_LAST_ROW(current_row, dimensions) )
   {
     *row_indices++ = current_cell + get_number_of_columns(dimensions) ;
     *values++  = conductances->South ; /* == -C */
@@ -455,7 +455,7 @@ Quantity_t add_liquid_column
 
   /* TOP */
 
-  if ( current_layer < get_number_of_layers(dimensions) - 1)
+  if ( ! IS_LAST_LAYER(current_layer, dimensions) )
   {
     *row_indices++ = current_cell + get_layer_area(dimensions) ;
 

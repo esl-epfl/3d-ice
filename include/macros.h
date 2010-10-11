@@ -78,11 +78,11 @@ extern "C"
 
 /******************************************************************************/
 
-# define FIRST_ROW_INDEX        GRIDDIMENSION_I
-# define LAST_ROW_INDEX(dim)    (get_number_of_rows (dim) - 1)
+# define FIRST_ROW_INDEX              GRIDDIMENSION_I
+# define LAST_ROW_INDEX(dim)          (get_number_of_rows (dim) - 1)
 
-# define IS_FIRST_ROW(row)      (row == FIRST_ROW_INDEX)
-# define IS_LAST_ROW(row, dim)  (row == LAST_ROW_INDEX(dim))
+# define IS_FIRST_ROW(row)            (row == FIRST_ROW_INDEX)
+# define IS_LAST_ROW(row, dim)        (row == LAST_ROW_INDEX(dim))
 
 # define FOR_EVERY_ROW(index, dim)            \
                                               \
@@ -102,6 +102,14 @@ extern "C"
                                               \
     GridDimension_t index = GRIDDIMENSION_I ; \
     for (index = FIRST_COLUMN_INDEX ; index <= LAST_COLUMN_INDEX(dim) ; index++)
+
+/******************************************************************************/
+
+# define FIRST_LAYER_INDEX            GRIDDIMENSION_I
+# define LAST_LAYER_INDEX(dim)        (get_number_of_layers (dim) - 1)
+
+# define IS_FIRST_LAYER(layer)        (layer == FIRST_LAYER_INDEX)
+# define IS_LAST_LAYER(layer, dim)    (layer == LAST_LAYER_INDEX(dim))
 
 /******************************************************************************/
 

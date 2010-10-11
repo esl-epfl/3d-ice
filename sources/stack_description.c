@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include "stack_description.h"
+#include "macros.h"
 #include "layer.h"
 #include "../bison/stack_description_parser.h"
 #include "../flex/stack_description_scanner.h"
@@ -145,28 +146,26 @@ void print_all_floorplans
   StackDescription* stkd
 )
 {
-  StackElement* stack_element = stkd->StackElementsList ;
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
-  for ( ; stack_element != NULL ; stack_element = stack_element->Next)
-
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
-
-      print_floorplan(stream, prefix, stack_element->Floorplan) ;
+      print_floorplan(stream, prefix, stk_el->Floorplan) ;
+  }
 }
 
 /******************************************************************************/
 
 int fill_floorplans (StackDescription* stkd)
 {
-  StackElement* stack_element = stkd->StackElementsList ;
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
-  for ( ; stack_element != NULL ; stack_element = stack_element->Next)
-
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
-
-      if (fill_floorplan (stack_element->Floorplan, stkd->Dimensions) == 1)
+      if (fill_floorplan (stk_el->Floorplan, stkd->Dimensions) == 1)
 
         return 1 ;
+  }
 
   return 0 ;
  }
@@ -175,18 +174,17 @@ int fill_floorplans (StackDescription* stkd)
 
 static void align_layers_in_die (StackDescription* stkd)
 {
-  Layer*          layer        = NULL ;
   GridDimension_t layer_offset = GRIDDIMENSION_I ;
-  Die*            die          = stkd->DiesList ;
 
-  for ( ; die != NULL ; die = die->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (Die, die, stkd->DiesList)
   {
     layer_offset = 0 ;
-    layer = die->LayersList ;
-    for ( ; layer != NULL ; layer = layer->Next)
+
+    FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
     {
       layer->LayersOffset = layer_offset++ ;
     }
+
   }
 }
 
@@ -195,13 +193,11 @@ static void align_layers_in_die (StackDescription* stkd)
 static void align_stack_elements (StackDescription* stkd)
 {
   GridDimension_t layer_counter = GRIDDIMENSION_I ;
-  StackElement*   stack_element = stkd->StackElementsList ;
 
-  for ( ; stack_element != NULL ; stack_element = stack_element->Next)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
   {
-    stack_element->LayersOffset = layer_counter ;
-
-    layer_counter += stack_element->NLayers ;
+    stk_el->LayersOffset = layer_counter ;
+    layer_counter        += stk_el->NLayers ;
   }
 
  }
@@ -214,8 +210,6 @@ void fill_conductances_stack_description
   Conductances*     conductances
 )
 {
-  StackElement* stack_element = NULL ;
-
 #ifdef PRINT_CONDUCTANCES
   fprintf
   (
@@ -227,24 +221,19 @@ void fill_conductances_stack_description
   ) ;
 #endif
 
-  for
-  (
-    stack_element = stkd->StackElementsList ;
-    stack_element != NULL ;
-    stack_element = stack_element->Next
-  )
-
-    switch (stack_element->Type)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    switch (stk_el->Type)
     {
       case TDICE_STACK_ELEMENT_DIE :
 
         conductances = fill_conductances_die
                        (
-                         stack_element->Pointer.Die,
+                         stk_el->Pointer.Die,
                          conductances,
                          stkd->Dimensions,
                          stkd->ConventionalHeatSink,
-                         stack_element->LayersOffset
+                         stk_el->LayersOffset
                        ) ;
         break ;
 
@@ -252,11 +241,11 @@ void fill_conductances_stack_description
 
         conductances = fill_conductances_layer
                        (
-                         stack_element->Pointer.Layer,
+                         stk_el->Pointer.Layer,
                          conductances,
                          stkd->Dimensions,
                          stkd->ConventionalHeatSink,
-                         stack_element->LayersOffset
+                         stk_el->LayersOffset
                        ) ;
         break ;
 
@@ -265,10 +254,11 @@ void fill_conductances_stack_description
         conductances = fill_conductances_channel
                        (
 #                        ifdef PRINT_CONDUCTANCES
-                         stack_element->LayersOffset,
+                         stk_el->LayersOffset,
 #                        endif
                          stkd->Channel,
-                         conductances, stkd->Dimensions
+                         conductances,
+                         stkd->Dimensions
                        ) ;
         break ;
 
@@ -283,11 +273,13 @@ void fill_conductances_stack_description
         (
           stderr,
           "Error! Unknown stack element type %d\n",
-          stack_element->Type
+          stk_el->Type
         ) ;
         return ;
 
-    } /* switch stack_elementy->Type */
+    } /* switch stk_el->Type */
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
 }
 
 /******************************************************************************/
@@ -299,8 +291,6 @@ void fill_capacities_stack_description
   Time_t            delta_time
 )
 {
-  StackElement* stack_element = NULL ;
-
 #ifdef PRINT_CAPACITIES
   fprintf
   (
@@ -312,22 +302,19 @@ void fill_capacities_stack_description
   ) ;
 #endif
 
-  for
-  (
-    stack_element = stkd->StackElementsList ;
-    stack_element != NULL ;
-    stack_element = stack_element->Next
-  )
-    switch (stack_element->Type)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+
+    switch (stk_el->Type)
     {
       case TDICE_STACK_ELEMENT_DIE :
 
         capacities = fill_capacities_die
                      (
 #                      ifdef PRINT_CAPACITIES
-                       stack_element->LayersOffset,
+                       stk_el->LayersOffset,
 #                      endif
-                       stack_element->Pointer.Die,
+                       stk_el->Pointer.Die,
                        capacities,
                        stkd->Dimensions,
                        delta_time
@@ -339,9 +326,9 @@ void fill_capacities_stack_description
         capacities = fill_capacities_layer
                      (
 #                      ifdef PRINT_CAPACITIES
-                       stack_element->LayersOffset,
+                       stk_el->LayersOffset,
 #                      endif
-                       stack_element->Pointer.Layer,
+                       stk_el->Pointer.Layer,
                        capacities,
                        stkd->Dimensions,
                        delta_time
@@ -353,7 +340,7 @@ void fill_capacities_stack_description
         capacities = fill_capacities_channel
                      (
 #                      ifdef PRINT_CAPACITIES
-                       stack_element->LayersOffset,
+                       stk_el->LayersOffset,
 #                      endif
                        stkd->Channel,
                        capacities,
@@ -373,11 +360,13 @@ void fill_capacities_stack_description
         (
           stderr,
           "Error! Unknown stack element type %d\n",
-          stack_element->Type
+          stk_el->Type
         ) ;
         return ;
 
-    } /* switch stack_element->Type */
+    } /* switch stk_el->Type */
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
 }
 
 /******************************************************************************/
@@ -389,8 +378,6 @@ void fill_sources_stack_description
   Conductances*     conductances
 )
 {
-  StackElement* stack_element = NULL ;
-
 #ifdef PRINT_SOURCES
   fprintf (stderr,
     "fill_sources_stack_description ( l %d r %d c %d )\n",
@@ -399,24 +386,19 @@ void fill_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  for
-  (
-    stack_element = stkd->StackElementsList ;
-    stack_element != NULL ;
-    stack_element      = stack_element->Next
-  )
-
-    switch (stack_element->Type)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    switch (stk_el->Type)
     {
       case TDICE_STACK_ELEMENT_DIE :
 
         sources = fill_sources_die
                   (
-                    stack_element->LayersOffset,
-                    stack_element->Pointer.Die,
+                    stk_el->LayersOffset,
+                    stk_el->Pointer.Die,
                     stkd->ConventionalHeatSink,
                     conductances,
-                    stack_element->Floorplan,
+                    stk_el->Floorplan,
                     sources,
                     stkd->Dimensions
                   ) ;
@@ -428,9 +410,9 @@ void fill_sources_stack_description
         sources = fill_sources_empty_layer
                   (
 #                   ifdef PRINT_SOURCES
-                    stack_element->Pointer.Layer,
+                    stk_el->Pointer.Layer,
 #                   endif
-                    stack_element->LayersOffset,
+                    stk_el->LayersOffset,
                     stkd->ConventionalHeatSink,
                     conductances,
                     sources,
@@ -443,7 +425,7 @@ void fill_sources_stack_description
         sources = fill_sources_channel
                   (
 #                   ifdef PRINT_SOURCES
-                    stack_element->LayersOffset,
+                    stk_el->LayersOffset,
 #                   endif
                     stkd->Channel,
                     sources,
@@ -459,10 +441,11 @@ void fill_sources_stack_description
       default :
 
         fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stack_element->Type) ;
+          stk_el->Type) ;
         return ;
 
-    } /* switch stack_element->Type */
+    } /* switch stk_el->Type */
+  } // FOR_EVERY_ELEMENT_IN_LIST
 }
 
 /******************************************************************************/
@@ -477,9 +460,8 @@ void fill_system_matrix_stack_description
   SystemMatrixValue_t*  values
 )
 {
-  StackElement* stack_element = NULL ;
-  Quantity_t    added         = QUANTITY_I ;
-  Quantity_t    area          = get_layer_area (stkd->Dimensions) ;
+  Quantity_t added = QUANTITY_I ;
+  Quantity_t area  = get_layer_area (stkd->Dimensions) ;
 
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf
@@ -493,28 +475,18 @@ void fill_system_matrix_stack_description
 
   *column_pointers++ = SYSTEMMATRIXCOLUMN_I ;
 
-  for
-  (
-    stack_element    = stkd->StackElementsList ;
-    stack_element   != NULL ;
-    conductances    += area * stack_element->NLayers,
-    capacities      += area * stack_element->NLayers,
-    column_pointers += area * stack_element->NLayers,
-    row_indices     += added,
-    values          += added,
-    stack_element    = stack_element->Next
-  )
-
-    switch (stack_element->Type)
+  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  {
+    switch (stk_el->Type)
     {
       case TDICE_STACK_ELEMENT_DIE :
 
         added = fill_system_matrix_die
                 (
-                  stack_element->Pointer.Die, stkd->Dimensions,
+                  stk_el->Pointer.Die, stkd->Dimensions,
                   conductances, capacities,
                   stkd->ConventionalHeatSink,
-                  stack_element->LayersOffset,
+                  stk_el->LayersOffset,
                   column_pointers, row_indices, values
                 ) ;
         break ;
@@ -524,11 +496,11 @@ void fill_system_matrix_stack_description
         added = fill_system_matrix_layer
                 (
 #                 ifdef PRINT_SYSTEM_MATRIX
-                  stack_element->Pointer.Layer,
+                  stk_el->Pointer.Layer,
 #                 endif
                   stkd->Dimensions, conductances, capacities,
                   stkd->ConventionalHeatSink,
-                  stack_element->LayersOffset,
+                  stk_el->LayersOffset,
                   column_pointers, row_indices, values
                 ) ;
         break ;
@@ -541,7 +513,7 @@ void fill_system_matrix_stack_description
                   stkd->Channel,
 #                 endif
                   stkd->Dimensions, conductances, capacities,
-                  stack_element->LayersOffset,
+                  stk_el->LayersOffset,
                   column_pointers, row_indices, values
                 ) ;
         break ;
@@ -554,10 +526,18 @@ void fill_system_matrix_stack_description
       default :
 
         fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stack_element->Type) ;
+          stk_el->Type) ;
         return ;
 
-    } /* stack_element->Type */
+    } /* stk_el->Type */
+
+    conductances    += area * stk_el->NLayers ;
+    capacities      += area * stk_el->NLayers ;
+    column_pointers += area * stk_el->NLayers ;
+    row_indices     += added ;
+    values          += added ;
+
+  } // FOR_EVERY_ELEMENT_IN_LIST
 }
 
 /******************************************************************************/
