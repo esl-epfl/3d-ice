@@ -393,14 +393,13 @@ die
        source_layer
        layers_list
     {
-      Layer* layer ;
       Die* die = $$ = alloc_and_init_die() ;
 
       if (die == NULL)
       {
-        free ($2) ;
+        free             ($2) ;
         free_layers_list ($4) ;
-        free_layer ($5) ;
+        free_layer       ($5) ;
         free_layers_list ($6) ;
 
         stack_description_error
@@ -416,9 +415,9 @@ die
           = (String_t) malloc ((21 + strlen($2)) * sizeof (char)) ;
         sprintf (message, "Die %s already declared", $2) ;
 
-        free ($2) ;
+        free             ($2) ;
         free_layers_list ($4) ;
-        free_layer ($5) ;
+        free_layer       ($5) ;
         free_layers_list ($6) ;
         free_die (die) ;
         stack_description_error (stkd, scanner, message) ;
@@ -432,7 +431,7 @@ die
       {
         die->LayersList = $6 ;
 
-        layer = $6 ;
+        Layer* layer = $6 ;
         while (layer->Next != NULL)
           layer = layer->Next ;
         layer->Next = $5 ;
@@ -443,12 +442,13 @@ die
       die->SourceLayer = $5 ;
       $5->Next = $4 ;
 
-      layer = die->LayersList ;
-      while (layer != NULL)
-      {
-        die->NLayers++ ;
-        layer = layer->Next ;
-      }
+      GridDimension_t layer_offset = GRIDDIMENSION_I ;
+
+      FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+
+        layer->LayersOffset = layer_offset++ ;
+
+      die->NLayers = layer_offset ;
     }
   ;
 
@@ -554,6 +554,15 @@ stack
       if (found_channel == FALSE_V && stkd->Channel != NULL)
 
         fprintf (stderr, "Warning: channel section declared but not used\n") ;
+
+
+      GridDimension_t layer_index = GRIDDIMENSION_I ;
+
+      FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+      {
+        stk_el->LayersOffset = layer_index ;
+        layer_index          += stk_el->NLayers ;
+      }
 
       // Reset for the next parsing ...
       last_stack_element = TDICE_STACK_ELEMENT_NONE ;

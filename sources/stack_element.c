@@ -105,8 +105,8 @@ void print_stack_elements_list
   FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, list)
   {
     fprintf (stream,
-      "%s  Stackelement (l %-2d)\t%s\t",
-      prefix, stk_el->LayersOffset, stk_el->Id) ;
+      "%s  Stackelement (l %-2d - %-2d)\t%s\t",
+      prefix, stk_el->LayersOffset, stk_el->NLayers, stk_el->Id) ;
 
     switch (stk_el->Type)
     {

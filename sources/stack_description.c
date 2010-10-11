@@ -43,8 +43,6 @@
 
 extern int  stack_description_parse (StackDescription* stkd, yyscan_t scanner) ;
 static int  fill_floorplans         (StackDescription* stkd) ;
-static void align_layers_in_die     (StackDescription* stkd) ;
-static void align_stack_elements    (StackDescription* stkd) ;
 
 /******************************************************************************/
 
@@ -89,9 +87,6 @@ int fill_stack_description
   fclose (input) ;
 
   if (result == 1) return result ;
-
-  align_stack_elements (stkd) ;
-  align_layers_in_die  (stkd) ;
 
   return fill_floorplans (stkd) ;
 }
@@ -168,38 +163,6 @@ int fill_floorplans (StackDescription* stkd)
   }
 
   return 0 ;
- }
-
-/******************************************************************************/
-
-static void align_layers_in_die (StackDescription* stkd)
-{
-  GridDimension_t layer_offset = GRIDDIMENSION_I ;
-
-  FOR_EVERY_ELEMENT_IN_LIST (Die, die, stkd->DiesList)
-  {
-    layer_offset = 0 ;
-
-    FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
-    {
-      layer->LayersOffset = layer_offset++ ;
-    }
-
-  }
-}
-
-/******************************************************************************/
-
-static void align_stack_elements (StackDescription* stkd)
-{
-  GridDimension_t layer_counter = GRIDDIMENSION_I ;
-
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
-  {
-    stk_el->LayersOffset = layer_counter ;
-    layer_counter        += stk_el->NLayers ;
-  }
-
  }
 
 /******************************************************************************/
