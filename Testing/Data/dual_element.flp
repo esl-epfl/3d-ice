@@ -1,7 +1,0 @@
-BottomElement :
-  position      0,     0 ;
-  dimension   300,  2000 ;
-
-TopElement :
-  position      0,  2000 ;
-  dimension   300,  8000 ;

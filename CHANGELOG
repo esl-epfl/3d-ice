@@ -33,27 +33,10 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
-3DICE_MAIN = .
-
-include $(3DICE_MAIN)/makefile.def
-
-.PHONY: all lib examples clean
-
-all: lib examples
-
-lib:
-	cd $(3DICE_FLEX)    ; make ;
-	cd $(3DICE_BISON)   ; make ;
-	cd $(3DICE_SOURCES) ; make ;
-	cd $(3DICE_LIB)     ; make ;
-
-examples: lib
-	cd $(3DICE_EXAMPLES) ; make ;
-
-clean:
-	cd $(3DICE_FLEX)       ; make clean ;
-	cd $(3DICE_BISON)      ; make clean ;
-	cd $(3DICE_SOURCES)    ; make clean ;
-	cd $(3DICE_LIB)        ; make clean ;
-	cd $(3DICE_EXAMPLES)   ; make clean ;
-
+ ##############################################################################
+ 2010-10-07 3D-ICE 1.0.1
+   * Bug fixes
+ ##############################################################################
+ 2010-09-28 3D-ICE 1.0
+   * First release
+ ##############################################################################

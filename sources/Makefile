@@ -33,27 +33,23 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
-3DICE_MAIN = .
+3DICE_MAIN = ..
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib examples clean
+CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 
-all: lib examples
+CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
+#CFLAGS := $(CFLAGS) -DPRINT_CONDUCTANCES
+#CFLAGS := $(CFLAGS) -DPRINT_CAPACITIES
+#CFLAGS := $(CFLAGS) -DPRINT_SYSTEM_MATRIX
+#CFLAGS := $(CFLAGS) -DPRINT_SOURCES
 
-lib:
-	cd $(3DICE_FLEX)    ; make ;
-	cd $(3DICE_BISON)   ; make ;
-	cd $(3DICE_SOURCES) ; make ;
-	cd $(3DICE_LIB)     ; make ;
+all: $(3DICE_SOURCES_O)
 
-examples: lib
-	cd $(3DICE_EXAMPLES) ; make ;
+-include $(3DICE_SOURCES_D)
 
 clean:
-	cd $(3DICE_FLEX)       ; make clean ;
-	cd $(3DICE_BISON)      ; make clean ;
-	cd $(3DICE_SOURCES)    ; make clean ;
-	cd $(3DICE_LIB)        ; make clean ;
-	cd $(3DICE_EXAMPLES)   ; make clean ;
+	@$(RM) $(RMFLAGS) $(3DICE_SOURCES_O)
+	@$(RM) $(RMFLAGS) $(3DICE_SOURCES_D)
 

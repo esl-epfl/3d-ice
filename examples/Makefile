@@ -33,27 +33,29 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
-3DICE_MAIN = .
+3DICE_MAIN = ..
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib examples clean
+all: FillThermalData Emulate3DICe
 
-all: lib examples
+CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
+CLIBS = $(3DICE_LIB_A) $(SLU_LIBS)
 
-lib:
-	cd $(3DICE_FLEX)    ; make ;
-	cd $(3DICE_BISON)   ; make ;
-	cd $(3DICE_SOURCES) ; make ;
-	cd $(3DICE_LIB)     ; make ;
+-include FillThermalData.d
 
-examples: lib
-	cd $(3DICE_EXAMPLES) ; make ;
+FillThermalData: FillThermalData.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
+-include Emulate3DICe.d
+
+Emulate3DICe: Emulate3DICe.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
 
 clean:
-	cd $(3DICE_FLEX)       ; make clean ;
-	cd $(3DICE_BISON)      ; make clean ;
-	cd $(3DICE_SOURCES)    ; make clean ;
-	cd $(3DICE_LIB)        ; make clean ;
-	cd $(3DICE_EXAMPLES)   ; make clean ;
-
+	@$(RM) $(RMFLAGS) FillThermalData
+	@$(RM) $(RMFLAGS) FillThermalData.o
+	@$(RM) $(RMFLAGS) FillThermalData.d
+	@$(RM) $(RMFLAGS) Emulate3DICe
+	@$(RM) $(RMFLAGS) Emulate3DICe.o
+	@$(RM) $(RMFLAGS) Emulate3DICe.d
