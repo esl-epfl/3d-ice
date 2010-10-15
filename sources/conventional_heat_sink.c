@@ -144,7 +144,7 @@ void add_sources_conventional_heat_sink
   {
     FOR_EVERY_COLUMN (column, dimensions)
     {
-      *sources = (conventionalheatsink->AmbientTemperature * conductances->Top) ;
+      *sources += (conventionalheatsink->AmbientTemperature * conductances->Top) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
