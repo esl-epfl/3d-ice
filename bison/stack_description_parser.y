@@ -821,7 +821,6 @@ dimensions
       /* Set lengths and NColumns */
 
       stkd->Dimensions->Chip.Length = (ChipDimension_t) $5 ;
-      stkd->Dimensions->Cell.Length = (CellDimension_t) $12 ;
 
       if (stkd->Channel == NULL)
       {
@@ -829,9 +828,11 @@ dimensions
 
         stkd->Dimensions->StackHasChannel = FALSE_V ;
 
+        stkd->Dimensions->Cell.WallLength = (CellDimension_t) $12 ;
+
         stkd->Dimensions->Grid.NColumns
           = (GridDimension_t)
-            stkd->Dimensions->Chip.Length / stkd->Dimensions->Cell.Length ;
+            stkd->Dimensions->Chip.Length / stkd->Dimensions->Cell.WallLength ;
       }
       else
       {
@@ -842,6 +843,7 @@ dimensions
         stkd->Dimensions->Cell.FirstWallLength = tmp_first_wall_length ;
         stkd->Dimensions->Cell.LastWallLength  = tmp_last_wall_length ;
         stkd->Dimensions->Cell.WallLength      = tmp_wall_length ;
+
         stkd->Dimensions->Cell.ChannelLength   = tmp_channel_length ;
 
         CellDimension_t ratio
@@ -875,7 +877,7 @@ dimensions
           YYABORT ;
         }
 
-        /* Check the number of ciolumns get */
+        /* Check the number of columns */
 
         if (stkd->Dimensions->Grid.NColumns < 3)
         {
@@ -888,12 +890,12 @@ dimensions
 
 first_wall_length
   : /* empty */                  { $$ = 0.0 ; }
-  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ;  }
+  | FIRST WALL LENGTH DVALUE ';' { $$ =  $4 ; }
   ;
 
 last_wall_length
   : /* empty */                 { $$ = 0.0 ; }
-  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ;  }
+  | LAST WALL LENGTH DVALUE ';' { $$ =  $4 ; }
   ;
 
 %%

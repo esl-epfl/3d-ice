@@ -48,7 +48,6 @@ void init_dimensions (Dimensions* dimensions)
   dimensions->Cell.ChannelLength   = CELLDIMENSION_I ;
 
   dimensions->Cell.Width           = CELLDIMENSION_I ;
-  dimensions->Cell.Length          = CELLDIMENSION_I ;
 
   dimensions->Grid.NLayers     = GRIDDIMENSION_I ;
   dimensions->Grid.NRows       = GRIDDIMENSION_I ;
@@ -90,7 +89,7 @@ void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
 
     fprintf (stream,
       "%sCell dimensions          (l x w) = (%.2f x %.2f) um\n",
-      prefix, dimensions->Cell.Length, dimensions->Cell.Width) ;
+      prefix, dimensions->Cell.WallLength, dimensions->Cell.Width) ;
 
   else
 
@@ -116,7 +115,7 @@ CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
 {
   if (!dimensions->StackHasChannel)
 
-    return dimensions->Cell.Length ;
+    return dimensions->Cell.WallLength ;
 
   if (IS_FIRST_COLUMN(column))
 

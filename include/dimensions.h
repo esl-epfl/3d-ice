@@ -58,7 +58,6 @@ extern "C"
     CellDimension_t ChannelLength ;
 
     CellDimension_t Width ;
-    CellDimension_t Length ;
 
   } CellDimensions ;
 
