@@ -245,7 +245,7 @@ Source_t* fill_sources_die
 
 /******************************************************************************/
 
-Quantity_t fill_system_matrix_die
+SystemMatrix fill_system_matrix_die
 (
   Die*                  die,
   Dimensions*           dimensions,
@@ -253,41 +253,32 @@ Quantity_t fill_system_matrix_die
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
   GridDimension_t       current_layer,
-  SystemMatrixColumn_t* column_pointers,
-  SystemMatrixRow_t*    row_indices,
-  SystemMatrixValue_t*  values
+  SystemMatrix          system_matrix
 )
 {
-  Quantity_t tot_added = QUANTITY_I ;
-  Quantity_t added     = QUANTITY_I ;
-
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "(l %2d) fill_system_matrix_die\n", current_layer) ;
 # endif
 
   FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
   {
-    added = fill_system_matrix_layer
-            (
-#             ifdef PRINT_SYSTEM_MATRIX
-              layer,
-#             endif
-              dimensions, conductances, capacities,
-              conventionalheatsink,
-              current_layer + layer->LayersOffset,
-              column_pointers, row_indices, values
-            ) ;
+    system_matrix = fill_system_matrix_layer
+                    (
+#                     ifdef PRINT_SYSTEM_MATRIX
+                      layer,
+#                     endif
+                      dimensions, conductances, capacities,
+                      conventionalheatsink,
+                      current_layer + layer->LayersOffset,
+                      system_matrix
+                     ) ;
 
     conductances    += get_layer_area (dimensions) ;
     capacities      += get_layer_area (dimensions) ;
-    column_pointers += get_layer_area (dimensions) ;
-    row_indices     += added ;
-    values          += added ;
-    tot_added       += added ;
 
   }  // FOR_EVERY_ELEMENT_IN_LIST
 
-  return tot_added ;
+  return system_matrix ;
 }
 
 /******************************************************************************/

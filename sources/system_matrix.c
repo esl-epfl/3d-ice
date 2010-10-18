@@ -45,12 +45,12 @@
 int alloc_system_matrix
 (
   SystemMatrix*   matrix,
-  Quantity_t      nvalues,
+  Quantity_t      size,
   Quantity_t      nnz
 )
 {
-  matrix->Size    = nvalues ;
-  matrix->NNz     = nnz ;
+  matrix->Size = size ;
+  matrix->NNz  = nnz ;
 
   matrix->RowIndices
     = (SystemMatrixRow_t*) malloc (sizeof(SystemMatrixRow_t) * nnz ) ;
@@ -59,7 +59,7 @@ int alloc_system_matrix
     return 0 ;
 
   matrix->ColumnPointers
-    = (SystemMatrixColumn_t*) malloc (sizeof(SystemMatrixColumn_t) * nvalues + 1 ) ;
+    = (SystemMatrixColumn_t*) malloc (sizeof(SystemMatrixColumn_t) * size + 1 ) ;
 
   if (matrix->ColumnPointers == NULL)
   {
@@ -91,7 +91,7 @@ void free_system_matrix (SystemMatrix* matrix)
 
 /******************************************************************************/
 
-Quantity_t add_solid_column
+SystemMatrix add_solid_column
 (
   Dimensions*           dimensions,
   Conductances*         conductances,
@@ -100,15 +100,12 @@ Quantity_t add_solid_column
   GridDimension_t       current_layer,
   GridDimension_t       current_row,
   GridDimension_t       current_column,
-  SystemMatrixColumn_t* column_pointers,
-  SystemMatrixRow_t*    row_indices,
-  SystemMatrixValue_t*  values
+  SystemMatrix          system_matrix
 )
 {
   SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
   SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
   SystemMatrixValue_t* diagonal_pointer = NULL ;
-  Quantity_t           added            = QUANTITY_I ;
 
   GridDimension_t      current_cell
     = get_cell_offset_in_stack (dimensions, current_layer,
@@ -122,27 +119,26 @@ Quantity_t add_solid_column
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
-  *column_pointers = *(column_pointers - 1) ;
+  *system_matrix.ColumnPointers = *(system_matrix.ColumnPointers - 1) ;
 
   /* BOTTOM */
 
   if ( ! IS_FIRST_LAYER(current_layer) )
   {
-    *row_indices++ = current_cell - get_layer_area(dimensions) ;
+    *system_matrix.RowIndices++ = current_cell - get_layer_area(dimensions) ;
 
     conductance = PARALLEL (conductances->Bottom,
                            (conductances - get_layer_area(dimensions))->Top) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
     "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
-    *(row_indices-1), *(values-1),
+    *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
     conductances->Bottom, (conductances - get_layer_area(dimensions))->Top) ;
 #endif
   }
@@ -151,21 +147,20 @@ Quantity_t add_solid_column
 
   if ( ! IS_FIRST_ROW(current_row) )
   {
-    *row_indices++ = current_cell - get_number_of_columns(dimensions) ;
+    *system_matrix.RowIndices++ = current_cell - get_number_of_columns(dimensions) ;
 
     conductance = PARALLEL (conductances->South,
                            (conductances - get_number_of_columns(dimensions))->North) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  south   \t%d\t%.5e = %.5e (S) || %.5e (N)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->South, (conductances - get_number_of_columns(dimensions))->North) ;
 #endif
   }
@@ -174,36 +169,34 @@ Quantity_t add_solid_column
 
   if ( ! IS_FIRST_COLUMN(current_column) )
   {
-    *row_indices++ = current_cell - 1 ;
+    *system_matrix.RowIndices++ = current_cell - 1 ;
 
     conductance = PARALLEL (conductances->West,
                            (conductances - 1)->East) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->West, (conductances - 1)->East) ;
 #endif
   }
 
   /* DIAGONAL */
 
-  *row_indices++   = current_cell ;
-  *values          = *capacities ;
-  diagonal_pointer = values++ ;
+  *system_matrix.RowIndices++ = current_cell ;
+  *system_matrix.Values       = *capacities ;
+  diagonal_pointer            = system_matrix.Values++ ;
 
-  (*column_pointers)++ ;
-  added ++ ;
+  (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "  diagonal\t%d\t ", *(row_indices-1)) ;
+  fprintf (stderr, "  diagonal\t%d\t ", *(system_matrix.RowIndices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
   if (conventionalheatsink != NULL)
     fprintf (stderr, "            ( + %.5e [capacity] + %.5e [ehtc N])\n",
@@ -216,21 +209,20 @@ Quantity_t add_solid_column
 
   if ( ! IS_LAST_COLUMN(current_column, dimensions) )
   {
-    *row_indices++ = current_cell + 1 ;
+    *system_matrix.RowIndices++ = current_cell + 1 ;
 
     conductance = PARALLEL (conductances->East,
                            (conductances + 1)->West) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added ++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->East, (conductances + 1)->West) ;
 #endif
   }
@@ -239,21 +231,20 @@ Quantity_t add_solid_column
 
   if ( ! IS_LAST_ROW(current_row, dimensions) )
   {
-    *row_indices++ = current_cell + get_number_of_columns(dimensions) ;
+    *system_matrix.RowIndices++ = current_cell + get_number_of_columns(dimensions) ;
 
     conductance = PARALLEL (conductances->North,
                            (conductances + get_number_of_columns(dimensions))->South) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  north   \t%d\t%.5e = %.5e (N) || %.5e (S)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->North, (conductances + get_number_of_columns(dimensions))->South) ;
 #endif
   }
@@ -262,21 +253,20 @@ Quantity_t add_solid_column
 
   if ( ! IS_LAST_LAYER(current_layer, dimensions) )
   {
-    *row_indices++ = current_cell + get_layer_area(dimensions) ;
+    *system_matrix.RowIndices++ = current_cell + get_layer_area(dimensions) ;
 
     conductance = PARALLEL (conductances->Top,
                            (conductances + get_layer_area(dimensions))->Bottom) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->Top, (conductances + get_layer_area(dimensions))->Bottom) ;
 #endif
   }
@@ -297,15 +287,17 @@ Quantity_t add_solid_column
   fprintf (stderr, "%.5e", *diagonal_pointer) ;
   fsetpos (stderr, &last_fpos) ;
 
-  fprintf (stderr, "  %d (+%d)\n", *column_pointers, added) ;
+  fprintf (stderr, "  %d\n", *system_matrix.ColumnPointers) ;
 #endif
 
-  return added ;
+  system_matrix.ColumnPointers++ ;
+
+  return system_matrix ;
 }
 
 /******************************************************************************/
 
-Quantity_t add_liquid_column
+SystemMatrix add_liquid_column
 (
   Dimensions*           dimensions,
   Conductances*         conductances,
@@ -313,15 +305,12 @@ Quantity_t add_liquid_column
   GridDimension_t       current_layer,
   GridDimension_t       current_row,
   GridDimension_t       current_column,
-  SystemMatrixColumn_t* column_pointers,
-  SystemMatrixRow_t*    row_indices,
-  SystemMatrixValue_t*  values
+  SystemMatrix          system_matrix
 )
 {
   SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
   SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
   SystemMatrixValue_t* diagonal_pointer = NULL ;
-  Quantity_t           added            = QUANTITY_I ;
 
   GridDimension_t      current_cell
     = get_cell_offset_in_stack (dimensions, current_layer,
@@ -335,27 +324,26 @@ Quantity_t add_liquid_column
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
-  *column_pointers = *(column_pointers - 1) ;
+  *system_matrix.ColumnPointers = *(system_matrix.ColumnPointers - 1) ;
 
   /* BOTTOM */
 
   if ( ! IS_FIRST_LAYER(current_layer) )
   {
-    *row_indices++ = current_cell - get_layer_area(dimensions) ;
+    *system_matrix.RowIndices++ = current_cell - get_layer_area(dimensions) ;
 
     conductance = PARALLEL (conductances->Bottom,
                            (conductances - get_layer_area(dimensions))->Top) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->Bottom, (conductances - get_layer_area(dimensions))->Top) ;
 #endif
   }
@@ -364,15 +352,14 @@ Quantity_t add_liquid_column
 
   if ( ! IS_FIRST_ROW(current_row) )
   {
-    *row_indices++ = current_cell - get_number_of_columns(dimensions) ;
-    *values++  = conductances->North ; /* == (C) */
+    *system_matrix.RowIndices++ = current_cell - get_number_of_columns(dimensions) ;
+    *system_matrix.Values++  = conductances->North ; /* == (C) */
 
-    (*column_pointers)++ ;
-    added++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  south   \t%d\t%.5e (N)\n", *(row_indices-1), *(values-1)) ;
+      "  south   \t%d\t%.5e (N)\n", *(system_matrix.RowIndices-1), *(system_matrix.Values-1)) ;
 #endif
   }
 
@@ -380,36 +367,34 @@ Quantity_t add_liquid_column
 
   if ( ! IS_FIRST_COLUMN(current_column) )
   {
-    *row_indices++ = current_cell - 1 ;
+    *system_matrix.RowIndices++ = current_cell - 1 ;
 
     conductance = PARALLEL (conductances->West,
                            (conductances - 1)->East) ;
 
-    *values++        = -conductance ;
-    diagonal_value  +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->West, (conductances - 1)->East) ;
 #endif
   }
 
   /* DIAGONAL */
 
-  *row_indices++   = current_cell ;
-  *values          = *capacities ;
-  diagonal_pointer = values++ ;
+  *system_matrix.RowIndices++ = current_cell ;
+  *system_matrix.Values       = *capacities ;
+  diagonal_pointer            = system_matrix.Values++ ;
 
-  (*column_pointers)++ ;
-  added++;
+  (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "  diagonal\t%d\t", *(row_indices-1)) ;
+  fprintf (stderr, "  diagonal\t%d\t", *(system_matrix.RowIndices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
   fprintf (stderr, "            ( + %.5e [capacity] )\n", *capacities) ;
 #endif
@@ -418,21 +403,20 @@ Quantity_t add_liquid_column
 
   if ( ! IS_LAST_COLUMN(current_column, dimensions) )
   {
-    *row_indices++ = current_cell + 1 ;
+    *system_matrix.RowIndices++ = current_cell + 1 ;
 
     conductance = PARALLEL (conductances->East,
                            (conductances + 1)->West) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->East, (conductances + 1)->West) ;
 #endif
   }
@@ -441,15 +425,14 @@ Quantity_t add_liquid_column
 
   if ( ! IS_LAST_ROW(current_row, dimensions) )
   {
-    *row_indices++ = current_cell + get_number_of_columns(dimensions) ;
-    *values++  = conductances->South ; /* == -C */
+    *system_matrix.RowIndices++ = current_cell + get_number_of_columns(dimensions) ;
+    *system_matrix.Values++  = conductances->South ; /* == -C */
 
-    (*column_pointers)++ ;
-    added ++ ;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  north   \t%d\t%.5e (S)\n", *(row_indices-1), *(values-1)) ;
+      "  north   \t%d\t%.5e (S)\n", *(system_matrix.RowIndices-1), *(system_matrix.Values-1)) ;
 #endif
   }
 
@@ -457,21 +440,20 @@ Quantity_t add_liquid_column
 
   if ( ! IS_LAST_LAYER(current_layer, dimensions) )
   {
-    *row_indices++ = current_cell + get_layer_area(dimensions) ;
+    *system_matrix.RowIndices++ = current_cell + get_layer_area(dimensions) ;
 
     conductance = PARALLEL (conductances->Top,
                            (conductances + get_layer_area(dimensions))->Bottom) ;
 
-    *values++       = -conductance ;
-    diagonal_value +=  conductance ;
+    *system_matrix.Values++  = -conductance ;
+    diagonal_value          +=  conductance ;
 
-    (*column_pointers)++ ;
-    added++;
+    (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
       "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
-      *(row_indices-1), *(values-1),
+      *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
       conductances->Top, (conductances + get_layer_area(dimensions))->Bottom) ;
 #endif
   }
@@ -490,10 +472,12 @@ Quantity_t add_liquid_column
   fprintf (stderr, "%.5e", *diagonal_pointer) ;
   fsetpos (stderr, &last_fpos) ;
 
-  fprintf (stderr, "  %d (+%d)\n", *column_pointers, added) ;
+  fprintf (stderr, "  %d\n", *system_matrix.ColumnPointers) ;
 #endif
 
-  return added ;
+  system_matrix.ColumnPointers++ ;
+
+  return system_matrix ;
 }
 
 /******************************************************************************/

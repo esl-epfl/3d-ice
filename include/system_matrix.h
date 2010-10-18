@@ -43,7 +43,7 @@ extern "C"
 
 /******************************************************************************/
 
-#include "stack_description.h"
+#include "conventional_heat_sink.h"
 
 /******************************************************************************/
 
@@ -84,7 +84,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t add_solid_column
+  SystemMatrix add_solid_column
   (
     Dimensions*           dimensions,
     Conductances*         conductances,
@@ -93,14 +93,12 @@ extern "C"
     GridDimension_t       current_layer,
     GridDimension_t       current_row,
     GridDimension_t       current_column,
-    SystemMatrixColumn_t* column_pointers,
-    SystemMatrixRow_t*    row_indices,
-    SystemMatrixValue_t*  values
+    SystemMatrix          system_matrix
   ) ;
 
 /******************************************************************************/
 
-  Quantity_t add_liquid_column
+  SystemMatrix add_liquid_column
   (
     Dimensions*           dimensions,
     Conductances*         conductances,
@@ -108,9 +106,7 @@ extern "C"
     GridDimension_t       current_layer,
     GridDimension_t       current_row,
     GridDimension_t       current_column,
-    SystemMatrixColumn_t* column_pointers,
-    SystemMatrixRow_t*    row_indices,
-    SystemMatrixValue_t*  values
+    SystemMatrix          system_matrix
   ) ;
 
 /******************************************************************************/

@@ -48,6 +48,7 @@ extern "C"
 #include "types.h"
 #include "material.h"
 #include "conductances.h"
+#include "system_matrix.h"
 
 /******************************************************************************/
 
@@ -151,7 +152,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t fill_system_matrix_channel
+  SystemMatrix fill_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
     Channel*              channel,
@@ -160,9 +161,7 @@ extern "C"
     Conductances*         conductances,
     Capacity_t*           capacities,
     GridDimension_t       current_layer,
-    SystemMatrixColumn_t* column_pointers,
-    SystemMatrixRow_t*    row_indices,
-    SystemMatrixValue_t*  values
+    SystemMatrix          system_matrix
   ) ;
 
 /******************************************************************************/

@@ -78,9 +78,7 @@ extern void fill_system_matrix_stack_description
   StackDescription*     stkd,
   Conductances*         conductances,
   Capacity_t*           capacities,
-  SystemMatrixColumn_t* column_indices,
-  SystemMatrixRow_t*    row_pointers,
-  SystemMatrixValue_t*  values
+  SystemMatrix          system_matrix
 ) ;
 
 static void init_data (double* data, Quantity_t size, double init_value)
@@ -194,12 +192,11 @@ int fill_thermal_data
 
   if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
                             get_number_of_non_zeroes(stkd->Dimensions)) == 0 )
-    goto sm_a_fail ;
+    goto system_matrix_fail ;
 
   fill_system_matrix_stack_description
   (
-    stkd, tdata->Conductances, tdata->Capacities,
-    tdata->SM_A.ColumnPointers, tdata->SM_A.RowIndices, tdata->SM_A.Values
+    stkd, tdata->Conductances, tdata->Capacities, tdata->SM_A
   ) ;
 
   dCreate_CompCol_Matrix
@@ -257,7 +254,7 @@ slu_perm_c_fail :
 slu_perm_r_fail :
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
   free_system_matrix (&tdata->SM_A) ;
-sm_a_fail :
+system_matrix_fail :
   free (tdata->Sources) ;
 sources_fail :
   free (tdata->Capacities) ;
@@ -433,8 +430,7 @@ int change_coolant_flow_rate
 
   fill_system_matrix_stack_description
   (
-    stkd, tdata->Conductances, tdata->Capacities,
-    tdata->SM_A.ColumnPointers, tdata->SM_A.RowIndices, tdata->SM_A.Values
+    stkd, tdata->Conductances, tdata->Capacities, tdata->SM_A
   ) ;
 
   tdata->SLU_Options.Fact = SamePattern ;

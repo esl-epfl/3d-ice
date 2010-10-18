@@ -37,7 +37,6 @@
 
 #include "layer.h"
 #include "macros.h"
-#include "system_matrix.h"
 
 /******************************************************************************/
 
@@ -336,7 +335,7 @@ Source_t* fill_sources_empty_layer
 
 /******************************************************************************/
 
-Quantity_t fill_system_matrix_layer
+SystemMatrix fill_system_matrix_layer
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Layer*                layer,
@@ -346,14 +345,9 @@ Quantity_t fill_system_matrix_layer
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
   GridDimension_t       current_layer,
-  SystemMatrixColumn_t* column_pointers,
-  SystemMatrixRow_t*    row_indices,
-  SystemMatrixValue_t*  values
+  SystemMatrix          system_matrix
 )
 {
-  Quantity_t      added     = QUANTITY_I ;
-  Quantity_t      tot_added = QUANTITY_I ;
-
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
     "(l %2d) fill_system_matrix_layer %s\n",
@@ -365,26 +359,21 @@ Quantity_t fill_system_matrix_layer
     FOR_EVERY_COLUMN (column, dimensions)
     {
 
-      added = add_solid_column
-              (
-                dimensions, conductances, capacities,
-                conventionalheatsink,
-                current_layer, row, column,
-                column_pointers, row_indices, values
-              ) ;
-
+      system_matrix = add_solid_column
+                      (
+                        dimensions, conductances, capacities,
+                        conventionalheatsink,
+                        current_layer, row, column,
+                        system_matrix
+                      ) ;
 
       conductances    ++ ;
       capacities      ++ ;
-      column_pointers ++ ;
-      row_indices     += added ;
-      values          += added ;
-      tot_added       += added ;
 
     } // FOR_EVERY_COLUMN
   } // FOR_EVERY_ROW
 
-  return tot_added ;
+  return system_matrix ;
 }
 
 /******************************************************************************/

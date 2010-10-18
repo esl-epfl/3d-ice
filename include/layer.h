@@ -51,6 +51,7 @@ extern "C"
 #include "conductances.h"
 #include "floorplan.h"
 #include "conventional_heat_sink.h"
+#include "system_matrix.h"
 
 /******************************************************************************/
 
@@ -154,7 +155,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Quantity_t fill_system_matrix_layer
+  SystemMatrix fill_system_matrix_layer
   (
 #   ifdef PRINT_SYSTEM_MATRIX
     Layer*                layer,
@@ -164,9 +165,7 @@ extern "C"
     Capacity_t*           capacities,
     ConventionalHeatSink* conventionalheatsink,
     GridDimension_t       current_layer,
-    SystemMatrixColumn_t* column_pointers,
-    SystemMatrixRow_t*    row_indices,
-    SystemMatrixValue_t*  values
+    SystemMatrix          system_matrix
   ) ;
 
 /******************************************************************************/

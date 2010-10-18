@@ -341,7 +341,7 @@ Source_t* fill_sources_channel
 
 /******************************************************************************/
 
-Quantity_t fill_system_matrix_channel
+SystemMatrix fill_system_matrix_channel
 (
 # ifdef PRINT_SYSTEM_MATRIX
   Channel*              channel,
@@ -350,14 +350,9 @@ Quantity_t fill_system_matrix_channel
   Conductances*         conductances,
   Capacity_t*           capacities,
   GridDimension_t       current_layer,
-  SystemMatrixColumn_t* column_pointers,
-  SystemMatrixRow_t*    row_indices,
-  SystemMatrixValue_t*  values
+  SystemMatrix          system_matrix
 )
 {
-  Quantity_t added     = QUANTITY_I ;
-  Quantity_t tot_added = QUANTITY_I ;
-
 # ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
     "(l %2d) fill_system_matrix_channel %s \n",
@@ -370,34 +365,30 @@ Quantity_t fill_system_matrix_channel
     {
        if (IS_CHANNEL_COLUMN(column))
 
-         added = add_liquid_column
-                 (
-                   dimensions, conductances, capacities,
-                   current_layer, row, column,
-                   column_pointers, row_indices, values
-                 ) ;
+         system_matrix = add_liquid_column
+                         (
+                           dimensions, conductances, capacities,
+                           current_layer, row, column,
+                           system_matrix
+                         ) ;
 
        else
 
-         added = add_solid_column
-                 (
-                   dimensions, conductances, capacities,
-                   NULL,
-                   current_layer, row, column,
-                   column_pointers, row_indices, values
-                 ) ;
+         system_matrix = add_solid_column
+                         (
+                           dimensions, conductances, capacities,
+                           NULL,
+                           current_layer, row, column,
+                           system_matrix
+                         ) ;
 
       conductances    ++ ;
       capacities      ++ ;
-      column_pointers ++ ;
-      row_indices     += added ;
-      values          += added ;
-      tot_added       += added ;
 
     } // FOR_EVERY_COLUMN
   }  // FOR_EVERY_ROW
 
-  return tot_added ;
+  return system_matrix ;
 }
 
 /******************************************************************************/
