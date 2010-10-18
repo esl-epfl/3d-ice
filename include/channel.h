@@ -81,7 +81,7 @@ extern "C"
 
     /* The material composing the wall */
 
-    Material* Wall ;
+    Material* WallMaterial ;
 
   } Channel ;
 
@@ -106,7 +106,7 @@ extern "C"
   Conductances* fill_conductances_channel
   (
 #   ifdef PRINT_CONDUCTANCES
-    GridDimension_t current_layer,
+    GridDimension_t layer_index,
 #   endif
     Channel*        channel,
     Conductances*   conductances,
@@ -118,7 +118,7 @@ extern "C"
   Conductances* update_conductances_channel
   (
 #   ifdef PRINT_CONDUCTANCES
-    GridDimension_t current_layer,
+    GridDimension_t layer_index,
 #   endif
     Channel*        channel,
     Conductances*   conductances,
@@ -130,7 +130,7 @@ extern "C"
   Capacity_t* fill_capacities_channel
   (
 #   ifdef PRINT_CAPACITIES
-    GridDimension_t current_layer,
+    GridDimension_t layer_index,
 #   endif
     Channel*        channel,
     Capacity_t*     capacities,
@@ -143,7 +143,7 @@ extern "C"
   Source_t* fill_sources_channel
   (
 #   ifdef PRINT_SOURCES
-    GridDimension_t current_layer,
+    GridDimension_t layer_index,
 #   endif
     Channel*        channel,
     Source_t*       sources,
@@ -160,7 +160,7 @@ extern "C"
     Dimensions*           dimensions,
     Conductances*         conductances,
     Capacity_t*           capacities,
-    GridDimension_t       current_layer,
+    GridDimension_t       layer_index,
     SystemMatrix          system_matrix
   ) ;
 

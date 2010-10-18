@@ -91,7 +91,7 @@ extern "C"
     Dimensions*           dimensions,
     Source_t*             sources,
     Conductances*         conductances,
-    GridDimension_t       layer
+    GridDimension_t       layer_index
   ) ;
 
 /******************************************************************************/
@@ -102,7 +102,7 @@ extern "C"
     Dimensions*           dimensions,
     Source_t*             sources,
     Conductances*         conductances,
-    GridDimension_t       layer
+    GridDimension_t       layer_index
   ) ;
 
 /******************************************************************************/

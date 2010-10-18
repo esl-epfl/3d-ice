@@ -50,7 +50,7 @@ init_stack_element (StackElement* stack_element)
   stack_element->Floorplan     = NULL ;
   stack_element->Id            = STRING_I ;
   stack_element->NLayers       = GRIDDIMENSION_I ;
-  stack_element->LayersOffset  = GRIDDIMENSION_I ;
+  stack_element->Offset        = GRIDDIMENSION_I ;
   stack_element->Next          = NULL ;
 }
 
@@ -106,7 +106,7 @@ void print_stack_elements_list
   {
     fprintf (stream,
       "%s  Stackelement (l %-2d - %-2d)\t%s\t",
-      prefix, stk_el->LayersOffset, stk_el->NLayers, stk_el->Id) ;
+      prefix, stk_el->Offset, stk_el->NLayers, stk_el->Id) ;
 
     switch (stk_el->Type)
     {

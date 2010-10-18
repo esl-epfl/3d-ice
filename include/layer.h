@@ -63,7 +63,7 @@ extern "C"
 
     /* The offset (#of layers) counting from the first layer in the die */
 
-    GridDimension_t LayersOffset ;
+    GridDimension_t Offset ;
 
     /* The material composing the layer */
 
@@ -108,7 +108,7 @@ extern "C"
     Conductances*         conductances,
     Dimensions*           dimensions,
     ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       current_layer
+    GridDimension_t       layer_index
   ) ;
 
 /******************************************************************************/
@@ -116,7 +116,7 @@ extern "C"
   Capacity_t* fill_capacities_layer
   (
 #   ifdef PRINT_CAPACITIES
-    GridDimension_t current_layer,
+    GridDimension_t layer_index,
 #   endif
     Layer*          layer,
     Capacity_t*     capacities,
@@ -131,7 +131,7 @@ extern "C"
 #   ifdef PRINT_SOURCES
     Layer*                layer,
 #   endif
-    GridDimension_t       current_layer,
+    GridDimension_t       layer_index,
     ConventionalHeatSink* conventionalheatsink,
     Conductances*         conductances,
     Floorplan*            floorplan,
@@ -146,7 +146,7 @@ extern "C"
 #   ifdef PRINT_SOURCES
     Layer*                layer,
 #   endif
-    GridDimension_t       current_layer,
+    GridDimension_t       layer_index,
     ConventionalHeatSink* conventionalheatsink,
     Conductances*         conductances,
     Source_t*             sources,
@@ -164,7 +164,7 @@ extern "C"
     Conductances*         conductances,
     Capacity_t*           capacities,
     ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       current_layer,
+    GridDimension_t       layer_index,
     SystemMatrix          system_matrix
   ) ;
 

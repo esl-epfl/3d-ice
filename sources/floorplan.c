@@ -172,67 +172,65 @@ Bool_t align_to_grid
   Dimensions*       dimensions
 )
 {
-  CellDimension_t cx     = CELLDIMENSION_I ;
-  CellDimension_t cy     = CELLDIMENSION_I ;
-  GridDimension_t column = GRIDDIMENSION_I ;
-  GridDimension_t row    = GRIDDIMENSION_I ;
+  CellDimension_t cx = CELLDIMENSION_I ;
+  CellDimension_t cy = CELLDIMENSION_I ;
+  GridDimension_t column_index = GRIDDIMENSION_I ;
+  GridDimension_t row_index    = GRIDDIMENSION_I ;
 
   /* West side */
 
   cx     = get_cell_length (dimensions, 0) / 2.0 ;
-  column = 0 ;
 
   while ( cx < floorplan_element->SW_X )
   {
-    cx += (get_cell_length (dimensions, column) / 2.0)
-          + (get_cell_length (dimensions, column + 1) / 2.0) ;
-    column++ ;
+    cx += (get_cell_length (dimensions, column_index) / 2.0)
+          + (get_cell_length (dimensions, column_index + 1) / 2.0) ;
+    column_index++ ;
   }
 
-  floorplan_element->SW_Column = column ;
+  floorplan_element->SW_Column = column_index ;
 
   /* East side */
 
   while (cx < floorplan_element->SW_X + floorplan_element->Length)
   {
-    cx += get_cell_length (dimensions, column) / 2.0
-          + (get_cell_length (dimensions, column + 1) / 2.0) ;
+    cx += get_cell_length (dimensions, column_index) / 2.0
+          + (get_cell_length (dimensions, column_index + 1) / 2.0) ;
 
-   column ++ ;
+   column_index ++ ;
   }
 
-  floorplan_element->NE_Column = column - 1 ;
+  floorplan_element->NE_Column = column_index - 1 ;
 
   /* Effective length */
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+  FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (tmp_column_index, floorplan_element)
   {
     floorplan_element->EffectiveLength
-      += get_cell_length (dimensions, column_index) ;
+      += get_cell_length (dimensions, tmp_column_index) ;
   }
 
   /* South side */
 
   cy  = (get_cell_width (dimensions) / 2.0) ;
-  row = 0 ;
 
   while ( cy < floorplan_element->SW_Y )
   {
     cy += get_cell_width (dimensions) ;
-    row++ ;
+    row_index++ ;
   }
 
-  floorplan_element->SW_Row = row ;
+  floorplan_element->SW_Row = row_index ;
 
   /* North side */
 
   while ( cy <= floorplan_element->SW_Y + floorplan_element->Width )
   {
     cy += get_cell_width (dimensions) ;
-    row++ ;
+    row_index++ ;
   }
 
-  floorplan_element->NE_Row = row - 1 ;
+  floorplan_element->NE_Row = row_index - 1 ;
 
   /* Effective width */
 

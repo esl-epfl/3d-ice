@@ -260,9 +260,9 @@ material
         YYABORT ;
       }
 
-      material->Id                  = $2 ;
-      material->ThermalConductivity = $6 ;
-      material->VolHeatCapacity     = $11 ;
+      material->Id                     = $2 ;
+      material->ThermalConductivity    = $6 ;
+      material->VolumetricHeatCapacity = $11 ;
 
     }
   ;
@@ -337,10 +337,10 @@ channel
       stkd->Channel->CoolantHTCs     = $25 ;
       stkd->Channel->CoolantVHC      = $30 ;
       stkd->Channel->CoolantTIn      = $35 ;
-      stkd->Channel->Wall
+      stkd->Channel->WallMaterial
         = find_material_in_list (stkd->MaterialsList, $18) ;
 
-      if (stkd->Channel->Wall == NULL)
+      if (stkd->Channel->WallMaterial == NULL)
       {
         String_t message
           = (String_t) malloc ((18 + strlen($18)) * sizeof (char)) ;
@@ -352,7 +352,7 @@ channel
         YYABORT ;
       }
 
-      stkd->Channel->Wall->Used++ ;
+      stkd->Channel->WallMaterial->Used++ ;
 
       free ($18) ;
     }
@@ -446,7 +446,7 @@ die
 
       FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
 
-        layer->LayersOffset = layer_offset++ ;
+        layer->Offset = layer_offset++ ;
 
       die->NLayers = layer_offset ;
     }
@@ -560,8 +560,8 @@ stack
 
       FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
       {
-        stk_el->LayersOffset = layer_index ;
-        layer_index          += stk_el->NLayers ;
+        stk_el->Offset = layer_index ;
+        layer_index   += stk_el->NLayers ;
       }
 
       // Reset for the next parsing ...

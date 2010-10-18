@@ -539,9 +539,9 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    GridDimension_t   layer,
-    GridDimension_t   row,
-    GridDimension_t   column,
+    GridDimension_t   layer_index,
+    GridDimension_t   row_index,
+    GridDimension_t   column_index,
     Temperature_t*    cell_temperature
   ) ;
 

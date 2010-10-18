@@ -87,7 +87,7 @@ void print_die (FILE* stream, String_t prefix, Die* die)
     "%s  Number of layers  %d\n", prefix, die->NLayers) ;
 
   fprintf (stream,
-    "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->LayersOffset) ;
+    "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->Offset) ;
 
   String_t new_prefix = (String_t) malloc (sizeof(char)*(strlen(prefix) + 2)) ;
   // FIXME typeof(pointed by string)
@@ -128,7 +128,7 @@ Conductances* fill_conductances_die
   Conductances*         conductances,
   Dimensions*           dimensions,
   ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       current_layer
+  GridDimension_t       layer_index
 )
 {
 # ifdef PRINT_CONDUCTANCES
@@ -143,7 +143,7 @@ Conductances* fill_conductances_die
                      conductances,
                      dimensions,
                      conventionalheatsink,
-                     current_layer + layer->LayersOffset
+                     layer_index + layer->Offset
                    ) ;
 
   } // FOR_EVERY_ELEMENT_IN_LIST
@@ -156,7 +156,7 @@ Conductances* fill_conductances_die
 Capacity_t* fill_capacities_die
 (
 # ifdef PRINT_CAPACITIES
-  GridDimension_t current_layer,
+  GridDimension_t layer_index,
 # endif
   Die*            die,
   Capacity_t*     capacities,
@@ -166,8 +166,8 @@ Capacity_t* fill_capacities_die
 {
 # ifdef PRINT_CAPACITIES
   fprintf (stderr,
-    "current_layer = %d\tfill_capacities_die %s\n",
-    current_layer, die->Id) ;
+    "layer_index = %d\tfill_capacities_die %s\n",
+    layer_index, die->Id) ;
 # endif
 
   FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
@@ -175,7 +175,7 @@ Capacity_t* fill_capacities_die
     capacities = fill_capacities_layer
                  (
 #                  ifdef PRINT_CAPACITIES
-                   current_layer + layer->LayersOffset,
+                   layer_index + layer->Offset,
 #                  endif
                    layer,
                    capacities,
@@ -192,7 +192,7 @@ Capacity_t* fill_capacities_die
 
 Source_t* fill_sources_die
 (
-  GridDimension_t       current_layer,
+  GridDimension_t       layer_index,
   Die*                  die,
   ConventionalHeatSink* conventionalheatsink,
   Conductances*         conductances,
@@ -203,8 +203,8 @@ Source_t* fill_sources_die
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tfill_sources_die %s floorplan %s\n",
-    current_layer, die->Id, floorplan->FileName) ;
+    "layer_index = %d\tfill_sources_die %s floorplan %s\n",
+    layer_index, die->Id, floorplan->FileName) ;
 #endif
 
   FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
@@ -216,7 +216,7 @@ Source_t* fill_sources_die
 #                 ifdef PRINT_SOURCES
                   layer,
 #                 endif
-                  current_layer + layer->LayersOffset,
+                  layer_index + layer->Offset,
                   conventionalheatsink,
                   conductances,
                   floorplan,
@@ -231,7 +231,7 @@ Source_t* fill_sources_die
 #                 ifdef PRINT_SOURCES
                   layer,
 #                 endif
-                  current_layer + layer->LayersOffset,
+                  layer_index + layer->Offset,
                   conventionalheatsink,
                   conductances,
                   sources,
@@ -252,12 +252,12 @@ SystemMatrix fill_system_matrix_die
   Conductances*         conductances,
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       current_layer,
+  GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "(l %2d) fill_system_matrix_die\n", current_layer) ;
+  fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
 # endif
 
   FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
@@ -269,7 +269,7 @@ SystemMatrix fill_system_matrix_die
 #                     endif
                       dimensions, conductances, capacities,
                       conventionalheatsink,
-                      current_layer + layer->LayersOffset,
+                      layer_index + layer->Offset,
                       system_matrix
                      ) ;
 

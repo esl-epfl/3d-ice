@@ -116,7 +116,7 @@ extern "C"
     Conductances*         conductances,
     Dimensions*           dimensions,
     ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       current_layer
+    GridDimension_t       layer_index
   ) ;
 
 /******************************************************************************/
@@ -124,7 +124,7 @@ extern "C"
   Capacity_t* fill_capacities_die
   (
 #   ifdef PRINT_CAPACITIES
-    GridDimension_t current_layer,
+    GridDimension_t layer_index,
 #   endif
     Die*            die,
     Capacity_t*     capacities,
@@ -136,7 +136,7 @@ extern "C"
 
   Source_t*               fill_sources_die
   (
-    GridDimension_t       current_layer,
+    GridDimension_t       layer_index,
     Die*                  die,
     ConventionalHeatSink* conventionalheatsink,
     Conductances*         conductances,
@@ -154,7 +154,7 @@ extern "C"
     Conductances*         conductances,
     Capacity_t*           capacities,
     ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       current_layer,
+    GridDimension_t       layer_index,
     SystemMatrix          system_matrix
   ) ;
 

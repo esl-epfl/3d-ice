@@ -83,7 +83,7 @@ extern "C"
     /* The offset (#of layers) counting from the */
     /* first layer in the stack                  */
 
-    GridDimension_t LayersOffset ;
+    GridDimension_t Offset ;
 
     /* To collect stack elements in a linked list */
 

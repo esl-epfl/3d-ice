@@ -114,7 +114,7 @@ extern "C"
 /******************************************************************************/
 
   CellDimension_t
-  get_cell_length (Dimensions* dimensions, GridDimension_t column) ;
+  get_cell_length (Dimensions* dimensions, GridDimension_t column_index) ;
 
   CellDimension_t
   get_cell_width  (Dimensions* dimensions) ;
@@ -138,16 +138,16 @@ extern "C"
   GridDimension_t   get_cell_offset_in_layer
   (
     Dimensions*     dimensions,
-    GridDimension_t row,
-    GridDimension_t column
+    GridDimension_t row_index,
+    GridDimension_t column_index
   ) ;
 
   GridDimension_t   get_cell_offset_in_stack
   (
     Dimensions*     dimensions,
-    GridDimension_t layer,
-    GridDimension_t row,
-    GridDimension_t column
+    GridDimension_t layer_index,
+    GridDimension_t row_index,
+    GridDimension_t column_index
   ) ;
 
 /******************************************************************************/

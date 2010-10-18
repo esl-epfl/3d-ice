@@ -67,9 +67,9 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
@@ -85,9 +85,9 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
@@ -103,9 +103,9 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
@@ -121,9 +121,9 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
@@ -139,9 +139,9 @@ extern "C"
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
@@ -155,9 +155,9 @@ extern "C"
   void fill_conductances_liquid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Dimensions*            dimensions,
     Conductances*          conductances,
@@ -174,9 +174,9 @@ extern "C"
   void update_conductances_liquid_cell
   (
 #   ifdef PRINT_CONDUCTANCES
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,

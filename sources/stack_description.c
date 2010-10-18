@@ -198,7 +198,7 @@ void fill_conductances_stack_description
                          conductances,
                          stkd->Dimensions,
                          stkd->ConventionalHeatSink,
-                         stk_el->LayersOffset
+                         stk_el->Offset
                        ) ;
         break ;
 
@@ -210,7 +210,7 @@ void fill_conductances_stack_description
                          conductances,
                          stkd->Dimensions,
                          stkd->ConventionalHeatSink,
-                         stk_el->LayersOffset
+                         stk_el->Offset
                        ) ;
         break ;
 
@@ -219,7 +219,7 @@ void fill_conductances_stack_description
         conductances = fill_conductances_channel
                        (
 #                        ifdef PRINT_CONDUCTANCES
-                         stk_el->LayersOffset,
+                         stk_el->Offset,
 #                        endif
                          stkd->Channel,
                          conductances,
@@ -286,7 +286,7 @@ void update_conductances_stack_description
         conductances = update_conductances_channel
                        (
 #                        ifdef PRINT_CONDUCTANCES
-                         stk_el->LayersOffset,
+                         stk_el->Offset,
 #                        endif
                          stkd->Channel,
                          conductances,
@@ -344,7 +344,7 @@ void fill_capacities_stack_description
         capacities = fill_capacities_die
                      (
 #                      ifdef PRINT_CAPACITIES
-                       stk_el->LayersOffset,
+                       stk_el->Offset,
 #                      endif
                        stk_el->Pointer.Die,
                        capacities,
@@ -358,7 +358,7 @@ void fill_capacities_stack_description
         capacities = fill_capacities_layer
                      (
 #                      ifdef PRINT_CAPACITIES
-                       stk_el->LayersOffset,
+                       stk_el->Offset,
 #                      endif
                        stk_el->Pointer.Layer,
                        capacities,
@@ -372,7 +372,7 @@ void fill_capacities_stack_description
         capacities = fill_capacities_channel
                      (
 #                      ifdef PRINT_CAPACITIES
-                       stk_el->LayersOffset,
+                       stk_el->Offset,
 #                      endif
                        stkd->Channel,
                        capacities,
@@ -426,7 +426,7 @@ void fill_sources_stack_description
 
         sources = fill_sources_die
                   (
-                    stk_el->LayersOffset,
+                    stk_el->Offset,
                     stk_el->Pointer.Die,
                     stkd->ConventionalHeatSink,
                     conductances,
@@ -444,7 +444,7 @@ void fill_sources_stack_description
 #                   ifdef PRINT_SOURCES
                     stk_el->Pointer.Layer,
 #                   endif
-                    stk_el->LayersOffset,
+                    stk_el->Offset,
                     stkd->ConventionalHeatSink,
                     conductances,
                     sources,
@@ -457,7 +457,7 @@ void fill_sources_stack_description
         sources = fill_sources_channel
                   (
 #                   ifdef PRINT_SOURCES
-                    stk_el->LayersOffset,
+                    stk_el->Offset,
 #                   endif
                     stkd->Channel,
                     sources,
@@ -517,7 +517,7 @@ void update_sources_stack_description
         sources = fill_sources_channel
                   (
 #                   ifdef PRINT_SOURCES
-                    stk_el->LayersOffset,
+                    stk_el->Offset,
 #                   endif
                     stkd->Channel,
                     sources,
@@ -575,7 +575,7 @@ void fill_system_matrix_stack_description
                           stk_el->Pointer.Die, stkd->Dimensions,
                           conductances, capacities,
                           stkd->ConventionalHeatSink,
-                          stk_el->LayersOffset,
+                          stk_el->Offset,
                           system_matrix
                         ) ;
         break ;
@@ -589,7 +589,7 @@ void fill_system_matrix_stack_description
 #                         endif
                           stkd->Dimensions, conductances, capacities,
                           stkd->ConventionalHeatSink,
-                          stk_el->LayersOffset,
+                          stk_el->Offset,
                           system_matrix
                         ) ;
         break ;
@@ -602,7 +602,7 @@ void fill_system_matrix_stack_description
                           stkd->Channel,
 #                         endif
                           stkd->Dimensions, conductances, capacities,
-                          stk_el->LayersOffset,
+                          stk_el->Offset,
                           system_matrix
                         ) ;
         break ;

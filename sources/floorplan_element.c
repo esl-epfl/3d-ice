@@ -226,14 +226,15 @@ void get_max_temperature_floorplan_element
     )
   ] ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
   {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
     {
 
       *max_temperature = MAX
       (
-        temperatures [get_cell_offset_in_layer (dimensions, row, column)],
+        temperatures [get_cell_offset_in_layer (dimensions,
+                                                row_index, column_index)],
         *max_temperature
       ) ;
 
@@ -262,14 +263,15 @@ void get_min_temperature_floorplan_element
     )
   ] ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
   {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
     {
 
       *min_temperature = MIN
       (
-        temperatures [get_cell_offset_in_layer (dimensions, row, column)],
+        temperatures [get_cell_offset_in_layer (dimensions,
+                                                row_index, column_index)],
         *min_temperature
       ) ;
 
@@ -292,13 +294,14 @@ void get_avg_temperature_floorplan_element
 
   *avg_temperature = TEMPERATURE_I ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
   {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
     {
 
       *avg_temperature
-        += temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
+        += temperatures [get_cell_offset_in_layer (dimensions,
+                                                   row_index, column_index)] ;
 
       counter++ ;
 
@@ -334,11 +337,12 @@ void get_min_avg_max_temperatures_floorplan_element
     )
   ] ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, floorplan_element)
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
   {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, floorplan_element)
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
     {
-      tmp = temperatures [get_cell_offset_in_layer (dimensions, row, column)] ;
+      tmp = temperatures [get_cell_offset_in_layer (dimensions,
+                                                    row_index, column_index)] ;
 
       *max_temperature = MAX (tmp, *max_temperature) ;
 

@@ -42,10 +42,10 @@
 
 void init_layer (Layer* layer)
 {
-  layer->Height       = CELLDIMENSION_I ;
-  layer->LayersOffset = GRIDDIMENSION_I ;
-  layer->Material     = NULL ;
-  layer->Next         = NULL ;
+  layer->Height   = CELLDIMENSION_I ;
+  layer->Offset   = GRIDDIMENSION_I ;
+  layer->Material = NULL ;
+  layer->Next     = NULL ;
 }
 
 /******************************************************************************/
@@ -79,7 +79,7 @@ void print_layer (FILE* stream, String_t prefix, Layer* layer)
 {
   fprintf (stream,
     "%sLayer #%d height %5.2f um, material %s\n",
-    prefix, layer->LayersOffset, layer->Height, layer->Material->Id) ;
+    prefix, layer->Offset, layer->Height, layer->Material->Id) ;
 }
 
 /******************************************************************************/
@@ -99,16 +99,16 @@ Conductances*   fill_conductances_layer
   Conductances*         conductances,
   Dimensions*           dimensions,
   ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       current_layer
+  GridDimension_t       layer_index
 )
 {
   void (*fill_conductances)
   (
 #   ifdef PRINT_CONDUCTANCES
     Dimensions*            dimensions,
-    GridDimension_t        current_layer,
-    GridDimension_t        current_row,
-    GridDimension_t        current_column,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
 #   endif
     Conductances*          conductances,
     CellDimension_t        cell_length,
@@ -118,11 +118,11 @@ Conductances*   fill_conductances_layer
     AmbientHTC_t           ambient_htc
   ) ;
 
-  if (current_layer == 0)
+  if ( IS_FIRST_LAYER(layer_index) )
 
     fill_conductances = &fill_conductances_bottom_solid_cell ;
 
-  else if (current_layer == get_number_of_layers(dimensions) - 1)
+  else if ( IS_LAST_LAYER (layer_index, dimensions) )
 
     if (conventionalheatsink == NULL)
 
@@ -141,18 +141,18 @@ Conductances*   fill_conductances_layer
   fprintf (stderr, "fill_conductances_layer %s\n", layer->Material->Id) ;
 #endif
 
-  FOR_EVERY_ROW (row, dimensions)
+  FOR_EVERY_ROW (row_index, dimensions)
   {
-    FOR_EVERY_COLUMN (column, dimensions)
+    FOR_EVERY_COLUMN (column_index, dimensions)
     {
       fill_conductances
       (
 #ifdef PRINT_CONDUCTANCES
         dimensions,
-        current_layer, row, column,
+        layer_index, row_index, column_index,
 #endif
         conductances,
-        get_cell_length (dimensions, column),
+        get_cell_length (dimensions, column_index),
         get_cell_width  (dimensions),
         layer->Height,
         layer->Material->ThermalConductivity,
@@ -173,7 +173,7 @@ Conductances*   fill_conductances_layer
 Capacity_t* fill_capacities_layer
 (
 #ifdef PRINT_CAPACITIES
-  GridDimension_t current_layer,
+  GridDimension_t layer_index,
 #endif
   Layer*          layer,
   Capacity_t*     capacities,
@@ -183,20 +183,20 @@ Capacity_t* fill_capacities_layer
 {
 #ifdef PRINT_CAPACITIES
   fprintf (stderr,
-    "current_layer = %d\tfill_capacities_layer %s\n",
-    current_layer, layer->Material->Id) ;
+    "layer_index = %d\tfill_capacities_layer %s\n",
+    layer_index, layer->Material->Id) ;
 #endif
 
-  FOR_EVERY_ROW (row, dimensions)
+  FOR_EVERY_ROW (row_index, dimensions)
   {
-    FOR_EVERY_COLUMN (column, dimensions)
+    FOR_EVERY_COLUMN (column_index, dimensions)
     {
       *capacities = CAPACITY
                     (
-                      get_cell_length (dimensions, column),
+                      get_cell_length (dimensions, column_index),
                       get_cell_width (dimensions),
                       layer->Height,
-                      layer->Material->VolHeatCapacity,
+                      layer->Material->VolumetricHeatCapacity,
                       delta_time
                     ) ;
 
@@ -204,11 +204,11 @@ Capacity_t* fill_capacities_layer
       fprintf (stderr,
           "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f " \
                       " |  %.5e [capacity] = (l x w x h x %.5e [        vhc]) / %.5e [delta] |\n",
-        current_layer, row, column,
-        get_cell_offset_in_stack (dimensions, current_layer, row, column),
-        get_cell_length(dimensions, column),
+        layer_index, row_index, column_index,
+        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        get_cell_length(dimensions, column_index),
         get_cell_width (dimensions),
-        layer->Height, *capacities, layer->Material->VolHeatCapacity, delta_time
+        layer->Height, *capacities, layer->Material->VolumetricHeatCapacity, delta_time
       ) ;
 #endif
 
@@ -227,7 +227,7 @@ Source_t* fill_sources_active_layer
 # ifdef PRINT_SOURCES
   Layer*                layer,
 # endif
-  GridDimension_t       current_layer,
+  GridDimension_t       layer_index,
   ConventionalHeatSink* conventionalheatsink,
   Conductances*         conductances,
   Floorplan*            floorplan,
@@ -240,8 +240,8 @@ Source_t* fill_sources_active_layer
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tfill_sources_source_layer   %s\n",
-    current_layer, layer->Material->Id) ;
+    "layer_index = %d\tfill_sources_source_layer   %s\n",
+    layer_index, layer->Material->Id) ;
 #endif
 
   FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, floorplan->ElementsList)
@@ -251,14 +251,14 @@ Source_t* fill_sources_active_layer
 
     power = get_from_powers_queue(flp_el->PowerValues) ;
 
-    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row, flp_el)
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, flp_el)
     {
-      FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column, flp_el)
+      FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, flp_el)
       {
-        sources [get_cell_offset_in_layer (dimensions, row, column)]
+        sources [get_cell_offset_in_layer (dimensions, row_index, column_index)]
 
           = (
-               power * get_cell_length (dimensions, column)
+               power * get_cell_length (dimensions, column_index)
                      * get_cell_width (dimensions)
             )
             /  flp_el_surface ;
@@ -268,10 +268,10 @@ Source_t* fill_sources_active_layer
           "solid  cell  | l %2d r %4d c %4d [%6d] "
                        "| l %5.2f w %5.2f "  \
                        "| %.5e [source] = (%.5e [W] * l * w) / %.5e | %s\n",
-          current_layer, row, column,
-          get_cell_offset_in_stack (dimensions, current_layer, row, column),
-          get_cell_length (dimensions, column), get_cell_width (dimensions),
-          sources [get_cell_offset_in_layer (dimensions, row, column)],
+          layer_index, row_index, column_index,
+          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+          get_cell_length (dimensions, column_index), get_cell_width (dimensions),
+          sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
           get_from_powers_queue(flp_el->PowerValues), flp_el_surface,
           flp_el->Id) ;
 #endif
@@ -283,7 +283,7 @@ Source_t* fill_sources_active_layer
 
   } // FOR_EVERY_ELEMENT_IN_LIST
 
-  if ( current_layer == (get_number_of_layers(dimensions) - 1)
+  if ( IS_LAST_LAYER (layer_index, dimensions)
        && conventionalheatsink != NULL )
 
     add_sources_conventional_heat_sink
@@ -292,7 +292,7 @@ Source_t* fill_sources_active_layer
       dimensions,
       sources,
       conductances,
-      current_layer
+      layer_index
     ) ;
 
   return sources + get_layer_area (dimensions) ;
@@ -305,7 +305,7 @@ Source_t* fill_sources_empty_layer
 # ifdef PRINT_SOURCES
   Layer*                layer,
 # endif
-  GridDimension_t       current_layer,
+  GridDimension_t       layer_index,
   ConventionalHeatSink* conventionalheatsink,
   Conductances*         conductances,
   Source_t*             sources,
@@ -314,11 +314,11 @@ Source_t* fill_sources_empty_layer
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tfill_sources_empty_layer    %s\n",
-    current_layer, layer->Material->Id) ;
+    "layer_index = %d\tfill_sources_empty_layer    %s\n",
+    layer_index, layer->Material->Id) ;
 #endif
 
-  if ( current_layer == (get_number_of_layers(dimensions) - 1)
+  if ( layer_index == (get_number_of_layers(dimensions) - 1)
        && conventionalheatsink != NULL )
 
     fill_sources_conventional_heat_sink
@@ -327,7 +327,7 @@ Source_t* fill_sources_empty_layer
       dimensions,
       sources,
       conductances,
-      current_layer
+      layer_index
     ) ;
 
   return sources + get_layer_area (dimensions) ;
@@ -344,26 +344,26 @@ SystemMatrix fill_system_matrix_layer
   Conductances*         conductances,
   Capacity_t*           capacities,
   ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       current_layer,
+  GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
     "(l %2d) fill_system_matrix_layer %s\n",
-    current_layer, layer->Material->Id) ;
+    layer_index, layer->Material->Id) ;
 #endif
 
-  FOR_EVERY_ROW (row, dimensions)
+  FOR_EVERY_ROW (row_index, dimensions)
   {
-    FOR_EVERY_COLUMN (column, dimensions)
+    FOR_EVERY_COLUMN (column_index, dimensions)
     {
 
       system_matrix = add_solid_column
                       (
                         dimensions, conductances, capacities,
                         conventionalheatsink,
-                        current_layer, row, column,
+                        layer_index, row_index, column_index,
                         system_matrix
                       ) ;
 

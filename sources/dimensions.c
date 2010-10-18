@@ -111,23 +111,27 @@ void free_dimensions (Dimensions* dimensions)
 
 /******************************************************************************/
 
-CellDimension_t get_cell_length (Dimensions* dimensions, GridDimension_t column)
+CellDimension_t get_cell_length
+(
+  Dimensions*     dimensions,
+  GridDimension_t column_index
+)
 {
   if (!dimensions->StackHasChannel)
 
     return dimensions->Cell.WallLength ;
 
-  if (IS_FIRST_COLUMN(column))
+  if (IS_FIRST_COLUMN(column_index))
 
     return dimensions->Cell.FirstWallLength ;
 
-  else if (IS_LAST_COLUMN(column, dimensions))
+  else if (IS_LAST_COLUMN(column_index, dimensions))
 
     return dimensions->Cell.LastWallLength ;
 
   else
 
-    if (IS_CHANNEL_COLUMN(column))
+    if (IS_CHANNEL_COLUMN(column_index))
 
       return dimensions->Cell.ChannelLength ;
 
@@ -190,11 +194,11 @@ GridDimension_t get_layer_area (Dimensions* dimensions)
 GridDimension_t get_cell_offset_in_layer
 (
   Dimensions*     dimensions,
-  GridDimension_t row,
-  GridDimension_t column
+  GridDimension_t row_index,
+  GridDimension_t column_index
 )
 {
-  return row * get_number_of_columns (dimensions) + column ;
+  return row_index * get_number_of_columns (dimensions) + column_index ;
 }
 
 /******************************************************************************/
@@ -202,13 +206,13 @@ GridDimension_t get_cell_offset_in_layer
 GridDimension_t get_cell_offset_in_stack
 (
   Dimensions*     dimensions,
-  GridDimension_t layer,
-  GridDimension_t row,
-  GridDimension_t column
+  GridDimension_t layer_index,
+  GridDimension_t row_index,
+  GridDimension_t column_index
 )
 {
-  return layer * get_layer_area (dimensions)
-         + get_cell_offset_in_layer (dimensions, row, column) ;
+  return layer_index * get_layer_area (dimensions)
+         + get_cell_offset_in_layer (dimensions, row_index, column_index) ;
 }
 
 /******************************************************************************/

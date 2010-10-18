@@ -42,9 +42,9 @@ void fill_conductances_bottom_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  GridDimension_t       current_layer,
-  GridDimension_t       current_row,
-  GridDimension_t       current_column,
+  GridDimension_t       layer_index,
+  GridDimension_t       row_index,
+  GridDimension_t       column_index,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
@@ -75,9 +75,9 @@ void fill_conductances_bottom_solid_cell
     "solid  bottom  | l %2d r %4d c %4d [%6d] " \
                    "| l %5.2f w %5.2f h %5.2f " \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
@@ -90,9 +90,9 @@ void fill_conductances_central_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  GridDimension_t       current_layer,
-  GridDimension_t       current_row,
-  GridDimension_t       current_column,
+  GridDimension_t       layer_index,
+  GridDimension_t       row_index,
+  GridDimension_t       column_index,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
@@ -122,9 +122,9 @@ void fill_conductances_central_solid_cell
     "solid  central | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
@@ -137,9 +137,9 @@ void fill_conductances_top_solid_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  GridDimension_t       current_layer,
-  GridDimension_t       current_row,
-  GridDimension_t       current_column,
+  GridDimension_t       layer_index,
+  GridDimension_t       row_index,
+  GridDimension_t       column_index,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
@@ -170,9 +170,9 @@ void fill_conductances_top_solid_cell
     "solid  top     | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
@@ -185,9 +185,9 @@ void fill_conductances_top_solid_cell_ehtc
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  GridDimension_t       current_layer,
-  GridDimension_t       current_row,
-  GridDimension_t       current_column,
+  GridDimension_t       layer_index,
+  GridDimension_t       row_index,
+  GridDimension_t       column_index,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
@@ -226,9 +226,9 @@ void fill_conductances_top_solid_cell_ehtc
     "solid top ehtc | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;
@@ -240,9 +240,9 @@ void fill_conductances_top_solid_cell_ehtc
 void fill_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  GridDimension_t current_layer,
-  GridDimension_t current_row,
-  GridDimension_t current_column,
+  GridDimension_t layer_index,
+  GridDimension_t row_index,
+  GridDimension_t column_index,
 # endif
   Dimensions*     dimensions,
   Conductances*   conductances,
@@ -273,9 +273,9 @@ void fill_conductances_liquid_cell
                    "| l %5.2f w %5.2f h %5.2f "   \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e "
                    "| C = %e\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom, C) ;
@@ -287,9 +287,9 @@ void fill_conductances_liquid_cell
 void update_conductances_liquid_cell
 (
 # ifdef PRINT_CONDUCTANCES
-  GridDimension_t current_layer,
-  GridDimension_t current_row,
-  GridDimension_t current_column,
+  GridDimension_t layer_index,
+  GridDimension_t row_index,
+  GridDimension_t column_index,
   CellDimension_t cell_length,
   CellDimension_t cell_width,
   CellDimension_t cell_height,
@@ -312,9 +312,9 @@ void update_conductances_liquid_cell
                    "| l %5.2f w %5.2f h %5.2f "   \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e "
                    "| C = %e\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom, C) ;
@@ -327,9 +327,9 @@ void fill_conductances_wall_cell
 (
 # ifdef PRINT_CONDUCTANCES
   Dimensions*           dimensions,
-  GridDimension_t       current_layer,
-  GridDimension_t       current_row,
-  GridDimension_t       current_column,
+  GridDimension_t       layer_index,
+  GridDimension_t       row_index,
+  GridDimension_t       column_index,
 # endif
   Conductances*         conductances,
   CellDimension_t       cell_length,
@@ -355,9 +355,9 @@ void fill_conductances_wall_cell
     "wall           | l %2d r %4d c %4d [%6d] "  \
                    "| l %5.2f w %5.2f h %5.2f "  \
                    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-    current_layer, current_row, current_column,
+    layer_index, row_index, column_index,
     get_cell_offset_in_stack (dimensions,
-                              current_layer, current_row, current_column),
+                              layer_index, row_index, column_index),
     cell_length, cell_width, cell_height,
     conductances->North, conductances->South, conductances->East,
     conductances->West, conductances->Top, conductances->Bottom) ;

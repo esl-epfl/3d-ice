@@ -43,11 +43,11 @@
 
 void init_material (Material* material)
 {
-  material->Id                  = STRING_I ;
-  material->Used                = QUANTITY_I ;
-  material->VolHeatCapacity     = SOLIDVHC_I ;
-  material->ThermalConductivity = SOLIDTC_I ;
-  material->Next                = NULL ;
+  material->Id                     = STRING_I ;
+  material->Used                   = QUANTITY_I ;
+  material->VolumetricHeatCapacity = SOLIDVHC_I ;
+  material->ThermalConductivity    = SOLIDTC_I ;
+  material->Next                   = NULL ;
 }
 
 /******************************************************************************/
@@ -85,7 +85,7 @@ void print_material (FILE* stream, String_t prefix, Material* material)
                                            material->Id) ;
   fprintf (stream,
     "%s  Volumetric Heat Capacity %.3e\n", prefix,
-                                           material->VolHeatCapacity) ;
+                                           material->VolumetricHeatCapacity) ;
   fprintf (stream,
     "%s  Thermal Conductivity     %.3e\n", prefix,
                                            material->ThermalConductivity) ;

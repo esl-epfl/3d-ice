@@ -92,26 +92,26 @@ void fill_sources_conventional_heat_sink
   Dimensions*           dimensions,
   Source_t*             sources,
   Conductances*         conductances,
-  GridDimension_t       layer
+  GridDimension_t       layer_index
 )
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tadd_sources_conventional_heat_sink\n", layer) ;
+    "layer_index = %d\tadd_sources_conventional_heat_sink\n", layer_index) ;
 #endif
 
-  conductances += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
+  conductances += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  FOR_EVERY_ROW (row, dimensions)
+  FOR_EVERY_ROW (row_index, dimensions)
   {
-    FOR_EVERY_COLUMN (column, dimensions)
+    FOR_EVERY_COLUMN (column_index, dimensions)
     {
       *sources = (conventionalheatsink->AmbientTemperature * conductances->Top) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | = %f * %.5e = %.5e\n",
-          layer, row, column,
-          get_cell_offset_in_stack (dimensions, layer, row, column),
+          layer_index, row_index, column_index,
+          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
           conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
 #endif
       sources++ ;
@@ -130,26 +130,26 @@ void add_sources_conventional_heat_sink
   Dimensions*           dimensions,
   Source_t*             sources,
   Conductances*         conductances,
-  GridDimension_t       layer
+  GridDimension_t       layer_index
 )
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "current_layer = %d\tadd_sources_conventional_heat_sink\n", layer) ;
+    "layer_index = %d\tadd_sources_conventional_heat_sink\n", layer_index) ;
 #endif
 
-  conductances += get_cell_offset_in_stack (dimensions, layer, 0, 0) ;
+  conductances += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  FOR_EVERY_ROW (row, dimensions)
+  FOR_EVERY_ROW (row_index, dimensions)
   {
-    FOR_EVERY_COLUMN (column, dimensions)
+    FOR_EVERY_COLUMN (column_index, dimensions)
     {
       *sources += (conventionalheatsink->AmbientTemperature * conductances->Top) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
-          layer, row, column,
-          get_cell_offset_in_stack (dimensions, layer, row, column),
+          layer_index, row_index, column_index,
+          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
           conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
 #endif
       sources++ ;

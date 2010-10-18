@@ -61,7 +61,7 @@ extern "C"
 
     /* The volume-specific heat capacity [ J / ( um3 * K ) ] */
 
-    SolidVHC_t VolHeatCapacity ;
+    SolidVHC_t VolumetricHeatCapacity ;
 
     /* The thermal conductivity [ W / ( um * K ) ] */
 
