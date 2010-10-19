@@ -188,6 +188,17 @@ stack_description_file
                   material->Id) ;
 
       //
+      // Checks if all the dies are used
+      //
+
+      FOR_EVERY_ELEMENT_IN_LIST (Die, die, stkd->DiesList)
+
+        if (die->Used == 0)
+
+          fprintf(stderr, "Warning: die %s declared but not used\n",
+                  die->Id) ;
+
+      //
       // Counts the number of layers
       //
 
@@ -763,6 +774,8 @@ stack_element
         free_stack_element (stack_element) ;
         YYABORT ;
       }
+
+      stack_element->Pointer.Die->Used++ ;
 
       stack_element->NLayers = stack_element->Pointer.Die->NLayers ;
       stack_element->Floorplan = alloc_and_init_floorplan () ;

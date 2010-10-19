@@ -60,6 +60,10 @@ extern "C"
 
     String_t Id ;
 
+    /* For parsing purpose */
+
+    Quantity_t Used ;
+
     /* The number of layer composing the die */
 
     GridDimension_t NLayers ;

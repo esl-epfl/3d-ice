@@ -44,6 +44,7 @@
 void init_die (Die* die)
 {
   die->Id          = STRING_I ;
+  die->Used        = QUANTITY_I ;
   die->NLayers     = GRIDDIMENSION_I ;
   die->LayersList  = NULL ;
   die->SourceLayer = NULL ;
