@@ -93,131 +93,26 @@ void print_layers_list (FILE* stream, String_t prefix, Layer* list)
 
 /******************************************************************************/
 
-Conductances*   fill_conductances_layer
+void fill_thermal_grid_data_layer
 (
-  Layer*                layer,
-  Conductances*         conductances,
-  Dimensions*           dimensions,
-  ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       layer_index
+  ThermalGridData* thermalgriddata,
+  GridDimension_t  layer_index,
+  Layer*           layer
 )
 {
-  void (*fill_conductances)
+# ifdef PRINT_THERMAL_GRID_DATA
+  fprintf (stderr, "\n#%d\tLayer   [%s]\n\n", layer_index, layer->Material->Id) ;
+# endif
+
+  fill_thermal_grid_data
   (
-#   ifdef PRINT_CONDUCTANCES
-    Dimensions*            dimensions,
-    GridDimension_t        layer_index,
-    GridDimension_t        row_index,
-    GridDimension_t        column_index,
-#   endif
-    Conductances*          conductances,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    SolidTC_t              thermal_conductivity,
-    AmbientHTC_t           ambient_htc
+    thermalgriddata,
+    layer_index,
+    TDICE_LAYER_SOLID,
+    layer->Material->ThermalConductivity,
+    layer->Material->VolumetricHeatCapacity,
+    layer->Height
   ) ;
-
-  if ( IS_FIRST_LAYER(layer_index) )
-
-    fill_conductances = &fill_conductances_bottom_solid_cell ;
-
-  else if ( IS_LAST_LAYER (layer_index, dimensions) )
-
-    if (conventionalheatsink == NULL)
-
-      fill_conductances = &fill_conductances_top_solid_cell ;
-
-    else
-
-      fill_conductances = &fill_conductances_top_solid_cell_ehtc ;
-
-  else
-
-    fill_conductances = &fill_conductances_central_solid_cell ;
-
-
-#ifdef PRINT_CONDUCTANCES
-  fprintf (stderr, "fill_conductances_layer %s\n", layer->Material->Id) ;
-#endif
-
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      fill_conductances
-      (
-#ifdef PRINT_CONDUCTANCES
-        dimensions,
-        layer_index, row_index, column_index,
-#endif
-        conductances,
-        get_cell_length (dimensions, column_index),
-        get_cell_width  (dimensions),
-        layer->Height,
-        layer->Material->ThermalConductivity,
-        conventionalheatsink == NULL ? (AmbientHTC_t) 0
-                                     : conventionalheatsink->AmbientHTC
-      ) ;
-
-      conductances++ ;
-
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
-
-  return conductances ;
-}
-
-/******************************************************************************/
-
-Capacity_t* fill_capacities_layer
-(
-#ifdef PRINT_CAPACITIES
-  GridDimension_t layer_index,
-#endif
-  Layer*          layer,
-  Capacity_t*     capacities,
-  Dimensions*     dimensions,
-  Time_t          delta_time
-)
-{
-#ifdef PRINT_CAPACITIES
-  fprintf (stderr,
-    "layer_index = %d\tfill_capacities_layer %s\n",
-    layer_index, layer->Material->Id) ;
-#endif
-
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      *capacities = CAPACITY
-                    (
-                      get_cell_length (dimensions, column_index),
-                      get_cell_width (dimensions),
-                      layer->Height,
-                      layer->Material->VolumetricHeatCapacity,
-                      delta_time
-                    ) ;
-
-#ifdef PRINT_CAPACITIES
-      fprintf (stderr,
-          "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f " \
-                      " |  %.5e [capacity] = (l x w x h x %.5e [        vhc]) / %.5e [delta] |\n",
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-        get_cell_length(dimensions, column_index),
-        get_cell_width (dimensions),
-        layer->Height, *capacities, layer->Material->VolumetricHeatCapacity, delta_time
-      ) ;
-#endif
-
-      capacities++ ;
-
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
-
-  return capacities ;
 }
 
 /******************************************************************************/
@@ -229,7 +124,7 @@ Source_t* fill_sources_active_layer
 # endif
   GridDimension_t       layer_index,
   ConventionalHeatSink* conventionalheatsink,
-  Conductances*         conductances,
+  ThermalGridData*      thermalgriddata,
   Floorplan*            floorplan,
   Source_t*             sources,
   Dimensions*           dimensions
@@ -291,7 +186,7 @@ Source_t* fill_sources_active_layer
       conventionalheatsink,
       dimensions,
       sources,
-      conductances,
+      thermalgriddata,
       layer_index
     ) ;
 
@@ -307,7 +202,7 @@ Source_t* fill_sources_empty_layer
 # endif
   GridDimension_t       layer_index,
   ConventionalHeatSink* conventionalheatsink,
-  Conductances*         conductances,
+  ThermalGridData*      thermalgriddata,
   Source_t*             sources,
   Dimensions*           dimensions
 )
@@ -326,7 +221,7 @@ Source_t* fill_sources_empty_layer
       conventionalheatsink,
       dimensions,
       sources,
-      conductances,
+      thermalgriddata,
       layer_index
     ) ;
 
@@ -341,9 +236,7 @@ SystemMatrix fill_system_matrix_layer
   Layer*                layer,
 # endif
   Dimensions*           dimensions,
-  Conductances*         conductances,
-  Capacity_t*           capacities,
-  ConventionalHeatSink* conventionalheatsink,
+  ThermalGridData*      thermalgriddata,
   GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
@@ -361,14 +254,10 @@ SystemMatrix fill_system_matrix_layer
 
       system_matrix = add_solid_column
                       (
-                        dimensions, conductances, capacities,
-                        conventionalheatsink,
+                        dimensions, thermalgriddata,
                         layer_index, row_index, column_index,
                         system_matrix
                       ) ;
-
-      conductances    ++ ;
-      capacities      ++ ;
 
     } // FOR_EVERY_COLUMN
   } // FOR_EVERY_ROW

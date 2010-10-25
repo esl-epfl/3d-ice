@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include "stack_description.h"
+#include "thermal_grid_data.h"
 #include "macros.h"
 #include "layer.h"
 #include "system_matrix.h"
@@ -169,21 +170,18 @@ int fill_floorplans (StackDescription* stkd)
 
 /******************************************************************************/
 
-void fill_conductances_stack_description
+void fill_thermal_grid_data_stack_description
 (
   StackDescription* stkd,
-  Conductances*     conductances
+  ThermalGridData*  thermalgriddata
 )
 {
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
-    "fill_conductances_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions)
-  ) ;
+#ifdef PRINT_THERMAL_GRID_DATA
+  fprintf (stderr,
+
+    "Fill thermal grid data stack description ( %d layers )\n",
+
+    get_number_of_layers  (stkd->Dimensions)) ;
 #endif
 
   FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
@@ -192,193 +190,35 @@ void fill_conductances_stack_description
     {
       case TDICE_STACK_ELEMENT_DIE :
 
-        conductances = fill_conductances_die
-                       (
-                         stk_el->Pointer.Die,
-                         conductances,
-                         stkd->Dimensions,
-                         stkd->ConventionalHeatSink,
-                         stk_el->Offset
-                       ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_LAYER :
-
-        conductances = fill_conductances_layer
-                       (
-                         stk_el->Pointer.Layer,
-                         conductances,
-                         stkd->Dimensions,
-                         stkd->ConventionalHeatSink,
-                         stk_el->Offset
-                       ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_CHANNEL :
-
-        conductances = fill_conductances_channel
-                       (
-#                        ifdef PRINT_CONDUCTANCES
-                         stk_el->Offset,
-#                        endif
-                         stkd->Channel,
-                         conductances,
-                         stkd->Dimensions
-                       ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_NONE :
-
-        fprintf (stderr, "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf
+        fill_thermal_grid_data_die
         (
-          stderr,
-          "Error! Unknown stack element type %d\n",
-          stk_el->Type
+          thermalgriddata,
+          stk_el->Offset,
+          stk_el->Pointer.Die
         ) ;
-        return ;
 
-    } /* switch stk_el->Type */
-
-  } // FOR_EVERY_ELEMENT_IN_LIST
-}
-
-/******************************************************************************/
-
-void update_conductances_stack_description
-(
-  StackDescription* stkd,
-  Conductances*     conductances
-)
-{
-#ifdef PRINT_CONDUCTANCES
-  fprintf
-  (
-    stderr,
-    "update_conductances_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions)
-  ) ;
-#endif
-
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
-  {
-    switch (stk_el->Type)
-    {
-      case TDICE_STACK_ELEMENT_DIE :
-
-        conductances += get_layer_area (stkd->Dimensions)
-                        * (stk_el->Pointer.Die->NLayers);
         break ;
 
       case TDICE_STACK_ELEMENT_LAYER :
 
-        conductances += get_layer_area (stkd->Dimensions) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_CHANNEL :
-
-        conductances = update_conductances_channel
-                       (
-#                        ifdef PRINT_CONDUCTANCES
-                         stk_el->Offset,
-#                        endif
-                         stkd->Channel,
-                         conductances,
-                         stkd->Dimensions
-                       ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_NONE :
-
-        fprintf (stderr, "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf
+        fill_thermal_grid_data_layer
         (
-          stderr,
-          "Error! Unknown stack element type %d\n",
-          stk_el->Type
+          thermalgriddata,
+          stk_el->Offset,
+          stk_el->Pointer.Layer
         ) ;
-        return ;
 
-    } /* switch stk_el->Type */
-
-  } // FOR_EVERY_ELEMENT_IN_LIST
-}
-
-/******************************************************************************/
-
-void fill_capacities_stack_description
-(
-  StackDescription* stkd,
-  Capacity_t*       capacities,
-  Time_t            delta_time
-)
-{
-#ifdef PRINT_CAPACITIES
-  fprintf
-  (
-    stderr,
-    "fill_capacities_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions)
-  ) ;
-#endif
-
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
-  {
-
-    switch (stk_el->Type)
-    {
-      case TDICE_STACK_ELEMENT_DIE :
-
-        capacities = fill_capacities_die
-                     (
-#                      ifdef PRINT_CAPACITIES
-                       stk_el->Offset,
-#                      endif
-                       stk_el->Pointer.Die,
-                       capacities,
-                       stkd->Dimensions,
-                       delta_time
-                     ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_LAYER :
-
-        capacities = fill_capacities_layer
-                     (
-#                      ifdef PRINT_CAPACITIES
-                       stk_el->Offset,
-#                      endif
-                       stk_el->Pointer.Layer,
-                       capacities,
-                       stkd->Dimensions,
-                       delta_time
-                     ) ;
         break ;
 
       case TDICE_STACK_ELEMENT_CHANNEL :
 
-        capacities = fill_capacities_channel
-                     (
-#                      ifdef PRINT_CAPACITIES
-                       stk_el->Offset,
-#                      endif
-                       stkd->Channel,
-                       capacities,
-                       stkd->Dimensions,
-                       delta_time
-                     ) ;
+        fill_thermal_grid_data_channel
+        (
+          thermalgriddata,
+          stk_el->Offset,
+          stkd->Channel
+        ) ;
+
         break ;
 
       case TDICE_STACK_ELEMENT_NONE :
@@ -407,7 +247,7 @@ void fill_sources_stack_description
 (
   StackDescription* stkd,
   Source_t*         sources,
-  Conductances*     conductances
+  ThermalGridData*  thermalgriddata
 )
 {
 #ifdef PRINT_SOURCES
@@ -429,7 +269,7 @@ void fill_sources_stack_description
                     stk_el->Offset,
                     stk_el->Pointer.Die,
                     stkd->ConventionalHeatSink,
-                    conductances,
+                    thermalgriddata,
                     stk_el->Floorplan,
                     sources,
                     stkd->Dimensions
@@ -446,7 +286,7 @@ void fill_sources_stack_description
 #                   endif
                     stk_el->Offset,
                     stkd->ConventionalHeatSink,
-                    conductances,
+                    thermalgriddata,
                     sources,
                     stkd->Dimensions
                   ) ;
@@ -545,13 +385,10 @@ void update_sources_stack_description
 void fill_system_matrix_stack_description
 (
   StackDescription*     stkd,
-  Conductances*         conductances,
-  Capacity_t*           capacities,
+  ThermalGridData*      thermalgriddata,
   SystemMatrix          system_matrix
 )
 {
-  Quantity_t area  = get_layer_area (stkd->Dimensions) ;
-
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf
   (
@@ -573,8 +410,7 @@ void fill_system_matrix_stack_description
         system_matrix = fill_system_matrix_die
                         (
                           stk_el->Pointer.Die, stkd->Dimensions,
-                          conductances, capacities,
-                          stkd->ConventionalHeatSink,
+                          thermalgriddata,
                           stk_el->Offset,
                           system_matrix
                         ) ;
@@ -587,8 +423,8 @@ void fill_system_matrix_stack_description
 #                         ifdef PRINT_SYSTEM_MATRIX
                           stk_el->Pointer.Layer,
 #                         endif
-                          stkd->Dimensions, conductances, capacities,
-                          stkd->ConventionalHeatSink,
+                          stkd->Dimensions,
+                          thermalgriddata,
                           stk_el->Offset,
                           system_matrix
                         ) ;
@@ -601,7 +437,8 @@ void fill_system_matrix_stack_description
 #                         ifdef PRINT_SYSTEM_MATRIX
                           stkd->Channel,
 #                         endif
-                          stkd->Dimensions, conductances, capacities,
+                          stkd->Dimensions,
+                          thermalgriddata,
                           stk_el->Offset,
                           system_matrix
                         ) ;
@@ -620,8 +457,6 @@ void fill_system_matrix_stack_description
 
     } /* stk_el->Type */
 
-    conductances    += area * stk_el->NLayers ;
-    capacities      += area * stk_el->NLayers ;
 
   } // FOR_EVERY_ELEMENT_IN_LIST
 }

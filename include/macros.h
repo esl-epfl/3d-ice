@@ -97,6 +97,7 @@ extern "C"
 # define IS_FIRST_COLUMN(column)      (column == FIRST_COLUMN_INDEX)
 # define IS_LAST_COLUMN(column, dim)  (column == LAST_COLUMN_INDEX(dim))
 # define IS_CHANNEL_COLUMN(column)    (column & 1)
+# define IS_WALL_COLUMN(column)       (! IS_CHANNEL_COLUMN(column) )
 
 # define FOR_EVERY_COLUMN(index, dim)         \
                                               \
@@ -110,6 +111,11 @@ extern "C"
 
 # define IS_FIRST_LAYER(layer)        (layer == FIRST_LAYER_INDEX)
 # define IS_LAST_LAYER(layer, dim)    (layer == LAST_LAYER_INDEX(dim))
+
+# define FOR_EVERY_LAYER(index, dim)          \
+                                              \
+    GridDimension_t index = GRIDDIMENSION_I ; \
+    for (index = FIRST_LAYER_INDEX ; index <= LAST_LAYER_INDEX(dim) ; index++)
 
 /******************************************************************************/
 
@@ -140,12 +146,6 @@ extern "C"
       index <= LAST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) ; \
       index++                                                \
     )
-
-/******************************************************************************/
-
-# define CAPACITY(length, width, height, vhc, time) \
-                                                    \
-    ((length * width * height) * vhc) / time
 
 /******************************************************************************/
 

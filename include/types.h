@@ -139,6 +139,8 @@ extern "C"
 
   } CoolantHTCs_t ;
 
+# define COOLANTHTCS_I (CoolantHTCs_t) { COOLANTHTC_I, COOLANTHTC_I, COOLANTHTC_I }
+
   /* Coolant volumetric heat capacity */
 
   typedef double CoolantVHC_t ;

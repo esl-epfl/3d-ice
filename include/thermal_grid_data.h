@@ -33,8 +33,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_LAYER_H_
-#define _3DICE_LAYER_H_
+#ifndef _3DICE_THERMALGRIDDATA_H_
+#define _3DICE_THERMALGRIDDATA_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -43,112 +43,110 @@ extern "C"
 
 /******************************************************************************/
 
-#include <stdio.h>
-
 #include "types.h"
-#include "material.h"
 #include "dimensions.h"
-#include "thermal_grid_data.h"
-#include "floorplan.h"
-#include "conventional_heat_sink.h"
-#include "system_matrix.h"
 
 /******************************************************************************/
 
-  struct Layer
-  {
-    /* The heigh of the layer in um. (1 cell) */
+  /* The type of a layer */
 
+  typedef enum
+  {
+    TDICE_LAYER_NONE = 0,
+    TDICE_LAYER_SOLID,
+    TDICE_LAYER_CHS,
+    TDICE_LAYER_CHANNEL
+
+  } Layer_t ;
+
+  typedef enum
+  {
+    TDICE_CONDUCTANCE_NORTH = 0,
+    TDICE_CONDUCTANCE_SOUTH,
+    TDICE_CONDUCTANCE_EAST,
+    TDICE_CONDUCTANCE_WEST,
+    TDICE_CONDUCTANCE_TOP,
+    TDICE_CONDUCTANCE_BOTTOM
+
+  } Conductance_d ;
+
+  typedef struct
+  {
+    Layer_t         Type ;
+    SolidTC_t       ThermalConductivity ;
+    SolidVHC_t      SolidVHC ;
     CellDimension_t Height ;
 
-    /* The offset (#of layers) counting from the first layer in the die */
+  } PerLayerData ;
 
-    GridDimension_t Offset ;
+  typedef struct
+  {
+    PerLayerData* LayersData ;
 
-    /* The material composing the layer */
+    CoolantVHC_t  CoolantVHC  ;
+    CoolantHTCs_t CoolantHTCs ;
+    CoolantFR_t   CoolantFR   ;
 
-    Material* Material ;
+    AmbientHTC_t AmbientHTC ;
 
-    /* To collect layers in a linked list */
+    Time_t DeltaTime ;
 
-    struct Layer* Next ;
-  } ;
-
-  typedef struct Layer Layer ;
-
-/******************************************************************************/
-
-  void init_layer (Layer* layer) ;
+  } ThermalGridData ;
 
 /******************************************************************************/
 
-  Layer* alloc_and_init_layer (void) ;
+  void init_thermal_grid_data (ThermalGridData* thermalgriddata) ;
 
 /******************************************************************************/
 
-  void free_layer (Layer* layer) ;
+  int alloc_thermal_grid_data
+  (
+    ThermalGridData* thermalgriddata,
+    Quantity_t       quantity,
+    CoolantVHC_t     coolant_vhc,
+    CoolantHTCs_t    coolant_htcs,
+    CoolantFR_t      coolant_fr,
+    AmbientHTC_t     ambient_htc,
+    Time_t           delta_time
+  ) ;
 
 /******************************************************************************/
 
-  void free_layers_list (Layer* list) ;
+  void free_thermal_grid_data (ThermalGridData* thermalgriddata) ;
 
 /******************************************************************************/
 
-  void print_layer (FILE* stream, String_t prefix, Layer* layer) ;
-
-/******************************************************************************/
-
-  void print_layers_list (FILE* stream, String_t prefix, Layer* list) ;
-
-/******************************************************************************/
-
-  void fill_thermal_grid_data_layer
+  void fill_thermal_grid_data
   (
     ThermalGridData* thermalgriddata,
     GridDimension_t  layer_index,
-    Layer*           layer
+    Layer_t          type,
+    SolidTC_t        thermal_conductivity,
+    SolidVHC_t       solid_vhc,
+    CellDimension_t  height
   ) ;
 
 /******************************************************************************/
 
-  Source_t* fill_sources_active_layer
+  Capacity_t get_capacity
   (
-#   ifdef PRINT_SOURCES
-    Layer*                layer,
-#   endif
-    GridDimension_t       layer_index,
-    ConventionalHeatSink* conventionalheatsink,
-    ThermalGridData*      thermalgriddata,
-    Floorplan*            floorplan,
-    Source_t*             sources,
-    Dimensions*           dimensions
+    ThermalGridData* thermalgriddata,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    GridDimension_t  row_index,
+    GridDimension_t  column_index
   ) ;
 
 /******************************************************************************/
 
-  Source_t* fill_sources_empty_layer
+  Conductance_t get_conductance
   (
-#   ifdef PRINT_SOURCES
-    Layer*                layer,
-#   endif
-    GridDimension_t       layer_index,
-    ConventionalHeatSink* conventionalheatsink,
-    ThermalGridData*      thermalgriddata,
-    Source_t*             sources,
-    Dimensions*           dimensions
-  ) ;
-
-/******************************************************************************/
-
-  SystemMatrix fill_system_matrix_layer
-  (
-#   ifdef PRINT_SYSTEM_MATRIX
-    Layer*                layer,
-#   endif
-    Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    GridDimension_t       layer_index,
-    SystemMatrix          system_matrix
+    ThermalGridData* thermalgriddata,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    GridDimension_t  row_index,
+    GridDimension_t  column_index,
+    Conductance_d    direction
   ) ;
 
 /******************************************************************************/
@@ -157,4 +155,4 @@ extern "C"
 }
 #endif
 
-#endif /* _3DICE_LAYER_H_ */
+#endif /* _3DICE_THERMALGRIDDATA_H_ */

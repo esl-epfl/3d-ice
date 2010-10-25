@@ -47,7 +47,7 @@ extern "C"
 
 #include "types.h"
 #include "layer.h"
-#include "conductances.h"
+#include "thermal_grid_data.h"
 #include "floorplan.h"
 #include "conventional_heat_sink.h"
 #include "system_matrix.h"
@@ -114,26 +114,11 @@ extern "C"
 
 /******************************************************************************/
 
-  Conductances* fill_conductances_die
+  void fill_thermal_grid_data_die
   (
-    Die*                  die,
-    Conductances*         conductances,
-    Dimensions*           dimensions,
-    ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       layer_index
-  ) ;
-
-/******************************************************************************/
-
-  Capacity_t* fill_capacities_die
-  (
-#   ifdef PRINT_CAPACITIES
-    GridDimension_t layer_index,
-#   endif
-    Die*            die,
-    Capacity_t*     capacities,
-    Dimensions*     dimensions,
-    Time_t          delta_time
+    ThermalGridData* thermalgriddata,
+    GridDimension_t  layer_index,
+    Die*             die
   ) ;
 
 /******************************************************************************/
@@ -143,7 +128,7 @@ extern "C"
     GridDimension_t       layer_index,
     Die*                  die,
     ConventionalHeatSink* conventionalheatsink,
-    Conductances*         conductances,
+    ThermalGridData*      thermalgriddata,
     Floorplan*            floorplan,
     Source_t*             sources,
     Dimensions*           dimensions
@@ -155,9 +140,7 @@ extern "C"
   (
     Die*                  die,
     Dimensions*           dimensions,
-    Conductances*         conductances,
-    Capacity_t*           capacities,
-    ConventionalHeatSink* conventionalheatsink,
+    ThermalGridData*      thermalgriddata,
     GridDimension_t       layer_index,
     SystemMatrix          system_matrix
   ) ;

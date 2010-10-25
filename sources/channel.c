@@ -42,14 +42,12 @@
 
 void init_channel (Channel* channel)
 {
-  channel->Height             = CELLDIMENSION_I ;
-  channel->CoolantHTCs.Side   = COOLANTHTC_I ;
-  channel->CoolantHTCs.Top    = COOLANTHTC_I ;
-  channel->CoolantHTCs.Bottom = COOLANTHTC_I ;
-  channel->CoolantVHC         = COOLANTVHC_I ;
-  channel->CoolantTIn         = TEMPERATURE_I ;
-  channel->CoolantFR          = COOLANTFR_I ;
-  channel->WallMaterial       = NULL ;
+  channel->Height       = CELLDIMENSION_I ;
+  channel->CoolantHTCs  = COOLANTHTCS_I ;
+  channel->CoolantVHC   = COOLANTVHC_I ;
+  channel->CoolantTIn   = TEMPERATURE_I ;
+  channel->CoolantFR    = COOLANTFR_I ;
+  channel->WallMaterial = NULL ;
 }
 
 /******************************************************************************/
@@ -113,184 +111,26 @@ void print_channel (FILE* stream, String_t prefix, Channel* channel)
 
 /******************************************************************************/
 
-Conductances* fill_conductances_channel
-(
-# ifdef PRINT_CONDUCTANCES
-  GridDimension_t layer_index,
-# endif
-  Channel*        channel,
-  Conductances*   conductances,
-  Dimensions*     dimensions
+void fill_thermal_grid_data_channel
+  (
+  ThermalGridData* thermalgriddata,
+  GridDimension_t  layer_index,
+  Channel*         channel
 )
 {
-# ifdef PRINT_CONDUCTANCES
-  fprintf (stderr, "fill_conductances_channel %s\n",
-           channel->WallMaterial->Id) ;
+# ifdef PRINT_THERMAL_GRID_DATA
+  fprintf (stderr, "\n#%d\tChannel [%s]\n\n", layer_index, channel->Wall->Id) ;
 # endif
 
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      if (IS_CHANNEL_COLUMN(column_index))
-
-        fill_conductances_liquid_cell
-        (
-#         ifdef PRINT_CONDUCTANCES
-          layer_index, row_index, column_index,
-#         endif
-          dimensions,
-          conductances,
-          get_cell_length (dimensions, column_index),
-          get_cell_width  (dimensions),
-          channel->Height,
-          channel->CoolantHTCs,
-          channel->CoolantVHC,
-          channel->CoolantFR
-        ) ;
-
-      else
-
-        fill_conductances_wall_cell
-        (
-#         ifdef PRINT_CONDUCTANCES
-          dimensions,
-          layer_index, row_index, column_index,
-#         endif
-          conductances,
-          get_cell_length (dimensions, column_index),
-          get_cell_width  (dimensions),
-          channel->Height,
-          channel->WallMaterial->ThermalConductivity
-        ) ;
-
-      conductances++ ;
-
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
-
-  return conductances ;
-}
-
-/******************************************************************************/
-
-Conductances* update_conductances_channel
-(
-# ifdef PRINT_CONDUCTANCES
-  GridDimension_t layer_index,
-# endif
-  Channel*        channel,
-  Conductances*   conductances,
-  Dimensions*     dimensions
-)
-{
-# ifdef PRINT_CONDUCTANCES
-  fprintf (stderr, "update_conductances_channel %s\n",
-           channel->WallMaterial->Id) ;
-# endif
-
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      if (IS_CHANNEL_COLUMN(column_index))
-
-        update_conductances_liquid_cell
-        (
-#         ifdef PRINT_CONDUCTANCES
-          layer_index, row_index, column_index,
-          get_cell_length (dimensions, column_index),
-          get_cell_width  (dimensions),
-          channel->Height,
-#         endif
-          dimensions,
-          conductances,
-          channel->CoolantVHC,
-          channel->CoolantFR
-        ) ;
-
-      conductances++ ;
-
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
-
-  return conductances ;
-}
-
-/******************************************************************************/
-
-/* ( [um3] . [ J / ( um3 . K ) ]) / [sec]  */
-/* = [ J / (K . sec) ]                     */
-/* = [ W / K ]                             */
-
-Capacity_t* fill_capacities_channel
-(
-# ifdef PRINT_CAPACITIES
-  GridDimension_t layer_index,
-# endif
-  Channel*        channel,
-  Capacity_t*     capacities,
-  Dimensions*     dimensions,
-  Time_t          delta_time
-)
-{
-# ifdef PRINT_CAPACITIES
-  fprintf (stderr,
-    "layer_index = %d\tfill_capacities_channel %s\n",
-    layer_index, channel->WallMaterial->Id) ;
-# endif
-
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      if (IS_CHANNEL_COLUMN(column_index))
-      {
-        *capacities  = CAPACITY
-                       (
-                         get_cell_length (dimensions, column_index),
-                         get_cell_width  (dimensions),
-                         channel->Height,
-                         channel->CoolantVHC,
-                         delta_time
-                       ) ;
-#       ifdef PRINT_CAPACITIES
-        fprintf (stderr,
-          "liquid cell  |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  %.5e [capacity] = (l x w x h x %.5e [coolant vhc]) / %.5e [delta] |\n",
-          layer_index, row_index, column_index,
-          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-          get_cell_length(dimensions, column_index), get_cell_width (dimensions),
-          channel->Height, *capacities, channel->CoolantVHC, delta_time) ;
-#       endif
-      }
-      else
-      {
-        *capacities = CAPACITY
-                      (
-                        get_cell_length (dimensions, column_index),
-                        get_cell_width  (dimensions),
-                        channel->Height,
-                        channel->WallMaterial->VolumetricHeatCapacity,
-                        delta_time
-                      ) ;
-#       ifdef PRINT_CAPACITIES
-        fprintf (stderr,
-          "solid cell   |  l %2d r %4d c %4d [%6d] |  l %5.2f w %5.2f h %5.2f "\
-                      " |  %.5e [capacity] = (l x w x h x %.5e [wall    vhc]) / %.5e [delta] |\n",
-          layer_index, row_index, column_index,
-          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-          get_cell_length(dimensions, column_index), get_cell_width (dimensions),
-          channel->Height, *capacities, channel->WallMaterial->VolumetricHeatCapacity, delta_time) ;
-#       endif
-      }
-
-      capacities++ ;
-
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
-
-  return capacities ;
+  fill_thermal_grid_data
+  (
+    thermalgriddata,
+    layer_index,
+    TDICE_LAYER_CHANNEL,
+    channel->WallMaterial->ThermalConductivity,
+    channel->WallMaterial->VolumetricHeatCapacity,
+    channel->Height
+  ) ;
 }
 
 /******************************************************************************/
@@ -348,8 +188,7 @@ SystemMatrix fill_system_matrix_channel
   Channel*              channel,
 # endif
   Dimensions*           dimensions,
-  Conductances*         conductances,
-  Capacity_t*           capacities,
+  ThermalGridData*      thermalgriddata,
   GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
@@ -368,7 +207,7 @@ SystemMatrix fill_system_matrix_channel
 
          system_matrix = add_liquid_column
                          (
-                           dimensions, conductances, capacities,
+                           dimensions, thermalgriddata,
                            layer_index, row_index, column_index,
                            system_matrix
                          ) ;
@@ -377,14 +216,10 @@ SystemMatrix fill_system_matrix_channel
 
          system_matrix = add_solid_column
                          (
-                           dimensions, conductances, capacities,
-                           NULL,
+                           dimensions, thermalgriddata,
                            layer_index, row_index, column_index,
                            system_matrix
                          ) ;
-
-      conductances    ++ ;
-      capacities      ++ ;
 
     } // FOR_EVERY_COLUMN
   }  // FOR_EVERY_ROW

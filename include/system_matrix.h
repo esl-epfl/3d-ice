@@ -43,7 +43,8 @@ extern "C"
 
 /******************************************************************************/
 
-#include "conventional_heat_sink.h"
+#include "dimensions.h"
+#include "thermal_grid_data.h"
 
 /******************************************************************************/
 
@@ -87,9 +88,7 @@ extern "C"
   SystemMatrix add_solid_column
   (
     Dimensions*           dimensions,
-    Conductances*         conductances,
-    Capacity_t*           capacities,
-    ConventionalHeatSink* conventionalheatsink,
+    ThermalGridData*      thermalgriddata,
     GridDimension_t       current_layer,
     GridDimension_t       current_row,
     GridDimension_t       current_column,
@@ -101,8 +100,7 @@ extern "C"
   SystemMatrix add_liquid_column
   (
     Dimensions*           dimensions,
-    Conductances*         conductances,
-    Capacity_t*           capacities,
+    ThermalGridData*      thermalgriddata,
     GridDimension_t       current_layer,
     GridDimension_t       current_row,
     GridDimension_t       current_column,

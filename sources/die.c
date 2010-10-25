@@ -123,70 +123,25 @@ Die* find_die_in_list (Die* list, String_t id)
 
 /******************************************************************************/
 
-Conductances* fill_conductances_die
+void fill_thermal_grid_data_die
 (
-  Die*                  die,
-  Conductances*         conductances,
-  Dimensions*           dimensions,
-  ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       layer_index
+  ThermalGridData* thermalgriddata,
+  GridDimension_t  layer_index,
+  Die*             die
 )
 {
-# ifdef PRINT_CONDUCTANCES
-  fprintf (stderr, "fill_conductances_die   %s\n", die->Id) ;
+# ifdef PRINT_THERMAL_GRID_DATA
+  fprintf (stderr, "\n#%d\tDie     [%s]\n\n", layer_index, die->Id) ;
 # endif
 
   FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
-  {
-    conductances = fill_conductances_layer
-                   (
-                     layer,
-                     conductances,
-                     dimensions,
-                     conventionalheatsink,
-                     layer_index + layer->Offset
-                   ) ;
 
-  } // FOR_EVERY_ELEMENT_IN_LIST
-
-  return conductances ;
-}
-
-/******************************************************************************/
-
-Capacity_t* fill_capacities_die
-(
-# ifdef PRINT_CAPACITIES
-  GridDimension_t layer_index,
-# endif
-  Die*            die,
-  Capacity_t*     capacities,
-  Dimensions*     dimensions,
-  Time_t          delta_time
-)
-{
-# ifdef PRINT_CAPACITIES
-  fprintf (stderr,
-    "layer_index = %d\tfill_capacities_die %s\n",
-    layer_index, die->Id) ;
-# endif
-
-  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
-  {
-    capacities = fill_capacities_layer
-                 (
-#                  ifdef PRINT_CAPACITIES
-                   layer_index + layer->Offset,
-#                  endif
-                   layer,
-                   capacities,
-                   dimensions,
-                   delta_time
-                 ) ;
-
-  } // FOR_EVERY_ELEMENT_IN_LIST
-
-  return capacities ;
+    fill_thermal_grid_data_layer
+    (
+      thermalgriddata,
+      layer_index++,
+      layer
+    ) ;
 }
 
 /******************************************************************************/
@@ -196,7 +151,7 @@ Source_t* fill_sources_die
   GridDimension_t       layer_index,
   Die*                  die,
   ConventionalHeatSink* conventionalheatsink,
-  Conductances*         conductances,
+  ThermalGridData*      thermalgriddata,
   Floorplan*            floorplan,
   Source_t*             sources,
   Dimensions*           dimensions
@@ -219,7 +174,7 @@ Source_t* fill_sources_die
 #                 endif
                   layer_index + layer->Offset,
                   conventionalheatsink,
-                  conductances,
+                  thermalgriddata,
                   floorplan,
                   sources,
                   dimensions
@@ -234,7 +189,7 @@ Source_t* fill_sources_die
 #                 endif
                   layer_index + layer->Offset,
                   conventionalheatsink,
-                  conductances,
+                  thermalgriddata,
                   sources,
                   dimensions
                 ) ;
@@ -250,9 +205,7 @@ SystemMatrix fill_system_matrix_die
 (
   Die*                  die,
   Dimensions*           dimensions,
-  Conductances*         conductances,
-  Capacity_t*           capacities,
-  ConventionalHeatSink* conventionalheatsink,
+  ThermalGridData*      thermalgriddata,
   GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
@@ -268,14 +221,10 @@ SystemMatrix fill_system_matrix_die
 #                     ifdef PRINT_SYSTEM_MATRIX
                       layer,
 #                     endif
-                      dimensions, conductances, capacities,
-                      conventionalheatsink,
+                      dimensions, thermalgriddata,
                       layer_index + layer->Offset,
                       system_matrix
                      ) ;
-
-    conductances    += get_layer_area (dimensions) ;
-    capacities      += get_layer_area (dimensions) ;
 
   }  // FOR_EVERY_ELEMENT_IN_LIST
 

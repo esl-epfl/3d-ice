@@ -43,7 +43,8 @@ extern "C"
 
 /******************************************************************************/
 
-#include "conductances.h"
+#include "types.h"
+#include "thermal_grid_data.h"
 #include "stack_description.h"
 #include "system_matrix.h"
 #include "slu_ddefs.h"
@@ -53,12 +54,12 @@ extern "C"
   typedef struct
   {
     /* The following pointers point to memory used to store, for every cell  */
-    /* in the 3D grid (temperatures, sources, capacities and conductances)   */
+    /* in the 3D grid, the temperature and the source values                 */
 
     Temperature_t* Temperatures ;
     Source_t*      Sources ;
-    Capacity_t*    Capacities ;
-    Conductances*  Conductances ;
+
+    ThermalGridData ThermalGridData ;
 
     /* The initial (homogeneous) temperature of the chip (every cell) */
 
@@ -199,10 +200,9 @@ extern "C"
 
   /* Change the flow rate.                                                  */
   /*                                                                        */
-  /* Sets the new value and then upadte the north and south conductances in */
-  /* all (and only) the liquid cells, re-fill the system matrix A and       */
-  /* update only the (channel) inlet source values.                         */
-  /* Then, it re-factor the System matrix.                                  */
+  /* Sets the new value and then re-fill the system matrix A and update     */
+  /* only the (channel) inlet source values. Then, it re-factor the System  */
+  /* matrix.                                                                */
   /*                                                                        */
   /* Returns                                                                */
   /*                                                                        */

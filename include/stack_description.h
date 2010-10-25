@@ -50,7 +50,6 @@ extern "C"
 #include "die.h"
 #include "stack_element.h"
 #include "dimensions.h"
-#include "conductances.h"
 #include "conventional_heat_sink.h"
 
 /******************************************************************************/

@@ -47,7 +47,7 @@ extern "C"
 
 #include "types.h"
 #include "material.h"
-#include "conductances.h"
+#include "thermal_grid_data.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
@@ -103,39 +103,11 @@ extern "C"
 
 /******************************************************************************/
 
-  Conductances* fill_conductances_channel
+  void fill_thermal_grid_data_channel
   (
-#   ifdef PRINT_CONDUCTANCES
-    GridDimension_t layer_index,
-#   endif
-    Channel*        channel,
-    Conductances*   conductances,
-    Dimensions*     dimensions
-  ) ;
-
-/******************************************************************************/
-
-  Conductances* update_conductances_channel
-  (
-#   ifdef PRINT_CONDUCTANCES
-    GridDimension_t layer_index,
-#   endif
-    Channel*        channel,
-    Conductances*   conductances,
-    Dimensions*     dimensions
-  ) ;
-
-/******************************************************************************/
-
-  Capacity_t* fill_capacities_channel
-  (
-#   ifdef PRINT_CAPACITIES
-    GridDimension_t layer_index,
-#   endif
-    Channel*        channel,
-    Capacity_t*     capacities,
-    Dimensions*     dimensions,
-    Time_t          delta_time
+    ThermalGridData* thermalgriddata,
+    GridDimension_t  layer_index,
+    Channel*         channel
   ) ;
 
 /******************************************************************************/
@@ -158,8 +130,7 @@ extern "C"
     Channel*              channel,
 #   endif
     Dimensions*           dimensions,
-    Conductances*         conductances,
-    Capacity_t*           capacities,
+    ThermalGridData*      thermalgriddata,
     GridDimension_t       layer_index,
     SystemMatrix          system_matrix
   ) ;

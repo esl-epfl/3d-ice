@@ -91,7 +91,7 @@ void fill_sources_conventional_heat_sink
   ConventionalHeatSink* conventionalheatsink,
   Dimensions*           dimensions,
   Source_t*             sources,
-  Conductances*         conductances,
+  ThermalGridData*      thermalgriddata,
   GridDimension_t       layer_index
 )
 {
@@ -100,23 +100,23 @@ void fill_sources_conventional_heat_sink
     "layer_index = %d\tadd_sources_conventional_heat_sink\n", layer_index) ;
 #endif
 
-  conductances += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
   FOR_EVERY_ROW (row_index, dimensions)
   {
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-      *sources = (conventionalheatsink->AmbientTemperature * conductances->Top) ;
+      *sources++ = (conventionalheatsink->AmbientTemperature
+                    * get_conductance (thermalgriddata, dimensions,
+                                       layer_index, row_index, column_index,
+                                       TDICE_CONDUCTANCE_TOP)) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | = %f * %.5e = %.5e\n",
           layer_index, row_index, column_index,
           get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-          conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
+          conventionalheatsink->AmbientTemperature,
+          get_conductance (thermalgriddata, dimensions, layer, row, column, TDICE_CONDUCTANCE_TOP),
+          *(sources-1)) ;
 #endif
-      sources++ ;
-      conductances++ ;
-
     } // FOR_EVERY_COLUMN
   } // FOR_EVERY_ROW
 
@@ -129,7 +129,7 @@ void add_sources_conventional_heat_sink
   ConventionalHeatSink* conventionalheatsink,
   Dimensions*           dimensions,
   Source_t*             sources,
-  Conductances*         conductances,
+  ThermalGridData*      thermalgriddata,
   GridDimension_t       layer_index
 )
 {
@@ -138,23 +138,23 @@ void add_sources_conventional_heat_sink
     "layer_index = %d\tadd_sources_conventional_heat_sink\n", layer_index) ;
 #endif
 
-  conductances += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
   FOR_EVERY_ROW (row_index, dimensions)
   {
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-      *sources += (conventionalheatsink->AmbientTemperature * conductances->Top) ;
+      *sources++ += (conventionalheatsink->AmbientTemperature
+                     * get_conductance (thermalgriddata, dimensions,
+                                        layer_index, row_index, column_index,
+                                        TDICE_CONDUCTANCE_TOP)) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
           layer_index, row_index, column_index,
           get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-          conventionalheatsink->AmbientTemperature, conductances->Top, *sources) ;
+          conventionalheatsink->AmbientTemperature,
+          get_conductance (thermalgriddata, dimensions, layer, row, column, TDICE_CONDUCTANCE_TOP),
+          *(sources-1)) ;
 #endif
-      sources++ ;
-      conductances++ ;
-
     } // FOR_EVERY_COLUMN
   } // FOR_EVERY_ROW
 

@@ -46,7 +46,7 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
-#include "conductances.h"
+#include "thermal_grid_data.h"
 
 /******************************************************************************/
 
@@ -90,7 +90,7 @@ extern "C"
     ConventionalHeatSink* conventionalheatsink,
     Dimensions*           dimensions,
     Source_t*             sources,
-    Conductances*         conductances,
+    ThermalGridData*      thermalgriddata,
     GridDimension_t       layer_index
   ) ;
 
@@ -101,7 +101,7 @@ extern "C"
     ConventionalHeatSink* conventionalheatsink,
     Dimensions*           dimensions,
     Source_t*             sources,
-    Conductances*         conductances,
+    ThermalGridData*      thermalgriddata,
     GridDimension_t       layer_index
   ) ;
 
