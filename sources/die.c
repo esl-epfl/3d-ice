@@ -55,7 +55,9 @@ void init_die (Die* die)
 
 Die* alloc_and_init_die (void)
 {
-  Die* die = (Die*) malloc ( sizeof(Die) ) ;
+  Die* die ;
+
+  MALLOC (die, 1) ;
 
   if (die != NULL) init_die (die) ;
 
@@ -90,8 +92,9 @@ void print_die (FILE* stream, String_t prefix, Die* die)
   fprintf (stream,
     "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->Offset) ;
 
-  String_t new_prefix = (String_t) malloc (sizeof(char)*(strlen(prefix) + 2)) ;
-  // FIXME typeof(pointed by string)
+  String_t new_prefix ;
+
+  MALLOC (new_prefix, strlen(prefix) + 2) ;
 
   strcpy (new_prefix, prefix) ;
   strcat (new_prefix, "  ") ;

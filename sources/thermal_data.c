@@ -122,15 +122,15 @@ int fill_thermal_data
   StackDescription* stkd
 )
 {
+  int result ;
+
   tdata->Size = (Quantity_t) get_number_of_cells(stkd->Dimensions) ;
 
   /* Alloc and set temperatures */
 
-  if ( (tdata->Temperatures
-         = (Temperature_t*) malloc ( sizeof(Temperature_t) * tdata->Size )
-       ) == NULL )
+  MALLOC (tdata->Temperatures, tdata->Size) ;
 
-    goto temperatures_fail ;
+  if (tdata->Temperatures == NULL)  goto temperatures_fail ;
 
   /* Set Temperatures and SLU vector B */
 
@@ -144,8 +144,6 @@ int fill_thermal_data
   ) ;
 
   /* Alloc and set thermal grid data */
-
-  int result ;
 
   if (stkd->Channel == NULL)
   {
@@ -185,19 +183,22 @@ int fill_thermal_data
 
   /* Alloc and set sources */
 
-  if ( (tdata->Sources
-         = (Source_t*) malloc ( sizeof(Source_t) * tdata->Size )
-       ) == NULL )
+  MALLOC (tdata->Sources, tdata->Size) ;
 
-    goto sources_fail ;
+  if (tdata->Sources == NULL)  goto sources_fail ;
 
   init_data (tdata->Sources, tdata->Size, 0.0) ;
 
   /* Alloc and set system matrix */
 
-  if ( alloc_system_matrix (&tdata->SM_A, tdata->Size,
-                            get_number_of_non_zeroes(stkd->Dimensions)) == 0 )
-    goto system_matrix_fail ;
+  result = alloc_system_matrix
+           (
+             &tdata->SM_A,
+             tdata->Size,
+             get_number_of_non_zeroes(stkd->Dimensions)
+           ) ;
+
+  if (result == 0)  goto system_matrix_fail ;
 
   fill_system_matrix_stack_description
   (
@@ -213,20 +214,17 @@ int fill_thermal_data
 
   /* Alloc SLU memory */
 
-  if ( (tdata->SLU_PermutationMatrixR
-         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+  MALLOC (tdata->SLU_PermutationMatrixR, tdata->Size) ;
 
-    goto slu_perm_r_fail ;
+  if (tdata->SLU_PermutationMatrixR == NULL )  goto slu_perm_r_fail ;
 
-  if ( (tdata->SLU_PermutationMatrixC
-         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+  MALLOC (tdata->SLU_PermutationMatrixC, tdata->Size) ;
 
-    goto slu_perm_c_fail ;
+  if (tdata->SLU_PermutationMatrixC == NULL )  goto slu_perm_c_fail ;
 
-  if ( (tdata->SLU_Etree
-         = (int *) malloc ( sizeof(int) * tdata->Size )) == NULL )
+  MALLOC (tdata->SLU_Etree, tdata->Size) ;
 
-    goto slu_etree_fail ;
+  if (tdata->SLU_Etree == NULL)  goto slu_etree_fail ;
 
 
   get_perm_c (tdata->SLU_Options.ColPerm,
@@ -245,8 +243,7 @@ int fill_thermal_data
           &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
           &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
-  if (tdata->SLU_Info == 0)
-    tdata->SLU_Options.Fact = FACTORED ;
+  if (tdata->SLU_Info == 0)  tdata->SLU_Options.Fact = FACTORED ;
 
   return tdata->SLU_Info ;
 

@@ -36,6 +36,7 @@
 #include <stdlib.h>
 
 #include "powers_queue.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -50,7 +51,9 @@ void init_powers_queue (PowersQueue* queue)
 
 PowersQueue* alloc_and_init_powers_queue (void)
 {
-  PowersQueue* queue = (PowersQueue*) malloc (sizeof(PowersQueue)) ;
+  PowersQueue* queue ;
+
+  MALLOC (queue, 1) ;
 
   if (queue != NULL)  init_powers_queue (queue) ;
 
@@ -81,7 +84,7 @@ void put_into_powers_queue (PowersQueue* queue, Power_t power)
 {
   PowerNode* tmp = queue->Tail ;
 
-  queue->Tail = (PowerNode*) malloc ( sizeof(PowerNode) ) ;
+  MALLOC (queue->Tail, 1) ;
 
   if ( queue->Tail == NULL )
   {

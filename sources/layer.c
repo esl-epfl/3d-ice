@@ -52,7 +52,9 @@ void init_layer (Layer* layer)
 
 Layer* alloc_and_init_layer (void)
 {
-  Layer* layer = (Layer*) malloc (sizeof (Layer)) ;
+  Layer* layer ;
+
+  MALLOC (layer, 1) ;
 
   if (layer != NULL) init_layer (layer) ;
 

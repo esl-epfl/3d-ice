@@ -37,6 +37,7 @@
 #include "dimensions.h"
 #include "floorplan.h"
 #include "floorplan_element.h"
+#include "macros.h"
 %}
 
 %union
@@ -115,8 +116,17 @@ floorplan_element_list
     {
       if (find_floorplan_element_in_list($1, $2->Id) != NULL)
       {
-        String_t message
-          = (String_t) malloc ((37 + strlen($2->Id)) * sizeof (char)) ;
+        String_t message ;
+
+        MALLOC (message, 37 + strlen($2->Id)) ;
+
+        if (message == NULL)
+        {
+          floorplan_error (floorplan, dimensions, scanner, "Malloc error") ;
+          free_floorplan_element ($2) ;
+          YYABORT ;
+        }
+
         sprintf (message, "Floorplan element %s already declared", $2->Id) ;
 
         floorplan_error (floorplan, dimensions, scanner, message) ;

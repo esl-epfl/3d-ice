@@ -54,7 +54,9 @@ void init_channel (Channel* channel)
 
 Channel* alloc_and_init_channel (void)
 {
-  Channel* channel = (Channel*) malloc ( sizeof(Channel) ) ;
+  Channel* channel ;
+
+  MALLOC (channel, 1) ;
 
   if (channel != NULL) init_channel (channel) ;
 

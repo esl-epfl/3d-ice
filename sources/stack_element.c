@@ -58,8 +58,9 @@ init_stack_element (StackElement* stack_element)
 
 StackElement* alloc_and_init_stack_element (void)
 {
-  StackElement* stack_element
-    = (StackElement* ) malloc( sizeof(StackElement) ) ;
+  StackElement* stack_element ;
+
+  MALLOC (stack_element, 1) ;
 
   if (stack_element != NULL) init_stack_element(stack_element) ;
 

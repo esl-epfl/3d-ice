@@ -260,8 +260,17 @@ material
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
-        String_t message
-          = (String_t) malloc ((26 + strlen($2)) * sizeof (char)) ;
+        String_t message ;
+
+        MALLOC (message, 26 + strlen($2)) ;
+
+        if (message == NULL)
+        {
+          free ($2) ;
+          free_material (material) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
         sprintf (message, "Material %s already declared", $2) ;
 
         free ($2) ;
@@ -353,12 +362,21 @@ channel
 
       if (stkd->Channel->WallMaterial == NULL)
       {
-        String_t message
-          = (String_t) malloc ((18 + strlen($18)) * sizeof (char)) ;
+        String_t message ;
+
+        MALLOC (message, 18 + strlen($18)) ;
+
+        if (message == NULL)
+        {
+          free ($18) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
+
         sprintf (message, "Unknown material %s", $18) ;
 
-        stack_description_error (stkd, scanner, message) ;
         free ($18) ;
+        stack_description_error (stkd, scanner, message) ;
         free (message) ;
         YYABORT ;
       }
@@ -422,15 +440,28 @@ die
 
       if (find_die_in_list(stkd->DiesList, $2) != NULL)
       {
-        String_t message
-          = (String_t) malloc ((21 + strlen($2)) * sizeof (char)) ;
+        String_t message ;
+
+        MALLOC (message, 21 + strlen($2)) ;
+
+        if (message == NULL)
+        {
+          free             ($2) ;
+          free_layers_list ($4) ;
+          free_layer       ($5) ;
+          free_layers_list ($6) ;
+          free_die         (die) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
+
         sprintf (message, "Die %s already declared", $2) ;
 
         free             ($2) ;
         free_layers_list ($4) ;
         free_layer       ($5) ;
         free_layers_list ($6) ;
-        free_die (die) ;
+        free_die         (die) ;
         stack_description_error (stkd, scanner, message) ;
         free (message) ;
         YYABORT ;
@@ -503,13 +534,24 @@ layer_content : DVALUE IDENTIFIER ';'
 
       if (layer->Material == NULL)
       {
-        String_t message
-          = (String_t) malloc ((18 + strlen($2)) * sizeof (char)) ;
+        String_t message ;
+
+        MALLOC (message, 18 + strlen($2)) ;
+
+        if (message == NULL)
+        {
+          free ($2) ;
+          free_layer(layer) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
+
         sprintf (message, "Unknown material %s", $2) ;
 
         free ($2) ;
-        free (message) ;
         free_layer(layer) ;
+        stack_description_error (stkd, scanner, message) ;
+        free (message) ;
         YYABORT ;
       }
 
@@ -610,8 +652,18 @@ stack_elements
 
       if (find_stack_element_in_list($1, $2->Id) != NULL)
       {
-        String_t message
-          = (String_t) malloc ((31 + strlen($2->Id)) * sizeof (char)) ;
+        String_t message ;
+
+        MALLOC (message, 31 + strlen($2->Id)) ;
+
+        if (message == NULL)
+        {
+          free_stack_element ($2) ;
+          free_stack_elements_list ($1) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
+
         sprintf (message, "Stack element %s already declared", $2->Id) ;
 
         free_stack_element ($2) ;
@@ -666,17 +718,28 @@ stack_element
 
       if (layer->Material == NULL)
       {
-        String_t message
-          = (String_t) malloc ((18 + strlen($4)) * sizeof (char)) ;
-        sprintf (message, "Unknown material %s", $4) ;
+        String_t message ;
 
-        stack_description_error (stkd, scanner, message) ;
+        MALLOC (message, 18 + strlen($4)) ;
+
+        if (message == NULL)
+        {
+          free ($2) ;
+          free ($4) ;
+          free_stack_element (stack_element) ;
+          free_layer (layer) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
+
+        sprintf (message, "Unknown material %s", $4) ;
 
         free ($2) ;
         free ($4) ;
-        free (message) ;
         free_stack_element (stack_element) ;
-        free_layer(layer) ;
+        free_layer (layer) ;
+        stack_description_error (stkd, scanner, message) ;
+        free (message) ;
         YYABORT ;
       }
 
@@ -762,16 +825,26 @@ stack_element
 
       if (stack_element->Pointer.Die == NULL)
       {
-        String_t message
-          = (String_t) malloc ((13 + strlen($3)) * sizeof (char)) ;
-        sprintf (message, "Unknown die %s", $3) ;
+        String_t message ;
 
-        stack_description_error (stkd, scanner, message) ;
+        MALLOC (message, 13 + strlen($3)) ;
+
+        if (message == NULL)
+        {
+          free ($3) ;
+          free ($5) ;
+          free_stack_element (stack_element) ;
+          stack_description_error (stkd, scanner, "Malloc error") ;
+          YYABORT ;
+        }
+
+        sprintf (message, "Unknown die %s", $3) ;
 
         free($3) ;
         free($5) ;
-        free(message) ;
         free_stack_element (stack_element) ;
+        stack_description_error (stkd, scanner, message) ;
+        free(message) ;
         YYABORT ;
       }
 

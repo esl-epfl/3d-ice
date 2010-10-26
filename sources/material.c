@@ -54,7 +54,9 @@ void init_material (Material* material)
 
 Material* alloc_and_init_material (void)
 {
-  Material* material = (Material*) malloc (sizeof (Material)) ;
+  Material* material ;
+
+  MALLOC (material, 1) ;
 
   if (material != NULL) init_material (material) ;
 
