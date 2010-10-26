@@ -68,13 +68,17 @@ extern "C"
 
     GridDimension_t NLayers ;
 
-    /* The list of layers composing the die (from bottom to top) */
+    /* Pointer to the top-most layer */
 
-    Layer* LayersList ;
+    Layer* TopLayer ;
 
     /* Pointer to the source layer */
 
     Layer* SourceLayer ;
+
+    /* Pointer to the bottom-most layer */
+
+    Layer* BottomLayer ;
 
     /* To collect dies in a linked list */
 

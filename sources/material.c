@@ -170,7 +170,7 @@ void print_detailed_materials_list
 
 Material* find_material_in_list (Material* list, String_t id)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (Material, material, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, list)
 
     if (strcmp (material->Id, id) == 0) break ;
 

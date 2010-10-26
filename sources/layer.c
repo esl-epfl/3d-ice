@@ -46,6 +46,7 @@ void init_layer (Layer* layer)
   layer->Offset   = GRIDDIMENSION_I ;
   layer->Material = NULL ;
   layer->Next     = NULL ;
+  layer->Prev     = NULL ;
 }
 
 /******************************************************************************/
@@ -115,13 +116,17 @@ void print_detailed_layer
   fprintf (stream,
            STRING_F "layer->Next     = %p\n",
            prefix, layer->Next) ;
+
+  fprintf (stream,
+           STRING_F "layer->Prev     = %p\n",
+           prefix, layer->Prev) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_layers_list (FILE* stream, String_t prefix, Layer* list)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, list)
 
     print_formatted_layer (stream, prefix, layer) ;
 }
@@ -189,7 +194,7 @@ Source_t* fill_sources_active_layer
            layer_index, layer->Material->Id) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, floorplan->ElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
   {
     flp_el_surface
       = (CellDimension_t) (flp_el->EffectiveLength * flp_el->EffectiveWidth) ;

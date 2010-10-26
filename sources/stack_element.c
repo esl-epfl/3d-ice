@@ -103,7 +103,7 @@ void print_stack_elements_list
 {
   fprintf (stream, "%sStack:\n", prefix) ;
 
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
   {
     fprintf (stream,
       "%s  Stackelement (l %-2d - %-2d)\t%s\t",
@@ -150,7 +150,7 @@ void print_stack_elements_list
 
 StackElement*  find_stack_element_in_list (StackElement* list, String_t id)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
 
     if (strcmp(stk_el->Id, id) == 0)  break ;
 

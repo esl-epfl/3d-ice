@@ -144,7 +144,7 @@ void print_all_floorplans
   StackDescription* stkd
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -156,7 +156,7 @@ void print_all_floorplans
 
 int fill_floorplans (StackDescription* stkd)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -184,7 +184,7 @@ void fill_thermal_grid_data_stack_description
     get_number_of_layers  (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     switch (stk_el->Type)
     {
@@ -258,7 +258,7 @@ void fill_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     switch (stk_el->Type)
     {
@@ -336,7 +336,7 @@ void update_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     switch (stk_el->Type)
     {
@@ -401,7 +401,7 @@ void fill_system_matrix_stack_description
 
   *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
 
-  FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     switch (stk_el->Type)
     {

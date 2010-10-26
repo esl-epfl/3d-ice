@@ -145,7 +145,7 @@ void print_floorplan_elements_list
   FloorplanElement* list
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
 
     print_floorplan_element (stream, prefix, flp_el) ;
 }
@@ -158,7 +158,7 @@ void print_formatted_floorplan_elements_list
   FloorplanElement* list
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
   {
     print_formatted_floorplan_element (stream, flp_el) ;
     fprintf(stream, "\n") ;
@@ -173,7 +173,7 @@ FloorplanElement* find_floorplan_element_in_list
   String_t          id
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
 
     if (strcmp (flp_el->Id, id) == 0) break ;
 

@@ -75,12 +75,31 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Cross a linked list of ... */
+# define JOIN_ELEMENTS(first, second) \
+                                      \
+    do                                \
+    {                                 \
+      first->Next  = second ;         \
+      second->Prev = first  ;         \
+    } while (0)
 
-# define FOR_EVERY_ELEMENT_IN_LIST(type, index, begin) \
+/******************************************************************************/
+
+  /* Cross a linked list of ... from left to right */
+
+# define FOR_EVERY_ELEMENT_IN_LIST_FORWARD(type, index, begin) \
                                                        \
    type* index = NULL ;                                \
    for (index = begin ; index != NULL ; index = index->Next)
+
+/******************************************************************************/
+
+  /* Cross a linked list of ... from right to left */
+
+# define FOR_EVERY_ELEMENT_IN_LIST_BACKWARD(type, index, begin) \
+                                                                \
+   type* index = NULL ;                                         \
+   for (index = begin ; index != NULL ; index = index->Prev)
 
 /******************************************************************************/
 

@@ -125,9 +125,9 @@ Bool_t check_intersections
 {
   Bool_t result = FALSE_V ;
 
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
-                             flp_el,
-                             floorplan->ElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
+                                     flp_el,
+                                     floorplan->ElementsList)
 
     if (check_intersection (flp_el, floorplan_element) == TRUE_V)
     {
@@ -391,9 +391,9 @@ int get_all_max_temperatures_floorplan
   Temperature_t* max_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
-                             flp_el,
-                             floorplan->ElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
+                                     flp_el,
+                                     floorplan->ElementsList)
 
     get_max_temperature_floorplan_element
     (
@@ -416,9 +416,9 @@ int get_all_min_temperatures_floorplan
   Temperature_t* min_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
-                             flp_el,
-                             floorplan->ElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
+                                     flp_el,
+                                     floorplan->ElementsList)
 
     get_min_temperature_floorplan_element
     (
@@ -441,9 +441,9 @@ int get_all_avg_temperatures_floorplan
   Temperature_t* avg_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
-                             flp_el,
-                             floorplan->ElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
+                                     flp_el,
+                                     floorplan->ElementsList)
 
     get_avg_temperature_floorplan_element
     (
@@ -468,9 +468,9 @@ int get_all_min_avg_max_temperatures_floorplan
   Temperature_t* max_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement,
-                             flp_el,
-                             floorplan->ElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
+                                     flp_el,
+                                     floorplan->ElementsList)
 
     get_min_avg_max_temperatures_floorplan_element
     (

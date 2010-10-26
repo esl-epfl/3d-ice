@@ -69,9 +69,10 @@ extern "C"
 
     Material* Material ;
 
-    /* To collect layers in a linked list */
+    /* To collect layers in a double linked list */
 
     struct Layer* Next ;
+    struct Layer* Prev ;
   } ;
 
   typedef struct Layer Layer ;

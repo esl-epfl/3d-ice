@@ -180,7 +180,7 @@ stack_description_file
       // Checks if all the materials are used
       //
 
-      FOR_EVERY_ELEMENT_IN_LIST (Material, material, stkd->MaterialsList)
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, stkd->MaterialsList)
 
         if (material->Used == 0)
 
@@ -191,7 +191,7 @@ stack_description_file
       // Checks if all the dies are used
       //
 
-      FOR_EVERY_ELEMENT_IN_LIST (Die, die, stkd->DiesList)
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, stkd->DiesList)
 
         if (die->Used == 0)
 
@@ -202,7 +202,7 @@ stack_description_file
       // Counts the number of layers
       //
 
-      FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
 
         stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
 
@@ -417,10 +417,10 @@ dies_list
 
 die
 
-  : DIE IDENTIFIER ':'
-       layers_list
-       source_layer
-       layers_list
+  : DIE IDENTIFIER ':'         /* $2 Die identifier                          */
+       layers_list             /* $4 list of layers (above source -> top)    */
+       source_layer            /* $5 source layer                            */
+       layers_list             /* $6 list of layers (bottom -> below source) */
     {
       Die* die = $$ = alloc_and_init_die() ;
 
@@ -440,53 +440,77 @@ die
 
       if (find_die_in_list(stkd->DiesList, $2) != NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 21 + strlen($2)) ;
-
-        if (message == NULL)
-        {
-          free             ($2) ;
-          free_layers_list ($4) ;
-          free_layer       ($5) ;
-          free_layers_list ($6) ;
-          free_die         (die) ;
-          stack_description_error (stkd, scanner, "Malloc error") ;
-          YYABORT ;
-        }
-
+        String_t message
+          = (String_t) malloc ((21 + strlen($2)) * sizeof (char)) ;
         sprintf (message, "Die %s already declared", $2) ;
 
         free             ($2) ;
         free_layers_list ($4) ;
         free_layer       ($5) ;
         free_layers_list ($6) ;
-        free_die         (die) ;
+        free_die (die) ;
         stack_description_error (stkd, scanner, message) ;
         free (message) ;
         YYABORT ;
       }
 
       die->Id = $2 ;
+      die->SourceLayer = $5 ;
+
+      /* The layers within a die are declared from top to bottom       */
+      /* but here we revert it: the first layer in the list LayersList */
+      /* will be the bottom-most layer in the die                      */
 
       if ($6 != NULL)
       {
-        die->LayersList = $6 ;
+        /* if there are layers below the source, */
+        /* the list of layers begins with $6     */
 
-        Layer* layer = $6 ;
-        while (layer->Next != NULL)
-          layer = layer->Next ;
-        layer->Next = $5 ;
+        die->BottomLayer = $6 ;
+
+        /* $6 moved until the end .. */
+
+        while ($6->Next != NULL) $6 = $6->Next ;
+
+        /* the list $6 continues with the source layer $5 */
+
+        JOIN_ELEMENTS ($6, $5) ;
       }
       else
-        die->LayersList = $5 ;
+      {
+        /* if there aren't layers below the source, the list of layers */
+        /* begins directly with the source layer $5                    */
 
-      die->SourceLayer = $5 ;
-      $5->Next = $4 ;
+        die->BottomLayer = $5 ;
+      }
+
+      if ($4 != NULL)
+      {
+        /* if there are layers above the source  */
+        /* $5 is connected to the list $4        */
+
+        JOIN_ELEMENTS ($5, $4) ;
+
+        /* $4 moved until the end .. */
+
+        while ($4->Next != NULL) $4 = $4->Next ;
+
+        /* the list finishes with the last layer in $4 */
+
+        die->TopLayer = $4 ;
+      }
+      else
+      {
+        /* if there aren't layers below the source,   */
+        /* The list finishes with the source layer $5 */
+
+        die->TopLayer = $5 ;
+      }
+
 
       GridDimension_t layer_offset = GRIDDIMENSION_I ;
 
-      FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
 
         layer->Offset = layer_offset++ ;
 
@@ -506,8 +530,8 @@ layers_list
 
 layers
 
-  : layer         {                 $$ = $1 ; }
-  | layers layer  { $2->Next = $1 ; $$ = $2 ; }
+  : layer         {                         $$ = $1 ; }
+  | layers layer  { JOIN_ELEMENTS($2, $1) ; $$ = $2 ; }
   ;
 
 layer         : LAYER  layer_content { $$ = $2 ; } ;
@@ -611,7 +635,7 @@ stack
 
       GridDimension_t layer_index = GRIDDIMENSION_I ;
 
-      FOR_EVERY_ELEMENT_IN_LIST (StackElement, stk_el, stkd->StackElementsList)
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
       {
         stk_el->Offset = layer_index ;
         layer_index   += stk_el->NLayers ;

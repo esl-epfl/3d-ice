@@ -46,8 +46,9 @@ void init_die (Die* die)
   die->Id          = STRING_I ;
   die->Used        = QUANTITY_I ;
   die->NLayers     = GRIDDIMENSION_I ;
-  die->LayersList  = NULL ;
+  die->TopLayer    = NULL ;
   die->SourceLayer = NULL ;
+  die->BottomLayer = NULL ;
   die->Next        = NULL ;
 }
 
@@ -66,7 +67,7 @@ Die* alloc_and_init_die (void)
 
 void free_die (Die* die)
 {
-  free_layers_list (die->LayersList) ;
+  free_layers_list (die->BottomLayer) ;
   free (die->Id) ;
   free (die) ;
 }
@@ -105,7 +106,7 @@ void print_formatted_die
            STRING_F "die " STRING_F " :\n",
            prefix, die->Id) ;
 
-  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (Layer, layer, die->TopLayer)
   {
     if (layer == die->SourceLayer)
 
@@ -152,14 +153,22 @@ void print_detailed_die
            prefix, die->NLayers) ;
 
   fprintf (stream,
-           STRING_F "die->LayersList  = %p\n",
-           prefix, die->LayersList) ;
+           STRING_F "die->BottomLayer = %p\n",
+           prefix, die->BottomLayer) ;
+
+  fprintf (stream,
+           STRING_F "die->SourceLayer = %p\n",
+           prefix, die->SourceLayer) ;
+
+  fprintf (stream,
+           STRING_F "die->TopLayer    = %p\n",
+           prefix, die->TopLayer) ;
 
   fprintf (stream,
            STRING_F "\n",
            new_prefix) ;
 
-  print_detailed_layers_list (stream, new_prefix, die->LayersList) ;
+  print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
 
   fprintf (stream,
            STRING_F "\n",
@@ -214,7 +223,7 @@ void print_detailed_dies_list
 
 Die* find_die_in_list (Die* list, String_t id)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (Die, die, list)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, list)
 
     if (strcmp(die->Id, id) == 0) break ;
 
@@ -234,7 +243,7 @@ void fill_thermal_grid_data_die
   fprintf (stderr, "\n#%d\tDie     [%s]\n\n", layer_index, die->Id) ;
 # endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
 
     fill_thermal_grid_data_layer
     (
@@ -263,7 +272,7 @@ Source_t* fill_sources_die
     layer_index, die->Id, floorplan->FileName) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
   {
     if ( die->SourceLayer == layer )
 
@@ -314,7 +323,7 @@ SystemMatrix fill_system_matrix_die
   fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
 # endif
 
-  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
   {
     system_matrix = fill_system_matrix_layer
                     (
