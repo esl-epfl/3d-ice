@@ -52,9 +52,7 @@ void init_layer (Layer* layer)
 
 Layer* alloc_and_init_layer (void)
 {
-  Layer* layer ;
-
-  MALLOC (layer, 1) ;
+  Layer* layer = malloc (sizeof(*layer));
 
   if (layer != NULL) init_layer (layer) ;
 
@@ -77,20 +75,67 @@ void free_layers_list (Layer* list)
 
 /******************************************************************************/
 
-void print_layer (FILE* stream, String_t prefix, Layer* layer)
+void print_formatted_layer
+(
+  FILE*    stream,
+  String_t prefix,
+  Layer*   layer
+)
 {
   fprintf (stream,
-    "%sLayer #%d height %5.2f um, material %s\n",
-    prefix, layer->Offset, layer->Height, layer->Material->Id) ;
+    STRING_F " " CELLDIMENSION_F "  " STRING_F "\n",
+    prefix, layer->Height, layer->Material->Id) ;
 }
 
 /******************************************************************************/
 
-void print_layers_list (FILE* stream, String_t prefix, Layer* list)
+void print_detailed_layer
+(
+  FILE*    stream,
+  String_t prefix,
+  Layer*   layer
+)
+{
+  fprintf (stream,
+           STRING_F "layer           = %p\n",
+           prefix, layer) ;
+
+  fprintf (stream,
+           STRING_F "layer->Height   = " CELLDIMENSION_F "\n",
+           prefix, layer->Height) ;
+
+  fprintf (stream,
+           STRING_F "layer->Offset   = " GRIDDIMENSION_F "\n",
+           prefix, layer->Offset) ;
+
+  fprintf (stream,
+           STRING_F "layer->Material = %p\n",
+           prefix, layer->Material) ;
+
+  fprintf (stream,
+           STRING_F "layer->Next     = %p\n",
+           prefix, layer->Next) ;
+}
+
+/******************************************************************************/
+
+void print_formatted_layers_list (FILE* stream, String_t prefix, Layer* list)
 {
   FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, list)
 
-    print_layer (stream, prefix, layer) ;
+    print_formatted_layer (stream, prefix, layer) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_layers_list (FILE* stream, String_t prefix, Layer* list)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Layer, layer, list)
+  {
+    print_detailed_layer (stream, prefix, layer) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
+  print_detailed_layer (stream, prefix, layer) ;
 }
 
 /******************************************************************************/
@@ -103,7 +148,9 @@ void fill_thermal_grid_data_layer
 )
 {
 # ifdef PRINT_THERMAL_GRID_DATA
-  fprintf (stderr, "\n#%d\tLayer   [%s]\n\n", layer_index, layer->Material->Id) ;
+  fprintf (stderr,
+           "\n#" GRIDDIMENSION_F "\tLayer   [" STRING_F "]\n\n",
+           layer_index, layer->Material->Id) ;
 # endif
 
   fill_thermal_grid_data
@@ -137,8 +184,9 @@ Source_t* fill_sources_active_layer
 
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "layer_index = %d\tfill_sources_source_layer   %s\n",
-    layer_index, layer->Material->Id) ;
+           "layer_index = " GRIDDIMENSION_F \
+           "\tfill_sources_source_layer   " STRING_F "\n",
+           layer_index, layer->Material->Id) ;
 #endif
 
   FOR_EVERY_ELEMENT_IN_LIST (FloorplanElement, flp_el, floorplan->ElementsList)
@@ -162,9 +210,16 @@ Source_t* fill_sources_active_layer
 
 #ifdef PRINT_SOURCES
         fprintf (stderr,
-          "solid  cell  | l %2d r %4d c %4d [%6d] "
-                       "| l %5.2f w %5.2f "  \
-                       "| %.5e [source] = (%.5e [W] * l * w) / %.5e | %s\n",
+          "solid  cell  | l " GRIDDIMENSION_F     \
+                        " r " GRIDDIMENSION_F     \
+                        " c " GRIDDIMENSION_F     \
+                        " ["  GRIDDIMENSION_F "]" \
+                      " | l " CELLDIMENSION_F     \
+                        " w " CELLDIMENSION_F     \
+                      " | " SOURCE_F " [source] = ("
+                            POWER_F " [W] * l * w) / "
+                            CELLDIMENSION_F " | "
+                            STRING_F "\n",
           layer_index, row_index, column_index,
           get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
           get_cell_length (dimensions, column_index), get_cell_width (dimensions),
@@ -211,7 +266,8 @@ Source_t* fill_sources_empty_layer
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "layer_index = %d\tfill_sources_empty_layer    %s\n",
+    "layer_index = " GRIDDIMENSION_F \
+    "\tfill_sources_empty_layer    " STRING_F "\n",
     layer_index, layer->Material->Id) ;
 #endif
 
@@ -245,7 +301,7 @@ SystemMatrix fill_system_matrix_layer
 {
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
-    "(l %2d) fill_system_matrix_layer %s\n",
+    "(l " GRIDDIMENSION_F ") fill_system_matrix_layer " STRING_F "\n",
     layer_index, layer->Material->Id) ;
 #endif
 

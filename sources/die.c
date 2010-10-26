@@ -55,9 +55,7 @@ void init_die (Die* die)
 
 Die* alloc_and_init_die (void)
 {
-  Die* die ;
-
-  MALLOC (die, 1) ;
+  Die* die = malloc (sizeof(*die)) ;
 
   if (die != NULL) init_die (die) ;
 
@@ -82,35 +80,134 @@ void free_dies_list (Die* list)
 
 /******************************************************************************/
 
-void print_die (FILE* stream, String_t prefix, Die* die)
+void print_formatted_die
+(
+  FILE*    stream,
+  String_t prefix,
+  Die*     die
+)
 {
-  fprintf (stream,
-    "%sDie %s:\n",                prefix, die->Id) ;
-  fprintf (stream,
-    "%s  Number of layers  %d\n", prefix, die->NLayers) ;
+  String_t new_prefix_layer
+    = malloc (sizeof(*new_prefix_layer) * (10 + strlen(prefix))) ;
+
+  if (new_prefix_layer == NULL) return ;
+
+  sprintf (new_prefix_layer, STRING_F "   layer ", prefix) ;
+
+  String_t new_prefix_source
+    = malloc (sizeof(*new_prefix_source) * (10 + strlen(prefix))) ;
+
+  sprintf (new_prefix_source, STRING_F "   source", prefix) ;
+
+  if (new_prefix_source == NULL) return ;
 
   fprintf (stream,
-    "%s  Source layer is layer #%d\n", prefix, die->SourceLayer->Offset) ;
+           STRING_F "die " STRING_F " :\n",
+           prefix, die->Id) ;
 
-  String_t new_prefix ;
+  FOR_EVERY_ELEMENT_IN_LIST (Layer, layer, die->LayersList)
+  {
+    if (layer == die->SourceLayer)
 
-  MALLOC (new_prefix, strlen(prefix) + 2) ;
+      print_formatted_layer (stream, new_prefix_layer, layer) ;
 
-  strcpy (new_prefix, prefix) ;
-  strcat (new_prefix, "  ") ;
+    else
 
-  print_layers_list (stream, new_prefix, die->LayersList) ;
+      print_formatted_layer (stream, new_prefix_source, layer) ;
+  }
+
+  free (new_prefix_layer) ;
+  free (new_prefix_source) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_die
+(
+  FILE*    stream,
+  String_t prefix,
+  Die*     die
+)
+{
+  String_t new_prefix = malloc (sizeof(*new_prefix) * (6 + strlen(prefix))) ;
+
+  if (new_prefix == NULL) return ;
+
+  sprintf (new_prefix, STRING_F "   | ", prefix) ;
+
+  fprintf (stream,
+           STRING_F "die              = %p\n",
+           prefix, die) ;
+
+  fprintf (stream,
+           STRING_F "die->Id          = " STRING_F "\n",
+           prefix, die->Id) ;
+
+  fprintf (stream,
+           STRING_F "die->Used        = " QUANTITY_F "\n",
+           prefix, die->Used) ;
+
+  fprintf (stream,
+           STRING_F "die->NLayers     = " GRIDDIMENSION_F "\n",
+           prefix, die->NLayers) ;
+
+  fprintf (stream,
+           STRING_F "die->LayersList  = %p\n",
+           prefix, die->LayersList) ;
+
+  fprintf (stream,
+           STRING_F "\n",
+           new_prefix) ;
+
+  print_detailed_layers_list (stream, new_prefix, die->LayersList) ;
+
+  fprintf (stream,
+           STRING_F "\n",
+           new_prefix) ;
+
+  fprintf (stream,
+           STRING_F "die->SourceLayer = %p\n",
+           prefix, die->SourceLayer) ;
+
+  fprintf (stream,
+           STRING_F "die->Next        = %p\n",
+           prefix, die->Next) ;
 
   free (new_prefix) ;
 }
 
 /******************************************************************************/
 
-void print_dies_list (FILE* stream, String_t prefix, Die* list)
+void print_formatted_dies_list
+(
+  FILE*    stream,
+  String_t prefix,
+  Die*     list
+)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (Die, die, list)
+  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
+  {
+    print_formatted_die (stream, prefix, die) ;
+    fprintf (stream, STRING_F "\n\n", prefix) ;
+  }
+  print_formatted_die (stream, prefix, die) ;
+}
 
-    print_die (stream, prefix, die) ;
+/******************************************************************************/
+
+void print_detailed_dies_list
+(
+  FILE*    stream,
+  String_t prefix,
+  Die*     list
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
+  {
+    print_detailed_die (stream, prefix, die) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
+  print_detailed_die (stream, prefix, die) ;
 }
 
 /******************************************************************************/

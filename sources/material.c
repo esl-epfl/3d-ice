@@ -54,9 +54,7 @@ void init_material (Material* material)
 
 Material* alloc_and_init_material (void)
 {
-  Material* material ;
-
-  MALLOC (material, 1) ;
+  Material* material = malloc (sizeof(*material)) ;
 
   if (material != NULL) init_material (material) ;
 
@@ -80,26 +78,92 @@ void free_materials_list (Material* list)
 
 /******************************************************************************/
 
-void print_material (FILE* stream, String_t prefix, Material* material)
+void print_formatted_material
+(
+  FILE*     stream,
+  String_t  prefix,
+  Material* material
+)
 {
   fprintf (stream,
-    "%sMaterial %s:\n",                    prefix,
-                                           material->Id) ;
+           STRING_F "material " STRING_F " :\n",
+           prefix, material->Id) ;
+
   fprintf (stream,
-    "%s  Volumetric Heat Capacity %.3e\n", prefix,
-                                           material->VolumetricHeatCapacity) ;
+           STRING_F "   thermal conductivity     " SOLIDTC_F "\n",
+           prefix, material->ThermalConductivity) ;
+
   fprintf (stream,
-    "%s  Thermal Conductivity     %.3e\n", prefix,
-                                           material->ThermalConductivity) ;
+           STRING_F "   volumetric heat capacity " SOLIDVHC_F "\n",
+           prefix, material->VolumetricHeatCapacity) ;
 }
 
 /******************************************************************************/
 
-void print_materials_list (FILE* stream, String_t prefix, Material* list)
+void print_detailed_material
+(
+  FILE*     stream,
+  String_t  prefix,
+  Material* material
+)
 {
-  FOR_EVERY_ELEMENT_IN_LIST (Material, material, list)
+  fprintf (stream,
+           STRING_F "material                         = %p\n",
+           prefix, material) ;
 
-    print_material (stream, prefix, material) ;
+  fprintf (stream,
+           STRING_F "material->Id                     = " STRING_F "\n",
+           prefix, material->Id) ;
+
+  fprintf (stream,
+           STRING_F "material->Used                   = " QUANTITY_F "\n",
+           prefix, material->Used) ;
+
+  fprintf (stream,
+           STRING_F "material->ThermalConductivity    = " SOLIDTC_F "\n",
+           prefix, material->ThermalConductivity) ;
+
+  fprintf (stream,
+           STRING_F "material->VolumetricHeatCapacity = " SOLIDVHC_F "\n",
+           prefix, material->VolumetricHeatCapacity) ;
+
+  fprintf (stream,
+           STRING_F "material->Next                   = %p\n",
+           prefix, material->Next) ;
+}
+
+/******************************************************************************/
+
+void print_formatted_materials_list
+(
+  FILE*     stream,
+  String_t  prefix,
+  Material* list
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
+  {
+    print_formatted_material (stream, prefix, material) ;
+    fprintf (stream, STRING_F "\n\n", prefix) ;
+  }
+  print_formatted_material (stream, prefix, material) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_materials_list
+(
+  FILE*     stream,
+  String_t  prefix,
+  Material* list
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
+  {
+    print_detailed_material (stream, prefix, material) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
+  print_detailed_material (stream, prefix, material) ;
 }
 
 /******************************************************************************/

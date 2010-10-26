@@ -84,6 +84,15 @@ extern "C"
 
 /******************************************************************************/
 
+  /* Cross a linked list of ... except the last */
+
+# define FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST(type, index, begin) \
+                                                                   \
+   type* index = NULL ;                                            \
+   for (index = begin ; index->Next != NULL ; index = index->Next)
+
+/******************************************************************************/
+
 # define FIRST_ROW_INDEX              GRIDDIMENSION_I
 # define LAST_ROW_INDEX(dim)          (get_number_of_rows (dim) - 1)
 

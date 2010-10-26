@@ -171,7 +171,7 @@ extern "C"
 
   typedef double CellDimension_t ;
 # define         CELLDIMENSION_I 0.0
-# define         CELLDIMENSION_F "%d"
+# define         CELLDIMENSION_F "%6.1f"
 
   /* Chip dimension (for chip length, width) */
 

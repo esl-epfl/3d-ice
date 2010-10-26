@@ -118,7 +118,7 @@ void print_stack_description
 {
   fprintf(stream, "%sStack read from file %s\n", prefix, stkd->FileName) ;
 
-  print_materials_list (stream, prefix, stkd->MaterialsList) ;
+  print_detailed_materials_list (stream, prefix, stkd->MaterialsList) ;
 
   if (stkd->ConventionalHeatSink != NULL)
 
@@ -128,7 +128,7 @@ void print_stack_description
 
     print_channel (stream, prefix, stkd->Channel) ;
 
-  print_dies_list (stream, prefix, stkd->DiesList) ;
+  print_detailed_dies_list (stream, prefix, stkd->DiesList) ;
 
   print_stack_elements_list (stream, prefix, stkd->StackElementsList) ;
 

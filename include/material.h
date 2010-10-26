@@ -110,21 +110,39 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Prints on the stream the content of the fields  */
-  /* of the material. "prefix" is a string (at least */
-  /* empty and null terminated) that is printed in   */
-  /* every line before the description.              */
-
-  void print_material (FILE* stream, String_t prefix, Material* material) ;
+  void print_formatted_material
+  (
+    FILE*     stream,
+    String_t  prefix,
+    Material* material
+  ) ;
 
 /******************************************************************************/
 
-  /* Prints on the stream the content of the fields  */
-  /* of all the materials it finds following the     */
-  /* linked list (see Next field). "prefix" is       */
-  /* printed for every material in the list.         */
+  void print_detailed_material
+  (
+    FILE*     stream,
+    String_t  prefix,
+    Material* material
+  ) ;
 
-  void print_materials_list (FILE* stream, String_t prefix, Material* list) ;
+/******************************************************************************/
+
+  void print_formatted_materials_list
+  (
+    FILE* stream,
+    String_t prefix,
+    Material* list
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_materials_list
+  (
+    FILE* stream,
+    String_t prefix,
+    Material* list
+  ) ;
 
 /******************************************************************************/
 

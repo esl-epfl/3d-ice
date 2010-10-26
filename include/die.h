@@ -102,11 +102,39 @@ extern "C"
 
 /******************************************************************************/
 
-  void print_die (FILE* stream, String_t prefix, Die* die) ;
+  void print_formatted_die
+  (
+    FILE*    stream,
+    String_t prefix,
+    Die*     die
+  ) ;
 
 /******************************************************************************/
 
-  void print_dies_list (FILE* stream, String_t prefix, Die* list) ;
+  void print_detailed_die
+  (
+    FILE*    stream,
+    String_t prefix,
+    Die*     die
+  ) ;
+
+/******************************************************************************/
+
+  void print_formatted_dies_list
+  (
+    FILE*    stream,
+    String_t prefix,
+    Die*     list
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_dies_list
+  (
+    FILE*    stream,
+    String_t prefix,
+    Die*     list
+  ) ;
 
 /******************************************************************************/
 

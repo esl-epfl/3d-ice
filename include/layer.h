@@ -94,11 +94,39 @@ extern "C"
 
 /******************************************************************************/
 
-  void print_layer (FILE* stream, String_t prefix, Layer* layer) ;
+  void print_formatted_layer
+  (
+    FILE*    stream,
+    String_t prefix,
+    Layer*   layer
+  ) ;
 
 /******************************************************************************/
 
-  void print_layers_list (FILE* stream, String_t prefix, Layer* list) ;
+  void print_detailed_layer
+  (
+    FILE*    stream,
+    String_t prefix,
+    Layer*   layer
+  ) ;
+
+/******************************************************************************/
+
+  void print_formatted_layers_list
+  (
+    FILE*    stream,
+    String_t prefix,
+    Layer*   list
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_layers_list
+  (
+    FILE*    stream,
+    String_t prefix,
+    Layer*   list
+  ) ;
 
 /******************************************************************************/
 
