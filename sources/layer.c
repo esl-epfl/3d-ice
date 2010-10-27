@@ -103,23 +103,23 @@ void print_detailed_layer
 
   fprintf (stream,
            STRING_F "layer->Height   = " CELLDIMENSION_F "\n",
-           prefix, layer->Height) ;
+           prefix,   layer->Height) ;
 
   fprintf (stream,
            STRING_F "layer->Offset   = " GRIDDIMENSION_F "\n",
-           prefix, layer->Offset) ;
+           prefix,   layer->Offset) ;
 
   fprintf (stream,
            STRING_F "layer->Material = %p\n",
-           prefix, layer->Material) ;
+           prefix,   layer->Material) ;
 
   fprintf (stream,
            STRING_F "layer->Next     = %p\n",
-           prefix, layer->Next) ;
+           prefix,   layer->Next) ;
 
   fprintf (stream,
            STRING_F "layer->Prev     = %p\n",
-           prefix, layer->Prev) ;
+           prefix,   layer->Prev) ;
 }
 
 /******************************************************************************/

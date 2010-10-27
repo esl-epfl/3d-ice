@@ -109,27 +109,27 @@ void print_detailed_material
 {
   fprintf (stream,
            STRING_F "material                         = %p\n",
-           prefix, material) ;
+           prefix,   material) ;
 
   fprintf (stream,
            STRING_F "material->Id                     = " STRING_F "\n",
-           prefix, material->Id) ;
+           prefix,   material->Id) ;
 
   fprintf (stream,
            STRING_F "material->Used                   = " QUANTITY_F "\n",
-           prefix, material->Used) ;
+           prefix,   material->Used) ;
 
   fprintf (stream,
            STRING_F "material->ThermalConductivity    = " SOLIDTC_F "\n",
-           prefix, material->ThermalConductivity) ;
+           prefix,   material->ThermalConductivity) ;
 
   fprintf (stream,
            STRING_F "material->VolumetricHeatCapacity = " SOLIDVHC_F "\n",
-           prefix, material->VolumetricHeatCapacity) ;
+           prefix,   material->VolumetricHeatCapacity) ;
 
   fprintf (stream,
            STRING_F "material->Next                   = %p\n",
-           prefix, material->Next) ;
+           prefix,   material->Next) ;
 }
 
 /******************************************************************************/

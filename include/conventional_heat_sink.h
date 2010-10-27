@@ -52,7 +52,7 @@ extern "C"
 
   typedef struct
   {
-    /* The heat transfert coefficent */
+    /* The heat transfert coefficient */
 
     AmbientHTC_t AmbientHTC ;
 
@@ -64,7 +64,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void init_environment_heat_sink (ConventionalHeatSink* conventionalheatsink) ;
+  void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink) ;
 
 /******************************************************************************/
 
@@ -76,7 +76,16 @@ extern "C"
 
 /******************************************************************************/
 
-  void print_conventional_heat_sink
+  void print_formatted_conventional_heat_sink
+  (
+    FILE*                 stream,
+    String_t              prefix,
+    ConventionalHeatSink* conventionalheatsink
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_conventional_heat_sink
   (
     FILE*                 stream,
     String_t              prefix,

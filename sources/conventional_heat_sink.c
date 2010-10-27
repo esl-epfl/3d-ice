@@ -70,18 +70,46 @@ void free_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
 
 /******************************************************************************/
 
-void print_conventional_heat_sink
+void print_formatted_conventional_heat_sink
 (
   FILE*                 stream,
   String_t              prefix,
   ConventionalHeatSink* conventionalheatsink
 )
 {
-  fprintf(stream, "%sConventional Heat Sink\n", prefix) ;
-  fprintf(stream, "%s  Heat Transfer coefficent %.5e\n",
-                  prefix, conventionalheatsink->AmbientHTC) ;
-  fprintf(stream, "%s  Ambient temperature      %.4e\n",
-                  prefix, conventionalheatsink->AmbientTemperature) ;
+  fprintf (stream,
+           STRING_F "conventional heat sink :\n",
+           prefix) ;
+
+  fprintf (stream,
+           STRING_F "   heat transfer coefficient " AMBIENTHTC_F " ;\n",
+           prefix, conventionalheatsink->AmbientHTC) ;
+
+  fprintf (stream,
+           STRING_F "   ambient temperature       " TEMPERATURE_F " ;\n",
+           prefix, conventionalheatsink->AmbientTemperature) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_conventional_heat_sink
+(
+  FILE*                 stream,
+  String_t              prefix,
+  ConventionalHeatSink* conventionalheatsink
+)
+{
+  fprintf (stream,
+           STRING_F "conventionalheatsink                      = %p\n",
+           prefix,   conventionalheatsink) ;
+
+  fprintf (stream,
+           STRING_F "conventionalheatsink->AmbientHTC          = " AMBIENTHTC_F "\n",
+           prefix,   conventionalheatsink->AmbientHTC) ;
+
+  fprintf (stream,
+           STRING_F "conventionalheatsink->AmbientTemperature  = " TEMPERATURE_F "\n",
+           prefix,   conventionalheatsink->AmbientTemperature) ;
 }
 
 /******************************************************************************/

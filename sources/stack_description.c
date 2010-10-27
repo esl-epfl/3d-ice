@@ -122,7 +122,9 @@ void print_stack_description
 
   if (stkd->ConventionalHeatSink != NULL)
 
-    print_conventional_heat_sink (stream, prefix, stkd->ConventionalHeatSink) ;
+    print_detailed_conventional_heat_sink (stream,
+                                           prefix,
+                                           stkd->ConventionalHeatSink) ;
 
   if (stkd->Channel != NULL)
 
@@ -132,7 +134,7 @@ void print_stack_description
 
   print_stack_elements_list (stream, prefix, stkd->StackElementsList) ;
 
-  print_dimensions (stream, prefix, stkd->Dimensions) ;
+  print_detailed_dimensions (stream, prefix, stkd->Dimensions) ;
 }
 
 /******************************************************************************/

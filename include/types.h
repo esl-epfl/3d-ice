@@ -48,6 +48,7 @@ extern "C"
   typedef int Bool_t ;
 # define      FALSE_V (0)
 # define      TRUE_V  (!FALSE_V)
+# define      BOOL_F "%d"
 
   /* Quantity */
 

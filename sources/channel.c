@@ -107,27 +107,27 @@ void print_formatted_channel
            prefix, channel->WallMaterial->Id) ;
 
   fprintf (stream,
-           STRING_F "   coolant flow rate " COOLANTFR_F " ;\n",
+           STRING_F "   coolant flow rate                       " COOLANTFR_F " ;\n",
            prefix, channel->CoolantFR) ;
 
   fprintf (stream,
-           STRING_F "   coolant heat transfert coefficent side " COOLANTHTC_F " ,\n",
+           STRING_F "   coolant heat transfert coefficient side " COOLANTHTC_F " ,\n",
            prefix, channel->CoolantHTCs.Side) ;
 
   fprintf (stream,
-           STRING_F "                                      top " COOLANTHTC_F " ,\n",
+           STRING_F "                                       top " COOLANTHTC_F " ,\n",
            prefix, channel->CoolantHTCs.Top) ;
 
   fprintf (stream,
-           STRING_F "                                   bottom " COOLANTHTC_F " ;\n",
+           STRING_F "                                    bottom " COOLANTHTC_F " ;\n",
            prefix, channel->CoolantHTCs.Bottom) ;
 
   fprintf (stream,
-           STRING_F "   coolant volumetric heat capacity " COOLANTVHC_F " ;\n",
+           STRING_F "   coolant volumetric heat capacity        " COOLANTVHC_F " ;\n",
            prefix, channel->CoolantVHC) ;
 
   fprintf (stream,
-           STRING_F "   coolant incoming temperature " TEMPERATURE_F " ;\n",
+           STRING_F "   coolant incoming temperature            " TEMPERATURE_F " ;\n",
            prefix, channel->CoolantTIn ) ;
 }
 
@@ -142,39 +142,39 @@ void print_detailed_channel
 {
   fprintf (stream,
            STRING_F "channel                     = %p\n",
-           prefix, channel) ;
+           prefix,   channel) ;
 
   fprintf (stream,
            STRING_F "channel->Height             = " CELLDIMENSION_F "\n",
-           prefix, channel->Height) ;
+           prefix,   channel->Height) ;
 
   fprintf (stream,
            STRING_F "channel->CoolantHTCs.Side   = " COOLANTHTC_F "\n",
-           prefix, channel->CoolantHTCs.Side) ;
+           prefix,   channel->CoolantHTCs.Side) ;
 
   fprintf (stream,
            STRING_F "channel->CoolantHTCs.Top    = " COOLANTHTC_F "\n",
-           prefix, channel->CoolantHTCs.Top) ;
+           prefix,   channel->CoolantHTCs.Top) ;
 
   fprintf (stream,
            STRING_F "channel->CoolantHTCs.Bottom = " COOLANTHTC_F "\n",
-           prefix, channel->CoolantHTCs.Bottom) ;
+           prefix,   channel->CoolantHTCs.Bottom) ;
 
   fprintf (stream,
            STRING_F "channel->CoolantVHC         = " COOLANTVHC_F "\n",
-           prefix, channel->CoolantVHC) ;
+           prefix,   channel->CoolantVHC) ;
 
   fprintf (stream,
            STRING_F "channel->CoolantTIn         = " TEMPERATURE_F "\n",
-           prefix, channel->CoolantTIn) ;
+           prefix,   channel->CoolantTIn) ;
 
   fprintf (stream,
            STRING_F "channel->CoolantFR          = " COOLANTFR_F "\n",
-           prefix, channel->CoolantFR) ;
+           prefix,   channel->CoolantFR) ;
 
   fprintf (stream,
            STRING_F "channel->WallMaterial       = %p\n",
-           prefix, channel->WallMaterial) ;
+           prefix,   channel->WallMaterial) ;
 }
 
 /******************************************************************************/

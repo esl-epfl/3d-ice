@@ -138,31 +138,31 @@ void print_detailed_die
 
   fprintf (stream,
            STRING_F "die              = %p\n",
-           prefix, die) ;
+           prefix,   die) ;
 
   fprintf (stream,
            STRING_F "die->Id          = " STRING_F "\n",
-           prefix, die->Id) ;
+           prefix,   die->Id) ;
 
   fprintf (stream,
            STRING_F "die->Used        = " QUANTITY_F "\n",
-           prefix, die->Used) ;
+           prefix,   die->Used) ;
 
   fprintf (stream,
            STRING_F "die->NLayers     = " GRIDDIMENSION_F "\n",
-           prefix, die->NLayers) ;
+           prefix,   die->NLayers) ;
 
   fprintf (stream,
            STRING_F "die->BottomLayer = %p\n",
-           prefix, die->BottomLayer) ;
+           prefix,   die->BottomLayer) ;
 
   fprintf (stream,
            STRING_F "die->SourceLayer = %p\n",
-           prefix, die->SourceLayer) ;
+           prefix,   die->SourceLayer) ;
 
   fprintf (stream,
            STRING_F "die->TopLayer    = %p\n",
-           prefix, die->TopLayer) ;
+           prefix,   die->TopLayer) ;
 
   fprintf (stream,
            STRING_F "\n",
@@ -176,11 +176,11 @@ void print_detailed_die
 
   fprintf (stream,
            STRING_F "die->SourceLayer = %p\n",
-           prefix, die->SourceLayer) ;
+           prefix,   die->SourceLayer) ;
 
   fprintf (stream,
            STRING_F "die->Next        = %p\n",
-           prefix, die->Next) ;
+           prefix,   die->Next) ;
 
   free (new_prefix) ;
 }

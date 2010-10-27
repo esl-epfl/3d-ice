@@ -108,8 +108,21 @@ extern "C"
 
 /******************************************************************************/
 
-  void
-  print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions) ;
+  void print_formatted_dimensions
+  (
+    FILE*       stream,
+    String_t    prefix,
+    Dimensions* dimensions
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_dimensions
+  (
+    FILE*       stream,
+    String_t    prefix,
+    Dimensions* dimensions
+  ) ;
 
 /******************************************************************************/
 

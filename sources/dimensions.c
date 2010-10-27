@@ -76,32 +76,90 @@ Dimensions* alloc_and_init_dimensions (void)
 
 /******************************************************************************/
 
-void print_dimensions (FILE* stream, String_t prefix, Dimensions* dimensions)
+void print_formatted_dimensions
+(
+  FILE*       stream,
+  String_t    prefix,
+  Dimensions* dimensions
+)
 {
   fprintf (stream,
-    "%sGrid dimensions      (L x R x C) = (%d x %d x %d) -> %d nonzeroes\n",
-    prefix, get_number_of_layers(dimensions), get_number_of_rows(dimensions),
-            get_number_of_columns(dimensions), dimensions->Grid.NNz) ;
+           STRING_F "dimensions : \n",
+           prefix) ;
 
   fprintf (stream,
-    "%sChip dimensions          (L x W) = (%.2f x %.2f) um\n",
-    prefix, dimensions->Chip.Length, dimensions->Chip.Width) ;
+           STRING_F "   chip length " CHIPDIMENSION_F " , width " CHIPDIMENSION_F " ;\n",
+           prefix, dimensions->Chip.Length, dimensions->Chip.Width) ;
 
-  if (dimensions->StackHasChannel == FALSE_V )
+  fprintf (stream,
+           STRING_F "   cell length " CELLDIMENSION_F " , width " CELLDIMENSION_F " ;\n",
+           prefix, dimensions->Cell.WallLength, dimensions->Cell.Width) ;
+}
 
-    fprintf (stream,
-      "%sCell dimensions          (l x w) = (%.2f x %.2f) um\n",
-      prefix, dimensions->Cell.WallLength, dimensions->Cell.Width) ;
+/******************************************************************************/
 
-  else
+void print_detailed_dimensions
+(
+  FILE* stream,
+  String_t prefix,
+  Dimensions* dimensions
+)
+{
+  fprintf (stream,
+           STRING_F "dimensions                       = %p\n",
+           prefix, dimensions) ;
 
-    fprintf (stream,
-      "%sCell dimensions (f, c, w, l) x w = (%.2f, %.2f, %.2f, %.2f) x %.2f um\n",
-      prefix, dimensions->Cell.FirstWallLength,
-              dimensions->Cell.ChannelLength,
-              dimensions->Cell.WallLength,
-              dimensions->Cell.LastWallLength,
-              dimensions->Cell.Width) ;
+  fprintf (stream,
+           STRING_F "dimensions->Cell.FirstWallLength = " CELLDIMENSION_F "\n",
+           prefix,   dimensions->Cell.FirstWallLength) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Cell.WallLength      = " CELLDIMENSION_F "\n",
+           prefix,   dimensions->Cell.WallLength) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Cell.LastWallLength  = " CELLDIMENSION_F "\n",
+           prefix,   dimensions->Cell.LastWallLength) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Cell.ChannelLength   = " CELLDIMENSION_F "\n",
+           prefix,   dimensions->Cell.ChannelLength) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Cell.Width           = " CELLDIMENSION_F "\n",
+           prefix,   dimensions->Cell.Width) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Grid.NLayers         = " GRIDDIMENSION_F "\n",
+           prefix,   dimensions->Grid.NLayers) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Grid.NRows           = " GRIDDIMENSION_F "\n",
+           prefix,   dimensions->Grid.NRows) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Grid.NColumns        = " GRIDDIMENSION_F "\n",
+           prefix,   dimensions->Grid.NColumns) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Grid.NCells          = " GRIDDIMENSION_F "\n",
+           prefix,   dimensions->Grid.NCells) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Grid.NNz             = " GRIDDIMENSION_F "\n",
+           prefix,   dimensions->Grid.NNz) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Chip.Length          = " CHIPDIMENSION_F "\n",
+           prefix,   dimensions->Chip.Length) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->Chip.Width           = " CHIPDIMENSION_F "\n",
+           prefix,   dimensions->Chip.Width) ;
+
+  fprintf (stream,
+           STRING_F "dimensions->StackHasChannel      = " BOOL_F "\n",
+           prefix,   dimensions->StackHasChannel) ;
 }
 
 /******************************************************************************/

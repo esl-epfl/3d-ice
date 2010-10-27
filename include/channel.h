@@ -59,7 +59,7 @@ extern "C"
 
     CellDimension_t Height ;
 
-    /* The heat transfert coefficents of the cooling liquid */
+    /* The heat transfert coefficients of the cooling liquid */
     /* in [ (W / ( um2 * K ) ]                              */
 
     CoolantHTCs_t CoolantHTCs ;

@@ -163,7 +163,7 @@ static CellDimension_t tmp_channel_length    = CELLDIMENSION_I ;
 stack_description_file
 
   : materials_list
-    environment_heat_sink
+    conventional_heat_sink
     channel
     {
       if (stkd->Channel == NULL && stkd->ConventionalHeatSink == NULL)
@@ -291,7 +291,7 @@ material
 /******************************* Heatsink *************************************/
 /******************************************************************************/
 
-environment_heat_sink
+conventional_heat_sink
 
   : /* empty */
   | CONVENTIONAL HEAT SINK ':'
