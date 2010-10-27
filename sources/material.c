@@ -90,11 +90,11 @@ void print_formatted_material
            prefix, material->Id) ;
 
   fprintf (stream,
-           STRING_F "   thermal conductivity     " SOLIDTC_F "\n",
+           STRING_F "   thermal conductivity     " SOLIDTC_F " ;\n",
            prefix, material->ThermalConductivity) ;
 
   fprintf (stream,
-           STRING_F "   volumetric heat capacity " SOLIDVHC_F "\n",
+           STRING_F "   volumetric heat capacity " SOLIDVHC_F " ;\n",
            prefix, material->VolumetricHeatCapacity) ;
 }
 

@@ -84,7 +84,7 @@ void print_formatted_layer
 )
 {
   fprintf (stream,
-    STRING_F " " CELLDIMENSION_F "  " STRING_F "\n",
+    STRING_F " " CELLDIMENSION_F "  " STRING_F " ;\n",
     prefix, layer->Height, layer->Material->Id) ;
 }
 
