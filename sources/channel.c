@@ -54,9 +54,7 @@ void init_channel (Channel* channel)
 
 Channel* alloc_and_init_channel (void)
 {
-  Channel* channel ;
-
-  MALLOC (channel, 1) ;
+  Channel* channel = malloc (sizeof(*channel)) ;
 
   if (channel != NULL) init_channel (channel) ;
 
@@ -72,43 +70,111 @@ void free_channel (Channel* channel)
 
 /******************************************************************************/
 
-void print_channel (FILE* stream, String_t prefix, Channel* channel)
+void print_formatted_channel
+(
+  FILE*       stream,
+  String_t    prefix,
+  Channel*    channel,
+  Dimensions* dimensions
+)
 {
-  fprintf(stream,
-    "%sChannel\n",                                   prefix) ;
-  fprintf(stream,
-    "%s  Height                            %5.2f\n", prefix,
-                                                     channel->Height) ;
-  fprintf(stream,
-    "%s  Coolant Heat Transfert Coefficents s %.5e t %.5e b %.5e\n",
-                                                  prefix,
-                                                  channel->CoolantHTCs.Side,
-                                                  channel->CoolantHTCs.Top,
-                                                  channel->CoolantHTCs.Bottom) ;
-  fprintf(stream,
-    "%s  Coolant Volumetric Heat Capacity  %.4e\n",  prefix,
-                                                     channel->CoolantVHC) ;
-  fprintf(stream,
-    "%s  Coolant incoming temperature      %.4e\n",  prefix,
-                                                     channel->CoolantTIn) ;
-  fprintf(stream,
-    "%s  Flow Rate                         %.4e\n",  prefix,
-                                                     channel->CoolantFR) ;
+  fprintf (stream,
+           STRING_F "channel :\n",
+           prefix) ;
 
-  Material* wall = channel->WallMaterial ;
+  fprintf (stream,
+           STRING_F "              height " CELLDIMENSION_F " ;\n",
+           prefix, channel->Height) ;
 
-  if (wall != NULL)
-  {
-    fprintf(stream,
-    "%s  WallMaterial thermal conductivity         %.4e (%s)\n",
-    prefix, wall->ThermalConductivity, wall->Id) ;
-    fprintf(stream,
-    "%s  WallMaterial Volum. Heat Capacity         %.4e (%s)\n",
-    prefix, wall->VolumetricHeatCapacity, wall->Id) ;
-  }
-  else
-    fprintf(stream,
-    "%s  WallMaterial material not specified\n", prefix) ;
+  fprintf (stream,
+           STRING_F "      channel length " CELLDIMENSION_F " ;\n",
+           prefix, dimensions->Cell.ChannelLength) ;
+
+  fprintf (stream,
+           STRING_F "         wall length " CELLDIMENSION_F " ;\n",
+           prefix, dimensions->Cell.WallLength) ;
+
+  fprintf (stream,
+           STRING_F "   first wall length " CELLDIMENSION_F " ;\n",
+           prefix, dimensions->Cell.FirstWallLength) ;
+
+  fprintf (stream,
+           STRING_F "    last wall length " CELLDIMENSION_F " ;\n",
+           prefix, dimensions->Cell.LastWallLength) ;
+
+  fprintf (stream,
+           STRING_F "   wall material " STRING_F " ;\n",
+           prefix, channel->WallMaterial->Id) ;
+
+  fprintf (stream,
+           STRING_F "   coolant flow rate " COOLANTFR_F " ;\n",
+           prefix, channel->CoolantFR) ;
+
+  fprintf (stream,
+           STRING_F "   coolant heat transfert coefficent side " COOLANTHTC_F " ,\n",
+           prefix, channel->CoolantHTCs.Side) ;
+
+  fprintf (stream,
+           STRING_F "                                      top " COOLANTHTC_F " ,\n",
+           prefix, channel->CoolantHTCs.Top) ;
+
+  fprintf (stream,
+           STRING_F "                                   bottom " COOLANTHTC_F " ;\n",
+           prefix, channel->CoolantHTCs.Bottom) ;
+
+  fprintf (stream,
+           STRING_F "   coolant volumetric heat capacity " COOLANTVHC_F " ;\n",
+           prefix, channel->CoolantVHC) ;
+
+  fprintf (stream,
+           STRING_F "   coolant incoming temperature " TEMPERATURE_F " ;\n",
+           prefix, channel->CoolantTIn ) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_channel
+(
+  FILE*       stream,
+  String_t    prefix,
+  Channel*    channel
+)
+{
+  fprintf (stream,
+           STRING_F "channel                     = %p\n",
+           prefix, channel) ;
+
+  fprintf (stream,
+           STRING_F "channel->Height             = " CELLDIMENSION_F "\n",
+           prefix, channel->Height) ;
+
+  fprintf (stream,
+           STRING_F "channel->CoolantHTCs.Side   = " COOLANTHTC_F "\n",
+           prefix, channel->CoolantHTCs.Side) ;
+
+  fprintf (stream,
+           STRING_F "channel->CoolantHTCs.Top    = " COOLANTHTC_F "\n",
+           prefix, channel->CoolantHTCs.Top) ;
+
+  fprintf (stream,
+           STRING_F "channel->CoolantHTCs.Bottom = " COOLANTHTC_F "\n",
+           prefix, channel->CoolantHTCs.Bottom) ;
+
+  fprintf (stream,
+           STRING_F "channel->CoolantVHC         = " COOLANTVHC_F "\n",
+           prefix, channel->CoolantVHC) ;
+
+  fprintf (stream,
+           STRING_F "channel->CoolantTIn         = " TEMPERATURE_F "\n",
+           prefix, channel->CoolantTIn) ;
+
+  fprintf (stream,
+           STRING_F "channel->CoolantFR          = " COOLANTFR_F "\n",
+           prefix, channel->CoolantFR) ;
+
+  fprintf (stream,
+           STRING_F "channel->WallMaterial       = %p\n",
+           prefix, channel->WallMaterial) ;
 }
 
 /******************************************************************************/

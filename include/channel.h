@@ -99,7 +99,22 @@ extern "C"
 
 /******************************************************************************/
 
-  void print_channel (FILE* stream, String_t prefix, Channel* channel) ;
+  void print_formatted_channel
+  (
+    FILE*       stream,
+    String_t    prefix,
+    Channel*    channel,
+    Dimensions* dimensions
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_channel
+  (
+    FILE*    stream,
+    String_t prefix,
+    Channel* channel
+  ) ;
 
 /******************************************************************************/
 

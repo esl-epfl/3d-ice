@@ -126,7 +126,7 @@ void print_stack_description
 
   if (stkd->Channel != NULL)
 
-    print_channel (stream, prefix, stkd->Channel) ;
+    print_detailed_channel (stream, prefix, stkd->Channel) ;
 
   print_detailed_dies_list (stream, prefix, stkd->DiesList) ;
 
