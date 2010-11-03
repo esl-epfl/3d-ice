@@ -62,9 +62,8 @@ int alloc_thermal_grid_data
   Time_t           delta_time
 )
 {
-  PerLayerData* layersdata ;
-
-  MALLOC (layersdata, quantity) ;
+  PerLayerData* layersdata
+    = malloc (sizeof(PerLayerData) * quantity) ;
 
   if (layersdata == NULL) return 1 ;
 

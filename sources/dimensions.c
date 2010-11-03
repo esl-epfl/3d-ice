@@ -65,9 +65,7 @@ void init_dimensions (Dimensions* dimensions)
 
 Dimensions* alloc_and_init_dimensions (void)
 {
-  Dimensions* dimensions ;
-
-  MALLOC (dimensions, 1) ;
+  Dimensions* dimensions = malloc (sizeof(Dimensions)) ;
 
   if (dimensions != NULL) init_dimensions (dimensions) ;
 

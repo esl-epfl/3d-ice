@@ -274,18 +274,15 @@ void fill_thermal_grid_data_stack_element
 
     case TDICE_STACK_ELEMENT_NONE :
 
-      fprintf (stderr, "Error! Found stack element with unset type\n") ;
-      return ;
+      fprintf (stderr,
+        "Error! Found stack element with unset type\n") ;
+      break ;
 
     default :
 
-      fprintf
-      (
-        stderr,
+      fprintf (stderr,
         "Error! Unknown stack element type %d\n",
-        stack_element->Type
-      ) ;
-      return ;
+        stack_element->Type) ;
 
   } /* switch stack_element->Type */
 }
@@ -343,14 +340,15 @@ Source_t* fill_sources_stack_element
 
     case TDICE_STACK_ELEMENT_NONE :
 
-      fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+      fprintf (stderr,
+        "Error! Found stack element with unset type\n") ;
       break ;
 
     default :
 
-      fprintf (stderr, "Error! Unknown stack element type %d\n",
+      fprintf (stderr,
+        "Error! Unknown stack element type %d\n",
         stack_element->Type) ;
-      break ;
 
   } /* switch stack_element->Type */
 
@@ -395,14 +393,15 @@ void update_sources_stack_element
 
     case TDICE_STACK_ELEMENT_NONE :
 
-      fprintf (stderr,  "Error! Found stack element with unset type\n") ;
-      return ;
+      fprintf (stderr,
+        "Error! Found stack element with unset type\n") ;
+      break ;
 
     default :
 
-      fprintf (stderr, "Error! Unknown stack element type %d\n",
+      fprintf (stderr,
+        "Error! Unknown stack element type %d\n",
         stack_element->Type) ;
-      return ;
 
   } /* switch stk_el->Type */
 }
@@ -457,14 +456,15 @@ SystemMatrix fill_system_matrix_stack_element
 
     case TDICE_STACK_ELEMENT_NONE :
 
-      fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+      fprintf (stderr,
+        "Error! Found stack element with unset type\n") ;
       break ;
 
     default :
 
-      fprintf (stderr, "Error! Unknown stack element type %d\n",
+      fprintf (stderr,
+        "Error! Unknown stack element type %d\n",
         stack_element->Type) ;
-      break ;
 
   } /* stk_el->Type */
 

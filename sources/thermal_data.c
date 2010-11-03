@@ -128,7 +128,8 @@ int fill_thermal_data
 
   /* Alloc and set temperatures */
 
-  MALLOC (tdata->Temperatures, tdata->Size) ;
+  tdata->Temperatures
+    = malloc (sizeof(Temperature_t) * tdata->Size) ;
 
   if (tdata->Temperatures == NULL)  goto temperatures_fail ;
 
@@ -183,7 +184,8 @@ int fill_thermal_data
 
   /* Alloc and set sources */
 
-  MALLOC (tdata->Sources, tdata->Size) ;
+  tdata->Sources
+    = malloc (sizeof(Source_t) * tdata->Size) ;
 
   if (tdata->Sources == NULL)  goto sources_fail ;
 
@@ -214,15 +216,18 @@ int fill_thermal_data
 
   /* Alloc SLU memory */
 
-  MALLOC (tdata->SLU_PermutationMatrixR, tdata->Size) ;
+  tdata->SLU_PermutationMatrixR
+    = malloc(sizeof(*tdata->SLU_PermutationMatrixR) * tdata->Size) ;
 
   if (tdata->SLU_PermutationMatrixR == NULL )  goto slu_perm_r_fail ;
 
-  MALLOC (tdata->SLU_PermutationMatrixC, tdata->Size) ;
+  tdata->SLU_PermutationMatrixC
+    = malloc(sizeof(*tdata->SLU_PermutationMatrixC) * tdata->Size) ;
 
   if (tdata->SLU_PermutationMatrixC == NULL )  goto slu_perm_c_fail ;
 
-  MALLOC (tdata->SLU_Etree, tdata->Size) ;
+  tdata->SLU_Etree
+    = malloc (sizeof(*tdata->SLU_Etree) * tdata->Size) ;
 
   if (tdata->SLU_Etree == NULL)  goto slu_etree_fail ;
 

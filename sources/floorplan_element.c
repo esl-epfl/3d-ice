@@ -69,9 +69,7 @@ void init_floorplan_element (FloorplanElement* floorplan_element)
 
 FloorplanElement* alloc_and_init_floorplan_element (void)
 {
-  FloorplanElement* floorplan_element ;
-
-  MALLOC (floorplan_element, 1) ;
+  FloorplanElement* floorplan_element = malloc (sizeof(FloorplanElement));
 
   if (floorplan_element != NULL)  init_floorplan_element(floorplan_element) ;
 

@@ -260,9 +260,7 @@ material
 
       if (find_material_in_list(stkd->MaterialsList, $2) != NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 26 + strlen($2)) ;
+        String_t message = malloc (sizeof(*message) * (26 + strlen($2))) ;
 
         if (message == NULL)
         {
@@ -362,9 +360,7 @@ channel
 
       if (stkd->Channel->WallMaterial == NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 18 + strlen($18)) ;
+        String_t message = malloc (sizeof(*message) * (18 + strlen($18))) ;
 
         if (message == NULL)
         {
@@ -558,9 +554,7 @@ layer_content : DVALUE IDENTIFIER ';'
 
       if (layer->Material == NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 18 + strlen($2)) ;
+        String_t message = malloc (sizeof(*message) * (18 + strlen($2))) ;
 
         if (message == NULL)
         {
@@ -676,9 +670,7 @@ stack_elements
 
       if (find_stack_element_in_list($1, $2->Id) != NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 31 + strlen($2->Id)) ;
+        String_t message = malloc (sizeof(*message) * (31 + strlen($2->Id))) ;
 
         if (message == NULL)
         {
@@ -742,9 +734,7 @@ stack_element
 
       if (layer->Material == NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 18 + strlen($4)) ;
+        String_t message = malloc (sizeof(*message) * (18 + strlen($4))) ;
 
         if (message == NULL)
         {
@@ -850,9 +840,7 @@ stack_element
 
       if (stack_element->Pointer.Die == NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 13 + strlen($3)) ;
+        String_t message = malloc (sizeof(*message) * (13 + strlen($3))) ;
 
         if (message == NULL)
         {

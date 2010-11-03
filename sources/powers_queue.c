@@ -51,9 +51,7 @@ void init_powers_queue (PowersQueue* queue)
 
 PowersQueue* alloc_and_init_powers_queue (void)
 {
-  PowersQueue* queue ;
-
-  MALLOC (queue, 1) ;
+  PowersQueue* queue = malloc (sizeof(PowersQueue)) ;
 
   if (queue != NULL)  init_powers_queue (queue) ;
 
@@ -84,7 +82,7 @@ void put_into_powers_queue (PowersQueue* queue, Power_t power)
 {
   PowerNode* tmp = queue->Tail ;
 
-  MALLOC (queue->Tail, 1) ;
+  queue->Tail = malloc (sizeof(PowerNode)) ;
 
   if ( queue->Tail == NULL )
   {

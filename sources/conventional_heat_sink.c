@@ -50,9 +50,8 @@ void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
 
 ConventionalHeatSink* alloc_and_init_conventional_heat_sink (void)
 {
-  ConventionalHeatSink* conventionalheatsink ;
-
-  MALLOC (conventionalheatsink, 1) ;
+  ConventionalHeatSink* conventionalheatsink
+    = malloc (sizeof(ConventionalHeatSink)) ;
 
   if (conventionalheatsink != NULL)
 

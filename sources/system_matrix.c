@@ -51,13 +51,15 @@ int alloc_system_matrix
   matrix->Size = size ;
   matrix->NNz  = nnz ;
 
-  MALLOC (matrix->RowIndices, nnz) ;
+  matrix->RowIndices
+    = malloc (sizeof(SystemMatrixRow_t) * nnz) ;
 
   if (matrix->RowIndices == NULL)
 
     return 0 ;
 
-  MALLOC (matrix->ColumnPointers, size + 1) ;
+  matrix->ColumnPointers
+    = malloc (sizeof(SystemMatrixColumn_t) * size + 1) ;
 
   if (matrix->ColumnPointers == NULL)
   {
@@ -65,7 +67,8 @@ int alloc_system_matrix
     return 0 ;
   }
 
-  MALLOC (matrix->Values, nnz) ;
+  matrix->Values
+    = malloc (sizeof(SystemMatrixValue_t) * nnz) ;
 
   if (matrix->Values == NULL)
   {

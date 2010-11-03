@@ -116,9 +116,8 @@ floorplan_element_list
     {
       if (find_floorplan_element_in_list($1, $2->Id) != NULL)
       {
-        String_t message ;
-
-        MALLOC (message, 37 + strlen($2->Id)) ;
+        String_t message
+          = malloc (sizeof(*message) * (37 + strlen($2->Id))) ;
 
         if (message == NULL)
         {
