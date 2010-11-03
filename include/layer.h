@@ -140,14 +140,14 @@ extern "C"
 
 /******************************************************************************/
 
-  Source_t* fill_sources_active_layer
+  void fill_sources_active_layer
   (
 #   ifdef PRINT_SOURCES
     Layer*                layer,
 #   endif
     GridDimension_t       layer_index,
-    ConventionalHeatSink* conventionalheatsink,
-    ThermalGridData*      thermalgriddata,
+//    ConventionalHeatSink* conventionalheatsink,
+//    ThermalGridData*      thermalgriddata,
     Floorplan*            floorplan,
     Source_t*             sources,
     Dimensions*           dimensions
@@ -155,7 +155,7 @@ extern "C"
 
 /******************************************************************************/
 
-  Source_t* fill_sources_empty_layer
+  void fill_sources_empty_layer
   (
     Source_t*             sources,
     Dimensions*           dimensions,

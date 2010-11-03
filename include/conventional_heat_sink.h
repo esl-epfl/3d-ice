@@ -96,22 +96,20 @@ extern "C"
 
   void fill_sources_conventional_heat_sink
   (
-    ConventionalHeatSink* conventionalheatsink,
-    Dimensions*           dimensions,
     Source_t*             sources,
+    Dimensions*           dimensions,
     ThermalGridData*      thermalgriddata,
-    GridDimension_t       layer_index
+    ConventionalHeatSink* conventionalheatsink
   ) ;
 
 /******************************************************************************/
 
   void add_sources_conventional_heat_sink
   (
-    ConventionalHeatSink* conventionalheatsink,
-    Dimensions*           dimensions,
     Source_t*             sources,
+    Dimensions*           dimensions,
     ThermalGridData*      thermalgriddata,
-    GridDimension_t       layer_index
+    ConventionalHeatSink* conventionalheatsink
   ) ;
 
 /******************************************************************************/

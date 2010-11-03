@@ -139,21 +139,21 @@ extern "C"
 
 /******************************************************************************/
 
-  Source_t* fill_sources_stack_element
+  void fill_sources_stack_element
   (
     Source_t*             sources,
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    ConventionalHeatSink* conventionalheatsink,
     StackElement*         stack_element
   ) ;
 
 /******************************************************************************/
 
-  void update_sources_stack_element
+  void fill_chs_sources_stack_element
   (
     Source_t*             sources,
     Dimensions*           dimensions,
+    ThermalGridData*      thermalgriddata,
+    ConventionalHeatSink* conventionalheatsink,
     StackElement*         stack_element
   ) ;
 

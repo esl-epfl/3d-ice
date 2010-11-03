@@ -155,15 +155,24 @@ extern "C"
 
 /******************************************************************************/
 
-  Source_t*               fill_sources_die
+  void fill_sources_die
+  (
+    Source_t*             sources,
+    Dimensions*           dimensions,
+    GridDimension_t       layer_index,
+    Die*                  die,
+    Floorplan*            floorplan
+  ) ;
+
+/******************************************************************************/
+
+  void fill_chs_sources_die
   (
     Source_t*             sources,
     Dimensions*           dimensions,
     ThermalGridData*      thermalgriddata,
     ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       layer_index,
-    Die*                  die,
-    Floorplan*            floorplan
+    Die*                  die
   ) ;
 
 /******************************************************************************/

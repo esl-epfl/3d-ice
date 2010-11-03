@@ -289,12 +289,10 @@ void fill_thermal_grid_data_stack_element
 
 /******************************************************************************/
 
-Source_t* fill_sources_stack_element
+void fill_sources_stack_element
 (
   Source_t*             sources,
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
-  ConventionalHeatSink* conventionalheatsink,
   StackElement*         stack_element
 )
 {
@@ -302,40 +300,29 @@ Source_t* fill_sources_stack_element
   {
     case TDICE_STACK_ELEMENT_DIE :
 
-      sources = fill_sources_die
-                (
-                  sources, dimensions,
-                  thermalgriddata, conventionalheatsink,
-                  stack_element->Offset,
-                  stack_element->Pointer.Die,
-                  stack_element->Floorplan
-                ) ;
-
+      fill_sources_die
+      (
+        sources,
+        dimensions,
+        stack_element->Offset,
+        stack_element->Pointer.Die,
+        stack_element->Floorplan
+      ) ;
       break ;
 
     case TDICE_STACK_ELEMENT_LAYER :
 
-      sources = fill_sources_empty_layer
-                (
-                  sources, dimensions,
-                  thermalgriddata, conventionalheatsink,
-                  stack_element->Offset
-#                 ifdef PRINT_SOURCES
-                  ,stack_element->Pointer.Layer
-#                 endif
-                ) ;
       break ;
 
     case TDICE_STACK_ELEMENT_CHANNEL :
 
-      sources = fill_sources_channel
-                (
-                  sources, dimensions,
-#                 ifdef PRINT_SOURCES
-                  stack_element->Offset,
-#                 endif
-                  stack_element->Pointer.Channel
-                ) ;
+      fill_sources_channel
+      (
+        sources,
+        dimensions,
+        stack_element->Offset,
+        stack_element->Pointer.Channel
+      ) ;
       break ;
 
     case TDICE_STACK_ELEMENT_NONE :
@@ -351,16 +338,16 @@ Source_t* fill_sources_stack_element
         stack_element->Type) ;
 
   } /* switch stack_element->Type */
-
-  return sources ;
 }
 
 /******************************************************************************/
 
-void update_sources_stack_element
+void fill_chs_sources_stack_element
 (
   Source_t*             sources,
   Dimensions*           dimensions,
+  ThermalGridData*      thermalgriddata,
+  ConventionalHeatSink* conventionalheatsink,
   StackElement*         stack_element
 )
 {
@@ -368,27 +355,32 @@ void update_sources_stack_element
   {
     case TDICE_STACK_ELEMENT_DIE :
 
-      sources += get_layer_area (dimensions)
-                 * (stack_element->Pointer.Die->NLayers) ;
-
+      fill_chs_sources_die
+      (
+        sources,
+        dimensions,
+        thermalgriddata,
+        conventionalheatsink,
+        stack_element->Pointer.Die
+      ) ;
       break ;
 
     case TDICE_STACK_ELEMENT_LAYER :
 
-      sources += get_layer_area (dimensions) ;
+      fill_sources_conventional_heat_sink
+      (
+        sources,
+        dimensions,
+        thermalgriddata,
+        conventionalheatsink
+      ) ;
+
       break ;
 
     case TDICE_STACK_ELEMENT_CHANNEL :
 
-      sources = fill_sources_channel
-                (
-                  sources,
-                  dimensions,
-#                 ifdef PRINT_SOURCES
-                  stack_element->Offset,
-#                 endif
-                  stack_element->Pointer.Channel
-                ) ;
+      fprintf (stderr,
+        "Error! Channel cannot be the last stack element\n") ;
       break ;
 
     case TDICE_STACK_ELEMENT_NONE :
@@ -403,7 +395,7 @@ void update_sources_stack_element
         "Error! Unknown stack element type %d\n",
         stack_element->Type) ;
 
-  } /* switch stk_el->Type */
+  } /* switch stack_element->Type */
 }
 
 /******************************************************************************/

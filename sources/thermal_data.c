@@ -54,7 +54,7 @@ extern void fill_sources_stack_description
   StackDescription* stkd
 ) ;
 
-extern void update_sources_stack_description
+extern void update_channel_inlet_stack_description
 (
   Source_t*         sources,
   StackDescription* stkd
@@ -480,7 +480,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
 /******************************************************************************/
 
-int change_coolant_flow_rate
+int update_coolant_flow_rate
 (
   ThermalData*      tdata,
   StackDescription* stkd,
@@ -513,11 +513,10 @@ int change_coolant_flow_rate
           &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
           &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
-
-  update_sources_stack_description (tdata->Sources, stkd) ;
-
   if (tdata->SLU_Info == 0)
     tdata->SLU_Options.Fact = FACTORED ;
+
+  update_channel_inlet_stack_description (tdata->Sources, stkd) ;
 
   return tdata->SLU_Info ;
 }

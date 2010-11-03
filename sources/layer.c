@@ -172,14 +172,14 @@ void fill_thermal_grid_data_layer
 
 /******************************************************************************/
 
-Source_t* fill_sources_active_layer
+void fill_sources_active_layer
 (
 # ifdef PRINT_SOURCES
   Layer*                layer,
 # endif
   GridDimension_t       layer_index,
-  ConventionalHeatSink* conventionalheatsink,
-  ThermalGridData*      thermalgriddata,
+//  ConventionalHeatSink* conventionalheatsink,
+//  ThermalGridData*      thermalgriddata,
   Floorplan*            floorplan,
   Source_t*             sources,
   Dimensions*           dimensions
@@ -194,6 +194,8 @@ Source_t* fill_sources_active_layer
            "\tfill_sources_source_layer   " STRING_F "\n",
            layer_index, layer->Material->Id) ;
 #endif
+
+  sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
   {
@@ -241,7 +243,7 @@ Source_t* fill_sources_active_layer
 
   } // FOR_EVERY_ELEMENT_IN_LIST
 
-  if ( IS_LAST_LAYER (layer_index, dimensions)
+/*  if ( IS_LAST_LAYER (layer_index, dimensions)
        && conventionalheatsink != NULL )
 
     add_sources_conventional_heat_sink
@@ -251,46 +253,42 @@ Source_t* fill_sources_active_layer
       sources,
       thermalgriddata,
       layer_index
-    ) ;
-
-  return sources + get_layer_area (dimensions) ;
+    ) ;*/
 }
 
 /******************************************************************************/
 
-Source_t* fill_sources_empty_layer
-(
-  Source_t*             sources,
-  Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
-  ConventionalHeatSink* conventionalheatsink,
-  GridDimension_t       layer_index
-# ifdef PRINT_SOURCES
-  ,Layer*                layer
-# endif
-)
-{
-#ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "layer_index = " GRIDDIMENSION_F \
-    "\tfill_sources_empty_layer    " STRING_F "\n",
-    layer_index, layer->Material->Id) ;
-#endif
-
-  if ( layer_index == (get_number_of_layers(dimensions) - 1)
-       && conventionalheatsink != NULL )
-
-    fill_sources_conventional_heat_sink
-    (
-      conventionalheatsink,
-      dimensions,
-      sources,
-      thermalgriddata,
-      layer_index
-    ) ;
-
-  return sources + get_layer_area (dimensions) ;
-}
+// void fill_sources_empty_layer
+// (
+//   Source_t*             sources,
+//   Dimensions*           dimensions,
+//   ThermalGridData*      thermalgriddata,
+//   ConventionalHeatSink* conventionalheatsink,
+//   GridDimension_t       layer_index
+// # ifdef PRINT_SOURCES
+//   ,Layer*                layer
+// # endif
+// )
+// {
+// #ifdef PRINT_SOURCES
+//   fprintf (stderr,
+//     "layer_index = " GRIDDIMENSION_F
+//     "\tfill_sources_empty_layer    " STRING_F "\n",
+//     layer_index, layer->Material->Id) ;
+// #endif
+//
+//   if ( IS_LAST_LAYER (layer_index, dimensions)
+//        && conventionalheatsink != NULL )
+//
+//     fill_sources_conventional_heat_sink
+//     (
+//       conventionalheatsink,
+//       dimensions,
+//       sources,
+//       thermalgriddata,
+//       layer_index
+//     ) ;
+// }
 
 /******************************************************************************/
 

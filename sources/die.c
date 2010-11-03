@@ -249,12 +249,10 @@ void fill_thermal_grid_data_die
 
 /******************************************************************************/
 
-Source_t* fill_sources_die
+void fill_sources_die
 (
   Source_t*             sources,
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
-  ConventionalHeatSink* conventionalheatsink,
   GridDimension_t       layer_index,
   Die*                  die,
   Floorplan*            floorplan
@@ -266,40 +264,48 @@ Source_t* fill_sources_die
     layer_index, die->Id, floorplan->FileName) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
-  {
-    if ( die->SourceLayer == layer )
+  fill_sources_active_layer
+  (
+#   ifdef PRINT_SOURCES
+    die->SourceLayer,
+#   endif
+    layer_index + die->SourceLayer->Offset,
+    floorplan,
+    sources,
+    dimensions
+  ) ;
+}
 
-      sources = fill_sources_active_layer
-                (
-#                 ifdef PRINT_SOURCES
-                  layer,
-#                 endif
-                  layer_index + layer->Offset,
-                  conventionalheatsink,
-                  thermalgriddata,
-                  floorplan,
-                  sources,
-                  dimensions
-                ) ;
+/******************************************************************************/
 
-    else
+void fill_chs_sources_die
+(
+  Source_t*             sources,
+  Dimensions*           dimensions,
+  ThermalGridData*      thermalgriddata,
+  ConventionalHeatSink* conventionalheatsink,
+  Die*                  die
+)
+{
+  if (die->TopLayer == die->SourceLayer)
 
-      sources = fill_sources_empty_layer
-                (
-                  sources,
-                  dimensions,
-                  thermalgriddata,
-                  conventionalheatsink,
-                  layer_index + layer->Offset
-#                 ifdef PRINT_SOURCES
-                  ,layer
-#                 endif
-                ) ;
+    add_sources_conventional_heat_sink
+    (
+      sources,
+      dimensions,
+      thermalgriddata,
+      conventionalheatsink
+    ) ;
 
-  } // FOR_EVERY_ELEMENT_IN_LIST
+  else
 
-  return sources ;
+    fill_sources_conventional_heat_sink
+    (
+      sources,
+      dimensions,
+      thermalgriddata,
+      conventionalheatsink
+    ) ;
 }
 
 /******************************************************************************/

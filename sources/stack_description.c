@@ -294,20 +294,32 @@ void fill_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+  StackElement* stack_element = NULL ;
+  StackElement* last_stk_el = NULL ;
+  for
+  (
+    stack_element  = stkd->StackElementsList ;
+    stack_element != NULL ;
+    last_stk_el    = stack_element ,
+    stack_element  = stack_element->Next
+  )
+    fill_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
 
-    sources = fill_sources_stack_element
-              (
-                sources, stkd->Dimensions,
-                thermalgriddata, stkd->ConventionalHeatSink,
-                stack_element
-              ) ;
+  if (stkd->ConventionalHeatSink != NULL)
+
+    fill_chs_sources_stack_element
+    (
+      sources,
+      stkd->Dimensions,
+      thermalgriddata,
+      stkd->ConventionalHeatSink,
+      last_stk_el
+    ) ;
 }
 
 /******************************************************************************/
 
-void update_sources_stack_description
+void update_channel_inlet_stack_description
 (
   Source_t*         sources,
   StackDescription* stkd
@@ -315,7 +327,7 @@ void update_sources_stack_description
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "update_sources_stack_description ( l %d r %d c %d )\n",
+    "update_channel_inlet_stack_description ( l %d r %d c %d )\n",
     get_number_of_layers  (stkd->Dimensions),
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions)) ;
@@ -324,7 +336,15 @@ void update_sources_stack_description
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
                                      stkd->StackElementsList)
 
-    update_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
+    if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
+
+      fill_sources_channel
+      (
+        sources,
+        stkd->Dimensions,
+        stack_element->Offset,
+        stack_element->Pointer.Channel
+      ) ;
 }
 
 /******************************************************************************/

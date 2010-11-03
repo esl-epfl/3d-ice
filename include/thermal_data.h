@@ -198,7 +198,7 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Change the flow rate.                                                  */
+  /* Update the flow rate.                                                  */
   /*                                                                        */
   /* Sets the new value and then re-fill the system matrix A and update     */
   /* only the (channel) inlet source values. Then, it re-factor the System  */
@@ -210,7 +210,7 @@ extern "C"
   /* >0 otherwise (factorization error). Please see the "output" field of   */
   /*     the function "dgstrf" in SuperLU                                   */
 
-  int change_coolant_flow_rate
+  int update_coolant_flow_rate
   (
     ThermalData*      tdata,
     StackDescription* stkd,

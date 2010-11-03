@@ -115,17 +115,20 @@ void print_detailed_conventional_heat_sink
 
 void fill_sources_conventional_heat_sink
 (
-  ConventionalHeatSink* conventionalheatsink,
-  Dimensions*           dimensions,
   Source_t*             sources,
+  Dimensions*           dimensions,
   ThermalGridData*      thermalgriddata,
-  GridDimension_t       layer_index
+  ConventionalHeatSink* conventionalheatsink
 )
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "layer_index = %d\tadd_sources_conventional_heat_sink\n", layer_index) ;
+    "layer_index = %d\tadd_sources_conventional_heat_sink\n",
+    LAST_LAYER_INDEX(dimensions)) ;
 #endif
+
+  sources += get_cell_offset_in_stack (dimensions,
+                                       LAST_LAYER_INDEX(dimensions), 0, 0) ;
 
   FOR_EVERY_ROW (row_index, dimensions)
   {
@@ -133,17 +136,17 @@ void fill_sources_conventional_heat_sink
     {
       *sources++ = (conventionalheatsink->AmbientTemperature
                     * get_conductance (thermalgriddata, dimensions,
-                                       layer_index, row_index, column_index,
+                                       LAST_LAYER_INDEX(dimensions), row_index, column_index,
                                        TDICE_CONDUCTANCE_TOP)) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | = %f * %.5e = %.5e\n",
-          layer_index, row_index, column_index,
+          LAST_LAYER_INDEX(dimensions), row_index, column_index,
           get_cell_offset_in_stack (dimensions,
-                                    layer_index, row_index, column_index),
+                                    LAST_LAYER_INDEX(dimensions), row_index, column_index),
           conventionalheatsink->AmbientTemperature,
           get_conductance (thermalgriddata, dimensions,
-                           layer_index, row_index, column_index,
+                           LAST_LAYER_INDEX(dimensions), row_index, column_index,
                            TDICE_CONDUCTANCE_TOP),
           *(sources-1)) ;
 #endif
@@ -156,17 +159,19 @@ void fill_sources_conventional_heat_sink
 
 void add_sources_conventional_heat_sink
 (
-  ConventionalHeatSink* conventionalheatsink,
-  Dimensions*           dimensions,
   Source_t*             sources,
+  Dimensions*           dimensions,
   ThermalGridData*      thermalgriddata,
-  GridDimension_t       layer_index
+  ConventionalHeatSink* conventionalheatsink
 )
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-    "layer_index = %d\tadd_sources_conventional_heat_sink\n", layer_index) ;
+    "layer_index = %d\tadd_sources_conventional_heat_sink\n", LAST_LAYER_INDEX(dimensions)) ;
 #endif
+
+  sources += get_cell_offset_in_stack (dimensions,
+                                       LAST_LAYER_INDEX(dimensions), 0, 0) ;
 
   FOR_EVERY_ROW (row_index, dimensions)
   {
@@ -174,17 +179,17 @@ void add_sources_conventional_heat_sink
     {
       *sources++ += (conventionalheatsink->AmbientTemperature
                      * get_conductance (thermalgriddata, dimensions,
-                                        layer_index, row_index, column_index,
+                                        LAST_LAYER_INDEX(dimensions), row_index, column_index,
                                         TDICE_CONDUCTANCE_TOP)) ;
 #ifdef PRINT_SOURCES
         fprintf (stderr,
           "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
-          layer_index, row_index, column_index,
+          LAST_LAYER_INDEX(dimensions), row_index, column_index,
           get_cell_offset_in_stack (dimensions,
-                                    layer_index, row_index, column_index),
+                                    LAST_LAYER_INDEX(dimensions), row_index, column_index),
           conventionalheatsink->AmbientTemperature,
           get_conductance (thermalgriddata, dimensions,
-                           layer_index, row_index, column_index,
+                           LAST_LAYER_INDEX(dimensions), row_index, column_index,
                            TDICE_CONDUCTANCE_TOP),
           *(sources-1)) ;
 #endif

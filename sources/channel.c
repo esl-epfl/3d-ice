@@ -203,49 +203,44 @@ void fill_thermal_grid_data_channel
 
 /******************************************************************************/
 
-Source_t* fill_sources_channel
+void fill_sources_channel
 (
   Source_t*       sources,
   Dimensions*     dimensions,
-# ifdef PRINT_SOURCES
   GridDimension_t layer_index,
-# endif
   Channel*        channel
 )
 {
-  Cconv_t C = CCONV(get_number_of_columns (dimensions),
-                    channel->CoolantVHC, channel->CoolantFR) ;
-
 # ifdef PRINT_SOURCES
   fprintf (stderr,
     "layer_index = %d\tfill_sources_channel %s\n",
     layer_index, channel->WallMaterial->Id) ;
 # endif
 
-  FOR_EVERY_ROW (row_index, dimensions)
+  Cconv_t C = CCONV(get_number_of_columns (dimensions),
+                    channel->CoolantVHC, channel->CoolantFR) ;
+
+  sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+
+  FOR_EVERY_COLUMN (column_index, dimensions)
   {
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    if (IS_CHANNEL_COLUMN(column_index))
     {
-      if (IS_FIRST_ROW(row_index) && IS_CHANNEL_COLUMN(column_index))
-      {
-        *sources = 2.0 * C * channel->CoolantTIn ;
+      *sources = 2.0 * C * channel->CoolantTIn ;
 
-#       ifdef PRINT_SOURCES
-        fprintf (stderr,
-          "liquid cell  | l %2d r %4d c %4d [%6d] "
-          "| %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
-          layer_index, row_index, column_index,
-          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-          *sources, channel->CoolantTIn, C) ;
-#       endif
-      }
+#     ifdef PRINT_SOURCES
+      fprintf (stderr,
+        "liquid cell  | l %2d r 0 c %4d [%6d] "
+        "| %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
+        layer_index, column_index,
+        get_cell_offset_in_stack (dimensions, layer_index, 0, column_index),
+        *sources, channel->CoolantTIn, C) ;
+#     endif
+    }
 
-      sources++ ;
+    sources++ ;
 
-    } // FOR_EVERY_COLUMN
-  }  // FOR_EVERY_ROW
-
-  return sources ;
+  } // FOR_EVERY_COLUMN
 }
 
 /******************************************************************************/
