@@ -115,6 +115,26 @@ void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan)
 
 /******************************************************************************/
 
+void fill_sources_floorplan
+(
+  Source_t*   sources,
+  Dimensions* dimensions,
+  Floorplan*  floorplan
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
+                                     floorplan->ElementsList)
+
+    fill_sources_floorplan_element
+    (
+      sources,
+      dimensions,
+      floorplan_element
+    ) ;
+}
+
+/******************************************************************************/
+
 Bool_t check_intersections
 (
   Floorplan*        floorplan,

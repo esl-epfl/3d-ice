@@ -160,8 +160,8 @@ extern "C"
     Source_t*             sources,
     Dimensions*           dimensions,
     GridDimension_t       layer_index,
-    Die*                  die,
-    Floorplan*            floorplan
+    Floorplan*            floorplan,
+    Die*                  die
   ) ;
 
 /******************************************************************************/

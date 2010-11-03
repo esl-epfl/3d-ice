@@ -34,7 +34,6 @@
  ******************************************************************************/
 
 #include <stdlib.h>
-#include "string.h"
 
 #include "layer.h"
 #include "macros.h"
@@ -172,22 +171,17 @@ void fill_thermal_grid_data_layer
 
 /******************************************************************************/
 
-void fill_sources_active_layer
+void fill_sources_layer
 (
-# ifdef PRINT_SOURCES
-  Layer*                layer,
-# endif
-  GridDimension_t       layer_index,
-//  ConventionalHeatSink* conventionalheatsink,
-//  ThermalGridData*      thermalgriddata,
-  Floorplan*            floorplan,
   Source_t*             sources,
-  Dimensions*           dimensions
+  Dimensions*           dimensions,
+  GridDimension_t       layer_index,
+  Floorplan*            floorplan
+# ifdef PRINT_SOURCES
+  ,Layer*               layer
+# endif
 )
 {
-  CellDimension_t flp_el_surface = CELLDIMENSION_I ;
-  Power_t         power          = POWER_I ;
-
 #ifdef PRINT_SOURCES
   fprintf (stderr,
            "layer_index = " GRIDDIMENSION_F \
@@ -197,98 +191,8 @@ void fill_sources_active_layer
 
   sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
-  {
-    flp_el_surface
-      = (CellDimension_t) (flp_el->EffectiveLength * flp_el->EffectiveWidth) ;
-
-    power = get_from_powers_queue(flp_el->PowerValues) ;
-
-    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, flp_el)
-    {
-      FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, flp_el)
-      {
-        sources [get_cell_offset_in_layer (dimensions, row_index, column_index)]
-
-          = (
-               power * get_cell_length (dimensions, column_index)
-                     * get_cell_width (dimensions)
-            )
-            /  flp_el_surface ;
-
-#ifdef PRINT_SOURCES
-        fprintf (stderr,
-          "solid  cell  | l " GRIDDIMENSION_F     \
-                        " r " GRIDDIMENSION_F     \
-                        " c " GRIDDIMENSION_F     \
-                        " ["  GRIDDIMENSION_F "]" \
-                      " | l " CELLDIMENSION_F     \
-                        " w " CELLDIMENSION_F     \
-                      " | " SOURCE_F " [source] = ("
-                            POWER_F " [W] * l * w) / "
-                            CELLDIMENSION_F " | "
-                            STRING_F "\n",
-          layer_index, row_index, column_index,
-          get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-          get_cell_length (dimensions, column_index), get_cell_width (dimensions),
-          sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
-          get_from_powers_queue(flp_el->PowerValues), flp_el_surface,
-          flp_el->Id) ;
-#endif
-
-      } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
-    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
-
-    pop_from_powers_queue (flp_el->PowerValues) ;
-
-  } // FOR_EVERY_ELEMENT_IN_LIST
-
-/*  if ( IS_LAST_LAYER (layer_index, dimensions)
-       && conventionalheatsink != NULL )
-
-    add_sources_conventional_heat_sink
-    (
-      conventionalheatsink,
-      dimensions,
-      sources,
-      thermalgriddata,
-      layer_index
-    ) ;*/
+  fill_sources_floorplan (sources, dimensions, floorplan) ;
 }
-
-/******************************************************************************/
-
-// void fill_sources_empty_layer
-// (
-//   Source_t*             sources,
-//   Dimensions*           dimensions,
-//   ThermalGridData*      thermalgriddata,
-//   ConventionalHeatSink* conventionalheatsink,
-//   GridDimension_t       layer_index
-// # ifdef PRINT_SOURCES
-//   ,Layer*                layer
-// # endif
-// )
-// {
-// #ifdef PRINT_SOURCES
-//   fprintf (stderr,
-//     "layer_index = " GRIDDIMENSION_F
-//     "\tfill_sources_empty_layer    " STRING_F "\n",
-//     layer_index, layer->Material->Id) ;
-// #endif
-//
-//   if ( IS_LAST_LAYER (layer_index, dimensions)
-//        && conventionalheatsink != NULL )
-//
-//     fill_sources_conventional_heat_sink
-//     (
-//       conventionalheatsink,
-//       dimensions,
-//       sources,
-//       thermalgriddata,
-//       layer_index
-//     ) ;
-// }
 
 /******************************************************************************/
 

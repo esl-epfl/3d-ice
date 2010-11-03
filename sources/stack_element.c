@@ -305,8 +305,8 @@ void fill_sources_stack_element
         sources,
         dimensions,
         stack_element->Offset,
-        stack_element->Pointer.Die,
-        stack_element->Floorplan
+        stack_element->Floorplan,
+        stack_element->Pointer.Die
       ) ;
       break ;
 

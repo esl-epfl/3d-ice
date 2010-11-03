@@ -89,6 +89,15 @@ extern "C"
 
 /******************************************************************************/
 
+  void fill_sources_floorplan
+  (
+    Source_t*   sources,
+    Dimensions* dimensions,
+    Floorplan*  floorplan
+  ) ;
+
+/******************************************************************************/
+
   Bool_t check_intersections
   (
     Floorplan*        floorplan,

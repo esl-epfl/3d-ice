@@ -129,6 +129,15 @@ extern "C"
 
 /******************************************************************************/
 
+  void fill_sources_floorplan_element
+  (
+    Source_t*         sources,
+    Dimensions*       dimensions,
+    FloorplanElement* floorplan_element
+  ) ;
+
+/******************************************************************************/
+
   FloorplanElement* find_floorplan_element_in_list
   (
     FloorplanElement* list,

@@ -50,7 +50,6 @@ extern "C"
 #include "dimensions.h"
 #include "thermal_grid_data.h"
 #include "floorplan.h"
-#include "conventional_heat_sink.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
@@ -140,30 +139,14 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_sources_active_layer
-  (
-#   ifdef PRINT_SOURCES
-    Layer*                layer,
-#   endif
-    GridDimension_t       layer_index,
-//    ConventionalHeatSink* conventionalheatsink,
-//    ThermalGridData*      thermalgriddata,
-    Floorplan*            floorplan,
-    Source_t*             sources,
-    Dimensions*           dimensions
-  ) ;
-
-/******************************************************************************/
-
-  void fill_sources_empty_layer
+  void fill_sources_layer
   (
     Source_t*             sources,
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    ConventionalHeatSink* conventionalheatsink,
-    GridDimension_t       layer_index
+    GridDimension_t       layer_index,
+    Floorplan*            floorplan
 #   ifdef PRINT_SOURCES
-    ,Layer*               layer
+    ,Layer*                layer
 #   endif
   ) ;
 

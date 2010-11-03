@@ -254,8 +254,8 @@ void fill_sources_die
   Source_t*             sources,
   Dimensions*           dimensions,
   GridDimension_t       layer_index,
-  Die*                  die,
-  Floorplan*            floorplan
+  Floorplan*            floorplan,
+  Die*                  die
 )
 {
 #ifdef PRINT_SOURCES
@@ -264,15 +264,15 @@ void fill_sources_die
     layer_index, die->Id, floorplan->FileName) ;
 #endif
 
-  fill_sources_active_layer
+  fill_sources_layer
   (
-#   ifdef PRINT_SOURCES
-    die->SourceLayer,
-#   endif
-    layer_index + die->SourceLayer->Offset,
-    floorplan,
     sources,
-    dimensions
+    dimensions,
+    layer_index + die->SourceLayer->Offset,
+    floorplan
+#   ifdef PRINT_SOURCES
+    ,die->SourceLayer
+#   endif
   ) ;
 }
 
