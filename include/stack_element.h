@@ -47,6 +47,7 @@ extern "C"
 
 #include "layer.h"
 #include "die.h"
+#include "channel.h"
 #include "floorplan.h"
 
 /******************************************************************************/
@@ -66,8 +67,9 @@ extern "C"
 
     union {
 
-      Layer* Layer ;
-      Die*   Die ;
+      Layer*   Layer ;
+      Die*     Die ;
+      Channel* Channel ;
 
     } Pointer ;
 
@@ -125,6 +127,44 @@ extern "C"
     FILE*         stream,
     String_t      prefix,
     StackElement* list
+  ) ;
+
+/******************************************************************************/
+
+  void fill_thermal_grid_data_stack_element
+  (
+    ThermalGridData*      thermalgriddata,
+    StackElement*         stack_element
+  ) ;
+
+/******************************************************************************/
+
+  Source_t* fill_sources_stack_element
+  (
+    Source_t*             sources,
+    Dimensions*           dimensions,
+    ThermalGridData*      thermalgriddata,
+    ConventionalHeatSink* conventionalheatsink,
+    StackElement*         stack_element
+  ) ;
+
+/******************************************************************************/
+
+  void update_sources_stack_element
+  (
+    Source_t*             sources,
+    Dimensions*           dimensions,
+    StackElement*         stack_element
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix fill_system_matrix_stack_element
+  (
+    SystemMatrix          system_matrix,
+    Dimensions*           dimensions,
+    ThermalGridData*      thermalgriddata,
+    StackElement*         stack_element
   ) ;
 
 /******************************************************************************/

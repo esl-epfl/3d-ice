@@ -205,12 +205,12 @@ void fill_thermal_grid_data_channel
 
 Source_t* fill_sources_channel
 (
+  Source_t*       sources,
+  Dimensions*     dimensions,
 # ifdef PRINT_SOURCES
   GridDimension_t layer_index,
 # endif
-  Channel*        channel,
-  Source_t*       sources,
-  Dimensions*     dimensions
+  Channel*        channel
 )
 {
   Cconv_t C = CCONV(get_number_of_columns (dimensions),

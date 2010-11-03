@@ -43,28 +43,28 @@
 
 extern void fill_thermal_grid_data_stack_description
 (
-   StackDescription* stkd,
-   ThermalGridData*  thermalgriddata
+   ThermalGridData*  thermalgriddata,
+   StackDescription* stkd
 ) ;
 
 extern void fill_sources_stack_description
 (
-  StackDescription* stkd,
   Source_t*         sources,
-  ThermalGridData*  thermalgriddata
+  ThermalGridData*  thermalgriddata,
+  StackDescription* stkd
 ) ;
 
 extern void update_sources_stack_description
 (
-  StackDescription* stkd,
-  Source_t*         sources
+  Source_t*         sources,
+  StackDescription* stkd
 ) ;
 
 extern void fill_system_matrix_stack_description
 (
-  StackDescription*     stkd,
+  SystemMatrix          system_matrix,
   ThermalGridData*      thermalgriddata,
-  SystemMatrix          system_matrix
+  StackDescription*     stkd
 ) ;
 
 static void init_data (double* data, Quantity_t size, double init_value)
@@ -174,7 +174,7 @@ int fill_thermal_data
 
   if (result == 1)  goto thermal_grid_data_fail ;
 
-  fill_thermal_grid_data_stack_description (stkd, &tdata->ThermalGridData) ;
+  fill_thermal_grid_data_stack_description (&tdata->ThermalGridData, stkd) ;
 
   if (stkd->ConventionalHeatSink != NULL)
 
@@ -202,7 +202,7 @@ int fill_thermal_data
 
   fill_system_matrix_stack_description
   (
-    stkd, &tdata->ThermalGridData, tdata->SM_A
+    tdata->SM_A, &tdata->ThermalGridData, stkd
   ) ;
 
   dCreate_CompCol_Matrix
@@ -368,9 +368,9 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 
     fill_sources_stack_description
     (
-      stkd,
       tdata->Sources,
-      &(tdata->ThermalGridData)
+      &(tdata->ThermalGridData),
+      stkd
     ) ;
 
     tdata->CurrentSlotLimit += tdata->SlotTime ;
@@ -430,9 +430,9 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
     fill_sources_stack_description
     (
-      stkd,
       tdata->Sources,
-      &(tdata->ThermalGridData)
+      &(tdata->ThermalGridData),
+      stkd
     ) ;
 
     tdata->CurrentSlotLimit += tdata->SlotTime ;
@@ -487,7 +487,7 @@ int change_coolant_flow_rate
 
   fill_system_matrix_stack_description
   (
-    stkd, &tdata->ThermalGridData, tdata->SM_A
+    tdata->SM_A, &tdata->ThermalGridData, stkd
   ) ;
 
   tdata->SLU_Options.Fact = SamePattern ;
@@ -509,7 +509,7 @@ int change_coolant_flow_rate
           &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
 
-  update_sources_stack_description (stkd, tdata->Sources) ;
+  update_sources_stack_description (tdata->Sources, stkd) ;
 
   if (tdata->SLU_Info == 0)
     tdata->SLU_Options.Fact = FACTORED ;

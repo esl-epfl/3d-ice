@@ -157,14 +157,14 @@ extern "C"
 
   Source_t* fill_sources_empty_layer
   (
-#   ifdef PRINT_SOURCES
-    Layer*                layer,
-#   endif
-    GridDimension_t       layer_index,
-    ConventionalHeatSink* conventionalheatsink,
-    ThermalGridData*      thermalgriddata,
     Source_t*             sources,
-    Dimensions*           dimensions
+    Dimensions*           dimensions,
+    ThermalGridData*      thermalgriddata,
+    ConventionalHeatSink* conventionalheatsink,
+    GridDimension_t       layer_index
+#   ifdef PRINT_SOURCES
+    ,Layer*               layer
+#   endif
   ) ;
 
 /******************************************************************************/

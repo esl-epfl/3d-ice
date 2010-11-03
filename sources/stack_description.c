@@ -215,7 +215,7 @@ void print_detailed_stack_description
            STRING_F "  Dimensions                    = %p\n",
            prefix, stkd->Dimensions) ;
 
-  fprintf (stream,"\n") ;
+  fprintf (stream, STRING_F "\n", prefix) ;
   print_detailed_dimensions (stream, new_prefix, stkd->Dimensions) ;
 
   free (new_prefix) ;
@@ -258,8 +258,8 @@ int fill_floorplans (StackDescription* stkd)
 
 void fill_thermal_grid_data_stack_description
 (
-  StackDescription* stkd,
-  ThermalGridData*  thermalgriddata
+  ThermalGridData*  thermalgriddata,
+  StackDescription* stkd
 )
 {
 #ifdef PRINT_THERMAL_GRID_DATA
@@ -270,70 +270,20 @@ void fill_thermal_grid_data_stack_description
     get_number_of_layers  (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
-  {
-    switch (stk_el->Type)
-    {
-      case TDICE_STACK_ELEMENT_DIE :
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
 
-        fill_thermal_grid_data_die
-        (
-          thermalgriddata,
-          stk_el->Offset,
-          stk_el->Pointer.Die
-        ) ;
+    fill_thermal_grid_data_stack_element (thermalgriddata, stack_element) ;
 
-        break ;
-
-      case TDICE_STACK_ELEMENT_LAYER :
-
-        fill_thermal_grid_data_layer
-        (
-          thermalgriddata,
-          stk_el->Offset,
-          stk_el->Pointer.Layer
-        ) ;
-
-        break ;
-
-      case TDICE_STACK_ELEMENT_CHANNEL :
-
-        fill_thermal_grid_data_channel
-        (
-          thermalgriddata,
-          stk_el->Offset,
-          stkd->Channel
-        ) ;
-
-        break ;
-
-      case TDICE_STACK_ELEMENT_NONE :
-
-        fprintf (stderr, "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf
-        (
-          stderr,
-          "Error! Unknown stack element type %d\n",
-          stk_el->Type
-        ) ;
-        return ;
-
-    } /* switch stk_el->Type */
-
-  } // FOR_EVERY_ELEMENT_IN_LIST
 }
 
 /******************************************************************************/
 
 void fill_sources_stack_description
 (
-  StackDescription* stkd,
   Source_t*         sources,
-  ThermalGridData*  thermalgriddata
+  ThermalGridData*  thermalgriddata,
+  StackDescription* stkd
 )
 {
 #ifdef PRINT_SOURCES
@@ -344,74 +294,23 @@ void fill_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
-  {
-    switch (stk_el->Type)
-    {
-      case TDICE_STACK_ELEMENT_DIE :
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
 
-        sources = fill_sources_die
-                  (
-                    stk_el->Offset,
-                    stk_el->Pointer.Die,
-                    stkd->ConventionalHeatSink,
-                    thermalgriddata,
-                    stk_el->Floorplan,
-                    sources,
-                    stkd->Dimensions
-                  ) ;
-
-        break ;
-
-      case TDICE_STACK_ELEMENT_LAYER :
-
-        sources = fill_sources_empty_layer
-                  (
-#                   ifdef PRINT_SOURCES
-                    stk_el->Pointer.Layer,
-#                   endif
-                    stk_el->Offset,
-                    stkd->ConventionalHeatSink,
-                    thermalgriddata,
-                    sources,
-                    stkd->Dimensions
-                  ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_CHANNEL :
-
-        sources = fill_sources_channel
-                  (
-#                   ifdef PRINT_SOURCES
-                    stk_el->Offset,
-#                   endif
-                    stkd->Channel,
-                    sources,
-                    stkd->Dimensions
-                  ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_NONE :
-
-        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stk_el->Type) ;
-        return ;
-
-    } /* switch stk_el->Type */
-  } // FOR_EVERY_ELEMENT_IN_LIST
+    sources = fill_sources_stack_element
+              (
+                sources, stkd->Dimensions,
+                thermalgriddata, stkd->ConventionalHeatSink,
+                stack_element
+              ) ;
 }
 
 /******************************************************************************/
 
 void update_sources_stack_description
 (
-  StackDescription* stkd,
-  Source_t*         sources
+  Source_t*         sources,
+  StackDescription* stkd
 )
 {
 #ifdef PRINT_SOURCES
@@ -422,57 +321,19 @@ void update_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
-  {
-    switch (stk_el->Type)
-    {
-      case TDICE_STACK_ELEMENT_DIE :
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
 
-        sources += get_layer_area (stkd->Dimensions)
-                   * (stk_el->Pointer.Die->NLayers) ;
-
-        break ;
-
-      case TDICE_STACK_ELEMENT_LAYER :
-
-        sources += get_layer_area (stkd->Dimensions) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_CHANNEL :
-
-        sources = fill_sources_channel
-                  (
-#                   ifdef PRINT_SOURCES
-                    stk_el->Offset,
-#                   endif
-                    stkd->Channel,
-                    sources,
-                    stkd->Dimensions
-                  ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_NONE :
-
-        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stk_el->Type) ;
-        return ;
-
-    } /* switch stk_el->Type */
-  } // FOR_EVERY_ELEMENT_IN_LIST
+    update_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
 }
 
 /******************************************************************************/
 
 void fill_system_matrix_stack_description
 (
-  StackDescription*     stkd,
+  SystemMatrix          system_matrix,
   ThermalGridData*      thermalgriddata,
-  SystemMatrix          system_matrix
+  StackDescription*     stkd
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
@@ -484,67 +345,17 @@ void fill_system_matrix_stack_description
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
-
   *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
-  {
-    switch (stk_el->Type)
-    {
-      case TDICE_STACK_ELEMENT_DIE :
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
 
-        system_matrix = fill_system_matrix_die
-                        (
-                          stk_el->Pointer.Die, stkd->Dimensions,
-                          thermalgriddata,
-                          stk_el->Offset,
-                          system_matrix
-                        ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_LAYER :
-
-        system_matrix = fill_system_matrix_layer
-                        (
-#                         ifdef PRINT_SYSTEM_MATRIX
-                          stk_el->Pointer.Layer,
-#                         endif
-                          stkd->Dimensions,
-                          thermalgriddata,
-                          stk_el->Offset,
-                          system_matrix
-                        ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_CHANNEL :
-
-        system_matrix = fill_system_matrix_channel
-                        (
-#                         ifdef PRINT_SYSTEM_MATRIX
-                          stkd->Channel,
-#                         endif
-                          stkd->Dimensions,
-                          thermalgriddata,
-                          stk_el->Offset,
-                          system_matrix
-                        ) ;
-        break ;
-
-      case TDICE_STACK_ELEMENT_NONE :
-
-        fprintf (stderr,  "Error! Found stack element with unset type\n") ;
-        return ;
-
-      default :
-
-        fprintf (stderr, "Error! Unknown stack element type %d\n",
-          stk_el->Type) ;
-        return ;
-
-    } /* stk_el->Type */
-
-
-  } // FOR_EVERY_ELEMENT_IN_LIST
+    system_matrix = fill_system_matrix_stack_element
+                    (
+                      system_matrix, stkd->Dimensions,
+                      thermalgriddata,
+                      stack_element
+                    ) ;
 }
 
 /******************************************************************************/

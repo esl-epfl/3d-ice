@@ -157,13 +157,13 @@ extern "C"
 
   Source_t*               fill_sources_die
   (
+    Source_t*             sources,
+    Dimensions*           dimensions,
+    ThermalGridData*      thermalgriddata,
+    ConventionalHeatSink* conventionalheatsink,
     GridDimension_t       layer_index,
     Die*                  die,
-    ConventionalHeatSink* conventionalheatsink,
-    ThermalGridData*      thermalgriddata,
-    Floorplan*            floorplan,
-    Source_t*             sources,
-    Dimensions*           dimensions
+    Floorplan*            floorplan
   ) ;
 
 /******************************************************************************/

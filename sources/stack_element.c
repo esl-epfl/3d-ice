@@ -44,14 +44,15 @@
 void
 init_stack_element (StackElement* stack_element)
 {
-  stack_element->Type          = STACKELEMENT_I ;
-  stack_element->Pointer.Layer = NULL ;
-  stack_element->Pointer.Die   = NULL ;
-  stack_element->Floorplan     = NULL ;
-  stack_element->Id            = STRING_I ;
-  stack_element->NLayers       = GRIDDIMENSION_I ;
-  stack_element->Offset        = GRIDDIMENSION_I ;
-  stack_element->Next          = NULL ;
+  stack_element->Type            = STACKELEMENT_I ;
+  stack_element->Pointer.Layer   = NULL ;
+  stack_element->Pointer.Die     = NULL ;
+  stack_element->Pointer.Channel = NULL ;
+  stack_element->Floorplan       = NULL ;
+  stack_element->Id              = STRING_I ;
+  stack_element->NLayers         = GRIDDIMENSION_I ;
+  stack_element->Offset          = GRIDDIMENSION_I ;
+  stack_element->Next            = NULL ;
 }
 
 /******************************************************************************/
@@ -189,6 +190,12 @@ void print_detailed_stack_elements_list
               STRING_F "  Pointer.Die               = %p\n",
               prefix,   stk_el->Pointer.Die);
     }
+    if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL)
+    {
+     fprintf (stream,
+              STRING_F "  Pointer.Channel           = %p\n",
+              prefix,   stk_el->Pointer.Channel);
+    }
     else if (stk_el->Type == TDICE_STACK_ELEMENT_LAYER)
     {
       fprintf (stream,
@@ -220,6 +227,248 @@ void print_detailed_stack_elements_list
   } // FOR_EVERY_ELEMENT_IN_LIST
 
   free (new_prefix) ;
+}
+
+/******************************************************************************/
+
+void fill_thermal_grid_data_stack_element
+(
+  ThermalGridData* thermalgriddata,
+  StackElement*    stack_element
+)
+{
+  switch (stack_element->Type)
+  {
+    case TDICE_STACK_ELEMENT_DIE :
+
+      fill_thermal_grid_data_die
+      (
+        thermalgriddata,
+        stack_element->Offset,
+        stack_element->Pointer.Die
+      ) ;
+
+      break ;
+
+    case TDICE_STACK_ELEMENT_LAYER :
+
+      fill_thermal_grid_data_layer
+      (
+        thermalgriddata,
+        stack_element->Offset,
+        stack_element->Pointer.Layer
+      ) ;
+
+      break ;
+
+    case TDICE_STACK_ELEMENT_CHANNEL :
+
+      fill_thermal_grid_data_channel
+      (
+        thermalgriddata,
+        stack_element->Offset,
+        stack_element->Pointer.Channel
+      ) ;
+
+      break ;
+
+    case TDICE_STACK_ELEMENT_NONE :
+
+      fprintf (stderr, "Error! Found stack element with unset type\n") ;
+      return ;
+
+    default :
+
+      fprintf
+      (
+        stderr,
+        "Error! Unknown stack element type %d\n",
+        stack_element->Type
+      ) ;
+      return ;
+
+  } /* switch stack_element->Type */
+}
+
+/******************************************************************************/
+
+Source_t* fill_sources_stack_element
+(
+  Source_t*             sources,
+  Dimensions*           dimensions,
+  ThermalGridData*      thermalgriddata,
+  ConventionalHeatSink* conventionalheatsink,
+  StackElement*         stack_element
+)
+{
+  switch (stack_element->Type)
+  {
+    case TDICE_STACK_ELEMENT_DIE :
+
+      sources = fill_sources_die
+                (
+                  sources, dimensions,
+                  thermalgriddata, conventionalheatsink,
+                  stack_element->Offset,
+                  stack_element->Pointer.Die,
+                  stack_element->Floorplan
+                ) ;
+
+      break ;
+
+    case TDICE_STACK_ELEMENT_LAYER :
+
+      sources = fill_sources_empty_layer
+                (
+                  sources, dimensions,
+                  thermalgriddata, conventionalheatsink,
+                  stack_element->Offset
+#                 ifdef PRINT_SOURCES
+                  ,stack_element->Pointer.Layer
+#                 endif
+                ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_CHANNEL :
+
+      sources = fill_sources_channel
+                (
+                  sources, dimensions,
+#                 ifdef PRINT_SOURCES
+                  stack_element->Offset,
+#                 endif
+                  stack_element->Pointer.Channel
+                ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_NONE :
+
+      fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+      break ;
+
+    default :
+
+      fprintf (stderr, "Error! Unknown stack element type %d\n",
+        stack_element->Type) ;
+      break ;
+
+  } /* switch stack_element->Type */
+
+  return sources ;
+}
+
+/******************************************************************************/
+
+void update_sources_stack_element
+(
+  Source_t*             sources,
+  Dimensions*           dimensions,
+  StackElement*         stack_element
+)
+{
+  switch (stack_element->Type)
+  {
+    case TDICE_STACK_ELEMENT_DIE :
+
+      sources += get_layer_area (dimensions)
+                 * (stack_element->Pointer.Die->NLayers) ;
+
+      break ;
+
+    case TDICE_STACK_ELEMENT_LAYER :
+
+      sources += get_layer_area (dimensions) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_CHANNEL :
+
+      sources = fill_sources_channel
+                (
+                  sources,
+                  dimensions,
+#                 ifdef PRINT_SOURCES
+                  stack_element->Offset,
+#                 endif
+                  stack_element->Pointer.Channel
+                ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_NONE :
+
+      fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+      return ;
+
+    default :
+
+      fprintf (stderr, "Error! Unknown stack element type %d\n",
+        stack_element->Type) ;
+      return ;
+
+  } /* switch stk_el->Type */
+}
+
+/******************************************************************************/
+
+SystemMatrix fill_system_matrix_stack_element
+(
+  SystemMatrix     system_matrix,
+  Dimensions*      dimensions,
+  ThermalGridData* thermalgriddata,
+  StackElement*    stack_element
+)
+{
+  switch (stack_element->Type)
+  {
+    case TDICE_STACK_ELEMENT_DIE :
+
+      system_matrix = fill_system_matrix_die
+                      (
+                        stack_element->Pointer.Die, dimensions,
+                        thermalgriddata, stack_element->Offset,
+                        system_matrix
+                      ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_LAYER :
+
+      system_matrix = fill_system_matrix_layer
+                      (
+#                       ifdef PRINT_SYSTEM_MATRIX
+                        stack_element->Pointer.Layer,
+#                       endif
+                        dimensions,
+                        thermalgriddata, stack_element->Offset,
+                        system_matrix
+                      ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_CHANNEL :
+
+      system_matrix = fill_system_matrix_channel
+                      (
+#                       ifdef PRINT_SYSTEM_MATRIX
+                        stack_element->Pointer.Channel,
+#                       endif
+                        dimensions,
+                        thermalgriddata, stack_element->Offset,
+                        system_matrix
+                      ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_NONE :
+
+      fprintf (stderr,  "Error! Found stack element with unset type\n") ;
+      break ;
+
+    default :
+
+      fprintf (stderr, "Error! Unknown stack element type %d\n",
+        stack_element->Type) ;
+      break ;
+
+  } /* stk_el->Type */
+
+  return system_matrix ;
 }
 
 /******************************************************************************/

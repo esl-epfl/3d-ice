@@ -816,9 +816,10 @@ stack_element
         YYABORT ;
       }
 
-      stack_element->Type    = TDICE_STACK_ELEMENT_CHANNEL ;
-      stack_element->Id      = $2 ;
-      stack_element->NLayers = 1 ;
+      stack_element->Type            = TDICE_STACK_ELEMENT_CHANNEL ;
+      stack_element->Pointer.Channel = stkd->Channel ;
+      stack_element->Id              = $2 ;
+      stack_element->NLayers         = 1 ;
 
       found_channel = TRUE_V ;
       last_stack_element = TDICE_STACK_ELEMENT_CHANNEL ;

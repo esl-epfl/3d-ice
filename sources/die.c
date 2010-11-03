@@ -242,7 +242,7 @@ void fill_thermal_grid_data_die
     fill_thermal_grid_data_layer
     (
       thermalgriddata,
-      layer_index++,
+      layer_index + layer->Offset,
       layer
     ) ;
 }
@@ -251,13 +251,13 @@ void fill_thermal_grid_data_die
 
 Source_t* fill_sources_die
 (
+  Source_t*             sources,
+  Dimensions*           dimensions,
+  ThermalGridData*      thermalgriddata,
+  ConventionalHeatSink* conventionalheatsink,
   GridDimension_t       layer_index,
   Die*                  die,
-  ConventionalHeatSink* conventionalheatsink,
-  ThermalGridData*      thermalgriddata,
-  Floorplan*            floorplan,
-  Source_t*             sources,
-  Dimensions*           dimensions
+  Floorplan*            floorplan
 )
 {
 #ifdef PRINT_SOURCES
@@ -287,14 +287,14 @@ Source_t* fill_sources_die
 
       sources = fill_sources_empty_layer
                 (
-#                 ifdef PRINT_SOURCES
-                  layer,
-#                 endif
-                  layer_index + layer->Offset,
-                  conventionalheatsink,
-                  thermalgriddata,
                   sources,
-                  dimensions
+                  dimensions,
+                  thermalgriddata,
+                  conventionalheatsink,
+                  layer_index + layer->Offset
+#                 ifdef PRINT_SOURCES
+                  ,layer
+#                 endif
                 ) ;
 
   } // FOR_EVERY_ELEMENT_IN_LIST

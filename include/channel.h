@@ -129,12 +129,12 @@ extern "C"
 
   Source_t* fill_sources_channel
   (
+    Source_t*       sources,
+    Dimensions*     dimensions,
 #   ifdef PRINT_SOURCES
     GridDimension_t layer_index,
 #   endif
-    Channel*        channel,
-    Source_t*       sources,
-    Dimensions*     dimensions
+    Channel*        channel
   ) ;
 
 /******************************************************************************/
