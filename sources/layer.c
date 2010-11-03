@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include "string.h"
 
 #include "layer.h"
 #include "macros.h"
@@ -98,28 +99,28 @@ void print_detailed_layer
 )
 {
   fprintf (stream,
-           STRING_F "layer           = %p\n",
+           STRING_F "layer                   = %p\n",
            prefix, layer) ;
 
   fprintf (stream,
-           STRING_F "layer->Height   = " CELLDIMENSION_F "\n",
-           prefix,   layer->Height) ;
+           STRING_F "  Height                = " CELLDIMENSION_F "\n",
+           prefix, layer->Height) ;
 
   fprintf (stream,
-           STRING_F "layer->Offset   = " GRIDDIMENSION_F "\n",
-           prefix,   layer->Offset) ;
+           STRING_F "  Offset                = " GRIDDIMENSION_F "\n",
+           prefix, layer->Offset) ;
 
   fprintf (stream,
-           STRING_F "layer->Material = %p\n",
-           prefix,   layer->Material) ;
+           STRING_F "  Material              = %p\n",
+           prefix, layer->Material) ;
 
   fprintf (stream,
-           STRING_F "layer->Next     = %p\n",
-           prefix,   layer->Next) ;
+           STRING_F "  Next                  = %p\n",
+           prefix, layer->Next) ;
 
   fprintf (stream,
-           STRING_F "layer->Prev     = %p\n",
-           prefix,   layer->Prev) ;
+           STRING_F "  Prev                  = %p\n",
+           prefix, layer->Prev) ;
 }
 
 /******************************************************************************/

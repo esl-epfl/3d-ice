@@ -58,9 +58,7 @@ init_stack_element (StackElement* stack_element)
 
 StackElement* alloc_and_init_stack_element (void)
 {
-  StackElement* stack_element ;
-
-  MALLOC (stack_element, 1) ;
+  StackElement* stack_element = malloc (sizeof(*stack_element)) ;
 
   if (stack_element != NULL) init_stack_element(stack_element) ;
 
@@ -94,56 +92,134 @@ void free_stack_elements_list (StackElement* list)
 
 /******************************************************************************/
 
-void print_stack_elements_list
+void print_formatted_stack_elements_list
 (
   FILE*         stream,
   String_t      prefix,
   StackElement* list
 )
 {
-  fprintf (stream, "%sStack:\n", prefix) ;
+  unsigned int max_stk_el_id_length = 0 ;
+  unsigned int max_die_id_length = 0 ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
   {
-    fprintf (stream,
-      "%s  Stackelement (l %-2d - %-2d)\t%s\t",
-      prefix, stk_el->Offset, stk_el->NLayers, stk_el->Id) ;
+    max_stk_el_id_length = MAX (max_stk_el_id_length,
+                                strlen(stk_el->Id)) ;
 
-    switch (stk_el->Type)
+    if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
+
+      max_die_id_length = MAX (max_die_id_length,
+                               strlen(stk_el->Pointer.Die->Id)) ;
+  }
+
+  fprintf (stream, STRING_F "stack : \n", prefix) ;
+
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, list)
+  {
+    switch (stack_element->Type)
     {
-      case TDICE_STACK_ELEMENT_NONE :
+      case TDICE_STACK_ELEMENT_CHANNEL :
 
-        fprintf (stream, "NO TYPE\n") ;
+        fprintf (stream,
+                 STRING_F "   channel  %-*s ;\n",
+                 prefix, max_stk_el_id_length, stack_element->Id) ;
         break ;
 
       case TDICE_STACK_ELEMENT_DIE :
 
         fprintf (stream,
-          "die     (%s) %s \n",
-          stk_el->Pointer.Die->Id, stk_el->Floorplan->FileName) ;
+                 STRING_F "   die      %-*s %-*s floorplan \"%s\"\n",
+                 prefix,
+                 max_stk_el_id_length, stack_element->Id,
+                 max_die_id_length, stack_element->Pointer.Die->Id,
+                 stack_element->Floorplan->FileName) ;
         break ;
 
       case TDICE_STACK_ELEMENT_LAYER :
 
         fprintf (stream,
-          "layer   (%s) %5.2f um\n",
-          stk_el->Pointer.Layer->Material->Id, stk_el->Pointer.Layer->Height) ;
+                 STRING_F "   layer    %-*s ;\n",
+                 prefix, max_stk_el_id_length, stack_element->Id) ;
         break ;
 
-      case TDICE_STACK_ELEMENT_CHANNEL :
+      case TDICE_STACK_ELEMENT_NONE :
 
-        fprintf (stream,
-          "channel\n") ;
+        fprintf (stderr, "Warining: found stack element type none\n") ;
         break ;
 
       default :
 
-        fprintf (stream, "Error! Unknown type %d\n", stk_el->Type) ;
-        break ;
+        fprintf (stderr, "Undefined stack element type %d\n",
+                 stack_element->Type) ;
     }
+  }
+}
+
+/******************************************************************************/
+
+void print_detailed_stack_elements_list
+(
+  FILE*         stream,
+  String_t      prefix,
+  StackElement* list
+)
+{
+  String_t new_prefix = malloc (sizeof(*new_prefix) * (4 + strlen(prefix))) ;
+  if (new_prefix == NULL) return ;
+  sprintf (new_prefix, STRING_F "    ", prefix) ;
+
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
+  {
+    fprintf (stream,
+             STRING_F "stk_el                      = %p\n",
+             prefix,   stk_el);
+
+    fprintf (stream,
+             STRING_F "  Id                        = " STRING_F "\n",
+             prefix,   stk_el->Id);
+
+    fprintf (stream,
+             STRING_F "  Type                      = %d\n",
+             prefix,   stk_el->Type);
+
+    if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
+    {
+     fprintf (stream,
+              STRING_F "  Pointer.Die               = %p\n",
+              prefix,   stk_el->Pointer.Die);
+    }
+    else if (stk_el->Type == TDICE_STACK_ELEMENT_LAYER)
+    {
+      fprintf (stream,
+               STRING_F "  Pointer.Layer             = %p\n",
+               prefix,   stk_el->Pointer.Layer);
+      fprintf (stream, STRING_F "\n", prefix) ;
+      print_detailed_layer (stream, new_prefix, stk_el->Pointer.Layer) ;
+      fprintf (stream, STRING_F "\n", prefix) ;
+    }
+
+    fprintf (stream,
+             STRING_F "  NLayers                   = " GRIDDIMENSION_F "\n",
+             prefix,   stk_el->NLayers);
+
+    fprintf (stream,
+             STRING_F "  Floorplan                 = %p\n",
+             prefix,   stk_el->Floorplan);
+
+    fprintf (stream,
+             STRING_F "  Offset                    = " GRIDDIMENSION_F "\n",
+             prefix,   stk_el->Offset);
+
+    fprintf (stream,
+             STRING_F "  Next                      = %p\n",
+             prefix,   stk_el->Next);
+
+    fprintf (stream, STRING_F "\n", prefix) ;
 
   } // FOR_EVERY_ELEMENT_IN_LIST
 
+  free (new_prefix) ;
 }
 
 /******************************************************************************/

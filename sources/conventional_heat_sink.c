@@ -100,15 +100,15 @@ void print_detailed_conventional_heat_sink
 )
 {
   fprintf (stream,
-           STRING_F "conventionalheatsink                      = %p\n",
+           STRING_F "conventionalheatsink        = %p\n",
            prefix,   conventionalheatsink) ;
 
   fprintf (stream,
-           STRING_F "conventionalheatsink->AmbientHTC          = " AMBIENTHTC_F "\n",
+           STRING_F "  AmbientHTC                = " AMBIENTHTC_F "\n",
            prefix,   conventionalheatsink->AmbientHTC) ;
 
   fprintf (stream,
-           STRING_F "conventionalheatsink->AmbientTemperature  = " TEMPERATURE_F "\n",
+           STRING_F "  AmbientTemperature        = " TEMPERATURE_F "\n",
            prefix,   conventionalheatsink->AmbientTemperature) ;
 }
 

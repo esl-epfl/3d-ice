@@ -145,36 +145,36 @@ void print_detailed_channel
            prefix,   channel) ;
 
   fprintf (stream,
-           STRING_F "channel->Height             = " CELLDIMENSION_F "\n",
-           prefix,   channel->Height) ;
+           STRING_F "  Height                    = " CELLDIMENSION_F "\n",
+           prefix,  channel->Height) ;
 
   fprintf (stream,
-           STRING_F "channel->CoolantHTCs.Side   = " COOLANTHTC_F "\n",
-           prefix,   channel->CoolantHTCs.Side) ;
+           STRING_F "  CoolantHTCs.Side          = " COOLANTHTC_F "\n",
+           prefix,  channel->CoolantHTCs.Side) ;
 
   fprintf (stream,
-           STRING_F "channel->CoolantHTCs.Top    = " COOLANTHTC_F "\n",
-           prefix,   channel->CoolantHTCs.Top) ;
+           STRING_F "  CoolantHTCs.Top           = " COOLANTHTC_F "\n",
+           prefix,  channel->CoolantHTCs.Top) ;
 
   fprintf (stream,
-           STRING_F "channel->CoolantHTCs.Bottom = " COOLANTHTC_F "\n",
-           prefix,   channel->CoolantHTCs.Bottom) ;
+           STRING_F "  CoolantHTCs.Bottom        = " COOLANTHTC_F "\n",
+           prefix,  channel->CoolantHTCs.Bottom) ;
 
   fprintf (stream,
-           STRING_F "channel->CoolantVHC         = " COOLANTVHC_F "\n",
-           prefix,   channel->CoolantVHC) ;
+           STRING_F "  CoolantVHC                = " COOLANTVHC_F "\n",
+           prefix,  channel->CoolantVHC) ;
 
   fprintf (stream,
-           STRING_F "channel->CoolantTIn         = " TEMPERATURE_F "\n",
-           prefix,   channel->CoolantTIn) ;
+           STRING_F "  CoolantTIn                = " TEMPERATURE_F "\n",
+           prefix,  channel->CoolantTIn) ;
 
   fprintf (stream,
-           STRING_F "channel->CoolantFR          = " COOLANTFR_F "\n",
-           prefix,   channel->CoolantFR) ;
+           STRING_F "  CoolantFR                 = " COOLANTFR_F "\n",
+           prefix,  channel->CoolantFR) ;
 
   fprintf (stream,
-           STRING_F "channel->WallMaterial       = %p\n",
-           prefix,   channel->WallMaterial) ;
+           STRING_F "  WallMaterial              = %p\n",
+           prefix,  channel->WallMaterial) ;
 }
 
 /******************************************************************************/

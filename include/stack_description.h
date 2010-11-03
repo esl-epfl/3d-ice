@@ -64,6 +64,11 @@ extern "C"
 
     Material* MaterialsList ;
 
+    /* Information (if present) about the heat dissipation */
+    /* throught the top surface                            */
+
+    ConventionalHeatSink* ConventionalHeatSink ;
+
     /* The (if present) single type of channel used to compose the 3d stack */
 
     Channel* Channel ;
@@ -71,11 +76,6 @@ extern "C"
     /* The list of dies available to compose the 3d stack */
 
     Die* DiesList ;
-
-    /* Information (if present) about the heat dissipation */
-    /* throught the top surface                            */
-
-    ConventionalHeatSink* ConventionalHeatSink ;
 
     /* The list of stack elements componing the 3Dstack */
 
@@ -127,7 +127,16 @@ extern "C"
   /* To print the content of only one of the fields of stkd, use the        */
   /* printing function in the corresponding header file                     */
 
-  void print_stack_description
+  void print_formatted_stack_description
+  (
+    FILE*             stream,
+    String_t          prefix,
+    StackDescription* stkd
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_stack_description
   (
     FILE*             stream,
     String_t          prefix,

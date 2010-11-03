@@ -111,7 +111,16 @@ extern "C"
 
 /******************************************************************************/
 
-  void print_stack_elements_list
+  void print_formatted_stack_elements_list
+  (
+    FILE*         stream,
+    String_t      prefix,
+    StackElement* list
+  ) ;
+
+/******************************************************************************/
+
+  void print_detailed_stack_elements_list
   (
     FILE*         stream,
     String_t      prefix,

@@ -53,9 +53,9 @@ void init_stack_description (StackDescription* stkd)
 {
   stkd->FileName             = STRING_I ;
   stkd->MaterialsList        = NULL ;
+  stkd->ConventionalHeatSink = NULL ;
   stkd->Channel              = NULL ;
   stkd->DiesList             = NULL ;
-  stkd->ConventionalHeatSink = NULL ;
   stkd->StackElementsList    = NULL ;
   stkd->Dimensions           = NULL ;
 }
@@ -109,32 +109,116 @@ void free_stack_description (StackDescription* stkd)
 
 /******************************************************************************/
 
-void print_stack_description
+void print_formatted_stack_description
 (
   FILE*             stream,
   String_t          prefix,
   StackDescription* stkd
 )
 {
-  fprintf(stream, "%sStack read from file %s\n", prefix, stkd->FileName) ;
-
-  print_detailed_materials_list (stream, prefix, stkd->MaterialsList) ;
+  print_formatted_materials_list (stream, prefix, stkd->MaterialsList) ;
+  fprintf (stream, STRING_F "\n", prefix) ;
 
   if (stkd->ConventionalHeatSink != NULL)
-
-    print_detailed_conventional_heat_sink (stream,
-                                           prefix,
-                                           stkd->ConventionalHeatSink) ;
+  {
+    print_formatted_conventional_heat_sink (stream, prefix,
+                                            stkd->ConventionalHeatSink) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
 
   if (stkd->Channel != NULL)
+  {
+    print_formatted_channel (stream, prefix, stkd->Channel, stkd->Dimensions) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
 
-    print_detailed_channel (stream, prefix, stkd->Channel) ;
+  print_formatted_dies_list (stream, prefix, stkd->DiesList) ;
+  fprintf (stream, STRING_F "\n", prefix) ;
 
-  print_detailed_dies_list (stream, prefix, stkd->DiesList) ;
+  print_formatted_stack_elements_list (stream, prefix,
+                                       stkd->StackElementsList) ;
+  fprintf (stream, STRING_F "\n", prefix) ;
 
-  print_stack_elements_list (stream, prefix, stkd->StackElementsList) ;
+  print_formatted_dimensions (stream, prefix, stkd->Dimensions) ;
+}
 
-  print_detailed_dimensions (stream, prefix, stkd->Dimensions) ;
+/******************************************************************************/
+
+void print_detailed_stack_description
+(
+  FILE*             stream,
+  String_t          prefix,
+  StackDescription* stkd
+)
+{
+  String_t new_prefix = malloc (sizeof(*new_prefix) * (4 + strlen(prefix))) ;
+  if (new_prefix == NULL) return ;
+  sprintf (new_prefix, STRING_F "    ", prefix) ;
+
+  fprintf (stream,
+           STRING_F "stkd                            = %p\n",
+           prefix, stkd) ;
+
+  fprintf (stream,
+           STRING_F "  FileName                      = " STRING_F "\n",
+           prefix, stkd->FileName) ;
+
+  fprintf (stream,
+           STRING_F "  MaterialsList                 = %p\n",
+           prefix, stkd->MaterialsList) ;
+
+  fprintf (stream, STRING_F "\n", prefix) ;
+  print_detailed_materials_list (stream, new_prefix, stkd->MaterialsList) ;
+  fprintf (stream, STRING_F "\n", prefix) ;
+
+  fprintf (stream,
+           STRING_F "  ConventionalHeatSink          = %p\n",
+           prefix, stkd->ConventionalHeatSink) ;
+
+  if (stkd->ConventionalHeatSink != NULL)
+  {
+    fprintf (stream, STRING_F "\n", prefix) ;
+    print_detailed_conventional_heat_sink (stream, new_prefix,
+                                           stkd->ConventionalHeatSink) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
+
+  fprintf (stream,
+           STRING_F "  Channel                       = %p\n",
+           prefix, stkd->Channel) ;
+
+  if (stkd->Channel != NULL)
+  {
+    fprintf (stream, STRING_F "\n", prefix) ;
+    print_detailed_channel (stream, new_prefix, stkd->Channel) ;
+    fprintf (stream, STRING_F "\n", prefix) ;
+  }
+
+  fprintf (stream,
+           STRING_F "  DiesList                      = %p\n",
+           prefix, stkd->DiesList) ;
+
+  fprintf (stream, STRING_F "\n", prefix) ;
+  print_detailed_dies_list (stream, new_prefix, stkd->DiesList) ;
+  fprintf (stream, STRING_F "\n", prefix) ;
+
+  fprintf (stream,
+           STRING_F "  StackElementsList             = %p\n",
+           prefix, stkd->StackElementsList) ;
+
+  fprintf (stream, STRING_F "\n", prefix) ;
+  print_detailed_stack_elements_list (stream, new_prefix,
+                                      stkd->StackElementsList) ;
+  fprintf (stream, STRING_F "\n", prefix) ;
+
+  fprintf (stream,
+           STRING_F "  Dimensions                    = %p\n",
+           prefix, stkd->Dimensions) ;
+
+  fprintf (stream,"\n") ;
+  print_detailed_dimensions (stream, new_prefix, stkd->Dimensions) ;
+
+  free (new_prefix) ;
 }
 
 /******************************************************************************/
