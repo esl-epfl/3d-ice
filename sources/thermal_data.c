@@ -343,7 +343,7 @@ fill_system_vector
           layer, row, column,
           get_cell_offset_in_stack (dimensions, layer, row, column),
           *(vector-1), *(sources-1),
-          get_capacity(capacities, layer, column), old) ;
+          get_capacity(thermalgriddata, dimensions, layer, row, column), old) ;
 #       endif
 
       } // FOR_EVERY_COLUMN
