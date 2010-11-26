@@ -79,15 +79,15 @@ void print_formatted_conventional_heat_sink
 )
 {
   fprintf (stream,
-           STRING_F "conventional heat sink :\n",
+           "%sconventional heat sink :\n",
            prefix) ;
 
   fprintf (stream,
-           STRING_F "   heat transfer coefficient " AMBIENTHTC_F " ;\n",
+           "%s   heat transfer coefficient %.4e ;\n",
            prefix, conventionalheatsink->AmbientHTC) ;
 
   fprintf (stream,
-           STRING_F "   ambient temperature       " TEMPERATURE_F " ;\n",
+           "%s   ambient temperature       %.2f ;\n",
            prefix, conventionalheatsink->AmbientTemperature) ;
 }
 
@@ -101,23 +101,23 @@ void print_detailed_conventional_heat_sink
 )
 {
   fprintf (stream,
-           STRING_F "conventionalheatsink        = %p\n",
+           "%sconventionalheatsink        = %p\n",
            prefix,   conventionalheatsink) ;
 
   fprintf (stream,
-           STRING_F "  AmbientHTC                = " AMBIENTHTC_F "\n",
+           "%s  AmbientHTC                = %.4e\n",
            prefix,   conventionalheatsink->AmbientHTC) ;
 
   fprintf (stream,
-           STRING_F "  AmbientTemperature        = " TEMPERATURE_F "\n",
+           "%s  AmbientTemperature        = %.2f\n",
            prefix,   conventionalheatsink->AmbientTemperature) ;
 
   fprintf (stream,
-           STRING_F "  TopLayer                  = %p\n",
+           "%s  TopLayer                  = %p\n",
            prefix,   conventionalheatsink->TopLayer) ;
 
   fprintf (stream,
-           STRING_F "  IsSourceLayer             = " BOOL_F "\n",
+           "%s  IsSourceLayer             = %d\n",
            prefix,   conventionalheatsink->IsSourceLayer) ;
 }
 
@@ -192,15 +192,13 @@ void fill_sources_conventional_heat_sink
 
 #       ifdef PRINT_SOURCES
         fprintf (stderr,
-            "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
+            "solid  cell  |  l %2d r %4d c %4d [%7d] | += %f * %.5e = %.5e\n",
             LAST_LAYER_INDEX(dimensions), row_index, column_index,
             get_cell_offset_in_stack (dimensions,
                                       LAST_LAYER_INDEX(dimensions), row_index, column_index),
             conventionalheatsink->AmbientTemperature,
-            get_conductance (thermalcells, dimensions,
-                             LAST_LAYER_INDEX(dimensions), row_index, column_index,
-                             TDICE_CONDUCTANCE_TOP),
-            *(sources-1)) ;
+            thermalcells->Top,
+            *sources) ;
 #       endif
 
         sources++ ;
@@ -219,15 +217,13 @@ void fill_sources_conventional_heat_sink
 
 #       ifdef PRINT_SOURCES
         fprintf (stderr,
-            "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
+            "solid  cell  |  l %2d r %4d c %4d [%7d] | += %f * %.5e = %.5e\n",
             LAST_LAYER_INDEX(dimensions), row_index, column_index,
             get_cell_offset_in_stack (dimensions,
                                       LAST_LAYER_INDEX(dimensions), row_index, column_index),
             conventionalheatsink->AmbientTemperature,
-            get_conductance (thermalcells, dimensions,
-                             LAST_LAYER_INDEX(dimensions), row_index, column_index,
-                             TDICE_CONDUCTANCE_TOP),
-            *(sources-1)) ;
+            thermalcells->Top,
+            *sources) ;
 #       endif
 
         sources++ ;

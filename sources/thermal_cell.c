@@ -76,7 +76,7 @@ void fill_solid_cell_bottom
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
 
-    "  l %2d r %4d c %4d [%6d] | l %5.2f w %5.2f h %5.2f "  \
+    "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
     "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
 
     layer_index, row_index, column_index,
@@ -126,7 +126,7 @@ void fill_solid_cell_central
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
 
-    "  l %2d r %4d c %4d [%6d] | l %5.2f w %5.2f h %5.2f "  \
+    "  l %2d r %4d c %4d [%d] | l %6.1f w %6.1f h %6.1f "  \
     "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
 
     layer_index, row_index, column_index,
@@ -177,7 +177,7 @@ void fill_solid_cell_top
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
 
-    "  l %2d r %4d c %4d [%6d] | l %5.2f w %5.2f h %5.2f "  \
+    "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
     "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
 
     layer_index, row_index, column_index,
@@ -227,7 +227,7 @@ void fill_solid_cell_conventional_heat_sink
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
 
-    "  l %2d r %4d c %4d [%6d] | l %5.2f w %5.2f h %5.2f "  \
+    "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
     "|                                     T % .5e  B % .5e |\n",
 
     layer_index, row_index, column_index,
@@ -279,7 +279,7 @@ void fill_liquid_cell
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
 
-    "  l %2d r %4d c %4d [%6d] | l %5.2f w %5.2f h %5.2f "  \
+    "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
     "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
 
     layer_index, row_index, column_index,

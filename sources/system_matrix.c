@@ -113,7 +113,7 @@ SystemMatrix add_solid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
   fprintf (stderr,
-    "add_solid_column   l %2d r %4d c %4d [%6d]\n",
+    "add_solid_column   l %2d r %4d c %4d [%7d]\n",
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
@@ -138,14 +138,10 @@ SystemMatrix add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-    "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
+    "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
     *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-    get_conductance (thermalcells, dimensions,
-                     current_layer, current_row, current_column,
-                     TDICE_CONDUCTANCE_BOTTOM),
-    get_conductance (thermalcells, dimensions,
-                     current_layer - 1, current_row, current_column,
-                     TDICE_CONDUCTANCE_TOP) ) ;
+    thermalcells[current_cell].Bottom,
+    thermalcells[current_cell - get_layer_area(dimensions)].Top) ;
 #endif
   }
 
@@ -168,14 +164,10 @@ SystemMatrix add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  south   \t%d\t%.5e = %.5e (S) || %.5e (N)\n",
+      "  south   \t%d\t% .4e = % .4e (S) || % .4e (N)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_SOUTH),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row - 1, current_column,
-                       TDICE_CONDUCTANCE_NORTH)) ;
+      thermalcells[current_cell].South,
+      thermalcells[current_cell - get_number_of_columns(dimensions)].North) ;
 #endif
   }
 
@@ -198,14 +190,10 @@ SystemMatrix add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
+      "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_WEST),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column - 1,
-                       TDICE_CONDUCTANCE_EAST) ) ;
+      thermalcells[current_cell].West,
+      thermalcells[current_cell - 1].East) ;
 #endif
   }
 
@@ -220,7 +208,7 @@ SystemMatrix add_solid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "  diagonal\t%d\t", *(system_matrix.RowIndices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "            ( + %.5e [capacity] )\n", *(values-1)) ;
+  fprintf (stderr, "            ( + % .4e [capacity] )\n", *(system_matrix.Values-1)) ;
 #endif
 
   /* EAST */
@@ -242,14 +230,10 @@ SystemMatrix add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
+      "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_EAST),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column + 1,
-                       TDICE_CONDUCTANCE_WEST)) ;
+      thermalcells[current_cell].East,
+      thermalcells[current_cell + 1].West) ;
 #endif
   }
 
@@ -272,14 +256,10 @@ SystemMatrix add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  north   \t%d\t%.5e = %.5e (N) || %.5e (S)\n",
+      "  north   \t%d\t% .4e = % .4e (N) || % .4e (S)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_NORTH),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row + 1, current_column,
-                       TDICE_CONDUCTANCE_SOUTH)) ;
+      thermalcells[current_cell].North,
+      thermalcells[current_cell + get_number_of_columns(dimensions)].South) ;
 #endif
   }
 
@@ -302,14 +282,10 @@ SystemMatrix add_solid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
+      "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_TOP),
-      get_conductance (thermalcells, dimensions,
-                       current_layer + 1, current_row, current_column,
-                       TDICE_CONDUCTANCE_BOTTOM)) ;
+      thermalcells[current_cell].Top,
+      thermalcells[current_cell + get_layer_area(dimensions)].Bottom) ;
 #endif
   }
 
@@ -320,7 +296,7 @@ SystemMatrix add_solid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fgetpos (stderr, &last_fpos) ;
   fsetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "%.5e", *diagonal_pointer) ;
+  fprintf (stderr, "% .4e", *diagonal_pointer) ;
   fsetpos (stderr, &last_fpos) ;
 
   fprintf (stderr, "  %d\n", *system_matrix.ColumnPointers) ;
@@ -355,7 +331,7 @@ SystemMatrix add_liquid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fpos_t diag_fposition, last_fpos ;
   fprintf (stderr,
-    "add_liquid_column  l %2d r %4d c %4d [%6d]\n",
+    "add_liquid_column  l %2d r %4d c %4d [%7d]\n",
     current_layer, current_row, current_column, current_cell) ;
 #endif
 
@@ -380,14 +356,10 @@ SystemMatrix add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
+      "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_BOTTOM),
-      get_conductance (thermalcells, dimensions,
-                       current_layer - 1, current_row, current_column,
-                       TDICE_CONDUCTANCE_TOP) ) ;
+      thermalcells[current_cell].Bottom,
+      thermalcells[current_cell - get_layer_area(dimensions)].Top) ;
 #endif
   }
 
@@ -402,7 +374,7 @@ SystemMatrix add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  south   \t%d\t%.5e (N)\n", *(system_matrix.RowIndices-1), *(system_matrix.Values-1)) ;
+      "  south   \t%d\t% .4e (N)\n", *(system_matrix.RowIndices-1), *(system_matrix.Values-1)) ;
 #endif
   }
 
@@ -425,14 +397,10 @@ SystemMatrix add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
+      "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_WEST),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column - 1,
-                       TDICE_CONDUCTANCE_EAST)) ;
+      thermalcells[current_cell].West,
+      thermalcells[current_cell - 1].East) ;
 #endif
   }
 
@@ -447,7 +415,7 @@ SystemMatrix add_liquid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr, "  diagonal\t%d\t", *(system_matrix.RowIndices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "            ( + %.5e [capacity] )\n", *(values-1)) ;
+  fprintf (stderr, "            ( + % .4e [capacity] )\n", *(system_matrix.Values-1)) ;
 #endif
 
   /* EAST */
@@ -469,14 +437,10 @@ SystemMatrix add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
+      "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_EAST),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column + 1,
-                       TDICE_CONDUCTANCE_WEST)) ;
+      thermalcells[current_cell].East,
+      thermalcells[current_cell + 1].West) ;
 #endif
   }
 
@@ -491,7 +455,7 @@ SystemMatrix add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  north   \t%d\t%.5e (S)\n", *(system_matrix.RowIndices-1), *(system_matrix.Values-1)) ;
+      "  north   \t%d\t% .4e (S)\n", *(system_matrix.RowIndices-1), *(system_matrix.Values-1)) ;
 #endif
   }
 
@@ -514,14 +478,10 @@ SystemMatrix add_liquid_column
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-      "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
+      "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalcells, dimensions,
-                       current_layer, current_row, current_column,
-                       TDICE_CONDUCTANCE_TOP),
-      get_conductance (thermalcells, dimensions,
-                       current_layer + 1, current_row, current_column,
-                       TDICE_CONDUCTANCE_BOTTOM) ) ;
+      thermalcells[current_cell].Top,
+      thermalcells[current_cell + get_layer_area(dimensions)].Bottom) ;
 #endif
   }
 
@@ -536,7 +496,7 @@ SystemMatrix add_liquid_column
 #ifdef PRINT_SYSTEM_MATRIX
   fgetpos (stderr, &last_fpos) ;
   fsetpos (stderr, &diag_fposition) ;
-  fprintf (stderr, "%.5e", *diagonal_pointer) ;
+  fprintf (stderr, "% .4e", *diagonal_pointer) ;
   fsetpos (stderr, &last_fpos) ;
 
   fprintf (stderr, "  %d\n", *system_matrix.ColumnPointers) ;

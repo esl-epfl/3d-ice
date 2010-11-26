@@ -82,15 +82,15 @@ void print_formatted_dimensions
 )
 {
   fprintf (stream,
-           STRING_F "dimensions : \n",
+           "%sdimensions : \n",
            prefix) ;
 
   fprintf (stream,
-           STRING_F "   chip length " CHIPDIMENSION_F " , width " CHIPDIMENSION_F " ;\n",
+           "%s   chip length %7.1f , width %7.1f ;\n",
            prefix, dimensions->Chip.Length, dimensions->Chip.Width) ;
 
   fprintf (stream,
-           STRING_F "   cell length " CELLDIMENSION_F " , width " CELLDIMENSION_F " ;\n",
+           "%s   cell length %7.1f , width %7.1f ;\n",
            prefix, dimensions->Cell.WallLength, dimensions->Cell.Width) ;
 }
 
@@ -104,59 +104,59 @@ void print_detailed_dimensions
 )
 {
   fprintf (stream,
-           STRING_F "dimensions                  = %p\n",
+           "%sdimensions                  = %p\n",
            prefix, dimensions) ;
 
   fprintf (stream,
-           STRING_F "  Cell.FirstWallLength      = " CELLDIMENSION_F "\n",
+           "%s  Cell.FirstWallLength      = %.1f\n",
            prefix, dimensions->Cell.FirstWallLength) ;
 
   fprintf (stream,
-           STRING_F "  Cell.WallLength           = " CELLDIMENSION_F "\n",
+           "%s  Cell.WallLength           = %.1f\n",
            prefix, dimensions->Cell.WallLength) ;
 
   fprintf (stream,
-           STRING_F "  Cell.LastWallLength       = " CELLDIMENSION_F "\n",
+           "%s  Cell.LastWallLength       = %.1f\n",
            prefix, dimensions->Cell.LastWallLength) ;
 
   fprintf (stream,
-           STRING_F "  Cell.ChannelLength        = " CELLDIMENSION_F "\n",
+           "%s  Cell.ChannelLength        = %.1f\n",
            prefix, dimensions->Cell.ChannelLength) ;
 
   fprintf (stream,
-           STRING_F "  Cell.Width                = " CELLDIMENSION_F "\n",
+           "%s  Cell.Width                = %.1f\n",
            prefix, dimensions->Cell.Width) ;
 
   fprintf (stream,
-           STRING_F "  Grid.NLayers              = " GRIDDIMENSION_F "\n",
+           "%s  Grid.NLayers              = %d\n",
            prefix, dimensions->Grid.NLayers) ;
 
   fprintf (stream,
-           STRING_F "  Grid.NRows                = " GRIDDIMENSION_F "\n",
+           "%s  Grid.NRows                = %d\n",
            prefix, dimensions->Grid.NRows) ;
 
   fprintf (stream,
-           STRING_F "  Grid.NColumns             = " GRIDDIMENSION_F "\n",
+           "%s  Grid.NColumns             = %d\n",
            prefix, dimensions->Grid.NColumns) ;
 
   fprintf (stream,
-           STRING_F "  Grid.NCells               = " GRIDDIMENSION_F "\n",
+           "%s  Grid.NCells               = %d\n",
            prefix, dimensions->Grid.NCells) ;
 
   fprintf (stream,
-           STRING_F "  Grid.NNz                  = " GRIDDIMENSION_F "\n",
+           "%s  Grid.NNz                  = %d\n",
            prefix, dimensions->Grid.NNz) ;
 
   fprintf (stream,
-           STRING_F "  Chip.Length               = " CHIPDIMENSION_F "\n",
+           "%s  Chip.Length               = %.1f\n",
            prefix, dimensions->Chip.Length) ;
 
   fprintf (stream,
-           STRING_F "  Chip.Width                = " CHIPDIMENSION_F "\n",
+           "%s  Chip.Width                = %.1f\n",
            prefix, dimensions->Chip.Width) ;
 
   fprintf (stream,
-           STRING_F "  StackHasChannel           = " BOOL_F "\n",
+           "%s  StackHasChannel           = %d\n",
            prefix, dimensions->StackHasChannel) ;
 }
 

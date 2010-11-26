@@ -131,6 +131,9 @@ extern "C"
 
   void fill_sources_floorplan_element
   (
+#ifdef PRINT_SOURCES
+    GridDimension_t   layer_index,
+#endif
     Source_t*         sources,
     Dimensions*       dimensions,
     FloorplanElement* floorplan_element

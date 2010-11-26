@@ -86,15 +86,15 @@ void print_formatted_material
 )
 {
   fprintf (stream,
-           STRING_F "material " STRING_F " :\n",
+           "%smaterial %s :\n",
            prefix, material->Id) ;
 
   fprintf (stream,
-           STRING_F "   thermal conductivity     " SOLIDTC_F " ;\n",
+           "%s   thermal conductivity     %.4e ;\n",
            prefix, material->ThermalConductivity) ;
 
   fprintf (stream,
-           STRING_F "   volumetric heat capacity " SOLIDVHC_F " ;\n",
+           "%s   volumetric heat capacity %.4e ;\n",
            prefix, material->VolumetricHeatCapacity) ;
 }
 
@@ -108,27 +108,27 @@ void print_detailed_material
 )
 {
   fprintf (stream,
-           STRING_F "material                    = %p\n",
+           "%smaterial                    = %p\n",
            prefix, material) ;
 
   fprintf (stream,
-           STRING_F "  Id                        = " STRING_F "\n",
+           "%s  Id                        = %s\n",
            prefix, material->Id) ;
 
   fprintf (stream,
-           STRING_F "  Used                      = " QUANTITY_F "\n",
+           "%s  Used                      = %d\n",
            prefix, material->Used) ;
 
   fprintf (stream,
-           STRING_F "  ThermalConductivity       = " SOLIDTC_F "\n",
+           "%s  ThermalConductivity       = %.4e\n",
            prefix, material->ThermalConductivity) ;
 
   fprintf (stream,
-           STRING_F "  VolumetricHeatCapacity    = " SOLIDVHC_F "\n",
+           "%s  VolumetricHeatCapacity    = %.4e\n",
            prefix, material->VolumetricHeatCapacity) ;
 
   fprintf (stream,
-           STRING_F "  Next                      = %p\n",
+           "%s  Next                      = %p\n",
            prefix, material->Next) ;
 }
 
@@ -144,7 +144,7 @@ void print_formatted_materials_list
   FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
   {
     print_formatted_material (stream, prefix, material) ;
-    fprintf (stream, STRING_F "\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
   }
   print_formatted_material (stream, prefix, material) ;
 }
@@ -161,7 +161,7 @@ void print_detailed_materials_list
   FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
   {
     print_detailed_material (stream, prefix, material) ;
-    fprintf (stream, STRING_F "\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
   }
   print_detailed_material (stream, prefix, material) ;
 }

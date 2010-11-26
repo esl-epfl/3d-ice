@@ -316,12 +316,11 @@ fill_system_vector
 #       ifdef PRINT_SYSTEM_VECTOR
         fprintf (stderr,
 
-          "l %2d r %4d c %4d [%6d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
+          " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
 
           layer, row, column,
           get_cell_offset_in_stack (dimensions, layer, row, column),
-          *(vector-1), *(sources-1),
-          get_capacity(thermalcells, dimensions, layer, row, column), old) ;
+          *(vector-1), *(sources-1), (thermalcells-1)->Capacity, old) ;
 #       endif
 
       } // FOR_EVERY_COLUMN

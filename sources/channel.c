@@ -79,55 +79,55 @@ void print_formatted_channel
 )
 {
   fprintf (stream,
-           STRING_F "channel :\n",
+           "%schannel :\n",
            prefix) ;
 
   fprintf (stream,
-           STRING_F "              height " CELLDIMENSION_F " ;\n",
+           "%s              height %7.1f ;\n",
            prefix, channel->Height) ;
 
   fprintf (stream,
-           STRING_F "      channel length " CELLDIMENSION_F " ;\n",
+           "%s      channel length %7.1f ;\n",
            prefix, dimensions->Cell.ChannelLength) ;
 
   fprintf (stream,
-           STRING_F "         wall length " CELLDIMENSION_F " ;\n",
+           "%s         wall length %7.1f ;\n",
            prefix, dimensions->Cell.WallLength) ;
 
   fprintf (stream,
-           STRING_F "   first wall length " CELLDIMENSION_F " ;\n",
+           "%s   first wall length %7.1f ;\n",
            prefix, dimensions->Cell.FirstWallLength) ;
 
   fprintf (stream,
-           STRING_F "    last wall length " CELLDIMENSION_F " ;\n",
+           "%s    last wall length %7.1f ;\n",
            prefix, dimensions->Cell.LastWallLength) ;
 
   fprintf (stream,
-           STRING_F "   wall material " STRING_F " ;\n",
+           "%s   wall material %s ;\n",
            prefix, channel->WallMaterial->Id) ;
 
   fprintf (stream,
-           STRING_F "   coolant flow rate                       " COOLANTFR_F " ;\n",
+           "%s   coolant flow rate                       %.4e ;\n",
            prefix, channel->CoolantFR) ;
 
   fprintf (stream,
-           STRING_F "   coolant heat transfert coefficient side " COOLANTHTC_F " ,\n",
+           "%s   coolant heat transfert coefficient side %.4e ,\n",
            prefix, channel->CoolantHTCs.Side) ;
 
   fprintf (stream,
-           STRING_F "                                       top " COOLANTHTC_F " ,\n",
+           "%s                                       top %.4e ,\n",
            prefix, channel->CoolantHTCs.Top) ;
 
   fprintf (stream,
-           STRING_F "                                    bottom " COOLANTHTC_F " ;\n",
+           "%s                                    bottom %.4e ;\n",
            prefix, channel->CoolantHTCs.Bottom) ;
 
   fprintf (stream,
-           STRING_F "   coolant volumetric heat capacity        " COOLANTVHC_F " ;\n",
+           "%s   coolant volumetric heat capacity        %.4e ;\n",
            prefix, channel->CoolantVHC) ;
 
   fprintf (stream,
-           STRING_F "   coolant incoming temperature            " TEMPERATURE_F " ;\n",
+           "%s   coolant incoming temperature          %.2f ;\n",
            prefix, channel->CoolantTIn ) ;
 }
 
@@ -141,39 +141,39 @@ void print_detailed_channel
 )
 {
   fprintf (stream,
-           STRING_F "channel                     = %p\n",
+           "%schannel                     = %p\n",
            prefix,   channel) ;
 
   fprintf (stream,
-           STRING_F "  Height                    = " CELLDIMENSION_F "\n",
+           "%s  Height                    = %.1f\n",
            prefix,  channel->Height) ;
 
   fprintf (stream,
-           STRING_F "  CoolantHTCs.Side          = " COOLANTHTC_F "\n",
+           "%s  CoolantHTCs.Side          = %.4e\n",
            prefix,  channel->CoolantHTCs.Side) ;
 
   fprintf (stream,
-           STRING_F "  CoolantHTCs.Top           = " COOLANTHTC_F "\n",
+           "%s  CoolantHTCs.Top           = %.4e\n",
            prefix,  channel->CoolantHTCs.Top) ;
 
   fprintf (stream,
-           STRING_F "  CoolantHTCs.Bottom        = " COOLANTHTC_F "\n",
+           "%s  CoolantHTCs.Bottom        = %.4e\n",
            prefix,  channel->CoolantHTCs.Bottom) ;
 
   fprintf (stream,
-           STRING_F "  CoolantVHC                = " COOLANTVHC_F "\n",
+           "%s  CoolantVHC                = %.4e\n",
            prefix,  channel->CoolantVHC) ;
 
   fprintf (stream,
-           STRING_F "  CoolantTIn                = " TEMPERATURE_F "\n",
+           "%s  CoolantTIn                = %.2f\n",
            prefix,  channel->CoolantTIn) ;
 
   fprintf (stream,
-           STRING_F "  CoolantFR                 = " COOLANTFR_F "\n",
+           "%s  CoolantFR                 = %.4e\n",
            prefix,  channel->CoolantFR) ;
 
   fprintf (stream,
-           STRING_F "  WallMaterial              = %p\n",
+           "%s  WallMaterial              = %p\n",
            prefix,  channel->WallMaterial) ;
 }
 
@@ -263,7 +263,7 @@ void fill_sources_channel
 
 #     ifdef PRINT_SOURCES
       fprintf (stderr,
-        "liquid cell  | l %2d r 0 c %4d [%6d] "
+        "liquid cell  | l %2d r %4d [%7d] "
         "| %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
         layer_index, column_index,
         get_cell_offset_in_stack (dimensions, layer_index, 0, column_index),

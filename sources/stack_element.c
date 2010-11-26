@@ -114,7 +114,7 @@ void print_formatted_stack_elements_list
                                strlen(stk_el->Pointer.Die->Id)) ;
   }
 
-  fprintf (stream, STRING_F "stack : \n", prefix) ;
+  fprintf (stream, "%sstack : \n", prefix) ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, list)
   {
@@ -123,14 +123,14 @@ void print_formatted_stack_elements_list
       case TDICE_STACK_ELEMENT_CHANNEL :
 
         fprintf (stream,
-                 STRING_F "   channel  %-*s ;\n",
+                 "%s   channel  %-*s ;\n",
                  prefix, max_stk_el_id_length, stack_element->Id) ;
         break ;
 
       case TDICE_STACK_ELEMENT_DIE :
 
         fprintf (stream,
-                 STRING_F "   die      %-*s %-*s floorplan \"%s\"\n",
+                 "%s   die      %-*s %-*s floorplan \"%s\"\n",
                  prefix,
                  max_stk_el_id_length, stack_element->Id,
                  max_die_id_length, stack_element->Pointer.Die->Id,
@@ -140,7 +140,7 @@ void print_formatted_stack_elements_list
       case TDICE_STACK_ELEMENT_LAYER :
 
         fprintf (stream,
-                 STRING_F "   layer    %-*s ;\n",
+                 "%s   layer    %-*s ;\n",
                  prefix, max_stk_el_id_length, stack_element->Id) ;
         break ;
 
@@ -168,61 +168,61 @@ void print_detailed_stack_elements_list
 {
   String_t new_prefix = malloc (sizeof(*new_prefix) * (4 + strlen(prefix))) ;
   if (new_prefix == NULL) return ;
-  sprintf (new_prefix, STRING_F "    ", prefix) ;
+  sprintf (new_prefix, "%s    ", prefix) ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
   {
     fprintf (stream,
-             STRING_F "stk_el                      = %p\n",
+             "%sstk_el                      = %p\n",
              prefix,   stk_el);
 
     fprintf (stream,
-             STRING_F "  Id                        = " STRING_F "\n",
+             "%s  Id                        = " "%s\n",
              prefix,   stk_el->Id);
 
     fprintf (stream,
-             STRING_F "  Type                      = %d\n",
+             "%s  Type                      = %d\n",
              prefix,   stk_el->Type);
 
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
     {
      fprintf (stream,
-              STRING_F "  Pointer.Die               = %p\n",
+              "%s  Pointer.Die               = %p\n",
               prefix,   stk_el->Pointer.Die);
     }
     if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL)
     {
      fprintf (stream,
-              STRING_F "  Pointer.Channel           = %p\n",
+              "%s  Pointer.Channel           = %p\n",
               prefix,   stk_el->Pointer.Channel);
     }
     else if (stk_el->Type == TDICE_STACK_ELEMENT_LAYER)
     {
       fprintf (stream,
-               STRING_F "  Pointer.Layer             = %p\n",
+               "%s  Pointer.Layer             = %p\n",
                prefix,   stk_el->Pointer.Layer);
-      fprintf (stream, STRING_F "\n", prefix) ;
+      fprintf (stream, "%s\n", prefix) ;
       print_detailed_layer (stream, new_prefix, stk_el->Pointer.Layer) ;
-      fprintf (stream, STRING_F "\n", prefix) ;
+      fprintf (stream, "%s\n", prefix) ;
     }
 
     fprintf (stream,
-             STRING_F "  NLayers                   = " GRIDDIMENSION_F "\n",
+             "%s  NLayers                   = %d\n",
              prefix,   stk_el->NLayers);
 
     fprintf (stream,
-             STRING_F "  Floorplan                 = %p\n",
+             "%s  Floorplan                 = %p\n",
              prefix,   stk_el->Floorplan);
 
     fprintf (stream,
-             STRING_F "  Offset                    = " GRIDDIMENSION_F "\n",
+             "%s  Offset                    = %d\n",
              prefix,   stk_el->Offset);
 
     fprintf (stream,
-             STRING_F "  Next                      = %p\n",
+             "%s  Next                      = %p\n",
              prefix,   stk_el->Next);
 
-    fprintf (stream, STRING_F "\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
 
   } // FOR_EVERY_ELEMENT_IN_LIST
 

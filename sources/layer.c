@@ -84,7 +84,7 @@ void print_formatted_layer
 )
 {
   fprintf (stream,
-    STRING_F " " CELLDIMENSION_F "  " STRING_F " ;\n",
+    "%s %7.1f  %s ;\n",
     prefix, layer->Height, layer->Material->Id) ;
 }
 
@@ -98,27 +98,27 @@ void print_detailed_layer
 )
 {
   fprintf (stream,
-           STRING_F "layer                   = %p\n",
+           "%slayer                   = %p\n",
            prefix, layer) ;
 
   fprintf (stream,
-           STRING_F "  Height                = " CELLDIMENSION_F "\n",
+           "%s  Height                = %.1f\n",
            prefix, layer->Height) ;
 
   fprintf (stream,
-           STRING_F "  Offset                = " GRIDDIMENSION_F "\n",
+           "%s  Offset                = %d\n",
            prefix, layer->Offset) ;
 
   fprintf (stream,
-           STRING_F "  Material              = %p\n",
+           "%s  Material              = %p\n",
            prefix, layer->Material) ;
 
   fprintf (stream,
-           STRING_F "  Next                  = %p\n",
+           "%s  Next                  = %p\n",
            prefix, layer->Next) ;
 
   fprintf (stream,
-           STRING_F "  Prev                  = %p\n",
+           "%s  Prev                  = %p\n",
            prefix, layer->Prev) ;
 }
 
@@ -138,7 +138,7 @@ void print_detailed_layers_list (FILE* stream, String_t prefix, Layer* list)
   FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Layer, layer, list)
   {
     print_detailed_layer (stream, prefix, layer) ;
-    fprintf (stream, STRING_F "\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
   }
   print_detailed_layer (stream, prefix, layer) ;
 }
@@ -224,14 +224,19 @@ void fill_sources_layer
 {
 #ifdef PRINT_SOURCES
   fprintf (stderr,
-           "layer_index = " GRIDDIMENSION_F \
-           "\tfill_sources_source_layer   " STRING_F "\n",
+           "layer_index = %d\tfill_sources_source_layer   %s\n",
            layer_index, layer->Material->Id) ;
 #endif
 
   sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  fill_sources_floorplan (sources, dimensions, floorplan) ;
+  fill_sources_floorplan
+  (
+#ifdef PRINT_SOURCES
+    layer_index,
+#endif
+    sources, dimensions, floorplan
+  ) ;
 }
 
 /******************************************************************************/
@@ -249,7 +254,7 @@ SystemMatrix fill_system_matrix_layer
 {
 #ifdef PRINT_SYSTEM_MATRIX
   fprintf (stderr,
-    "(l " GRIDDIMENSION_F ") fill_system_matrix_layer " STRING_F "\n",
+    "(l %d) fill_system_matrix_layer %s\n",
     layer_index, layer->Material->Id) ;
 #endif
 

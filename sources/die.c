@@ -93,18 +93,16 @@ void print_formatted_die
 
   if (new_prefix_layer == NULL) return ;
 
-  sprintf (new_prefix_layer, STRING_F "    layer", prefix) ;
+  sprintf (new_prefix_layer, "%s    layer", prefix) ;
 
   String_t new_prefix_source
     = malloc (sizeof(*new_prefix_source) * (10 + strlen(prefix))) ;
 
-  sprintf (new_prefix_source, STRING_F "   source", prefix) ;
+  sprintf (new_prefix_source, "%s   source", prefix) ;
 
   if (new_prefix_source == NULL) return ;
 
-  fprintf (stream,
-           STRING_F "die " STRING_F " :\n",
-           prefix, die->Id) ;
+  fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
   FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (Layer, layer, die->TopLayer)
   {
@@ -134,46 +132,46 @@ void print_detailed_die
 
   if (new_prefix == NULL) return ;
 
-  sprintf (new_prefix, STRING_F "    ", prefix) ;
+  sprintf (new_prefix, "%s    ", prefix) ;
 
   fprintf (stream,
-           STRING_F "die                         = %p\n",
+           "%sdie                         = %p\n",
            prefix, die) ;
 
   fprintf (stream,
-           STRING_F "  Id                        = " STRING_F "\n",
+           "%s  Id                        = %s\n",
            prefix, die->Id) ;
 
   fprintf (stream,
-           STRING_F "  Used                      = " QUANTITY_F "\n",
+           "%s  Used                      = %d\n",
            prefix, die->Used) ;
 
   fprintf (stream,
-           STRING_F "  NLayers                   = " GRIDDIMENSION_F "\n",
+           "%s  NLayers                   = %d\n",
            prefix, die->NLayers) ;
 
   fprintf (stream,
-           STRING_F "  TopLayer                  = %p\n",
+           "%s  TopLayer                  = %p\n",
            prefix, die->TopLayer) ;
 
   fprintf (stream,
-           STRING_F "  SourceLayer               = %p\n",
+           "%s  SourceLayer               = %p\n",
            prefix, die->SourceLayer) ;
 
   fprintf (stream,
-           STRING_F "  BottomLayer               = %p\n",
+           "%s  BottomLayer               = %p\n",
            prefix, die->BottomLayer) ;
 
-  fprintf (stream, STRING_F "\n", prefix) ;
+  fprintf (stream, "%s\n", prefix) ;
   print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
-  fprintf (stream, STRING_F "\n", prefix) ;
+  fprintf (stream, "%s\n", prefix) ;
 
   fprintf (stream,
-           STRING_F "  SourceLayer               = %p\n",
+           "%s  SourceLayer               = %p\n",
            prefix, die->SourceLayer) ;
 
   fprintf (stream,
-           STRING_F "  Next                      = %p\n",
+           "%s  Next                      = %p\n",
            prefix, die->Next) ;
 
   free (new_prefix) ;
@@ -191,7 +189,7 @@ void print_formatted_dies_list
   FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
   {
     print_formatted_die (stream, prefix, die) ;
-    fprintf (stream, STRING_F "\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
   }
   print_formatted_die (stream, prefix, die) ;
 }
@@ -208,7 +206,7 @@ void print_detailed_dies_list
   FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
   {
     print_detailed_die (stream, prefix, die) ;
-    fprintf (stream, STRING_F "\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
   }
   print_detailed_die (stream, prefix, die) ;
 }

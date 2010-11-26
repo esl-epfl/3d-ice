@@ -60,6 +60,12 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
+  fprintf (stdout, "----------------------------------------------\n");
+  print_detailed_stack_description (stdout, "", &stkd) ;
+  fprintf (stdout, "----------------------------------------------\n");
+  print_formatted_stack_description (stdout, "", &stkd) ;
+  fprintf (stdout, "----------------------------------------------\n");
+
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
 
