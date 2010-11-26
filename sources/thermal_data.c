@@ -456,15 +456,7 @@ int update_coolant_flow_rate
     tdata->SM_A, tdata->ThermalCells, stkd
   ) ;
 
-  tdata->SLU_Options.Fact = SamePattern ;
-
-  get_perm_c (tdata->SLU_Options.ColPerm,
-              &tdata->SLUMatrix_A,
-              tdata->SLU_PermutationMatrixC) ;
-
-  sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
-               tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
-               &tdata->SLUMatrix_A_Permuted) ;
+  tdata->SLU_Options.Fact = SamePattern_SameRowPerm ;
 
   dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
           sp_ienv(2), sp_ienv(1), /* relax and panel size */
