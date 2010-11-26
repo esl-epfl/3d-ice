@@ -134,7 +134,7 @@ void stack_description_error
   String_t          message
 ) ;
 
-static StackElement_t  last_stack_element    = STACKELEMENT_I ;
+static StackElement*   last_stack_element    = NULL ;
 static Bool_t          found_die             = FALSE_V ;
 static Bool_t          found_channel         = FALSE_V ;
 static CellDimension_t tmp_first_wall_length = CELLDIMENSION_I ;
@@ -594,10 +594,11 @@ stack
 
       stkd->StackElementsList = $3 ;
 
-      if (last_stack_element == TDICE_STACK_ELEMENT_CHANNEL)
+      if (   last_stack_element != NULL
+          && last_stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
       {
         // Reset for the next parsing ...
-        last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+        last_stack_element = NULL ;
         found_die          = FALSE_V ;
         found_channel      = FALSE_V ;
 
@@ -611,7 +612,7 @@ stack
       if (found_die == FALSE_V)
       {
         // Reset for the next parsing ...
-        last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+        last_stack_element = NULL ;
         found_die          = FALSE_V ;
         found_channel      = FALSE_V ;
 
@@ -636,7 +637,7 @@ stack
       }
 
       // Reset for the next parsing ...
-      last_stack_element = TDICE_STACK_ELEMENT_NONE ;
+      last_stack_element = NULL ;
       found_die          = FALSE_V ;
       found_channel      = FALSE_V ;
     }
@@ -650,7 +651,8 @@ stack_elements
       // After parsing with success the first stack element ...
       //
 
-      if (last_stack_element == TDICE_STACK_ELEMENT_CHANNEL)
+      if (   last_stack_element != NULL
+          && last_stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
       {
         free_stack_element ($1) ;
         stack_description_error
@@ -659,6 +661,28 @@ stack_elements
         ) ;
         YYABORT ;
       }
+
+      if (stkd->ConventionalHeatSink != NULL)
+      {
+
+        if (   last_stack_element != NULL
+            && last_stack_element->Type == TDICE_STACK_ELEMENT_LAYER)
+
+          stkd->ConventionalHeatSink->TopLayer
+            = last_stack_element->Pointer.Layer ;
+
+        else
+        {
+          stkd->ConventionalHeatSink->TopLayer
+            = last_stack_element->Pointer.Die->TopLayer ;
+
+          if (   last_stack_element->Pointer.Die->TopLayer
+              == last_stack_element->Pointer.Die->SourceLayer)
+
+            stkd->ConventionalHeatSink->IsSourceLayer = TRUE_V ;
+        }
+      }
+
 
       $$ = $1 ;
     }
@@ -766,7 +790,7 @@ stack_element
       stack_element->Id            = $2 ;
       stack_element->NLayers       = 1 ;
 
-      last_stack_element = TDICE_STACK_ELEMENT_LAYER ;
+      last_stack_element = stack_element ;
     }
   | CHANNEL IDENTIFIER ';'
     {
@@ -784,7 +808,8 @@ stack_element
         YYABORT ;
       }
 
-      if (last_stack_element == TDICE_STACK_ELEMENT_CHANNEL)
+      if (   last_stack_element != NULL
+          && last_stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
       {
         free ($2) ;
         stack_description_error
@@ -812,7 +837,7 @@ stack_element
       stack_element->NLayers         = 1 ;
 
       found_channel = TRUE_V ;
-      last_stack_element = TDICE_STACK_ELEMENT_CHANNEL ;
+      last_stack_element = stack_element ;
     }
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'
     {
@@ -883,7 +908,7 @@ stack_element
       free($3) ;
 
       found_die = TRUE_V ;
-      last_stack_element = TDICE_STACK_ELEMENT_DIE ;
+      last_stack_element = stack_element ;
     }
   ;
 

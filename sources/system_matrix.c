@@ -94,7 +94,7 @@ void free_system_matrix (SystemMatrix* matrix)
 SystemMatrix add_solid_column
 (
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
+  ThermalCell*          thermalcells,
   GridDimension_t       current_layer,
   GridDimension_t       current_row,
   GridDimension_t       current_column,
@@ -127,12 +127,8 @@ SystemMatrix add_solid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_BOTTOM),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer - 1, current_row, current_column,
-                                     TDICE_CONDUCTANCE_TOP)
+                    thermalcells[current_cell].Bottom,
+                    thermalcells[current_cell - get_layer_area(dimensions)].Top
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -144,10 +140,10 @@ SystemMatrix add_solid_column
     fprintf (stderr,
     "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
     *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-    get_conductance (thermalgriddata, dimensions,
+    get_conductance (thermalcells, dimensions,
                      current_layer, current_row, current_column,
                      TDICE_CONDUCTANCE_BOTTOM),
-    get_conductance (thermalgriddata, dimensions,
+    get_conductance (thermalcells, dimensions,
                      current_layer - 1, current_row, current_column,
                      TDICE_CONDUCTANCE_TOP) ) ;
 #endif
@@ -161,12 +157,8 @@ SystemMatrix add_solid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_SOUTH),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row - 1, current_column,
-                                     TDICE_CONDUCTANCE_NORTH)
+                    thermalcells[current_cell].South,
+                    thermalcells[current_cell - get_number_of_columns(dimensions)].North
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -178,10 +170,10 @@ SystemMatrix add_solid_column
     fprintf (stderr,
       "  south   \t%d\t%.5e = %.5e (S) || %.5e (N)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_SOUTH),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row - 1, current_column,
                        TDICE_CONDUCTANCE_NORTH)) ;
 #endif
@@ -195,12 +187,8 @@ SystemMatrix add_solid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_WEST),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column - 1,
-                                     TDICE_CONDUCTANCE_EAST)
+                    thermalcells[current_cell].West,
+                    thermalcells[current_cell - 1].East
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -212,10 +200,10 @@ SystemMatrix add_solid_column
     fprintf (stderr,
       "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_WEST),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column - 1,
                        TDICE_CONDUCTANCE_EAST) ) ;
 #endif
@@ -224,26 +212,15 @@ SystemMatrix add_solid_column
   /* DIAGONAL */
 
   *system_matrix.RowIndices++ = current_cell ;
-  *system_matrix.Values       = get_capacity (thermalgriddata, dimensions,
-                                              current_layer, current_row, current_column) ;
+  *system_matrix.Values       = thermalcells[current_cell].Capacity ;
   diagonal_pointer            = system_matrix.Values++ ;
 
   (*system_matrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "  diagonal\t%d\t ", *(system_matrix.RowIndices-1)) ;
+  fprintf (stderr, "  diagonal\t%d\t", *(system_matrix.RowIndices-1)) ;
   fgetpos (stderr, &diag_fposition) ;
-  if (!IS_LAST_LAYER(current_layer, dimensions))
-    fprintf (stderr, "            ( + %.5e [capacity] )\n", *(values-1)) ;
-  else
-    fprintf (stderr, "            ( + %.5e [capacity] + %.5e [ehtc N])\n",
-             *(values-1), get_conductance
-                          (
-                            thermalgriddata, dimensions,
-                            current_layer, current_row, current_column,
-                            TDICE_CONDUCTANCE_TOP
-                          )) ;
-
+  fprintf (stderr, "            ( + %.5e [capacity] )\n", *(values-1)) ;
 #endif
 
   /* EAST */
@@ -254,12 +231,8 @@ SystemMatrix add_solid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_EAST),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column + 1,
-                                     TDICE_CONDUCTANCE_WEST)
+                    thermalcells[current_cell].East,
+                    thermalcells[current_cell + 1].West
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -271,10 +244,10 @@ SystemMatrix add_solid_column
     fprintf (stderr,
       "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_EAST),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column + 1,
                        TDICE_CONDUCTANCE_WEST)) ;
 #endif
@@ -288,12 +261,8 @@ SystemMatrix add_solid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_NORTH),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row + 1, current_column,
-                                     TDICE_CONDUCTANCE_SOUTH)
+                    thermalcells[current_cell].North,
+                    thermalcells[current_cell + get_number_of_columns(dimensions)].South
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -305,10 +274,10 @@ SystemMatrix add_solid_column
     fprintf (stderr,
       "  north   \t%d\t%.5e = %.5e (N) || %.5e (S)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_NORTH),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row + 1, current_column,
                        TDICE_CONDUCTANCE_SOUTH)) ;
 #endif
@@ -322,12 +291,8 @@ SystemMatrix add_solid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_TOP),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer + 1, current_row, current_column,
-                                     TDICE_CONDUCTANCE_BOTTOM)
+                    thermalcells[current_cell].Top,
+                    thermalcells[current_cell + get_layer_area(dimensions)].Bottom
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -339,22 +304,13 @@ SystemMatrix add_solid_column
     fprintf (stderr,
       "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_TOP),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer + 1, current_row, current_column,
                        TDICE_CONDUCTANCE_BOTTOM)) ;
 #endif
-  }
-  else
-  {
-    diagonal_value += get_conductance
-                      (
-                        thermalgriddata, dimensions,
-                        current_layer, current_row, current_column,
-                        TDICE_CONDUCTANCE_TOP
-                      ) ;
   }
 
   /* DIAGONAL ELEMENT */
@@ -380,7 +336,7 @@ SystemMatrix add_solid_column
 SystemMatrix add_liquid_column
 (
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
+  ThermalCell*          thermalcells,
   GridDimension_t       current_layer,
   GridDimension_t       current_row,
   GridDimension_t       current_column,
@@ -413,12 +369,8 @@ SystemMatrix add_liquid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_BOTTOM),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer - 1, current_row, current_column,
-                                     TDICE_CONDUCTANCE_TOP)
+                    thermalcells[current_cell].Bottom,
+                    thermalcells[current_cell - get_layer_area(dimensions)].Top
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -430,10 +382,10 @@ SystemMatrix add_liquid_column
     fprintf (stderr,
       "  bottom  \t%d\t%.5e = %.5e (B) || %.5e (T)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_BOTTOM),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer - 1, current_row, current_column,
                        TDICE_CONDUCTANCE_TOP) ) ;
 #endif
@@ -444,12 +396,7 @@ SystemMatrix add_liquid_column
   if ( ! IS_FIRST_ROW(current_row) )
   {
     *system_matrix.RowIndices++ = current_cell - get_number_of_columns(dimensions) ;
-    *system_matrix.Values++  = get_conductance
-                               (
-                                 thermalgriddata, dimensions,
-                                 current_layer, current_row, current_column,
-                                 TDICE_CONDUCTANCE_NORTH /* == C */
-                               ) ;
+    *system_matrix.Values++     = thermalcells[current_cell].North ; /* == C */
 
     (*system_matrix.ColumnPointers)++ ;
 
@@ -467,12 +414,8 @@ SystemMatrix add_liquid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_WEST),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column - 1,
-                                     TDICE_CONDUCTANCE_EAST)
+                    thermalcells[current_cell].West,
+                    thermalcells[current_cell - 1].East
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -484,10 +427,10 @@ SystemMatrix add_liquid_column
     fprintf (stderr,
       "  west    \t%d\t%.5e = %.5e (W) || %.5e (E)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_WEST),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column - 1,
                        TDICE_CONDUCTANCE_EAST)) ;
 #endif
@@ -496,8 +439,7 @@ SystemMatrix add_liquid_column
   /* DIAGONAL */
 
   *system_matrix.RowIndices++ = current_cell ;
-  *system_matrix.Values       = get_capacity (thermalgriddata, dimensions,
-                                   current_layer, current_row, current_column);
+  *system_matrix.Values       = thermalcells[current_cell].Capacity ;
   diagonal_pointer            = system_matrix.Values++ ;
 
   (*system_matrix.ColumnPointers)++ ;
@@ -516,12 +458,8 @@ SystemMatrix add_liquid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_EAST),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column + 1,
-                                     TDICE_CONDUCTANCE_WEST)
+                    thermalcells[current_cell].East,
+                    thermalcells[current_cell + 1].West
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -533,10 +471,10 @@ SystemMatrix add_liquid_column
     fprintf (stderr,
       "  east    \t%d\t%.5e = %.5e (E) || %.5e (W)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_EAST),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column + 1,
                        TDICE_CONDUCTANCE_WEST)) ;
 #endif
@@ -547,12 +485,7 @@ SystemMatrix add_liquid_column
   if ( ! IS_LAST_ROW(current_row, dimensions) )
   {
     *system_matrix.RowIndices++ = current_cell + get_number_of_columns(dimensions) ;
-    *system_matrix.Values++  = get_conductance
-                               (
-                                 thermalgriddata, dimensions,
-                                 current_layer, current_row, current_column,
-                                 TDICE_CONDUCTANCE_SOUTH /* == -C */
-                               ) ;
+    *system_matrix.Values++     = thermalcells[current_cell].South ; /* == - C */
 
     (*system_matrix.ColumnPointers)++ ;
 
@@ -570,12 +503,8 @@ SystemMatrix add_liquid_column
 
     conductance = PARALLEL
                   (
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer, current_row, current_column,
-                                     TDICE_CONDUCTANCE_TOP),
-                    get_conductance (thermalgriddata, dimensions,
-                                     current_layer + 1, current_row, current_column,
-                                     TDICE_CONDUCTANCE_BOTTOM)
+                    thermalcells[current_cell].Top,
+                    thermalcells[current_cell + get_layer_area(dimensions)].Bottom
                   ) ;
 
     *system_matrix.Values++  = -conductance ;
@@ -587,10 +516,10 @@ SystemMatrix add_liquid_column
     fprintf (stderr,
       "  top     \t%d\t%.5e = %.5e (T) || %.5e (B)\n",
       *(system_matrix.RowIndices-1), *(system_matrix.Values-1),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer, current_row, current_column,
                        TDICE_CONDUCTANCE_TOP),
-      get_conductance (thermalgriddata, dimensions,
+      get_conductance (thermalcells, dimensions,
                        current_layer + 1, current_row, current_column,
                        TDICE_CONDUCTANCE_BOTTOM) ) ;
 #endif
@@ -602,12 +531,7 @@ SystemMatrix add_liquid_column
 
   if (current_row == 0 || current_row == get_number_of_rows(dimensions) - 1)
 
-    *diagonal_pointer += get_conductance
-                         (
-                           thermalgriddata, dimensions,
-                           current_layer, current_row, current_column,
-                           TDICE_CONDUCTANCE_NORTH
-                         ) ; /* == (C) */
+    *diagonal_pointer += thermalcells[current_cell].North ; /* == (C) */
 
 #ifdef PRINT_SYSTEM_MATRIX
   fgetpos (stderr, &last_fpos) ;

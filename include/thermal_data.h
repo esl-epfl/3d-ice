@@ -44,7 +44,7 @@ extern "C"
 /******************************************************************************/
 
 #include "types.h"
-#include "thermal_grid_data.h"
+#include "thermal_cell.h"
 #include "stack_description.h"
 #include "system_matrix.h"
 #include "slu_ddefs.h"
@@ -59,7 +59,7 @@ extern "C"
     Temperature_t* Temperatures ;
     Source_t*      Sources ;
 
-    ThermalGridData ThermalGridData ;
+    ThermalCell*   ThermalCells ;
 
     /* The initial (homogeneous) temperature of the chip (every cell) */
 

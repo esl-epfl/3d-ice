@@ -44,6 +44,8 @@ void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
 {
   conventionalheatsink->AmbientHTC         = AMBIENTHTC_I ;
   conventionalheatsink->AmbientTemperature = TEMPERATURE_I ;
+  conventionalheatsink->TopLayer           = NULL ;
+  conventionalheatsink->IsSourceLayer      = FALSE_V ;
 }
 
 /******************************************************************************/
@@ -109,6 +111,52 @@ void print_detailed_conventional_heat_sink
   fprintf (stream,
            STRING_F "  AmbientTemperature        = " TEMPERATURE_F "\n",
            prefix,   conventionalheatsink->AmbientTemperature) ;
+
+  fprintf (stream,
+           STRING_F "  TopLayer                  = %p\n",
+           prefix,   conventionalheatsink->TopLayer) ;
+
+  fprintf (stream,
+           STRING_F "  IsSourceLayer             = " BOOL_F "\n",
+           prefix,   conventionalheatsink->IsSourceLayer) ;
+}
+
+/******************************************************************************/
+
+void fill_thermal_cell_conventional_heat_sink
+(
+   ThermalCell*          thermalcells,
+   Dimensions*           dimensions,
+   ConventionalHeatSink* conventionalheatsink
+)
+{
+  GridDimension_t layer_index = LAST_LAYER_INDEX(dimensions) ;
+
+  thermalcells += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+
+  FOR_EVERY_ROW (row_index, dimensions)
+  {
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+
+      fill_solid_cell_conventional_heat_sink
+      (
+#       ifdef PRINT_THERMAL_CELLS
+        dimensions,
+        layer_index, row_index, column_index,
+#       endif
+        thermalcells,
+        get_cell_length(dimensions, column_index),
+        get_cell_width(dimensions),
+        conventionalheatsink->TopLayer->Height,
+        conventionalheatsink->TopLayer->Material->ThermalConductivity,
+        conventionalheatsink->AmbientHTC
+      ) ;
+
+      thermalcells++ ;
+
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
 }
 
 /******************************************************************************/
@@ -116,8 +164,8 @@ void print_detailed_conventional_heat_sink
 void fill_sources_conventional_heat_sink
 (
   Source_t*             sources,
+  ThermalCell*          thermalcells,
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
   ConventionalHeatSink* conventionalheatsink
 )
 {
@@ -130,72 +178,96 @@ void fill_sources_conventional_heat_sink
   sources += get_cell_offset_in_stack (dimensions,
                                        LAST_LAYER_INDEX(dimensions), 0, 0) ;
 
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      *sources++ = (conventionalheatsink->AmbientTemperature
-                    * get_conductance (thermalgriddata, dimensions,
-                                       LAST_LAYER_INDEX(dimensions), row_index, column_index,
-                                       TDICE_CONDUCTANCE_TOP)) ;
-#ifdef PRINT_SOURCES
-        fprintf (stderr,
-          "solid  cell  |  l %2d r %4d c %4d [%6d] | = %f * %.5e = %.5e\n",
-          LAST_LAYER_INDEX(dimensions), row_index, column_index,
-          get_cell_offset_in_stack (dimensions,
-                                    LAST_LAYER_INDEX(dimensions), row_index, column_index),
-          conventionalheatsink->AmbientTemperature,
-          get_conductance (thermalgriddata, dimensions,
-                           LAST_LAYER_INDEX(dimensions), row_index, column_index,
-                           TDICE_CONDUCTANCE_TOP),
-          *(sources-1)) ;
-#endif
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
+  thermalcells += get_cell_offset_in_stack (dimensions,
+                                           LAST_LAYER_INDEX(dimensions), 0, 0) ;
 
+  if (conventionalheatsink->IsSourceLayer == TRUE_V)
+  {
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index, dimensions)
+      {
+        *sources += conventionalheatsink->AmbientTemperature
+                    * thermalcells->Top ;
+
+#       ifdef PRINT_SOURCES
+        fprintf (stderr,
+            "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
+            LAST_LAYER_INDEX(dimensions), row_index, column_index,
+            get_cell_offset_in_stack (dimensions,
+                                      LAST_LAYER_INDEX(dimensions), row_index, column_index),
+            conventionalheatsink->AmbientTemperature,
+            get_conductance (thermalcells, dimensions,
+                             LAST_LAYER_INDEX(dimensions), row_index, column_index,
+                             TDICE_CONDUCTANCE_TOP),
+            *(sources-1)) ;
+#       endif
+
+        sources++ ;
+        thermalcells ++ ;
+      } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
+  }
+  else
+  {
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index, dimensions)
+      {
+        *sources = conventionalheatsink->AmbientTemperature
+                   * thermalcells->Top ;
+
+#       ifdef PRINT_SOURCES
+        fprintf (stderr,
+            "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
+            LAST_LAYER_INDEX(dimensions), row_index, column_index,
+            get_cell_offset_in_stack (dimensions,
+                                      LAST_LAYER_INDEX(dimensions), row_index, column_index),
+            conventionalheatsink->AmbientTemperature,
+            get_conductance (thermalcells, dimensions,
+                             LAST_LAYER_INDEX(dimensions), row_index, column_index,
+                             TDICE_CONDUCTANCE_TOP),
+            *(sources-1)) ;
+#       endif
+
+        sources++ ;
+        thermalcells ++ ;
+      } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
+  }
 }
 
 /******************************************************************************/
 
-void add_sources_conventional_heat_sink
+void fill_system_matrix_conventional_heat_sink
 (
-  Source_t*             sources,
+  SystemMatrix          system_matrix,
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
-  ConventionalHeatSink* conventionalheatsink
+  ThermalCell*          thermalcells
 )
 {
-#ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "layer_index = %d\tadd_sources_conventional_heat_sink\n", LAST_LAYER_INDEX(dimensions)) ;
-#endif
+  GridDimension_t cell_index = get_cell_offset_in_stack
+                               (
+                                 dimensions,
+                                 LAST_LAYER_INDEX(dimensions), 0 ,0
+                               ) ;
 
-  sources += get_cell_offset_in_stack (dimensions,
-                                       LAST_LAYER_INDEX(dimensions), 0, 0) ;
+  thermalcells += cell_index ;
 
-  FOR_EVERY_ROW (row_index, dimensions)
+  while (cell_index < get_number_of_cells(dimensions))
   {
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-      *sources++ += (conventionalheatsink->AmbientTemperature
-                     * get_conductance (thermalgriddata, dimensions,
-                                        LAST_LAYER_INDEX(dimensions), row_index, column_index,
-                                        TDICE_CONDUCTANCE_TOP)) ;
-#ifdef PRINT_SOURCES
-        fprintf (stderr,
-          "solid  cell  |  l %2d r %4d c %4d [%6d] | += %f * %.5e = %.5e\n",
-          LAST_LAYER_INDEX(dimensions), row_index, column_index,
-          get_cell_offset_in_stack (dimensions,
-                                    LAST_LAYER_INDEX(dimensions), row_index, column_index),
-          conventionalheatsink->AmbientTemperature,
-          get_conductance (thermalgriddata, dimensions,
-                           LAST_LAYER_INDEX(dimensions), row_index, column_index,
-                           TDICE_CONDUCTANCE_TOP),
-          *(sources-1)) ;
-#endif
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
+    GridDimension_t row_index ;
 
+    for (row_index = system_matrix.ColumnPointers [ cell_index ] ;
+         row_index < system_matrix.ColumnPointers [ cell_index + 1 ] ;
+         row_index ++)
+
+      if ( system_matrix.RowIndices [ row_index ] == cell_index )
+
+        system_matrix.Values [ row_index ] += thermalcells++->Top ;
+
+    cell_index++ ;
+  }
 }
 
 /******************************************************************************/

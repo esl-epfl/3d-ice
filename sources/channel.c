@@ -179,26 +179,59 @@ void print_detailed_channel
 
 /******************************************************************************/
 
-void fill_thermal_grid_data_channel
-  (
-  ThermalGridData* thermalgriddata,
+void fill_thermal_cell_channel
+(
+  ThermalCell*     thermalcells,
+  Time_t           delta_time,
+  Dimensions*      dimensions,
   GridDimension_t  layer_index,
   Channel*         channel
 )
 {
-# ifdef PRINT_THERMAL_GRID_DATA
-  fprintf (stderr, "\n#%d\tChannel [%s]\n\n", layer_index, channel->Wall->Id) ;
-# endif
+  thermalcells += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  fill_thermal_grid_data
-  (
-    thermalgriddata,
-    layer_index,
-    TDICE_LAYER_CHANNEL,
-    channel->WallMaterial->ThermalConductivity,
-    channel->WallMaterial->VolumetricHeatCapacity,
-    channel->Height
-  ) ;
+  FOR_EVERY_ROW (row_index, dimensions)
+  {
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+      if (IS_CHANNEL_COLUMN(column_index))
+
+        fill_liquid_cell
+        (
+#   ifdef PRINT_THERMAL_CELLS
+          layer_index, row_index, column_index,
+#   endif
+          dimensions,
+          thermalcells,
+          get_cell_length(dimensions, column_index),
+          get_cell_width(dimensions),
+          channel->Height,
+          channel->CoolantHTCs,
+          channel->CoolantVHC,
+          channel->CoolantFR,
+          delta_time
+        ) ;
+
+      else
+
+        fill_solid_cell_central
+        (
+#   ifdef PRINT_THERMAL_CELLS
+          dimensions,
+          layer_index, row_index, column_index,
+#   endif
+          thermalcells,
+          get_cell_length(dimensions, column_index),
+          get_cell_width(dimensions),
+          channel->Height,
+          channel->WallMaterial->ThermalConductivity,
+          channel->WallMaterial->VolumetricHeatCapacity,
+          delta_time
+        ) ;
+
+      thermalcells ++ ;
+    }
+  }
 }
 
 /******************************************************************************/
@@ -251,7 +284,7 @@ SystemMatrix fill_system_matrix_channel
   Channel*              channel,
 # endif
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
+  ThermalCell*          thermalcells,
   GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
@@ -270,7 +303,7 @@ SystemMatrix fill_system_matrix_channel
 
          system_matrix = add_liquid_column
                          (
-                           dimensions, thermalgriddata,
+                           dimensions, thermalcells,
                            layer_index, row_index, column_index,
                            system_matrix
                          ) ;
@@ -279,7 +312,7 @@ SystemMatrix fill_system_matrix_channel
 
          system_matrix = add_solid_column
                          (
-                           dimensions, thermalgriddata,
+                           dimensions, thermalcells,
                            layer_index, row_index, column_index,
                            system_matrix
                          ) ;

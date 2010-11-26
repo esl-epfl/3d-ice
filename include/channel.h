@@ -47,7 +47,7 @@ extern "C"
 
 #include "types.h"
 #include "material.h"
-#include "thermal_grid_data.h"
+#include "thermal_cell.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
@@ -118,9 +118,12 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_grid_data_channel
+
+  void fill_thermal_cell_channel
   (
-    ThermalGridData* thermalgriddata,
+    ThermalCell*     thermalcells,
+    Time_t           delta_time,
+    Dimensions*      dimensions,
     GridDimension_t  layer_index,
     Channel*         channel
   ) ;
@@ -129,10 +132,10 @@ extern "C"
 
   void fill_sources_channel
   (
-    Source_t*       sources,
-    Dimensions*     dimensions,
-    GridDimension_t layer_index,
-    Channel*        channel
+    Source_t*        sources,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    Channel*         channel
   ) ;
 
 /******************************************************************************/
@@ -140,12 +143,12 @@ extern "C"
   SystemMatrix fill_system_matrix_channel
   (
 #   ifdef PRINT_SYSTEM_MATRIX
-    Channel*              channel,
+    Channel*         channel,
 #   endif
-    Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    GridDimension_t       layer_index,
-    SystemMatrix          system_matrix
+    Dimensions*      dimensions,
+    ThermalCell*     thermalcells,
+    GridDimension_t  layer_index,
+    SystemMatrix     system_matrix
   ) ;
 
 /******************************************************************************/

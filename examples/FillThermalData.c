@@ -57,10 +57,8 @@ main(int argc, char** argv)
   init_stack_description (&stkd) ;
 
   if (fill_stack_description (&stkd, argv[1]) != 0)
-  {
-    free_stack_description (&stkd) ;
+
     return EXIT_FAILURE ;
-  }
 
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////

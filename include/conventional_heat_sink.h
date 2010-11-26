@@ -46,7 +46,8 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
-#include "thermal_grid_data.h"
+#include "thermal_cell.h"
+#include "layer.h"
 
 /******************************************************************************/
 
@@ -59,6 +60,14 @@ extern "C"
     /* The temperarute of the environment in [K] */
 
     Temperature_t AmbientTemperature ;
+
+    /* Pointer to the top layer in the 3DIC */
+
+    Layer* TopLayer ;
+
+    /* Is the top layer a source layer ? */
+
+    Bool_t IsSourceLayer ;
 
   } ConventionalHeatSink ;
 
@@ -94,22 +103,30 @@ extern "C"
 
 /******************************************************************************/
 
+  void fill_thermal_cell_conventional_heat_sink
+  (
+     ThermalCell*          thermalcells,
+     Dimensions*           dimensions,
+     ConventionalHeatSink* conventionalheatsink
+  ) ;
+
+/******************************************************************************/
+
   void fill_sources_conventional_heat_sink
   (
     Source_t*             sources,
+    ThermalCell*          thermalcells,
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
     ConventionalHeatSink* conventionalheatsink
   ) ;
 
 /******************************************************************************/
 
-  void add_sources_conventional_heat_sink
+  void fill_system_matrix_conventional_heat_sink
   (
-    Source_t*             sources,
+    SystemMatrix          system_matrix,
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    ConventionalHeatSink* conventionalheatsink
+    ThermalCell*          thermalcells
   ) ;
 
 /******************************************************************************/

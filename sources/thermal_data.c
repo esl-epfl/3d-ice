@@ -41,16 +41,17 @@
 
 /******************************************************************************/
 
-extern void fill_thermal_grid_data_stack_description
+extern void fill_thermal_cell_stack_description
 (
-   ThermalGridData*  thermalgriddata,
+   ThermalCell*      thermalcells,
+   Time_t            delta_time,
    StackDescription* stkd
 ) ;
 
 extern void fill_sources_stack_description
 (
   Source_t*         sources,
-  ThermalGridData*  thermalgriddata,
+  ThermalCell*      thermalcells,
   StackDescription* stkd
 ) ;
 
@@ -63,7 +64,7 @@ extern void update_channel_inlet_stack_description
 extern void fill_system_matrix_stack_description
 (
   SystemMatrix          system_matrix,
-  ThermalGridData*      thermalgriddata,
+  ThermalCell*          thermalcells,
   StackDescription*     stkd
 ) ;
 
@@ -94,8 +95,7 @@ void init_thermal_data
 
   tdata->Temperatures = NULL ;
   tdata->Sources      = NULL ;
-
-  init_thermal_grid_data (&tdata->ThermalGridData) ;
+  tdata->ThermalCells = NULL ;
 
   tdata->SLU_PermutationMatrixR = NULL ;
   tdata->SLU_PermutationMatrixC = NULL ;
@@ -146,41 +146,15 @@ int fill_thermal_data
 
   /* Alloc and set thermal grid data */
 
-  if (stkd->Channel == NULL)
-  {
-    result = alloc_thermal_grid_data
-             (
-               &tdata->ThermalGridData,
-               get_number_of_layers(stkd->Dimensions),
-               COOLANTVHC_I, COOLANTHTCS_I, COOLANTFR_I,
-               stkd->ConventionalHeatSink == NULL ?
-               (AmbientHTC_t) 0 : stkd->ConventionalHeatSink->AmbientHTC,
-               tdata->StepTime
-             ) ;
-  }
-  else
-  {
-    result = alloc_thermal_grid_data
-             (
-               &tdata->ThermalGridData,
-               get_number_of_layers(stkd->Dimensions),
-               stkd->Channel->CoolantVHC,
-               stkd->Channel->CoolantHTCs,
-               stkd->Channel->CoolantFR,
-               stkd->ConventionalHeatSink == NULL ?
-               (AmbientHTC_t) 0 : stkd->ConventionalHeatSink->AmbientHTC,
-               tdata->StepTime
-             ) ;
-  }
+  tdata->ThermalCells
+    = malloc (sizeof(ThermalCell) * tdata->Size) ;
 
-  if (result == 1)  goto thermal_grid_data_fail ;
+  if (tdata->ThermalCells == NULL)  goto thermal_cell_data_fail ;
 
-  fill_thermal_grid_data_stack_description (&tdata->ThermalGridData, stkd) ;
-
-  if (stkd->ConventionalHeatSink != NULL)
-
-    tdata->ThermalGridData.LayersData[LAST_LAYER_INDEX(stkd->Dimensions)].Type
-      = TDICE_LAYER_CHS ;
+  fill_thermal_cell_stack_description
+  (
+    tdata->ThermalCells, tdata->StepTime, stkd
+  ) ;
 
   /* Alloc and set sources */
 
@@ -204,7 +178,7 @@ int fill_thermal_data
 
   fill_system_matrix_stack_description
   (
-    tdata->SM_A, &tdata->ThermalGridData, stkd
+    tdata->SM_A, tdata->ThermalCells, stkd
   ) ;
 
   dCreate_CompCol_Matrix
@@ -264,8 +238,8 @@ slu_perm_r_fail :
 system_matrix_fail :
   free (tdata->Sources) ;
 sources_fail :
-  free_thermal_grid_data (&tdata->ThermalGridData) ;
-thermal_grid_data_fail :
+  free (tdata->ThermalCells) ;
+thermal_cell_data_fail :
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
   free (tdata->Temperatures) ;
 temperatures_fail :
@@ -278,8 +252,7 @@ void free_thermal_data (ThermalData* tdata)
 {
   free (tdata->Temperatures) ;
   free (tdata->Sources) ;
-
-  free_thermal_grid_data (&tdata->ThermalGridData) ;
+  free (tdata->ThermalCells) ;
 
   free (tdata->SLU_PermutationMatrixR) ;
   free (tdata->SLU_PermutationMatrixC) ;
@@ -315,7 +288,7 @@ fill_system_vector
   Dimensions*          dimensions,
   SystemMatrixValue_t* vector,
   Source_t*            sources,
-  ThermalGridData*     thermalgriddata,
+  ThermalCell*         thermalcells,
   Temperature_t*       temperatures
 )
 {
@@ -336,7 +309,7 @@ fill_system_vector
 
         *vector++ =   *sources++
                     +
-                      get_capacity(thermalgriddata, dimensions, layer, row, column)
+                      thermalcells++->Capacity
                     *
                       *temperatures++ ;
 
@@ -348,7 +321,7 @@ fill_system_vector
           layer, row, column,
           get_cell_offset_in_stack (dimensions, layer, row, column),
           *(vector-1), *(sources-1),
-          get_capacity(thermalgriddata, dimensions, layer, row, column), old) ;
+          get_capacity(thermalcells, dimensions, layer, row, column), old) ;
 #       endif
 
       } // FOR_EVERY_COLUMN
@@ -373,9 +346,7 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 
     fill_sources_stack_description
     (
-      tdata->Sources,
-      &(tdata->ThermalGridData),
-      stkd
+      tdata->Sources, tdata->ThermalCells, stkd
     ) ;
 
     tdata->CurrentSlotLimit += tdata->SlotTime ;
@@ -387,11 +358,8 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 
   fill_system_vector
   (
-    stkd->Dimensions,
-    tdata->Temperatures,
-    tdata->Sources,
-    &tdata->ThermalGridData,
-    tdata->Temperatures
+    stkd->Dimensions, tdata->Temperatures,
+    tdata->Sources, tdata->ThermalCells, tdata->Temperatures
   ) ;
 
   dgstrs
@@ -435,9 +403,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 
     fill_sources_stack_description
     (
-      tdata->Sources,
-      &(tdata->ThermalGridData),
-      stkd
+      tdata->Sources, tdata->ThermalCells, stkd
     ) ;
 
     tdata->CurrentSlotLimit += tdata->SlotTime ;
@@ -447,11 +413,8 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
   {
     fill_system_vector
     (
-      stkd->Dimensions,
-      tdata->Temperatures,
-      tdata->Sources,
-      &tdata->ThermalGridData,
-      tdata->Temperatures
+      stkd->Dimensions, tdata->Temperatures,
+      tdata->Sources, tdata->ThermalCells, tdata->Temperatures
     ) ;
 
     dgstrs
@@ -487,12 +450,11 @@ int update_coolant_flow_rate
   CoolantFR_t       new_coolant_fr
 )
 {
-  stkd->Channel->CoolantFR = tdata->ThermalGridData.CoolantFR
-    = CONVERT_COOLANT_FLOW_RATE(new_coolant_fr) ;
+  stkd->Channel->CoolantFR = CONVERT_COOLANT_FLOW_RATE(new_coolant_fr) ;
 
   fill_system_matrix_stack_description
   (
-    tdata->SM_A, &tdata->ThermalGridData, stkd
+    tdata->SM_A, tdata->ThermalCells, stkd
   ) ;
 
   tdata->SLU_Options.Fact = SamePattern ;

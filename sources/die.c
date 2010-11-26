@@ -226,22 +226,22 @@ Die* find_die_in_list (Die* list, String_t id)
 
 /******************************************************************************/
 
-void fill_thermal_grid_data_die
+void fill_thermal_cell_die
 (
-  ThermalGridData* thermalgriddata,
+  ThermalCell*     thermalcells,
+  Time_t           delta_time,
+  Dimensions*      dimensions,
   GridDimension_t  layer_index,
   Die*             die
 )
 {
-# ifdef PRINT_THERMAL_GRID_DATA
-  fprintf (stderr, "\n#%d\tDie     [%s]\n\n", layer_index, die->Id) ;
-# endif
-
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
 
-    fill_thermal_grid_data_layer
+    fill_thermal_cell_layer
     (
-      thermalgriddata,
+      thermalcells,
+      delta_time,
+      dimensions,
       layer_index + layer->Offset,
       layer
     ) ;
@@ -278,43 +278,11 @@ void fill_sources_die
 
 /******************************************************************************/
 
-void fill_chs_sources_die
-(
-  Source_t*             sources,
-  Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
-  ConventionalHeatSink* conventionalheatsink,
-  Die*                  die
-)
-{
-  if (die->TopLayer == die->SourceLayer)
-
-    add_sources_conventional_heat_sink
-    (
-      sources,
-      dimensions,
-      thermalgriddata,
-      conventionalheatsink
-    ) ;
-
-  else
-
-    fill_sources_conventional_heat_sink
-    (
-      sources,
-      dimensions,
-      thermalgriddata,
-      conventionalheatsink
-    ) ;
-}
-
-/******************************************************************************/
-
 SystemMatrix fill_system_matrix_die
 (
   Die*                  die,
   Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
+  ThermalCell*          thermalcells,
   GridDimension_t       layer_index,
   SystemMatrix          system_matrix
 )
@@ -330,7 +298,7 @@ SystemMatrix fill_system_matrix_die
 #                     ifdef PRINT_SYSTEM_MATRIX
                       layer,
 #                     endif
-                      dimensions, thermalgriddata,
+                      dimensions, thermalcells,
                       layer_index + layer->Offset,
                       system_matrix
                      ) ;

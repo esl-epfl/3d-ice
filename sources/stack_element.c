@@ -231,9 +231,11 @@ void print_detailed_stack_elements_list
 
 /******************************************************************************/
 
-void fill_thermal_grid_data_stack_element
+void fill_thermal_cell_stack_element
 (
-  ThermalGridData* thermalgriddata,
+  ThermalCell*     thermalcells,
+  Time_t           delta_time,
+  Dimensions*      dimensions,
   StackElement*    stack_element
 )
 {
@@ -241,9 +243,11 @@ void fill_thermal_grid_data_stack_element
   {
     case TDICE_STACK_ELEMENT_DIE :
 
-      fill_thermal_grid_data_die
+      fill_thermal_cell_die
       (
-        thermalgriddata,
+        thermalcells,
+        delta_time,
+        dimensions,
         stack_element->Offset,
         stack_element->Pointer.Die
       ) ;
@@ -252,9 +256,11 @@ void fill_thermal_grid_data_stack_element
 
     case TDICE_STACK_ELEMENT_LAYER :
 
-      fill_thermal_grid_data_layer
+      fill_thermal_cell_layer
       (
-        thermalgriddata,
+        thermalcells,
+        delta_time,
+        dimensions,
         stack_element->Offset,
         stack_element->Pointer.Layer
       ) ;
@@ -263,9 +269,11 @@ void fill_thermal_grid_data_stack_element
 
     case TDICE_STACK_ELEMENT_CHANNEL :
 
-      fill_thermal_grid_data_channel
+      fill_thermal_cell_channel
       (
-        thermalgriddata,
+        thermalcells,
+        delta_time,
+        dimensions,
         stack_element->Offset,
         stack_element->Pointer.Channel
       ) ;
@@ -342,69 +350,11 @@ void fill_sources_stack_element
 
 /******************************************************************************/
 
-void fill_chs_sources_stack_element
-(
-  Source_t*             sources,
-  Dimensions*           dimensions,
-  ThermalGridData*      thermalgriddata,
-  ConventionalHeatSink* conventionalheatsink,
-  StackElement*         stack_element
-)
-{
-  switch (stack_element->Type)
-  {
-    case TDICE_STACK_ELEMENT_DIE :
-
-      fill_chs_sources_die
-      (
-        sources,
-        dimensions,
-        thermalgriddata,
-        conventionalheatsink,
-        stack_element->Pointer.Die
-      ) ;
-      break ;
-
-    case TDICE_STACK_ELEMENT_LAYER :
-
-      fill_sources_conventional_heat_sink
-      (
-        sources,
-        dimensions,
-        thermalgriddata,
-        conventionalheatsink
-      ) ;
-
-      break ;
-
-    case TDICE_STACK_ELEMENT_CHANNEL :
-
-      fprintf (stderr,
-        "Error! Channel cannot be the last stack element\n") ;
-      break ;
-
-    case TDICE_STACK_ELEMENT_NONE :
-
-      fprintf (stderr,
-        "Error! Found stack element with unset type\n") ;
-      break ;
-
-    default :
-
-      fprintf (stderr,
-        "Error! Unknown stack element type %d\n",
-        stack_element->Type) ;
-
-  } /* switch stack_element->Type */
-}
-
-/******************************************************************************/
-
 SystemMatrix fill_system_matrix_stack_element
 (
   SystemMatrix     system_matrix,
   Dimensions*      dimensions,
-  ThermalGridData* thermalgriddata,
+  ThermalCell*     thermalcells,
   StackElement*    stack_element
 )
 {
@@ -415,7 +365,7 @@ SystemMatrix fill_system_matrix_stack_element
       system_matrix = fill_system_matrix_die
                       (
                         stack_element->Pointer.Die, dimensions,
-                        thermalgriddata, stack_element->Offset,
+                        thermalcells, stack_element->Offset,
                         system_matrix
                       ) ;
       break ;
@@ -428,7 +378,7 @@ SystemMatrix fill_system_matrix_stack_element
                         stack_element->Pointer.Layer,
 #                       endif
                         dimensions,
-                        thermalgriddata, stack_element->Offset,
+                        thermalcells, stack_element->Offset,
                         system_matrix
                       ) ;
       break ;
@@ -441,7 +391,7 @@ SystemMatrix fill_system_matrix_stack_element
                         stack_element->Pointer.Channel,
 #                       endif
                         dimensions,
-                        thermalgriddata, stack_element->Offset,
+                        thermalcells, stack_element->Offset,
                         system_matrix
                       ) ;
       break ;

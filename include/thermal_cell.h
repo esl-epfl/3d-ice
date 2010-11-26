@@ -33,8 +33,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_THERMALGRIDDATA_H_
-#define _3DICE_THERMALGRIDDATA_H_
+#ifndef _3DICE_THERMALCELL_H_
+#define _3DICE_THERMALCELL_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -48,111 +48,116 @@ extern "C"
 
 /******************************************************************************/
 
-  /* The type of a layer */
-
-  typedef enum
-  {
-    TDICE_LAYER_NONE = 0,
-    TDICE_LAYER_SOLID,
-    TDICE_LAYER_CHS,
-    TDICE_LAYER_CHANNEL
-
-  } Layer_t ;
-
-  typedef enum
-  {
-    TDICE_CONDUCTANCE_NORTH = 0,
-    TDICE_CONDUCTANCE_SOUTH,
-    TDICE_CONDUCTANCE_EAST,
-    TDICE_CONDUCTANCE_WEST,
-    TDICE_CONDUCTANCE_TOP,
-    TDICE_CONDUCTANCE_BOTTOM
-
-  } Conductance_d ;
-
   typedef struct
   {
-    Layer_t         Type ;
-    SolidTC_t       ThermalConductivity ;
-    SolidVHC_t      SolidVHC ;
-    CellDimension_t Height ;
+    Conductance_t Top ;
+    Conductance_t Bottom ;
+    Conductance_t North ;
+    Conductance_t South ;
+    Conductance_t East ;
+    Conductance_t West ;
 
-  } PerLayerData ;
+    Capacity_t    Capacity ;
 
-  typedef struct
-  {
-    PerLayerData* LayersData ;
-
-    CoolantVHC_t  CoolantVHC  ;
-    CoolantHTCs_t CoolantHTCs ;
-    CoolantFR_t   CoolantFR   ;
-
-    AmbientHTC_t AmbientHTC ;
-
-    Time_t DeltaTime ;
-
-  } ThermalGridData ;
+  } ThermalCell ;
 
 /******************************************************************************/
 
-  void init_thermal_grid_data (ThermalGridData* thermalgriddata) ;
-
-/******************************************************************************/
-
-  int alloc_thermal_grid_data
+  void fill_solid_cell_bottom
   (
-    ThermalGridData* thermalgriddata,
-    Quantity_t       quantity,
-    CoolantVHC_t     coolant_vhc,
-    CoolantHTCs_t    coolant_htcs,
-    CoolantFR_t      coolant_fr,
-    AmbientHTC_t     ambient_htc,
-    Time_t           delta_time
+#   ifdef PRINT_THERMAL_CELLS
+    Dimensions*           dimensions,
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    SolidTC_t              solid_tc,
+    SolidVHC_t             solid_vhc,
+    Time_t                 delta_time
   ) ;
 
 /******************************************************************************/
 
-  void free_thermal_grid_data (ThermalGridData* thermalgriddata) ;
-
-/******************************************************************************/
-
-  void fill_thermal_grid_data
+  void fill_solid_cell_central
   (
-    ThermalGridData* thermalgriddata,
-    GridDimension_t  layer_index,
-    Layer_t          type,
-    SolidTC_t        thermal_conductivity,
-    SolidVHC_t       solid_vhc,
-    CellDimension_t  height
+#   ifdef PRINT_THERMAL_CELLS
+    Dimensions*           dimensions,
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    SolidTC_t              solid_tc,
+    SolidVHC_t             solid_vhc,
+    Time_t                 delta_time
   ) ;
 
 /******************************************************************************/
 
-  Capacity_t get_capacity
+  void fill_solid_cell_top
   (
-    ThermalGridData* thermalgriddata,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index
+#   ifdef PRINT_THERMAL_CELLS
+    Dimensions*           dimensions,
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    SolidTC_t              solid_tc,
+    SolidVHC_t             solid_vhc,
+    Time_t                 delta_time
   ) ;
 
 /******************************************************************************/
 
-  Conductance_t get_conductance
+  void fill_solid_cell_conventional_heat_sink
   (
-    ThermalGridData* thermalgriddata,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    Conductance_d    direction
+#   ifdef PRINT_THERMAL_CELLS
+    Dimensions*           dimensions,
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    ThermalCell*          thermalcell,
+    CellDimension_t       cell_length,
+    CellDimension_t       cell_width,
+    CellDimension_t       cell_height,
+    SolidTC_t             thermal_conductivity,
+    AmbientHTC_t          ambient_htc
   ) ;
 
 /******************************************************************************/
+
+  void fill_liquid_cell
+  (
+#   ifdef PRINT_THERMAL_CELLS
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    Dimensions*            dimensions,
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    CoolantHTCs_t          coolant_htcs,
+    CoolantVHC_t           coolant_vhc,
+    CoolantFR_t            coolant_fr,
+    Time_t                 delta_time
+  ) ;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _3DICE_THERMALGRIDDATA_H_ */
+#endif /* _3DICE_THERMALCELL_H_ */

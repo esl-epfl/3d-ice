@@ -44,7 +44,7 @@ extern "C"
 /******************************************************************************/
 
 #include "dimensions.h"
-#include "thermal_grid_data.h"
+#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -88,7 +88,7 @@ extern "C"
   SystemMatrix add_solid_column
   (
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
+    ThermalCell*          thermalcells,
     GridDimension_t       current_layer,
     GridDimension_t       current_row,
     GridDimension_t       current_column,
@@ -100,7 +100,7 @@ extern "C"
   SystemMatrix add_liquid_column
   (
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
+    ThermalCell*          thermalcells,
     GridDimension_t       current_layer,
     GridDimension_t       current_row,
     GridDimension_t       current_column,

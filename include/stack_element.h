@@ -131,9 +131,11 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_grid_data_stack_element
+  void fill_thermal_cell_stack_element
   (
-    ThermalGridData*      thermalgriddata,
+    ThermalCell*          thermalcells,
+    Time_t                delta_time,
+    Dimensions*           dimensions,
     StackElement*         stack_element
   ) ;
 
@@ -148,22 +150,11 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_chs_sources_stack_element
-  (
-    Source_t*             sources,
-    Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    ConventionalHeatSink* conventionalheatsink,
-    StackElement*         stack_element
-  ) ;
-
-/******************************************************************************/
-
   SystemMatrix fill_system_matrix_stack_element
   (
     SystemMatrix          system_matrix,
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
+    ThermalCell*          thermalcells,
     StackElement*         stack_element
   ) ;
 

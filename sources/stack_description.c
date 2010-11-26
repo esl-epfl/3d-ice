@@ -34,7 +34,7 @@
  ******************************************************************************/
 
 #include "stack_description.h"
-#include "thermal_grid_data.h"
+#include "thermal_cell.h"
 #include "macros.h"
 #include "layer.h"
 #include "system_matrix.h"
@@ -256,25 +256,33 @@ int fill_floorplans (StackDescription* stkd)
 
 /******************************************************************************/
 
-void fill_thermal_grid_data_stack_description
+void fill_thermal_cell_stack_description
 (
-  ThermalGridData*  thermalgriddata,
+  ThermalCell*      thermalcells,
+  Time_t            delta_time,
   StackDescription* stkd
 )
 {
-#ifdef PRINT_THERMAL_GRID_DATA
-  fprintf (stderr,
-
-    "Fill thermal grid data stack description ( %d layers )\n",
-
-    get_number_of_layers  (stkd->Dimensions)) ;
-#endif
-
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
                                      stkd->StackElementsList)
+  {
+    fill_thermal_cell_stack_element
+    (
+      thermalcells,
+      delta_time,
+      stkd->Dimensions,
+      stack_element
+    ) ;
+  }
 
-    fill_thermal_grid_data_stack_element (thermalgriddata, stack_element) ;
+  if (stkd->ConventionalHeatSink)
 
+    fill_thermal_cell_conventional_heat_sink
+    (
+      thermalcells,
+      stkd->Dimensions,
+      stkd->ConventionalHeatSink
+    ) ;
 }
 
 /******************************************************************************/
@@ -282,7 +290,7 @@ void fill_thermal_grid_data_stack_description
 void fill_sources_stack_description
 (
   Source_t*         sources,
-  ThermalGridData*  thermalgriddata,
+  ThermalCell*      thermalcells,
   StackDescription* stkd
 )
 {
@@ -294,26 +302,19 @@ void fill_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  StackElement* stack_element = NULL ;
-  StackElement* last_stk_el = NULL ;
-  for
-  (
-    stack_element  = stkd->StackElementsList ;
-    stack_element != NULL ;
-    last_stk_el    = stack_element ,
-    stack_element  = stack_element->Next
-  )
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
+
     fill_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
 
   if (stkd->ConventionalHeatSink != NULL)
 
-    fill_chs_sources_stack_element
+    fill_sources_conventional_heat_sink
     (
       sources,
+      thermalcells,
       stkd->Dimensions,
-      thermalgriddata,
-      stkd->ConventionalHeatSink,
-      last_stk_el
+      stkd->ConventionalHeatSink
     ) ;
 }
 
@@ -352,7 +353,7 @@ void update_channel_inlet_stack_description
 void fill_system_matrix_stack_description
 (
   SystemMatrix          system_matrix,
-  ThermalGridData*      thermalgriddata,
+  ThermalCell*          thermalcells,
   StackDescription*     stkd
 )
 {
@@ -365,6 +366,9 @@ void fill_system_matrix_stack_description
     get_number_of_rows    (stkd->Dimensions),
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
+
+  SystemMatrix tmp_system_matrix = system_matrix ;
+
   *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
@@ -373,9 +377,15 @@ void fill_system_matrix_stack_description
     system_matrix = fill_system_matrix_stack_element
                     (
                       system_matrix, stkd->Dimensions,
-                      thermalgriddata,
-                      stack_element
+                      thermalcells, stack_element
                     ) ;
+
+    if (stkd->ConventionalHeatSink != NULL)
+
+      fill_system_matrix_conventional_heat_sink
+      (
+        tmp_system_matrix, stkd->Dimensions, thermalcells
+      ) ;
 }
 
 /******************************************************************************/

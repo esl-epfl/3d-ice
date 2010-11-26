@@ -47,9 +47,8 @@ extern "C"
 
 #include "types.h"
 #include "layer.h"
-#include "thermal_grid_data.h"
+#include "thermal_cell.h"
 #include "floorplan.h"
-#include "conventional_heat_sink.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
@@ -146,9 +145,11 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_grid_data_die
+  void fill_thermal_cell_die
   (
-    ThermalGridData* thermalgriddata,
+    ThermalCell*     thermalcells,
+    Time_t           delta_time,
+    Dimensions*      dimensions,
     GridDimension_t  layer_index,
     Die*             die
   ) ;
@@ -166,22 +167,11 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_chs_sources_die
-  (
-    Source_t*             sources,
-    Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
-    ConventionalHeatSink* conventionalheatsink,
-    Die*                  die
-  ) ;
-
-/******************************************************************************/
-
   SystemMatrix fill_system_matrix_die
   (
     Die*                  die,
     Dimensions*           dimensions,
-    ThermalGridData*      thermalgriddata,
+    ThermalCell*          thermalcells,
     GridDimension_t       layer_index,
     SystemMatrix          system_matrix
   ) ;
