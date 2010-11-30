@@ -211,21 +211,31 @@ stack_description_file
       //
 
       stkd->Dimensions->Grid.NCells
-        = get_number_of_layers(stkd->Dimensions)
+        =   get_number_of_layers(stkd->Dimensions)
           * get_number_of_rows(stkd->Dimensions)
           * get_number_of_columns(stkd->Dimensions) ;
 
       stkd->Dimensions->Grid.NNz
-        =   get_number_of_layers(stkd->Dimensions)
-            * (
-                  get_number_of_rows(stkd->Dimensions)
-                  * (3 * get_number_of_columns(stkd->Dimensions) - 2)
-                + 2 * get_number_of_columns(stkd->Dimensions)
-                  * (get_number_of_rows(stkd->Dimensions) - 1)
-              )
-          + (get_number_of_layers(stkd->Dimensions) - 1 ) * 2
+
+        = // Number of coefficients in the diagonal
+            get_number_of_layers(stkd->Dimensions)
+          * get_number_of_rows(stkd->Dimensions)
+          * get_number_of_columns(stkd->Dimensions)
+          +
+          // Number of coefficients Bottom <-> Top
+          2 * (get_number_of_layers(stkd->Dimensions) - 1 )
             * get_number_of_rows(stkd->Dimensions)
-            * get_number_of_columns(stkd->Dimensions) ;
+            * get_number_of_columns(stkd->Dimensions)
+          +
+          // Number of coefficients North <-> South
+          2 * get_number_of_layers(stkd->Dimensions)
+            * (get_number_of_rows(stkd->Dimensions) - 1 )
+            * get_number_of_columns(stkd->Dimensions)
+          +
+          // Number of coefficients East <-> West
+          2 * get_number_of_layers(stkd->Dimensions)
+            * get_number_of_rows(stkd->Dimensions)
+            * (get_number_of_columns(stkd->Dimensions) - 1 ) ;
 
     }
   ;
