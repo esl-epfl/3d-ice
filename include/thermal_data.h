@@ -74,8 +74,13 @@ extern "C"
     Time_t StepTime ;
     Time_t SlotTime ;
 
-    Time_t CurrentTime ;
-    Time_t CurrentSlotLimit ;
+    /* Quantities used for simulation */
+
+    Quantity_t SlotLength ;
+
+    Quantity_t CurrentTime ;
+
+    Quantity_t CurrentSlotLimit ;
 
     /* The matrix A representing the linear system */
 

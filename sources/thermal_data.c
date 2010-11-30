@@ -88,8 +88,10 @@ void init_thermal_data
   tdata->StepTime = step_time ;
   tdata->SlotTime = slot_time ;
 
-  tdata->CurrentTime      = TIME_I ;
-  tdata->CurrentSlotLimit = TIME_I ;
+  tdata->SlotLength = (Quantity_t) ( slot_time / step_time ) ;
+
+  tdata->CurrentTime      = QUANTITY_I ;
+  tdata->CurrentSlotLimit = QUANTITY_I ;
 
   tdata->InitialTemperature = initial_temperature ;
 
@@ -277,7 +279,7 @@ void free_thermal_data (ThermalData* tdata)
 
 Time_t get_current_time(ThermalData* tdata)
 {
-  return tdata->CurrentTime ;
+  return tdata->CurrentTime * tdata->StepTime ;
 }
 
 /******************************************************************************/
@@ -348,9 +350,9 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
       tdata->Sources, tdata->ThermalCells, stkd
     ) ;
 
-    tdata->CurrentSlotLimit += tdata->SlotTime ;
+    tdata->CurrentSlotLimit += tdata->SlotLength;
 
-    if (tdata->CurrentTime != 0.0)
+    if (tdata->CurrentTime != QUANTITY_I)
 
       return 2 ;
   }
@@ -379,7 +381,7 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
     return tdata->SLU_Info ;
   }
 
-  tdata->CurrentTime += tdata->StepTime ;
+  tdata->CurrentTime++ ;
 
   return 0 ;
 }
@@ -405,7 +407,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
       tdata->Sources, tdata->ThermalCells, stkd
     ) ;
 
-    tdata->CurrentSlotLimit += tdata->SlotTime ;
+    tdata->CurrentSlotLimit += tdata->SlotLength ;
   }
 
   while ( tdata->CurrentTime < tdata->CurrentSlotLimit )
@@ -434,7 +436,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
       return tdata->SLU_Info ;
     }
 
-    tdata->CurrentTime += tdata->StepTime ;
+    tdata->CurrentTime++ ;
   }
 
   return 0 ;
