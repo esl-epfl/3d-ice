@@ -1,0 +1,25 @@
+material silicon : 
+  thermal conductivity     1.30e-04 ;
+  volumetric heat capacity 1.63566e-12 ;
+
+material beol:
+  thermal conductivity	    2.25e-06 ;
+  volumetric heat capacity 2.1745e-12 ;
+
+conventional heat sink :
+  heat transfer coefficient   1.0e-07 ;
+  ambient temperature       300.0 ;
+
+die mydie :
+  layer 	 12	beol ;
+  source	  2	silicon ;
+	
+stack:
+
+  die die1 mydie floorplan "niagara.flp" ;
+
+dimensions :
+
+  chip length 14000 , width  15000 ;
+  cell length    50 , width    200 ;
+

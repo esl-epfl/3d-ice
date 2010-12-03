@@ -37,7 +37,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-all: FillThermalData Emulate3DICe
+all: FillThermalData Emulate3DICe CreateNNInputData
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS)
@@ -52,6 +52,11 @@ FillThermalData: FillThermalData.o $(3DICE_LIB_A)
 Emulate3DICe: Emulate3DICe.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
+-include CreateNNInputData.d
+
+CreateNNInputData: CreateNNInputData.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
 clean:
 	@$(RM) $(RMFLAGS) FillThermalData
 	@$(RM) $(RMFLAGS) FillThermalData.o
@@ -59,3 +64,7 @@ clean:
 	@$(RM) $(RMFLAGS) Emulate3DICe
 	@$(RM) $(RMFLAGS) Emulate3DICe.o
 	@$(RM) $(RMFLAGS) Emulate3DICe.d
+	@$(RM) $(RMFLAGS) CreateNNInputData
+	@$(RM) $(RMFLAGS) CreateNNInputData.o
+	@$(RM) $(RMFLAGS) CreateNNInputData.d
+
