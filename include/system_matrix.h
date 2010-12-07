@@ -72,6 +72,10 @@ extern "C"
 
 /******************************************************************************/
 
+  void init_system_matrix (SystemMatrix* matrix) ;
+
+/******************************************************************************/
+
   int alloc_system_matrix
   (
     SystemMatrix* matrix,

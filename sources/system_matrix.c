@@ -41,6 +41,17 @@
 
 /******************************************************************************/
 
+void init_system_matrix (SystemMatrix* matrix)
+{
+  matrix->ColumnPointers = NULL ;
+  matrix->RowIndices     = NULL;
+  matrix->Values         = NULL ;
+  matrix->Size           = QUANTITY_I ;
+  matrix->NNz            = QUANTITY_I ;
+}
+
+/******************************************************************************/
+
 int alloc_system_matrix
 (
   SystemMatrix*   matrix,

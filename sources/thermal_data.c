@@ -99,6 +99,8 @@ void init_thermal_data
   tdata->Sources      = NULL ;
   tdata->ThermalCells = NULL ;
 
+  init_system_matrix (&tdata->SM_A) ;
+
   tdata->SLU_PermutationMatrixR = NULL ;
   tdata->SLU_PermutationMatrixC = NULL ;
   tdata->SLU_Etree              = NULL ;
