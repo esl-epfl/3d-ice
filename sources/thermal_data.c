@@ -105,6 +105,14 @@ void init_thermal_data
   tdata->SLU_PermutationMatrixC = NULL ;
   tdata->SLU_Etree              = NULL ;
 
+  tdata->SLUMatrix_A.Store          = NULL ;
+  tdata->SLUMatrix_A_Permuted.Store = NULL ;
+  tdata->SLUMatrix_B.Store          = NULL ;
+  tdata->SLUMatrix_L.Store          = NULL ;
+  tdata->SLUMatrix_U.Store          = NULL ;
+
+  tdata->SLU_Info = 0 ;
+
   StatInit (&tdata->SLU_Stat) ;
 
   set_default_options (&tdata->SLU_Options) ;
