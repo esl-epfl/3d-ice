@@ -38,7 +38,7 @@
  ##############################################################################
 
 3DICE_LIBNAME   = 3D-ICE
-3DICE_VERSION   = 1.0
+3DICE_VERSION   = 1.0.1
 3DICE_RELEASE   = $(3DICE_LIBNAME)-$(3DICE_VERSION)
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include
@@ -92,7 +92,7 @@ SLU_MAIN    = $(HOME)/SuperLU_4.0
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 #SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_4.0 -lblas
-SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_4.0 -L/usr/lib64 -lblas
+SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_4.0 -L/usr/lib -lblas
 
  #
  # Commands and flags
