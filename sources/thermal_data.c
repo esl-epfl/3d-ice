@@ -349,7 +349,7 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
     return -1 ;
   }
 
-  if (tdata->CurrentTime >= tdata->CurrentSlotLimit)
+  if (tdata->CurrentTime == tdata->CurrentSlotLimit)
   {
     if (get_number_of_remaining_power_values(stkd) == 0)
 
@@ -406,7 +406,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
     return -1 ;
   }
 
-  if (tdata->CurrentTime >= tdata->CurrentSlotLimit)
+  if (tdata->CurrentTime == tdata->CurrentSlotLimit)
   {
     if ( get_number_of_remaining_power_values(stkd) == 0)
 
@@ -420,7 +420,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd)
     tdata->CurrentSlotLimit += tdata->SlotLength ;
   }
 
-  while ( tdata->CurrentTime < tdata->CurrentSlotLimit )
+  while ( tdata->CurrentTime != tdata->CurrentSlotLimit )
   {
     fill_system_vector
     (
