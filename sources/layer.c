@@ -64,7 +64,7 @@ Layer* alloc_and_init_layer (void)
 
 void free_layer (Layer* layer)
 {
-  free (layer) ;
+  FREE_POINTER (free, layer) ;
 }
 
 /******************************************************************************/

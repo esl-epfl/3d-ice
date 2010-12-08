@@ -65,7 +65,7 @@ Channel* alloc_and_init_channel (void)
 
 void free_channel (Channel* channel)
 {
-  free (channel) ;
+  FREE_POINTER (free, channel) ;
 }
 
 /******************************************************************************/

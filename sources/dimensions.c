@@ -164,7 +164,7 @@ void print_detailed_dimensions
 
 void free_dimensions (Dimensions* dimensions)
 {
-  free (dimensions) ;
+  FREE_POINTER (free, dimensions) ;
 }
 
 /******************************************************************************/

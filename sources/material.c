@@ -65,8 +65,8 @@ Material* alloc_and_init_material (void)
 
 void free_material (Material* material)
 {
-  free (material->Id) ;
-  free (material) ;
+  FREE_POINTER (free, material->Id) ;
+  FREE_POINTER (free, material) ;
 }
 
 /******************************************************************************/

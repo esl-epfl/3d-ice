@@ -74,7 +74,7 @@ int alloc_system_matrix
 
   if (matrix->ColumnPointers == NULL)
   {
-    free (matrix->RowIndices) ;
+    FREE_POINTER (free, matrix->RowIndices) ;
     return 0 ;
   }
 
@@ -83,8 +83,8 @@ int alloc_system_matrix
 
   if (matrix->Values == NULL)
   {
-    free (matrix->ColumnPointers) ;
-    free (matrix->RowIndices) ;
+    FREE_POINTER (free, matrix->ColumnPointers) ;
+    FREE_POINTER (free, matrix->RowIndices) ;
     return 0 ;
   }
 
@@ -95,9 +95,9 @@ int alloc_system_matrix
 
 void free_system_matrix (SystemMatrix* matrix)
 {
-  free (matrix->ColumnPointers) ;
-  free (matrix->RowIndices) ;
-  free (matrix->Values) ;
+  FREE_POINTER (free, matrix->ColumnPointers) ;
+  FREE_POINTER (free, matrix->RowIndices) ;
+  FREE_POINTER (free, matrix->Values) ;
 }
 
 /******************************************************************************/

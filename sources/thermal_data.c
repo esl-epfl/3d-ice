@@ -241,19 +241,19 @@ int fill_thermal_data
   /* Free if malloc errors */
 
 slu_etree_fail :
-  free (tdata->SLU_PermutationMatrixC) ;
+  FREE_POINTER (free, tdata->SLU_PermutationMatrixC) ;
 slu_perm_c_fail :
-  free (tdata->SLU_PermutationMatrixR) ;
+  FREE_POINTER (free, tdata->SLU_PermutationMatrixR) ;
 slu_perm_r_fail :
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
   free_system_matrix (&tdata->SM_A) ;
 system_matrix_fail :
-  free (tdata->Sources) ;
+  FREE_POINTER (free, tdata->Sources) ;
 sources_fail :
-  free (tdata->ThermalCells) ;
+  FREE_POINTER (free, tdata->ThermalCells) ;
 thermal_cell_data_fail :
   Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
-  free (tdata->Temperatures) ;
+  FREE_POINTER (free, tdata->Temperatures) ;
 temperatures_fail :
   return -1 ;
 }
@@ -262,13 +262,13 @@ temperatures_fail :
 
 void free_thermal_data (ThermalData* tdata)
 {
-  free (tdata->Temperatures) ;
-  free (tdata->Sources) ;
-  free (tdata->ThermalCells) ;
+  FREE_POINTER (free, tdata->Temperatures) ;
+  FREE_POINTER (free, tdata->Sources) ;
+  FREE_POINTER (free, tdata->ThermalCells) ;
 
-  free (tdata->SLU_PermutationMatrixR) ;
-  free (tdata->SLU_PermutationMatrixC) ;
-  free (tdata->SLU_Etree) ;
+  FREE_POINTER (free, tdata->SLU_PermutationMatrixR) ;
+  FREE_POINTER (free, tdata->SLU_PermutationMatrixC) ;
+  FREE_POINTER (free, tdata->SLU_Etree) ;
 
   StatFree (&tdata->SLU_Stat) ;
 

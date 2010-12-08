@@ -66,7 +66,7 @@ ConventionalHeatSink* alloc_and_init_conventional_heat_sink (void)
 
 void free_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
 {
-  free (conventionalheatsink) ;
+  FREE_POINTER (free, conventionalheatsink) ;
 }
 
 /******************************************************************************/

@@ -71,9 +71,9 @@ Floorplan* alloc_and_init_floorplan (void)
 
 void free_floorplan (Floorplan* floorplan)
 {
-  free_floorplan_elements_list (floorplan->ElementsList) ;
-  free (floorplan->FileName) ;
-  free (floorplan) ;
+  FREE_POINTER (free_floorplan_elements_list, floorplan->ElementsList) ;
+  FREE_POINTER (free,                         floorplan->FileName) ;
+  FREE_POINTER (free,                         floorplan) ;
 }
 
 /******************************************************************************/

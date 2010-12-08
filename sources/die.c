@@ -67,9 +67,10 @@ Die* alloc_and_init_die (void)
 
 void free_die (Die* die)
 {
-  free_layers_list (die->BottomLayer) ;
-  free (die->Id) ;
-  free (die) ;
+  die->TopLayer = NULL ;
+  FREE_POINTER (free_layers_list, die->BottomLayer) ;
+  FREE_POINTER (free,             die->Id) ;
+  FREE_POINTER (free,             die) ;
 }
 
 /******************************************************************************/
@@ -115,8 +116,8 @@ void print_formatted_die
       print_formatted_layer (stream, new_prefix_layer, layer) ;
   }
 
-  free (new_prefix_layer) ;
-  free (new_prefix_source) ;
+  FREE_POINTER (free, new_prefix_layer) ;
+  FREE_POINTER (free, new_prefix_source) ;
 }
 
 /******************************************************************************/
@@ -174,7 +175,7 @@ void print_detailed_die
            "%s  Next                      = %p\n",
            prefix, die->Next) ;
 
-  free (new_prefix) ;
+  FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

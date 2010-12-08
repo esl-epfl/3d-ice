@@ -73,7 +73,7 @@ void free_powers_queue (PowersQueue* queue)
 
     pop_from_powers_queue(queue) ;
 
-  free (queue) ;
+  FREE_POINTER (free, queue) ;
 }
 
 /******************************************************************************/
@@ -117,7 +117,7 @@ void pop_from_powers_queue (PowersQueue* queue)
 {
   PowerNode* tmp = queue->Head->Next ;
 
-  free(queue->Head) ;
+  FREE_POINTER (free, queue->Head) ;
 
   queue->Head = tmp ;
 

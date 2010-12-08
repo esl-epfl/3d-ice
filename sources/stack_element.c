@@ -73,15 +73,15 @@ void free_stack_element (StackElement* stack_element)
   if (stack_element->Type == TDICE_STACK_ELEMENT_DIE
       && stack_element->Floorplan != NULL)
 
-    free_floorplan (stack_element->Floorplan) ;
+    FREE_POINTER (free_floorplan, stack_element->Floorplan) ;
 
   else if (stack_element->Type == TDICE_STACK_ELEMENT_LAYER
            && stack_element->Pointer.Layer != NULL)
 
-    free_layer (stack_element->Pointer.Layer) ;
+    FREE_POINTER (free_layer, stack_element->Pointer.Layer) ;
 
-  free (stack_element->Id) ;
-  free (stack_element) ;
+  FREE_POINTER (free, stack_element->Id) ;
+  FREE_POINTER (free, stack_element) ;
 }
 
 /******************************************************************************/
@@ -226,7 +226,7 @@ void print_detailed_stack_elements_list
 
   } // FOR_EVERY_ELEMENT_IN_LIST
 
-  free (new_prefix) ;
+  FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

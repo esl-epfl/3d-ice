@@ -67,7 +67,7 @@ static Quantity_t first_queue_length = QUANTITY_I ;
 %type <p_floorplan_element> floorplan_element_list ;
 %type <p_powers_queue>      power_values_list ;
 
-%destructor { free($$) ; } <identifier>
+%destructor { FREE_POINTER (free, $$) ; } <identifier>
 
 %token POSITION   "keyword position"
 %token DIMENSION  "keyword dimension"
@@ -103,8 +103,10 @@ floorplan_element_list
 
       if (tmp_1 || tmp_2)
       {
-        free_floorplan_element ($1) ;
+        FREE_POINTER (free_floorplan_element, $1) ;
+
         floorplan_error (floorplan, dimensions, scanner, "") ;
+
         YYABORT ;
       }
 
@@ -122,15 +124,19 @@ floorplan_element_list
         if (message == NULL)
         {
           floorplan_error (floorplan, dimensions, scanner, "Malloc error") ;
-          free_floorplan_element ($2) ;
+
+          FREE_POINTER (free_floorplan_element, $2) ;
+
           YYABORT ;
         }
 
         sprintf (message, "Floorplan element %s already declared", $2->Id) ;
 
         floorplan_error (floorplan, dimensions, scanner, message) ;
-        free_floorplan_element ($2) ;
-        free (message) ;
+
+        FREE_POINTER (free_floorplan_element, $2) ;
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
@@ -141,8 +147,10 @@ floorplan_element_list
 
       if (tmp_1 || tmp_2 || tmp_3 )
       {
-        free_floorplan_element ($2) ;
+        FREE_POINTER (free_floorplan_element, $2) ;
+
         floorplan_error (floorplan, dimensions, scanner, "") ;
+
         YYABORT ;
       }
 

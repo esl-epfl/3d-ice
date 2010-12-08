@@ -119,10 +119,10 @@
 %token <char_p>   IDENTIFIER "identifier"
 %token <char_p>   PATH       "path to file"
 
-%destructor { free($$) ;                      } <char_p>
-%destructor { free_layers_list ($$) ;         } <layers>
-%destructor { free_dies_list ($$) ;           } <dies>
-%destructor { free_stack_elements_list ($$) ; } <stack_elements>
+%destructor { FREE_POINTER (free,                     $$) ; } <char_p>
+%destructor { FREE_POINTER (free_layers_list,         $$) ; } <layers>
+%destructor { FREE_POINTER (free_dies_list,           $$) ; } <dies>
+%destructor { FREE_POINTER (free_stack_elements_list, $$) ; } <stack_elements>
 
 %{
 #include "../flex/stack_description_scanner.h"
@@ -260,11 +260,13 @@ material
 
       if (material == NULL)
       {
-        free ($2) ;
+        FREE_POINTER (free, $2) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc material failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -274,17 +276,21 @@ material
 
         if (message == NULL)
         {
-          free ($2) ;
-          free_material (material) ;
+          FREE_POINTER (free,          $2) ;
+          FREE_POINTER (free_material, material) ;
+
           stack_description_error (stkd, scanner, "Malloc error") ;
           YYABORT ;
         }
         sprintf (message, "Material %s already declared", $2) ;
 
-        free ($2) ;
-        free_material (material) ;
+        FREE_POINTER (free,          $2) ;
+        FREE_POINTER (free_material, material) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free (message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
@@ -346,11 +352,13 @@ channel
 
       if (stkd->Channel == NULL)
       {
-        free ($18) ;
+        FREE_POINTER (free, $18) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc channel failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -374,22 +382,27 @@ channel
 
         if (message == NULL)
         {
-          free ($18) ;
+          FREE_POINTER (free, $18) ;
+
           stack_description_error (stkd, scanner, "Malloc error") ;
+
           YYABORT ;
         }
 
         sprintf (message, "Unknown material %s", $18) ;
 
-        free ($18) ;
+        FREE_POINTER (free, $18) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free (message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
       stkd->Channel->WallMaterial->Used++ ;
 
-      free ($18) ;
+      FREE_POINTER (free, $18) ;
     }
   ;
 
@@ -432,15 +445,16 @@ die
 
       if (die == NULL)
       {
-        free             ($2) ;
-        free_layers_list ($4) ;
-        free_layer       ($5) ;
-        free_layers_list ($6) ;
+        FREE_POINTER (free,             $2) ;
+        FREE_POINTER (free_layers_list, $4) ;
+        FREE_POINTER (free_layer,       $5) ;
+        FREE_POINTER (free_layers_list, $6);
 
         stack_description_error
         (
           stkd, scanner, "malloc die failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -450,13 +464,16 @@ die
           = (String_t) malloc ((21 + strlen($2)) * sizeof (char)) ;
         sprintf (message, "Die %s already declared", $2) ;
 
-        free             ($2) ;
-        free_layers_list ($4) ;
-        free_layer       ($5) ;
-        free_layers_list ($6) ;
-        free_die (die) ;
+        FREE_POINTER (free,             $2) ;
+        FREE_POINTER (free_layers_list, $4) ;
+        FREE_POINTER (free_layer,       $5) ;
+        FREE_POINTER (free_layers_list, $6);
+        FREE_POINTER (free_die,         die) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free (message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
@@ -551,11 +568,13 @@ layer_content : DVALUE IDENTIFIER ';'
 
       if (layer == NULL)
       {
-        free ($2) ;
+        FREE_POINTER (free, $2) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc layer failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -568,24 +587,29 @@ layer_content : DVALUE IDENTIFIER ';'
 
         if (message == NULL)
         {
-          free ($2) ;
-          free_layer(layer) ;
+          FREE_POINTER (free,       $2) ;
+          FREE_POINTER (free_layer, layer) ;
+
           stack_description_error (stkd, scanner, "Malloc error") ;
+
           YYABORT ;
         }
 
         sprintf (message, "Unknown material %s", $2) ;
 
-        free ($2) ;
-        free_layer(layer) ;
+        FREE_POINTER (free,       $2) ;
+        FREE_POINTER (free_layer, layer) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free (message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
       layer->Material->Used++ ;
 
-      free ($2) ;
+      FREE_POINTER (free, $2) ;
     }
   ;
 
@@ -664,11 +688,13 @@ stack_elements
       if (   last_stack_element != NULL
           && last_stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
       {
-        free_stack_element ($1) ;
+        FREE_POINTER (free_stack_element, $1) ;
+
         stack_description_error
         (
           stkd, scanner, "channel as top stack element not supported"
         ) ;
+
         YYABORT ;
       }
 
@@ -708,18 +734,23 @@ stack_elements
 
         if (message == NULL)
         {
-          free_stack_element ($2) ;
-          free_stack_elements_list ($1) ;
+          FREE_POINTER (free_stack_element,       $2) ;
+          FREE_POINTER (free_stack_elements_list, $1) ;
+
           stack_description_error (stkd, scanner, "Malloc error") ;
+
           YYABORT ;
         }
 
         sprintf (message, "Stack element %s already declared", $2->Id) ;
 
-        free_stack_element ($2) ;
-        free_stack_elements_list ($1) ;
+        FREE_POINTER (free_stack_element,       $2) ;
+        FREE_POINTER (free_stack_elements_list, $1) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free (message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
@@ -740,12 +771,14 @@ stack_element
 
       if (stack_element == NULL)
       {
-        free ($2) ;
-        free ($4) ;
+        FREE_POINTER (free, $2) ;
+        FREE_POINTER (free, $4) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc stack element failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -753,13 +786,15 @@ stack_element
 
       if (layer == NULL)
       {
-        free ($2) ;
-        free ($4) ;
-        free_stack_element (stack_element) ;
+        FREE_POINTER (free,               $2) ;
+        FREE_POINTER (free,               $4) ;
+        FREE_POINTER (free_stack_element, stack_element) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc layer failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -772,28 +807,33 @@ stack_element
 
         if (message == NULL)
         {
-          free ($2) ;
-          free ($4) ;
-          free_stack_element (stack_element) ;
-          free_layer (layer) ;
+          FREE_POINTER (free,               $2) ;
+          FREE_POINTER (free,               $4) ;
+          FREE_POINTER (free_stack_element, stack_element) ;
+          FREE_POINTER (free_layer,         layer) ;
+
           stack_description_error (stkd, scanner, "Malloc error") ;
+
           YYABORT ;
         }
 
         sprintf (message, "Unknown material %s", $4) ;
 
-        free ($2) ;
-        free ($4) ;
-        free_stack_element (stack_element) ;
-        free_layer (layer) ;
+        FREE_POINTER (free,               $2) ;
+        FREE_POINTER (free,               $4) ;
+        FREE_POINTER (free_stack_element, stack_element) ;
+        FREE_POINTER (free_layer,         layer) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free (message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
       layer->Material->Used++ ;
 
-      free($4) ;
+      FREE_POINTER (free, $4) ;
 
       stack_element->Type          = TDICE_STACK_ELEMENT_LAYER ;
       stack_element->Pointer.Layer = layer ;
@@ -810,22 +850,26 @@ stack_element
 
       if (stkd->Channel == NULL)
       {
-        free ($2) ;
+        FREE_POINTER (free, $2) ;
+
         stack_description_error
         (
           stkd, scanner, "channel used in stack but not declared"
         ) ;
+
         YYABORT ;
       }
 
       if (   last_stack_element != NULL
           && last_stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
       {
-        free ($2) ;
+        FREE_POINTER (free, $2) ;
+
         stack_description_error
         (
           stkd, scanner, "two consecutive channel layers not supported"
         ) ;
+
         YYABORT ;
       }
 
@@ -833,11 +877,13 @@ stack_element
 
       if (stack_element == NULL)
       {
-        free ($2) ;
+        FREE_POINTER (free, $2) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc stack element failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -859,13 +905,15 @@ stack_element
 
       if (stack_element == NULL)
       {
-        free ($2) ;
-        free ($3) ;
-        free ($5) ;
+        FREE_POINTER (free, $2) ;
+        FREE_POINTER (free, $3) ;
+        FREE_POINTER (free, $5) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc stack element failed"
         ) ;
+
         YYABORT ;
       }
 
@@ -879,20 +927,25 @@ stack_element
 
         if (message == NULL)
         {
-          free ($3) ;
-          free ($5) ;
-          free_stack_element (stack_element) ;
+          FREE_POINTER (free,               $3) ;
+          FREE_POINTER (free,               $5) ;
+          FREE_POINTER (free_stack_element, stack_element) ;
+
           stack_description_error (stkd, scanner, "Malloc error") ;
+
           YYABORT ;
         }
 
         sprintf (message, "Unknown die %s", $3) ;
 
-        free($3) ;
-        free($5) ;
-        free_stack_element (stack_element) ;
+        FREE_POINTER (free,               $3) ;
+        FREE_POINTER (free,               $5) ;
+        FREE_POINTER (free_stack_element, stack_element) ;
+
         stack_description_error (stkd, scanner, message) ;
-        free(message) ;
+
+        FREE_POINTER (free, message) ;
+
         YYABORT ;
       }
 
@@ -903,19 +956,21 @@ stack_element
 
       if (stack_element->Floorplan == NULL)
       {
-        free($3) ;
-        free($5) ;
-        free_stack_element (stack_element) ;
+        FREE_POINTER (free,               $3) ;
+        FREE_POINTER (free,               $5) ;
+        FREE_POINTER (free_stack_element, stack_element) ;
+
         stack_description_error
         (
           stkd, scanner, "malloc floorplan failed"
         ) ;
+
         YYABORT ;
       }
 
       stack_element->Floorplan->FileName = $5 ;
 
-      free($3) ;
+      FREE_POINTER (free, $3) ;
 
       found_die = TRUE_V ;
       last_stack_element = stack_element ;
@@ -1049,5 +1104,5 @@ void stack_description_error
     stack_description_get_lineno (scanner),
     message
   ) ;
-  free_stack_description (stkd) ;
+  FREE_POINTER (free_stack_description, stkd) ;
 }

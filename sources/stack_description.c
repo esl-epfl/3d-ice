@@ -98,13 +98,13 @@ int fill_stack_description
 
 void free_stack_description (StackDescription* stkd)
 {
-  free_materials_list         (stkd->MaterialsList) ;
-  free_channel                (stkd->Channel) ;
-  free_dies_list              (stkd->DiesList) ;
-  free_conventional_heat_sink (stkd->ConventionalHeatSink) ;
-  free_stack_elements_list    (stkd->StackElementsList) ;
-  free_dimensions             (stkd->Dimensions) ;
-  free                        (stkd->FileName) ;
+  FREE_POINTER (free_materials_list,         stkd->MaterialsList) ;
+  FREE_POINTER (free_channel,                stkd->Channel) ;
+  FREE_POINTER (free_dies_list,              stkd->DiesList) ;
+  FREE_POINTER (free_conventional_heat_sink, stkd->ConventionalHeatSink) ;
+  FREE_POINTER (free_stack_elements_list,    stkd->StackElementsList) ;
+  FREE_POINTER (free_dimensions,             stkd->Dimensions) ;
+  FREE_POINTER (free,                        stkd->FileName) ;
 }
 
 /******************************************************************************/
@@ -218,7 +218,7 @@ void print_detailed_stack_description
   fprintf (stream, "%s\n", prefix) ;
   print_detailed_dimensions (stream, new_prefix, stkd->Dimensions) ;
 
-  free (new_prefix) ;
+  FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

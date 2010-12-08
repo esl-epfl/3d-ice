@@ -80,9 +80,9 @@ FloorplanElement* alloc_and_init_floorplan_element (void)
 
 void free_floorplan_element (FloorplanElement* floorplan_element)
 {
-  free (floorplan_element->Id) ;
-  free_powers_queue (floorplan_element->PowerValues) ;
-  free (floorplan_element) ;
+  FREE_POINTER (free_powers_queue, floorplan_element->PowerValues) ;
+  FREE_POINTER (free,              floorplan_element->Id) ;
+  FREE_POINTER (free,              floorplan_element) ;
 }
 
 /******************************************************************************/

@@ -56,6 +56,16 @@ extern "C"
 
 /******************************************************************************/
 
+# define FREE_POINTER(function, pointer) \
+                                         \
+    do                                   \
+    {                                    \
+      function (pointer) ;               \
+      pointer = NULL ;                   \
+    } while (0)
+
+/******************************************************************************/
+
   /* Free a linked list of ... */
 
 # define FREE_LIST(type, list, free_function) \
@@ -64,7 +74,7 @@ extern "C"
     for ( ; list != NULL ; list = next)       \
     {                                         \
       next = list->Next ;                     \
-      free_function (list) ;                  \
+      FREE_POINTER (free_function, list) ;    \
     }
 
 /******************************************************************************/
