@@ -80,8 +80,6 @@ extern "C"
 
     Quantity_t CurrentTime ;
 
-    Quantity_t CurrentSlotLimit ;
-
     /* The matrix A representing the linear system */
 
     SystemMatrix SM_A ;
@@ -176,10 +174,8 @@ extern "C"
   /*                                                                        */
   /* Returns                                                                */
   /*                                                                        */
-  /*  -1 if the tdata.SM_A hasn't been factored before                      */
-  /*   0 if the emulation succeeded,                                        */
   /*   1 if the time slots are over,                                        */
-  /*   2 if the time reached the end of a time slot,                        */
+  /*   0 if the emulation succeeded (step consumed),                        */
   /*  <0 if there have been a problem with the computation of the solution  */
   /*     of the linear system. See the "info" prameter of "dgstrs" in       */
   /*     SuperLU.                                                           */
@@ -192,9 +188,8 @@ extern "C"
   /*                                                                        */
   /* Returns                                                                */
   /*                                                                        */
-  /*  -1 if the tdata.SM_A hasn't been factored before                      */
-  /*   0 if the emulation succeeded,                                        */
   /*   1 if the time slots are over                                         */
+  /*   0 if the emulation succeeded (slot consumed),                        */
   /*  <0 if there have been a problem with the computation of the solution  */
   /*     of the linear system. See the "info" prameter of "dgstrs"          */
   /*     in SuperLU.                                                        */

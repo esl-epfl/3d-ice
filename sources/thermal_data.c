@@ -91,7 +91,6 @@ void init_thermal_data
   tdata->SlotLength = (Quantity_t) ( slot_time / step_time ) ;
 
   tdata->CurrentTime      = QUANTITY_I ;
-  tdata->CurrentSlotLimit = QUANTITY_I ;
 
   tdata->InitialTemperature = initial_temperature ;
 
@@ -343,13 +342,7 @@ fill_system_vector
 
 int emulate_step (ThermalData* tdata, StackDescription* stkd)
 {
-  if (tdata->SLU_Options.Fact != FACTORED)
-  {
-    fprintf (stderr, "call fill_thermal_data before emulating\n") ;
-    return -1 ;
-  }
-
-  if (tdata->CurrentTime == tdata->CurrentSlotLimit)
+  if (tdata->CurrentTime % tdata->SlotLength == 0)
   {
     if (get_number_of_remaining_power_values(stkd) == 0)
 
@@ -359,12 +352,6 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
     (
       tdata->Sources, tdata->ThermalCells, stkd
     ) ;
-
-    tdata->CurrentSlotLimit += tdata->SlotLength;
-
-    if (tdata->CurrentTime != QUANTITY_I)
-
-      return 2 ;
   }
 
   fill_system_vector
@@ -400,56 +387,17 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 
 int emulate_slot (ThermalData* tdata, StackDescription* stkd)
 {
-  if (tdata->SLU_Options.Fact != FACTORED)
+  int result = 0 ;
+
+  do
   {
-    fprintf (stderr, "call fill_thermal_data before emulating\n") ;
-    return -1 ;
-  }
+    result = emulate_step(tdata, stkd) ;
 
-  if (tdata->CurrentTime == tdata->CurrentSlotLimit)
-  {
-    if ( get_number_of_remaining_power_values(stkd) == 0)
+    if (result != 0)  break ;
 
-      return 1 ;
+  } while (tdata->CurrentTime % tdata->SlotLength != 0) ;
 
-    fill_sources_stack_description
-    (
-      tdata->Sources, tdata->ThermalCells, stkd
-    ) ;
-
-    tdata->CurrentSlotLimit += tdata->SlotLength ;
-  }
-
-  while ( tdata->CurrentTime != tdata->CurrentSlotLimit )
-  {
-    fill_system_vector
-    (
-      stkd->Dimensions, tdata->Temperatures,
-      tdata->Sources, tdata->ThermalCells, tdata->Temperatures
-    ) ;
-
-    dgstrs
-    (
-      NOTRANS,
-      &tdata->SLUMatrix_L,
-      &tdata->SLUMatrix_U,
-      tdata->SLU_PermutationMatrixC,
-      tdata->SLU_PermutationMatrixR,
-      &tdata->SLUMatrix_B,
-      &tdata->SLU_Stat,
-      &tdata->SLU_Info
-    ) ;
-
-    if (tdata->SLU_Info < 0)
-    {
-      fprintf (stderr, "Error while solving linear system\n") ;
-      return tdata->SLU_Info ;
-    }
-
-    tdata->CurrentTime++ ;
-  }
-
-  return 0 ;
+  return result ;
 }
 
 /******************************************************************************/
