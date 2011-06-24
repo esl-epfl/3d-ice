@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 1.0.1 .                               #
+ # This file is part of 3D-ICE, version 1.0.2 .                               #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #

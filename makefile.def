@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 1.0.1 .                               #
+ # This file is part of 3D-ICE, version 1.0.2 .                               #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -38,7 +38,7 @@
  ##############################################################################
 
 3DICE_LIBNAME   = 3D-ICE
-3DICE_VERSION   = 1.0.1
+3DICE_VERSION   = 1.0.2
 3DICE_RELEASE   = $(3DICE_LIBNAME)-$(3DICE_VERSION)
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include

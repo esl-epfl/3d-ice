@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 1.0.1 .                               #
+ # This file is part of 3D-ICE, version 1.0.2 .                               #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -33,6 +33,10 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
+ ##############################################################################
+ 2011-06-03 3D-ICE 1.0.2
+   * Bug fix: Improved filling source vector functions
+   * Bug fix: Counting simulation time with integers
  ##############################################################################
  2010-10-07 3D-ICE 1.0.1
    * Bug fixes
