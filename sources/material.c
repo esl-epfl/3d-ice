@@ -41,140 +41,135 @@
 
 /******************************************************************************/
 
-void init_material (Material* material)
+void init_material (Material *material)
 {
-  material->Id                     = STRING_I ;
-  material->Used                   = QUANTITY_I ;
-  material->VolumetricHeatCapacity = SOLIDVHC_I ;
-  material->ThermalConductivity    = SOLIDTC_I ;
-  material->Next                   = NULL ;
+    material->Id                     = NULL ;
+    material->Used                   = 0u ;
+    material->VolumetricHeatCapacity = 0.0 ;
+    material->ThermalConductivity    = 0.0 ;
+    material->Next                   = NULL ;
 }
 
 /******************************************************************************/
 
-Material* alloc_and_init_material (void)
+Material * alloc_and_init_material (void)
 {
-  Material* material = malloc (sizeof(*material)) ;
+    Material *material = (Material *) malloc ( sizeof(Material) ) ;
 
-  if (material != NULL) init_material (material) ;
+    if (material != NULL)
 
-  return material ;
+        init_material (material) ;
+
+    return material ;
 }
 
 /******************************************************************************/
 
-void free_material (Material* material)
+void free_material (Material *material)
 {
-  FREE_POINTER (free, material->Id) ;
-  FREE_POINTER (free, material) ;
+    FREE_POINTER (free, material->Id) ;
+    FREE_POINTER (free, material) ;
 }
 
 /******************************************************************************/
 
-void free_materials_list (Material* list)
+void free_materials_list (Material *list)
 {
-  FREE_LIST (Material, list, free_material) ;
+    FREE_LIST (Material, list, free_material) ;
+}
+
+/******************************************************************************/
+
+Material * find_material_in_list (Material *list, char *id)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, list)
+    {
+        if (strcmp(material->Id, id) == 0)
+            break ;
+    }
+    return material ;
 }
 
 /******************************************************************************/
 
 void print_formatted_material
-(
-  FILE*     stream,
-  String_t  prefix,
-  Material* material
-)
+
+    (FILE *stream, char *prefix, Material *material)
+
 {
-  fprintf (stream,
-           "%smaterial %s :\n",
-           prefix, material->Id) ;
+    fprintf (stream,
+             "%smaterial %s :\n",
+             prefix, material->Id) ;
 
-  fprintf (stream,
-           "%s   thermal conductivity     %.4e ;\n",
-           prefix, material->ThermalConductivity) ;
+    fprintf (stream,
+             "%s   thermal conductivity     %.4e  ;\n",
+             prefix, material->ThermalConductivity) ;
 
-  fprintf (stream,
-           "%s   volumetric heat capacity %.4e ;\n",
-           prefix, material->VolumetricHeatCapacity) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_material
-(
-  FILE*     stream,
-  String_t  prefix,
-  Material* material
-)
-{
-  fprintf (stream,
-           "%smaterial                    = %p\n",
-           prefix, material) ;
-
-  fprintf (stream,
-           "%s  Id                        = %s\n",
-           prefix, material->Id) ;
-
-  fprintf (stream,
-           "%s  Used                      = %d\n",
-           prefix, material->Used) ;
-
-  fprintf (stream,
-           "%s  ThermalConductivity       = %.4e\n",
-           prefix, material->ThermalConductivity) ;
-
-  fprintf (stream,
-           "%s  VolumetricHeatCapacity    = %.4e\n",
-           prefix, material->VolumetricHeatCapacity) ;
-
-  fprintf (stream,
-           "%s  Next                      = %p\n",
-           prefix, material->Next) ;
+    fprintf (stream,
+             "%s   volumetric heat capacity %.4e  ;\n",
+             prefix, material->VolumetricHeatCapacity) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_materials_list
-(
-  FILE*     stream,
-  String_t  prefix,
-  Material* list
-)
+
+    (FILE *stream, char *prefix, Material *list)
+
 {
-  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
-  {
+    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
+    {
+        print_formatted_material (stream, prefix, material) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
     print_formatted_material (stream, prefix, material) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
-  print_formatted_material (stream, prefix, material) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_material
+
+    (FILE *stream, char *prefix, Material *material)
+
+{
+    fprintf (stream,
+             "%smaterial                    = %p\n",
+             prefix, material) ;
+
+    fprintf (stream,
+             "%s  Id                        = %s\n",
+             prefix, material->Id) ;
+
+    fprintf (stream,
+             "%s  Used                      = %d\n",
+             prefix, material->Used) ;
+
+    fprintf (stream,
+             "%s  ThermalConductivity       = %.4e\n",
+             prefix, material->ThermalConductivity) ;
+
+    fprintf (stream,
+             "%s  VolumetricHeatCapacity    = %.4e\n",
+             prefix, material->VolumetricHeatCapacity) ;
+
+    fprintf (stream,
+             "%s  Next                      = %p\n",
+             prefix, material->Next) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_materials_list
-(
-  FILE*     stream,
-  String_t  prefix,
-  Material* list
-)
+
+    (FILE *stream, char *prefix, Material *list)
+
 {
-  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
-  {
+    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
+    {
+        print_detailed_material (stream, prefix, material) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
     print_detailed_material (stream, prefix, material) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
-  print_detailed_material (stream, prefix, material) ;
-}
-
-/******************************************************************************/
-
-Material* find_material_in_list (Material* list, String_t id)
-{
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, list)
-
-    if (strcmp (material->Id, id) == 0) break ;
-
-  return material ;
 }
 
 /******************************************************************************/

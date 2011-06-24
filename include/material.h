@@ -37,126 +37,132 @@
 #define _3DICE_MATERIAL_H_
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 /******************************************************************************/
 
 #include <stdio.h>
-
-#include "types.h"
-
-/******************************************************************************/
-
-  struct Material
-  {
-    /* The Id of the material */
-
-    String_t Id ;
-
-    /* For parsing purpose */
-
-    Quantity_t Used ;
-
-    /* The volume-specific heat capacity [ J / ( um3 * K ) ] */
-
-    SolidVHC_t VolumetricHeatCapacity ;
-
-    /* The thermal conductivity [ W / ( um * K ) ] */
-
-    SolidTC_t ThermalConductivity ;
-
-    /* To collect materials in a linked list */
-
-    struct Material* Next ;
-
-  };
-
-  typedef struct Material Material ;
+#include <stdint.h>
 
 /******************************************************************************/
 
-  /* Given a valid address of a Material structure,  */
-  /* sets all its fields to a default value.         */
+    struct Material
+    {
+        /*
+         * The Id of the material
+         */
 
-  void init_material (Material* material) ;
+        char *Id ;
 
-/******************************************************************************/
+        /*
+         * To know, after the parsing of a stack file, if a
+         */
+        /*
+         * material has been declared but never used
+         */
 
-  /* Allocates a Material structure and sets its     */
-  /* fields to their default values. Returns a valid */
-  /* Material address if the allocation succeed or   */
-  /* NULL if it fails.                               */
+        uint8_t Used ;
 
-  Material* alloc_and_init_material (void) ;
+        /*
+         * The volume-specific heat capacity [ J / ( um3 * K ) ]
+         */
 
-/******************************************************************************/
+        double VolumetricHeatCapacity ;
 
-  /* Given the address of a Material structure,      */
-  /* frees both the Id string and the memory pointed */
-  /* by the address received.                        */
+        /*
+         * The thermal conductivity [ W / ( um * K ) ]
+         */
 
-  void free_material (Material* material) ;
+        double ThermalConductivity ;
 
-/******************************************************************************/
+        /*
+         * To collect materials in a linked list
+         */
 
-  /* Given the address of a Material structure,      */
-  /* frees the material pointed by this address and  */
-  /* all the materials it finds following the linked */
-  /* list (see Next field).                          */
+        struct Material *Next ;
+    } ;
 
-  void free_materials_list (Material* list) ;
-
-/******************************************************************************/
-
-  void print_formatted_material
-  (
-    FILE*     stream,
-    String_t  prefix,
-    Material* material
-  ) ;
+    typedef struct Material Material ;
 
 /******************************************************************************/
 
-  void print_detailed_material
-  (
-    FILE*     stream,
-    String_t  prefix,
-    Material* material
-  ) ;
+    /*
+     * Given a valid address of a Material structure,
+     * sets all its fields to a default value.
+     */
+
+    void init_material (Material *material) ;
 
 /******************************************************************************/
 
-  void print_formatted_materials_list
-  (
-    FILE* stream,
-    String_t prefix,
-    Material* list
-  ) ;
+    /*
+     * Allocates a Material structure and sets its
+     * Material address if the allocation succeed or
+     * NULL if it fails.
+     */
+
+    Material * alloc_and_init_material (void) ;
 
 /******************************************************************************/
 
-  void print_detailed_materials_list
-  (
-    FILE* stream,
-    String_t prefix,
-    Material* list
-  ) ;
+    /*
+     * Given the address of a Material structure,
+     * frees both the Id string and the memory pointed
+     * by the address received.
+     */
+
+    void free_material (Material *material) ;
 
 /******************************************************************************/
 
-  /* Id based search of a Material structure in a    */
-  /* material list. Returns the address of a         */
-  /* founded structure or NULL if it does not find   */
-  /* it.                                             */
+    /*
+     * Given the address of a Material structure,
+     * frees the material pointed by this address and
+     * all the materials it finds following the linked
+     * list  (see Next field).
+     */
 
-  Material* find_material_in_list (Material* list, String_t id) ;
+    void free_materials_list (Material *list) ;
+
+/******************************************************************************/
+
+    /*
+     * Id based search of a Material structure in a
+     * material list. Returns the address of a
+     * founded structure or NULL if it does not find
+     * it.
+     */
+
+    Material * find_material_in_list (Material *list, char *id) ;
+
+/******************************************************************************/
+
+    void print_formatted_material
+
+         (FILE *stream, char *prefix, Material *material) ;
+
+/******************************************************************************/
+
+    void print_formatted_materials_list
+
+         (FILE *stream, char *prefix, Material *material) ;
+
+/******************************************************************************/
+
+    void print_detailed_material
+
+         (FILE *stream, char *prefix, Material *material) ;
+
+/******************************************************************************/
+
+    void print_detailed_materials_list
+
+         (FILE *stream, char *prefix, Material *material) ;
 
 /******************************************************************************/
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _3DICE_MATERIAL_H_ */
+#endif    /* _3DICE_MATERIAL_H_ */
