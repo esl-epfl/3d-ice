@@ -89,6 +89,10 @@ extern "C"
 
 /******************************************************************************/
 
+  void print_system_matrix (String_t filename, SystemMatrix matrix) ;
+
+/******************************************************************************/
+
   SystemMatrix add_solid_column
   (
     Dimensions*           dimensions,
@@ -102,6 +106,54 @@ extern "C"
 /******************************************************************************/
 
   SystemMatrix add_liquid_column
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_liquid_column_2rm
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_bottom_wall_column_2rm
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_top_wall_column_2rm
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_virtual_wall_column_2rm
   (
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,

@@ -167,6 +167,21 @@ extern "C"
 
 /******************************************************************************/
 
+  void init_power_values_die
+  (
+    Floorplan*            floorplan
+  ) ;
+
+/******************************************************************************/
+
+  void insert_power_values_die
+  (
+    Floorplan*            floorplan,
+    PowersQueue*          pvalues
+  ) ;
+
+/******************************************************************************/
+
   SystemMatrix fill_system_matrix_die
   (
     Die*                  die,

@@ -277,6 +277,34 @@ void fill_sources_die
 
 /******************************************************************************/
 
+void init_power_values_die
+(
+  Floorplan*            floorplan
+)
+{
+  init_power_values_floorplan
+  (
+    floorplan
+  ) ;
+}
+
+/******************************************************************************/
+
+void insert_power_values_die
+(
+  Floorplan*            floorplan,
+  PowersQueue*          pvalues
+)
+{
+  insert_power_values_floorplan
+  (
+    floorplan,
+    pvalues
+  ) ;
+}
+
+/******************************************************************************/
+
 SystemMatrix fill_system_matrix_die
 (
   Die*                  die,

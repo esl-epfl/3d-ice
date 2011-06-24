@@ -68,6 +68,23 @@ extern void fill_system_matrix_stack_description
   StackDescription*     stkd
 ) ;
 
+extern void init_power_values
+(
+  StackDescription* stkd
+) ;
+
+extern void insert_power_values_by_powers_queue
+(
+  StackDescription* stkd,
+  PowersQueue*      pvalues
+) ;
+
+extern void insert_power_values
+(
+  StackDescription* stkd,
+  Power_t*          pvalues
+) ;
+
 static void init_data (double* data, Quantity_t size, double init_value)
 {
   while (size--) *data++ = init_value ;
@@ -224,6 +241,12 @@ int fill_thermal_data
   sp_preorder (&tdata->SLU_Options, &tdata->SLUMatrix_A,
                tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
                &tdata->SLUMatrix_A_Permuted) ;
+
+
+# ifdef PRINT_SYSTEM_MATRIX_FILE
+  print_system_matrix("result.txt", tdata->SM_A);
+  fprintf(stderr, "Printed system matrix.\n");
+# endif
 
   dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
           sp_ienv(2), sp_ienv(1), /* relax and panel size */

@@ -195,6 +195,20 @@ extern "C"
 
 /******************************************************************************/
 
+  /* The type of a channel model type */
+
+  enum ChannelModel_t
+  {
+    TDICE_CHANNEL_MODEL_4RM = 0,
+    TDICE_CHANNEL_MODEL_2RM
+  } ;
+
+  typedef enum ChannelModel_t ChannelModel_t ;
+# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_4RM
+# define                      NUM_LAYERS_2RM 4
+
+/******************************************************************************/
+
 #ifdef __cplusplus
 }
 #endif

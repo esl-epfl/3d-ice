@@ -320,6 +320,60 @@ void fill_sources_stack_description
 
 /******************************************************************************/
 
+void init_power_values
+(
+  StackDescription* stkd
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
+
+    init_power_values_stack_element (stack_element) ;
+}
+
+/******************************************************************************/
+
+Bool_t insert_power_values_by_powers_queue
+(
+  StackDescription* stkd,
+  PowersQueue*      pvalues
+)
+{
+  if (pvalues->Length != get_total_number_of_floorplan_elements(stkd))
+    return FALSE_V;
+
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
+
+    insert_power_values_stack_element (stack_element, pvalues) ;
+
+  return TRUE_V;
+}
+
+/******************************************************************************/
+
+Bool_t insert_power_values
+(
+  StackDescription* stkd,
+  Power_t*          pvalues
+)
+{
+  PowersQueue* pvalues_queue;
+  pvalues_queue = alloc_and_init_powers_queue();
+  if (pvalues == NULL)
+    return FALSE_V;
+
+  Quantity_t index;
+  Quantity_t totalNFloorplanElements = get_total_number_of_floorplan_elements(stkd);
+
+  for (index = 0; index < totalNFloorplanElements; index++)
+    put_into_powers_queue(pvalues_queue, pvalues[index]);
+
+  return insert_power_values_by_powers_queue(stkd, pvalues_queue);
+}
+
+/******************************************************************************/
+
 void update_channel_inlet_stack_description
 (
   Source_t*         sources,
@@ -424,6 +478,24 @@ Quantity_t get_number_of_floorplan_elements
 
   return stk_el->Floorplan->NElements ;
 }
+
+/******************************************************************************/
+
+Quantity_t get_total_number_of_floorplan_elements
+(
+  StackDescription* stkd
+)
+{
+  Quantity_t total_number_of_floorplan_elements = QUANTITY_I;
+
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
+    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+      total_number_of_floorplan_elements += stack_element->Floorplan->NElements;
+
+  return total_number_of_floorplan_elements;
+}
+
 
 /******************************************************************************/
 

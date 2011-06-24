@@ -34,17 +34,21 @@
  ******************************************************************************/
 
 #include <stdlib.h>
-#include <stdio.h>
+#include <time.h>
 
 #include "stack_description.h"
 #include "thermal_data.h"
+#include "network_interface.h"
+#include "NIPreamble.h"
 
 int
 main(int argc, char** argv)
 {
   StackDescription stkd ;
   ThermalData      tdata ;
-  Quantity_t       counter = QUANTITY_I ;
+  int sockfd;
+  MessagesQueue*     mqueue;
+  TemperaturesQueue* tqueue;
 
   // Checks if there are the all the arguments
   ////////////////////////////////////////////////////////////////////////////
@@ -52,21 +56,6 @@ main(int argc, char** argv)
   if (argc != 4)
   {
     fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]) ;
-    return EXIT_FAILURE ;
-  }
-
-  FILE* t_output = fopen ("3DICE-Temperatures.txt", "w") ;
-  if (t_output == NULL)
-  {
-    fprintf(stderr, "Error opening temperatures file\n") ;
-    return EXIT_FAILURE ;
-  }
-
-  FILE* p_output = fopen ("3DICE-PowerSources.txt", "w") ;
-  if (p_output == NULL)
-  {
-    fprintf(stderr, "Error opening power sources file\n") ;
-    fclose (t_output) ;
     return EXIT_FAILURE ;
   }
 
@@ -80,8 +69,6 @@ main(int argc, char** argv)
   if (fill_stack_description (&stkd, argv[1]) != 0)
 
     return EXIT_FAILURE ;
-
-  print_detailed_dimensions (stdout, "", stkd.Dimensions);
 
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
@@ -98,27 +85,72 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  do
-  {
-    for (counter = QUANTITY_I ; counter < tdata.Size ; counter++)
+  // initlization for the communication
+#if INTERNET_DOMAIN
+  sockfd = init_server_internet_domain(PORTNO);
+#else
+  sockfd = init_server_unix_domain(SOCKET_NAME);
+#endif
+
+  if ( sockfd < 0)
+    printf("error initilizing network interface\n");
+  mqueue = alloc_and_init_messages_queue();
+  tqueue = alloc_and_init_temperatures_queue();
+
+#if DYNAMIC_POWER_VALUES
+  init_power_values (&stkd); // initilize the power values got from a stack description file
+
+  // check whether the power values from a client is valid,
+  // if not, this variable is used for terminating the simulation
+  Bool_t * is_valid = malloc(sizeof(Bool_t));
+
+  Quantity_t num_floorplan_elements = get_total_number_of_floorplan_elements(&stkd);
+  Power_t* pvalues = malloc(num_floorplan_elements * sizeof(Power_t));
+#endif
+
+  // get network messages
+  get_messages(sockfd, mqueue);
+
+  do {
+
+#if DYNAMIC_POWER_VALUES
+    pvalues = get_power_values_from_network(
+      sockfd,
+      pvalues,
+      num_floorplan_elements,
+      is_valid
+      );
+
+    if (*is_valid == FALSE_V) break;
+
+    if (insert_power_values (&stkd, pvalues) == FALSE_V)
     {
-      fprintf(t_output, "%.5f  ", tdata.Temperatures[counter]) ;
-      fprintf(p_output, "%.5e  ", tdata.Sources[counter]) ;
+      printf("error inserting dynamic power values");
+      break;
     }
+#endif
 
-    fprintf(t_output, "\n") ;
-    fprintf(p_output, "\n") ;
-  }
-  while (emulate_step (&tdata, &stkd) != 1) ;
+    // process network messages
+    process_messages(mqueue, tqueue, &stkd, &tdata);
 
-  fclose(t_output) ;
-  fclose(p_output) ;
+    // send results
+    send_results(sockfd, tqueue);
+
+  } while (emulate_step (&tdata, &stkd) != 1) ;
+
+  // close server
+  close_server(sockfd);
 
   // free all data
   ////////////////////////////////////////////////////////////////////////////
-
+  free_messages_queue    (mqueue) ;
+  free_temperatures_queue(tqueue) ;
   free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
+
+#if DYNAMIC_POWER_VALUES
+  free(pvalues);
+#endif
 
   return EXIT_SUCCESS ;
 }

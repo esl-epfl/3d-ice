@@ -83,6 +83,14 @@ extern "C"
 
     Material* WallMaterial ;
 
+    /* The channel model */
+
+    ChannelModel_t ChannelModelType ;
+
+    /* The pitch of the channel in [um] (1 cell)    */
+
+    CellDimension_t Pitch ;
+
   } Channel ;
 
 /******************************************************************************/
@@ -142,9 +150,7 @@ extern "C"
 
   SystemMatrix fill_system_matrix_channel
   (
-#   ifdef PRINT_SYSTEM_MATRIX
     Channel*         channel,
-#   endif
     Dimensions*      dimensions,
     ThermalCell*     thermalcells,
     GridDimension_t  layer_index,

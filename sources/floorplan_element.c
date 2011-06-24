@@ -142,6 +142,33 @@ void fill_sources_floorplan_element
 
 /******************************************************************************/
 
+void init_power_values_floorplan_element
+(
+  FloorplanElement* floorplan_element
+)
+{
+  free_powers_queue(floorplan_element->PowerValues);
+  floorplan_element->PowerValues = alloc_and_init_powers_queue();
+}
+
+/******************************************************************************/
+
+void insert_power_values_floorplan_element
+(
+  FloorplanElement* floorplan_element,
+  PowersQueue*      pvalues
+)
+{
+  Power_t power
+      = get_from_powers_queue(pvalues);
+
+  put_into_powers_queue(floorplan_element->PowerValues, power);
+
+  pop_from_powers_queue (pvalues) ;
+}
+
+/******************************************************************************/
+
 void print_floorplan_element
 (
   FILE*             stream,

@@ -350,6 +350,84 @@ void fill_sources_stack_element
 
 /******************************************************************************/
 
+void init_power_values_stack_element
+(
+  StackElement*         stack_element
+)
+{
+  switch (stack_element->Type)
+  {
+    case TDICE_STACK_ELEMENT_DIE :
+
+      init_power_values_die
+      (
+        stack_element->Floorplan
+      ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_LAYER :
+
+      break;
+
+    case TDICE_STACK_ELEMENT_CHANNEL :
+
+      break;
+
+    case TDICE_STACK_ELEMENT_NONE :
+
+      break;
+
+    default :
+
+      fprintf (stderr,
+        "Error! Unknown stack element type %d\n",
+        stack_element->Type) ;
+
+  } /* switch stack_element->Type */
+}
+
+/******************************************************************************/
+
+void insert_power_values_stack_element
+(
+  StackElement*         stack_element,
+  PowersQueue*          pvalues
+)
+{
+  switch (stack_element->Type)
+  {
+    case TDICE_STACK_ELEMENT_DIE :
+
+      insert_power_values_die
+      (
+        stack_element->Floorplan,
+        pvalues
+      ) ;
+      break ;
+
+    case TDICE_STACK_ELEMENT_LAYER :
+
+      break;
+
+    case TDICE_STACK_ELEMENT_CHANNEL :
+
+      break;
+
+    case TDICE_STACK_ELEMENT_NONE :
+
+      break;
+
+    default :
+
+      fprintf (stderr,
+        "Error! Unknown stack element type %d\n",
+        stack_element->Type) ;
+
+  } /* switch stack_element->Type */
+}
+
+/******************************************************************************/
+
 SystemMatrix fill_system_matrix_stack_element
 (
   SystemMatrix     system_matrix,
@@ -387,9 +465,7 @@ SystemMatrix fill_system_matrix_stack_element
 
       system_matrix = fill_system_matrix_channel
                       (
-#                       ifdef PRINT_SYSTEM_MATRIX
                         stack_element->Pointer.Channel,
-#                       endif
                         dimensions,
                         thermalcells, stack_element->Offset,
                         system_matrix

@@ -185,6 +185,13 @@ extern "C"
 
 /******************************************************************************/
 
+  Quantity_t get_total_number_of_floorplan_elements
+  (
+    StackDescription* stkd
+  ) ;
+
+/******************************************************************************/
+
   /* Given a StackDescription, returns the number of channels outlets in a  */
   /* channel layer (the number of channels is the number of liquid columns  */
   /* and it is the same for every channel layer)                            */

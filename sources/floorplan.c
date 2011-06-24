@@ -141,6 +141,40 @@ void fill_sources_floorplan
 
 /******************************************************************************/
 
+void init_power_values_floorplan
+(
+  Floorplan*   floorplan
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
+                                     floorplan->ElementsList)
+
+    init_power_values_floorplan_element
+    (
+      floorplan_element
+    ) ;
+}
+
+/******************************************************************************/
+
+void insert_power_values_floorplan
+(
+  Floorplan*   floorplan,
+  PowersQueue* pvalues
+)
+{
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
+                                     floorplan->ElementsList)
+
+    insert_power_values_floorplan_element
+    (
+      floorplan_element,
+      pvalues
+    ) ;
+}
+
+/******************************************************************************/
+
 Bool_t check_intersections
 (
   Floorplan*        floorplan,

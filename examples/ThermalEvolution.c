@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <time.h>
 
 #include "stack_description.h"
@@ -44,6 +45,9 @@ main(int argc, char** argv)
 {
   StackDescription stkd ;
   ThermalData      tdata ;
+
+  char filename [50] ;
+  int  counter = 0 ;
 
   // Checks if there are the all the arguments
   ////////////////////////////////////////////////////////////////////////////
@@ -57,7 +61,7 @@ main(int argc, char** argv)
   // Init StackDescription and parse the input file
   ////////////////////////////////////////////////////////////////////////////
 
-  fprintf (stdout, "Preparing stk data ...\n") ;
+  fprintf (stdout, "Preparing stk data ... ") ;  fflush (stdout) ;
 
   init_stack_description (&stkd) ;
 
@@ -65,10 +69,12 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
+  fprintf (stdout, "done !\n") ;
+
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
 
-  fprintf (stdout, "Preparing thermal data ...\n") ;
+  fprintf (stdout, "Preparing thermal data ... ") ;  fflush (stdout) ;
 
   init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
 
@@ -80,101 +86,63 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  // Alloc memory to store 1 temperature value for each floorplan element
-  // in the floorplan on die "die2"
+  fprintf (stdout, "done !\n") ;
+
+  // Consume all time slots printing time by time the thermal map
   ////////////////////////////////////////////////////////////////////////////
 
-  Quantity_t counter ;
-  Quantity_t nfloorplanelements
-    = get_number_of_floorplan_elements (&stkd, "die2") ;
-
-  if (nfloorplanelements < 0)
-  {
-    printf ("no element die2 found\n") ;
-    free_thermal_data (&tdata) ;
-    free_stack_description (&stkd) ;
-    return EXIT_FAILURE ;
-  }
-
-  Temperature_t* max_results
-    = malloc (sizeof(Temperature_t) * nfloorplanelements) ;
-
-  if (max_results == NULL)
-  {
-    printf ("alloc memory failed\n") ;
-    free_thermal_data      (&tdata) ;
-    free_stack_description (&stkd) ;
-    return EXIT_FAILURE ;
-  }
-
-  // Consume all time slots printing time by time the max temperature
-  // for every floorplan element composing die "die2" and the temperature
-  // of the liquid leaving the channel layer at the first channel.
-  // The do { } while () ; loop prints the temperatures at all the time points.
-  ////////////////////////////////////////////////////////////////////////////
-
-  Temperature_t outlet, cell1, cell2 ;
   clock_t Time = clock() ;
 
   do
   {
-    // get max temperatures
+     printf("%5.3fs ", get_current_time(&tdata)) ; fflush (stdout) ;
 
-    if ( get_all_max_temperatures_of_floorplan (&stkd, &tdata,
-                                                "die2", max_results)
-         != 0 )
-    {
-      printf ("error getting max temps\n") ;
-      break ;
-    }
-    // get outlet temperature
+     // Print thermal map for die1
+     /////////////////////////////////////////////////////////////////////////
 
-    if ( get_temperature_of_channel_outlet (&stkd, &tdata,
-                                            "channel1", 0, &outlet)
-         != 0 )
-    {
-      printf ("error getting oultet temp\n") ;
-      break ;
-    }
+     sprintf (filename, "die1_%05d.tmap", counter) ;
 
-/*
-    if ( get_cell_temperature (&stkd, &tdata, 2, 11, 4, &cell1) != 0 )
-    {
-      printf ("error getting cell1 temp\n") ;
-      break ;
-    }
+     if ( print_thermal_map (&stkd, &tdata, "die2", filename) != 0 )
 
-    if ( get_cell_temperature (&stkd, &tdata, 6, 34, 84, &cell2) != 0 )
-    {
-      printf ("error getting cell2 temp\n") ;
-      break ;
-    }
-*/
-    // Print results
+       printf ("error die1 thermal map\n") ;
 
-    printf("%5.3fs  ", get_current_time(&tdata)) ;
-    for (counter = 0 ; counter < nfloorplanelements ; counter++)
-      printf("%7.3f  ", max_results[counter]) ;
-    /*printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;*/
-    printf("%7.3f\n", outlet) ;
-  }
-  while (emulate_step (&tdata, &stkd) != 1) ;
-  // while (emulate_slot (&tdata, &stkd) != 1) ;
+     printf("%s ", filename) ; fflush (stdout) ;
+
+     // Print thermal map for channel1
+     /////////////////////////////////////////////////////////////////////////
+
+     sprintf (filename, "channel_%05d.tmap", counter) ;
+
+     if ( print_thermal_map (&stkd, &tdata, "channel1", filename) != 0 )
+
+       printf ("error channel thermal map\n") ;
+
+     printf("%s ", filename) ; fflush (stdout) ;
+
+     // Print thermal map for die2
+     /////////////////////////////////////////////////////////////////////////
+
+     sprintf (filename, "die2_%05d.tmap", counter) ;
+
+     if ( print_thermal_map (&stkd, &tdata, "die2", filename) != 0 )
+
+       printf ("error die2 thermal map\n") ;
+
+     printf("%s\n", filename) ; fflush (stdout) ;
+
+     /////////////////////////////////////////////////////////////////////////
+
+     counter++ ;
+
+  }  while (emulate_step (&tdata, &stkd) != 1) ;
+
 
   fprintf (stdout, "emulation took %.3f sec\n",
            ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
 
-  // At the end of emulation, creates the thermal map of the channel layer
-  ////////////////////////////////////////////////////////////////////////////
-
-  if ( print_thermal_map (&stkd, &tdata, "channel1", "channel1_map.txt") != 0 )
-
-      printf ("error chanel thermal map\n") ;
-
   // free all data
   ////////////////////////////////////////////////////////////////////////////
 
-  free                   (max_results) ;
   free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
 

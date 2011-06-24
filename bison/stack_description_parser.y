@@ -56,6 +56,7 @@
    Layer*        layer_p ;
    StackElement* stack_element_p ;
    CoolantHTCs_t coolanthtcs_v ;
+   ChannelModel_t channel_model_v ;
 }
 
 %type <double_v> first_wall_length
@@ -114,10 +115,13 @@
 %token SIDE                  "keyword side"
 %token TOP                   "keyword top"
 %token BOTTOM                "keyword bottom"
+%token TYPE                  "keyword type"
+%token PITCH                 "keyword pitch"
 
 %token <double_v> DVALUE     "double value"
 %token <char_p>   IDENTIFIER "identifier"
 %token <char_p>   PATH       "path to file"
+%token <channel_model_v>   CHANNEL_MODEL_TYPE       "channel model type"
 
 %destructor { FREE_POINTER (free,                     $$) ; } <char_p>
 %destructor { FREE_POINTER (free_layers_list,         $$) ; } <layers>
@@ -199,15 +203,19 @@ stack_description_file
                   die->Id) ;
 
       //
-      // Counts the number of layers
+      // Counts the number of layers and channels
       //
 
-      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
+      Quantity_t num_channels = QUANTITY_I;
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList) {
 
         stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
+        if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL) num_channels++;
+
+      }
 
       //
-      // Evaluate the number of cells and nonzeroe elements
+      // Evaluate the number of cells and nonzero elements
       //
 
       stkd->Dimensions->Grid.NCells
@@ -215,27 +223,83 @@ stack_description_file
           * get_number_of_rows(stkd->Dimensions)
           * get_number_of_columns(stkd->Dimensions) ;
 
-      stkd->Dimensions->Grid.NNz
+      if (stkd->Channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM) {
 
-        = // Number of coefficients in the diagonal
-            get_number_of_layers(stkd->Dimensions)
-          * get_number_of_rows(stkd->Dimensions)
-          * get_number_of_columns(stkd->Dimensions)
-          +
-          // Number of coefficients Bottom <-> Top
-          2 * (get_number_of_layers(stkd->Dimensions) - 1 )
+        Quantity_t num_layers_for_channel    =
+          num_channels * NUM_LAYERS_2RM;
+
+        Quantity_t num_layers_except_channel =
+          get_number_of_layers(stkd->Dimensions) - num_layers_for_channel;
+
+        stkd->Dimensions->Grid.NNz
+
+          = // For Normal Cells
+            // Number of coefficients in the diagonal
+              num_layers_except_channel
             * get_number_of_rows(stkd->Dimensions)
             * get_number_of_columns(stkd->Dimensions)
-          +
-          // Number of coefficients North <-> South
-          2 * get_number_of_layers(stkd->Dimensions)
-            * (get_number_of_rows(stkd->Dimensions) - 1 )
-            * get_number_of_columns(stkd->Dimensions)
-          +
-          // Number of coefficients East <-> West
-          2 * get_number_of_layers(stkd->Dimensions)
+            +
+            // Number of coefficients Bottom <-> Top
+            2 * num_layers_except_channel
+              * get_number_of_rows(stkd->Dimensions)
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients North <-> South
+            2 * num_layers_except_channel
+              * (get_number_of_rows(stkd->Dimensions) - 1 )
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients East <-> West
+            2 * num_layers_except_channel
+              * get_number_of_rows(stkd->Dimensions)
+              * (get_number_of_columns(stkd->Dimensions) - 1 )
+            +
+
+            // For Channel Cells
+            // Number of coefficients in the diagonal
+                num_layers_for_channel
+              * get_number_of_rows(stkd->Dimensions)
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients Bottom <-> Top
+            2 * (num_layers_for_channel + num_channels)
+              * get_number_of_rows(stkd->Dimensions)
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients North <-> South
+            2 * num_channels
+              * (get_number_of_rows(stkd->Dimensions) - 1 )
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients East <-> West
+            0
+            ;
+
+      } else {
+
+        stkd->Dimensions->Grid.NNz
+
+          = // Number of coefficients in the diagonal
+              get_number_of_layers(stkd->Dimensions)
             * get_number_of_rows(stkd->Dimensions)
-            * (get_number_of_columns(stkd->Dimensions) - 1 ) ;
+            * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients Bottom <-> Top
+            2 * (get_number_of_layers(stkd->Dimensions) - 1 )
+              * get_number_of_rows(stkd->Dimensions)
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients North <-> South
+            2 * get_number_of_layers(stkd->Dimensions)
+              * (get_number_of_rows(stkd->Dimensions) - 1 )
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients East <-> West
+            2 * get_number_of_layers(stkd->Dimensions)
+              * get_number_of_rows(stkd->Dimensions)
+              * (get_number_of_columns(stkd->Dimensions) - 1 ) ;
+
+      }
 
     }
   ;
@@ -347,6 +411,8 @@ channel
         coolant_heat_transfer_coefficients
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'
         COOLANT INCOMING TEMPERATURE DVALUE ';'
+        TYPE CHANNEL_MODEL_TYPE ';'
+        CHANNEL PITCH DVALUE ';'
     {
       stkd->Channel = alloc_and_init_channel() ;
 
@@ -373,6 +439,8 @@ channel
       stkd->Channel->CoolantHTCs     = $25 ;
       stkd->Channel->CoolantVHC      = $30 ;
       stkd->Channel->CoolantTIn      = $35 ;
+      stkd->Channel->ChannelModelType= $38 ;
+      stkd->Channel->Pitch           = $42 ;
       stkd->Channel->WallMaterial
         = find_material_in_list (stkd->MaterialsList, $18) ;
 
@@ -890,6 +958,9 @@ stack_element
       stack_element->Type            = TDICE_STACK_ELEMENT_CHANNEL ;
       stack_element->Pointer.Channel = stkd->Channel ;
       stack_element->Id              = $2 ;
+      if (stkd->Channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM)
+        stack_element->NLayers       = NUM_LAYERS_2RM ;
+      else
       stack_element->NLayers         = 1 ;
 
       found_channel = TRUE_V ;
@@ -1028,6 +1099,7 @@ dimensions
         /* There are channels in the stack */
 
         stkd->Dimensions->StackHasChannel = TRUE_V ;
+        stkd->Dimensions->ChannelModelType = stkd->Channel->ChannelModelType ;
 
         stkd->Dimensions->Cell.FirstWallLength = tmp_first_wall_length ;
         stkd->Dimensions->Cell.LastWallLength  = tmp_last_wall_length ;
@@ -1035,35 +1107,43 @@ dimensions
 
         stkd->Dimensions->Cell.ChannelLength   = tmp_channel_length ;
 
-        CellDimension_t ratio
-         = (stkd->Dimensions->Chip.Length
-            - stkd->Dimensions->Cell.FirstWallLength
-            - stkd->Dimensions->Cell.LastWallLength
-            - stkd->Dimensions->Cell.ChannelLength
-           )
-           /
-           ( stkd->Dimensions->Cell.ChannelLength
-             + stkd->Dimensions->Cell.WallLength
-           ) ;
+        if (stkd->Dimensions->ChannelModelType == TDICE_CHANNEL_MODEL_2RM) {
 
-        if ( ratio - (int) ratio != 0)
-        {
-          stack_description_error
-          (
-            stkd, scanner, "cell dimensions does not fit the chip length correctly"
-          ) ;
-          YYABORT ;
-        }
 
-        stkd->Dimensions->Grid.NColumns = 2 * ratio + 3 ;
+          stkd->Dimensions->Grid.NColumns = stkd->Dimensions->Chip.Length
+                                            / stkd->Dimensions->Cell.ChannelLength ;
 
-        if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
-        {
-          stack_description_error
-          (
-            stkd, scanner, "colum number must be odd when channel is declared"
-          ) ;
-          YYABORT ;
+        } else {
+
+          CellDimension_t ratio
+           = (stkd->Dimensions->Chip.Length
+              - stkd->Dimensions->Cell.FirstWallLength
+              - stkd->Dimensions->Cell.LastWallLength
+              - stkd->Dimensions->Cell.ChannelLength
+             )
+             /
+             ( stkd->Dimensions->Cell.ChannelLength
+               + stkd->Dimensions->Cell.WallLength
+             ) ;
+          if ( ratio - (int) ratio != 0)
+          {
+            stack_description_error
+            (
+              stkd, scanner, "cell dimensions does not fit the chip length correctly"
+            ) ;
+            YYABORT ;
+          }
+          stkd->Dimensions->Grid.NColumns = 2 * ratio + 3 ;
+
+          if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
+          {
+            stack_description_error
+            (
+              stkd, scanner, "colum number must be odd when channel is declared"
+            ) ;
+            YYABORT ;
+          }
+
         }
 
         /* Check the number of columns */

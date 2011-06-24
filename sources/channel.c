@@ -48,6 +48,8 @@ void init_channel (Channel* channel)
   channel->CoolantTIn   = TEMPERATURE_I ;
   channel->CoolantFR    = COOLANTFR_I ;
   channel->WallMaterial = NULL ;
+  channel->ChannelModelType = CHANNELMODEL_I;
+  channel->Pitch            = CELLDIMENSION_I;
 }
 
 /******************************************************************************/
@@ -129,6 +131,14 @@ void print_formatted_channel
   fprintf (stream,
            "%s   coolant incoming temperature          %.2f ;\n",
            prefix, channel->CoolantTIn ) ;
+
+  fprintf (stream,
+           "%s   channel model type          %s ;\n",
+           prefix, (channel->ChannelModelType) ? "2RM" : "4RM") ;
+
+  fprintf (stream,
+           "%s              pitch %7.1f ;\n",
+           prefix, channel->Pitch) ;
 }
 
 /******************************************************************************/
@@ -175,6 +185,14 @@ void print_detailed_channel
   fprintf (stream,
            "%s  WallMaterial              = %p\n",
            prefix,  channel->WallMaterial) ;
+
+  fprintf (stream,
+           "%s   channel model type          %s ;\n",
+           prefix, (channel->ChannelModelType) ? "2RM" : "4RM") ;
+
+  fprintf (stream,
+           "%s  Pitch                    = %.1f\n",
+           prefix,  channel->Pitch) ;
 }
 
 /******************************************************************************/
@@ -188,6 +206,125 @@ void fill_thermal_cell_channel
   Channel*         channel
 )
 {
+  if (channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM) {
+    ThermalCell* original_thermalcells = thermalcells;
+
+    /* Bottom Wall */
+
+    thermalcells = original_thermalcells
+      + get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
+
+    FOR_EVERY_ROW (row_index_wall_bottom, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
+      {
+        fill_wall_cell_2rm
+          (
+#   ifdef PRINT_THERMAL_CELLS
+            layer_index,
+            row_index_wall_bottom,
+            column_index_wall_bottom,
+            dimensions,
+            get_cell_length(dimensions, column_index_wall_bottom),
+            get_cell_width(dimensions),
+            channel->Height,
+#   endif
+            thermalcells
+          ) ;
+
+        thermalcells++;
+      }
+    }
+
+    /* Channel for 2RM */
+
+    thermalcells = original_thermalcells
+      + get_cell_offset_in_stack (dimensions, layer_index + 1 , 0, 0) ;
+
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index, dimensions)
+      {
+        fill_liquid_cell_2rm
+          (
+#   ifdef PRINT_THERMAL_CELLS
+            layer_index + 1, row_index, column_index,
+#   endif
+            dimensions,
+            thermalcells,
+            get_cell_length(dimensions, column_index),
+            get_cell_width(dimensions),
+            channel->Height,
+            channel->Pitch,
+            channel->CoolantHTCs,
+            channel->CoolantVHC,
+            channel->CoolantFR,
+            delta_time
+          ) ;
+
+        thermalcells++;
+      }
+    }
+
+    /* Virtual wall */
+
+    thermalcells = original_thermalcells
+      + get_cell_offset_in_stack (dimensions, layer_index + 2 , 0, 0) ;
+
+    FOR_EVERY_ROW (row_index_virtual_wall, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
+      {
+        fill_virtual_wall_cell_2rm
+          (
+#   ifdef PRINT_THERMAL_CELLS
+            dimensions,
+            layer_index + 2, row_index_virtual_wall, column_index_virtual_wall,
+#   endif
+            thermalcells,
+            get_cell_length(dimensions, column_index_virtual_wall),
+            get_cell_width(dimensions),
+            channel->Height,
+            channel->Pitch,
+            channel->WallMaterial->ThermalConductivity,
+            channel->WallMaterial->VolumetricHeatCapacity,
+            delta_time
+          ) ;
+
+        thermalcells++;
+      }
+    }
+
+
+    /* Top Wall */
+
+    thermalcells = original_thermalcells
+      + get_cell_offset_in_stack (dimensions, layer_index + 3 , 0, 0) ;
+
+    FOR_EVERY_ROW (row_index_wall_top, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
+      {
+        fill_wall_cell_2rm
+          (
+#   ifdef PRINT_THERMAL_CELLS
+            layer_index + 3,
+            row_index_wall_top,
+            column_index_wall_top,
+            dimensions,
+            get_cell_length(dimensions, column_index_wall_top),
+            get_cell_width(dimensions),
+            channel->Height,
+#   endif
+            thermalcells
+          ) ;
+
+        thermalcells++;
+      }
+    }
+
+  } else {
+
   thermalcells += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
   FOR_EVERY_ROW (row_index, dimensions)
@@ -233,6 +370,7 @@ void fill_thermal_cell_channel
     }
   }
 }
+}
 
 /******************************************************************************/
 
@@ -244,20 +382,29 @@ void fill_sources_channel
   Channel*        channel
 )
 {
+  if (channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM)
+    // In 2RM, the channel offset is the layer index of the bottom wall,
+    // so we need to add one to "layer_index", which represents the layer index
+    // of the channel.
+    layer_index += 1;
+
 # ifdef PRINT_SOURCES
   fprintf (stderr,
     "layer_index = %d\tfill_sources_channel %s\n",
     layer_index, channel->WallMaterial->Id) ;
 # endif
 
-  Cconv_t C = CCONV(get_number_of_columns (dimensions),
-                    channel->CoolantVHC, channel->CoolantFR) ;
+  Cconv_t C = CCONV(get_number_of_columns (dimensions), channel->CoolantVHC, channel->CoolantFR);
+
+  if (channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM)
+    C *= POROSITY(dimensions->Cell.ChannelLength, channel->Pitch);
 
   sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
   FOR_EVERY_COLUMN (column_index, dimensions)
   {
-    if (IS_CHANNEL_COLUMN(column_index))
+    if (channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM
+        || IS_CHANNEL_COLUMN(column_index))
     {
       *sources = 2.0 * C * channel->CoolantTIn ;
 
@@ -280,9 +427,7 @@ void fill_sources_channel
 
 SystemMatrix fill_system_matrix_channel
 (
-# ifdef PRINT_SYSTEM_MATRIX
   Channel*              channel,
-# endif
   Dimensions*           dimensions,
   ThermalCell*          thermalcells,
   GridDimension_t       layer_index,
@@ -295,10 +440,75 @@ SystemMatrix fill_system_matrix_channel
     layer_index, channel->WallMaterial->Id) ;
 # endif
 
+  if (channel->ChannelModelType == TDICE_CHANNEL_MODEL_2RM) {
+
+    FOR_EVERY_ROW (row_index_wall_bottom, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
+      {
+        // Bottom Wall
+        system_matrix = add_bottom_wall_column_2rm
+          (
+            dimensions, thermalcells,
+            layer_index, row_index_wall_bottom, column_index_wall_bottom,
+            system_matrix
+          ) ;
+
+      } // FOR_EVERY_COLUMN
+    }  // FOR_EVERY_ROW
+
   FOR_EVERY_ROW (row_index, dimensions)
   {
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
+        // Channel for 2RM
+        system_matrix = add_liquid_column_2rm
+          (
+            dimensions, thermalcells,
+            layer_index+1, row_index, column_index,
+            system_matrix
+          ) ;
+
+      } // FOR_EVERY_COLUMN
+    }  // FOR_EVERY_ROW
+
+    FOR_EVERY_ROW (row_index_virtual_wall, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
+      {
+        // Virtual Wall
+        system_matrix = add_virtual_wall_column_2rm
+          (
+            dimensions, thermalcells,
+            layer_index+2, row_index_virtual_wall, column_index_virtual_wall,
+            system_matrix
+          ) ;
+
+      } // FOR_EVERY_COLUMN
+    }  // FOR_EVERY_ROW
+
+    FOR_EVERY_ROW (row_index_wall_top, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
+      {
+        // Top Wall
+        system_matrix = add_top_wall_column_2rm
+          (
+            dimensions, thermalcells,
+            layer_index+3, row_index_wall_top, column_index_wall_top,
+            system_matrix
+          ) ;
+
+      } // FOR_EVERY_COLUMN
+    }  // FOR_EVERY_ROW
+
+  } else {
+
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+      FOR_EVERY_COLUMN (column_index, dimensions)
+      {
+
        if (IS_CHANNEL_COLUMN(column_index))
 
          system_matrix = add_liquid_column
@@ -319,6 +529,7 @@ SystemMatrix fill_system_matrix_channel
 
     } // FOR_EVERY_COLUMN
   }  // FOR_EVERY_ROW
+  }
 
   return system_matrix ;
 }

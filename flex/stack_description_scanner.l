@@ -103,6 +103,7 @@ double                  {signed_integer}\.{unsigned_integer}{exponent}?
 identifier              [[:alpha:]](\_|[[:alnum:]])*
 path_begin              (\.{1,2}\/|\/)?
 path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
+channel_model_type      (2|4)(rm|RM)
 
 /* exclusive start conditions to exclude C/C++ like comments in */
 /* the scanned file.                                            */
@@ -150,6 +151,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "length"                     return LENGTH ;
 "material"                   return MATERIAL ;
 "on"                         return ON ;
+"pitch"                      return PITCH ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;
 "sink"                       return SINK ;
@@ -160,6 +162,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "thermal"                    return THERMAL ;
 "top"                        return TOP ;
 "transfer"                   return TRANSFER ;
+"type"                       return TYPE ;
 "volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
@@ -184,6 +187,15 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
                      yylval->char_p = (char *) malloc (sizeof(char) * n) ;
                      strncpy (yylval->char_p, yytext+1, n) ;
                      return PATH ;
+                   }
+
+{channel_model_type}  {
+                        if (strcmp(yytext, "2rm") == 0 | strcmp(yytext, "2RM") == 0)
+                          yylval->channel_model_v = TDICE_CHANNEL_MODEL_2RM ;
+                        else
+                          yylval->channel_model_v = TDICE_CHANNEL_MODEL_4RM ;
+
+                        return CHANNEL_MODEL_TYPE ;
                    }
 
 <ONE_LINE_COMMENT>\n              BEGIN(INITIAL) ;

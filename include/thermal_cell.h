@@ -156,6 +156,65 @@ extern "C"
     Time_t                 delta_time
   ) ;
 
+/******************************************************************************/
+
+  void fill_liquid_cell_2rm
+  (
+#   ifdef PRINT_THERMAL_CELLS
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    Dimensions*            dimensions,
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    CellDimension_t        channel_pitch,
+    CoolantHTCs_t          coolant_htcs,
+    CoolantVHC_t           coolant_vhc,
+    CoolantFR_t            coolant_fr,
+    Time_t                 delta_time
+  ) ;
+
+/******************************************************************************/
+
+  void fill_wall_cell_2rm
+  (
+# ifdef PRINT_THERMAL_CELLS
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
+    Dimensions*            dimensions,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+# endif
+    ThermalCell*           thermalcell
+  ) ;
+
+/******************************************************************************/
+
+  void fill_virtual_wall_cell_2rm
+  (
+# ifdef PRINT_THERMAL_CELLS
+    Dimensions*            dimensions,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
+# endif
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    CellDimension_t        channel_pitch,
+    SolidTC_t              solid_tc,
+    SolidVHC_t             solid_vhc,
+    Time_t                 delta_time
+  ) ;
+
+/******************************************************************************/
+
 #ifdef __cplusplus
 }
 #endif

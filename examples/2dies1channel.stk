@@ -29,6 +29,10 @@ channel:
    coolant volumetric heat capacity         4.172638e-12 ;
    coolant incoming temperature           300.0 ;
 
+   type 2rm ;
+
+   channel pitch 100 ;
+
 
 die bottomdie :
 	layer 	 12	beol ;

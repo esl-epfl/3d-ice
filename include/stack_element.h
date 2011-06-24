@@ -150,6 +150,21 @@ extern "C"
 
 /******************************************************************************/
 
+  void init_power_values_stack_element
+  (
+    StackElement*         stack_element
+  ) ;
+
+/******************************************************************************/
+
+  void insert_power_values_stack_element
+  (
+    StackElement*         stack_element,
+    PowersQueue*          pvalues
+  ) ;
+
+/******************************************************************************/
+
   SystemMatrix fill_system_matrix_stack_element
   (
     SystemMatrix          system_matrix,

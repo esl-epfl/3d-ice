@@ -220,6 +220,18 @@ extern "C"
 
 # define CONVERT_COOLANT_FLOW_RATE(fr) ( fr * 1e+12 ) / 60.0
 
+/******************************************************************************/
+
+# define POROSITY(channel_width, channel_pitch) (channel_width/channel_pitch)
+
+/******************************************************************************/
+
+# define EFFECTIVE_COOLANT_HTC(coolant_htc, channel_width, cavity_height, channel_pitch) \
+                                                                                         \
+  ((CoolantHTC_t) (                                                                      \
+                   coolant_htc * (channel_width + cavity_height) / channel_pitch         \
+                  ))
+
 #ifdef __cplusplus
 }
 #endif

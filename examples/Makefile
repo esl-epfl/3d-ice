@@ -37,7 +37,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-all: FillThermalData Emulate3DICe CreateNNInputData
+all: FillThermalData Emulate3DICe DynamicInput DynamicInputClient ThermalEvolution
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS)
@@ -52,9 +52,19 @@ FillThermalData: FillThermalData.o $(3DICE_LIB_A)
 Emulate3DICe: Emulate3DICe.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
--include CreateNNInputData.d
+-include DynamicInput.d
 
-CreateNNInputData: CreateNNInputData.o $(3DICE_LIB_A)
+DynamicInput: DynamicInput.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
+-include DynamicInputClient.d
+
+DynamicInputClient: DynamicInputClient.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
+-include ThermalEvolution.d
+
+ThermalEvolution: ThermalEvolution.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
 clean:
@@ -64,7 +74,12 @@ clean:
 	@$(RM) $(RMFLAGS) Emulate3DICe
 	@$(RM) $(RMFLAGS) Emulate3DICe.o
 	@$(RM) $(RMFLAGS) Emulate3DICe.d
-	@$(RM) $(RMFLAGS) CreateNNInputData
-	@$(RM) $(RMFLAGS) CreateNNInputData.o
-	@$(RM) $(RMFLAGS) CreateNNInputData.d
-
+	@$(RM) $(RMFLAGS) DynamicInput
+	@$(RM) $(RMFLAGS) DynamicInput.o
+	@$(RM) $(RMFLAGS) DynamicInput.d
+	@$(RM) $(RMFLAGS) DynamicInputClient
+	@$(RM) $(RMFLAGS) DynamicInputClient.o
+	@$(RM) $(RMFLAGS) DynamicInputClient.d
+	@$(RM) $(RMFLAGS) ThermalEvolution
+	@$(RM) $(RMFLAGS) ThermalEvolution.o
+	@$(RM) $(RMFLAGS) ThermalEvolution.d
