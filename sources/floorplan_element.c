@@ -117,16 +117,16 @@ void fill_sources_floorplan_element
     {
       sources [get_cell_offset_in_layer (dimensions, row_index, column_index)]
 
-        = (
-             power * get_cell_length (dimensions, column_index)
-                   * get_cell_width (dimensions)
-          )
-          /  flp_el_surface ;
+        += (
+              power * get_cell_length (dimensions, column_index)
+                    * get_cell_width (dimensions)
+           )
+           /  flp_el_surface ;
 
 #ifdef PRINT_SOURCES
       fprintf (stderr,
         "solid  cell  |l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f " \
-                    " | %.4e [source] = ( %.4e [W] * l * w) / %4.1f | %s\n",
+                    " | %.4e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
         layer_index, row_index, column_index,
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
         get_cell_length (dimensions, column_index), get_cell_width (dimensions),

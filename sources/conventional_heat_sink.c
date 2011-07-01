@@ -181,43 +181,16 @@ void fill_sources_conventional_heat_sink
   thermalcells += get_cell_offset_in_stack (dimensions,
                                            LAST_LAYER_INDEX(dimensions), 0, 0) ;
 
-  if (conventionalheatsink->IsSourceLayer == TRUE_V)
+  FOR_EVERY_ROW (row_index, dimensions)
   {
-    FOR_EVERY_ROW (row_index, dimensions)
+    FOR_EVERY_COLUMN (column_index, dimensions)
     {
-      FOR_EVERY_COLUMN (column_index, dimensions)
-      {
-        *sources += conventionalheatsink->AmbientTemperature
-                    * thermalcells->Top ;
-
-#       ifdef PRINT_SOURCES
-        fprintf (stderr,
-            "solid  cell  |  l %2d r %4d c %4d [%7d] | += %f * %.5e = %.5e\n",
-            LAST_LAYER_INDEX(dimensions), row_index, column_index,
-            get_cell_offset_in_stack (dimensions,
-                                      LAST_LAYER_INDEX(dimensions), row_index, column_index),
-            conventionalheatsink->AmbientTemperature,
-            thermalcells->Top,
-            *sources) ;
-#       endif
-
-        sources++ ;
-        thermalcells ++ ;
-      } // FOR_EVERY_COLUMN
-    } // FOR_EVERY_ROW
-  }
-  else
-  {
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index, dimensions)
-      {
         *sources = conventionalheatsink->AmbientTemperature
                    * thermalcells->Top ;
 
 #       ifdef PRINT_SOURCES
         fprintf (stderr,
-            "solid  cell  |  l %2d r %4d c %4d [%7d] | += %f * %.5e = %.5e\n",
+            "solid  cell  |  l %2d r %4d c %4d [%7d] | = %f * %.5e = %.5e\n",
             LAST_LAYER_INDEX(dimensions), row_index, column_index,
             get_cell_offset_in_stack (dimensions,
                                       LAST_LAYER_INDEX(dimensions), row_index, column_index),
@@ -228,9 +201,8 @@ void fill_sources_conventional_heat_sink
 
         sources++ ;
         thermalcells ++ ;
-      } // FOR_EVERY_COLUMN
-    } // FOR_EVERY_ROW
-  }
+    } // FOR_EVERY_COLUMN
+  } // FOR_EVERY_ROW
 }
 
 /******************************************************************************/

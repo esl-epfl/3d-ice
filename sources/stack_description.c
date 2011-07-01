@@ -302,10 +302,16 @@ void fill_sources_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+  // reset all the source vector to 0
 
-    fill_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
+  Quantity_t ccounter ;
+  Quantity_t ncells = get_number_of_cells (stkd->Dimensions) ;
+
+  for (ccounter = 0 ; ccounter != ncells ; ccounter++)
+
+    sources [ ccounter ] = 0.0 ;
+
+  // set the sources due to the heatsink (overwrites all cells in the last layer)
 
   if (stkd->ConventionalHeatSink != NULL)
 
@@ -316,6 +322,11 @@ void fill_sources_stack_description
       stkd->Dimensions,
       stkd->ConventionalHeatSink
     ) ;
+
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                     stkd->StackElementsList)
+
+    fill_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
 }
 
 /******************************************************************************/
