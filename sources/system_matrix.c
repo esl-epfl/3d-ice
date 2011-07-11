@@ -70,7 +70,7 @@ int alloc_system_matrix
     return 0 ;
 
   matrix->ColumnPointers
-    = malloc (sizeof(SystemMatrixColumn_t) * size + 1) ;
+    = malloc (sizeof(SystemMatrixColumn_t) * (size + 1)) ;
 
   if (matrix->ColumnPointers == NULL)
   {

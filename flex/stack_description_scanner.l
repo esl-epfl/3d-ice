@@ -183,9 +183,25 @@ channel_model_type      (2|4)(rm|RM)
                    }
 
 {path}             {
-                     int n = strlen(yytext) - 2 ;
-                     yylval->char_p = (char *) malloc (sizeof(char) * n) ;
-                     strncpy (yylval->char_p, yytext+1, n) ;
+                     // n is the length of path, ‘\0’ character excluded
+                     // we then remove two "s
+
+                     size_t n = strlen(yytext) - 2 ;
+
+                     // but we add one place for ‘\0’ when allocating
+
+                     yylval->char_p = (char *) malloc (sizeof(char) * (n + 1)) ;
+
+                     // we copy from the character after the first "
+
+                     strncpy (yylval->char_p,
+                              yytext + (1 * sizeof (char)),
+                              n * sizeof(char)) ;
+
+                     // We finally add the ‘\0’ at the and of the string
+
+                     yylval->char_p [n] = '\0' ;
+
                      return PATH ;
                    }
 
