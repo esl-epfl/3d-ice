@@ -1,5 +1,5 @@
 /********************** ********************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <math.h>
 
 #include "thermal_cell.h"
 #include "macros.h"
@@ -242,7 +243,7 @@ void fill_solid_cell_conventional_heat_sink
 
 /******************************************************************************/
 
-void fill_liquid_cell
+void fill_liquid_cell_mc_4rm
 (
 # ifdef PRINT_THERMAL_CELLS
   GridDimension_t        layer_index,
@@ -260,8 +261,8 @@ void fill_liquid_cell
   Time_t                 delta_time
 )
 {
-  Cconv_t C = CCONV (get_number_of_columns (dimensions),
-                     coolant_vhc, coolant_fr) ;
+  Cconv_t C = CCONV_MC_4RM (get_number_of_columns (dimensions),
+                             coolant_vhc, coolant_fr) ;
 
   thermalcell->North =  C ;
   thermalcell->South = -C ;
@@ -295,7 +296,7 @@ void fill_liquid_cell
 
 /******************************************************************************/
 
-void fill_liquid_cell_2rm
+void fill_liquid_cell_mc_2rm
 (
 # ifdef PRINT_THERMAL_CELLS
   GridDimension_t        layer_index,
@@ -307,30 +308,99 @@ void fill_liquid_cell_2rm
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
+  CellDimension_t        channel_width,
   CellDimension_t        channel_pitch,
+  Porosity_t             porosity,
   CoolantHTCs_t          coolant_htcs,
   CoolantVHC_t           coolant_vhc,
   CoolantFR_t            coolant_fr,
   Time_t                 delta_time
 )
 {
-  Cconv_t C = CCONV (get_number_of_columns (dimensions), coolant_vhc, coolant_fr)
-              * POROSITY(cell_length, channel_pitch);
+  Quantity_t nchannels = (Quantity_t) ((get_chip_length(dimensions) / channel_pitch) + 0.5); // round function
+  Cconv_t C = CCONV_MC_2RM (nchannels, coolant_vhc, coolant_fr, porosity, cell_length, channel_width);
 
-  thermalcell->North =  C ;
-  thermalcell->South = -C ;
+  thermalcell->North =  C;
+  thermalcell->South = -C;
 
   thermalcell->East = thermalcell->West
     = 0;
 
-  CoolantHTC_t eff_htc_top = EFFECTIVE_COOLANT_HTC(coolant_htcs.Top, cell_length, cell_height, channel_pitch);
+  CoolantHTC_t eff_htc_top = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Top, channel_width, cell_height, channel_pitch);
   thermalcell->Top = eff_htc_top * cell_width * cell_length ;
 
-  CoolantHTC_t eff_htc_bottom = EFFECTIVE_COOLANT_HTC(coolant_htcs.Bottom, cell_length, cell_height, channel_pitch);
+  CoolantHTC_t eff_htc_bottom = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Bottom, channel_width, cell_height, channel_pitch);
   thermalcell->Bottom = eff_htc_bottom * cell_width * cell_length ;
 
   thermalcell->Capacity
-    = ((cell_length * cell_width * cell_height) * coolant_vhc) * POROSITY(cell_length, channel_pitch) / delta_time ;
+    = ((cell_length * cell_width * cell_height) * coolant_vhc) * porosity / delta_time ;
+
+# ifdef PRINT_THERMAL_CELLS
+  fprintf (stderr,
+
+    "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
+    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
+
+    layer_index, row_index, column_index,
+    get_cell_offset_in_stack (dimensions,
+                              layer_index, row_index, column_index),
+    cell_length, cell_width, cell_height,
+    thermalcell->North, thermalcell->South, thermalcell->East,
+    thermalcell->West, thermalcell->Top, thermalcell->Bottom
+  ) ;
+# endif
+
+}
+
+
+/******************************************************************************/
+
+void fill_liquid_cell_pf
+(
+# ifdef PRINT_THERMAL_CELLS
+  GridDimension_t        layer_index,
+  GridDimension_t        row_index,
+  GridDimension_t        column_index,
+  Dimensions*            dimensions,
+# endif
+  ChannelModel_t         channel_model,
+  ThermalCell*           thermalcell,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  Porosity_t             porosity,
+  CoolantVHC_t           coolant_vhc,
+  DarcyVelocity_t        darcy_velocity,
+  Time_t                 delta_time
+)
+{
+  Cconv_t C = CCONV_PF (coolant_vhc, darcy_velocity, cell_length, cell_height);
+
+  thermalcell->North =   C;
+  thermalcell->South =  -C;
+
+  thermalcell->East = thermalcell->West
+    = 0;
+
+  CoolantHTC_t eff_htc_top, eff_htc_bottom;
+
+  if (channel_model == TDICE_CHANNEL_MODEL_PF_INLINE) {
+
+    eff_htc_top = EFFECTIVE_HTC_PF_INLINE(darcy_velocity);
+    eff_htc_bottom = eff_htc_top;
+
+  } else { // TDICE_CHANNEL_MODEL_PF_STAGGERED
+
+    eff_htc_top = EFFECTIVE_HTC_PF_STAGGERED(darcy_velocity);
+    eff_htc_bottom = eff_htc_top;
+
+  }
+
+  thermalcell->Top = eff_htc_top * cell_width * cell_length ;
+  thermalcell->Bottom = eff_htc_bottom * cell_width * cell_length ;
+
+  thermalcell->Capacity
+    = ((cell_length * cell_width * cell_height) * coolant_vhc) * porosity / delta_time ;
 
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
@@ -351,7 +421,115 @@ void fill_liquid_cell_2rm
 
 /******************************************************************************/
 
-void fill_wall_cell_2rm
+void fill_virtual_wall_cell_mc_2rm
+(
+# ifdef PRINT_THERMAL_CELLS
+  Dimensions*            dimensions,
+  GridDimension_t        layer_index,
+  GridDimension_t        row_index,
+  GridDimension_t        column_index,
+# endif
+  ThermalCell*           thermalcell,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  Porosity_t             porosity,
+  SolidTC_t              solid_tc,
+  SolidVHC_t             solid_vhc,
+  Time_t                 delta_time
+)
+{
+    thermalcell->East
+    = thermalcell->West
+    = 0;
+
+  thermalcell->Top = thermalcell->Bottom
+    = (solid_tc * cell_length * cell_width )
+      / (cell_height / (CellDimension_t) 2)
+      * (1 - porosity) ;
+
+  thermalcell->North = thermalcell->South
+    = (solid_tc * cell_length * cell_height )
+    / (cell_width / (CellDimension_t) 2)
+    * (1 - porosity) ;
+
+  thermalcell->Capacity
+    = (solid_vhc * (cell_length * cell_width * cell_height) * (1 - porosity))
+      / delta_time ;
+
+# ifdef PRINT_THERMAL_CELLS
+  fprintf (stderr,
+
+    "  l %2d r %4d c %4d [%d] | l %6.1f w %6.1f h %6.1f "  \
+    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
+
+    layer_index, row_index, column_index,
+    get_cell_offset_in_stack (dimensions,
+                              layer_index, row_index, column_index),
+    cell_length, cell_width, cell_height,
+    thermalcell->North, thermalcell->South, thermalcell->East,
+    thermalcell->West, thermalcell->Top, thermalcell->Bottom
+  ) ;
+# endif
+
+}
+
+
+/******************************************************************************/
+
+void fill_virtual_wall_cell_pf
+(
+# ifdef PRINT_THERMAL_CELLS
+  Dimensions*            dimensions,
+  GridDimension_t        layer_index,
+  GridDimension_t        row_index,
+  GridDimension_t        column_index,
+# endif
+  ThermalCell*           thermalcell,
+  CellDimension_t        cell_length,
+  CellDimension_t        cell_width,
+  CellDimension_t        cell_height,
+  Porosity_t             porosity,
+  SolidTC_t              solid_tc,
+  SolidVHC_t             solid_vhc,
+  Time_t                 delta_time
+)
+{
+  thermalcell->North
+    = thermalcell->South
+    = thermalcell->East
+    = thermalcell->West
+    = 0;
+
+  thermalcell->Top = thermalcell->Bottom
+    = (solid_tc * cell_length * cell_width )
+      / (cell_height / (CellDimension_t) 2)
+      * (1 - porosity) ;
+
+  thermalcell->Capacity
+    = (solid_vhc * (cell_length * cell_width * cell_height) * (1 - porosity))
+      / delta_time ;
+
+# ifdef PRINT_THERMAL_CELLS
+  fprintf (stderr,
+
+    "  l %2d r %4d c %4d [%d] | l %6.1f w %6.1f h %6.1f "  \
+    "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
+
+    layer_index, row_index, column_index,
+    get_cell_offset_in_stack (dimensions,
+                              layer_index, row_index, column_index),
+    cell_length, cell_width, cell_height,
+    thermalcell->North, thermalcell->South, thermalcell->East,
+    thermalcell->West, thermalcell->Top, thermalcell->Bottom
+  ) ;
+# endif
+
+}
+
+/******************************************************************************/
+
+void fill_wall_cell_mc_2rm
 (
 # ifdef PRINT_THERMAL_CELLS
   GridDimension_t        layer_index,
@@ -393,43 +571,33 @@ void fill_wall_cell_2rm
 
 /******************************************************************************/
 
-void fill_virtual_wall_cell_2rm
+void fill_wall_cell_pf
 (
 # ifdef PRINT_THERMAL_CELLS
-  Dimensions*            dimensions,
   GridDimension_t        layer_index,
   GridDimension_t        row_index,
   GridDimension_t        column_index,
-# endif
-  ThermalCell*           thermalcell,
+  Dimensions*            dimensions,
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
-  CellDimension_t        channel_pitch,
-  SolidTC_t              solid_tc,
-  SolidVHC_t             solid_vhc,
-  Time_t                 delta_time
+# endif
+  ThermalCell*           thermalcell
 )
 {
   thermalcell->North
     = thermalcell->South
     = thermalcell->East
     = thermalcell->West
+    = thermalcell->Top
+    = thermalcell->Bottom
+    = thermalcell->Capacity
     = 0;
-
-  thermalcell->Top = thermalcell->Bottom
-    = (solid_tc * cell_length * cell_width )
-      / (cell_height / (CellDimension_t) 2)
-      * (1 - POROSITY(cell_length, channel_pitch)) ;
-
-  thermalcell->Capacity
-    = (solid_vhc * (cell_length * cell_width * cell_height) * (1 - POROSITY(cell_length, channel_pitch)))
-      / delta_time ;
 
 # ifdef PRINT_THERMAL_CELLS
   fprintf (stderr,
 
-    "  l %2d r %4d c %4d [%d] | l %6.1f w %6.1f h %6.1f "  \
+    "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
     "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
 
     layer_index, row_index, column_index,
@@ -442,5 +610,6 @@ void fill_virtual_wall_cell_2rm
 # endif
 
 }
+
 
 /******************************************************************************/

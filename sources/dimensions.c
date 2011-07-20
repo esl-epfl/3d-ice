@@ -160,8 +160,8 @@ void print_detailed_dimensions
            prefix, dimensions->StackHasChannel) ;
 
   fprintf (stream,
-           "%s   channel model type          %s ;\n",
-           prefix, (dimensions->ChannelModelType) ? "2RM" : "4RM") ;
+           "%s   channel model type          %d ;\n",
+           prefix, dimensions->ChannelModel) ;
 }
 
 /******************************************************************************/
@@ -183,11 +183,13 @@ CellDimension_t get_cell_length
 
     return dimensions->Cell.WallLength ;
 
-  if (dimensions->ChannelModelType == TDICE_CHANNEL_MODEL_2RM) {
+  if (dimensions->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
+      dimensions->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED ||
+      dimensions->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
 
-    return dimensions->Cell.ChannelLength ;
+    return dimensions->Cell.WallLength ;
 
-  } else {
+  } else { //TDICE_CHANNEL_MODEL_MC_4RM
 
   if (IS_FIRST_COLUMN(column_index))
 
@@ -206,6 +208,7 @@ CellDimension_t get_cell_length
     else
 
       return dimensions->Cell.WallLength ;
+
   }
 
 }

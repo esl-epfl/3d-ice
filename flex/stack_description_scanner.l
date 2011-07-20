@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -103,7 +103,6 @@ double                  {signed_integer}\.{unsigned_integer}{exponent}?
 identifier              [[:alpha:]](\_|[[:alnum:]])*
 path_begin              (\.{1,2}\/|\/)?
 path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
-channel_model_type      (2|4)(rm|RM)
 
 /* exclusive start conditions to exclude C/C++ like comments in */
 /* the scanned file.                                            */
@@ -133,11 +132,16 @@ channel_model_type      (2|4)(rm|RM)
 "capacity"                   return CAPACITY ;
 "cell"                       return CELL ;
 "channel"                    return CHANNEL ;
+"microchannel_4rm"           return MC_4RM ;
+"microchannel_2rm"           return MC_2RM ;
+"pinfin_2rm"                 return PF_2RM ;
 "chip"                       return CHIP ;
 "coefficient"                return COEFFICIENT ;
 "conventional"               return CONVENTIONAL ;
 "coolant"                    return COOLANT ;
 "conductivity"               return CONDUCTIVITY ;
+"density"                    return DENSITY ;
+"diameter"                   return DIAMETER ;
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
 "first"                      return FIRST ;
@@ -151,6 +155,8 @@ channel_model_type      (2|4)(rm|RM)
 "length"                     return LENGTH ;
 "material"                   return MATERIAL ;
 "on"                         return ON ;
+"pin"                        return PIN ;
+"pin-fin"                    return PIN_FIN ;
 "pitch"                      return PITCH ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;
@@ -166,6 +172,10 @@ channel_model_type      (2|4)(rm|RM)
 "volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
+"inline"                     return INLINE ;
+"staggered"                  return STAGGERED ;
+"darcy"                      return DARCY ;
+"velocity"                   return VELOCITY ;
 
 {signed_integer}   {
                      yylval->double_v = atof(yytext) ;
@@ -203,15 +213,6 @@ channel_model_type      (2|4)(rm|RM)
                      yylval->char_p [n] = '\0' ;
 
                      return PATH ;
-                   }
-
-{channel_model_type}  {
-                        if (strcmp(yytext, "2rm") == 0 | strcmp(yytext, "2RM") == 0)
-                          yylval->channel_model_v = TDICE_CHANNEL_MODEL_2RM ;
-                        else
-                          yylval->channel_model_v = TDICE_CHANNEL_MODEL_4RM ;
-
-                        return CHANNEL_MODEL_TYPE ;
                    }
 
 <ONE_LINE_COMMENT>\n              BEGIN(INITIAL) ;

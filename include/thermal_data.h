@@ -168,6 +168,8 @@ extern "C"
 
   Time_t get_current_time (ThermalData* tdata) ;
 
+  Bool_t is_slot_time (ThermalData* tdata) ;
+
 /******************************************************************************/
 
   /* Consumes a time step emulating heat injection and dissipation.         */

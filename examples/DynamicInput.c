@@ -38,7 +38,8 @@
 
 #include "stack_description.h"
 #include "thermal_data.h"
-#include "network_interface.h"
+
+#include "server.h"
 #include "NIPreamble.h"
 
 int
@@ -46,18 +47,38 @@ main(int argc, char** argv)
 {
   StackDescription stkd ;
   ThermalData      tdata ;
+
   int sockfd;
+  Time_t slot_time;
+  Time_t step_time;
+  Bool_t is_transient;
+  int (*emulate)(ThermalData*, StackDescription*) = NULL;
+
   MessagesQueue*     mqueue;
   TemperaturesQueue* tqueue;
 
   // Checks if there are the all the arguments
   ////////////////////////////////////////////////////////////////////////////
 
-  if (argc != 4)
+  if (argc != 2)
   {
-    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]) ;
+    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]) ;
     return EXIT_FAILURE ;
   }
+
+  // initlization for the communication
+#if INTERNET_DOMAIN
+  sockfd = init_server_internet_domain(PORTNO);
+#else
+  sockfd = init_server_unix_domain(SOCKET_NAME);
+#endif
+  get_client_info(sockfd, &slot_time, &step_time, &is_transient);
+  /*printf("%f, %f, %d\n", slot_time, step_time, is_transient);*/
+
+  if (is_transient)
+    emulate = &emulate_step;
+  else
+    emulate = &emulate_slot;
 
   // Init StackDescription and parse the input file
   ////////////////////////////////////////////////////////////////////////////
@@ -75,7 +96,7 @@ main(int argc, char** argv)
 
   fprintf (stdout, "Preparing thermal data ...\n") ;
 
-  init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
+  init_thermal_data (&tdata, 300.00, slot_time, step_time) ;
 
   if (fill_thermal_data (&tdata, &stkd) != 0)
   {
@@ -85,50 +106,38 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  // initlization for the communication
-#if INTERNET_DOMAIN
-  sockfd = init_server_internet_domain(PORTNO);
-#else
-  sockfd = init_server_unix_domain(SOCKET_NAME);
-#endif
-
   if ( sockfd < 0)
     printf("error initilizing network interface\n");
   mqueue = alloc_and_init_messages_queue();
   tqueue = alloc_and_init_temperatures_queue();
 
-#if DYNAMIC_POWER_VALUES
   init_power_values (&stkd); // initilize the power values got from a stack description file
 
-  // check whether the power values from a client is valid,
-  // if not, this variable is used for terminating the simulation
-  Bool_t * is_valid = malloc(sizeof(Bool_t));
+  // this is used for terminating the simulation
+  Bool_t * is_terminating = malloc(sizeof(Bool_t));
 
   Quantity_t num_floorplan_elements = get_total_number_of_floorplan_elements(&stkd);
   Power_t* pvalues = malloc(num_floorplan_elements * sizeof(Power_t));
-#endif
 
   // get network messages
   get_messages(sockfd, mqueue);
 
   do {
 
-#if DYNAMIC_POWER_VALUES
-    pvalues = get_power_values_from_network(
-      sockfd,
-      pvalues,
-      num_floorplan_elements,
-      is_valid
-      );
+    if (is_slot_time(&tdata)) {
+      pvalues = get_power_values_from_network(
+        sockfd,
+        pvalues,
+        num_floorplan_elements,
+        is_terminating
+        );
 
-    if (*is_valid == FALSE_V) break;
-
-    if (insert_power_values (&stkd, pvalues) == FALSE_V)
-    {
-      printf("error inserting dynamic power values");
-      break;
+      if (insert_power_values (&stkd, pvalues) == FALSE_V)
+      {
+        printf("error inserting dynamic power values");
+        break;
+      }
     }
-#endif
 
     // process network messages
     process_messages(mqueue, tqueue, &stkd, &tdata);
@@ -136,7 +145,7 @@ main(int argc, char** argv)
     // send results
     send_results(sockfd, tqueue);
 
-  } while (emulate_step (&tdata, &stkd) != 1) ;
+  } while (*is_terminating == FALSE_V && (*emulate)(&tdata, &stkd) != 1) ;
 
   // close server
   close_server(sockfd);
@@ -147,10 +156,7 @@ main(int argc, char** argv)
   free_temperatures_queue(tqueue) ;
   free_thermal_data      (&tdata) ;
   free_stack_description (&stkd) ;
-
-#if DYNAMIC_POWER_VALUES
   free(pvalues);
-#endif
 
   return EXIT_SUCCESS ;
 }

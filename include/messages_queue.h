@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -32,80 +32,95 @@
  * Station 11                                  (SUBSCRIPTION IS NECESSARY)    *
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
-#include <stdlib.h>
-#include <time.h>
 
-#include "client.h"
-#include "NIPreamble.h"
+#ifndef _3DICE_MESSAGES_QUEUE_H_
+#define _3DICE_MESSAGES_QUEUE_H_
 
-int main(int argc, char** argv)
+#ifdef __cplusplus
+extern "C"
 {
-  if (argc != 4)
-  {
-    fprintf(stderr, "Usage: \"%s slot_time step_time SLOT(or STEP)\"\n", argv[0]) ;
-    return EXIT_FAILURE ;
-  }
-
-  int i;
-
-  srand(time(NULL));
-
-  Quantity_t counter = QUANTITY_I;
-  Power_t* pvalues = malloc(sizeof(Power_t) * NUM_POWER_VALUES);
-  TimeInfo* time_info = alloc_and_init_time_info(atof(argv[1]), atof(argv[2]), strcmp(argv[3], "SLOT"));
-
-  MessagesQueue*     mqueue = alloc_and_init_messages_queue();
-  TemperaturesQueue* tqueue = alloc_and_init_temperatures_queue();
-
-  // initilization for the communication
-#if INTERNET_DOMAIN
-  int sockfd                = init_client_internet_domain(HOST_NAME, PORTNO);
-#else
-  int sockfd                = init_client_unix_domain(SOCKET_NAME);
 #endif
-  send_client_info(sockfd, time_info->SlotTime, time_info->StepTime, time_info->IsTransient);
 
-  // create network messages
-  Temperature_t* max_results = malloc(sizeof(Temperature_t) * 4);
-  Temperature_t cell1, cell2, outlet;
+#include "types.h"
+#include "macros.h"
 
-  nm_get_all_max_temperatures_of_floorplan (mqueue, tqueue, "die2", max_results, 4);
-  nm_get_cell_temperature (mqueue, tqueue, 2, 11, 4, &cell1);
-  nm_get_cell_temperature (mqueue, tqueue, 6, 34, 84, &cell2);
-  nm_get_temperature_of_channel_outlet (mqueue, tqueue, "channel1", 0, &outlet);
+#define MAX_ID_SIZE 16
 
-  // send_messages
-  send_messages(sockfd, mqueue);
+enum MessageType
+{
+  MT_NONE = 0,
+  MT_FLOORPLAN,
+  MT_FLOORPLAN_ELEMENT,
+  MT_CHANNEL,
+  MT_CHANNEL_OUTLET,
+  MT_CELL
+} ;
 
-  Bool_t is_terminating = FALSE_V;
+typedef enum MessageType MessageType;
 
-  do {
-    if (is_slot_time_client(time_info)) {
-      for (i = 0; i < NUM_POWER_VALUES; i++) {
-        pvalues[i] = rand() % 30;
-      }
+enum TemperatureType
+{
+  TT_NONE = 0,
+  TT_MAX,
+  TT_MIN,
+  TT_AVG
+} ;
 
-      if (counter++ == NUM_TIME_SLOTS) {
-        is_terminating = TRUE_V;
-      }
+typedef enum TemperatureType TemperatureType;
 
-      send_power_values(sockfd, pvalues, NUM_POWER_VALUES, is_terminating);
-    }
+typedef struct {
 
-    get_results(sockfd, tqueue);
+  MessageType       header;
 
-    printf("%5.3fs  ", get_current_time_client(time_info)) ;
-    for (i = 0 ; i < 4 ; i++)
-      printf("%7.3f  ", max_results[i]) ;
-    printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;
+  char              floorplan_id[MAX_ID_SIZE];
+  char              floorplan_element_id[MAX_ID_SIZE];
 
-  } while (emulate(time_info, is_terminating));
+  char              channel_id[MAX_ID_SIZE];
 
-  close_client(sockfd);
+  GridDimension_t   layer_index;
+  GridDimension_t   row_index;
+  GridDimension_t   column_index;
 
-  free_time_info(time_info);
-  free_temperatures_queue(tqueue);
-  free_messages_queue(mqueue);
+  GridDimension_t   outlet_number;
 
-  return EXIT_SUCCESS ;
+  TemperatureType   temperature_type;
+
+  Quantity_t        num_results;
+
+} NetworkMessage;
+
+struct MessageNode
+{
+  NetworkMessage Message ;
+  struct MessageNode* Next ;
+} ;
+
+typedef struct MessageNode MessageNode ;
+
+typedef struct
+{
+  MessageNode* Head ;
+  MessageNode* Tail ;
+  Quantity_t Length ;
+
+} MessagesQueue ;
+
+void init_messages_queue (MessagesQueue* queue) ;
+
+MessagesQueue* alloc_and_init_messages_queue (void) ;
+
+Bool_t is_empty_messages_queue (MessagesQueue* queue) ;
+
+void free_messages_queue (MessagesQueue* queue) ;
+
+void put_into_messages_queue (MessagesQueue* queue, NetworkMessage message) ;
+
+void pop_from_messages_queue (MessagesQueue* queue) ;
+
+
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* _3DICE_MESSAGES_QUEUE_H_ */

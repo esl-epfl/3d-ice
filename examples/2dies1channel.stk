@@ -1,4 +1,4 @@
-material silicon : 
+material silicon :
    thermal conductivity     1.30e-04 ;
    volumetric heat capacity 1.63566e-12 ;
 
@@ -10,28 +10,60 @@ material beol:
 //  heat transfer coefficient   1.0e-07 ;
 //  ambient temperature       300.0 ;
 
-channel:
+
+microchannel_4rm :
 
    height 100 ;
 
-   channel length  50 ;
-   wall    length  50 ; 
+   channel length  500 ;
+   wall    length  500 ;
 
-   first wall length  25 ;
-   last  wall length  25 ; 
+   first wall length  250 ;
+   last  wall length  250 ;
 
    wall material silicon ;
 
    coolant flow rate                        48.0 ;
    coolant heat transfer coefficient side   2.7132e-08 ,
-                                     top    5.7132e-08 ,
-                                     bottom 4.7132e-08 ;
+                                     top    5.5698e-08 ,
+                                     bottom 5.5698e-08 ;
    coolant volumetric heat capacity         4.172638e-12 ;
-   coolant incoming temperature           300.0 ;
+   coolant incoming temperature             300.0 ;
 
-   type 2rm ;
 
-   channel pitch 100 ;
+/*
+microchannel_2rm :
+
+   height 100 ;
+
+   channel width    50 ;
+   channel pitch   100 ;
+
+   wall material silicon ;
+
+   coolant flow rate                        48.0 ;
+   coolant heat transfer coefficient top    5.5698e-08 ,
+                                     bottom 5.5698e-08 ;
+   coolant volumetric heat capacity         4.172638e-12 ;
+   coolant incoming temperature             300.0 ;
+*/
+
+/*
+pinfin_2rm :
+
+   height 100 ;
+
+   pin diameter   50 ;
+   pin pitch     100 ;
+
+   inline ; // staggered ;
+
+   pin material silicon ;
+
+   darcy velocity                           1.1066e+06 ;
+   coolant volumetric heat capacity         4.172638e-12 ;
+   coolant incoming temperature             300.0 ;
+*/
 
 
 die bottomdie :
@@ -39,9 +71,9 @@ die bottomdie :
 	source	  2	silicon ;
 	layer	 48	silicon ;
 	layer	100	silicon ;
-	
+
 die topdie :
-	
+
 	source	 2	silicon ;
 	layer	48	silicon ;
 

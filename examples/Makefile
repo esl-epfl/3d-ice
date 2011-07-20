@@ -40,7 +40,7 @@ include $(3DICE_MAIN)/makefile.def
 all: FillThermalData Emulate3DICe DynamicInput DynamicInputClient ThermalEvolution
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
-CLIBS = $(3DICE_LIB_A) $(SLU_LIBS)
+CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 
 -include FillThermalData.d
 

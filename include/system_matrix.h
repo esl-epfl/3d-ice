@@ -105,7 +105,7 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix add_liquid_column
+  SystemMatrix add_liquid_column_mc_4rm
   (
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,
@@ -117,7 +117,7 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix add_liquid_column_2rm
+  SystemMatrix add_liquid_column_pf
   (
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,
@@ -129,7 +129,7 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix add_bottom_wall_column_2rm
+  SystemMatrix add_bottom_wall_column_pf
   (
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,
@@ -141,7 +141,7 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix add_top_wall_column_2rm
+  SystemMatrix add_top_wall_column_pf
   (
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,
@@ -153,7 +153,55 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix add_virtual_wall_column_2rm
+  SystemMatrix add_virtual_wall_column_pf
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_liquid_column_mc_2rm
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_bottom_wall_column_mc_2rm
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_top_wall_column_mc_2rm
+  (
+    Dimensions*           dimensions,
+    ThermalCell*          thermalcells,
+    GridDimension_t       current_layer,
+    GridDimension_t       current_row,
+    GridDimension_t       current_column,
+    SystemMatrix          system_matrix
+  ) ;
+
+/******************************************************************************/
+
+  SystemMatrix add_virtual_wall_column_mc_2rm
   (
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,

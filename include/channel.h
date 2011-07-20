@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -54,10 +54,25 @@ extern "C"
 
   typedef struct
   {
+    /* The channel model */
 
-    /* The heigh of the channel in [um] (1 cell)    */
+    ChannelModel_t ChannelModel ;
+
+    /* The height of the channel in [um] (1 cell)    */
 
     CellDimension_t Height ;
+
+    /* The width of the channel in [um]              */
+
+    CellDimension_t Width ;
+
+    /* The pitch of the channel in [um]              */
+
+    CellDimension_t Pitch ;
+
+    /* Porosity */
+
+    Porosity_t Porosity ;
 
     /* The heat transfert coefficients of the cooling liquid */
     /* in [ (W / ( um2 * K ) ]                              */
@@ -79,17 +94,15 @@ extern "C"
 
     CoolantFR_t CoolantFR ;
 
+    /* Darcy Velocity
+     * [ um / sec ]
+     */
+
+    DarcyVelocity_t DarcyVelocity ;
+
     /* The material composing the wall */
 
     Material* WallMaterial ;
-
-    /* The channel model */
-
-    ChannelModel_t ChannelModelType ;
-
-    /* The pitch of the channel in [um] (1 cell)    */
-
-    CellDimension_t Pitch ;
 
   } Channel ;
 

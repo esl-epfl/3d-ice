@@ -77,7 +77,10 @@
                   $(3DICE_SOURCES)/system_matrix.c          \
                   $(3DICE_SOURCES)/thermal_cell.c           \
                   $(3DICE_SOURCES)/thermal_data.c		    \
-                  $(3DICE_SOURCES)/network_interface.c
+                  $(3DICE_SOURCES)/messages_queue.c 			  \
+                  $(3DICE_SOURCES)/temperatures_queue.c	    \
+                  $(3DICE_SOURCES)/server.c            	    \
+                  $(3DICE_SOURCES)/client.c
 
 3DICE_SOURCES_O = $(3DICE_SOURCES_C:.c=.o)
 3DICE_SOURCES_D = $(3DICE_SOURCES_C:.c=.d)

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -122,9 +122,9 @@ extern "C"
 # define IS_FIRST_ROW(row)            (row == FIRST_ROW_INDEX)
 # define IS_LAST_ROW(row, dim)        (row == LAST_ROW_INDEX(dim))
 
-# define FOR_EVERY_ROW(index, dim)            \
-                                              \
-    GridDimension_t index = GRIDDIMENSION_I ; \
+# define FOR_EVERY_ROW(index, dim)                   \
+                                                     \
+    GridDimension_t index = GRIDDIMENSION_I ;        \
     for (index = FIRST_ROW_INDEX ; index <= LAST_ROW_INDEX(dim) ; index++)
 
 /******************************************************************************/
@@ -137,9 +137,9 @@ extern "C"
 # define IS_CHANNEL_COLUMN(column)    (column & 1)
 # define IS_WALL_COLUMN(column)       (! IS_CHANNEL_COLUMN(column) )
 
-# define FOR_EVERY_COLUMN(index, dim)         \
-                                              \
-    GridDimension_t index = GRIDDIMENSION_I ; \
+# define FOR_EVERY_COLUMN(index, dim)                      \
+                                                           \
+    GridDimension_t index = GRIDDIMENSION_I ;              \
     for (index = FIRST_COLUMN_INDEX ; index <= LAST_COLUMN_INDEX(dim) ; index++)
 
 /******************************************************************************/
@@ -150,9 +150,9 @@ extern "C"
 # define IS_FIRST_LAYER(layer)        (layer == FIRST_LAYER_INDEX)
 # define IS_LAST_LAYER(layer, dim)    (layer == LAST_LAYER_INDEX(dim))
 
-# define FOR_EVERY_LAYER(index, dim)          \
-                                              \
-    GridDimension_t index = GRIDDIMENSION_I ; \
+# define FOR_EVERY_LAYER(index, dim)                     \
+                                                         \
+    GridDimension_t index = GRIDDIMENSION_I ;            \
     for (index = FIRST_LAYER_INDEX ; index <= LAST_LAYER_INDEX(dim) ; index++)
 
 /******************************************************************************/
@@ -187,11 +187,12 @@ extern "C"
 
 /******************************************************************************/
 
-/*
+/* 4RM for Microchannels
+ *
  * FlowRatePerChannel [ um3 / sec ] = FlowRate             [ um3 / sec ]
  *                                    / #ChannelColumns    [ ]
  *
- * CoolantVelocity      [ m / sec ] = FlowRatePerChannel   [ um3 / sec ]
+ * CoolantVelocity     [ m / sec ]  = FlowRatePerChannel   [ um3 / sec ]
  *                                    * ( 1 / Ay )         [   1 / um2 ]
  *
  * Cconv         [ J / ( K . sec) ]  = CoolantVHC          [ J / ( um3 . K ) ]
@@ -204,13 +205,95 @@ extern "C"
  * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
  */
 
-# define CCONV(ncolumns, coolant_vhc, coolant_fr) \
-                                                  \
-   (Cconv_t) (                                    \
-               (coolant_vhc * coolant_fr)         \
-               /                                  \
-               ((Cconv_t) (ncolumns - 1))         \
-             )
+# define CCONV_MC_4RM(ncolumns, coolant_vhc, coolant_fr) \
+                                                         \
+  (Cconv_t) (                                            \
+               (coolant_vhc * coolant_fr)                \
+               /                                         \
+               ((Cconv_t) (ncolumns - 1))                \
+            )
+
+/* 2RM for Microchannels
+ *
+ * FlowRatePerChannel [ um3 / sec ] = FlowRate                            [ um3 / sec ]
+ *                                    / #Channels                         [ ]
+ *
+ * CoolantVelocity      [ m / sec ] = FlowRatePerChannel                  [ um3 / sec ]
+ *                                    / (CavityHeight * ChannelWidth )    [ um2 ]
+ *
+ * Cconv         [ J / ( K . sec) ] = CoolantVHC                          [ J / ( um3 . K ) ]
+ *                                    * CoolantVelocity                   [ m / sec ]
+ *                                    * ( Cavityheight * CellLength / 2 ) [ um2 ]
+ *                                    * Porosity                          [ ]
+ * [ J / ( K . sec) ] = [ W / K ]
+ *
+ * CoolantVelocity = FlowRate / (#Channels * CavityHeight * ChannelWidth )
+ *
+ * Cconv           = (CoolantVHC * FlowRate * Porosity) / (#Channels * 2) * (CellLength / ChannelWidth)
+ */
+
+# define CCONV_MC_2RM(nchannels, coolant_vhc, coolant_fr, porosity, cell_length, channel_width) \
+                                                                                                \
+  (Cconv_t) (                                                                                   \
+               (coolant_vhc * coolant_fr * porosity)                                            \
+               /                                                                                \
+               ((Cconv_t) (nchannels * 2))                                                      \
+               *                                                                                \
+               (cell_length / channel_width)                                                    \
+            )
+
+/* Pin-fins
+ *
+ * Cconv     [ J / ( K . sec) ] = CoolantVHC                             [ J / ( um3 . K ) ]
+ *                                * DarcyVelosity                        [ m / sec ]
+ *                                * ( CavityHeight * CellLength / 2 )    [ um2 ]
+ *                                * Porosity                             [ ]
+ */
+
+# define CCONV_PF(coolant_vhc, darcy_velocity, cell_length, cavity_height)  \
+                                                                                                           \
+  (Cconv_t) (                                                                                              \
+                 (coolant_vhc * darcy_velocity * cell_length * cavity_height)   \
+                 /                                                              \
+                 ((Cconv_t) 2)                                                  \
+            )
+
+/******************************************************************************/
+
+/* Effective HTC for Microchannel 2RM
+ *
+ * HTC_eff         = HTC * (ChannelWidth + CavityHeight) / ChannelPitch
+ */
+
+# define EFFECTIVE_HTC_MC_2RM(htc, channel_width, cavity_height, channel_pitch)  \
+                                                                                 \
+  (CoolantHTC_t) (                                                               \
+                   htc * (channel_width + cavity_height) / channel_pitch         \
+                 )
+
+/* Effective HTC for Pinfin
+ *
+ * H_eff_inline    = ((2.527E-5 / (DarcyVelosity + 1.35)^0.64 )+1.533E-6)^(-1) * 1E-12
+ */
+
+# define EFFECTIVE_HTC_PF_INLINE(darcy_velocity)                                      \
+                                                                                      \
+  (CoolantHTC_t) (                                                                    \
+                   1e-12                                                              \
+                   /                                                                  \
+                   (2.527e-05 / pow((darcy_velocity/1e+06 + 1.35), 0.64) + 1.533e-06) \
+                 )
+/*
+ * H_eff_stag    = ((2.527E-5 / (DarcyVelosity + 1.35)^1.52 )+1.533E-6)^(-1) * 1E-12
+ */
+
+# define EFFECTIVE_HTC_PF_STAGGERED(darcy_velocity)                                   \
+                                                                                      \
+  (CoolantHTC_t) (                                                                    \
+                   1e-12                                                      \
+                   /                                                                  \
+                   (2.527e-05 / pow((darcy_velocity/1e+06 + 1.35), 1.52) + 1.533e-06) \
+                 )
 
 /******************************************************************************/
 
@@ -218,19 +301,8 @@ extern "C"
   * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
   */
 
-# define CONVERT_COOLANT_FLOW_RATE(fr) ( fr * 1e+12 ) / 60.0
+# define CONVERT_COOLANT_FLOW_RATE(fr) (( fr * 1e+12 ) / 60.0)
 
-/******************************************************************************/
-
-# define POROSITY(channel_width, channel_pitch) (channel_width/channel_pitch)
-
-/******************************************************************************/
-
-# define EFFECTIVE_COOLANT_HTC(coolant_htc, channel_width, cavity_height, channel_pitch) \
-                                                                                         \
-  ((CoolantHTC_t) (                                                                      \
-                   coolant_htc * (channel_width + cavity_height) / channel_pitch         \
-                  ))
 
 #ifdef __cplusplus
 }

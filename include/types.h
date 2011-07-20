@@ -139,10 +139,20 @@ extern "C"
   typedef double CoolantFR_t ;
 # define         COOLANTFR_I 0.0
 
+  /* Darcy Velocity  */
+
+  typedef double DarcyVelocity_t ;
+# define         DARCYVELOCITY_I 0.0
+
   /* C convection coefficient */
 
   typedef double Cconv_t ;
 # define         CCONV_I 0.0
+
+  /* Porosity */
+
+  typedef double Porosity_t ;
+# define         POROSITY_I 0.0
 
 /******************************************************************************/
 
@@ -199,13 +209,21 @@ extern "C"
 
   enum ChannelModel_t
   {
-    TDICE_CHANNEL_MODEL_4RM = 0,
-    TDICE_CHANNEL_MODEL_2RM
+    TDICE_CHANNEL_MODEL_MC_4RM = 0,
+    TDICE_CHANNEL_MODEL_MC_2RM,
+    TDICE_CHANNEL_MODEL_PF_INLINE,
+    TDICE_CHANNEL_MODEL_PF_STAGGERED
   } ;
 
   typedef enum ChannelModel_t ChannelModel_t ;
-# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_4RM
+
+# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_MC_4RM
+# define                      NUM_LAYERS_4RM 1
 # define                      NUM_LAYERS_2RM 4
+
+/******************************************************************************/
+
+# define PI (3.14159265358979323846)
 
 /******************************************************************************/
 

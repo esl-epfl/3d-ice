@@ -91,7 +91,7 @@ extern "C"
     ChipDimensions Chip ;
 
     Bool_t StackHasChannel ;
-    ChannelModel_t ChannelModelType ;
+    ChannelModel_t ChannelModel ;
 
   } Dimensions ;
 

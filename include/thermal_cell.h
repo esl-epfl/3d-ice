@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -138,7 +138,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_liquid_cell
+  void fill_liquid_cell_mc_4rm
   (
 #   ifdef PRINT_THERMAL_CELLS
     GridDimension_t       layer_index,
@@ -158,28 +158,28 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_liquid_cell_2rm
+  void fill_liquid_cell_pf
   (
 #   ifdef PRINT_THERMAL_CELLS
     GridDimension_t       layer_index,
     GridDimension_t       row_index,
     GridDimension_t       column_index,
-#   endif
     Dimensions*            dimensions,
+#   endif
+    ChannelModel_t         channel_model,
     ThermalCell*           thermalcell,
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
-    CellDimension_t        channel_pitch,
-    CoolantHTCs_t          coolant_htcs,
+    Porosity_t             porosity,
     CoolantVHC_t           coolant_vhc,
-    CoolantFR_t            coolant_fr,
+    DarcyVelocity_t        darcy_velocity,
     Time_t                 delta_time
   ) ;
 
 /******************************************************************************/
 
-  void fill_wall_cell_2rm
+  void fill_wall_cell_pf
   (
 # ifdef PRINT_THERMAL_CELLS
     GridDimension_t        layer_index,
@@ -195,7 +195,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_virtual_wall_cell_2rm
+  void fill_virtual_wall_cell_pf
   (
 # ifdef PRINT_THERMAL_CELLS
     Dimensions*            dimensions,
@@ -207,7 +207,66 @@ extern "C"
     CellDimension_t        cell_length,
     CellDimension_t        cell_width,
     CellDimension_t        cell_height,
+    Porosity_t             porosity,
+    SolidTC_t              solid_tc,
+    SolidVHC_t             solid_vhc,
+    Time_t                 delta_time
+  ) ;
+
+/******************************************************************************/
+
+  void fill_liquid_cell_mc_2rm
+  (
+#   ifdef PRINT_THERMAL_CELLS
+    GridDimension_t       layer_index,
+    GridDimension_t       row_index,
+    GridDimension_t       column_index,
+#   endif
+    Dimensions*            dimensions,
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    CellDimension_t        channel_width,
     CellDimension_t        channel_pitch,
+    Porosity_t             porosity,
+    CoolantHTCs_t          coolant_htcs,
+    CoolantVHC_t           coolant_vhc,
+    CoolantFR_t            coolant_fr,
+    Time_t                 delta_time
+  ) ;
+
+/******************************************************************************/
+
+  void fill_wall_cell_mc_2rm
+  (
+# ifdef PRINT_THERMAL_CELLS
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
+    Dimensions*            dimensions,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+# endif
+    ThermalCell*           thermalcell
+  ) ;
+
+/******************************************************************************/
+
+  void fill_virtual_wall_cell_mc_2rm
+  (
+# ifdef PRINT_THERMAL_CELLS
+    Dimensions*            dimensions,
+    GridDimension_t        layer_index,
+    GridDimension_t        row_index,
+    GridDimension_t        column_index,
+# endif
+    ThermalCell*           thermalcell,
+    CellDimension_t        cell_length,
+    CellDimension_t        cell_width,
+    CellDimension_t        cell_height,
+    Porosity_t             porosity,
     SolidTC_t              solid_tc,
     SolidVHC_t             solid_vhc,
     Time_t                 delta_time

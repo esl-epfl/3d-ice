@@ -1,0 +1,4 @@
+background:
+position 0,0;
+dimension 10000, 10000;
+power values 0, 50, 50;

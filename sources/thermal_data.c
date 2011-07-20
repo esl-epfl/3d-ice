@@ -316,6 +316,13 @@ Time_t get_current_time(ThermalData* tdata)
 
 /******************************************************************************/
 
+Bool_t is_slot_time(ThermalData* tdata)
+{
+  return (tdata->CurrentTime % tdata->SlotLength == 0) ? TRUE_V : FALSE_V;
+}
+
+/******************************************************************************/
+
 static void
 fill_system_vector
 (

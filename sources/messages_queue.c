@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 1.0.2 .                               *
+ * This file is part of 3D-ICE, version 1.0.1 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -32,80 +32,77 @@
  * Station 11                                  (SUBSCRIPTION IS NECESSARY)    *
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
+
 #include <stdlib.h>
-#include <time.h>
+#include <stdio.h>
 
-#include "client.h"
-#include "NIPreamble.h"
+#include "messages_queue.h"
 
-int main(int argc, char** argv)
+void init_messagess_queue (MessagesQueue* queue)
 {
-  if (argc != 4)
+  queue->Head   = NULL ;
+  queue->Tail   = NULL ;
+  queue->Length = QUANTITY_I ;
+}
+
+MessagesQueue* alloc_and_init_messages_queue (void)
+{
+  MessagesQueue* queue = malloc (sizeof(MessagesQueue)) ;
+
+  if (queue != NULL)  init_messagess_queue (queue) ;
+
+  return queue ;
+}
+
+Bool_t is_empty_messages_queue (MessagesQueue* queue)
+{
+  return (queue->Length == 0) ;
+}
+
+void free_messages_queue (MessagesQueue* queue)
+{
+  while (! is_empty_messages_queue(queue) )
+
+    pop_from_messages_queue(queue) ;
+
+  FREE_POINTER (free, queue) ;
+}
+
+void put_into_messages_queue (MessagesQueue* queue, NetworkMessage messages)
+{
+  MessageNode* tmp = queue->Tail ;
+
+  queue->Tail = malloc (sizeof(MessageNode)) ;
+
+  if ( queue->Tail == NULL )
   {
-    fprintf(stderr, "Usage: \"%s slot_time step_time SLOT(or STEP)\"\n", argv[0]) ;
-    return EXIT_FAILURE ;
+    fprintf (stderr, "malloc messages node error !!\n") ;
+    return ;
   }
 
-  int i;
+  queue->Tail->Message = messages ;
+  queue->Tail->Next  = NULL ;
 
-  srand(time(NULL));
+  if (queue->Head == NULL)
 
-  Quantity_t counter = QUANTITY_I;
-  Power_t* pvalues = malloc(sizeof(Power_t) * NUM_POWER_VALUES);
-  TimeInfo* time_info = alloc_and_init_time_info(atof(argv[1]), atof(argv[2]), strcmp(argv[3], "SLOT"));
+    queue->Head = queue->Tail ;
 
-  MessagesQueue*     mqueue = alloc_and_init_messages_queue();
-  TemperaturesQueue* tqueue = alloc_and_init_temperatures_queue();
+  else
 
-  // initilization for the communication
-#if INTERNET_DOMAIN
-  int sockfd                = init_client_internet_domain(HOST_NAME, PORTNO);
-#else
-  int sockfd                = init_client_unix_domain(SOCKET_NAME);
-#endif
-  send_client_info(sockfd, time_info->SlotTime, time_info->StepTime, time_info->IsTransient);
+    tmp->Next = queue->Tail ;
 
-  // create network messages
-  Temperature_t* max_results = malloc(sizeof(Temperature_t) * 4);
-  Temperature_t cell1, cell2, outlet;
-
-  nm_get_all_max_temperatures_of_floorplan (mqueue, tqueue, "die2", max_results, 4);
-  nm_get_cell_temperature (mqueue, tqueue, 2, 11, 4, &cell1);
-  nm_get_cell_temperature (mqueue, tqueue, 6, 34, 84, &cell2);
-  nm_get_temperature_of_channel_outlet (mqueue, tqueue, "channel1", 0, &outlet);
-
-  // send_messages
-  send_messages(sockfd, mqueue);
-
-  Bool_t is_terminating = FALSE_V;
-
-  do {
-    if (is_slot_time_client(time_info)) {
-      for (i = 0; i < NUM_POWER_VALUES; i++) {
-        pvalues[i] = rand() % 30;
-      }
-
-      if (counter++ == NUM_TIME_SLOTS) {
-        is_terminating = TRUE_V;
-      }
-
-      send_power_values(sockfd, pvalues, NUM_POWER_VALUES, is_terminating);
-    }
-
-    get_results(sockfd, tqueue);
-
-    printf("%5.3fs  ", get_current_time_client(time_info)) ;
-    for (i = 0 ; i < 4 ; i++)
-      printf("%7.3f  ", max_results[i]) ;
-    printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;
-
-  } while (emulate(time_info, is_terminating));
-
-  close_client(sockfd);
-
-  free_time_info(time_info);
-  free_temperatures_queue(tqueue);
-  free_messages_queue(mqueue);
-
-  return EXIT_SUCCESS ;
+  queue->Length++;
 }
+
+void pop_from_messages_queue (MessagesQueue* queue)
+{
+  MessageNode* tmp = queue->Head->Next ;
+
+  FREE_POINTER (free, queue->Head) ;
+
+  queue->Head = tmp ;
+
+  queue->Length--;
+}
+
+
