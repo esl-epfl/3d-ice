@@ -284,7 +284,7 @@ Bool_t align_to_grid
 
   /* North side */
 
-  while ( cy <= floorplan_element->SW_Y + floorplan_element->Width )
+  while ( cy < floorplan_element->SW_Y + floorplan_element->Width )
   {
     cy += get_cell_width (dimensions) ;
     row_index++ ;
