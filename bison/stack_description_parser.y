@@ -235,9 +235,36 @@ stack_description_file
           * get_number_of_rows(stkd->Dimensions)
           * get_number_of_columns(stkd->Dimensions) ;
 
-      if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
-          stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED) {
+      if (stkd->Channel == NULL || stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM){ 
+      // NO CHANNEL OR IT IS TDICE_CHANNEL_MODEL_MC_4RM
 
+       stkd->Dimensions->Grid.NNz
+
+          = // number of coefficients in the diagonal
+              get_number_of_layers(stkd->Dimensions)
+            * get_number_of_rows(stkd->Dimensions)
+            * get_number_of_columns(stkd->Dimensions)
+            +
+            // number of coefficients bottom <-> top
+            2 * (get_number_of_layers(stkd->Dimensions) - 1 )
+              * get_number_of_rows(stkd->Dimensions)
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients North <-> South
+            2 * get_number_of_layers(stkd->Dimensions)
+              * (get_number_of_rows(stkd->Dimensions) - 1 )
+              * get_number_of_columns(stkd->Dimensions)
+            +
+            // Number of coefficients East <-> West
+            2 * get_number_of_layers(stkd->Dimensions)
+              * get_number_of_rows(stkd->Dimensions)
+              * (get_number_of_columns(stkd->Dimensions) - 1 ) ;
+        
+      }
+
+      else if(stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
+          stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED) {
+        
         Quantity_t num_layers_for_channel    =
           num_channels * NUM_LAYERS_2RM;
 
@@ -287,8 +314,10 @@ stack_description_file
               // Number of coefficients East <-> West
               0
               ;
+        
 
-      } else if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
+      } else {
+        // TDICE_CHANNEL_MODEL_MC_2RM
 
         Quantity_t num_layers_for_channel    =
           num_channels * NUM_LAYERS_2RM;
@@ -339,30 +368,7 @@ stack_description_file
               // Number of coefficients East <-> West
               0
               ;
-
-      } else { // TDICE_CHANNEL_MODEL_MC_4RM
-
-        stkd->Dimensions->Grid.NNz
-
-          = // number of coefficients in the diagonal
-              get_number_of_layers(stkd->Dimensions)
-            * get_number_of_rows(stkd->Dimensions)
-            * get_number_of_columns(stkd->Dimensions)
-            +
-            // number of coefficients bottom <-> top
-            2 * (get_number_of_layers(stkd->Dimensions) - 1 )
-              * get_number_of_rows(stkd->Dimensions)
-              * get_number_of_columns(stkd->Dimensions)
-            +
-            // Number of coefficients North <-> South
-            2 * get_number_of_layers(stkd->Dimensions)
-              * (get_number_of_rows(stkd->Dimensions) - 1 )
-              * get_number_of_columns(stkd->Dimensions)
-            +
-            // Number of coefficients East <-> West
-            2 * get_number_of_layers(stkd->Dimensions)
-              * get_number_of_rows(stkd->Dimensions)
-              * (get_number_of_columns(stkd->Dimensions) - 1 ) ;
+        
 
       }
     }
