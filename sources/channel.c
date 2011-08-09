@@ -544,7 +544,7 @@ void fill_sources_channel
   } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
 
     Quantity_t nchannels = (Quantity_t) ((get_chip_length(dimensions) / channel->Pitch) + 0.5); // round function
-    C = CCONV_MC_2RM(nchannels, channel->CoolantVHC, channel->CoolantFR, channel->Porosity, get_cell_width(dimensions), channel->Width);
+    C = CCONV_MC_2RM(nchannels, channel->CoolantVHC, channel->CoolantFR, channel->Porosity, get_cell_length(dimensions,0), channel->Width);
 
   } else { //TDICE_CHANNEL_MODEL_MC_4RM
 
