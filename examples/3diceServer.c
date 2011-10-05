@@ -39,7 +39,7 @@
 #include "stack_description.h"
 #include "thermal_data.h"
 
-#include "server.h"
+#include "network_interface_server.h"
 #include "NIPreamble.h"
 
 int

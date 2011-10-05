@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "client.h"
+#include "network_interface_client.h"
 #include "NIPreamble.h"
 
 int main(int argc, char** argv)

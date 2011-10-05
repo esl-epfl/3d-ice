@@ -43,7 +43,7 @@
 #include <strings.h>
 #include <stdio.h>
 
-#include "client.h"
+#include "network_interface_client.h"
 
 TimeInfo* alloc_and_init_time_info (Time_t slot_time, Time_t step_time, Bool_t is_transient)
 {
@@ -150,33 +150,45 @@ void close_client(int sockfd)
 
 void send_client_info(int sockfd, Time_t slot_time, Time_t step_time, Bool_t is_transient)
 {
-  write(sockfd, &(slot_time), sizeof(Time_t));
-  write(sockfd, &(step_time), sizeof(Time_t));
-  write(sockfd, &(is_transient), sizeof(Bool_t));
+  if ( write(sockfd, &(slot_time), sizeof(Time_t)) == -1 )
+      printf("ERROR :: write error\n") ;
+  if ( write(sockfd, &(step_time), sizeof(Time_t)) == -1 )
+      printf("ERROR :: write error\n") ;
+  if ( write(sockfd, &(is_transient), sizeof(Bool_t)) == -1 )
+      printf("ERROR :: write error\n") ;
 }
 
 void send_power_values(int sockfd, Power_t* pvalues, Quantity_t num_values, Bool_t is_terminating)
 {
-  write(sockfd, &is_terminating, sizeof(Bool_t));
+  if ( write(sockfd, &is_terminating, sizeof(Bool_t)) == -1 )
+
+      printf("ERROR :: write error\n") ;
 
   if (is_terminating == FALSE_V)
-    write(sockfd, pvalues, num_values * sizeof(Power_t));
+
+    if ( write(sockfd, pvalues, num_values * sizeof(Power_t)) == -1 )
+
+      printf("ERROR :: write error\n") ;
 }
 
 void send_messages(int sockfd, MessagesQueue* queue)
 {
-  write(sockfd, &(queue->Length), sizeof(Quantity_t));
+  if ( write(sockfd, &(queue->Length), sizeof(Quantity_t)) == -1 )
+
+      printf("ERROR :: write error\n") ;
 
   MessageNode* tmp;
   for (tmp = queue->Head; tmp != NULL; tmp = tmp->Next)
-    write(sockfd, &(tmp->Message), sizeof(NetworkMessage));
+    if ( write(sockfd, &(tmp->Message), sizeof(NetworkMessage)) == -1 )
+      printf("ERROR :: write error\n") ;
 }
 
 void get_results(int sockfd, TemperaturesQueue* queue)
 {
   TemperatureNode* tmp;
   for (tmp = queue->Head; tmp != NULL; tmp = tmp->Next) {
-    read(sockfd, tmp->Values, sizeof(Temperature_t) * tmp->NumValues);
+    if ( read(sockfd, tmp->Values, sizeof(Temperature_t) * tmp->NumValues) == -1 )
+      printf("ERROR :: read error\n") ;
   }
 }
 

@@ -43,7 +43,7 @@
 #include <strings.h>
 #include <stdio.h>
 
-#include "server.h"
+#include "network_interface_server.h"
 
 int init_server_unix_domain(String_t socket_name)
 {
@@ -118,15 +118,19 @@ int init_server_internet_domain(int portno)
 void close_server(int sockfd)
 {
   Bool_t end_emulation = TRUE_V;
-  write(sockfd, &end_emulation, sizeof(Bool_t));
+  if (write(sockfd, &end_emulation, sizeof(Bool_t)) == -1)
+      printf("ERROR :: write error\n") ;
   close(sockfd);
 }
 
 void get_client_info(int sockfd, Time_t* slot_time, Time_t* step_time, Bool_t* is_transient)
 {
-  read(sockfd, slot_time, sizeof(Time_t));
-  read(sockfd, step_time, sizeof(Time_t));
-  read(sockfd, is_transient, sizeof(Bool_t));
+  if ( read(sockfd, slot_time, sizeof(Time_t)) == -1)
+      printf("ERROR :: read error\n") ;
+  if ( read(sockfd, step_time, sizeof(Time_t)) == -1)
+      printf("ERROR :: read error\n") ;
+  if ( read(sockfd, is_transient, sizeof(Bool_t)) == -1)
+      printf("ERROR :: read error\n") ;
 }
 
 
@@ -135,11 +139,15 @@ void get_messages(int sockfd, MessagesQueue* queue)
   Quantity_t i;
   Quantity_t num_messages;
 
-  read(sockfd, &num_messages, sizeof(Quantity_t));
+  if (read(sockfd, &num_messages, sizeof(Quantity_t)) == -1)
+      printf("ERROR :: read error\n") ;
+
   for (i = 0; i < num_messages; i++) {
 
     NetworkMessage message;
-    read(sockfd, &message, sizeof(NetworkMessage));
+    if (read(sockfd, &message, sizeof(NetworkMessage)) == -1)
+      printf("ERROR :: read error\n") ;
+
     put_into_messages_queue(queue, message);
 
   }
@@ -147,10 +155,12 @@ void get_messages(int sockfd, MessagesQueue* queue)
 
 Power_t* get_power_values_from_network(int sockfd, Power_t* pvalues, Quantity_t num_values, Bool_t* is_terminating)
 {
-  read(sockfd, is_terminating, sizeof(Bool_t));
+  if (read(sockfd, is_terminating, sizeof(Bool_t)) == -1)
+      printf("ERROR :: read error\n") ;
 
   if (*is_terminating == FALSE_V)
-    read(sockfd, pvalues, num_values * sizeof(Power_t));
+    if (read(sockfd, pvalues, num_values * sizeof(Power_t)) == -1)
+      printf("ERROR :: read error\n") ;
 
   return pvalues;
 }
@@ -201,7 +211,8 @@ void send_results(int sockfd, TemperaturesQueue* queue)
 {
   TemperatureNode* tmp;
   for (tmp = queue->Head; tmp != NULL; tmp = tmp->Next) {
-    write(sockfd, tmp->Values, sizeof(Temperature_t) * tmp->NumValues);
+    if (write(sockfd, tmp->Values, sizeof(Temperature_t) * tmp->NumValues) == -1)
+      printf("ERROR :: write error\n") ;
   }
 
   while (! is_empty_temperatures_queue(queue) ) {
