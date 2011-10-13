@@ -77,9 +77,13 @@ extern "C"
 
     Die* DiesList ;
 
-    /* The list of stack elements componing the 3Dstack */
+    /* Pointer to the top-most stack element in the list of stack elements */
 
-    StackElement* StackElementsList ;
+    StackElement* TopStackElement ;
+
+    /* Pointer to the bottom-most stack element in the list of stack elements */
+
+    StackElement* BottomStackElement ;
 
     /* Collection of all the dimensions (chip, grid of cells, cell) */
 

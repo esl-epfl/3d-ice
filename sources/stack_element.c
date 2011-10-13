@@ -52,6 +52,7 @@ init_stack_element (StackElement* stack_element)
   stack_element->Id              = STRING_I ;
   stack_element->NLayers         = GRIDDIMENSION_I ;
   stack_element->Offset          = GRIDDIMENSION_I ;
+  stack_element->Prev            = NULL ;
   stack_element->Next            = NULL ;
 }
 
@@ -103,7 +104,7 @@ void print_formatted_stack_elements_list
   unsigned int max_stk_el_id_length = 0 ;
   unsigned int max_die_id_length = 0 ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (StackElement, stk_el, list)
   {
     max_stk_el_id_length = MAX (max_stk_el_id_length,
                                 strlen(stk_el->Id)) ;
@@ -116,7 +117,7 @@ void print_formatted_stack_elements_list
 
   fprintf (stream, "%sstack : \n", prefix) ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, list)
+  FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (StackElement, stack_element, list)
   {
     switch (stack_element->Type)
     {
@@ -170,7 +171,7 @@ void print_detailed_stack_elements_list
   if (new_prefix == NULL) return ;
   sprintf (new_prefix, "%s    ", prefix) ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
+  FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (StackElement, stk_el, list)
   {
     fprintf (stream,
              "%sstk_el                      = %p\n",
@@ -218,6 +219,9 @@ void print_detailed_stack_elements_list
              "%s  Offset                    = %d\n",
              prefix,   stk_el->Offset);
 
+    fprintf (stream,
+             "%s  Prev                      = %p\n",
+             prefix,   stk_el->Prev);
     fprintf (stream,
              "%s  Next                      = %p\n",
              prefix,   stk_el->Next);
@@ -494,10 +498,10 @@ SystemMatrix fill_system_matrix_stack_element
 StackElement*  find_stack_element_in_list (StackElement* list, String_t id)
 {
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
-
+  {
     if (strcmp(stk_el->Id, id) == 0)  break ;
-
- return stk_el ;
+  }
+  return stk_el ;
 }
 
 /******************************************************************************/

@@ -219,7 +219,7 @@ stack_description_file
       //
 
       Quantity_t num_channels = QUANTITY_I;
-      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList) {
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement) {
 
         stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
         if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL) num_channels++;
@@ -903,7 +903,7 @@ stack
       // After parsing with success the list of stack elements ...
       //
 
-      stkd->StackElementsList = $3 ;
+      stkd->BottomStackElement = $3 ;
 
       if (   last_stack_element != NULL
           && last_stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
@@ -941,7 +941,7 @@ stack
 
       GridDimension_t layer_index = GRIDDIMENSION_I ;
 
-      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
+      FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
       {
         stk_el->Offset = layer_index ;
         layer_index   += stk_el->NLayers ;
@@ -996,6 +996,7 @@ stack_elements
         }
       }
 
+      stkd->TopStackElement = $1 ;
 
       $$ = $1 ;
     }
@@ -1031,7 +1032,8 @@ stack_elements
         YYABORT ;
       }
 
-      $2->Next = $1 ;
+      JOIN_ELEMENTS ($2, $1) ;
+
       $$ = $2 ;
     }
   ;

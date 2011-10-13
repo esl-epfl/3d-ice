@@ -56,7 +56,8 @@ void init_stack_description (StackDescription* stkd)
   stkd->ConventionalHeatSink = NULL ;
   stkd->Channel              = NULL ;
   stkd->DiesList             = NULL ;
-  stkd->StackElementsList    = NULL ;
+  stkd->TopStackElement      = NULL ;
+  stkd->BottomStackElement   = NULL ;
   stkd->Dimensions           = NULL ;
 }
 
@@ -102,7 +103,7 @@ void free_stack_description (StackDescription* stkd)
   FREE_POINTER (free_channel,                stkd->Channel) ;
   FREE_POINTER (free_dies_list,              stkd->DiesList) ;
   FREE_POINTER (free_conventional_heat_sink, stkd->ConventionalHeatSink) ;
-  FREE_POINTER (free_stack_elements_list,    stkd->StackElementsList) ;
+  FREE_POINTER (free_stack_elements_list,    stkd->BottomStackElement) ;
   FREE_POINTER (free_dimensions,             stkd->Dimensions) ;
   FREE_POINTER (free,                        stkd->FileName) ;
 }
@@ -136,7 +137,7 @@ void print_formatted_stack_description
   fprintf (stream, "%s\n", prefix) ;
 
   print_formatted_stack_elements_list (stream, prefix,
-                                       stkd->StackElementsList) ;
+                                       stkd->TopStackElement) ;
   fprintf (stream, "%s\n", prefix) ;
 
   print_formatted_dimensions (stream, prefix, stkd->Dimensions) ;
@@ -203,12 +204,16 @@ void print_detailed_stack_description
   fprintf (stream, "%s\n", prefix) ;
 
   fprintf (stream,
-           "%s  StackElementsList             = %p\n",
-           prefix, stkd->StackElementsList) ;
+           "%s  TopStackElement               = %p\n",
+           prefix, stkd->TopStackElement) ;
+
+  fprintf (stream,
+           "%s  BottomStackElement            = %p\n",
+           prefix, stkd->BottomStackElement) ;
 
   fprintf (stream, "%s\n", prefix) ;
   print_detailed_stack_elements_list (stream, new_prefix,
-                                      stkd->StackElementsList) ;
+                                      stkd->TopStackElement) ;
   fprintf (stream, "%s\n", prefix) ;
 
   fprintf (stream,
@@ -230,7 +235,7 @@ void print_all_floorplans
   StackDescription* stkd
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -242,7 +247,7 @@ void print_all_floorplans
 
 int fill_floorplans (StackDescription* stkd)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -264,7 +269,7 @@ void fill_thermal_cell_stack_description
 )
 {
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
   {
     fill_thermal_cell_stack_element
     (
@@ -324,7 +329,7 @@ void fill_sources_stack_description
     ) ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
 
     fill_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
 }
@@ -337,7 +342,7 @@ void init_power_values
 )
 {
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
 
     init_power_values_stack_element (stack_element) ;
 }
@@ -354,7 +359,7 @@ Bool_t insert_power_values_by_powers_queue
     return FALSE_V;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
 
     insert_power_values_stack_element (stack_element, pvalues) ;
 
@@ -400,7 +405,7 @@ void update_channel_inlet_stack_description
 #endif
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
 
     if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
 
@@ -437,7 +442,7 @@ void fill_system_matrix_stack_description
   *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
 
     system_matrix = fill_system_matrix_stack_element
                     (
@@ -457,7 +462,7 @@ void fill_system_matrix_stack_description
 
 Quantity_t get_number_of_remaining_power_values (StackDescription* stkd)
 {
-  StackElement* stk_el = stkd->StackElementsList ;
+  StackElement* stk_el = stkd->BottomStackElement ;
   while (stk_el != NULL && stk_el->Type != TDICE_STACK_ELEMENT_DIE)
     stk_el = stk_el->Next ;
 
@@ -476,7 +481,7 @@ Quantity_t get_number_of_floorplan_elements
 {
   StackElement* stk_el = find_stack_element_in_list
                          (
-                           stkd->StackElementsList,
+                           stkd->BottomStackElement,
                            floorplan_id
                          ) ;
   if (stk_el == NULL)
@@ -500,7 +505,7 @@ Quantity_t get_total_number_of_floorplan_elements
   Quantity_t total_number_of_floorplan_elements = QUANTITY_I;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->StackElementsList)
+                                     stkd->BottomStackElement)
     if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
       total_number_of_floorplan_elements += stack_element->Floorplan->NElements;
 

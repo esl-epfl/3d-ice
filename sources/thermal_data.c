@@ -478,7 +478,7 @@ int get_max_temperature_of_floorplan_element
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement* stk_el   = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -522,7 +522,7 @@ int get_min_temperature_of_floorplan_element
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -566,7 +566,7 @@ int get_avg_temperature_of_floorplan_element
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -612,7 +612,7 @@ int get_min_avg_max_temperatures_of_floorplan_element
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -658,7 +658,7 @@ int get_temperature_of_channel_outlet
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              channel_id
                            ) ;
   if (stk_el == NULL)
@@ -700,7 +700,7 @@ int get_all_max_temperatures_of_floorplan
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -744,7 +744,7 @@ int get_all_min_temperatures_of_floorplan
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -788,7 +788,7 @@ int get_all_avg_temperatures_of_floorplan
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
   if (stk_el == NULL)
@@ -834,7 +834,7 @@ int get_all_min_avg_max_temperatures_of_floorplan
   GridDimension_t offset = GRIDDIMENSION_I ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
-                             stkd->StackElementsList,
+                             stkd->BottomStackElement,
                              floorplan_id
                            ) ;
 
@@ -881,7 +881,7 @@ int get_all_temperatures_of_channel_outlets
   Temperature_t*  temperature_offset = NULL ;
   StackElement*   stk_el             = find_stack_element_in_list
                                        (
-                                         stkd->StackElementsList,
+                                         stkd->BottomStackElement,
                                          channel_id
                                        ) ;
   if (stk_el == NULL)
@@ -951,7 +951,7 @@ int print_thermal_map
   GridDimension_t layer_offset = GRIDDIMENSION_I ;
   StackElement*   stk_el       = find_stack_element_in_list
                                  (
-                                   stkd->StackElementsList,
+                                   stkd->BottomStackElement,
                                    stack_element_id
                                  ) ;
   if (stk_el == NULL)
