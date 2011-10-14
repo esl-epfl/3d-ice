@@ -129,7 +129,7 @@ void print_detailed_die
   Die*     die
 )
 {
-  String_t new_prefix = malloc (sizeof(*new_prefix) * (4 + strlen(prefix))) ;
+  String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
   if (new_prefix == NULL) return ;
 
@@ -163,17 +163,13 @@ void print_detailed_die
            "%s  BottomLayer               = %p\n",
            prefix, die->BottomLayer) ;
 
-  fprintf (stream, "%s\n", prefix) ;
-  print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
-  fprintf (stream, "%s\n", prefix) ;
-
-  fprintf (stream,
-           "%s  SourceLayer               = %p\n",
-           prefix, die->SourceLayer) ;
-
   fprintf (stream,
            "%s  Next                      = %p\n",
            prefix, die->Next) ;
+
+  fprintf (stream, "%s\n", prefix) ;
+  print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
+  fprintf (stream, "%s\n", prefix) ;
 
   FREE_POINTER (free, new_prefix) ;
 }

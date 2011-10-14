@@ -44,7 +44,7 @@ void init_channel (Channel* channel)
 {
   channel->ChannelModel     = CHANNELMODEL_I;
   channel->Height           = CELLDIMENSION_I;
-  channel->Width            = CELLDIMENSION_I;
+  channel->Length           = CELLDIMENSION_I;
   channel->Pitch            = CELLDIMENSION_I;
   channel->Porosity         = POROSITY_I;
   channel->CoolantHTCs      = COOLANTHTCS_I;
@@ -96,8 +96,8 @@ void print_formatted_channel
            prefix, channel->Height) ;
 
   fprintf (stream,
-           "%s              width %7.1f ;\n",
-           prefix, channel->Width) ;
+           "%s              length %7.1f ;\n",
+           prefix, channel->Length) ;
 
   fprintf (stream,
            "%s              pitch  %7.1f ;\n",
@@ -162,20 +162,20 @@ void print_detailed_channel
 )
 {
   fprintf (stream,
-           "%s   channel model type          %d ;\n",
-           prefix, channel->ChannelModel) ;
-
-  fprintf (stream,
            "%schannel                     = %p\n",
            prefix,   channel) ;
+
+  fprintf (stream,
+           "%s  Model type                = %d\n",
+           prefix, channel->ChannelModel) ;
 
   fprintf (stream,
            "%s  Height                    = %.1f\n",
            prefix,  channel->Height) ;
 
   fprintf (stream,
-           "%s  Height                    = %.1f\n",
-           prefix,  channel->Width) ;
+           "%s  Length                    = %.1f\n",
+           prefix,  channel->Length) ;
 
   fprintf (stream,
            "%s  Pitch                     = %.1f\n",
@@ -343,7 +343,7 @@ void fill_thermal_cell_channel
       }
     }
 
-  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
+  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
 
     /* Bottom Wall */
 
@@ -420,7 +420,7 @@ void fill_thermal_cell_channel
             get_cell_length(dimensions, column_index),
             get_cell_width(dimensions),
             channel->Height,
-            channel->Width,
+            channel->Length,
             channel->Pitch,
             channel->Porosity,
             channel->CoolantHTCs,
@@ -519,7 +519,7 @@ void fill_sources_channel
   Channel*        channel
 )
 {
-  if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM ||
+  if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2 ||
       channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
       channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED) {
     // In 2RM, the channel offset is the layer index of the bottom wall,
@@ -541,10 +541,10 @@ void fill_sources_channel
 
     C = CCONV_PF(channel->CoolantVHC, channel->DarcyVelocity, get_cell_length(dimensions, 0), channel->Height);
 
-  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
+  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
 
     Quantity_t nchannels = (Quantity_t) ((get_chip_length(dimensions) / channel->Pitch) + 0.5); // round function
-    C = CCONV_MC_2RM(nchannels, channel->CoolantVHC, channel->CoolantFR, channel->Porosity, get_cell_length(dimensions,0), channel->Width);
+    C = CCONV_MC_2RM(nchannels, channel->CoolantVHC, channel->CoolantFR, channel->Porosity, get_cell_length(dimensions,0), channel->Length);
 
   } else { //TDICE_CHANNEL_MODEL_MC_4RM
 
@@ -556,7 +556,7 @@ void fill_sources_channel
 
   FOR_EVERY_COLUMN (column_index, dimensions)
   {
-    if (channel->ChannelModel != TDICE_CHANNEL_MODEL_MC_4RM
+    if (channel->ChannelModel != TDICE_CHANNEL_MODEL_MC_RM4
         || IS_CHANNEL_COLUMN(column_index))
     {
       *sources = 2.0 * C * channel->CoolantTIn ;
@@ -657,7 +657,7 @@ SystemMatrix fill_system_matrix_channel
       } // FOR_EVERY_COLUMN
     }  // FOR_EVERY_ROW
 
-  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
+  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
 
     FOR_EVERY_ROW (row_index_wall_bottom, dimensions)
     {

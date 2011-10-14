@@ -99,7 +99,7 @@
 unsigned_integer        [[:digit:]]+
 signed_integer          [+-]?[[:digit:]]+
 exponent                [eE]{signed_integer}
-double                  {signed_integer}\.{unsigned_integer}{exponent}?
+double                  {signed_integer}(\.{unsigned_integer}{exponent}?)?
 identifier              [[:alpha:]](\_|[[:alnum:]])*
 path_begin              (\.{1,2}\/|\/)?
 path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
@@ -120,67 +120,59 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 
 [[:space:]]*                 ;
 
-"//"                         BEGIN(ONE_LINE_COMMENT) ;
-"/*"                         BEGIN(MULTIPLE_LINE_COMMENT) ;
-
-":"                          return yytext[0] ;
 ","                          return yytext[0] ;
 ";"                          return yytext[0] ;
+":"                          return yytext[0] ;
+
+"//"                         BEGIN(ONE_LINE_COMMENT) ;
+"/*"                         BEGIN(MULTIPLE_LINE_COMMENT) ;
 
 "ambient"                    return AMBIENT ;
 "bottom"                     return BOTTOM ;
 "capacity"                   return CAPACITY ;
 "cell"                       return CELL ;
 "channel"                    return CHANNEL ;
-"microchannel_4rm"           return MC_4RM ;
-"microchannel_2rm"           return MC_2RM ;
-"pinfin_2rm"                 return PF_2RM ;
 "chip"                       return CHIP ;
 "coefficient"                return COEFFICIENT ;
+"conductivity"               return CONDUCTIVITY ;
 "conventional"               return CONVENTIONAL ;
 "coolant"                    return COOLANT ;
-"conductivity"               return CONDUCTIVITY ;
-"density"                    return DENSITY ;
+"darcy"                      return DARCY ;
 "diameter"                   return DIAMETER ;
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
+"distribution"               return DISTRIBUTION ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
 "flow"                       return FLOW ;
 "heat"                       return HEAT ;
 "height"                     return HEIGHT ;
 "incoming"                   return INCOMING ;
-"layer"                      return LAYER ;
+"inline"                     return INLINE ;
 "last"                       return LAST ;
+"layer"                      return LAYER ;
 "length"                     return LENGTH ;
 "material"                   return MATERIAL ;
-"on"                         return ON ;
+"microchannel"               return MICROCHANNEL ;
 "pin"                        return PIN ;
-"pin-fin"                    return PIN_FIN ;
+"pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
 "rate"                       return RATE ;
+"rm2"                        return RM2 ;
+"rm4"                        return RM4 ;
 "side"                       return SIDE ;
 "sink"                       return SINK ;
 "source"                     return SOURCE ;
-"specific"                   return SPECIFIC ;
 "stack"                      return STACK ;
+"staggered"                  return STAGGERED ;
 "temperature"                return TEMPERATURE ;
 "thermal"                    return THERMAL ;
 "top"                        return TOP ;
 "transfer"                   return TRANSFER ;
-"type"                       return TYPE ;
+"velocity"                   return VELOCITY ;
 "volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
-"inline"                     return INLINE ;
-"staggered"                  return STAGGERED ;
-"darcy"                      return DARCY ;
-"velocity"                   return VELOCITY ;
-
-{signed_integer}   {
-                     yylval->double_v = atof(yytext) ;
-                     return DVALUE ;
-                   }
 
 {double}           {
                      yylval->double_v = atof(yytext) ;

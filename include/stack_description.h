@@ -77,11 +77,11 @@ extern "C"
 
     Die* DiesList ;
 
-    /* Pointer to the top-most stack element in the list of stack elements */
+    /* Pointer to the top-most stack elements componing the 3Dstack */
 
     StackElement* TopStackElement ;
 
-    /* Pointer to the bottom-most stack element in the list of stack elements */
+    /* Pointer to the bottom-most stack elements componing the 3Dstack */
 
     StackElement* BottomStackElement ;
 

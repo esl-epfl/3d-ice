@@ -11,7 +11,7 @@ material beol:
 //  ambient temperature       300.0 ;
 
 
-microchannel_4rm :
+microchannel rm4 :
 
    height 100 ;
 
@@ -31,13 +31,12 @@ microchannel_4rm :
    coolant incoming temperature             300.0 ;
 
 
-/*
-microchannel_2rm :
+/*microchannel rm2 :
 
    height 100 ;
 
-   channel width    50 ;
-   channel pitch   100 ;
+   channel length   50 ;
+   wall length      50 ;
 
    wall material silicon ;
 
@@ -49,14 +48,14 @@ microchannel_2rm :
 */
 
 /*
-pinfin_2rm :
+pinfin :
 
    height 100 ;
 
    pin diameter   50 ;
    pin pitch     100 ;
 
-   inline ; // staggered ;
+   pin distribution inline ; // staggered ;
 
    pin material silicon ;
 
@@ -78,13 +77,12 @@ die topdie :
 	layer	48	silicon ;
 
 stack:
-
-   die     die2     topdie    floorplan "four_elements.flp" ;
-   channel channel1 ;
-   die     die1     bottomdie floorplan "four_elements.flp" ;
+	die mydie1 bottomdie floorplan "niagara.flp" ;
+	die mydie2 topdie    floorplan "niagara.flp" ;
+	die mydie3 bottomdie floorplan "niagara.flp" ;
+	die mydie4 bottomdie floorplan "niagara.flp" ;
 
 dimensions :
 
-  chip length 10000 , width  10000 ;
-  cell length    50 , width    200 ;
-
+    chip length 10000 , width  10000 ;
+    cell length   100 , width    100 ;

@@ -87,10 +87,10 @@ extern "C"
 
     GridDimension_t Offset ;
 
-    /* To collect stack elements in a doubled linked list */
+    /* To collect stack elements in a double linked list */
 
-    struct StackElement* Prev ;
-    struct StackElement* Next ;
+    struct StackElement* Prev ;  // Towards the bottom of the stack
+    struct StackElement* Next ;  // Toward the top of the stack
 
   } ;
 

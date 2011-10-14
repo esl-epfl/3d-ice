@@ -185,7 +185,7 @@ CellDimension_t get_cell_length
 
   if (dimensions->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
       dimensions->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED ||
-      dimensions->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM) {
+      dimensions->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
 
     return dimensions->Cell.WallLength ;
 

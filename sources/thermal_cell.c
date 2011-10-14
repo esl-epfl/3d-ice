@@ -308,7 +308,7 @@ void fill_liquid_cell_mc_2rm
   CellDimension_t        cell_length,
   CellDimension_t        cell_width,
   CellDimension_t        cell_height,
-  CellDimension_t        channel_width,
+  CellDimension_t        channel_width,  // FIXME WIDTH or LENGTH ??
   CellDimension_t        channel_pitch,
   Porosity_t             porosity,
   CoolantHTCs_t          coolant_htcs,

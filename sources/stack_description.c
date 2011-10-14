@@ -106,6 +106,8 @@ void free_stack_description (StackDescription* stkd)
   FREE_POINTER (free_stack_elements_list,    stkd->BottomStackElement) ;
   FREE_POINTER (free_dimensions,             stkd->Dimensions) ;
   FREE_POINTER (free,                        stkd->FileName) ;
+
+  stkd->TopStackElement = NULL ;
 }
 
 /******************************************************************************/
@@ -152,78 +154,92 @@ void print_detailed_stack_description
   StackDescription* stkd
 )
 {
-  String_t new_prefix = malloc (sizeof(*new_prefix) * (4 + strlen(prefix))) ;
-  if (new_prefix == NULL) return ;
-  sprintf (new_prefix, "%s    ", prefix) ;
+    String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
-  fprintf (stream,
-           "%sstkd                            = %p\n",
-           prefix, stkd) ;
+    if (new_prefix == NULL) return ;
 
-  fprintf (stream,
-           "%s  FileName                      = " "%s\n",
-           prefix, stkd->FileName) ;
+    sprintf (new_prefix, "%s    ", prefix) ;
 
-  fprintf (stream,
-           "%s  MaterialsList                 = %p\n",
-           prefix, stkd->MaterialsList) ;
+    fprintf (stream,
+             "%sstkd                            = %p\n",
+             prefix, stkd) ;
 
-  fprintf (stream, "%s\n", prefix) ;
-  print_detailed_materials_list (stream, new_prefix, stkd->MaterialsList) ;
-  fprintf (stream, "%s\n", prefix) ;
+    fprintf (stream,
+             "%s  FileName                      = " "%s\n",
+             prefix, stkd->FileName) ;
 
-  fprintf (stream,
-           "%s  ConventionalHeatSink          = %p\n",
-           prefix, stkd->ConventionalHeatSink) ;
+    fprintf (stream,
+             "%s  MaterialsList                 = %p\n",
+             prefix, stkd->MaterialsList) ;
 
-  if (stkd->ConventionalHeatSink != NULL)
-  {
-    fprintf (stream, "%s\n", prefix) ;
-    print_detailed_conventional_heat_sink (stream, new_prefix,
+    if (stkd->MaterialsList != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+        print_detailed_materials_list (stream, new_prefix, stkd->MaterialsList) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    fprintf (stream,
+             "%s  ConventionalHeatSink          = %p\n",
+             prefix, stkd->ConventionalHeatSink) ;
+
+    if (stkd->ConventionalHeatSink != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+        print_detailed_conventional_heat_sink (stream, new_prefix,
                                            stkd->ConventionalHeatSink) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
-  fprintf (stream,
-           "%s  Channel                       = %p\n",
-           prefix, stkd->Channel) ;
+    fprintf (stream,
+             "%s  Channel                       = %p\n",
+             prefix, stkd->Channel) ;
 
-  if (stkd->Channel != NULL)
-  {
-    fprintf (stream, "%s\n", prefix) ;
-    print_detailed_channel (stream, new_prefix, stkd->Channel) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
+    if (stkd->Channel != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+        print_detailed_channel (stream, new_prefix, stkd->Channel) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
-  fprintf (stream,
-           "%s  DiesList                      = %p\n",
-           prefix, stkd->DiesList) ;
+    fprintf (stream,
+             "%s  DiesList                      = %p\n",
+             prefix, stkd->DiesList) ;
 
-  fprintf (stream, "%s\n", prefix) ;
-  print_detailed_dies_list (stream, new_prefix, stkd->DiesList) ;
-  fprintf (stream, "%s\n", prefix) ;
+    if (stkd->DiesList != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+        print_detailed_dies_list (stream, new_prefix, stkd->DiesList) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
-  fprintf (stream,
-           "%s  TopStackElement               = %p\n",
-           prefix, stkd->TopStackElement) ;
+    fprintf (stream,
+             "%s  TopStackElement               = %p\n",
+             prefix, stkd->TopStackElement) ;
 
-  fprintf (stream,
-           "%s  BottomStackElement            = %p\n",
-           prefix, stkd->BottomStackElement) ;
+    fprintf (stream,
+             "%s  BottomStackElement            = %p\n",
+             prefix, stkd->BottomStackElement) ;
 
-  fprintf (stream, "%s\n", prefix) ;
-  print_detailed_stack_elements_list (stream, new_prefix,
-                                      stkd->TopStackElement) ;
-  fprintf (stream, "%s\n", prefix) ;
+    if (stkd->TopStackElement != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+        print_detailed_stack_elements_list (stream, new_prefix, stkd->TopStackElement) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
-  fprintf (stream,
-           "%s  Dimensions                    = %p\n",
-           prefix, stkd->Dimensions) ;
+    fprintf (stream,
+             "%s  Dimensions                    = %p\n",
+             prefix, stkd->Dimensions) ;
 
-  fprintf (stream, "%s\n", prefix) ;
-  print_detailed_dimensions (stream, new_prefix, stkd->Dimensions) ;
+    if (stkd->Dimensions != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+        print_detailed_dimensions (stream, new_prefix, stkd->Dimensions) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
-  FREE_POINTER (free, new_prefix) ;
+    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/
@@ -247,7 +263,7 @@ void print_all_floorplans
 
 int fill_floorplans (StackDescription* stkd)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -257,7 +273,7 @@ int fill_floorplans (StackDescription* stkd)
   }
 
   return 0 ;
- }
+}
 
 /******************************************************************************/
 

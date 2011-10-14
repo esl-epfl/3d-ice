@@ -167,7 +167,7 @@ void print_detailed_stack_elements_list
   StackElement* list
 )
 {
-  String_t new_prefix = malloc (sizeof(*new_prefix) * (4 + strlen(prefix))) ;
+  String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
   if (new_prefix == NULL) return ;
   sprintf (new_prefix, "%s    ", prefix) ;
 

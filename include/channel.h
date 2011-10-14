@@ -62,9 +62,9 @@ extern "C"
 
     CellDimension_t Height ;
 
-    /* The width of the channel in [um]              */
+    /* The length of the channel in [um]             */
 
-    CellDimension_t Width ;
+    CellDimension_t Length ;
 
     /* The pitch of the channel in [um]              */
 
