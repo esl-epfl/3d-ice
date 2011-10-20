@@ -57,8 +57,6 @@ void init_dimensions (Dimensions* dimensions)
 
   dimensions->Chip.Length      = CHIPDIMENSION_I ;
   dimensions->Chip.Width       = CHIPDIMENSION_I ;
-
-  dimensions->StackHasChannel = FALSE_V ;
 }
 
 /******************************************************************************/
@@ -154,14 +152,6 @@ void print_detailed_dimensions
   fprintf (stream,
            "%s  Chip.Width                = %.1f\n",
            prefix, dimensions->Chip.Width) ;
-
-  fprintf (stream,
-           "%s  StackHasChannel           = %d\n",
-           prefix, dimensions->StackHasChannel) ;
-
-  fprintf (stream,
-           "%s   channel model type          %d ;\n",
-           prefix, dimensions->ChannelModel) ;
 }
 
 /******************************************************************************/
@@ -179,18 +169,6 @@ CellDimension_t get_cell_length
   GridDimension_t column_index
 )
 {
-  if (!dimensions->StackHasChannel)
-
-    return dimensions->Cell.WallLength ;
-
-  if (dimensions->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
-      dimensions->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED ||
-      dimensions->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
-
-    return dimensions->Cell.WallLength ;
-
-  } else { //TDICE_CHANNEL_MODEL_MC_4RM
-
   if (IS_FIRST_COLUMN(column_index))
 
     return dimensions->Cell.FirstWallLength ;
@@ -208,14 +186,14 @@ CellDimension_t get_cell_length
     else
 
       return dimensions->Cell.WallLength ;
-
-  }
-
 }
 
 /******************************************************************************/
 
-CellDimension_t get_cell_width (Dimensions* dimensions)
+CellDimension_t get_cell_width
+(
+    Dimensions* dimensions
+)
 {
   return dimensions->Cell.Width ;
 }

@@ -52,10 +52,11 @@ extern "C"
   typedef struct
   {
     CellDimension_t FirstWallLength ;
-    CellDimension_t WallLength ;
-    CellDimension_t LastWallLength ;
 
+    CellDimension_t WallLength ;
     CellDimension_t ChannelLength ;
+
+    CellDimension_t LastWallLength ;
 
     CellDimension_t Width ;
 
@@ -89,9 +90,6 @@ extern "C"
     CellDimensions Cell ;
     GridDimensions Grid ;
     ChipDimensions Chip ;
-
-    Bool_t StackHasChannel ;
-    ChannelModel_t ChannelModel ;
 
   } Dimensions ;
 
