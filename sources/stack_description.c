@@ -263,7 +263,7 @@ void print_all_floorplans
 
 int fill_floorplans (StackDescription* stkd)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->StackElementsList)
+  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
