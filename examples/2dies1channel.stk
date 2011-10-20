@@ -31,7 +31,8 @@ microchannel rm4 :
    coolant incoming temperature             300.0 ;
 
 
-/*microchannel rm2 :
+/*
+microchannel rm2 :
 
    height 100 ;
 
@@ -77,12 +78,13 @@ die topdie :
 	layer	48	silicon ;
 
 stack:
-	die mydie1 bottomdie floorplan "niagara.flp" ;
-	die mydie2 topdie    floorplan "niagara.flp" ;
-	die mydie3 bottomdie floorplan "niagara.flp" ;
-	die mydie4 bottomdie floorplan "niagara.flp" ;
+    die     die2     topdie    floorplan "four_elements.flp" ;
+    channel channel1 ;
+    die     die1     bottomdie floorplan "four_elements.flp" ;
+
 
 dimensions :
 
     chip length 10000 , width  10000 ;
     cell length   100 , width    100 ;
+

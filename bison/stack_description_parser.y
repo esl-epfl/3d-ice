@@ -143,6 +143,8 @@ static CellDimension_t tmp_first_wall_length = CELLDIMENSION_I ;
 static CellDimension_t tmp_last_wall_length  = CELLDIMENSION_I ;
 static CellDimension_t tmp_wall_length       = CELLDIMENSION_I ;
 static CellDimension_t tmp_channel_length    = CELLDIMENSION_I ;
+static Quantity_t      num_channels          = QUANTITY_I ;
+static Quantity_t      num_dies              = QUANTITY_I ;
 %}
 
 %name-prefix "stack_description_"
@@ -153,6 +155,12 @@ static CellDimension_t tmp_channel_length    = CELLDIMENSION_I ;
 %parse-param { StackDescription *stkd }
 %parse-param { yyscan_t scanner }
 %lex-param   { yyscan_t scanner }
+
+%initial-action
+{
+    num_channels = QUANTITY_I ;
+    num_dies     = QUANTITY_I ;
+} ;
 
 %start stack_description_file
 
@@ -169,95 +177,13 @@ stack_description_file
     microchannel
     dies_list
     stack
-    {
-        Bool_t die_in_stack          = FALSE_V ;
-        Bool_t channel_in_stack      = FALSE_V ;
-        Bool_t two_channels_in_stack = FALSE_V ;
-
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
-        {
-            if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
-
-                die_in_stack = TRUE_V ;
-
-            if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL)
-            {
-                channel_in_stack = TRUE_V ;
-
-                if (   stk_el->Next != NULL
-                    && stk_el->Next->Type == TDICE_STACK_ELEMENT_CHANNEL)
-
-                    two_channels_in_stack = TRUE_V ;
-            }
-        }
-
-        if (die_in_stack == FALSE_V)
-        {
-            stack_description_error (stkd, scanner, "Error: stack must contain at least one die") ;
-
-            YYABORT ;
-        }
-
-        if (channel_in_stack == TRUE_V && stkd->Channel == NULL)
-        {
-            stack_description_error (stkd, scanner, "Error: channel used in stack but not declared") ;
-
-            YYABORT ;
-        }
-
-        if (two_channels_in_stack == TRUE_V)
-        {
-            stack_description_error (stkd, scanner, "Error: cannot declare two consecutive channels") ;
-
-            YYABORT ;
-        }
-
-        if (stkd->TopStackElement->Type == TDICE_STACK_ELEMENT_CHANNEL)
-        {
-            stack_description_error (stkd, scanner, "Error: cannot declare a channel as top-most stack element") ;
-
-            YYABORT ;
-        }
-
-        if (stkd->BottomStackElement->Type == TDICE_STACK_ELEMENT_CHANNEL)
-        {
-            stack_description_error (stkd, scanner, "Error: cannot declare a channel as bottom-most stack element") ;
-
-            YYABORT ;
-        }
-
-        if (stkd->ConventionalHeatSink == NULL && stkd->Channel == NULL)
-
-            fprintf (stderr, "Warning: neither heat sink nor channel has been declared\n") ;
-
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, stkd->MaterialsList)
-
-            if (material->Used == 0)
-
-                fprintf(stderr, "Warning: material %s declared but not used\n", material->Id) ;
-
-
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, stkd->DiesList)
-
-            if (die->Used == 0)
-
-                fprintf(stderr, "Warning: die %s declared but not used\n", die->Id) ;
-
-    }
     dimensions
     {
-        // Counts the number of layers and channels
-
-        Quantity_t num_channels = QUANTITY_I;
+        // Counts the number of layers
 
         FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
         {
-
             stkd->Dimensions->Grid.NLayers += stk_el->NLayers ;
-
-            if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL)
-
-                num_channels++;
         }
 
         // Evaluate the number of cells and nonzero elements
@@ -867,13 +793,37 @@ stack
   : STACK ':'
         stack_elements
     {
-        GridDimension_t layer_index = GRIDDIMENSION_I ;
-
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
+        if (num_dies == 0)
         {
-            stk_el->Offset = layer_index ;
-            layer_index   += stk_el->NLayers ;
+            stack_description_error (stkd, scanner, "Error: stack must contain at least one die") ;
+
+            YYABORT ;
         }
+
+        if (stkd->BottomStackElement->Type == TDICE_STACK_ELEMENT_CHANNEL)
+        {
+            stack_description_error (stkd, scanner, "Error: cannot declare a channel as bottom-most stack element") ;
+
+            YYABORT ;
+        }
+
+        if (stkd->ConventionalHeatSink == NULL && stkd->Channel == NULL)
+
+            fprintf (stderr, "Warning: neither heat sink nor channel has been declared\n") ;
+
+
+        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, stkd->MaterialsList)
+
+            if (material->Used == 0)
+
+                fprintf(stderr, "Warning: material %s declared but not used\n", material->Id) ;
+
+
+        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, stkd->DiesList)
+
+            if (die->Used == 0)
+
+                fprintf(stderr, "Warning: die %s declared but not used\n", die->Id) ;
 
         if (stkd->ConventionalHeatSink != NULL)
         {
@@ -894,6 +844,14 @@ stack
                 stkd->ConventionalHeatSink->IsSourceLayer = TRUE_V ;
             }
         }
+
+        GridDimension_t layer_index = GRIDDIMENSION_I ;
+
+        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
+        {
+            stk_el->Offset = layer_index ;
+            layer_index   += stk_el->NLayers ;
+        }
     }
   ;
 
@@ -901,6 +859,13 @@ stack_elements
 
   : stack_element
     {
+        if (   stkd->TopStackElement == NULL && $1->Type == TDICE_STACK_ELEMENT_CHANNEL)
+        {
+            stack_description_error (stkd, scanner, "Error: cannot declare a channel as top-most stack element") ;
+
+            YYABORT ;
+        }
+
         stkd->TopStackElement    = $1 ;
         stkd->BottomStackElement = $1 ;
         $$ = $1 ;
@@ -914,6 +879,14 @@ stack_elements
             FREE_POINTER (free_stack_element, $2) ;
 
             stack_description_error (stkd, scanner, error_message) ;
+
+            YYABORT ;
+        }
+
+        if (   $1->Type == TDICE_STACK_ELEMENT_CHANNEL
+            && $2->Type == TDICE_STACK_ELEMENT_CHANNEL)
+        {
+            stack_description_error (stkd, scanner, "Error: cannot declare two consecutive channels") ;
 
             YYABORT ;
         }
@@ -985,6 +958,15 @@ stack_element
 
   | CHANNEL IDENTIFIER ';'  // $2 Identifier for the stack element
     {
+        num_channels++ ;
+
+        if (stkd->Channel == NULL)
+        {
+            stack_description_error (stkd, scanner, "Error: channel used in stack but not declared") ;
+
+            YYABORT ;
+        }
+
         StackElement* stack_element = $$ = alloc_and_init_stack_element() ;
 
         if (stack_element == NULL)
@@ -1016,6 +998,8 @@ stack_element
                                                   // $3 Identifier of the die
                                                   // $5 Path of the floorplan file
     {
+        num_dies++ ;
+
         StackElement* stack_element = $$ = alloc_and_init_stack_element() ;
 
         if (stack_element == NULL)
