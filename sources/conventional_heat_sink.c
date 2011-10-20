@@ -147,7 +147,7 @@ void fill_thermal_cell_conventional_heat_sink
 #       endif
         thermalcells,
         get_cell_length(dimensions, column_index),
-        get_cell_width(dimensions),
+        get_cell_width(dimensions, row_index),
         conventionalheatsink->TopLayer->Height,
         conventionalheatsink->TopLayer->Material->ThermalConductivity,
         conventionalheatsink->AmbientHTC

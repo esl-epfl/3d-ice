@@ -192,7 +192,8 @@ CellDimension_t get_cell_length
 
 CellDimension_t get_cell_width
 (
-    Dimensions* dimensions
+    Dimensions*     dimensions,
+    GridDimension_t __attribute__ ((unused)) row_index
 )
 {
   return dimensions->Cell.Width ;

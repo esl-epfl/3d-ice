@@ -197,7 +197,7 @@ void fill_thermal_cell_layer
 #   endif
         thermalcells,
         get_cell_length(dimensions, column_index),
-        get_cell_width(dimensions),
+        get_cell_width(dimensions, row_index),
         layer->Height,
         layer->Material->ThermalConductivity,
         layer->Material->VolumetricHeatCapacity,

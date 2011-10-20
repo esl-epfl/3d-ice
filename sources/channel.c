@@ -247,7 +247,7 @@ void fill_thermal_cell_channel
             column_index_wall_bottom,
             dimensions,
             get_cell_length(dimensions, column_index_wall_bottom),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index_wall_bottom),
             channel->Height,
 #   endif
             thermalcells
@@ -274,7 +274,7 @@ void fill_thermal_cell_channel
 #   endif
             thermalcells,
             get_cell_length(dimensions, column_index_virtual_wall),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index_virtual_wall),
             channel->Height,
             channel->Porosity,
             channel->WallMaterial->ThermalConductivity,
@@ -304,7 +304,7 @@ void fill_thermal_cell_channel
             channel->ChannelModel,
             thermalcells,
             get_cell_length(dimensions, column_index),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index),
             channel->Height,
             channel->Porosity,
             channel->CoolantVHC,
@@ -333,7 +333,7 @@ void fill_thermal_cell_channel
             column_index_wall_top,
             dimensions,
             get_cell_length(dimensions, column_index_wall_top),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index_wall_top),
             channel->Height,
 #   endif
             thermalcells
@@ -362,7 +362,7 @@ void fill_thermal_cell_channel
             column_index_wall_bottom,
             dimensions,
             get_cell_length(dimensions, column_index_wall_bottom),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index_wall_bottom),
             channel->Height,
 #   endif
             thermalcells
@@ -389,7 +389,7 @@ void fill_thermal_cell_channel
 #   endif
             thermalcells,
             get_cell_length(dimensions, column_index_virtual_wall),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index_virtual_wall),
             channel->Height,
             channel->Porosity,
             channel->WallMaterial->ThermalConductivity,
@@ -418,7 +418,7 @@ void fill_thermal_cell_channel
             dimensions,
             thermalcells,
             get_cell_length(dimensions, column_index),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index),
             channel->Height,
             channel->Length,
             channel->Pitch,
@@ -450,7 +450,7 @@ void fill_thermal_cell_channel
             column_index_wall_top,
             dimensions,
             get_cell_length(dimensions, column_index_wall_top),
-            get_cell_width(dimensions),
+            get_cell_width(dimensions, row_index_wall_top),
             channel->Height,
 #   endif
             thermalcells
@@ -478,7 +478,7 @@ void fill_thermal_cell_channel
               dimensions,
               thermalcells,
               get_cell_length(dimensions, column_index),
-              get_cell_width(dimensions),
+              get_cell_width(dimensions, row_index),
               channel->Height,
               channel->CoolantHTCs,
               channel->CoolantVHC,
@@ -496,7 +496,7 @@ void fill_thermal_cell_channel
 #   endif
               thermalcells,
               get_cell_length(dimensions, column_index),
-              get_cell_width(dimensions),
+              get_cell_width(dimensions, row_index),
               channel->Height,
               channel->WallMaterial->ThermalConductivity,
               channel->WallMaterial->VolumetricHeatCapacity,

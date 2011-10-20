@@ -272,11 +272,11 @@ Bool_t align_to_grid
 
   /* South side */
 
-  cy  = (get_cell_width (dimensions) / 2.0) ;
+  cy  = (get_cell_width (dimensions, 0) / 2.0) ;
 
   while ( cy < floorplan_element->SW_Y )
   {
-    cy += get_cell_width (dimensions) ;
+    cy += get_cell_width (dimensions, row_index) ;  // CHECKME
     row_index++ ;
   }
 
@@ -286,7 +286,7 @@ Bool_t align_to_grid
 
   while ( cy < floorplan_element->SW_Y + floorplan_element->Width )
   {
-    cy += get_cell_width (dimensions) ;
+    cy += get_cell_width (dimensions, row_index) ;  // CHECKME
     row_index++ ;
   }
 
@@ -294,9 +294,11 @@ Bool_t align_to_grid
 
   /* Effective width */
 
-  floorplan_element->EffectiveWidth =
-    get_cell_width (dimensions) * (floorplan_element->NE_Row
-                                   - floorplan_element->SW_Row + 1) ;
+  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (tmp_row_index, floorplan_element)
+  {
+    floorplan_element->EffectiveWidth
+      += get_cell_width (dimensions, tmp_row_index) ;  // CHECKME
+  }
 
   if (floorplan_element->NE_Row - floorplan_element->SW_Row == 0
       && floorplan_element->NE_Column - floorplan_element->SW_Column == 0)
@@ -304,7 +306,7 @@ Bool_t align_to_grid
     fprintf (stderr,
       "%s: no cells belong to floorplan element %s.\n",
       floorplan->FileName, floorplan_element->Id) ;
-    return TRUE_V ;
+    return TRUE_V ;  // FIXME
   }
 
   return FALSE_V ;

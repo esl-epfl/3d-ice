@@ -119,7 +119,7 @@ void fill_sources_floorplan_element
 
         += (
               power * get_cell_length (dimensions, column_index)
-                    * get_cell_width (dimensions)
+                    * get_cell_width (dimensions, row_index)
            )
            /  flp_el_surface ;
 
@@ -129,7 +129,7 @@ void fill_sources_floorplan_element
                     " | %.4e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
         layer_index, row_index, column_index,
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-        get_cell_length (dimensions, column_index), get_cell_width (dimensions),
+        get_cell_length (dimensions, column_index), get_cell_width (dimensions, row_index),
         sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
         power, flp_el_surface, floorplan_element->Id) ;
 #endif

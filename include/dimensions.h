@@ -129,7 +129,7 @@ extern "C"
   get_cell_length (Dimensions* dimensions, GridDimension_t column_index) ;
 
   CellDimension_t
-  get_cell_width  (Dimensions* dimensions) ;
+  get_cell_width  (Dimensions* dimensions, GridDimension_t row_index) ;
 
 /******************************************************************************/
 
