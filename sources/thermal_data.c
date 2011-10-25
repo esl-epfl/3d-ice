@@ -48,7 +48,7 @@ extern void fill_thermal_cell_stack_description
    StackDescription* stkd
 ) ;
 
-extern void fill_sources_stack_description
+extern int fill_sources_stack_description
 (
   Source_t*         sources,
   ThermalCell*      thermalcells,
@@ -374,14 +374,9 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
 {
   if (tdata->CurrentTime % tdata->SlotLength == 0)
   {
-    if (get_number_of_remaining_power_values(stkd) == 0)
+    if (fill_sources_stack_description (tdata->Sources, tdata->ThermalCells, stkd) != 0)
 
       return 1 ;
-
-    fill_sources_stack_description
-    (
-      tdata->Sources, tdata->ThermalCells, stkd
-    ) ;
   }
 
   fill_system_vector

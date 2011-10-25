@@ -54,13 +54,13 @@
 
 void floorplan_error
 (
-  Floorplan*  floorplan,
-  Dimensions* dimensions,
-  yyscan_t    yyscanner,
-  char const* msg
+   Floorplan*  floorplan,
+   Dimensions *dimensions,
+   yyscan_t    yyscanner,
+   char const *msg
 ) ;
 
-static Quantity_t first_queue_length = QUANTITY_I ;
+static char error_message [100] ;
 %}
 
 %type <p_floorplan_element> floorplan_element ;
@@ -94,153 +94,138 @@ static Quantity_t first_queue_length = QUANTITY_I ;
 
 %%
 
+/******************************************************************************/
+/************************* List of floorplan elements *************************/
+/******************************************************************************/
+
 floorplan_element_list
 
-  : floorplan_element
+  : floorplan_element             // $1 : pointer to the first floorplan element found
     {
-      Bool_t tmp_1 = check_location (floorplan, $1, dimensions) ;
-      Bool_t tmp_2 = align_to_grid  (floorplan, $1, dimensions) ;
+        Bool_t tmp_1 = check_location (floorplan, $1, dimensions) ;
+        Bool_t tmp_2 = align_to_grid  (floorplan, $1, dimensions) ;
 
-      if (tmp_1 || tmp_2)
-      {
-        FREE_POINTER (free_floorplan_element, $1) ;
-
-        floorplan_error (floorplan, dimensions, scanner, "") ;
-
-        YYABORT ;
-      }
-
-      floorplan->ElementsList = $1 ;
-      floorplan->NElements    = 1 ;
-      $$ = $1 ;
-    }
-  | floorplan_element_list floorplan_element
-    {
-      if (find_floorplan_element_in_list($1, $2->Id) != NULL)
-      {
-        String_t message
-          = malloc (sizeof(*message) * (37 + strlen($2->Id))) ;
-
-        if (message == NULL)
+        if (tmp_1 || tmp_2)
         {
-          floorplan_error (floorplan, dimensions, scanner, "Malloc error") ;
+            FREE_POINTER (free_floorplan_element, $1) ;
 
-          FREE_POINTER (free_floorplan_element, $2) ;
+            floorplan_error (floorplan, dimensions, scanner, "") ;
 
-          YYABORT ;
+            YYABORT ;
         }
 
-        sprintf (message, "Floorplan element %s already declared", $2->Id) ;
+        floorplan->ElementsList = $1 ;
+        floorplan->NElements    = 1 ;
 
-        floorplan_error (floorplan, dimensions, scanner, message) ;
+        $$ = $1 ;                 // $1 will be the new last element in the list
+    }
+  | floorplan_element_list floorplan_element // $1 : pointer to the last element in the list
+                                             // $2 : pointer to the element to add in the list
+    {
+        if (find_floorplan_element_in_list($1, $2->Id) != NULL)
+        {
+            sprintf (error_message, "Floorplan element %s already declared", $2->Id) ;
 
-        FREE_POINTER (free_floorplan_element, $2) ;
-        FREE_POINTER (free, message) ;
+            floorplan_error (floorplan, dimensions, scanner, error_message) ;
 
-        YYABORT ;
-      }
+            FREE_POINTER (free_floorplan_element, $2) ;
+
+            YYABORT ;
+        }
 
 
-      Bool_t tmp_1 = check_intersections (floorplan, $2) ;
-      Bool_t tmp_2 = check_location      (floorplan, $2, dimensions) ;
-      Bool_t tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
+        Bool_t tmp_1 = check_intersections (floorplan, $2) ;
+        Bool_t tmp_2 = check_location      (floorplan, $2, dimensions) ;
+        Bool_t tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
 
-      if (tmp_1 || tmp_2 || tmp_3 )
-      {
-        FREE_POINTER (free_floorplan_element, $2) ;
+        if (tmp_1 || tmp_2 || tmp_3 )
+        {
+            FREE_POINTER (free_floorplan_element, $2) ;
 
-        floorplan_error (floorplan, dimensions, scanner, "") ;
+            floorplan_error (floorplan, dimensions, scanner, "") ;
 
-        YYABORT ;
-      }
+            YYABORT ;
+        }
 
-      $1->Next = $2 ;
-      floorplan->NElements++ ;
-      $$ = $2 ;
+        floorplan->NElements++ ;
+
+        $1->Next = $2 ;           // insert $2 at the end of the list
+        $$ = $2 ;                 // $2 will be the new last element in the list
     }
   ;
+
+/******************************************************************************/
+/************************* Floorplan element **********************************/
+/******************************************************************************/
 
 floorplan_element
 
-  : IDENTIFIER ':'
-      POSITION  DVALUE ',' DVALUE ';'
-      DIMENSION DVALUE ',' DVALUE ';'
-      POWER VALUES power_values_list ';'
+  : IDENTIFIER ':'                             // $1
+      POSITION  DVALUE ',' DVALUE ';'          // $4 $6
+      DIMENSION DVALUE ',' DVALUE ';'          // $9 $11
+      POWER VALUES power_values_list ';'       // $15
     {
-      FloorplanElement *floorplan_element
-        = $$ = alloc_and_init_floorplan_element ( ) ;
+        FloorplanElement *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
 
-      if (floorplan_element == NULL)
-      {
-        perror ("alloc_floorplan_element") ;
-        floorplan_error (floorplan, dimensions, scanner, "") ;
-        YYABORT ;
-      }
-
-      floorplan_element->Id          = $1 ;
-      floorplan_element->SW_X        = $4 ;
-      floorplan_element->SW_Y        = $6 ;
-      floorplan_element->Length      = $9 ;
-      floorplan_element->Width       = $11 ;
-      floorplan_element->PowerValues = $15 ;
-
-      if (first_queue_length == 0)
-        first_queue_length = $15->Length ;
-      else
-        if ($15->Length < first_queue_length)
+        if (floorplan_element == NULL)
         {
-          floorplan_error (floorplan, dimensions, scanner, "Missing power value!") ;
-          YYABORT ;
+            FREE_POINTER (free, $1) ;
+
+            floorplan_error (floorplan, dimensions, scanner, "Malloc floorplan element failed") ;
+
+            YYABORT ;
         }
+
+        floorplan_element->Id          = $1 ;
+        floorplan_element->SW_X        = $4 ;
+        floorplan_element->SW_Y        = $6 ;
+        floorplan_element->Length      = $9 ;
+        floorplan_element->Width       = $11 ;
+        floorplan_element->PowerValues = $15 ;
+
     }
   ;
 
+/******************************************************************************/
+/************************* List of power values *******************************/
+/******************************************************************************/
+
 power_values_list
 
-  : DVALUE
+  : DVALUE              // $1
+                        // There must be at least one power value
     {
-      PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
+        PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
 
-      if (powers_list == NULL)
-      {
-        perror ("alloc_powers_queue") ;
-        floorplan_error (floorplan, dimensions, scanner, "") ;
-        YYABORT ;
-      }
+        if (powers_list == NULL)
+        {
+            floorplan_error (floorplan, dimensions, scanner, "Malloc power list failed") ;
 
-      put_into_powers_queue (powers_list, $1) ;
+            YYABORT ;
+        }
+
+        put_into_powers_queue (powers_list, $1) ;
     }
 
-  | power_values_list ',' DVALUE
+  | power_values_list ',' DVALUE         // $1 the power list so far ...
+                                         // $3 the poer value to add
     {
-      if (first_queue_length != 0
-          && $1->Length + 1 > first_queue_length)
-
-        fprintf (stderr, "%s:%d: Warning: discarding value %f\n",
-                 floorplan->FileName, floorplan_get_lineno(scanner), $3) ;
-
-      else
-
         put_into_powers_queue ($1, $3) ;
 
-      $$ = $1 ;
+        $$ = $1 ;
     }
   ;
 
 %%
 
-void
-floorplan_error
+void floorplan_error
 (
-  Floorplan  *floorplan,
-  Dimensions* dimensions,
-  yyscan_t   yyscanner,
-  char const *msg
+    Floorplan  *floorplan,
+    Dimensions* __attribute__ ((unused)) dimensions,
+    yyscan_t   yyscanner,
+    char const *msg
 )
 {
-  fprintf (stderr, "%s:%d: %s\n", floorplan->FileName,
-                                  floorplan_get_lineno(yyscanner),
-                                  msg) ;
-
-  get_chip_length (dimensions) ;  // FIXME
+    fprintf (stderr, "%s:%d: %s\n",
+             floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
 }

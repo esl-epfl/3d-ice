@@ -156,7 +156,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_sources_die
+  int fill_sources_die
   (
     Source_t*             sources,
     Dimensions*           dimensions,

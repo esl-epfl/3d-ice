@@ -301,55 +301,56 @@ void fill_thermal_cell_stack_element
 
 /******************************************************************************/
 
-void fill_sources_stack_element
+int fill_sources_stack_element
 (
   Source_t*             sources,
   Dimensions*           dimensions,
   StackElement*         stack_element
 )
 {
-  switch (stack_element->Type)
-  {
-    case TDICE_STACK_ELEMENT_DIE :
+    int toreturn = 0 ;
 
-      fill_sources_die
-      (
-        sources,
-        dimensions,
-        stack_element->Offset,
-        stack_element->Floorplan,
-        stack_element->Pointer.Die
-      ) ;
-      break ;
+    switch (stack_element->Type)
+    {
+        case TDICE_STACK_ELEMENT_DIE :
 
-    case TDICE_STACK_ELEMENT_LAYER :
+            toreturn = fill_sources_die
+                       (
+                        sources,
+                        dimensions,
+                        stack_element->Offset,
+                        stack_element->Floorplan,
+                        stack_element->Pointer.Die
+                       ) ;
+            break ;
 
-      break ;
+        case TDICE_STACK_ELEMENT_LAYER :
 
-    case TDICE_STACK_ELEMENT_CHANNEL :
+            break ;
 
-      fill_sources_channel
-      (
-        sources,
-        dimensions,
-        stack_element->Offset,
-        stack_element->Pointer.Channel
-      ) ;
-      break ;
+        case TDICE_STACK_ELEMENT_CHANNEL :
 
-    case TDICE_STACK_ELEMENT_NONE :
+            fill_sources_channel
+            (
+                sources,
+                dimensions,
+                stack_element->Offset,
+                stack_element->Pointer.Channel
+            ) ;
+            break ;
 
-      fprintf (stderr,
-        "Error! Found stack element with unset type\n") ;
-      break ;
+        case TDICE_STACK_ELEMENT_NONE :
 
-    default :
+            fprintf (stderr, "Error! Found stack element with unset type\n") ;
+            break ;
 
-      fprintf (stderr,
-        "Error! Unknown stack element type %d\n",
-        stack_element->Type) ;
+        default :
 
-  } /* switch stack_element->Type */
+            fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
+
+    } /* switch stack_element->Type */
+
+    return toreturn ;
 }
 
 /******************************************************************************/

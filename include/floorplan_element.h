@@ -129,7 +129,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_sources_floorplan_element
+  int fill_sources_floorplan_element
   (
 #ifdef PRINT_SOURCES
     GridDimension_t   layer_index,

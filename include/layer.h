@@ -141,7 +141,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_sources_layer
+  int fill_sources_layer
   (
     Source_t*             sources,
     Dimensions*           dimensions,

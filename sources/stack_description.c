@@ -308,7 +308,7 @@ void fill_thermal_cell_stack_description
 
 /******************************************************************************/
 
-void fill_sources_stack_description
+int fill_sources_stack_description
 (
   Source_t*         sources,
   ThermalCell*      thermalcells,
@@ -316,38 +316,41 @@ void fill_sources_stack_description
 )
 {
 #ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "fill_sources_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions)) ;
+    fprintf (stderr,
+        "fill_sources_stack_description ( l %d r %d c %d )\n",
+        get_number_of_layers  (stkd->Dimensions),
+        get_number_of_rows    (stkd->Dimensions),
+        get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  // reset all the source vector to 0
+    // reset all the source vector to 0
 
-  Quantity_t ccounter ;
-  Quantity_t ncells = get_number_of_cells (stkd->Dimensions) ;
+    Quantity_t ccounter ;
+    Quantity_t ncells = get_number_of_cells (stkd->Dimensions) ;
 
-  for (ccounter = 0 ; ccounter != ncells ; ccounter++)
+    for (ccounter = 0 ; ccounter != ncells ; ccounter++)
 
-    sources [ ccounter ] = 0.0 ;
+        sources [ ccounter ] = 0.0 ;
 
-  // set the sources due to the heatsink (overwrites all cells in the last layer)
+    // set the sources due to the heatsink (overwrites all cells in the last layer)
 
-  if (stkd->ConventionalHeatSink != NULL)
+    if (stkd->ConventionalHeatSink != NULL)
 
-    fill_sources_conventional_heat_sink
-    (
-      sources,
-      thermalcells,
-      stkd->Dimensions,
-      stkd->ConventionalHeatSink
-    ) ;
+        fill_sources_conventional_heat_sink
+        (
+            sources,
+            thermalcells,
+            stkd->Dimensions,
+            stkd->ConventionalHeatSink
+        ) ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
 
-    fill_sources_stack_element (sources, stkd->Dimensions, stack_element) ;
+        if (fill_sources_stack_element (sources, stkd->Dimensions, stack_element) != 0)
+
+            return 1 ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
@@ -472,19 +475,6 @@ void fill_system_matrix_stack_description
       (
         tmp_system_matrix, stkd->Dimensions, thermalcells
       ) ;
-}
-
-/******************************************************************************/
-
-Quantity_t get_number_of_remaining_power_values (StackDescription* stkd)
-{
-  StackElement* stk_el = stkd->BottomStackElement ;
-  while (stk_el != NULL && stk_el->Type != TDICE_STACK_ELEMENT_DIE)
-    stk_el = stk_el->Next ;
-
-  // if stk_el == NULL then BUG !!!
-
-  return stk_el->Floorplan->ElementsList->PowerValues->Length ;
 }
 
 /******************************************************************************/

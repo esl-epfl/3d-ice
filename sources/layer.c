@@ -211,7 +211,7 @@ void fill_thermal_cell_layer
 
 /******************************************************************************/
 
-void fill_sources_layer
+int fill_sources_layer
 (
   Source_t*             sources,
   Dimensions*           dimensions,
@@ -230,13 +230,11 @@ void fill_sources_layer
 
   sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  fill_sources_floorplan
-  (
+  return fill_sources_floorplan (
 #ifdef PRINT_SOURCES
-    layer_index,
+            layer_index,
 #endif
-    sources, dimensions, floorplan
-  ) ;
+            sources, dimensions, floorplan) ;
 }
 
 /******************************************************************************/

@@ -163,12 +163,6 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Returns the number of remaining power values (time slots) to emulate   */
-
-  Quantity_t get_number_of_remaining_power_values (StackDescription* stkd) ;
-
-/******************************************************************************/
-
   /* Given a StackDescription and the id (string) of a floorplan, returns   */
   /* the number of all the floorplan elements in that floorplan.            */
   /* The floorplan_id, is the string used to name the die stack element it  */

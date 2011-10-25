@@ -94,50 +94,54 @@ void free_floorplan_elements_list (FloorplanElement* list)
 
 /******************************************************************************/
 
-void fill_sources_floorplan_element
+int fill_sources_floorplan_element
 (
 #ifdef PRINT_SOURCES
-  GridDimension_t   layer_index,
+    GridDimension_t   layer_index,
 #endif
-  Source_t*         sources,
-  Dimensions*       dimensions,
-  FloorplanElement* floorplan_element
+    Source_t*         sources,
+    Dimensions*       dimensions,
+    FloorplanElement* floorplan_element
 )
 {
-  Power_t power
-      = get_from_powers_queue(floorplan_element->PowerValues);
+    if (is_empty_powers_queue (floorplan_element->PowerValues) == TRUE_V)
 
-  CellDimension_t flp_el_surface
+        return 1 ;
+
+    Power_t power = get_from_powers_queue(floorplan_element->PowerValues);
+
+    CellDimension_t flp_el_surface
       = (CellDimension_t) (floorplan_element->EffectiveLength
                            * floorplan_element->EffectiveWidth) ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
-  {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
     {
-      sources [get_cell_offset_in_layer (dimensions, row_index, column_index)]
+        FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+        {
+            sources [get_cell_offset_in_layer (dimensions, row_index, column_index)]
 
-        += (
-              power * get_cell_length (dimensions, column_index)
-                    * get_cell_width (dimensions, row_index)
-           )
-           /  flp_el_surface ;
+            += (power * get_cell_length (dimensions, column_index)
+                      * get_cell_width (dimensions, row_index)
+               )
+               /  flp_el_surface ;
 
 #ifdef PRINT_SOURCES
-      fprintf (stderr,
-        "solid  cell  |l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f " \
-                    " | %.4e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
-        get_cell_length (dimensions, column_index), get_cell_width (dimensions, row_index),
-        sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
-        power, flp_el_surface, floorplan_element->Id) ;
+            fprintf (stderr,
+                "solid  cell  |l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f " \
+                            " | %.4e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
+                layer_index, row_index, column_index,
+                get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+                get_cell_length (dimensions, column_index), get_cell_width (dimensions, row_index),
+                sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
+                power, flp_el_surface, floorplan_element->Id) ;
 #endif
 
-    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
-  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
+        } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 
-  pop_from_powers_queue (floorplan_element->PowerValues) ;
+    pop_from_powers_queue (floorplan_element->PowerValues) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/

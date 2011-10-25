@@ -142,7 +142,7 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_sources_stack_element
+  int fill_sources_stack_element
   (
     Source_t*             sources,
     Dimensions*           dimensions,

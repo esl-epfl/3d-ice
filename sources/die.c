@@ -244,7 +244,7 @@ void fill_thermal_cell_die
 
 /******************************************************************************/
 
-void fill_sources_die
+int fill_sources_die
 (
   Source_t*             sources,
   Dimensions*           dimensions,
@@ -259,16 +259,13 @@ void fill_sources_die
     layer_index, die->Id, floorplan->FileName) ;
 #endif
 
-  fill_sources_layer
-  (
-    sources,
-    dimensions,
-    layer_index + die->SourceLayer->Offset,
-    floorplan
+  return fill_sources_layer (sources, dimensions,
+                             layer_index + die->SourceLayer->Offset,
+                             floorplan
 #   ifdef PRINT_SOURCES
-    ,die->SourceLayer
+                            ,die->SourceLayer
 #   endif
-  ) ;
+                            ) ;
 }
 
 /******************************************************************************/
