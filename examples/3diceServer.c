@@ -112,6 +112,7 @@ main(int argc, char** argv)
   tqueue = alloc_and_init_temperatures_queue();
 
   init_power_values (&stkd); // initilize the power values got from a stack description file
+    // FIXME is it really needed ???
 
   // this is used for terminating the simulation
   Bool_t * is_terminating = malloc(sizeof(Bool_t));

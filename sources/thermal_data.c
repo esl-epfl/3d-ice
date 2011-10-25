@@ -41,50 +41,6 @@
 
 /******************************************************************************/
 
-extern void fill_thermal_cell_stack_description
-(
-   ThermalCell*      thermalcells,
-   Time_t            delta_time,
-   StackDescription* stkd
-) ;
-
-extern int fill_sources_stack_description
-(
-  Source_t*         sources,
-  ThermalCell*      thermalcells,
-  StackDescription* stkd
-) ;
-
-extern void update_channel_inlet_stack_description
-(
-  Source_t*         sources,
-  StackDescription* stkd
-) ;
-
-extern void fill_system_matrix_stack_description
-(
-  SystemMatrix          system_matrix,
-  ThermalCell*          thermalcells,
-  StackDescription*     stkd
-) ;
-
-extern void init_power_values
-(
-  StackDescription* stkd
-) ;
-
-extern void insert_power_values_by_powers_queue
-(
-  StackDescription* stkd,
-  PowersQueue*      pvalues
-) ;
-
-extern void insert_power_values
-(
-  StackDescription* stkd,
-  Power_t*          pvalues
-) ;
-
 static void init_data (double* data, Quantity_t size, double init_value)
 {
   while (size--) *data++ = init_value ;

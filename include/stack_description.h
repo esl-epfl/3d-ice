@@ -149,6 +149,50 @@ extern "C"
 
 /******************************************************************************/
 
+  /* Fill the 3d grid of thermal cells */
+
+  void fill_thermal_cell_stack_description
+  (
+    ThermalCell*      thermalcells,
+     Time_t            delta_time,
+     StackDescription* stkd
+  ) ;
+
+  /* Fill the source vector (power traces and channel inlets) */
+
+  int fill_sources_stack_description
+  (
+    Source_t*         sources,
+    ThermalCell*      thermalcells,
+    StackDescription* stkd
+  ) ;
+
+  /* Update the only source value corresponding to the channel inlets */
+
+  void update_channel_inlet_stack_description
+  (
+    Source_t*         sources,
+    StackDescription* stkd
+  ) ;
+
+  /* Fill the system matrix for thermal simulation */
+
+  void fill_system_matrix_stack_description
+  (
+    SystemMatrix          system_matrix,
+    ThermalCell*          thermalcells,
+    StackDescription*     stkd
+  ) ;
+
+
+  void init_power_values (StackDescription* stkd) ;  // FIXME These are needed here??
+
+  Bool_t insert_power_values_by_powers_queue (StackDescription* stkd, PowersQueue* pvalues) ;
+
+  Bool_t insert_power_values (StackDescription* stkd, Power_t* pvalues) ;
+
+/******************************************************************************/
+
   /* Print on stream (stdout, stderr or a given opened output file) all the */
   /* data related to the floorplan structures contained in the dies.        */
   /* Prefix is a string (it can be empty as "") printed as prefix at the    */
