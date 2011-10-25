@@ -951,33 +951,41 @@ dimensions
         stkd->Dimensions->Grid.NColumns = (GridDimension_t) ($5 / $12) ;
 
 
-        if (    stkd->Channel != NULL
-            &&  stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
+        if (stkd->Channel != NULL)
         {
-            stkd->Dimensions->Cell.ChannelLength   = channel_length ;
-            stkd->Dimensions->Cell.FirstWallLength = first_wall_length ;
-            stkd->Dimensions->Cell.LastWallLength  = last_wall_length ;
-            stkd->Dimensions->Cell.WallLength      = wall_length ;
-
-            CellDimension_t ratio
-                = ($5 - first_wall_length - last_wall_length -channel_length)
-                  /
-                  (channel_length + wall_length) ;
-
-            if ( ratio - (int) ratio != 0)
+            if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
             {
-                stack_description_error (stkd, scanner, "Error: cell dimensions does not fit the chip length correctly") ;
+                stkd->Dimensions->Cell.ChannelLength   = channel_length ;
+                stkd->Dimensions->Cell.FirstWallLength = first_wall_length ;
+                stkd->Dimensions->Cell.LastWallLength  = last_wall_length ;
+                stkd->Dimensions->Cell.WallLength      = wall_length ;
 
-                YYABORT ;
+                CellDimension_t ratio
+                    = ($5 - first_wall_length - last_wall_length -channel_length)
+                    /
+                    (channel_length + wall_length) ;
+
+                if ( ratio - (int) ratio != 0)
+                {
+                    stack_description_error (stkd, scanner, "Error: cell dimensions does not fit the chip length correctly") ;
+
+                    YYABORT ;
+                }
+
+                stkd->Dimensions->Grid.NColumns = 2 * ratio + 3 ;
+
+                if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
+                {
+                    stack_description_error (stkd, scanner, "Error: colum number must be odd when channel is declared") ;
+
+                    YYABORT ;
+                }
+
+                stkd->Channel->NChannels = (Quantity_t) ((stkd->Dimensions->Grid.NColumns - 1 )  / 2) ;
             }
-
-            stkd->Dimensions->Grid.NColumns = 2 * ratio + 3 ;
-
-            if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
+            else if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
             {
-                stack_description_error (stkd, scanner, "Error: colum number must be odd when channel is declared") ;
-
-                YYABORT ;
+                stkd->Channel->NChannels = (Quantity_t) (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
             }
         }
 

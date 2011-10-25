@@ -48,229 +48,282 @@ extern "C"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    Conductance_t Top ;
-    Conductance_t Bottom ;
-    Conductance_t North ;
-    Conductance_t South ;
-    Conductance_t East ;
-    Conductance_t West ;
+    typedef struct
+    {
+        Conductance_t Top ;
+        Conductance_t Bottom ;
+        Conductance_t North ;
+        Conductance_t South ;
+        Conductance_t East ;
+        Conductance_t West ;
 
-    Capacity_t    Capacity ;
+        Capacity_t    Capacity ;
 
-  } ThermalCell ;
-
-/******************************************************************************/
-
-  void fill_solid_cell_bottom
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    Dimensions*           dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-#   endif
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    SolidTC_t              solid_tc,
-    SolidVHC_t             solid_vhc,
-    Time_t                 delta_time
-  ) ;
+    }   ThermalCell ;
 
 /******************************************************************************/
 
-  void fill_solid_cell_central
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    Dimensions*           dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-#   endif
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    SolidTC_t              solid_tc,
-    SolidVHC_t             solid_vhc,
-    Time_t                 delta_time
-  ) ;
+    void fill_solid_cell_bottom
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        SolidTC_t           solid_tc,
+        SolidVHC_t          solid_vhc
+    ) ;
 
 /******************************************************************************/
 
-  void fill_solid_cell_top
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    Dimensions*           dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-#   endif
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    SolidTC_t              solid_tc,
-    SolidVHC_t             solid_vhc,
-    Time_t                 delta_time
-  ) ;
+    void fill_solid_cell_central
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        SolidTC_t           solid_tc,
+        SolidVHC_t          solid_vhc
+    ) ;
 
 /******************************************************************************/
 
-  void fill_solid_cell_conventional_heat_sink
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    Dimensions*           dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-#   endif
-    ThermalCell*          thermalcell,
-    CellDimension_t       cell_length,
-    CellDimension_t       cell_width,
-    CellDimension_t       cell_height,
-    SolidTC_t             thermal_conductivity,
-    AmbientHTC_t          ambient_htc
-  ) ;
+    void fill_solid_cell_top
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        SolidTC_t           solid_tc,
+        SolidVHC_t          solid_vhc
+    ) ;
 
 /******************************************************************************/
 
-  void fill_liquid_cell_mc_4rm
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-#   endif
-    Dimensions*            dimensions,
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    CoolantHTCs_t          coolant_htcs,
-    CoolantVHC_t           coolant_vhc,
-    CoolantFR_t            coolant_fr,
-    Time_t                 delta_time
-  ) ;
+    void fill_solid_cell_conventional_heat_sink
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        SolidTC_t           solid_tc,
+        AmbientHTC_t        ambient_htc
+    ) ;
 
 /******************************************************************************/
 
-  void fill_liquid_cell_pf
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-    Dimensions*            dimensions,
-#   endif
-    ChannelModel_t         channel_model,
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    Porosity_t             porosity,
-    CoolantVHC_t           coolant_vhc,
-    DarcyVelocity_t        darcy_velocity,
-    Time_t                 delta_time
-  ) ;
+    void fill_liquid_cell_mc_4rm
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        GridDimension_t     nchannels,
+        CoolantHTCs_t       coolant_htcs,
+        CoolantVHC_t        coolant_vhc,
+        CoolantFR_t         coolant_fr
+    ) ;
 
 /******************************************************************************/
 
-  void fill_wall_cell_pf
-  (
-# ifdef PRINT_THERMAL_CELLS
-    GridDimension_t        layer_index,
-    GridDimension_t        row_index,
-    GridDimension_t        column_index,
-    Dimensions*            dimensions,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-# endif
-    ThermalCell*           thermalcell
-  ) ;
+    void fill_liquid_cell_mc_2rm
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        GridDimension_t     nchannels,
+        CellDimension_t     channel_width,
+        CellDimension_t     channel_pitch,
+        Porosity_t          porosity,
+        CoolantHTCs_t       coolant_htcs,
+        CoolantVHC_t        coolant_vhc,
+        CoolantFR_t         coolant_fr
+    ) ;
 
 /******************************************************************************/
 
-  void fill_virtual_wall_cell_pf
-  (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions*            dimensions,
-    GridDimension_t        layer_index,
-    GridDimension_t        row_index,
-    GridDimension_t        column_index,
-# endif
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    Porosity_t             porosity,
-    SolidTC_t              solid_tc,
-    SolidVHC_t             solid_vhc,
-    Time_t                 delta_time
-  ) ;
+    void fill_liquid_cell_pf
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        ChannelModel_t      channel_model,
+
+        Porosity_t          porosity,
+        CoolantVHC_t        coolant_vhc,
+        DarcyVelocity_t     darcy_velocity
+    ) ;
 
 /******************************************************************************/
 
-  void fill_liquid_cell_mc_2rm
-  (
-#   ifdef PRINT_THERMAL_CELLS
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-#   endif
-    Dimensions*            dimensions,
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    CellDimension_t        channel_width,
-    CellDimension_t        channel_pitch,
-    Porosity_t             porosity,
-    CoolantHTCs_t          coolant_htcs,
-    CoolantVHC_t           coolant_vhc,
-    CoolantFR_t            coolant_fr,
-    Time_t                 delta_time
-  ) ;
+    void fill_wall_cell_mc_2rm
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height
+    ) ;
 
 /******************************************************************************/
 
-  void fill_wall_cell_mc_2rm
-  (
-# ifdef PRINT_THERMAL_CELLS
-    GridDimension_t        layer_index,
-    GridDimension_t        row_index,
-    GridDimension_t        column_index,
-    Dimensions*            dimensions,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-# endif
-    ThermalCell*           thermalcell
-  ) ;
+    void fill_wall_cell_pf
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height
+    ) ;
 
 /******************************************************************************/
 
-  void fill_virtual_wall_cell_mc_2rm
-  (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions*            dimensions,
-    GridDimension_t        layer_index,
-    GridDimension_t        row_index,
-    GridDimension_t        column_index,
-# endif
-    ThermalCell*           thermalcell,
-    CellDimension_t        cell_length,
-    CellDimension_t        cell_width,
-    CellDimension_t        cell_height,
-    Porosity_t             porosity,
-    SolidTC_t              solid_tc,
-    SolidVHC_t             solid_vhc,
-    Time_t                 delta_time
-  ) ;
+    void fill_virtual_wall_cell_mc_2rm
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+        ThermalCell         *thermal_cell,
+
+        Time_t              time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        Porosity_t          porosity,
+        SolidTC_t           solid_tc,
+        SolidVHC_t          solid_vhc
+    ) ;
+
+/******************************************************************************/
+
+    void fill_virtual_wall_cell_pf
+    (
+#ifdef PRINT_THERMAL_CELLS
+        Dimensions          *dimensions,
+
+        GridDimension_t     layer_index,
+        GridDimension_t     row_index,
+        GridDimension_t     column_index,
+#endif
+        ThermalCell         *thermal_cell,
+
+        Time_t              delta_time,
+
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
+
+        Porosity_t          porosity,
+        SolidTC_t           solid_tc,
+        SolidVHC_t          solid_vhc
+    ) ;
 
 /******************************************************************************/
 

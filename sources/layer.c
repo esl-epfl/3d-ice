@@ -163,12 +163,12 @@ void fill_thermal_cell_layer
     GridDimension_t       column_index,
 #   endif
     ThermalCell*          thermalcell,
+    Time_t                delta_time,
     CellDimension_t       cell_length,
     CellDimension_t       cell_width,
     CellDimension_t       cell_height,
     SolidTC_t             thermal_conductivity,
-    SolidVHC_t            volumetric_heat_capacity,
-    Time_t                delta_time
+    SolidVHC_t            volumetric_heat_capacity
   ) ;
 
   if (IS_FIRST_LAYER(layer_index))
@@ -195,13 +195,12 @@ void fill_thermal_cell_layer
         dimensions,
         layer_index, row_index, column_index,
 #   endif
-        thermalcells,
+        thermalcells, delta_time,
         get_cell_length(dimensions, column_index),
         get_cell_width(dimensions, row_index),
         layer->Height,
         layer->Material->ThermalConductivity,
-        layer->Material->VolumetricHeatCapacity,
-        delta_time
+        layer->Material->VolumetricHeatCapacity
       ) ;
 
       thermalcells ++ ;

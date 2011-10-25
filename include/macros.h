@@ -205,12 +205,12 @@ extern "C"
  * Cconv           = (CoolantVHC * FlowRate) / (#ChannelColumns * 2)
  */
 
-# define CCONV_MC_4RM(ncolumns, coolant_vhc, coolant_fr) \
-                                                         \
-  (Cconv_t) (                                            \
-               (coolant_vhc * coolant_fr)                \
-               /                                         \
-               ((Cconv_t) (ncolumns - 1))                \
+# define CCONV_MC_4RM(nchannels, coolant_vhc, coolant_fr) \
+                                                          \
+  (Cconv_t) (                                             \
+               (coolant_vhc * coolant_fr)                 \
+               /                                          \
+               ((Cconv_t) (nchannels * 2))                \
             )
 
 /* 2RM for Microchannels

@@ -106,6 +106,7 @@ extern "C"
   void fill_thermal_cell_conventional_heat_sink
   (
      ThermalCell*          thermalcells,
+     Time_t                delta_time,
      Dimensions*           dimensions,
      ConventionalHeatSink* conventionalheatsink
   ) ;

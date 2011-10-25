@@ -74,6 +74,10 @@ extern "C"
 
     Porosity_t Porosity ;
 
+    /*  Number of channels (per cavity) along chip length */
+
+    GridDimension_t NChannels ;
+
     /* The heat transfert coefficients of the cooling liquid */
     /* in [ (W / ( um2 * K ) ]                              */
 
