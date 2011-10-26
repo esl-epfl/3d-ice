@@ -541,176 +541,149 @@ void fill_sources_channel
 
 SystemMatrix fill_system_matrix_channel
 (
-  Channel*              channel,
-  Dimensions*           dimensions,
-  ThermalCell*          thermalcells,
-  GridDimension_t       layer_index,
-  SystemMatrix          system_matrix
-  )
+    Channel          *channel,
+    Dimensions       *dimensions,
+    ThermalCell      *thermalcells,
+    GridDimension_t  layer_index,
+    SystemMatrix     system_matrix
+)
 {
 # ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr,
-           "(l %2d) fill_system_matrix_channel %s \n",
-           layer_index, channel->WallMaterial->Id) ;
+    fprintf (stderr,
+        "(l %2d) fill_system_matrix_channel %s \n",
+        layer_index, channel->WallMaterial->Id) ;
 # endif
 
-  if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
-      channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED){
-
-    FOR_EVERY_ROW (row_index_wall_bottom, dimensions)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
     {
-      FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
-      {
+
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+
+                if (IS_CHANNEL_COLUMN(column_index))
+
+                    system_matrix = add_liquid_column_mc_4rm
+                                    (
+                                        dimensions, thermalcells,
+                                        layer_index, row_index, column_index,
+                                        system_matrix
+                                    ) ;
+
+                else
+
+                    system_matrix = add_solid_column
+                                    (
+                                        dimensions, thermalcells,
+                                        layer_index, row_index, column_index,
+                                        system_matrix
+                                    ) ;
+
+            } // FOR_EVERY_COLUMN
+        }  // FOR_EVERY_ROW
+    }
+    else
+    {
+        typedef SystemMatrix (*add_column_fp)
+            (Dimensions*, ThermalCell*,
+             GridDimension_t, GridDimension_t, GridDimension_t,
+             SystemMatrix)  ;
+
+        add_column_fp bottom_layer ;
+        add_column_fp virtual_layer ;
+        add_column_fp liquid_layer ;
+        add_column_fp top_layer ;
+
+        if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
+            || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
+        {
+            bottom_layer  = &add_bottom_wall_column_pf ;
+            virtual_layer = &add_virtual_wall_column_pf ;
+            liquid_layer  = &add_liquid_column_pf ;
+            top_layer     = &add_top_wall_column_pf ;
+        }
+        else  // TDICE_CHANNEL_MODEL_MC_RM2
+        {
+            bottom_layer  = &add_bottom_wall_column_mc_2rm ;
+            virtual_layer = &add_virtual_wall_column_mc_2rm ;
+            liquid_layer  = &add_liquid_column_mc_2rm ;
+            top_layer     = &add_top_wall_column_mc_2rm ;
+        }
+
         // Bottom Wall
-        system_matrix = add_bottom_wall_column_pf
-          (
-            dimensions, thermalcells,
-            layer_index, row_index_wall_bottom, column_index_wall_bottom,
-            system_matrix
-          ) ;
 
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
+        FOR_EVERY_ROW (row_index_wall_bottom, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
+            {
+                system_matrix = bottom_layer
+                                (
+                                    dimensions, thermalcells,
+                                    layer_index, row_index_wall_bottom, column_index_wall_bottom,
+                                    system_matrix
+                                ) ;
 
-    FOR_EVERY_ROW (row_index_virtual_wall, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
-      {
+            } // FOR_EVERY_COLUMN
+        }  // FOR_EVERY_ROW
+
+        layer_index++ ;
+
         // Virtual Wall
-        system_matrix = add_virtual_wall_column_pf
-          (
-            dimensions, thermalcells,
-            layer_index+1, row_index_virtual_wall, column_index_virtual_wall,
-            system_matrix
-          ) ;
 
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
+        FOR_EVERY_ROW (row_index_virtual_wall, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
+            {
+                system_matrix = virtual_layer
+                                (
+                                    dimensions, thermalcells,
+                                    layer_index, row_index_virtual_wall, column_index_virtual_wall,
+                                    system_matrix
+                                ) ;
 
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index, dimensions)
-      {
+            } // FOR_EVERY_COLUMN
+        }  // FOR_EVERY_ROW
+
+        layer_index++ ;
+
         // Channel for 2RM
-        system_matrix = add_liquid_column_pf
-          (
-            dimensions, thermalcells,
-            layer_index+2, row_index, column_index,
-            system_matrix
-          ) ;
 
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+                system_matrix = liquid_layer
+                                (
+                                    dimensions, thermalcells,
+                                    layer_index, row_index, column_index,
+                                    system_matrix
+                                ) ;
 
+            } // FOR_EVERY_COLUMN
+        }  // FOR_EVERY_ROW
 
-    FOR_EVERY_ROW (row_index_wall_top, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
-      {
+        layer_index++ ;
+
         // Top Wall
-        system_matrix = add_top_wall_column_pf
-          (
-            dimensions, thermalcells,
-            layer_index+3, row_index_wall_top, column_index_wall_top,
-            system_matrix
-          ) ;
 
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
+        FOR_EVERY_ROW (row_index_wall_top, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
+            {
+                system_matrix = top_layer
+                                (
+                                    dimensions, thermalcells,
+                                    layer_index, row_index_wall_top, column_index_wall_top,
+                                    system_matrix
+                                ) ;
 
-  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
+            } // FOR_EVERY_COLUMN
+        }  // FOR_EVERY_ROW
 
-    FOR_EVERY_ROW (row_index_wall_bottom, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
-      {
-        // Bottom Wall
-        system_matrix = add_bottom_wall_column_mc_2rm
-          (
-            dimensions, thermalcells,
-            layer_index, row_index_wall_bottom, column_index_wall_bottom,
-            system_matrix
-          ) ;
+    }
 
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
-
-    FOR_EVERY_ROW (row_index_virtual_wall, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
-      {
-        // Virtual Wall
-        system_matrix = add_virtual_wall_column_mc_2rm
-          (
-            dimensions, thermalcells,
-            layer_index+1, row_index_virtual_wall, column_index_virtual_wall,
-            system_matrix
-          ) ;
-
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
-
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index, dimensions)
-      {
-        // Channel for 2RM
-        system_matrix = add_liquid_column_mc_2rm
-          (
-            dimensions, thermalcells,
-            layer_index+2, row_index, column_index,
-            system_matrix
-          ) ;
-
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
-
-
-    FOR_EVERY_ROW (row_index_wall_top, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
-      {
-        // Top Wall
-        system_matrix = add_top_wall_column_mc_2rm
-          (
-            dimensions, thermalcells,
-            layer_index+3, row_index_wall_top, column_index_wall_top,
-            system_matrix
-          ) ;
-
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
-
-  } else { // TDICE_CHANNEL_MODEL_MC_4RM
-
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-      FOR_EVERY_COLUMN (column_index, dimensions)
-      {
-
-        if (IS_CHANNEL_COLUMN(column_index))
-
-          system_matrix = add_liquid_column_mc_4rm
-            (
-              dimensions, thermalcells,
-              layer_index, row_index, column_index,
-              system_matrix
-            ) ;
-
-        else
-
-          system_matrix = add_solid_column
-            (
-              dimensions, thermalcells,
-              layer_index, row_index, column_index,
-              system_matrix
-            ) ;
-
-      } // FOR_EVERY_COLUMN
-    }  // FOR_EVERY_ROW
-  }
-
-  return system_matrix ;
+    return system_matrix ;
 }
 
   /******************************************************************************/

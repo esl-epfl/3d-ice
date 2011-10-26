@@ -435,63 +435,60 @@ void insert_power_values_stack_element
 
 SystemMatrix fill_system_matrix_stack_element
 (
-  SystemMatrix     system_matrix,
-  Dimensions*      dimensions,
-  ThermalCell*     thermalcells,
-  StackElement*    stack_element
+    SystemMatrix  system_matrix,
+    Dimensions    *dimensions,
+    ThermalCell   *thermalcells,
+    StackElement  *stack_element
 )
 {
-  switch (stack_element->Type)
-  {
-    case TDICE_STACK_ELEMENT_DIE :
+    switch (stack_element->Type)
+    {
+        case TDICE_STACK_ELEMENT_DIE :
 
-      system_matrix = fill_system_matrix_die
-                      (
-                        stack_element->Pointer.Die, dimensions,
-                        thermalcells, stack_element->Offset,
-                        system_matrix
-                      ) ;
-      break ;
+            system_matrix = fill_system_matrix_die
+                            (
+                                stack_element->Pointer.Die, dimensions,
+                                thermalcells, stack_element->Offset,
+                                system_matrix
+                            ) ;
+            break ;
 
-    case TDICE_STACK_ELEMENT_LAYER :
+        case TDICE_STACK_ELEMENT_LAYER :
 
-      system_matrix = fill_system_matrix_layer
-                      (
-#                       ifdef PRINT_SYSTEM_MATRIX
-                        stack_element->Pointer.Layer,
-#                       endif
-                        dimensions,
-                        thermalcells, stack_element->Offset,
-                        system_matrix
-                      ) ;
-      break ;
+            system_matrix = fill_system_matrix_layer
+                            (
+#                               ifdef PRINT_SYSTEM_MATRIX
+                                stack_element->Pointer.Layer,
+#                               endif
+                                dimensions,
+                                thermalcells, stack_element->Offset,
+                                system_matrix
+                            ) ;
+            break ;
 
-    case TDICE_STACK_ELEMENT_CHANNEL :
+        case TDICE_STACK_ELEMENT_CHANNEL :
 
-      system_matrix = fill_system_matrix_channel
-                      (
-                        stack_element->Pointer.Channel,
-                        dimensions,
-                        thermalcells, stack_element->Offset,
-                        system_matrix
-                      ) ;
-      break ;
+            system_matrix = fill_system_matrix_channel
+                            (
+                                stack_element->Pointer.Channel,
+                                dimensions,
+                                thermalcells, stack_element->Offset,
+                                system_matrix
+                            ) ;
+            break ;
 
-    case TDICE_STACK_ELEMENT_NONE :
+        case TDICE_STACK_ELEMENT_NONE :
 
-      fprintf (stderr,
-        "Error! Found stack element with unset type\n") ;
-      break ;
+            fprintf (stderr, "Error! Found stack element with unset type\n") ;
+            break ;
 
-    default :
+        default :
 
-      fprintf (stderr,
-        "Error! Unknown stack element type %d\n",
-        stack_element->Type) ;
+            fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
 
-  } /* stk_el->Type */
+    } /* stk_el->Type */
 
-  return system_matrix ;
+    return system_matrix ;
 }
 
 /******************************************************************************/

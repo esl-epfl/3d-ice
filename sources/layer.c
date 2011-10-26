@@ -240,37 +240,37 @@ int fill_sources_layer
 
 SystemMatrix fill_system_matrix_layer
 (
-# ifdef PRINT_SYSTEM_MATRIX
-  Layer*                layer,
-# endif
-  Dimensions*           dimensions,
-  ThermalCell*          thermalcells,
-  GridDimension_t       layer_index,
-  SystemMatrix          system_matrix
+#ifdef PRINT_SYSTEM_MATRIX
+    Layer            *layer,
+#endif
+    Dimensions       *dimensions,
+    ThermalCell      *thermalcells,
+    GridDimension_t  layer_index,
+    SystemMatrix     system_matrix
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr,
-    "(l %d) fill_system_matrix_layer %s\n",
-    layer_index, layer->Material->Id) ;
+    fprintf (stderr,
+        "(l %d) fill_system_matrix_layer %s\n",
+        layer_index, layer->Material->Id) ;
 #endif
 
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    FOR_EVERY_ROW (row_index, dimensions)
     {
+        FOR_EVERY_COLUMN (column_index, dimensions)
+        {
 
-      system_matrix = add_solid_column
-                      (
-                        dimensions, thermalcells,
-                        layer_index, row_index, column_index,
-                        system_matrix
-                      ) ;
+            system_matrix = add_solid_column
+                            (
+                                dimensions, thermalcells,
+                                layer_index, row_index, column_index,
+                                system_matrix
+                            ) ;
 
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
+        } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
 
-  return system_matrix ;
+    return system_matrix ;
 }
 
 /******************************************************************************/

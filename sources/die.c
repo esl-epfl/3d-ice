@@ -300,32 +300,32 @@ void insert_power_values_die
 
 SystemMatrix fill_system_matrix_die
 (
-  Die*                  die,
-  Dimensions*           dimensions,
-  ThermalCell*          thermalcells,
-  GridDimension_t       layer_index,
-  SystemMatrix          system_matrix
+    Die              *die,
+    Dimensions       *dimensions,
+    ThermalCell      *thermalcells,
+    GridDimension_t  layer_index,
+    SystemMatrix     system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX
-  fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
+    fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
 # endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
-  {
-    system_matrix = fill_system_matrix_layer
-                    (
-#                     ifdef PRINT_SYSTEM_MATRIX
-                      layer,
-#                     endif
-                      dimensions, thermalcells,
-                      layer_index + layer->Offset,
-                      system_matrix
-                     ) ;
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
+    {
+        system_matrix = fill_system_matrix_layer
+                        (
+#                           ifdef PRINT_SYSTEM_MATRIX
+                            layer,
+#                           endif
+                            dimensions, thermalcells,
+                            layer_index + layer->Offset,
+                            system_matrix
+                        ) ;
 
-  }  // FOR_EVERY_ELEMENT_IN_LIST
+    }  // FOR_EVERY_ELEMENT_IN_LIST
 
-  return system_matrix ;
+    return system_matrix ;
 }
 
 /******************************************************************************/

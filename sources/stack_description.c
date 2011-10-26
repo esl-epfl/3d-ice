@@ -442,40 +442,38 @@ void update_channel_inlet_stack_description
 
 void fill_system_matrix_stack_description
 (
-  SystemMatrix          system_matrix,
-  ThermalCell*          thermalcells,
-  StackDescription*     stkd
+    SystemMatrix          system_matrix,
+    ThermalCell*          thermalcells,
+    StackDescription*     stkd
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
-  fprintf
-  (
-    stderr,
-    "fill_system_matrix_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions)) ;
+    fprintf (stderr,
+        "fill_system_matrix_stack_description ( l %d r %d c %d )\n",
+        get_number_of_layers  (stkd->Dimensions),
+        get_number_of_rows    (stkd->Dimensions),
+        get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  SystemMatrix tmp_system_matrix = system_matrix ;
+    SystemMatrix tmp_system_matrix = system_matrix ;
 
-  *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
+    *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
+                                       stkd->BottomStackElement)
 
-    system_matrix = fill_system_matrix_stack_element
-                    (
-                      system_matrix, stkd->Dimensions,
-                      thermalcells, stack_element
-                    ) ;
+        system_matrix = fill_system_matrix_stack_element
+                        (
+                          system_matrix, stkd->Dimensions,
+                          thermalcells, stack_element
+                        ) ;
 
     if (stkd->ConventionalHeatSink != NULL)
 
-      fill_system_matrix_conventional_heat_sink
-      (
-        tmp_system_matrix, stkd->Dimensions, thermalcells
-      ) ;
+        fill_system_matrix_conventional_heat_sink
+        (
+            tmp_system_matrix, stkd->Dimensions, thermalcells
+        ) ;
 }
 
 /******************************************************************************/

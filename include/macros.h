@@ -303,6 +303,7 @@ extern "C"
 
 # define CONVERT_COOLANT_FLOW_RATE(fr) (( fr * 1e+12 ) / 60.0)
 
+/******************************************************************************/
 
 #ifdef __cplusplus
 }
