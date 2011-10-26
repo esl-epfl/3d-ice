@@ -494,10 +494,10 @@ void fill_sources_channel
 
 #     ifdef PRINT_SOURCES
       fprintf (stderr,
-        "liquid cell  | l %2d r %4d [%7d] "
-        "| %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
-        layer_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, 0, column_index),
+        "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
+        " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
+        column_index,
+        get_cell_length (dimensions, column_index), get_cell_width (dimensions, 0),
         *sources, channel->CoolantTIn, C) ;
 #     endif
     }

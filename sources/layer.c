@@ -202,12 +202,12 @@ int fill_sources_layer
   Source_t*             sources,
   Dimensions*           dimensions,
   GridDimension_t       layer_index,
-  Floorplan*            floorplan
-# ifdef PRINT_SOURCES
-  ,Layer*               layer
-# endif
+  Floorplan*            floorplan,
+  Layer*                layer
 )
 {
+  layer_index += layer->Offset ;
+
 #ifdef PRINT_SOURCES
   fprintf (stderr,
            "layer_index = %d\tfill_sources_source_layer   %s\n",
@@ -216,11 +216,7 @@ int fill_sources_layer
 
   sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  return fill_sources_floorplan (
-#ifdef PRINT_SOURCES
-            layer_index,
-#endif
-            sources, dimensions, floorplan) ;
+  return fill_sources_floorplan (sources, dimensions, floorplan) ;
 }
 
 /******************************************************************************/

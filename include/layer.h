@@ -146,10 +146,8 @@ extern "C"
     Source_t*             sources,
     Dimensions*           dimensions,
     GridDimension_t       layer_index,
-    Floorplan*            floorplan
-#   ifdef PRINT_SOURCES
-    ,Layer*                layer
-#   endif
+    Floorplan*            floorplan,
+    Layer*                layer
   ) ;
 
 /******************************************************************************/

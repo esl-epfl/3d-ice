@@ -260,12 +260,8 @@ int fill_sources_die
 #endif
 
   return fill_sources_layer (sources, dimensions,
-                             layer_index + die->SourceLayer->Offset,
-                             floorplan
-#   ifdef PRINT_SOURCES
-                            ,die->SourceLayer
-#   endif
-                            ) ;
+                             layer_index,
+                             floorplan, die->SourceLayer) ;
 }
 
 /******************************************************************************/

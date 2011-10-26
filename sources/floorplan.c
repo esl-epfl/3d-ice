@@ -117,9 +117,6 @@ void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan)
 
 int fill_sources_floorplan
 (
-#ifdef PRINT_SOURCES
-  GridDimension_t   layer_index,
-#endif
   Source_t*   sources,
   Dimensions* dimensions,
   Floorplan*  floorplan
@@ -127,11 +124,7 @@ int fill_sources_floorplan
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element, floorplan->ElementsList)
     {
-        if (fill_sources_floorplan_element (
-#ifdef PRINT_SOURCES
-                layer_index,
-#endif
-                sources, dimensions, floorplan_element) != 0 )
+        if (fill_sources_floorplan_element (sources, dimensions, floorplan_element) != 0 )
 
             return 1 ;
     }

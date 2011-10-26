@@ -91,9 +91,6 @@ extern "C"
 
   int fill_sources_floorplan
   (
-#ifdef PRINT_SOURCES
-    GridDimension_t   layer_index,
-#endif
     Source_t*   sources,
     Dimensions* dimensions,
     Floorplan*  floorplan

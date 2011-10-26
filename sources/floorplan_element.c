@@ -96,9 +96,6 @@ void free_floorplan_elements_list (FloorplanElement* list)
 
 int fill_sources_floorplan_element
 (
-#ifdef PRINT_SOURCES
-    GridDimension_t   layer_index,
-#endif
     Source_t*         sources,
     Dimensions*       dimensions,
     FloorplanElement* floorplan_element
@@ -127,10 +124,9 @@ int fill_sources_floorplan_element
 
 #ifdef PRINT_SOURCES
             fprintf (stderr,
-                "solid  cell  |l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f " \
-                            " | %.4e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
-                layer_index, row_index, column_index,
-                get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+                "solid  cell  | r %4d c %4d | l %6.1f w %6.1f " \
+                            " | %.5e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
+                row_index, column_index,
                 get_cell_length (dimensions, column_index), get_cell_width (dimensions, row_index),
                 sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
                 power, flp_el_surface, floorplan_element->Id) ;
