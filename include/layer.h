@@ -156,9 +156,7 @@ extern "C"
 
   SystemMatrix fill_system_matrix_layer
   (
-#   ifdef PRINT_SYSTEM_MATRIX
     Layer*                layer,
-#   endif
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,
     GridDimension_t       layer_index,

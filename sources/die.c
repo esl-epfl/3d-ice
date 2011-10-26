@@ -315,11 +315,9 @@ SystemMatrix fill_system_matrix_die
     {
         system_matrix = fill_system_matrix_layer
                         (
-#                           ifdef PRINT_SYSTEM_MATRIX
                             layer,
-#                           endif
                             dimensions, thermalcells,
-                            layer_index + layer->Offset,
+                            layer_index,
                             system_matrix
                         ) ;
 

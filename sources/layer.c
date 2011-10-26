@@ -227,18 +227,18 @@ int fill_sources_layer
 
 SystemMatrix fill_system_matrix_layer
 (
-#ifdef PRINT_SYSTEM_MATRIX
     Layer            *layer,
-#endif
     Dimensions       *dimensions,
     ThermalCell      *thermalcells,
     GridDimension_t  layer_index,
     SystemMatrix     system_matrix
 )
 {
+    layer_index += layer->Offset ;
+
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
-        "(l %d) fill_system_matrix_layer %s\n",
+        "(l %2d) fill_system_matrix_layer %s\n",
         layer_index, layer->Material->Id) ;
 #endif
 

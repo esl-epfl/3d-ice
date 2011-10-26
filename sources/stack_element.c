@@ -457,9 +457,7 @@ SystemMatrix fill_system_matrix_stack_element
 
             system_matrix = fill_system_matrix_layer
                             (
-#                               ifdef PRINT_SYSTEM_MATRIX
                                 stack_element->Pointer.Layer,
-#                               endif
                                 dimensions,
                                 thermalcells, stack_element->Offset,
                                 system_matrix
