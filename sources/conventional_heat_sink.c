@@ -131,34 +131,36 @@ void fill_thermal_cell_conventional_heat_sink
    ConventionalHeatSink* conventionalheatsink
 )
 {
-  GridDimension_t layer_index = LAST_LAYER_INDEX(dimensions) ;
+    GridDimension_t layer_index = LAST_LAYER_INDEX(dimensions) ;
 
-  thermalcells += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+    thermalcells += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    FOR_EVERY_ROW (row_index, dimensions)
     {
+        FOR_EVERY_COLUMN (column_index, dimensions)
+        {
 
-      fill_solid_cell_conventional_heat_sink
-      (
-#       ifdef PRINT_THERMAL_CELLS
-        dimensions,
-        layer_index, row_index, column_index,
-#       endif
-        thermalcells,
-        delta_time,
-        get_cell_length(dimensions, column_index),
-        get_cell_width(dimensions, row_index),
-        conventionalheatsink->TopLayer->Height,
-        conventionalheatsink->TopLayer->Material->ThermalConductivity,
-        conventionalheatsink->AmbientHTC
-      ) ;
+#ifdef PRINT_THERMAL_CELLS
+            fprintf (stderr,
+                "  l %2d r %4d c %4d [%7d] ",
+                layer_index, row_index, column_index,
+                get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
+#endif
 
-      thermalcells++ ;
+            fill_solid_cell_conventional_heat_sink
+            (
+                thermalcells, delta_time,
+                get_cell_length(dimensions, column_index),
+                get_cell_width(dimensions, row_index),
+                conventionalheatsink->TopLayer->Height,
+                conventionalheatsink->TopLayer->Material->ThermalConductivity,
+                conventionalheatsink->AmbientHTC
+            ) ;
 
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
+            thermalcells++ ;
+
+        } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
 }
 
 /******************************************************************************/

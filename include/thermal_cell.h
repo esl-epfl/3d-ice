@@ -65,14 +65,6 @@ extern "C"
 
     void fill_solid_cell_bottom
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
-
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -89,14 +81,6 @@ extern "C"
 
     void fill_solid_cell_central
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
-
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -113,14 +97,6 @@ extern "C"
 
     void fill_solid_cell_top
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
-
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -137,14 +113,6 @@ extern "C"
 
     void fill_solid_cell_conventional_heat_sink
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
-
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -161,13 +129,6 @@ extern "C"
 
     void fill_liquid_cell_mc_4rm
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -186,13 +147,6 @@ extern "C"
 
     void fill_liquid_cell_mc_2rm
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -214,14 +168,6 @@ extern "C"
 
     void fill_liquid_cell_pf
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
-
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -241,13 +187,6 @@ extern "C"
 
     void fill_wall_cell_mc_2rm
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -261,13 +200,6 @@ extern "C"
 
     void fill_wall_cell_pf
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,
@@ -281,13 +213,6 @@ extern "C"
 
     void fill_virtual_wall_cell_mc_2rm
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
         ThermalCell         *thermal_cell,
 
         Time_t              time,
@@ -305,13 +230,6 @@ extern "C"
 
     void fill_virtual_wall_cell_pf
     (
-#ifdef PRINT_THERMAL_CELLS
-        Dimensions          *dimensions,
-
-        GridDimension_t     layer_index,
-        GridDimension_t     row_index,
-        GridDimension_t     column_index,
-#endif
         ThermalCell         *thermal_cell,
 
         Time_t              delta_time,

@@ -43,12 +43,6 @@
 
 void fill_solid_cell_bottom
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -73,30 +67,21 @@ void fill_solid_cell_bottom
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * solid_vhc) / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/
 
 void fill_solid_cell_central
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -121,30 +106,21 @@ void fill_solid_cell_central
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * solid_vhc) / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/
 
 void fill_solid_cell_top
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -169,30 +145,21 @@ void fill_solid_cell_top
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * solid_vhc) / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/
 
 void fill_solid_cell_conventional_heat_sink
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                __attribute__ ((unused)) delta_time,
     CellDimension_t       cell_length,
@@ -215,29 +182,19 @@ void fill_solid_cell_conventional_heat_sink
             cell_height * ambient_htc + (Conductance_t) 2 * solid_tc
           ) ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
+        "| l %6.1f w %6.1f h %6.1f "  \
         "|                                     T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
         cell_length, cell_width, cell_height,
         thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+#endif
 }
 
 /******************************************************************************/
 
 void fill_liquid_cell_mc_4rm
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -264,30 +221,21 @@ void fill_liquid_cell_mc_4rm
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * coolant_vhc) / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/
 
 void fill_liquid_cell_mc_2rm
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -321,18 +269,15 @@ void fill_liquid_cell_mc_2rm
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * coolant_vhc) * porosity / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 
 }
 
@@ -341,12 +286,6 @@ void fill_liquid_cell_mc_2rm
 
 void fill_liquid_cell_pf
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -381,30 +320,21 @@ void fill_liquid_cell_pf
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * coolant_vhc) * porosity / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/
 
 void fill_wall_cell_mc_2rm
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                __attribute__ ((unused)) delta_time,
     CellDimension_t       __attribute__ ((unused)) cell_length,
@@ -418,30 +348,21 @@ void fill_wall_cell_mc_2rm
 
     thermal_cell->Capacity = (Capacity_t) 0 ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/
 
 void fill_wall_cell_pf
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                __attribute__ ((unused)) delta_time,
     CellDimension_t       __attribute__ ((unused)) cell_length,
@@ -455,18 +376,15 @@ void fill_wall_cell_pf
 
     thermal_cell->Capacity = (Capacity_t) 0 ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 
 }
 
@@ -474,12 +392,6 @@ void fill_wall_cell_pf
 
 void fill_virtual_wall_cell_mc_2rm
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -505,18 +417,15 @@ void fill_virtual_wall_cell_mc_2rm
     thermal_cell->Capacity
         = (solid_vhc * (cell_length * cell_width * cell_height) * (1 - porosity)) / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 
@@ -524,12 +433,6 @@ void fill_virtual_wall_cell_mc_2rm
 
 void fill_virtual_wall_cell_pf
 (
-# ifdef PRINT_THERMAL_CELLS
-    Dimensions            *dimensions,
-    GridDimension_t       layer_index,
-    GridDimension_t       row_index,
-    GridDimension_t       column_index,
-# endif
     ThermalCell           *thermal_cell,
     Time_t                delta_time,
     CellDimension_t       cell_length,
@@ -551,18 +454,15 @@ void fill_virtual_wall_cell_pf
     thermal_cell->Capacity
         = (solid_vhc * (cell_length * cell_width * cell_height) * (1 - porosity)) / delta_time ;
 
-# ifdef PRINT_THERMAL_CELLS
+#ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
-
-        "  l %2d r %4d c %4d [%7d] | l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e |\n",
-
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index),
+        "| l %6.1f w %6.1f h %6.1f "  \
+        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
         cell_length, cell_width, cell_height,
         thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom) ;
-# endif
+        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
+        thermal_cell->Capacity) ;
+#endif
 }
 
 /******************************************************************************/

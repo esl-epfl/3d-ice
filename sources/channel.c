@@ -242,11 +242,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index_wall_bottom, column_index_wall_bottom,
+                    get_cell_offset_in_stack (dimensions, layer_index, row_index_wall_bottom, column_index_wall_bottom)) ;
+#endif
+
                 fill_wall_cell_pf
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index, row_index_wall_bottom, column_index_wall_bottom,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index_wall_bottom),
                     get_cell_width(dimensions, row_index_wall_bottom),
@@ -263,11 +267,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index + 1, row_index_virtual_wall, column_index_virtual_wall,
+                    get_cell_offset_in_stack (dimensions, layer_index + 1, row_index_virtual_wall, column_index_virtual_wall)) ;
+#endif
+
                 fill_virtual_wall_cell_pf
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index + 1, row_index_virtual_wall, column_index_virtual_wall,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index_virtual_wall),
                     get_cell_width(dimensions, row_index_virtual_wall),
@@ -287,11 +295,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index + 2, row_index, column_index,
+                    get_cell_offset_in_stack (dimensions, layer_index + 2, row_index, column_index)) ;
+#endif
+
                 fill_liquid_cell_pf
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index + 2, row_index, column_index,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index),
                     get_cell_width(dimensions, row_index),
@@ -312,11 +324,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index + 3, row_index_wall_top, column_index_wall_top,
+                    get_cell_offset_in_stack (dimensions, layer_index + 3, row_index_wall_top, column_index_wall_top)) ;
+#endif
+
                 fill_wall_cell_pf
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index + 3, row_index_wall_top, column_index_wall_top,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index_wall_top),
                     get_cell_width(dimensions, row_index_wall_top),
@@ -335,11 +351,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index_wall_bottom, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index_wall_bottom, column_index_wall_bottom,
+                    get_cell_offset_in_stack (dimensions, layer_index, row_index_wall_bottom, column_index_wall_bottom)) ;
+#endif
+
                 fill_wall_cell_mc_2rm
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index, row_index_wall_bottom, column_index_wall_bottom,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index_wall_bottom),
                     get_cell_width(dimensions, row_index_wall_bottom),
@@ -356,11 +376,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index_virtual_wall, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index + 1, row_index_virtual_wall, column_index_virtual_wall,
+                    get_cell_offset_in_stack (dimensions, layer_index + 1, row_index_virtual_wall, column_index_virtual_wall)) ;
+#endif
+
                 fill_virtual_wall_cell_mc_2rm
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index + 1, row_index_virtual_wall, column_index_virtual_wall,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index_virtual_wall),
                     get_cell_width(dimensions, row_index_virtual_wall),
@@ -380,11 +404,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index + 2, row_index, column_index,
+                    get_cell_offset_in_stack (dimensions, layer_index + 2, row_index, column_index)) ;
+#endif
+
                 fill_liquid_cell_mc_2rm
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index + 2, row_index, column_index,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index),
                     get_cell_width(dimensions, row_index),
@@ -408,11 +436,15 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index_wall_top, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index + 3, row_index_wall_top, column_index_wall_top,
+                    get_cell_offset_in_stack (dimensions, layer_index + 3, row_index_wall_top, column_index_wall_top)) ;
+#endif
+
                 fill_wall_cell_mc_2rm
                 (
-#ifdef PRINT_THERMAL_CELLS
-                    dimensions, layer_index + 3, row_index_wall_top, column_index_wall_top,
-#endif
                     thermalcells, delta_time,
                     get_cell_length(dimensions, column_index_wall_top),
                     get_cell_width(dimensions, row_index_wall_top),
@@ -431,13 +463,17 @@ void fill_thermal_cell_channel
         {
             FOR_EVERY_COLUMN (column_index, dimensions)
             {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index,
+                    get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
+#endif
+
                 if (IS_CHANNEL_COLUMN(column_index))
 
                     fill_liquid_cell_mc_4rm
                     (
-#ifdef PRINT_THERMAL_CELLS
-                        dimensions, layer_index, row_index, column_index,
-#endif
                         thermalcells, delta_time,
                         get_cell_length(dimensions, column_index),
                         get_cell_width(dimensions, row_index),
@@ -452,9 +488,6 @@ void fill_thermal_cell_channel
 
                     fill_solid_cell_central
                     (
-#ifdef PRINT_THERMAL_CELLS
-                        dimensions, layer_index, row_index, column_index,
-#endif
                         thermalcells, delta_time,
                         get_cell_length(dimensions, column_index),
                         get_cell_width(dimensions, row_index),
