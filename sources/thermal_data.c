@@ -198,12 +198,6 @@ int fill_thermal_data
                tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
                &tdata->SLUMatrix_A_Permuted) ;
 
-
-# ifdef PRINT_SYSTEM_MATRIX_FILE
-  print_system_matrix("result.txt", tdata->SM_A);
-  fprintf(stderr, "Printed system matrix.\n");
-# endif
-
   dgstrf (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
           sp_ienv(2), sp_ienv(1), /* relax and panel size */
           tdata->SLU_Etree,
