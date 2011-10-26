@@ -43,6 +43,10 @@ extern "C"
 
 /******************************************************************************/
 
+# define PI (3.14159265358979323846)
+
+/******************************************************************************/
+
   /* Max and min */
 
 # define MAX(a,b)  (((a) > (b)) ? (a) : (b))
@@ -68,14 +72,17 @@ extern "C"
 
   /* Free a linked list of ... */
 
-# define FREE_LIST(type, list, free_function) \
-                                              \
-    type* next = NULL ;                       \
-    for ( ; list != NULL ; list = next)       \
-    {                                         \
-      next = list->Next ;                     \
-      FREE_POINTER (free_function, list) ;    \
-    }
+# define FREE_LIST(type, list, free_function)    \
+                                                 \
+    do                                           \
+    {                                            \
+        type* next = NULL ;                      \
+        for ( ; list != NULL ; list = next)      \
+        {                                        \
+            next = list->Next ;                  \
+            FREE_POINTER (free_function, list) ; \
+        }                                        \
+    } while (0)                                  \
 
 /******************************************************************************/
 

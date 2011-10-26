@@ -52,9 +52,9 @@ void init_material (Material *material)
 
 /******************************************************************************/
 
-Material * alloc_and_init_material (void)
+Material *alloc_and_init_material (void)
 {
-    Material *material = (Material *) malloc ( sizeof(Material) ) ;
+    Material *material = (Material *) malloc (sizeof(Material)) ;
 
     if (material != NULL)
 
@@ -67,7 +67,10 @@ Material * alloc_and_init_material (void)
 
 void free_material (Material *material)
 {
-    FREE_POINTER (free, material->Id) ;
+    if (material->Id != NULL)
+
+        FREE_POINTER (free, material->Id) ;
+
     FREE_POINTER (free, material) ;
 }
 
@@ -80,7 +83,7 @@ void free_materials_list (Material *list)
 
 /******************************************************************************/
 
-Material * find_material_in_list (Material *list, char *id)
+Material *find_material_in_list (Material *list, char *id)
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, list)
     {
@@ -93,9 +96,11 @@ Material * find_material_in_list (Material *list, char *id)
 /******************************************************************************/
 
 void print_formatted_material
-
-    (FILE *stream, char *prefix, Material *material)
-
+(
+    FILE     *stream,
+    char     *prefix,
+    Material *material
+)
 {
     fprintf (stream,
              "%smaterial %s :\n",
@@ -113,9 +118,11 @@ void print_formatted_material
 /******************************************************************************/
 
 void print_formatted_materials_list
-
-    (FILE *stream, char *prefix, Material *list)
-
+(
+    FILE     *stream,
+    char     *prefix,
+    Material *list
+)
 {
     FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
     {
@@ -128,9 +135,11 @@ void print_formatted_materials_list
 /******************************************************************************/
 
 void print_detailed_material
-
-    (FILE *stream, char *prefix, Material *material)
-
+(
+    FILE     *stream,
+    char     *prefix,
+    Material *material
+)
 {
     fprintf (stream,
              "%smaterial                    = %p\n",
@@ -160,9 +169,11 @@ void print_detailed_material
 /******************************************************************************/
 
 void print_detailed_materials_list
-
-    (FILE *stream, char *prefix, Material *list)
-
+(
+    FILE     *stream,
+    char     *prefix,
+    Material *list
+)
 {
     FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
     {

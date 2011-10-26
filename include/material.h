@@ -36,6 +36,10 @@
 #ifndef _3DICE_MATERIAL_H_
 #define _3DICE_MATERIAL_H_
 
+/*! \file material.h
+ *  \brief File containing the definition and the interface to handle materials
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -47,118 +51,170 @@ extern "C" {
 
 /******************************************************************************/
 
+    /*! \struct Material
+     *
+     *  \brief Structure used to store data about the materials that compose the 2D/3D stack.
+     *
+     *  Materials are used when declaring layers composing a die or the
+     *  stack or when declaring the properties of the walls in a channel.
+     */
+
     struct Material
     {
-        /*
-         * The Id of the material
+        /*!
+         * The identifier used to refer to the material in the stack file
          */
 
         char *Id ;
 
-        /*
+        /*!
          * To know, after the parsing of a stack file, if a
-         */
-        /*
          * material has been declared but never used
          */
 
         uint8_t Used ;
 
-        /*
-         * The volume-specific heat capacity [ J / ( um3 * K ) ]
+        /*!
+         * The volume-specific heat capacity of the material,
+         * expressed as \f$ J / \left( \mu m^3 \cdot K \right) \f$
          */
 
         double VolumetricHeatCapacity ;
 
-        /*
-         * The thermal conductivity [ W / ( um * K ) ]
+        /*!
+         * The thermal conductivity of the material,
+         * expressed as \f$ W / \left( \mu m \cdot K \right) \f$
          */
 
         double ThermalConductivity ;
 
-        /*
-         * To collect materials in a linked list
+        /*!
+         * Pointer to collect materials in a linked list
          */
 
         struct Material *Next ;
     } ;
 
+    /*! Definition of the type Material
+     */
+
     typedef struct Material Material ;
 
 /******************************************************************************/
 
-    /*
-     * Given a valid address of a Material structure,
-     * sets all its fields to a default value.
+
+
+    /*! Sets all the fields of \a material to a default value (zero or \c NULL ).
+     *
+     * \param material the address of the material to initialize
      */
 
     void init_material (Material *material) ;
 
-/******************************************************************************/
 
-    /*
-     * Allocates a Material structure and sets its
-     * Material address if the allocation succeed or
-     * NULL if it fails.
+
+    /*! Allocates a Material in memory and sets its fields to their default
+     *  value with \c init_material
+     *
+     * \return the pointer to a new Material or \c NULL if the memory allocation fails
      */
 
-    Material * alloc_and_init_material (void) ;
+    Material *alloc_and_init_material (void) ;
 
-/******************************************************************************/
 
-    /*
-     * Given the address of a Material structure,
-     * frees both the Id string and the memory pointed
-     * by the address received.
+
+    /*! Frees the memory related to \a material
+     *
+     * The function frees the memory used to store the identifier
+     * Material::Id, if allocated, and then frees the memory pointed by
+     * material.
+     *
+     * The parametrer \a material must be a pointer previously obtained with
+     * \c alloc_and_init_material
+     *
+     * \param material the address of the material structure to free
      */
 
     void free_material (Material *material) ;
 
-/******************************************************************************/
 
-    /*
-     * Given the address of a Material structure,
-     * frees the material pointed by this address and
-     * all the materials it finds following the linked
-     * list  (see Next field).
+
+    /*! Frees a list of materials
+     *
+     * If frees, calling \c free_material, the material pointed by the
+     * parameter \a list and all the materials it finds following the
+     * linked list throught the field Material::Next.
+     *
+     * \param list the pointer to the first elment in the list to be freed
      */
 
     void free_materials_list (Material *list) ;
 
-/******************************************************************************/
 
-    /*
-     * Id based search of a Material structure in a
-     * material list. Returns the address of a
-     * founded structure or NULL if it does not find
-     * it.
+
+    /*! Searches for a Material in a linked list of materials.
+     *
+     * Id based search of a Material structure in a list.
+     *
+     * \param list the pointer to the list
+     * \param id   the identifier of the material to be found
+     *
+     * \return the address of a Material, if founded, or \c NULL if the search fails
      */
 
-    Material * find_material_in_list (Material *list, char *id) ;
+    Material *find_material_in_list (Material *list, char *id) ;
 
-/******************************************************************************/
+
+
+    /*! Prints the material as it looks in the stack file
+     *
+     * \param stream   the output stream (must be already open)
+     * \param prefix   a string to be printed as prefix at the beginning of each line
+     * \param material the material to print
+     */
 
     void print_formatted_material
 
          (FILE *stream, char *prefix, Material *material) ;
 
-/******************************************************************************/
+
+
+    /*! Prints a list of materials as they look in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first material in the list
+     */
 
     void print_formatted_materials_list
 
-         (FILE *stream, char *prefix, Material *material) ;
+         (FILE *stream, char *prefix, Material *list) ;
 
-/******************************************************************************/
+
+
+    /*! Prints detailed information about all the fields of a material
+     *
+     * \param stream   the output stream (must be already open)
+     * \param prefix   a string to be printed as prefix at the beginning of each line
+     * \param material the material to print
+     */
 
     void print_detailed_material
 
          (FILE *stream, char *prefix, Material *material) ;
 
-/******************************************************************************/
+
+
+    /*! Prints a list of detailed information about all the fields of the materials
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list the pointer to the first material in the list
+     */
 
     void print_detailed_materials_list
 
-         (FILE *stream, char *prefix, Material *material) ;
+         (FILE *stream, char *prefix, Material *list) ;
 
 /******************************************************************************/
 
