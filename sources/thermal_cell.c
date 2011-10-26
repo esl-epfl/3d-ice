@@ -236,18 +236,20 @@ void fill_liquid_cell_mc_4rm
 
 void fill_liquid_cell_mc_2rm
 (
-    ThermalCell           *thermal_cell,
-    Time_t                delta_time,
-    CellDimension_t       cell_length,
-    CellDimension_t       cell_width,
-    CellDimension_t       cell_height,
-    GridDimension_t       nchannels,
-    CellDimension_t       channel_width,  // FIXME WIDTH or LENGTH ??
-    CellDimension_t       channel_pitch,
-    Porosity_t            porosity,
-    CoolantHTCs_t         coolant_htcs,
-    CoolantVHC_t          coolant_vhc,
-    CoolantFR_t           coolant_fr
+    ThermalCell         *thermal_cell,
+    Time_t              delta_time,
+    CellDimension_t     cell_length,
+    CellDimension_t     cell_width,
+    CellDimension_t     cell_height,
+    ChannelModel_t      __attribute__ ((unused)) channel_model,
+    GridDimension_t     nchannels,
+    CellDimension_t     channel_width,  // FIXME width or length
+    CellDimension_t     channel_pitch,
+    Porosity_t          porosity,
+    CoolantHTCs_t       coolant_htcs,
+    CoolantVHC_t        coolant_vhc,
+    CoolantFR_t         coolant_fr,
+    DarcyVelocity_t     __attribute__ ((unused)) darcy_velocity
 )
 {
     Cconv_t C = CCONV_MC_2RM (nchannels, coolant_vhc, coolant_fr,
@@ -286,15 +288,20 @@ void fill_liquid_cell_mc_2rm
 
 void fill_liquid_cell_pf
 (
-    ThermalCell           *thermal_cell,
-    Time_t                delta_time,
-    CellDimension_t       cell_length,
-    CellDimension_t       cell_width,
-    CellDimension_t       cell_height,
-    ChannelModel_t        channel_model,
-    Porosity_t            porosity,
-    CoolantVHC_t          coolant_vhc,
-    DarcyVelocity_t       darcy_velocity
+    ThermalCell         *thermal_cell,
+    Time_t              delta_time,
+    CellDimension_t     cell_length,
+    CellDimension_t     cell_width,
+    CellDimension_t     cell_height,
+    ChannelModel_t      channel_model,
+    GridDimension_t     __attribute__ ((unused)) nchannels,
+    CellDimension_t     __attribute__ ((unused)) channel_width,
+    CellDimension_t     __attribute__ ((unused)) channel_pitch,
+    Porosity_t          porosity,
+    CoolantHTCs_t       __attribute__ ((unused)) coolant_htcs,
+    CoolantVHC_t        coolant_vhc,
+    CoolantFR_t         __attribute__ ((unused)) coolant_fr,
+    DarcyVelocity_t     darcy_velocity
 )
 {
     Cconv_t C = CCONV_PF (coolant_vhc, darcy_velocity, cell_length, cell_height);

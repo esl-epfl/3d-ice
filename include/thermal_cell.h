@@ -155,13 +155,17 @@ extern "C"
         CellDimension_t     cell_width,
         CellDimension_t     cell_height,
 
+        ChannelModel_t      channel_model,
+
         GridDimension_t     nchannels,
         CellDimension_t     channel_width,
         CellDimension_t     channel_pitch,
+
         Porosity_t          porosity,
         CoolantHTCs_t       coolant_htcs,
         CoolantVHC_t        coolant_vhc,
-        CoolantFR_t         coolant_fr
+        CoolantFR_t         coolant_fr,
+        DarcyVelocity_t     darcy_velocity
     ) ;
 
 /******************************************************************************/
@@ -178,8 +182,14 @@ extern "C"
 
         ChannelModel_t      channel_model,
 
+        GridDimension_t     nchannels,
+        CellDimension_t     channel_width,
+        CellDimension_t     channel_pitch,
+
         Porosity_t          porosity,
+        CoolantHTCs_t       coolant_htcs,
         CoolantVHC_t        coolant_vhc,
+        CoolantFR_t         coolant_fr,
         DarcyVelocity_t     darcy_velocity
     ) ;
 
