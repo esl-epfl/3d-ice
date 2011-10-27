@@ -239,14 +239,14 @@ extern "C"
  * Cconv           = (CoolantVHC * FlowRate * Porosity) / (#Channels * 2) * (CellLength / ChannelWidth)
  */
 
-# define CCONV_MC_2RM(nchannels, coolant_vhc, coolant_fr, porosity, cell_length, channel_width) \
-                                                                                                \
-  (Cconv_t) (                                                                                   \
-               (coolant_vhc * coolant_fr * porosity)                                            \
-               /                                                                                \
-               ((Cconv_t) (nchannels * 2))                                                      \
-               *                                                                                \
-               (cell_length / channel_width)                                                    \
+# define CCONV_MC_2RM(nchannels, coolant_vhc, coolant_fr, porosity, cell_length, channel_length) \
+                                                                                                 \
+  (Cconv_t) (                                                                                    \
+               (coolant_vhc * coolant_fr * porosity)                                             \
+               /                                                                                 \
+               ((Cconv_t) (nchannels * 2))                                                       \
+               *                                                                                 \
+               (cell_length / channel_length)                                                    \
             )
 
 /* Pin-fins

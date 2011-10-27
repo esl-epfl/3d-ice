@@ -221,7 +221,7 @@ void print_detailed_channel
 
 /******************************************************************************/
 
-void fill_thermal_cell_channel
+static void fill_thermal_cell_channel_4rm
 (
     ThermalCell*     thermalcells,
     Time_t           delta_time,
@@ -236,9 +236,68 @@ void fill_thermal_cell_channel
 
     thermalcells += cell_index ;
 
-    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
+    FOR_EVERY_ROW (row_index, dimensions)
     {
+        FOR_EVERY_COLUMN (column_index, dimensions)
+        {
+#ifdef PRINT_THERMAL_CELLS
+            fprintf (stderr,
+                "  l %2d r %4d c %4d [%7d] ",
+                layer_index, row_index, column_index, cell_index++) ;
+#endif
 
+            if (IS_CHANNEL_COLUMN(column_index))
+
+                fill_liquid_cell_mc_4rm
+                (
+                    thermalcells, delta_time,
+                    get_cell_length(dimensions, column_index),
+                    get_cell_width(dimensions, row_index),
+                    channel->Height,
+                    channel->NChannels,
+                    channel->CoolantHTCs,
+                    channel->CoolantVHC,
+                    channel->CoolantFR
+                ) ;
+
+            else
+
+                fill_solid_cell_central
+                (
+                    thermalcells, delta_time,
+                    get_cell_length(dimensions, column_index),
+                    get_cell_width(dimensions, row_index),
+                    channel->Height,
+                    channel->WallMaterial->ThermalConductivity,
+                    channel->WallMaterial->VolumetricHeatCapacity
+                ) ;
+
+            thermalcells ++ ;
+
+        } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
+}
+
+/******************************************************************************/
+
+static void fill_thermal_cell_channel_2rm
+(
+    ThermalCell*     thermalcells,
+    Time_t           delta_time,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    Channel*         channel
+)
+{
+    GridDimension_t cell_index =
+
+        get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
+
+    thermalcells += cell_index ;
+
+    /* Bottom Wall */
+
+    {
         FOR_EVERY_ROW (row_index, dimensions)
         {
             FOR_EVERY_COLUMN (column_index, dimensions)
@@ -249,194 +308,277 @@ void fill_thermal_cell_channel
                     layer_index, row_index, column_index, cell_index++) ;
 #endif
 
-                if (IS_CHANNEL_COLUMN(column_index))
+                init_thermal_cell (thermalcells) ;
 
-                    fill_liquid_cell_mc_4rm
-                    (
-                        thermalcells, delta_time,
-                        get_cell_length(dimensions, column_index),
-                        get_cell_width(dimensions, row_index),
-                        channel->Height,
-                        channel->NChannels,
-                        channel->CoolantHTCs,
-                        channel->CoolantVHC,
-                        channel->CoolantFR
-                    ) ;
-
-                else
-
-                    fill_solid_cell_central
-                    (
-                        thermalcells, delta_time,
-                        get_cell_length(dimensions, column_index),
-                        get_cell_width(dimensions, row_index),
-                        channel->Height,
-                        channel->WallMaterial->ThermalConductivity,
-                        channel->WallMaterial->VolumetricHeatCapacity
-                    ) ;
-
-                thermalcells ++ ;
+                thermalcells++;
 
             } // FOR_EVERY_COLUMN
         } // FOR_EVERY_ROW
     }
-    else
+
+    layer_index++ ;
+
+    /* Virtual wall */
+
     {
-        void (*fill_wall_cell)
-
-            (ThermalCell *, Time_t,
-             CellDimension_t, CellDimension_t, CellDimension_t) ;
-
-        void (*fill_virtual_wall_cell)
-
-            (ThermalCell *, Time_t,
-             CellDimension_t, CellDimension_t, CellDimension_t,
-             Porosity_t, SolidTC_t, SolidVHC_t) ;
-
-        void (*fill_liquid_cell)
-
-            (ThermalCell *, Time_t,
-             CellDimension_t, CellDimension_t, CellDimension_t,
-             ChannelModel_t,
-             GridDimension_t, CellDimension_t, CellDimension_t,
-             Porosity_t, CoolantHTCs_t, CoolantVHC_t, CoolantFR_t, DarcyVelocity_t) ;
-
-        if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
-            || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
+        FOR_EVERY_ROW (row_index, dimensions)
         {
-            fill_wall_cell         = &fill_wall_cell_pf ;
-            fill_virtual_wall_cell = &fill_virtual_wall_cell_pf ;
-            fill_liquid_cell       = &fill_liquid_cell_pf ;
-        }
-        else
-        {
-            fill_wall_cell         = &fill_wall_cell_mc_2rm ;
-            fill_virtual_wall_cell = &fill_virtual_wall_cell_mc_2rm ;
-            fill_liquid_cell       = &fill_liquid_cell_mc_2rm ;
-        }
-
-        /* Bottom Wall */
-
-        {
-            FOR_EVERY_ROW (row_index, dimensions)
+            FOR_EVERY_COLUMN (column_index, dimensions)
             {
-                FOR_EVERY_COLUMN (column_index, dimensions)
-                {
 #ifdef PRINT_THERMAL_CELLS
-                    fprintf (stderr,
-                        "  l %2d r %4d c %4d [%7d] ",
-                        layer_index, row_index, column_index, cell_index++) ;
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
 #endif
 
-                    fill_wall_cell
-                    (
-                        thermalcells, delta_time,
-                        get_cell_length(dimensions, column_index),
-                        get_cell_width(dimensions, row_index),
-                        channel->Height
-                    ) ;
+                fill_virtual_wall_cell_mc_2rm
+                (
+                    thermalcells, delta_time,
+                    get_cell_length(dimensions, column_index),
+                    get_cell_width(dimensions, row_index),
+                    channel->Height,
+                    channel->Porosity,
+                    channel->WallMaterial->ThermalConductivity,
+                    channel->WallMaterial->VolumetricHeatCapacity
+                ) ;
 
-                    thermalcells++;
+                thermalcells++;
 
-                } // FOR_EVERY_COLUMN
-            } // FOR_EVERY_ROW
-        }
-
-        layer_index++ ;
-
-        /* Virtual wall */
-
-        {
-            FOR_EVERY_ROW (row_index, dimensions)
-            {
-                FOR_EVERY_COLUMN (column_index, dimensions)
-                {
-#ifdef PRINT_THERMAL_CELLS
-                    fprintf (stderr,
-                        "  l %2d r %4d c %4d [%7d] ",
-                        layer_index, row_index, column_index, cell_index++) ;
-#endif
-
-                    fill_virtual_wall_cell
-                    (
-                        thermalcells, delta_time,
-                        get_cell_length(dimensions, column_index),
-                        get_cell_width(dimensions, row_index),
-                        channel->Height,
-                        channel->Porosity,
-                        channel->WallMaterial->ThermalConductivity,
-                        channel->WallMaterial->VolumetricHeatCapacity
-                    ) ;
-
-                    thermalcells++;
-
-                } // FOR_EVERY_COLUMN
-            } // FOR_EVERY_ROW
-        }
-
-        layer_index++ ;
-
-        /* Channel for PF 2RM */
-
-        {
-            FOR_EVERY_ROW (row_index, dimensions)
-            {
-                FOR_EVERY_COLUMN (column_index, dimensions)
-                {
-#ifdef PRINT_THERMAL_CELLS
-                    fprintf (stderr,
-                        "  l %2d r %4d c %4d [%7d] ",
-                        layer_index, row_index, column_index, cell_index++) ;
-#endif
-
-                    fill_liquid_cell
-                    (
-                        thermalcells, delta_time,
-                        get_cell_length(dimensions, column_index),
-                        get_cell_width(dimensions, row_index),
-                        channel->Height,
-                        channel->ChannelModel,
-                        channel->NChannels, channel->Length, channel->Pitch,
-                        channel->Porosity, channel->CoolantHTCs,
-                        channel->CoolantVHC, channel->CoolantFR,
-                        channel->DarcyVelocity
-                    ) ;
-
-                    thermalcells++;
-
-                } // FOR_EVERY_COLUMN
-            } // FOR_EVERY_ROW
-        }
-
-        layer_index++ ;
-
-        /* Top Wall */
-
-        {
-            FOR_EVERY_ROW (row_index, dimensions)
-            {
-                FOR_EVERY_COLUMN (column_index, dimensions)
-                {
-#ifdef PRINT_THERMAL_CELLS
-                    fprintf (stderr,
-                        "  l %2d r %4d c %4d [%7d] ",
-                        layer_index, row_index, column_index, cell_index++) ;
-#endif
-
-                    fill_wall_cell
-                    (
-                        thermalcells, delta_time,
-                        get_cell_length(dimensions, column_index),
-                        get_cell_width(dimensions, row_index),
-                        channel->Height
-                    ) ;
-
-                    thermalcells++;
-
-                } // FOR_EVERY_COLUMN
-            } // FOR_EVERY_ROW
-        }
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
     }
+
+    layer_index++ ;
+
+    /* Channel for PF 2RM */
+
+    {
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
+#endif
+
+                fill_liquid_cell_mc_2rm
+                (
+                    thermalcells, delta_time,
+                    get_cell_length(dimensions, column_index),
+                    get_cell_width(dimensions, row_index),
+                    channel->Height,
+                    channel->NChannels, channel->Length, channel->Pitch,
+                    channel->Porosity, channel->CoolantHTCs,
+                    channel->CoolantVHC, channel->CoolantFR
+                ) ;
+
+                thermalcells++;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    layer_index++ ;
+
+    /* Top Wall */
+
+    {
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
+#endif
+
+                init_thermal_cell (thermalcells) ;
+
+                thermalcells++;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    return ;
+}
+
+/******************************************************************************/
+
+static void fill_thermal_cell_channel_pf
+(
+    ThermalCell*     thermalcells,
+    Time_t           delta_time,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    Channel*         channel
+)
+{
+    GridDimension_t cell_index =
+
+        get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
+
+    thermalcells += cell_index ;
+
+    /* Bottom Wall */
+
+    {
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
+#endif
+
+                init_thermal_cell (thermalcells) ;
+
+                thermalcells++;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    layer_index++ ;
+
+    /* Virtual wall */
+
+    {
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
+#endif
+
+                fill_virtual_wall_cell_pf
+                (
+                    thermalcells, delta_time,
+                    get_cell_length(dimensions, column_index),
+                    get_cell_width(dimensions, row_index),
+                    channel->Height,
+                    channel->Porosity,
+                    channel->WallMaterial->ThermalConductivity,
+                    channel->WallMaterial->VolumetricHeatCapacity
+                ) ;
+
+                thermalcells++;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    layer_index++ ;
+
+    /* Channel for PF 2RM */
+
+    {
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
+#endif
+
+                fill_liquid_cell_pf
+                (
+                    thermalcells, delta_time,
+                    get_cell_length(dimensions, column_index),
+                    get_cell_width(dimensions, row_index),
+                    channel->Height,
+                    channel->ChannelModel,
+                    channel->Porosity, channel->CoolantVHC, channel->DarcyVelocity
+                ) ;
+
+                thermalcells++;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    layer_index++ ;
+
+    /* Top Wall */
+
+    {
+        FOR_EVERY_ROW (row_index, dimensions)
+        {
+            FOR_EVERY_COLUMN (column_index, dimensions)
+            {
+#ifdef PRINT_THERMAL_CELLS
+                fprintf (stderr,
+                    "  l %2d r %4d c %4d [%7d] ",
+                    layer_index, row_index, column_index, cell_index++) ;
+#endif
+
+                init_thermal_cell (thermalcells) ;
+
+                thermalcells++;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    return ;
+}
+
+/******************************************************************************/
+
+void fill_thermal_cell_channel
+(
+    ThermalCell*     thermalcells,
+    Time_t           delta_time,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    Channel*         channel
+)
+{
+    switch (channel->ChannelModel)
+    {
+        case TDICE_CHANNEL_MODEL_MC_RM4 :
+
+            fill_thermal_cell_channel_4rm
+
+                (thermalcells, delta_time, dimensions, layer_index, channel) ;
+
+            break ;
+
+        case TDICE_CHANNEL_MODEL_MC_RM2 :
+
+            fill_thermal_cell_channel_2rm
+
+                (thermalcells, delta_time, dimensions, layer_index, channel) ;
+
+            break ;
+
+        case TDICE_CHANNEL_MODEL_PF_INLINE :
+        case TDICE_CHANNEL_MODEL_PF_STAGGERED :
+
+            fill_thermal_cell_channel_pf
+
+                (thermalcells, delta_time, dimensions, layer_index, channel) ;
+
+            break ;
+
+        default :
+
+            fprintf (stderr,
+                "Error: unkonw channel model %d\n",
+                channel->ChannelModel) ;
+    }
+
+    return ;
 }
 
 /******************************************************************************/

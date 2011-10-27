@@ -301,7 +301,6 @@ void fill_thermal_cell_stack_description
     fill_thermal_cell_conventional_heat_sink
     (
       thermalcells,
-      delta_time,
       stkd->Dimensions,
       stkd->ConventionalHeatSink
     ) ;

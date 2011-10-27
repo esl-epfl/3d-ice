@@ -41,6 +41,19 @@
 
 /******************************************************************************/
 
+void init_thermal_cell (ThermalCell *thermal_cell)
+{
+    thermal_cell->Top      = CONDUCTANCE_I ;
+    thermal_cell->Bottom   = CONDUCTANCE_I ;
+    thermal_cell->North    = CONDUCTANCE_I ;
+    thermal_cell->South    = CONDUCTANCE_I ;
+    thermal_cell->East     = CONDUCTANCE_I ;
+    thermal_cell->West     = CONDUCTANCE_I ;
+    thermal_cell->Capacity = CAPACITY_I ;
+}
+
+/******************************************************************************/
+
 void fill_solid_cell_bottom
 (
     ThermalCell           *thermal_cell,
@@ -161,7 +174,6 @@ void fill_solid_cell_top
 void fill_solid_cell_conventional_heat_sink
 (
     ThermalCell           *thermal_cell,
-    Time_t                __attribute__ ((unused)) delta_time,
     CellDimension_t       cell_length,
     CellDimension_t       cell_width,
     CellDimension_t       cell_height,
@@ -241,30 +253,28 @@ void fill_liquid_cell_mc_2rm
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,
     CellDimension_t     cell_height,
-    ChannelModel_t      __attribute__ ((unused)) channel_model,
     GridDimension_t     nchannels,
-    CellDimension_t     channel_width,  // FIXME width or length
+    CellDimension_t     channel_length,
     CellDimension_t     channel_pitch,
     Porosity_t          porosity,
     CoolantHTCs_t       coolant_htcs,
     CoolantVHC_t        coolant_vhc,
-    CoolantFR_t         coolant_fr,
-    DarcyVelocity_t     __attribute__ ((unused)) darcy_velocity
+    CoolantFR_t         coolant_fr
 )
 {
     Cconv_t C = CCONV_MC_2RM (nchannels, coolant_vhc, coolant_fr,
-                              porosity, cell_length, channel_width);
+                              porosity, cell_length, channel_length);
 
     thermal_cell->North =  C;
     thermal_cell->South = -C;
 
     thermal_cell->East = thermal_cell->West = (Conductance_t) 0 ;
 
-    CoolantHTC_t eff_htc_top = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Top, channel_width, cell_height, channel_pitch);
+    CoolantHTC_t eff_htc_top = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Top, channel_length, cell_height, channel_pitch);
 
     thermal_cell->Top = eff_htc_top * cell_width * cell_length ;
 
-    CoolantHTC_t eff_htc_bottom = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Bottom, channel_width, cell_height, channel_pitch);
+    CoolantHTC_t eff_htc_bottom = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Bottom, channel_length, cell_height, channel_pitch);
 
     thermal_cell->Bottom = eff_htc_bottom * cell_width * cell_length ;
 
@@ -293,14 +303,9 @@ void fill_liquid_cell_pf
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,
     CellDimension_t     cell_height,
-    ChannelModel_t      channel_model,
-    GridDimension_t     __attribute__ ((unused)) nchannels,
-    CellDimension_t     __attribute__ ((unused)) channel_width,
-    CellDimension_t     __attribute__ ((unused)) channel_pitch,
+    ChannelModel_t      pin_distribution,
     Porosity_t          porosity,
-    CoolantHTCs_t       __attribute__ ((unused)) coolant_htcs,
     CoolantVHC_t        coolant_vhc,
-    CoolantFR_t         __attribute__ ((unused)) coolant_fr,
     DarcyVelocity_t     darcy_velocity
 )
 {
@@ -313,7 +318,7 @@ void fill_liquid_cell_pf
 
     CoolantHTC_t eff_htc ;
 
-    if (channel_model == TDICE_CHANNEL_MODEL_PF_INLINE)
+    if (pin_distribution == TDICE_CHANNEL_MODEL_PF_INLINE)
 
         eff_htc = EFFECTIVE_HTC_PF_INLINE(darcy_velocity) ;
 
@@ -336,63 +341,6 @@ void fill_liquid_cell_pf
         thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
         thermal_cell->Capacity) ;
 #endif
-}
-
-/******************************************************************************/
-
-void fill_wall_cell_mc_2rm
-(
-    ThermalCell           *thermal_cell,
-    Time_t                __attribute__ ((unused)) delta_time,
-    CellDimension_t       __attribute__ ((unused)) cell_length,
-    CellDimension_t       __attribute__ ((unused)) cell_width,
-    CellDimension_t       __attribute__ ((unused)) cell_height
-)
-{
-    thermal_cell->North = thermal_cell->South  = (Conductance_t) 0 ;
-    thermal_cell->East  = thermal_cell->West   = (Conductance_t) 0 ;
-    thermal_cell->Top   = thermal_cell->Bottom = (Conductance_t) 0 ;
-
-    thermal_cell->Capacity = (Capacity_t) 0 ;
-
-#ifdef PRINT_THERMAL_CELLS
-    fprintf (stderr,
-        "| l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
-        cell_length, cell_width, cell_height,
-        thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
-        thermal_cell->Capacity) ;
-#endif
-}
-
-/******************************************************************************/
-
-void fill_wall_cell_pf
-(
-    ThermalCell           *thermal_cell,
-    Time_t                __attribute__ ((unused)) delta_time,
-    CellDimension_t       __attribute__ ((unused)) cell_length,
-    CellDimension_t       __attribute__ ((unused)) cell_width,
-    CellDimension_t       __attribute__ ((unused)) cell_height
-)
-{
-    thermal_cell->North = thermal_cell->South  = (Conductance_t) 0 ;
-    thermal_cell->East  = thermal_cell->West   = (Conductance_t) 0 ;
-    thermal_cell->Top   = thermal_cell->Bottom = (Conductance_t) 0 ;
-
-    thermal_cell->Capacity = (Capacity_t) 0 ;
-
-#ifdef PRINT_THERMAL_CELLS
-    fprintf (stderr,
-        "| l %6.1f w %6.1f h %6.1f "  \
-        "| N % .5e  S % .5e  E % .5e  W % .5e  T % .5e  B % .5e | C %.5e\n",
-        cell_length, cell_width, cell_height,
-        thermal_cell->North, thermal_cell->South, thermal_cell->East,
-        thermal_cell->West, thermal_cell->Top, thermal_cell->Bottom,
-        thermal_cell->Capacity) ;
-#endif
-
 }
 
 /******************************************************************************/

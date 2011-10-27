@@ -36,6 +36,10 @@
 #ifndef _3DICE_THERMALCELL_H_
 #define _3DICE_THERMALCELL_H_
 
+/*! \file thermal_cell.h
+ *  \brief File containing the definition and the interface to handle a thermal cell
+ */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -48,20 +52,79 @@ extern "C"
 
 /******************************************************************************/
 
-    typedef struct
+    /*! \struct ThermalCell
+     *
+     *  \brief Structure used to store data about a single thermal cell
+     *
+     *  Each thermal cell has a length \a l, width \a w and height \a h, as
+     *  shown in the image, and it is modeled as a node containing six
+     *  resistances representing the conduction of heat in all the six directions
+     *  (top, bottom, north, south, east and west), and a capacitance representing
+     *  the heat storage inside the cell.
+     *
+     *  The conductance of the six resistors is stored as \f$ \frac{W}{K}\f$
+     *  while the capacitance is stored as FIXME.
+     *
+     *  \image html fig_unit_cell.bmp "RC representation of a thermal cell"
+     *
+     */
+
+    struct ThermalCell
     {
+        /*! The conductance of the resistor in the \a Top direction */
+
         Conductance_t Top ;
+
+        /*! The conductance of the resistor in the \a Bottom direction */
+
         Conductance_t Bottom ;
+
+        /*! The conductance of the resistor in the \a North direction */
+
         Conductance_t North ;
+
+        /*! The conductance of the resistor in the \a South direction */
+
         Conductance_t South ;
+
+        /*! The conductance of the resistor in the \a East direction */
+
         Conductance_t East ;
+
+        /*! The conductance of the resistor in the \a West direction */
+
         Conductance_t West ;
 
-        Capacity_t    Capacity ;
+        /*! The capacity of the thermal cell */
 
-    }   ThermalCell ;
+        Capacity_t Capacity ;
+
+    } ;
+
+    /*! Definition of the type ThermalCell */
+
+    typedef struct ThermalCell ThermalCell ;
 
 /******************************************************************************/
+
+    /*! Init a solid thermal cell using default values
+     *
+     * \param thermal_cell the address of the thermal cell to initialize
+     */
+
+    void init_thermal_cell (ThermalCell *thermal_cell) ;
+
+
+    /*! Fill a solid thermal cell that belongs to the bottom-most layer of a stack
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param delta_time   the time step of the simulation
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param solid_tc     the thermal conductivity of the material
+     * \param solid_vhc    the volumetric heat capacity of the material
+     */
 
     void fill_solid_cell_bottom
     (
@@ -77,7 +140,18 @@ extern "C"
         SolidVHC_t          solid_vhc
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Fill a solid thermal cell that belongs to a central layer in a stack
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param delta_time   the time step of the simulation
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param solid_tc     the thermal conductivity of the material
+     * \param solid_vhc    the volumetric heat capacity of the material
+     */
 
     void fill_solid_cell_central
     (
@@ -93,7 +167,18 @@ extern "C"
         SolidVHC_t          solid_vhc
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Fill a solid thermal cell that belongs to the top-most layer of a stack
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param delta_time   the time step of the simulation
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param solid_tc     the thermal conductivity of the material
+     * \param solid_vhc    the volumetric heat capacity of the material
+     */
 
     void fill_solid_cell_top
     (
@@ -109,13 +194,21 @@ extern "C"
         SolidVHC_t          solid_vhc
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Overwrites the content a solid thermal cell when the heat sink is used
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param solid_tc     the thermal conductivity of the material
+     * \param ambient_htc  the heat transfer coefficient of the air (CHECKME)
+     */
 
     void fill_solid_cell_conventional_heat_sink
     (
         ThermalCell         *thermal_cell,
-
-        Time_t              delta_time,
 
         CellDimension_t     cell_length,
         CellDimension_t     cell_width,
@@ -125,7 +218,20 @@ extern "C"
         AmbientHTC_t        ambient_htc
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Fill a liquid thermal cell as if it belongs to a microchannel modeled with 4 resistances
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param delta_time   the time step of the simulation
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param nchannels    the number of microchannels in the channel layer
+     * \param coolant_htcs the set of heat transfer coefficients of the coolant
+     * \param coolant_vhc  the volumetric heat capacity of the coolant
+     * \param coolant_fr   the flow rate of the coolant
+     */
 
     void fill_liquid_cell_mc_4rm
     (
@@ -143,7 +249,23 @@ extern "C"
         CoolantFR_t         coolant_fr
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Fill a liquid thermal cell as if it belongs to a microchannel modeled with 2 resistances
+     *
+     * \param thermal_cell   the address of the thermal cell to fill
+     * \param delta_time     the time step of the simulation
+     * \param cell_length    the length \a l of the thermal cell
+     * \param cell_width     the width \a w of the thermal cell
+     * \param cell_height    the height \a h of the thermal cell
+     * \param nchannels      the number of microchannels in the channel layer
+     * \param channel_length the length of the channel
+     * \param channel_pitch  the pitch of the channel
+     * \param porosity       FIXME
+     * \param coolant_htcs   the set of heat transfer coefficients of the coolant
+     * \param coolant_vhc    the volumetric heat capacity of the coolant
+     * \param coolant_fr     the flow rate of the coolant
+     */
 
     void fill_liquid_cell_mc_2rm
     (
@@ -155,20 +277,30 @@ extern "C"
         CellDimension_t     cell_width,
         CellDimension_t     cell_height,
 
-        ChannelModel_t      channel_model,
-
         GridDimension_t     nchannels,
-        CellDimension_t     channel_width,
+        CellDimension_t     channel_length,
         CellDimension_t     channel_pitch,
 
         Porosity_t          porosity,
         CoolantHTCs_t       coolant_htcs,
         CoolantVHC_t        coolant_vhc,
-        CoolantFR_t         coolant_fr,
-        DarcyVelocity_t     darcy_velocity
+        CoolantFR_t         coolant_fr
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Fill a liquid thermal cell as if it belongs to a channel with pin fins
+     *
+     * \param thermal_cell     the address of the thermal cell to fill
+     * \param delta_time       the time step of the simulation
+     * \param cell_length      the length \a l of the thermal cell
+     * \param cell_width       the width \a w of the thermal cell
+     * \param cell_height      the height \a h of the thermal cell
+     * \param pin_distribution the distribution of the pin fins
+     * \param porosity         FIXME
+     * \param coolant_vhc      the volumetric heat capacity of the coolant
+     * \param darcy_velocity   the darcy velocity of the coolant
+     */
 
     void fill_liquid_cell_pf
     (
@@ -180,52 +312,32 @@ extern "C"
         CellDimension_t     cell_width,
         CellDimension_t     cell_height,
 
-        ChannelModel_t      channel_model,
-
-        GridDimension_t     nchannels,
-        CellDimension_t     channel_width,
-        CellDimension_t     channel_pitch,
+        ChannelModel_t      pin_distribution,
 
         Porosity_t          porosity,
-        CoolantHTCs_t       coolant_htcs,
         CoolantVHC_t        coolant_vhc,
-        CoolantFR_t         coolant_fr,
         DarcyVelocity_t     darcy_velocity
     ) ;
 
-/******************************************************************************/
 
-    void fill_wall_cell_mc_2rm
-    (
-        ThermalCell         *thermal_cell,
 
-        Time_t              delta_time,
-
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height
-    ) ;
-
-/******************************************************************************/
-
-    void fill_wall_cell_pf
-    (
-        ThermalCell         *thermal_cell,
-
-        Time_t              delta_time,
-
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height
-    ) ;
-
-/******************************************************************************/
+    /*! Fill a solid cell that belongs to the virtual wall layer of a microchannel modeled with 2 resistances
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param delta_time   the time step of the simulation
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param porosity     FIXME
+     * \param solid_tc     the thermal conductivity of the material composing the walls
+     * \param solid_vhc    the volumetric heat capacity of the material composing the walls
+     */
 
     void fill_virtual_wall_cell_mc_2rm
     (
         ThermalCell         *thermal_cell,
 
-        Time_t              time,
+        Time_t              delta_time,
 
         CellDimension_t     cell_length,
         CellDimension_t     cell_width,
@@ -236,7 +348,19 @@ extern "C"
         SolidVHC_t          solid_vhc
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Fill a solid cell that belongs to the virtual wall layer of a channel with pin fins
+     *
+     * \param thermal_cell the address of the thermal cell to fill
+     * \param delta_time   the time step of the simulation
+     * \param cell_length  the length \a l of the thermal cell
+     * \param cell_width   the width \a w of the thermal cell
+     * \param cell_height  the height \a h of the thermal cell
+     * \param porosity     FIXME
+     * \param solid_tc     the thermal conductivity of the material composing the walls
+     * \param solid_vhc    the volumetric heat capacity of the material composing the walls
+     */
 
     void fill_virtual_wall_cell_pf
     (

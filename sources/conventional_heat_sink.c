@@ -126,7 +126,6 @@ void print_detailed_conventional_heat_sink
 void fill_thermal_cell_conventional_heat_sink
 (
    ThermalCell*          thermalcells,
-   Time_t                delta_time,
    Dimensions*           dimensions,
    ConventionalHeatSink* conventionalheatsink
 )
@@ -149,7 +148,7 @@ void fill_thermal_cell_conventional_heat_sink
 
             fill_solid_cell_conventional_heat_sink
             (
-                thermalcells, delta_time,
+                thermalcells,
                 get_cell_length(dimensions, column_index),
                 get_cell_width(dimensions, row_index),
                 conventionalheatsink->TopLayer->Height,
