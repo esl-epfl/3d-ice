@@ -145,14 +145,23 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_cell_die
-  (
-    ThermalCell*     thermalcells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Die*             die
-  ) ;
+    /*! Fills the thermal cells corresponding to a die
+     *
+     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
+     *  \param delta_time    the time resolution of the thermal simulation
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param layer_index   offset (#layers) of the die within the stack
+     *  \param die           pointer to the die
+     */
+
+    void fill_thermal_cell_die
+    (
+        ThermalCell     *thermal_cells,
+        Time_t           delta_time,
+        Dimensions      *dimensions,
+        GridDimension_t  layer_index,
+        Die             *die
+    ) ;
 
 /******************************************************************************/
 

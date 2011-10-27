@@ -398,8 +398,6 @@ static void fill_thermal_cell_channel_2rm
             } // FOR_EVERY_COLUMN
         } // FOR_EVERY_ROW
     }
-
-    return ;
 }
 
 /******************************************************************************/
@@ -525,8 +523,6 @@ static void fill_thermal_cell_channel_pf
             } // FOR_EVERY_COLUMN
         } // FOR_EVERY_ROW
     }
-
-    return ;
 }
 
 /******************************************************************************/
@@ -573,8 +569,6 @@ void fill_thermal_cell_channel
                 "Error: unkonw channel model %d\n",
                 channel->ChannelModel) ;
     }
-
-    return ;
 }
 
 /******************************************************************************/

@@ -279,31 +279,22 @@ int fill_floorplans (StackDescription* stkd)
 
 void fill_thermal_cell_stack_description
 (
-  ThermalCell*      thermalcells,
-  Time_t            delta_time,
-  StackDescription* stkd
+    ThermalCell      *thermal_cells,
+    Time_t            delta_time,
+    StackDescription *stkd
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
-  {
-    fill_thermal_cell_stack_element
-    (
-      thermalcells,
-      delta_time,
-      stkd->Dimensions,
-      stack_element
-    ) ;
-  }
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
 
-  if (stkd->ConventionalHeatSink)
+        fill_thermal_cell_stack_element
 
-    fill_thermal_cell_conventional_heat_sink
-    (
-      thermalcells,
-      stkd->Dimensions,
-      stkd->ConventionalHeatSink
-    ) ;
+            (thermal_cells, delta_time, stkd->Dimensions, stack_element) ;
+
+    if (stkd->ConventionalHeatSink)
+
+        fill_thermal_cell_conventional_heat_sink
+
+            (thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
 }
 
 /******************************************************************************/

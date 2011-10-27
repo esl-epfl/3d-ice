@@ -149,14 +149,24 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Fill the 3d grid of thermal cells */
+    /*! Fills the 3d grid of thermal cells
+     *
+     *  The function fills all the thermal cells representing the 3d volume
+     *  of the IC stack, starting from the bottom-most stack element. If the
+     *  heat sink is used, it adapts the top-most layer to connect it to
+     *  the enviroment and enable heat dissipation.
+     *
+     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
+     *  \param delta_time    the time resolution of the thermal simulation
+     *  \param stkd          pointer to the stack descritpion structure
+     */
 
-  void fill_thermal_cell_stack_description
-  (
-    ThermalCell*      thermalcells,
-     Time_t            delta_time,
-     StackDescription* stkd
-  ) ;
+    void fill_thermal_cell_stack_description
+    (
+        ThermalCell      *thermal_cells,
+        Time_t            delta_time,
+        StackDescription *stkd
+    ) ;
 
   /* Fill the source vector (power traces and channel inlets) */
 

@@ -237,66 +237,51 @@ void print_detailed_stack_elements_list
 
 void fill_thermal_cell_stack_element
 (
-  ThermalCell*     thermalcells,
-  Time_t           delta_time,
-  Dimensions*      dimensions,
-  StackElement*    stack_element
+    ThermalCell  *thermal_cells,
+    Time_t        delta_time,
+    Dimensions   *dimensions,
+    StackElement *stack_element
 )
 {
-  switch (stack_element->Type)
-  {
-    case TDICE_STACK_ELEMENT_DIE :
+    switch (stack_element->Type)
+    {
+        case TDICE_STACK_ELEMENT_DIE :
 
-      fill_thermal_cell_die
-      (
-        thermalcells,
-        delta_time,
-        dimensions,
-        stack_element->Offset,
-        stack_element->Pointer.Die
-      ) ;
+            fill_thermal_cell_die
 
-      break ;
+                (thermal_cells, delta_time, dimensions,
+                 stack_element->Offset, stack_element->Pointer.Die) ;
 
-    case TDICE_STACK_ELEMENT_LAYER :
+            break ;
 
-      fill_thermal_cell_layer
-      (
-        thermalcells,
-        delta_time,
-        dimensions,
-        stack_element->Offset,
-        stack_element->Pointer.Layer
-      ) ;
+        case TDICE_STACK_ELEMENT_LAYER :
 
-      break ;
+            fill_thermal_cell_layer
 
-    case TDICE_STACK_ELEMENT_CHANNEL :
+                (thermal_cells, delta_time, dimensions,
+                 stack_element->Offset, stack_element->Pointer.Layer) ;
 
-      fill_thermal_cell_channel
-      (
-        thermalcells,
-        delta_time,
-        dimensions,
-        stack_element->Offset,
-        stack_element->Pointer.Channel
-      ) ;
+            break ;
 
-      break ;
+        case TDICE_STACK_ELEMENT_CHANNEL :
 
-    case TDICE_STACK_ELEMENT_NONE :
+            fill_thermal_cell_channel
 
-      fprintf (stderr,
-        "Error! Found stack element with unset type\n") ;
-      break ;
+                (thermal_cells, delta_time, dimensions,
+                 stack_element->Offset, stack_element->Pointer.Channel) ;
 
-    default :
+            break ;
 
-      fprintf (stderr,
-        "Error! Unknown stack element type %d\n",
-        stack_element->Type) ;
+        case TDICE_STACK_ELEMENT_NONE :
 
-  } /* switch stack_element->Type */
+            fprintf (stderr, "Error! Found stack element with unset type\n") ;
+            break ;
+
+        default :
+
+            fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
+
+    } /* switch stack_element->Type */
 }
 
 /******************************************************************************/

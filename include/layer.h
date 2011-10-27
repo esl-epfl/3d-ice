@@ -130,14 +130,23 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_cell_layer
-  (
-    ThermalCell*     thermalcells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Layer*           layer
-  ) ;
+    /*! Fills the thermal cells corresponding to a layer in the stack
+     *
+     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
+     *  \param delta_time    the time resolution of the thermal simulation
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param layer_index   offset (#layers) of the layer within the stack
+     *  \param channel       pointer to the layer
+     */
+
+    void fill_thermal_cell_layer
+    (
+        ThermalCell*     thermal_cells,
+        Time_t           delta_time,
+        Dimensions*      dimensions,
+        GridDimension_t  layer_index,
+        Layer*           layer
+    ) ;
 
 /******************************************************************************/
 

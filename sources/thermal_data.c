@@ -136,9 +136,8 @@ int fill_thermal_data
   if (tdata->ThermalCells == NULL)  goto thermal_cell_data_fail ;
 
   fill_thermal_cell_stack_description
-  (
-    tdata->ThermalCells, tdata->StepTime, stkd
-  ) ;
+
+      (tdata->ThermalCells, tdata->StepTime, stkd) ;
 
   /* Alloc and set sources */
 

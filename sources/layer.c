@@ -147,7 +147,7 @@ void print_detailed_layers_list (FILE* stream, String_t prefix, Layer* list)
 
 void fill_thermal_cell_layer
 (
-    ThermalCell*     thermalcells,
+    ThermalCell*     thermal_cells,
     Time_t           delta_time,
     Dimensions*      dimensions,
     GridDimension_t  layer_index,
@@ -158,11 +158,11 @@ void fill_thermal_cell_layer
                        CellDimension_t, CellDimension_t, CellDimension_t,
                        SolidTC_t, SolidVHC_t) ;
 
-    if (IS_FIRST_LAYER(layer_index))
+    if (IS_FIRST_LAYER (layer_index))
 
         fill_cell = fill_solid_cell_bottom ;
 
-    else if (IS_LAST_LAYER(layer_index, dimensions))
+    else if (IS_LAST_LAYER (layer_index, dimensions))
 
         fill_cell = fill_solid_cell_top ;
 
@@ -170,7 +170,11 @@ void fill_thermal_cell_layer
 
         fill_cell = fill_solid_cell_central ;
 
-    thermalcells += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+    GridDimension_t cell_index
+
+        = get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+
+    thermal_cells += cell_index ;
 
     FOR_EVERY_ROW (row_index, dimensions)
     {
@@ -179,18 +183,17 @@ void fill_thermal_cell_layer
 #ifdef PRINT_THERMAL_CELLS
             fprintf (stderr,
                 "  l %2d r %4d c %4d [%7d] ",
-                layer_index, row_index, column_index,
-                get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
+                layer_index, row_index, column_index, cell_index++) ;
 #endif
 
-            fill_cell (thermalcells, delta_time,
+            fill_cell (thermal_cells, delta_time,
                        get_cell_length(dimensions, column_index),
                        get_cell_width(dimensions, row_index),
                        layer->Height,
                        layer->Material->ThermalConductivity,
                        layer->Material->VolumetricHeatCapacity) ;
 
-            thermalcells ++ ;
+            thermal_cells ++ ;
         }
     }
 }

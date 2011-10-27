@@ -223,23 +223,18 @@ Die* find_die_in_list (Die* list, String_t id)
 
 void fill_thermal_cell_die
 (
-  ThermalCell*     thermalcells,
-  Time_t           delta_time,
-  Dimensions*      dimensions,
-  GridDimension_t  layer_index,
-  Die*             die
+    ThermalCell*     thermal_cells,
+    Time_t           delta_time,
+    Dimensions*      dimensions,
+    GridDimension_t  layer_index,
+    Die*             die
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
 
-    fill_thermal_cell_layer
-    (
-      thermalcells,
-      delta_time,
-      dimensions,
-      layer_index + layer->Offset,
-      layer
-    ) ;
+        fill_thermal_cell_layer
+
+            (thermal_cells, delta_time, dimensions, layer_index++, layer) ;
 }
 
 /******************************************************************************/

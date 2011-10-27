@@ -132,13 +132,21 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_cell_stack_element
-  (
-    ThermalCell*          thermalcells,
-    Time_t                delta_time,
-    Dimensions*           dimensions,
-    StackElement*         stack_element
-  ) ;
+    /*! Fill the thermal cells corresponding to a stack element
+     *
+     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
+     *  \param delta_time    the time resolution of the thermal simulation
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param stack_element pointer to the stack element
+     */
+
+    void fill_thermal_cell_stack_element
+    (
+        ThermalCell*          thermal_cells,
+        Time_t                delta_time,
+        Dimensions*           dimensions,
+        StackElement*         stack_element
+    ) ;
 
 /******************************************************************************/
 

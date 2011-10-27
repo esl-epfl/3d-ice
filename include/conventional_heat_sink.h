@@ -103,12 +103,22 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_thermal_cell_conventional_heat_sink
-  (
-     ThermalCell*          thermalcells,
-     Dimensions*           dimensions,
-     ConventionalHeatSink* conventionalheatsink
-  ) ;
+    /*! Applies the conventional heat sink to the grid of thermal cells
+     *
+     *  The function adapts the top-most layer of the 3d stack to connect it to
+     *  the enviroment and to enable heat dissipation.
+     *
+     *  \param thermal_cells          pointer to the first thermal cell in the 3d grid
+     *  \param dimensions             pointer to the structure storing the dimensions
+     *  \param conventional_heat_sink pointer to the heat sink structure
+     */
+
+    void fill_thermal_cell_conventional_heat_sink
+    (
+       ThermalCell          *thermal_cells,
+       Dimensions           *dimensions,
+       ConventionalHeatSink *conventional_heat_sink
+    ) ;
 
 /******************************************************************************/
 
