@@ -67,6 +67,10 @@ extern "C"
 
     GridDimension_t NLayers ;
 
+    /* The offset (#layers) of the source layer within the die */
+
+    GridDimension_t SourceLayerOffset ;
+
     /* Pointer to the top-most layer */
 
     Layer* TopLayer ;
@@ -165,14 +169,28 @@ extern "C"
 
 /******************************************************************************/
 
-  int fill_sources_die
-  (
-    Source_t*             sources,
-    Dimensions*           dimensions,
-    GridDimension_t       layer_index,
-    Floorplan*            floorplan,
-    Die*                  die
-  ) ;
+    /*! Fills the source vector corresponding to a die
+     *
+     *  \param sources     pointer to the first element in the source vector
+     *  \param dimensions  pointer to the structure storing the dimensions
+     *  \param layer_index offset (#layers) of the die within the stack
+     *  \param floorplan   pointer to the floorplan placed on the source layer
+     *  \param die         pointer to the die
+     *
+     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
+     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
+     *                           (at least one floorplan element with no power
+     *                            values in its queue)
+     */
+
+    Error_t fill_sources_die
+    (
+        Source_t        *sources,
+        Dimensions      *dimensions,
+        GridDimension_t  layer_index,
+        Floorplan       *floorplan,
+        Die             *die
+    ) ;
 
 /******************************************************************************/
 

@@ -169,17 +169,17 @@ CellDimension_t get_cell_length
   GridDimension_t column_index
 )
 {
-  if (IS_FIRST_COLUMN(column_index))
+  if (IS_FIRST_COLUMN (column_index))
 
     return dimensions->Cell.FirstWallLength ;
 
-  else if (IS_LAST_COLUMN(column_index, dimensions))
+  else if (IS_LAST_COLUMN (column_index, dimensions))
 
     return dimensions->Cell.LastWallLength ;
 
   else
 
-    if (IS_CHANNEL_COLUMN(column_index))
+    if (column_index & 1)
 
       return dimensions->Cell.ChannelLength ;
 

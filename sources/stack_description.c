@@ -299,11 +299,11 @@ void fill_thermal_cell_stack_description
 
 /******************************************************************************/
 
-int fill_sources_stack_description
+Error_t fill_sources_stack_description
 (
-  Source_t*         sources,
-  ThermalCell*      thermalcells,
-  StackDescription* stkd
+    Source_t         *sources,
+    ThermalCell      *thermal_cells,
+    StackDescription *stkd
 )
 {
 #ifdef PRINT_SOURCES
@@ -321,27 +321,23 @@ int fill_sources_stack_description
 
     for (ccounter = 0 ; ccounter != ncells ; ccounter++)
 
-        sources [ ccounter ] = 0.0 ;
+        sources [ ccounter ] = SOURCE_I ;
 
     // set the sources due to the heatsink (overwrites all cells in the last layer)
 
     if (stkd->ConventionalHeatSink != NULL)
 
         fill_sources_conventional_heat_sink
-        (
-            sources,
-            thermalcells,
-            stkd->Dimensions,
-            stkd->ConventionalHeatSink
-        ) ;
+
+            (sources, thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
 
-        if (fill_sources_stack_element (sources, stkd->Dimensions, stack_element) != 0)
+        if (fill_sources_stack_element (sources, stkd->Dimensions, stack_element) == TDICE_FAILURE)
 
-            return 1 ;
+            return TDICE_FAILURE ;
 
-    return 0 ;
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

@@ -286,27 +286,24 @@ void fill_thermal_cell_stack_element
 
 /******************************************************************************/
 
-int fill_sources_stack_element
+Error_t fill_sources_stack_element
 (
-  Source_t*             sources,
-  Dimensions*           dimensions,
-  StackElement*         stack_element
+    Source_t     *sources,
+    Dimensions   *dimensions,
+    StackElement *stack_element
 )
 {
-    int toreturn = 0 ;
+    Error_t toreturn = TDICE_SUCCESS ;
 
     switch (stack_element->Type)
     {
         case TDICE_STACK_ELEMENT_DIE :
 
             toreturn = fill_sources_die
-                       (
-                        sources,
-                        dimensions,
-                        stack_element->Offset,
-                        stack_element->Floorplan,
-                        stack_element->Pointer.Die
-                       ) ;
+
+                (sources, dimensions, stack_element->Offset,
+                 stack_element->Floorplan, stack_element->Pointer.Die) ;
+
             break ;
 
         case TDICE_STACK_ELEMENT_LAYER :
@@ -316,12 +313,10 @@ int fill_sources_stack_element
         case TDICE_STACK_ELEMENT_CHANNEL :
 
             fill_sources_channel
-            (
-                sources,
-                dimensions,
-                stack_element->Offset,
-                stack_element->Pointer.Channel
-            ) ;
+
+                (sources, dimensions, stack_element->Offset,
+                 stack_element->Pointer.Channel) ;
+
             break ;
 
         case TDICE_STACK_ELEMENT_NONE :
@@ -442,7 +437,6 @@ SystemMatrix fill_system_matrix_stack_element
 
             system_matrix = fill_system_matrix_layer
                             (
-                                stack_element->Pointer.Layer,
                                 dimensions,
                                 thermalcells, stack_element->Offset,
                                 system_matrix

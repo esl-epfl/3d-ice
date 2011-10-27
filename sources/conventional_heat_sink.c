@@ -171,46 +171,47 @@ void fill_thermal_cell_conventional_heat_sink
 
 void fill_sources_conventional_heat_sink
 (
-  Source_t*             sources,
-  ThermalCell*          thermalcells,
-  Dimensions*           dimensions,
-  ConventionalHeatSink* conventionalheatsink
+    Source_t             *sources,
+    ThermalCell          *thermal_cells,
+    Dimensions           *dimensions,
+    ConventionalHeatSink *conventional_heat_sink
 )
 {
+    GridDimension_t layer_index = LAST_LAYER_INDEX (dimensions) ;
+
 #ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "layer_index = %d\tadd_sources_conventional_heat_sink\n",
-    LAST_LAYER_INDEX(dimensions)) ;
+    fprintf (stderr,
+        "layer_index = %d\tadd_sources_conventional_heat_sink\n",
+        layer_index) ;
 #endif
 
-  sources += get_cell_offset_in_stack (dimensions,
-                                       LAST_LAYER_INDEX(dimensions), 0, 0) ;
+    GridDimension_t cell_index =
 
-  thermalcells += get_cell_offset_in_stack (dimensions,
-                                           LAST_LAYER_INDEX(dimensions), 0, 0) ;
+        get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-  FOR_EVERY_ROW (row_index, dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    thermal_cells += cell_index ;
+    sources       += cell_index ;
+
+    FOR_EVERY_ROW (row_index, dimensions)
     {
-        *sources = conventionalheatsink->AmbientTemperature
-                   * thermalcells->Top ;
+        FOR_EVERY_COLUMN (column_index, dimensions)
+        {
+            *sources = conventional_heat_sink->AmbientTemperature
+                       * thermal_cells->Top ;
 
-#       ifdef PRINT_SOURCES
-        fprintf (stderr,
-            "solid  cell  |  l %2d r %4d c %4d [%7d] | = %f * %.5e = %.5e\n",
-            LAST_LAYER_INDEX(dimensions), row_index, column_index,
-            get_cell_offset_in_stack (dimensions,
-                                      LAST_LAYER_INDEX(dimensions), row_index, column_index),
-            conventionalheatsink->AmbientTemperature,
-            thermalcells->Top,
-            *sources) ;
-#       endif
+#ifdef PRINT_SOURCES
+            fprintf (stderr,
+                "solid  cell  |  l %2d r %4d c %4d [%7d] | = %f * %.5e = %.5e\n",
+                layer_index, row_index, column_index, cell_index++,
+                conventional_heat_sink->AmbientTemperature,
+                thermal_cells->Top, *sources) ;
+#endif
 
-        sources++ ;
-        thermalcells ++ ;
-    } // FOR_EVERY_COLUMN
-  } // FOR_EVERY_ROW
+            sources++ ;
+            thermal_cells ++ ;
+
+        } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
 }
 
 /******************************************************************************/

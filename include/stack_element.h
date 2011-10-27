@@ -142,20 +142,27 @@ extern "C"
 
     void fill_thermal_cell_stack_element
     (
-        ThermalCell*          thermal_cells,
-        Time_t                delta_time,
-        Dimensions*           dimensions,
-        StackElement*         stack_element
+        ThermalCell  *thermal_cells,
+        Time_t        delta_time,
+        Dimensions   *dimensions,
+        StackElement *stack_element
     ) ;
 
-/******************************************************************************/
 
-  int fill_sources_stack_element
-  (
-    Source_t*             sources,
-    Dimensions*           dimensions,
-    StackElement*         stack_element
-  ) ;
+
+    /*! Fills the source vector corresponding to a stack element
+     *
+     *  \param sources       pointer to the first element in the source vector
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param stack_element pointer to the stack element
+     */
+
+    Error_t fill_sources_stack_element
+    (
+        Source_t     *sources,
+        Dimensions   *dimensions,
+        StackElement *stack_element
+    ) ;
 
 /******************************************************************************/
 

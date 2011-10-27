@@ -115,20 +115,20 @@ void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan)
 
 /******************************************************************************/
 
-int fill_sources_floorplan
+Error_t fill_sources_floorplan
 (
-  Source_t*   sources,
-  Dimensions* dimensions,
-  Floorplan*  floorplan
+    Source_t   *sources,
+    Dimensions *dimensions,
+    Floorplan  *floorplan
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element, floorplan->ElementsList)
-    {
-        if (fill_sources_floorplan_element (sources, dimensions, floorplan_element) != 0 )
 
-            return 1 ;
-    }
-    return 0 ;
+        if (fill_sources_floorplan_element (sources, dimensions, floorplan_element) == TDICE_FAILURE)
+
+            return TDICE_FAILURE ;
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

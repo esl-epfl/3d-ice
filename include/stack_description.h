@@ -168,14 +168,29 @@ extern "C"
         StackDescription *stkd
     ) ;
 
-  /* Fill the source vector (power traces and channel inlets) */
+    /*! Fills the source vector
+     *
+     *  The function resets the source vector. If the heat sink is used,
+     *  it inserts power values into the thermal cells in the top-most layer.
+     *  Then, it extracts power traces from each floorplan elements and power
+     *  related to the inlet of the channels.
+     *
+     *  \param sources       pointer to the first element in the source vector
+     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
+     *  \param stkd          pointer to the stack descritpion structure
+     *
+     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
+     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
+     *                           (at least one floorplan element with no power
+     *                            values in its queue)
+     */
 
-  int fill_sources_stack_description
-  (
-    Source_t*         sources,
-    ThermalCell*      thermalcells,
-    StackDescription* stkd
-  ) ;
+    Error_t fill_sources_stack_description
+    (
+        Source_t         *sources,
+        ThermalCell      *thermal_cells,
+        StackDescription *stkd
+    ) ;
 
   /* Update the only source value corresponding to the channel inlets */
 

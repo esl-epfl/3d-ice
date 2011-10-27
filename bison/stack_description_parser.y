@@ -592,7 +592,7 @@ die
         die->SourceLayer = $5 ;
 
         // The layers within a die are declared in the stack file from top
-        // to bottom but here we revert it: the first layer in the list
+        // to bottom but here we revert the order: the first layer in the list
         // LayersList will be the bottom-most layer in the die
 
         if ($6 != NULL)
@@ -602,9 +602,18 @@ die
 
             die->BottomLayer = $6 ;
 
+            die->NLayers++ ;
+            die->SourceLayerOffset++ ;
+
             // $6 moved until the end ..
 
-            while ($6->Next != NULL) $6 = $6->Next ;
+            while ($6->Next != NULL)
+            {
+                $6 = $6->Next ;
+
+                die->NLayers++ ;
+                die->SourceLayerOffset++ ;
+            }
 
             // the list $6 continues with the source layer $5
 
@@ -618,6 +627,8 @@ die
             die->BottomLayer = $5 ;
         }
 
+        die->NLayers++ ;
+
         if ($4 != NULL)
         {
             // if there are layers above the source
@@ -625,9 +636,16 @@ die
 
             JOIN_ELEMENTS ($5, $4) ;
 
+            die->NLayers++ ;
+
             // $4 moved until the end ..
 
-            while ($4->Next != NULL) $4 = $4->Next ;
+            while ($4->Next != NULL)
+            {
+                $4 = $4->Next ;
+
+                die->NLayers++ ;
+            }
 
             // the list finishes with the last layer in $4
 
@@ -640,18 +658,6 @@ die
 
             die->TopLayer = $5 ;
         }
-
-        // Computation of the layer's offset within the die
-
-        GridDimension_t layer_offset = GRIDDIMENSION_I ;
-
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
-
-            layer->Offset = layer_offset++ ;
-
-        // Save the number of layers
-
-        die->NLayers = layer_offset ;
     }
   ;
 

@@ -122,13 +122,21 @@ extern "C"
 
 /******************************************************************************/
 
-  void fill_sources_conventional_heat_sink
-  (
-    Source_t*             sources,
-    ThermalCell*          thermalcells,
-    Dimensions*           dimensions,
-    ConventionalHeatSink* conventionalheatsink
-  ) ;
+    /*! Fills the source vector to enable heat dissipation through the heat sink
+     *
+     *  \param sources                pointer to the first element in the source vector
+     *  \param thermal_cells          pointer to the first thermal cell in the 3d grid
+     *  \param dimensions             pointer to the structure storing the dimensions
+     *  \param conventional_heat_sink pointer to the heat sink structure
+     */
+
+    void fill_sources_conventional_heat_sink
+    (
+        Source_t             *sources,
+        ThermalCell          *thermal_cells,
+        Dimensions           *dimensions,
+        ConventionalHeatSink *conventional_heat_sink
+    ) ;
 
 /******************************************************************************/
 

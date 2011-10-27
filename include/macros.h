@@ -141,8 +141,12 @@ extern "C"
 
 # define IS_FIRST_COLUMN(column)      (column == FIRST_COLUMN_INDEX)
 # define IS_LAST_COLUMN(column, dim)  (column == LAST_COLUMN_INDEX(dim))
-# define IS_CHANNEL_COLUMN(column)    (column & 1)
-# define IS_WALL_COLUMN(column)       (! IS_CHANNEL_COLUMN(column) )
+
+# define IS_CHANNEL_COLUMN(channel_model, column) \
+                                                  \
+        (channel_model == TDICE_CHANNEL_MODEL_MC_RM4 ? column & 1 : TRUE_V)
+
+# define IS_WALL_COLUMN(column)       (! IS_CHANNEL_COLUMN(column))
 
 # define FOR_EVERY_COLUMN(index, dim)                      \
                                                            \

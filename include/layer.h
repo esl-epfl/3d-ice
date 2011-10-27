@@ -60,10 +60,6 @@ extern "C"
 
     CellDimension_t Height ;
 
-    /* The offset (#of layers) counting from the first layer in the die */
-
-    GridDimension_t Offset ;
-
     /* The material composing the layer */
 
     Material* Material ;
@@ -150,20 +146,8 @@ extern "C"
 
 /******************************************************************************/
 
-  int fill_sources_layer
-  (
-    Source_t*             sources,
-    Dimensions*           dimensions,
-    GridDimension_t       layer_index,
-    Floorplan*            floorplan,
-    Layer*                layer
-  ) ;
-
-/******************************************************************************/
-
   SystemMatrix fill_system_matrix_layer
   (
-    Layer*                layer,
     Dimensions*           dimensions,
     ThermalCell*          thermalcells,
     GridDimension_t       layer_index,

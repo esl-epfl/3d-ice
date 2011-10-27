@@ -43,7 +43,6 @@
 void init_layer (Layer* layer)
 {
   layer->Height   = CELLDIMENSION_I ;
-  layer->Offset   = GRIDDIMENSION_I ;
   layer->Material = NULL ;
   layer->Next     = NULL ;
   layer->Prev     = NULL ;
@@ -104,10 +103,6 @@ void print_detailed_layer
   fprintf (stream,
            "%s  Height                = %.1f\n",
            prefix, layer->Height) ;
-
-  fprintf (stream,
-           "%s  Offset                = %d\n",
-           prefix, layer->Offset) ;
 
   fprintf (stream,
            "%s  Material              = %p\n",
@@ -200,45 +195,16 @@ void fill_thermal_cell_layer
 
 /******************************************************************************/
 
-int fill_sources_layer
-(
-  Source_t*             sources,
-  Dimensions*           dimensions,
-  GridDimension_t       layer_index,
-  Floorplan*            floorplan,
-  Layer*                layer
-)
-{
-  layer_index += layer->Offset ;
-
-#ifdef PRINT_SOURCES
-  fprintf (stderr,
-           "layer_index = %d\tfill_sources_source_layer   %s\n",
-           layer_index, layer->Material->Id) ;
-#endif
-
-  sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-  return fill_sources_floorplan (sources, dimensions, floorplan) ;
-}
-
-/******************************************************************************/
-
 SystemMatrix fill_system_matrix_layer
 (
-    Layer            *layer,
     Dimensions       *dimensions,
     ThermalCell      *thermalcells,
     GridDimension_t  layer_index,
     SystemMatrix     system_matrix
 )
 {
-    layer_index += layer->Offset ;
-
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-        "(l %2d) fill_system_matrix_layer %s\n",
-        layer_index, layer->Material->Id) ;
+    fprintf (stderr, "(l %2d) fill_system_matrix_layer \n", layer_index) ;
 #endif
 
     FOR_EVERY_ROW (row_index, dimensions)

@@ -438,7 +438,7 @@ int get_max_temperature_of_floorplan_element
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -482,7 +482,7 @@ int get_min_temperature_of_floorplan_element
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -526,7 +526,7 @@ int get_avg_temperature_of_floorplan_element
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -572,7 +572,7 @@ int get_min_avg_max_temperatures_of_floorplan_element
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -660,7 +660,7 @@ int get_all_max_temperatures_of_floorplan
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -704,7 +704,7 @@ int get_all_min_temperatures_of_floorplan
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -748,7 +748,7 @@ int get_all_avg_temperatures_of_floorplan
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -795,7 +795,7 @@ int get_all_min_avg_max_temperatures_of_floorplan
            (
              stkd->Dimensions,
              stk_el->Offset
-             + stk_el->Pointer.Die->SourceLayer->Offset,
+             + stk_el->Pointer.Die->SourceLayerOffset,
              0, 0
            ) ;
 
@@ -810,47 +810,6 @@ int get_all_min_avg_max_temperatures_of_floorplan
   ) ;
 
  return 0 ;
-}
-
-/******************************************************************************/
-
-int get_all_temperatures_of_channel_outlets
-(
-  StackDescription* stkd,
-  ThermalData*      tdata,
-  String_t          channel_id,
-  Temperature_t*    outlet_temperature
-)
-{
-  Temperature_t*  temperature_offset = NULL ;
-  StackElement*   stk_el             = find_stack_element_in_list
-                                       (
-                                         stkd->BottomStackElement,
-                                         channel_id
-                                       ) ;
-  if (stk_el == NULL)
-
-    return -1 ;
-
-  if (stk_el->Type != TDICE_STACK_ELEMENT_CHANNEL)
-
-    return -2 ;
-
-  temperature_offset = tdata->Temperatures
-                       + get_cell_offset_in_stack
-                         (
-                           stkd->Dimensions, stk_el->Offset,
-                           get_number_of_rows(stkd->Dimensions) - 1, 0
-                         ) ;
-
-
-  FOR_EVERY_COLUMN (column_index, stkd->Dimensions)
-
-    if (IS_CHANNEL_COLUMN(column_index) == TRUE_V)
-
-    *outlet_temperature++ = *temperature_offset++ ;
-
-  return 0 ;
 }
 
 /******************************************************************************/
@@ -911,7 +870,7 @@ int print_thermal_map
   layer_offset = stk_el->Offset ;
 
   if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
-    layer_offset += stk_el->Pointer.Die->SourceLayer->Offset ;
+    layer_offset += stk_el->Pointer.Die->SourceLayerOffset ;
 
   Temperature_t* temperature_offset
     = tdata->Temperatures

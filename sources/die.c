@@ -43,13 +43,14 @@
 
 void init_die (Die* die)
 {
-  die->Id          = STRING_I ;
-  die->Used        = QUANTITY_I ;
-  die->NLayers     = GRIDDIMENSION_I ;
-  die->TopLayer    = NULL ;
-  die->SourceLayer = NULL ;
-  die->BottomLayer = NULL ;
-  die->Next        = NULL ;
+  die->Id                = STRING_I ;
+  die->Used              = QUANTITY_I ;
+  die->NLayers           = GRIDDIMENSION_I ;
+  die->SourceLayerOffset = GRIDDIMENSION_I ;
+  die->TopLayer          = NULL ;
+  die->SourceLayer       = NULL ;
+  die->BottomLayer       = NULL ;
+  die->Next              = NULL ;
 }
 
 /******************************************************************************/
@@ -239,24 +240,26 @@ void fill_thermal_cell_die
 
 /******************************************************************************/
 
-int fill_sources_die
+Error_t fill_sources_die
 (
-  Source_t*             sources,
-  Dimensions*           dimensions,
-  GridDimension_t       layer_index,
-  Floorplan*            floorplan,
-  Die*                  die
+    Source_t        *sources,
+    Dimensions      *dimensions,
+    GridDimension_t  layer_index,
+    Floorplan       *floorplan,
+    Die             *die
 )
 {
 #ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "layer_index = %d\tfill_sources_die %s floorplan %s\n",
-    layer_index, die->Id, floorplan->FileName) ;
+    fprintf (stderr,
+        "layer_index = %d\tfill_sources_die %s floorplan %s\n",
+        layer_index, die->Id, floorplan->FileName) ;
 #endif
 
-  return fill_sources_layer (sources, dimensions,
-                             layer_index,
-                             floorplan, die->SourceLayer) ;
+    layer_index += die->SourceLayerOffset ;
+
+    sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+
+    return fill_sources_floorplan (sources, dimensions, floorplan) ;
 }
 
 /******************************************************************************/
@@ -306,9 +309,8 @@ SystemMatrix fill_system_matrix_die
     {
         system_matrix = fill_system_matrix_layer
                         (
-                            layer,
                             dimensions, thermalcells,
-                            layer_index,
+                            layer_index++,
                             system_matrix
                         ) ;
 

@@ -94,22 +94,26 @@ void free_floorplan_elements_list (FloorplanElement* list)
 
 /******************************************************************************/
 
-int fill_sources_floorplan_element
+Error_t fill_sources_floorplan_element
 (
-    Source_t*         sources,
-    Dimensions*       dimensions,
-    FloorplanElement* floorplan_element
+    Source_t         *sources,
+    Dimensions       *dimensions,
+    FloorplanElement *floorplan_element
 )
 {
     if (is_empty_powers_queue (floorplan_element->PowerValues) == TRUE_V)
 
-        return 1 ;
+        return TDICE_FAILURE ;
 
     Power_t power = get_from_powers_queue(floorplan_element->PowerValues);
 
     CellDimension_t flp_el_surface
       = (CellDimension_t) (floorplan_element->EffectiveLength
                            * floorplan_element->EffectiveWidth) ;
+
+    // Here we ADD the power value to the source vector. It works as long as
+    // the source vector is set to zero every time. This way the vale is added
+    // in case this is the top most layer and the heatsink is used
 
     FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
     {
@@ -137,7 +141,7 @@ int fill_sources_floorplan_element
 
     pop_from_powers_queue (floorplan_element->PowerValues) ;
 
-    return 0 ;
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

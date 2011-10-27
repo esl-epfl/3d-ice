@@ -116,7 +116,8 @@ extern "C" {
     /*! Allocates a Material in memory and sets its fields to their default
      *  value with \c init_material
      *
-     * \return the pointer to a new Material or \c NULL if the memory allocation fails
+     * \return the pointer to a new Material
+     * \return \c NULL if the memory allocation fails
      */
 
     Material *alloc_and_init_material (void) ;
@@ -159,7 +160,8 @@ extern "C" {
      * \param list the pointer to the list
      * \param id   the identifier of the material to be found
      *
-     * \return the address of a Material, if founded, or \c NULL if the search fails
+     * \return the address of a Material, if founded
+     * \return \c NULL if the search fails
      */
 
     Material *find_material_in_list (Material *list, char *id) ;

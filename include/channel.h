@@ -149,15 +149,23 @@ extern "C"
         Channel         *channel
     ) ;
 
-/******************************************************************************/
 
-  void fill_sources_channel
-  (
-    Source_t*        sources,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Channel*         channel
-  ) ;
+
+    /*! Fills the source vector corresponding to a channel
+     *
+     *  \param sources     pointer to the first element in the source vector
+     *  \param dimensions  pointer to the structure storing the dimensions
+     *  \param layer_index offset (#layers) of the channel within the stack
+     *  \param channel     pointer to the channel
+     */
+
+    void fill_sources_channel
+    (
+        Source_t        *sources,
+        Dimensions      *dimensions,
+        GridDimension_t  layer_index,
+        Channel         *channel
+    ) ;
 
 /******************************************************************************/
 

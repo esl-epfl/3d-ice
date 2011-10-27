@@ -244,7 +244,7 @@ static void fill_thermal_cell_channel_4rm
                 layer_index, row_index, column_index, cell_index++) ;
 #endif
 
-            if (IS_CHANNEL_COLUMN(column_index))
+            if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == TRUE_V)
 
                 fill_liquid_cell_mc_4rm
                 (
@@ -575,68 +575,89 @@ void fill_thermal_cell_channel
 
 void fill_sources_channel
 (
-  Source_t*       sources,
-  Dimensions*     dimensions,
-  GridDimension_t layer_index,
-  Channel*        channel
+    Source_t        *sources,
+    Dimensions      *dimensions,
+    GridDimension_t  layer_index,
+    Channel         *channel
 )
 {
-  if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2 ||
-      channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
-      channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED) {
-    // In 2RM, the channel offset is the layer index of the bottom wall,
-    // so we need to add the offset of channel to "layer_index", which represents the layer index
-    // of the channel.
-    layer_index += 2;
-  }
-
-# ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "layer_index = %d\tfill_sources_channel %s\n",
-    layer_index, channel->WallMaterial->Id) ;
-# endif
-
-  Cconv_t C;
-
-  if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
-      channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED) {
-
-    C = CCONV_PF(channel->Coolant.VHC, channel->DarcyVelocity, get_cell_length(dimensions, 0), channel->Height);
-
-  } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
-
-    Quantity_t nchannels = (Quantity_t) ((get_chip_length(dimensions) / channel->Pitch) + 0.5); // round function
-    C = CCONV_MC_2RM(nchannels, channel->Coolant.VHC, channel->CoolantFR, channel->Porosity, get_cell_length(dimensions,0), channel->Length);
-
-  } else { //TDICE_CHANNEL_MODEL_MC_4RM
-
-    Quantity_t nchannels = (Quantity_t) ((get_number_of_columns (dimensions) - 1)  / 2) ;
-    C = CCONV_MC_4RM(nchannels, channel->Coolant.VHC, channel->CoolantFR);
-
-  }
-
-  sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-  FOR_EVERY_COLUMN (column_index, dimensions)
-  {
-    if (channel->ChannelModel != TDICE_CHANNEL_MODEL_MC_RM4
-        || IS_CHANNEL_COLUMN(column_index))
+  if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2
+      || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
+      || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
     {
-      *sources = 2.0 * C * channel->Coolant.TIn ;
+        // In 2RM, the channel offset is the layer index of the bottom wall,
+        // so we need to add the offset of channel to "layer_index", which
+        // represents the layer index of the channel.
 
-#     ifdef PRINT_SOURCES
-      fprintf (stderr,
-        "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
-        " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
-        column_index,
-        get_cell_length (dimensions, column_index), get_cell_width (dimensions, 0),
-        *sources, channel->CoolantTIn, C) ;
-#     endif
+        layer_index += 2;
     }
 
-    sources++ ;
+# ifdef PRINT_SOURCES
+    fprintf (stderr,
+        "layer_index = %d\tfill_sources_channel %s\n",
+        layer_index, channel->WallMaterial->Id) ;
+# endif
 
-  } // FOR_EVERY_COLUMN
+    // TODO
+
+    // This piece of code works as long as the 2rm channel model
+    // is implemented with an homogeneous cell length. Here we use the length
+    // of the cell in the first column. Otherwise, the computation of C must
+    // me put inside the column loop.
+
+    Cconv_t C;
+
+    if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
+        || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
+    {
+
+        C = CCONV_PF
+
+            (channel->Coolant.VHC, channel->DarcyVelocity,
+             get_cell_length (dimensions, 0), channel->Height);
+
+    }
+    else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
+    {
+
+        C = CCONV_MC_2RM
+
+            (channel->NChannels, channel->Coolant.VHC, channel->CoolantFR,
+             channel->Porosity, get_cell_length(dimensions,0), channel->Length) ;
+
+    }
+    else //TDICE_CHANNEL_MODEL_MC_4RM
+    {
+
+        C = CCONV_MC_4RM
+
+            (channel->NChannels, channel->Coolant.VHC, channel->CoolantFR);
+
+    }
+
+    sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
+
+    Source_t tmp = 2.0 * C * channel->Coolant.TIn ;
+
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+        if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == TRUE_V)
+        {
+            *sources = tmp ;
+
+#ifdef PRINT_SOURCES
+            fprintf (stderr,
+                "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
+                " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
+                column_index,
+                get_cell_length (dimensions, column_index), get_cell_width (dimensions, 0),
+                *sources, channel->Coolant.TIn, C) ;
+#endif
+        }
+
+        sources++ ;
+
+    } // FOR_EVERY_COLUMN
 }
 
 /******************************************************************************/
@@ -664,7 +685,7 @@ SystemMatrix fill_system_matrix_channel
             FOR_EVERY_COLUMN (column_index, dimensions)
             {
 
-                if (IS_CHANNEL_COLUMN(column_index))
+                if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == TRUE_V)
 
                     system_matrix = add_liquid_column_mc_4rm
                                     (
