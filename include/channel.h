@@ -78,19 +78,9 @@ extern "C"
 
     GridDimension_t NChannels ;
 
-    /* The heat transfert coefficients of the cooling liquid */
-    /* in [ (W / ( um2 * K ) ]                              */
+    /* The properties of the fluid used as coolant */
 
-    CoolantHTCs_t CoolantHTCs ;
-
-    /* The volumetric heat capacity of the cooling liquid  */
-    /* in [ J / ( um3 * K ) ]                              */
-
-    CoolantVHC_t CoolantVHC ;
-
-    /* The temperarute of the incoming liquid in [K]  */
-
-    Temperature_t CoolantTIn ;
+    Coolant_t Coolant ;
 
     /* The flow rate per channel layer of the incolimg liquid   */
     /* Specified in [ ml / min ] but stored in [ um3 / sec ]    */
@@ -98,9 +88,7 @@ extern "C"
 
     CoolantFR_t CoolantFR ;
 
-    /* Darcy Velocity
-     * [ um / sec ]
-     */
+    /* Darcy Velocity [ um / sec ] */
 
     DarcyVelocity_t DarcyVelocity ;
 

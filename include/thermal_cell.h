@@ -228,8 +228,7 @@ extern "C"
      * \param cell_width   the width \a w of the thermal cell
      * \param cell_height  the height \a h of the thermal cell
      * \param nchannels    the number of microchannels in the channel layer
-     * \param coolant_htcs the set of heat transfer coefficients of the coolant
-     * \param coolant_vhc  the volumetric heat capacity of the coolant
+     * \param coolant      the thermal properties of the coolant
      * \param coolant_fr   the flow rate of the coolant
      */
 
@@ -244,8 +243,7 @@ extern "C"
         CellDimension_t     cell_height,
 
         GridDimension_t     nchannels,
-        CoolantHTCs_t       coolant_htcs,
-        CoolantVHC_t        coolant_vhc,
+        Coolant_t           coolant,
         CoolantFR_t         coolant_fr
     ) ;
 
@@ -262,8 +260,7 @@ extern "C"
      * \param channel_length the length of the channel
      * \param channel_pitch  the pitch of the channel
      * \param porosity       FIXME
-     * \param coolant_htcs   the set of heat transfer coefficients of the coolant
-     * \param coolant_vhc    the volumetric heat capacity of the coolant
+     * \param coolant        the thermal properties of the coolant
      * \param coolant_fr     the flow rate of the coolant
      */
 
@@ -282,8 +279,7 @@ extern "C"
         CellDimension_t     channel_pitch,
 
         Porosity_t          porosity,
-        CoolantHTCs_t       coolant_htcs,
-        CoolantVHC_t        coolant_vhc,
+        Coolant_t           coolant,
         CoolantFR_t         coolant_fr
     ) ;
 
@@ -298,7 +294,7 @@ extern "C"
      * \param cell_height      the height \a h of the thermal cell
      * \param pin_distribution the distribution of the pin fins
      * \param porosity         FIXME
-     * \param coolant_vhc      the volumetric heat capacity of the coolant
+     * \param coolant          the thermal properties of the coolant
      * \param darcy_velocity   the darcy velocity of the coolant
      */
 
@@ -315,7 +311,7 @@ extern "C"
         ChannelModel_t      pin_distribution,
 
         Porosity_t          porosity,
-        CoolantVHC_t        coolant_vhc,
+        Coolant_t           coolant,
         DarcyVelocity_t     darcy_velocity
     ) ;
 

@@ -117,22 +117,34 @@ extern "C"
   typedef double CoolantHTC_t ;
 # define         COOLANTHTC_I 0.0
 
-  /* The collection of the coolant heat transfer coefficient */
-
-  typedef struct
-  {
-    CoolantHTC_t Side ;
-    CoolantHTC_t Top ;
-    CoolantHTC_t Bottom ;
-
-  } CoolantHTCs_t ;
-
-# define COOLANTHTCS_I (CoolantHTCs_t) { COOLANTHTC_I, COOLANTHTC_I, COOLANTHTC_I }
-
   /* Coolant volumetric heat capacity */
 
   typedef double CoolantVHC_t ;
 # define         COOLANTVHC_I 0.0
+
+  /* the collection of parameters describing a cooling fluid */
+
+  struct Coolant_t
+  {
+    /* The heat transfert coefficients in [ (W / ( um2 * K ) ] */
+
+    CoolantHTC_t HTCSide ;
+    CoolantHTC_t HTCTop ;
+    CoolantHTC_t HTCBottom ;
+
+    /* The volumetric heat capacity in [ J / ( um3 * K ) ] */
+
+    CoolantVHC_t VHC ;
+
+    /* The temperarute at the channel inlet in [K]  */
+
+    Temperature_t TIn ;
+
+  } ;
+
+  typedef struct Coolant_t Coolant_t ;
+# define         COOLANT_I (Coolant_t) { COOLANTHTC_I, COOLANTHTC_I, COOLANTHTC_I, \
+                                         COOLANTVHC_I, TEMPERATURE_I }
 
   /* Coolant flow rate */
 

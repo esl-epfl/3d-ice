@@ -48,9 +48,7 @@ void init_channel (Channel* channel)
   channel->Pitch            = CELLDIMENSION_I;
   channel->Porosity         = POROSITY_I;
   channel->NChannels        = GRIDDIMENSION_I;
-  channel->CoolantHTCs      = COOLANTHTCS_I;
-  channel->CoolantVHC       = COOLANTVHC_I;
-  channel->CoolantTIn       = TEMPERATURE_I;
+  channel->Coolant          = COOLANT_I ;
   channel->CoolantFR        = COOLANTFR_I;
   channel->DarcyVelocity    = DARCYVELOCITY_I;
   channel->WallMaterial     = NULL;
@@ -134,23 +132,23 @@ void print_formatted_channel
 
   fprintf (stream,
            "%s   coolant heat transfert coefficient side %.4e ,\n",
-           prefix, channel->CoolantHTCs.Side) ;
+           prefix, channel->Coolant.HTCSide) ;
 
   fprintf (stream,
            "%s                                       top %.4e ,\n",
-           prefix, channel->CoolantHTCs.Top) ;
+           prefix, channel->Coolant.HTCTop) ;
 
   fprintf (stream,
            "%s                                    bottom %.4e ;\n",
-           prefix, channel->CoolantHTCs.Bottom) ;
+           prefix, channel->Coolant.HTCBottom) ;
 
   fprintf (stream,
            "%s   coolant volumetric heat capacity        %.4e ;\n",
-           prefix, channel->CoolantVHC) ;
+           prefix, channel->Coolant.VHC) ;
 
   fprintf (stream,
            "%s   coolant incoming temperature          %.2f ;\n",
-           prefix, channel->CoolantTIn ) ;
+           prefix, channel->Coolant.TIn ) ;
 }
 
 /******************************************************************************/
@@ -192,23 +190,23 @@ void print_detailed_channel
 
   fprintf (stream,
            "%s  CoolantHTCs.Side          = %.4e\n",
-           prefix,  channel->CoolantHTCs.Side) ;
+           prefix,  channel->Coolant.HTCSide) ;
 
   fprintf (stream,
            "%s  CoolantHTCs.Top           = %.4e\n",
-           prefix,  channel->CoolantHTCs.Top) ;
+           prefix,  channel->Coolant.HTCTop) ;
 
   fprintf (stream,
            "%s  CoolantHTCs.Bottom        = %.4e\n",
-           prefix,  channel->CoolantHTCs.Bottom) ;
+           prefix,  channel->Coolant.HTCBottom) ;
 
   fprintf (stream,
            "%s  CoolantVHC                = %.4e\n",
-           prefix,  channel->CoolantVHC) ;
+           prefix,  channel->Coolant.VHC) ;
 
   fprintf (stream,
            "%s  CoolantTIn                = %.2f\n",
-           prefix,  channel->CoolantTIn) ;
+           prefix,  channel->Coolant.TIn) ;
 
   fprintf (stream,
            "%s  CoolantFR                 = %.4e\n",
@@ -255,8 +253,7 @@ static void fill_thermal_cell_channel_4rm
                     get_cell_width(dimensions, row_index),
                     channel->Height,
                     channel->NChannels,
-                    channel->CoolantHTCs,
-                    channel->CoolantVHC,
+                    channel->Coolant,
                     channel->CoolantFR
                 ) ;
 
@@ -370,8 +367,7 @@ static void fill_thermal_cell_channel_2rm
                     get_cell_width(dimensions, row_index),
                     channel->Height,
                     channel->NChannels, channel->Length, channel->Pitch,
-                    channel->Porosity, channel->CoolantHTCs,
-                    channel->CoolantVHC, channel->CoolantFR
+                    channel->Porosity, channel->Coolant, channel->CoolantFR
                 ) ;
 
                 thermalcells++;
@@ -498,7 +494,7 @@ static void fill_thermal_cell_channel_pf
                     get_cell_width(dimensions, row_index),
                     channel->Height,
                     channel->ChannelModel,
-                    channel->Porosity, channel->CoolantVHC, channel->DarcyVelocity
+                    channel->Porosity, channel->Coolant, channel->DarcyVelocity
                 ) ;
 
                 thermalcells++;
@@ -611,17 +607,17 @@ void fill_sources_channel
   if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE ||
       channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED) {
 
-    C = CCONV_PF(channel->CoolantVHC, channel->DarcyVelocity, get_cell_length(dimensions, 0), channel->Height);
+    C = CCONV_PF(channel->Coolant.VHC, channel->DarcyVelocity, get_cell_length(dimensions, 0), channel->Height);
 
   } else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2) {
 
     Quantity_t nchannels = (Quantity_t) ((get_chip_length(dimensions) / channel->Pitch) + 0.5); // round function
-    C = CCONV_MC_2RM(nchannels, channel->CoolantVHC, channel->CoolantFR, channel->Porosity, get_cell_length(dimensions,0), channel->Length);
+    C = CCONV_MC_2RM(nchannels, channel->Coolant.VHC, channel->CoolantFR, channel->Porosity, get_cell_length(dimensions,0), channel->Length);
 
   } else { //TDICE_CHANNEL_MODEL_MC_4RM
 
     Quantity_t nchannels = (Quantity_t) ((get_number_of_columns (dimensions) - 1)  / 2) ;
-    C = CCONV_MC_4RM(nchannels, channel->CoolantVHC, channel->CoolantFR);
+    C = CCONV_MC_4RM(nchannels, channel->Coolant.VHC, channel->CoolantFR);
 
   }
 
@@ -632,7 +628,7 @@ void fill_sources_channel
     if (channel->ChannelModel != TDICE_CHANNEL_MODEL_MC_RM4
         || IS_CHANNEL_COLUMN(column_index))
     {
-      *sources = 2.0 * C * channel->CoolantTIn ;
+      *sources = 2.0 * C * channel->Coolant.TIn ;
 
 #     ifdef PRINT_SOURCES
       fprintf (stderr,

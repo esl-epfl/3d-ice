@@ -50,7 +50,7 @@
     double         double_v ;
     String_t       char_p ;
     Material*      material_p ;
-    CoolantHTCs_t  coolanthtcs_v ;
+    Coolant_t      coolant_v ;
     ChannelModel_t channel_model_v ;
     Die*           die_p ;
     Layer*         layer_p ;
@@ -60,8 +60,8 @@
 %type <double_v>        first_wall_length
 %type <double_v>        last_wall_length
 %type <channel_model_v> distribution
-%type <coolanthtcs_v>   coolant_heat_transfer_coefficients_rm4
-%type <coolanthtcs_v>   coolant_heat_transfer_coefficients_rm2
+%type <coolant_v>       coolant_heat_transfer_coefficients_rm4
+%type <coolant_v>       coolant_heat_transfer_coefficients_rm2
 %type <material_p>      material
 %type <material_p>      materials_list
 %type <die_p>           die
@@ -301,13 +301,15 @@ microchannel
         first_wall_length = ($15 != 0.0) ? $15 : $13 ;
         last_wall_length  = ($16 != 0.0) ? $16 : $13 ;
 
-        stkd->Channel->ChannelModel    = TDICE_CHANNEL_MODEL_MC_RM4 ;
-        stkd->Channel->Height          = $5 ;
-        stkd->Channel->CoolantFR       = CONVERT_COOLANT_FLOW_RATE($24) ;
-        stkd->Channel->CoolantHTCs     = $26 ;
-        stkd->Channel->CoolantVHC      = $31 ;
-        stkd->Channel->CoolantTIn      = $36 ;
-        stkd->Channel->WallMaterial    = find_material_in_list (stkd->MaterialsList, $19) ;
+        stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM4 ;
+        stkd->Channel->Height            = $5 ;
+        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE($24) ;
+        stkd->Channel->Coolant.HTCSide   = $26.HTCSide ;
+        stkd->Channel->Coolant.HTCTop    = $26.HTCTop ;
+        stkd->Channel->Coolant.HTCBottom = $26.HTCBottom ;
+        stkd->Channel->Coolant.VHC       = $31 ;
+        stkd->Channel->Coolant.TIn       = $36 ;
+        stkd->Channel->WallMaterial      = find_material_in_list (stkd->MaterialsList, $19) ;
 
         if (stkd->Channel->WallMaterial == NULL)
         {
@@ -346,16 +348,18 @@ microchannel
             YYABORT ;
         }
 
-        stkd->Channel->ChannelModel    = TDICE_CHANNEL_MODEL_MC_RM2 ;
-        stkd->Channel->Height          = $5 ;
-        stkd->Channel->Length          = $9 ;
-        stkd->Channel->Pitch           = $13 + $9 ;
-        stkd->Channel->Porosity        = stkd->Channel->Length / stkd->Channel->Pitch ;
-        stkd->Channel->CoolantFR       = CONVERT_COOLANT_FLOW_RATE($22) ;
-        stkd->Channel->CoolantHTCs     = $24 ;
-        stkd->Channel->CoolantVHC      = $29 ;
-        stkd->Channel->CoolantTIn      = $34 ;
-        stkd->Channel->WallMaterial    = find_material_in_list (stkd->MaterialsList, $17) ;
+        stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM2 ;
+        stkd->Channel->Height            = $5 ;
+        stkd->Channel->Length            = $9 ;
+        stkd->Channel->Pitch             = $13 + $9 ;
+        stkd->Channel->Porosity          = stkd->Channel->Length / stkd->Channel->Pitch ;
+        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE($22) ;
+        stkd->Channel->Coolant.HTCSide   = $24.HTCSide ;
+        stkd->Channel->Coolant.HTCTop    = $24.HTCTop ;
+        stkd->Channel->Coolant.HTCBottom = $24.HTCBottom ;
+        stkd->Channel->Coolant.VHC       = $29 ;
+        stkd->Channel->Coolant.TIn       = $34 ;
+        stkd->Channel->WallMaterial      = find_material_in_list (stkd->MaterialsList, $17) ;
 
         if (stkd->Channel->WallMaterial == NULL)
         {
@@ -394,13 +398,16 @@ microchannel
             YYABORT ;
         }
 
-        stkd->Channel->Height        = $4 ;
-        stkd->Channel->Porosity      = 1.0 - (PI * $8 * $8 / 4.0) / ($12 * $12) ;
-        stkd->Channel->ChannelModel  = $16 ;
-        stkd->Channel->DarcyVelocity = $24 ;
-        stkd->Channel->CoolantVHC    = $30 ;
-        stkd->Channel->CoolantTIn    = $35 ;
-        stkd->Channel->WallMaterial  = find_material_in_list (stkd->MaterialsList, $20) ;
+        stkd->Channel->Height            = $4 ;
+        stkd->Channel->Porosity          = 1.0 - (PI * $8 * $8 / 4.0) / ($12 * $12) ;
+        stkd->Channel->ChannelModel      = $16 ;
+        stkd->Channel->DarcyVelocity     = $24 ;
+        stkd->Channel->Coolant.HTCSide   = COOLANTHTC_I ;
+        stkd->Channel->Coolant.HTCTop    = COOLANTHTC_I ;
+        stkd->Channel->Coolant.HTCBottom = COOLANTHTC_I ;
+        stkd->Channel->Coolant.VHC       = $30 ;
+        stkd->Channel->Coolant.TIn       = $35 ;
+        stkd->Channel->WallMaterial      = find_material_in_list (stkd->MaterialsList, $20) ;
 
         if (stkd->Channel->WallMaterial == NULL)
         {
@@ -423,17 +430,17 @@ coolant_heat_transfer_coefficients_rm4
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
-        $$.Side   = $5 ;
-        $$.Top    = $5 ;
-        $$.Bottom = $5 ;
+        $$.HTCSide   = $5 ;
+        $$.HTCTop    = $5 ;
+        $$.HTCBottom = $5 ;
     }
   | COOLANT HEAT TRANSFER COEFFICIENT SIDE   DVALUE ','
                                       TOP    DVALUE ','
                                       BOTTOM DVALUE ';'
     {
-        $$.Side   = $6 ;
-        $$.Top    = $9 ;
-        $$.Bottom = $12 ;
+        $$.HTCSide   = $6 ;
+        $$.HTCTop    = $9 ;
+        $$.HTCBottom = $12 ;
     }
   ;
 
@@ -441,25 +448,27 @@ coolant_heat_transfer_coefficients_rm2
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
-        $$.Top    = $5 ;
-        $$.Bottom = $5 ;
+        $$.HTCSide   = COOLANTHTC_I ;
+        $$.HTCTop    = $5 ;
+        $$.HTCBottom = $5 ;
     }
   | COOLANT HEAT TRANSFER COEFFICIENT TOP    DVALUE ','
                                       BOTTOM DVALUE ';'
     {
-        $$.Top    = $6 ;
-        $$.Bottom = $9 ;
+        $$.HTCSide   = COOLANTHTC_I ;
+        $$.HTCTop    = $6 ;
+        $$.HTCBottom = $9 ;
     }
   ;
 
 first_wall_length
-  :                              { $$ = 0.0 ; } // Not mandatory
-  | FIRST WALL LENGTH DVALUE ';' { $$ =  $4 ; }
+  :                              { $$ = CELLDIMENSION_I ; } // Not mandatory
+  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ;              }
   ;
 
 last_wall_length
-  :                             { $$ = 0.0 ; } // Not mandatory
-  | LAST WALL LENGTH DVALUE ';' { $$ =  $4 ; }
+  :                             { $$ = CELLDIMENSION_I ; } // Not mandatory
+  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ;              }
   ;
 
 distribution

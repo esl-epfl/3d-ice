@@ -213,25 +213,24 @@ void fill_liquid_cell_mc_4rm
     CellDimension_t       cell_width,
     CellDimension_t       cell_height,
     GridDimension_t       nchannels,
-    CoolantHTCs_t         coolant_htcs,
-    CoolantVHC_t          coolant_vhc,
+    Coolant_t             coolant,
     CoolantFR_t           coolant_fr
 )
 {
-    Cconv_t C = CCONV_MC_4RM (nchannels, coolant_vhc, coolant_fr) ;
+    Cconv_t C = CCONV_MC_4RM (nchannels, coolant.VHC, coolant_fr) ;
 
     thermal_cell->North =  C ;
     thermal_cell->South = -C ;
 
     thermal_cell->East = thermal_cell->West
-        = coolant_htcs.Side * cell_width * cell_height ;
+        = coolant.HTCSide * cell_width * cell_height ;
 
-    thermal_cell->Top = coolant_htcs.Top * cell_width * cell_length ;
+    thermal_cell->Top = coolant.HTCTop * cell_width * cell_length ;
 
-    thermal_cell->Bottom = coolant_htcs.Bottom * cell_width * cell_length ;
+    thermal_cell->Bottom = coolant.HTCBottom * cell_width * cell_length ;
 
     thermal_cell->Capacity
-        = ((cell_length * cell_width * cell_height) * coolant_vhc) / delta_time ;
+        = ((cell_length * cell_width * cell_height) * coolant.VHC) / delta_time ;
 
 #ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
@@ -257,12 +256,11 @@ void fill_liquid_cell_mc_2rm
     CellDimension_t     channel_length,
     CellDimension_t     channel_pitch,
     Porosity_t          porosity,
-    CoolantHTCs_t       coolant_htcs,
-    CoolantVHC_t        coolant_vhc,
+    Coolant_t           coolant,
     CoolantFR_t         coolant_fr
 )
 {
-    Cconv_t C = CCONV_MC_2RM (nchannels, coolant_vhc, coolant_fr,
+    Cconv_t C = CCONV_MC_2RM (nchannels, coolant.VHC, coolant_fr,
                               porosity, cell_length, channel_length);
 
     thermal_cell->North =  C;
@@ -270,16 +268,16 @@ void fill_liquid_cell_mc_2rm
 
     thermal_cell->East = thermal_cell->West = (Conductance_t) 0 ;
 
-    CoolantHTC_t eff_htc_top = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Top, channel_length, cell_height, channel_pitch);
+    CoolantHTC_t eff_htc_top = EFFECTIVE_HTC_MC_2RM(coolant.HTCTop, channel_length, cell_height, channel_pitch);
 
     thermal_cell->Top = eff_htc_top * cell_width * cell_length ;
 
-    CoolantHTC_t eff_htc_bottom = EFFECTIVE_HTC_MC_2RM(coolant_htcs.Bottom, channel_length, cell_height, channel_pitch);
+    CoolantHTC_t eff_htc_bottom = EFFECTIVE_HTC_MC_2RM(coolant.HTCBottom, channel_length, cell_height, channel_pitch);
 
     thermal_cell->Bottom = eff_htc_bottom * cell_width * cell_length ;
 
     thermal_cell->Capacity
-        = ((cell_length * cell_width * cell_height) * coolant_vhc) * porosity / delta_time ;
+        = ((cell_length * cell_width * cell_height) * coolant.VHC) * porosity / delta_time ;
 
 #ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
@@ -305,11 +303,11 @@ void fill_liquid_cell_pf
     CellDimension_t     cell_height,
     ChannelModel_t      pin_distribution,
     Porosity_t          porosity,
-    CoolantVHC_t        coolant_vhc,
+    Coolant_t           coolant,
     DarcyVelocity_t     darcy_velocity
 )
 {
-    Cconv_t C = CCONV_PF (coolant_vhc, darcy_velocity, cell_length, cell_height);
+    Cconv_t C = CCONV_PF (coolant.VHC, darcy_velocity, cell_length, cell_height);
 
     thermal_cell->North =   C;
     thermal_cell->South =  -C;
@@ -330,7 +328,7 @@ void fill_liquid_cell_pf
         = eff_htc * cell_width * cell_length ;
 
     thermal_cell->Capacity
-        = ((cell_length * cell_width * cell_height) * coolant_vhc) * porosity / delta_time ;
+        = ((cell_length * cell_width * cell_height) * coolant.VHC) * porosity / delta_time ;
 
 #ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,
