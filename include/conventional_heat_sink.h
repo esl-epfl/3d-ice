@@ -138,14 +138,25 @@ extern "C"
         ConventionalHeatSink *conventional_heat_sink
     ) ;
 
-/******************************************************************************/
 
-  void fill_system_matrix_conventional_heat_sink
-  (
-    SystemMatrix          system_matrix,
-    Dimensions*           dimensions,
-    ThermalCell*          thermalcells
-  ) ;
+
+    /*! Fills the system matrix
+     *
+     *  Add the conductance in the Top direction for every coefficient in the
+     *  main diagonal of the matrix (only last layer)). This allow heat to flow
+     *  in the vertical direction.
+     *
+     *  \param system_matrix copy of the system matrix structure
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
+     */
+
+    void fill_system_matrix_conventional_heat_sink
+    (
+        SystemMatrix  system_matrix,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells
+    ) ;
 
 /******************************************************************************/
 

@@ -181,13 +181,23 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix fill_system_matrix_stack_element
-  (
-    SystemMatrix          system_matrix,
-    Dimensions*           dimensions,
-    ThermalCell*          thermalcells,
-    StackElement*         stack_element
-  ) ;
+    /*! Fills the system matrix
+     *
+     *  \param system_matrix copy of the system matrix structure
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
+     *  \param stack_element pointer to the stack element
+     *
+     *  \return A matrix partially filled (FIXME)
+     */
+
+    SystemMatrix fill_system_matrix_stack_element
+    (
+        SystemMatrix  system_matrix,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
+        StackElement *stack_element
+    ) ;
 
 /******************************************************************************/
 

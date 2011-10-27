@@ -160,9 +160,8 @@ int fill_thermal_data
   if (result == 0)  goto system_matrix_fail ;
 
   fill_system_matrix_stack_description
-  (
-    tdata->SM_A, tdata->ThermalCells, stkd
-  ) ;
+
+    (tdata->SM_A, tdata->ThermalCells, stkd) ;
 
   dCreate_CompCol_Matrix
   (
@@ -386,9 +385,8 @@ int update_coolant_flow_rate
   stkd->Channel->CoolantFR = CONVERT_COOLANT_FLOW_RATE(new_coolant_fr) ;
 
   fill_system_matrix_stack_description
-  (
-    tdata->SM_A, tdata->ThermalCells, stkd
-  ) ;
+
+    (tdata->SM_A, tdata->ThermalCells, stkd) ;  // TODO replace with "update"
 
   tdata->SLU_Options.Fact = SamePattern_SameRowPerm ;
 
@@ -401,6 +399,7 @@ int update_coolant_flow_rate
           &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
   if (tdata->SLU_Info == 0)
+
     tdata->SLU_Options.Fact = FACTORED ;
 
   update_channel_inlet_stack_description (tdata->Sources, stkd) ;

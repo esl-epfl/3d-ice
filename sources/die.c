@@ -296,9 +296,9 @@ SystemMatrix fill_system_matrix_die
 (
     Die              *die,
     Dimensions       *dimensions,
-    ThermalCell      *thermalcells,
-    GridDimension_t  layer_index,
-    SystemMatrix     system_matrix
+    ThermalCell      *thermal_cells,
+    GridDimension_t   layer_index,
+    SystemMatrix      system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX
@@ -306,15 +306,10 @@ SystemMatrix fill_system_matrix_die
 # endif
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
-    {
-        system_matrix = fill_system_matrix_layer
-                        (
-                            dimensions, thermalcells,
-                            layer_index++,
-                            system_matrix
-                        ) ;
 
-    }  // FOR_EVERY_ELEMENT_IN_LIST
+        system_matrix = fill_system_matrix_layer
+
+            (dimensions, thermal_cells, layer_index++, system_matrix) ;
 
     return system_matrix ;
 }

@@ -416,9 +416,9 @@ void insert_power_values_stack_element
 SystemMatrix fill_system_matrix_stack_element
 (
     SystemMatrix  system_matrix,
-    Dimensions    *dimensions,
-    ThermalCell   *thermalcells,
-    StackElement  *stack_element
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    StackElement *stack_element
 )
 {
     switch (stack_element->Type)
@@ -426,32 +426,27 @@ SystemMatrix fill_system_matrix_stack_element
         case TDICE_STACK_ELEMENT_DIE :
 
             system_matrix = fill_system_matrix_die
-                            (
-                                stack_element->Pointer.Die, dimensions,
-                                thermalcells, stack_element->Offset,
-                                system_matrix
-                            ) ;
+
+                (stack_element->Pointer.Die, dimensions,
+                 thermal_cells, stack_element->Offset, system_matrix) ;
+
             break ;
 
         case TDICE_STACK_ELEMENT_LAYER :
 
             system_matrix = fill_system_matrix_layer
-                            (
-                                dimensions,
-                                thermalcells, stack_element->Offset,
-                                system_matrix
-                            ) ;
+
+                (dimensions, thermal_cells, stack_element->Offset, system_matrix) ;
+
             break ;
 
         case TDICE_STACK_ELEMENT_CHANNEL :
 
             system_matrix = fill_system_matrix_channel
-                            (
-                                stack_element->Pointer.Channel,
-                                dimensions,
-                                thermalcells, stack_element->Offset,
-                                system_matrix
-                            ) ;
+
+                (stack_element->Pointer.Channel, dimensions,
+                 thermal_cells, stack_element->Offset, system_matrix) ;
+
             break ;
 
         case TDICE_STACK_ELEMENT_NONE :

@@ -197,8 +197,8 @@ void fill_thermal_cell_layer
 
 SystemMatrix fill_system_matrix_layer
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermalcells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     SystemMatrix     system_matrix
 )
@@ -211,13 +211,10 @@ SystemMatrix fill_system_matrix_layer
     {
         FOR_EVERY_COLUMN (column_index, dimensions)
         {
-
             system_matrix = add_solid_column
-                            (
-                                dimensions, thermalcells,
-                                layer_index, row_index, column_index,
-                                system_matrix
-                            ) ;
+
+                (dimensions, thermal_cells,
+                 layer_index, row_index, column_index, system_matrix) ;
 
         } // FOR_EVERY_COLUMN
     } // FOR_EVERY_ROW

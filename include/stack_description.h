@@ -200,14 +200,23 @@ extern "C"
     StackDescription* stkd
   ) ;
 
-  /* Fill the system matrix for thermal simulation */
+    /*! Fills the system matrix
+     *
+     *  The function fills, stack element by stack element, all the columns
+     *  of the system matrix. If the heat sink is used, the coefficients
+     *  related to the last layer are updated.
+     *
+     *  \param system_matrix copy of the system matrix structure
+     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
+     *  \param stkd          pointer to the stack descritpion structure
+     */
 
-  void fill_system_matrix_stack_description
-  (
-    SystemMatrix          system_matrix,
-    ThermalCell*          thermalcells,
-    StackDescription*     stkd
-  ) ;
+    void fill_system_matrix_stack_description
+    (
+        SystemMatrix      system_matrix,
+        ThermalCell      *thermal_cells,
+        StackDescription *stkd
+    ) ;
 
 
   void init_power_values (StackDescription* stkd) ;  // FIXME These are needed here??

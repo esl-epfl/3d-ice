@@ -54,9 +54,9 @@ void init_system_matrix (SystemMatrix* matrix)
 
 int alloc_system_matrix
 (
-    SystemMatrix*   matrix,
-    Quantity_t      size,
-    Quantity_t      nnz
+    SystemMatrix *matrix,
+    Quantity_t    size,
+    Quantity_t    nnz
 )
 {
     matrix->Size = size ;
@@ -125,8 +125,8 @@ void print_system_matrix (String_t filename, SystemMatrix matrix)
 
 SystemMatrix add_solid_column
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -329,8 +329,8 @@ SystemMatrix add_solid_column
 
 SystemMatrix add_liquid_column_mc_4rm
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -517,8 +517,8 @@ SystemMatrix add_liquid_column_mc_4rm
 
 SystemMatrix add_liquid_column_mc_2rm
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -659,8 +659,8 @@ SystemMatrix add_liquid_column_mc_2rm
 
 SystemMatrix add_bottom_wall_column_mc_2rm
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -784,8 +784,8 @@ SystemMatrix add_bottom_wall_column_mc_2rm
 
 SystemMatrix add_top_wall_column_mc_2rm
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -910,8 +910,8 @@ SystemMatrix add_top_wall_column_mc_2rm
 
 SystemMatrix add_virtual_wall_column_mc_2rm
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -1064,8 +1064,8 @@ SystemMatrix add_virtual_wall_column_mc_2rm
 
 SystemMatrix add_liquid_column_pf
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -1206,8 +1206,8 @@ SystemMatrix add_liquid_column_pf
 
 SystemMatrix add_bottom_wall_column_pf
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -1332,8 +1332,8 @@ SystemMatrix add_bottom_wall_column_pf
 
 SystemMatrix add_top_wall_column_pf
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,
@@ -1457,8 +1457,8 @@ SystemMatrix add_top_wall_column_pf
 
 SystemMatrix add_virtual_wall_column_pf
 (
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
+    Dimensions      *dimensions,
+    ThermalCell     *thermal_cells,
     GridDimension_t  layer_index,
     GridDimension_t  row_index,
     GridDimension_t  column_index,

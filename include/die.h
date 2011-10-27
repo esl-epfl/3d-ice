@@ -209,14 +209,25 @@ extern "C"
 
 /******************************************************************************/
 
-  SystemMatrix fill_system_matrix_die
-  (
-    Die*                  die,
-    Dimensions*           dimensions,
-    ThermalCell*          thermalcells,
-    GridDimension_t       layer_index,
-    SystemMatrix          system_matrix
-  ) ;
+    /*! Fills the system matrix
+     *
+     *  \param die           pointer to the die
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
+     *  \param layer_index   offset (#layers) of the die within the stack
+     *  \param system_matrix copy of the system matrix structure
+     *
+     *  \return A matrix partially filled (FIXME)
+     */
+
+    SystemMatrix fill_system_matrix_die
+    (
+        Die             *die,
+        Dimensions      *dimensions,
+        ThermalCell     *thermal_cells,
+        GridDimension_t  layer_index,
+        SystemMatrix     system_matrix
+    ) ;
 
 /******************************************************************************/
 

@@ -664,9 +664,9 @@ void fill_sources_channel
 
 SystemMatrix fill_system_matrix_channel
 (
-    Channel          *channel,
-    Dimensions       *dimensions,
-    ThermalCell      *thermalcells,
+    Channel         *channel,
+    Dimensions      *dimensions,
+    ThermalCell     *thermalcells,
     GridDimension_t  layer_index,
     SystemMatrix     system_matrix
 )
@@ -679,29 +679,23 @@ SystemMatrix fill_system_matrix_channel
 
     if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
     {
-
         FOR_EVERY_ROW (row_index, dimensions)
         {
             FOR_EVERY_COLUMN (column_index, dimensions)
             {
-
                 if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == TRUE_V)
 
                     system_matrix = add_liquid_column_mc_4rm
-                                    (
-                                        dimensions, thermalcells,
-                                        layer_index, row_index, column_index,
-                                        system_matrix
-                                    ) ;
+
+                        (dimensions, thermalcells,
+                         layer_index, row_index, column_index, system_matrix) ;
 
                 else
 
                     system_matrix = add_solid_column
-                                    (
-                                        dimensions, thermalcells,
-                                        layer_index, row_index, column_index,
-                                        system_matrix
-                                    ) ;
+
+                        (dimensions, thermalcells,
+                         layer_index, row_index, column_index, system_matrix) ;
 
             } // FOR_EVERY_COLUMN
         }  // FOR_EVERY_ROW
@@ -709,9 +703,9 @@ SystemMatrix fill_system_matrix_channel
     else
     {
         typedef SystemMatrix (*add_column_fp)
+
             (Dimensions*, ThermalCell*,
-             GridDimension_t, GridDimension_t, GridDimension_t,
-             SystemMatrix)  ;
+             GridDimension_t, GridDimension_t, GridDimension_t, SystemMatrix)  ;
 
         add_column_fp bottom_layer ;
         add_column_fp virtual_layer ;
@@ -742,11 +736,9 @@ SystemMatrix fill_system_matrix_channel
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
                     system_matrix = bottom_layer
-                                    (
-                                        dimensions, thermalcells,
-                                        layer_index, row_index, column_index,
-                                        system_matrix
-                                    ) ;
+
+                        (dimensions, thermalcells,
+                         layer_index, row_index, column_index, system_matrix) ;
 
                 } // FOR_EVERY_COLUMN
             }  // FOR_EVERY_ROW
@@ -761,11 +753,9 @@ SystemMatrix fill_system_matrix_channel
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
                     system_matrix = virtual_layer
-                                    (
-                                        dimensions, thermalcells,
-                                        layer_index, row_index, column_index,
-                                        system_matrix
-                                    ) ;
+
+                        (dimensions, thermalcells,
+                         layer_index, row_index, column_index, system_matrix) ;
 
                 } // FOR_EVERY_COLUMN
             }  // FOR_EVERY_ROW
@@ -781,11 +771,9 @@ SystemMatrix fill_system_matrix_channel
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
                     system_matrix = liquid_layer
-                                    (
-                                        dimensions, thermalcells,
-                                        layer_index, row_index, column_index,
-                                        system_matrix
-                                    ) ;
+
+                        (dimensions, thermalcells,
+                         layer_index, row_index, column_index, system_matrix) ;
 
                 } // FOR_EVERY_COLUMN
             }  // FOR_EVERY_ROW
@@ -800,11 +788,9 @@ SystemMatrix fill_system_matrix_channel
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
                     system_matrix = top_layer
-                                    (
-                                        dimensions, thermalcells,
-                                        layer_index, row_index, column_index,
-                                        system_matrix
-                                    ) ;
+
+                        (dimensions, thermalcells,
+                         layer_index, row_index, column_index, system_matrix) ;
 
                 } // FOR_EVERY_COLUMN
             }  // FOR_EVERY_ROW

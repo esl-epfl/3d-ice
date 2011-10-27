@@ -218,33 +218,33 @@ void fill_sources_conventional_heat_sink
 
 void fill_system_matrix_conventional_heat_sink
 (
-  SystemMatrix          system_matrix,
-  Dimensions*           dimensions,
-  ThermalCell*          thermalcells
+    SystemMatrix  system_matrix,
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells
 )
 {
-  GridDimension_t cell_index = get_cell_offset_in_stack
-                               (
-                                 dimensions,
-                                 LAST_LAYER_INDEX(dimensions), 0 ,0
-                               ) ;
+    GridDimension_t ncells = get_number_of_cells(dimensions) ;
 
-  thermalcells += cell_index ;
+    GridDimension_t cell_index = get_cell_offset_in_stack
 
-  while (cell_index < get_number_of_cells(dimensions))
-  {
-    GridDimension_t row_index ;
+        (dimensions, LAST_LAYER_INDEX(dimensions), 0 ,0) ;
 
-    for (row_index = system_matrix.ColumnPointers [ cell_index ] ;
-         row_index < system_matrix.ColumnPointers [ cell_index + 1 ] ;
-         row_index ++)
+    thermal_cells += cell_index ;
 
-      if ( system_matrix.RowIndices [ row_index ] == cell_index )
+    while (cell_index < ncells)
+    {
+        GridDimension_t row_index ;
 
-        system_matrix.Values [ row_index ] += thermalcells++->Top ;
+        for (row_index = system_matrix.ColumnPointers [ cell_index ] ;
+             row_index < system_matrix.ColumnPointers [ cell_index + 1 ] ;
+             row_index ++)
 
-    cell_index++ ;
-  }
+            if ( system_matrix.RowIndices [ row_index ] == cell_index )
+
+                system_matrix.Values [ row_index ] += thermal_cells++->Top ;
+
+        cell_index++ ;
+    }
 }
 
 /******************************************************************************/

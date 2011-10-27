@@ -428,9 +428,9 @@ void update_channel_inlet_stack_description
 
 void fill_system_matrix_stack_description
 (
-    SystemMatrix          system_matrix,
-    ThermalCell*          thermalcells,
-    StackDescription*     stkd
+    SystemMatrix      system_matrix,
+    ThermalCell*      thermal_cells,
+    StackDescription *stkd
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
@@ -445,21 +445,17 @@ void fill_system_matrix_stack_description
 
     *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                       stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
 
         system_matrix = fill_system_matrix_stack_element
-                        (
-                          system_matrix, stkd->Dimensions,
-                          thermalcells, stack_element
-                        ) ;
+
+            (system_matrix, stkd->Dimensions, thermal_cells, stack_element) ;
 
     if (stkd->ConventionalHeatSink != NULL)
 
         fill_system_matrix_conventional_heat_sink
-        (
-            tmp_system_matrix, stkd->Dimensions, thermalcells
-        ) ;
+
+            (tmp_system_matrix, stkd->Dimensions, thermal_cells) ;
 }
 
 /******************************************************************************/
