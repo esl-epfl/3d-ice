@@ -41,194 +41,185 @@
 
 /******************************************************************************/
 
-void init_die (Die* die)
+void init_die (Die *die)
 {
-  die->Id                = STRING_I ;
-  die->Used              = QUANTITY_I ;
-  die->NLayers           = GRIDDIMENSION_I ;
-  die->SourceLayerOffset = GRIDDIMENSION_I ;
-  die->TopLayer          = NULL ;
-  die->SourceLayer       = NULL ;
-  die->BottomLayer       = NULL ;
-  die->Next              = NULL ;
+    die->Id                = NULL ;
+    die->Used              = 0u ;
+    die->NLayers           = 0u ;
+    die->SourceLayerOffset = 0u ;
+    die->TopLayer          = NULL ;
+    die->SourceLayer       = NULL ;
+    die->BottomLayer       = NULL ;
+    die->Next              = NULL ;
 }
 
 /******************************************************************************/
 
-Die* alloc_and_init_die (void)
+Die *alloc_and_init_die (void)
 {
-  Die* die = malloc (sizeof(*die)) ;
+    Die *die = (Die *) malloc (sizeof(Die)) ;
 
-  if (die != NULL) init_die (die) ;
+    if (die != NULL)
 
-  return die ;
+        init_die (die) ;
+
+    return die ;
 }
 
 /******************************************************************************/
 
-void free_die (Die* die)
+void free_die (Die *die)
 {
-  die->TopLayer = NULL ;
-  FREE_POINTER (free_layers_list, die->BottomLayer) ;
-  FREE_POINTER (free,             die->Id) ;
-  FREE_POINTER (free,             die) ;
+    if (die->Id != NULL)
+
+        FREE_POINTER (free, die->Id) ;
+
+    die->TopLayer = NULL ;
+    FREE_POINTER (free_layers_list, die->BottomLayer) ;
+
+    FREE_POINTER (free, die) ;
 }
 
 /******************************************************************************/
 
-void free_dies_list (Die* list)
+void free_dies_list (Die *list)
 {
-  FREE_LIST (Die, list, free_die) ;
+    FREE_LIST (Die, list, free_die) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_die
-(
-  FILE*    stream,
-  String_t prefix,
-  Die*     die
-)
+Die *find_die_in_list (Die *list, char *id)
 {
-  String_t new_prefix_layer
-    = malloc (sizeof(*new_prefix_layer) * (10 + strlen(prefix))) ;
-
-  if (new_prefix_layer == NULL) return ;
-
-  sprintf (new_prefix_layer, "%s    layer", prefix) ;
-
-  String_t new_prefix_source
-    = malloc (sizeof(*new_prefix_source) * (10 + strlen(prefix))) ;
-
-  sprintf (new_prefix_source, "%s   source", prefix) ;
-
-  if (new_prefix_source == NULL) return ;
-
-  fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
-
-  FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (Layer, layer, die->TopLayer)
-  {
-    if (layer == die->SourceLayer)
-
-      print_formatted_layer (stream, new_prefix_source, layer) ;
-
-    else
-
-      print_formatted_layer (stream, new_prefix_layer, layer) ;
-  }
-
-  FREE_POINTER (free, new_prefix_layer) ;
-  FREE_POINTER (free, new_prefix_source) ;
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, list)
+    {
+        if (strcmp(die->Id, id) == 0) break ;
+    }
+    return die ;
 }
 
 /******************************************************************************/
 
-void print_detailed_die
-(
-  FILE*    stream,
-  String_t prefix,
-  Die*     die
-)
+void print_formatted_die (FILE  *stream, char *prefix, Die *die)
 {
-  String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+    char *new_prefix_layer = (char *)
 
-  if (new_prefix == NULL) return ;
+        malloc (sizeof (char) * (10 + strlen(prefix))) ;
 
-  sprintf (new_prefix, "%s    ", prefix) ;
+    char *new_prefix_source = (char *)
 
-  fprintf (stream,
-           "%sdie                         = %p\n",
-           prefix, die) ;
+        malloc (sizeof (char) * (10 + strlen(prefix))) ;
 
-  fprintf (stream,
-           "%s  Id                        = %s\n",
-           prefix, die->Id) ;
+    if (new_prefix_layer == NULL) return ;
 
-  fprintf (stream,
-           "%s  Used                      = %d\n",
-           prefix, die->Used) ;
+    if (new_prefix_source == NULL) return ;
 
-  fprintf (stream,
-           "%s  NLayers                   = %d\n",
-           prefix, die->NLayers) ;
+    sprintf (new_prefix_layer,  "%s    layer", prefix) ;
+    sprintf (new_prefix_source, "%s   source", prefix) ;
 
-  fprintf (stream,
-           "%s  TopLayer                  = %p\n",
-           prefix, die->TopLayer) ;
+    fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
-  fprintf (stream,
-           "%s  SourceLayer               = %p\n",
-           prefix, die->SourceLayer) ;
+    FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (Layer, layer, die->TopLayer)
+    {
+        if (layer == die->SourceLayer)
 
-  fprintf (stream,
-           "%s  BottomLayer               = %p\n",
-           prefix, die->BottomLayer) ;
+            print_formatted_layer (stream, new_prefix_source, layer) ;
 
-  fprintf (stream,
-           "%s  Next                      = %p\n",
-           prefix, die->Next) ;
+        else
 
-  fprintf (stream, "%s\n", prefix) ;
-  print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
-  fprintf (stream, "%s\n", prefix) ;
+            print_formatted_layer (stream, new_prefix_layer, layer) ;
+    }
 
-  FREE_POINTER (free, new_prefix) ;
+    FREE_POINTER (free, new_prefix_layer) ;
+    FREE_POINTER (free, new_prefix_source) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_dies_list
-(
-  FILE*    stream,
-  String_t prefix,
-  Die*     list
-)
+void print_formatted_dies_list (FILE  *stream, char *prefix, Die *list)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
-  {
+    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
+    {
+        print_formatted_die (stream, prefix, die) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
     print_formatted_die (stream, prefix, die) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
-  print_formatted_die (stream, prefix, die) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_dies_list
-(
-  FILE*    stream,
-  String_t prefix,
-  Die*     list
-)
+void print_detailed_die (FILE  *stream, char *prefix, Die *die)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
-  {
+    char *new_prefix = (char *)
+
+        malloc (sizeof (char) * (5 + strlen(prefix))) ;
+
+    if (new_prefix == NULL) return ;
+
+    sprintf (new_prefix, "%s    ", prefix) ;
+
+    fprintf (stream,
+        "%sdie                         = %p\n",
+        prefix, die) ;
+
+    fprintf (stream,
+        "%s  Id                        = %s\n",
+        prefix, die->Id) ;
+
+    fprintf (stream,
+        "%s  Used                      = %d\n",
+        prefix, die->Used) ;
+
+    fprintf (stream,
+        "%s  NLayers                   = %d\n",
+        prefix, die->NLayers) ;
+
+    fprintf (stream,
+        "%s  TopLayer                  = %p\n",
+        prefix, die->TopLayer) ;
+
+    fprintf (stream,
+        "%s  SourceLayer               = %p\n",
+        prefix, die->SourceLayer) ;
+
+    fprintf (stream,
+        "%s  BottomLayer               = %p\n",
+        prefix, die->BottomLayer) ;
+
+    fprintf (stream,
+        "%s  Next                      = %p\n",
+        prefix, die->Next) ;
+
+    fprintf (stream, "%s\n", prefix) ;
+
+    print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
+
+    fprintf (stream, "%s\n", prefix) ;
+
+    FREE_POINTER (free, new_prefix) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_dies_list (FILE  *stream, char *prefix, Die *list)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
+    {
+        print_detailed_die (stream, prefix, die) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
     print_detailed_die (stream, prefix, die) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
-  print_detailed_die (stream, prefix, die) ;
-}
-
-/******************************************************************************/
-
-Die* find_die_in_list (Die* list, String_t id)
-{
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, list)
-
-    if (strcmp(die->Id, id) == 0) break ;
-
-  return die ;
 }
 
 /******************************************************************************/
 
 void fill_thermal_cell_die
 (
-    ThermalCell*     thermal_cells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Die*             die
+    ThermalCell *thermal_cells,
+    double       delta_time,
+    Dimensions  *dimensions,
+    uint32_t     layer_index,
+    Die         *die
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
@@ -242,11 +233,11 @@ void fill_thermal_cell_die
 
 Error_t fill_sources_die
 (
-    Source_t        *sources,
-    Dimensions      *dimensions,
-    GridDimension_t  layer_index,
-    Floorplan       *floorplan,
-    Die             *die
+    double     *sources,
+    Dimensions *dimensions,
+    uint32_t    layer_index,
+    Floorplan  *floorplan,
+    Die        *die
 )
 {
 #ifdef PRINT_SOURCES
@@ -264,41 +255,13 @@ Error_t fill_sources_die
 
 /******************************************************************************/
 
-void init_power_values_die
-(
-  Floorplan*            floorplan
-)
-{
-  init_power_values_floorplan
-  (
-    floorplan
-  ) ;
-}
-
-/******************************************************************************/
-
-void insert_power_values_die
-(
-  Floorplan*            floorplan,
-  PowersQueue*          pvalues
-)
-{
-  insert_power_values_floorplan
-  (
-    floorplan,
-    pvalues
-  ) ;
-}
-
-/******************************************************************************/
-
 SystemMatrix fill_system_matrix_die
 (
-    Die              *die,
-    Dimensions       *dimensions,
-    ThermalCell      *thermal_cells,
-    GridDimension_t   layer_index,
-    SystemMatrix      system_matrix
+    Die          *die,
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    SystemMatrix  system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX

@@ -344,10 +344,7 @@ void init_power_values_stack_element
   {
     case TDICE_STACK_ELEMENT_DIE :
 
-      init_power_values_die
-      (
-        stack_element->Floorplan
-      ) ;
+      init_power_values_floorplan (stack_element->Floorplan) ;
       break ;
 
     case TDICE_STACK_ELEMENT_LAYER :
@@ -383,11 +380,7 @@ void insert_power_values_stack_element
   {
     case TDICE_STACK_ELEMENT_DIE :
 
-      insert_power_values_die
-      (
-        stack_element->Floorplan,
-        pvalues
-      ) ;
+      insert_power_values_floorplan (stack_element->Floorplan, pvalues) ;
       break ;
 
     case TDICE_STACK_ELEMENT_LAYER :

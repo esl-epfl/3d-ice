@@ -36,6 +36,10 @@
 #ifndef _3DICE_DIE_H_
 #define _3DICE_DIE_H_
 
+/*! \file die.h
+ *  \brief File containing the definition and the interface to handle dies
+ */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,110 +48,176 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
 
-#include "types.h"
 #include "layer.h"
 #include "thermal_cell.h"
+#include "dimensions.h"
 #include "floorplan.h"
+#include "powers_queue.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
 
-  struct Die
-  {
-    /* The id (string) of the die */
+    /*! \struct Die
+     *
+     *  \brief Structure used to store data about the dies that compose the 2D/3D stack.
+     *
+     *  Dies are one of the elements that can be used to build a 3d stack
+     */
 
-    String_t Id ;
+    struct Die
+    {
+        /*! The id (string) of the die */
 
-    /* For parsing purpose */
+        char *Id ;
 
-    Quantity_t Used ;
+        /*! To know, after the parsing of a stack file, if a
+         *  die has been declared but never used in the stack */
 
-    /* The number of layer composing the die */
+        uint8_t Used ;
 
-    GridDimension_t NLayers ;
+        /*! The number of layer composing the die */
 
-    /* The offset (# of layers) of the source layer within the die */
+        uint32_t NLayers ;
 
-    GridDimension_t SourceLayerOffset ;
+        /*! The offset (# of layers) of the source layer within the die */
 
-    /* Pointer to the top-most layer */
+        uint32_t SourceLayerOffset ;
 
-    Layer* TopLayer ;
+        /*! Pointer to the top-most layer */
 
-    /* Pointer to the source layer */
+        Layer *TopLayer ;
 
-    Layer* SourceLayer ;
+        /*! Pointer to the source layer */
 
-    /* Pointer to the bottom-most layer */
+        Layer *SourceLayer ;
 
-    Layer* BottomLayer ;
+        /*! Pointer to the bottom-most layer */
 
-    /* To collect dies in a linked list */
+        Layer *BottomLayer ;
 
-    struct Die* Next ;
+        /*! To collect dies in a linked list */
 
-  } ;
+        struct Die *Next ;
 
-  typedef struct Die Die ;
+    } ;
 
-/******************************************************************************/
+    /*! Definition of the type Die */
 
-  void init_die (Die* die) ;
-
-/******************************************************************************/
-
-  Die* alloc_and_init_die (void) ;
-
-/******************************************************************************/
-
-  void free_die (Die* die) ;
+    typedef struct Die Die ;
 
 /******************************************************************************/
 
-  void free_dies_list (Die* list) ;
 
-/******************************************************************************/
 
-  void print_formatted_die
-  (
-    FILE*    stream,
-    String_t prefix,
-    Die*     die
-  ) ;
+    /*! Sets all the fields of \a die to a default value (zero or \c NULL ).
+     *
+     * \param die the address of the die to initialize
+     */
 
-/******************************************************************************/
+    void init_die (Die *die) ;
 
-  void print_detailed_die
-  (
-    FILE*    stream,
-    String_t prefix,
-    Die*     die
-  ) ;
 
-/******************************************************************************/
 
-  void print_formatted_dies_list
-  (
-    FILE*    stream,
-    String_t prefix,
-    Die*     list
-  ) ;
+    /*! Allocates a die in memory and sets its fields to their default
+     *  value with \c init_die
+     *
+     * \return the pointer to a new Die
+     * \return \c NULL if the memory allocation fails
+     */
 
-/******************************************************************************/
+    Die *alloc_and_init_die (void) ;
 
-  void print_detailed_dies_list
-  (
-    FILE*    stream,
-    String_t prefix,
-    Die*     list
-  ) ;
 
-/******************************************************************************/
 
-  Die* find_die_in_list (Die* list, String_t id) ;
+    /*! Frees the memory related to \a die
+     *
+     * The function frees the memory used to store the identifier
+     * Die::Id, if allocated, frees the list of layers starting from the
+     * Die::BottomLayer and then frees the memory pointed by die.
+     *
+     * The parametrer \a die must be a pointer previously obtained with
+     * \c alloc_and_init_die
+     *
+     * \param die the address of the die structure to free
+     */
 
-/******************************************************************************/
+    void free_die (Die *die) ;
+
+
+
+    /*! Frees a list of diess
+     *
+     * If frees, calling \c free_die, the die pointed by the
+     * parameter \a list and all the dies it finds following the
+     * linked list throught the field Die::Next .
+     *
+     * \param list the pointer to the first elment in the list to be freed
+     */
+
+    void free_dies_list (Die *list) ;
+
+
+
+    /*! Searches for a Die in a linked list of dies.
+     *
+     * Id based search of a Die structure in a list.
+     *
+     * \param list the pointer to the list
+     * \param id   the identifier of the die to be found
+     *
+     * \return the address of a Die, if founded
+     * \return \c NULL if the search fails
+     */
+
+    Die *find_die_in_list (Die *list, char *id) ;
+
+
+
+    /*! Prints the die as it looks in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param die    the die to print
+     */
+
+    void print_formatted_die (FILE *stream, char *prefix, Die *die) ;
+
+
+
+    /*! Prints a list of dies as they look in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first die in the list
+     */
+
+    void print_formatted_dies_list (FILE *stream, char *prefix, Die *list) ;
+
+
+
+    /*! Prints detailed information about all the fields of a die
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param die    the die to print
+     */
+
+    void print_detailed_die (FILE *stream, char *prefix, Die *die) ;
+
+
+
+    /*! Prints a list of detailed information about all the fields of the dies
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first die in the list
+     */
+
+    void print_detailed_dies_list (FILE *stream, char *prefix, Die *list) ;
+
+
 
     /*! Fills the thermal cells corresponding to a die
      *
@@ -160,14 +230,14 @@ extern "C"
 
     void fill_thermal_cell_die
     (
-        ThermalCell     *thermal_cells,
-        Time_t           delta_time,
-        Dimensions      *dimensions,
-        GridDimension_t  layer_index,
-        Die             *die
+        ThermalCell *thermal_cells,
+        double       delta_time,
+        Dimensions  *dimensions,
+        uint32_t     layer_index,
+        Die         *die
     ) ;
 
-/******************************************************************************/
+
 
     /*! Fills the source vector corresponding to a die
      *
@@ -185,29 +255,14 @@ extern "C"
 
     Error_t fill_sources_die
     (
-        Source_t        *sources,
-        Dimensions      *dimensions,
-        GridDimension_t  layer_index,
-        Floorplan       *floorplan,
-        Die             *die
+        double     *sources,
+        Dimensions *dimensions,
+        uint32_t    layer_index,
+        Floorplan  *floorplan,
+        Die        *die
     ) ;
 
-/******************************************************************************/
 
-  void init_power_values_die
-  (
-    Floorplan*            floorplan
-  ) ;
-
-/******************************************************************************/
-
-  void insert_power_values_die
-  (
-    Floorplan*            floorplan,
-    PowersQueue*          pvalues
-  ) ;
-
-/******************************************************************************/
 
     /*! Fills the system matrix
      *
@@ -222,11 +277,11 @@ extern "C"
 
     SystemMatrix fill_system_matrix_die
     (
-        Die             *die,
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
-        GridDimension_t  layer_index,
-        SystemMatrix     system_matrix
+        Die          *die,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
+        uint32_t      layer_index,
+        SystemMatrix  system_matrix
     ) ;
 
 /******************************************************************************/
