@@ -36,6 +36,10 @@
 #ifndef _3DICE_LAYER_H_
 #define _3DICE_LAYER_H_
 
+/*! \file layer.h
+ *  \brief File containing the definition and the interface to handle layers
+ */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,113 +48,175 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
 
-#include "types.h"
 #include "material.h"
 #include "dimensions.h"
 #include "thermal_cell.h"
-#include "floorplan.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
 
-  struct Layer
-  {
-    /* The heigh of the layer in um. (1 cell) */
+    /*! \struct Layer
+     *
+     *  \brief Structure used to store data about the layers that compose the 2D/3D stack.
+     *
+     *  Layers are used to build dies os as stack elements
+     */
 
-    CellDimension_t Height ;
+    struct Layer
+    {
+        /*! The heigh of the layer in \f$ \mu m \f$ (1 cell) */
 
-    /* The material composing the layer */
+        double Height ;
 
-    Material* Material ;
+        /*! The material composing the layer */
 
-    /* To collect layers in a double linked list */
+        Material *Material ;
 
-    struct Layer* Next ;
-    struct Layer* Prev ;
-  } ;
+        /*! Pointer to the 'next' layer,
+         *  to collect layers in a double linked list */
 
-  typedef struct Layer Layer ;
+        struct Layer *Next ;
 
-/******************************************************************************/
+        /*! Pointer to the 'previous' layer,
+         *  to collect layers in a double linked list */
 
-  void init_layer (Layer* layer) ;
+        struct Layer *Prev ;
+    } ;
 
-/******************************************************************************/
+    /*! Definition of the type Layer */
 
-  Layer* alloc_and_init_layer (void) ;
-
-/******************************************************************************/
-
-  void free_layer (Layer* layer) ;
-
-/******************************************************************************/
-
-  void free_layers_list (Layer* list) ;
+    typedef struct Layer Layer ;
 
 /******************************************************************************/
 
-  void print_formatted_layer
-  (
-    FILE*    stream,
-    String_t prefix,
-    Layer*   layer
-  ) ;
 
-/******************************************************************************/
 
-  void print_detailed_layer
-  (
-    FILE*    stream,
-    String_t prefix,
-    Layer*   layer
-  ) ;
+    /*! Sets all the fields of \a layer to a default value (zero or \c NULL ).
+     *
+     * \param layer the address of the layer to initialize
+     */
 
-/******************************************************************************/
+    void init_layer (Layer *layer) ;
 
-  void print_formatted_layers_list
-  (
-    FILE*    stream,
-    String_t prefix,
-    Layer*   list
-  ) ;
 
-/******************************************************************************/
 
-  void print_detailed_layers_list
-  (
-    FILE*    stream,
-    String_t prefix,
-    Layer*   list
-  ) ;
+    /*! Allocates a Layer in memory and sets its fields to their default
+     *  value with \c init_layer
+     *
+     * \return the pointer to a new Layer
+     * \return \c NULL if the memory allocation fails
+     */
 
-/******************************************************************************/
+    Layer *alloc_and_init_layer (void) ;
+
+
+
+    /*! Frees the memory related to \a layer
+     *
+     * The function frees the memory pointed by \a layer .
+     *
+     * The parametrer \a layer must be a pointer previously obtained with
+     * \c alloc_and_init_layer
+     *
+     * \param layer the address of the layer structure to free
+     */
+
+    void free_layer (Layer *layer) ;
+
+
+
+    /*! Frees a list of layers
+     *
+     * If frees, calling \c free_layer, the layer pointed by the
+     * parameter \a list and all the layer it finds following the
+     * linked list throught the field Layer::Next.
+     *
+     * \param list the pointer to the first elment in the list to be freed
+     */
+
+    void free_layers_list (Layer *list) ;
+
+
+
+    /*! Prints the layer as it looks in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param layer  the layer to print
+     */
+
+    void print_formatted_layer
+
+        (FILE *stream, char *prefix, Layer *layer) ;
+
+
+
+    /*! Prints a list of layers as they look in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first layer in the list
+     */
+
+    void print_formatted_layers_list
+
+        (FILE *stream, char *prefix, Layer *list) ;
+
+
+
+    /*! Prints detailed information about all the fields of a layer
+     *
+     * \param stream  the output stream (must be already open)
+     * \param prefix  a string to be printed as prefix at the beginning of each line
+     * \param layer   the layer to print
+     */
+
+    void print_detailed_layer
+
+        (FILE *stream, char *prefix, Layer *layer) ;
+
+
+
+    /*! Prints a list of detailed information about all the fields of the layers
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list the pointer to the first layer in the list
+     */
+
+    void print_detailed_layers_list
+
+        (FILE *stream, char *prefix, Layer *list) ;
+
+
 
     /*! Fills the thermal cells corresponding to a layer in the stack
      *
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
      *  \param delta_time    the time resolution of the thermal simulation
      *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (#layers) of the layer within the stack
-     *  \param channel       pointer to the layer
+     *  \param layer_index   offset (# of layers) of the layer within the stack
+     *  \param layer         pointer to the layer
      */
 
     void fill_thermal_cell_layer
     (
-        ThermalCell*     thermal_cells,
-        Time_t           delta_time,
-        Dimensions*      dimensions,
-        GridDimension_t  layer_index,
-        Layer*           layer
+        ThermalCell *thermal_cells,
+        double       delta_time,
+        Dimensions  *dimensions,
+        uint32_t     layer_index,
+        Layer       *layer
     ) ;
 
-/******************************************************************************/
+
 
     /*! Fills the system matrix
      *
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (#layers) of the die within the stack
+     *  \param layer_index   offset (# of layers) of the die within the stack
      *  \param system_matrix copy of the system matrix structure
      *
      *  \return A matrix partially filled (FIXME)
@@ -158,10 +224,10 @@ extern "C"
 
     SystemMatrix fill_system_matrix_layer
     (
-        Dimensions*     dimensions,
-        ThermalCell*    thermal_cells,
-        GridDimension_t layer_index,
-        SystemMatrix    system_matrix
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
+        uint32_t      layer_index,
+        SystemMatrix  system_matrix
     ) ;
 
 /******************************************************************************/

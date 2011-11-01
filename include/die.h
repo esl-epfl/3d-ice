@@ -67,7 +67,7 @@ extern "C"
 
     GridDimension_t NLayers ;
 
-    /* The offset (#layers) of the source layer within the die */
+    /* The offset (# of layers) of the source layer within the die */
 
     GridDimension_t SourceLayerOffset ;
 
@@ -154,7 +154,7 @@ extern "C"
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
      *  \param delta_time    the time resolution of the thermal simulation
      *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (#layers) of the die within the stack
+     *  \param layer_index   offset (# of layers) of the die within the stack
      *  \param die           pointer to the die
      */
 
@@ -173,7 +173,7 @@ extern "C"
      *
      *  \param sources     pointer to the first element in the source vector
      *  \param dimensions  pointer to the structure storing the dimensions
-     *  \param layer_index offset (#layers) of the die within the stack
+     *  \param layer_index offset (# of layers) of the die within the stack
      *  \param floorplan   pointer to the floorplan placed on the source layer
      *  \param die         pointer to the die
      *
@@ -214,7 +214,7 @@ extern "C"
      *  \param die           pointer to the die
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (#layers) of the die within the stack
+     *  \param layer_index   offset (# of layers) of the die within the stack
      *  \param system_matrix copy of the system matrix structure
      *
      *  \return A matrix partially filled (FIXME)

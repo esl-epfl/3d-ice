@@ -136,7 +136,7 @@ extern "C"
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
      *  \param delta_time    the time resolution of the thermal simulation
      *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (#layers) of the channel within the stack
+     *  \param layer_index   offset (# of layers) of the channel within the stack
      *  \param channel       pointer to the channel
      */
 
@@ -155,7 +155,7 @@ extern "C"
      *
      *  \param sources     pointer to the first element in the source vector
      *  \param dimensions  pointer to the structure storing the dimensions
-     *  \param layer_index offset (#layers) of the channel within the stack
+     *  \param layer_index offset (# of layers) of the channel within the stack
      *  \param channel     pointer to the channel
      */
 
@@ -174,7 +174,7 @@ extern "C"
      *  \param channel       pointer to the channel
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (#layers) of the die within the stack
+     *  \param layer_index   offset (# of layers) of the die within the stack
      *  \param system_matrix copy of the system matrix structure
      *
      *  \return A matrix partially filled (FIXME)

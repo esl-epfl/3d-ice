@@ -40,118 +40,120 @@
 
 /******************************************************************************/
 
-void init_layer (Layer* layer)
+void init_layer (Layer *layer)
 {
-  layer->Height   = CELLDIMENSION_I ;
-  layer->Material = NULL ;
-  layer->Next     = NULL ;
-  layer->Prev     = NULL ;
+    layer->Height   = 0.0 ;
+    layer->Material = NULL ;
+    layer->Next     = NULL ;
+    layer->Prev     = NULL ;
 }
 
 /******************************************************************************/
 
-Layer* alloc_and_init_layer (void)
+Layer *alloc_and_init_layer (void)
 {
-  Layer* layer = malloc (sizeof(*layer));
+    Layer *layer = (Layer *) malloc (sizeof(Layer));
 
-  if (layer != NULL) init_layer (layer) ;
+    if (layer != NULL)
 
-  return layer ;
+        init_layer (layer) ;
+
+    return layer ;
 }
 
 /******************************************************************************/
 
-void free_layer (Layer* layer)
+void free_layer (Layer *layer)
 {
-  FREE_POINTER (free, layer) ;
+    FREE_POINTER (free, layer) ;
 }
 
 /******************************************************************************/
 
-void free_layers_list (Layer* list)
+void free_layers_list (Layer *list)
 {
-  FREE_LIST (Layer, list, free_layer) ;
+    FREE_LIST (Layer, list, free_layer) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_layer
 (
-  FILE*    stream,
-  String_t prefix,
-  Layer*   layer
+    FILE  *stream,
+    char  *prefix,
+    Layer *layer
 )
 {
-  fprintf (stream,
-    "%s %7.1f  %s ;\n",
-    prefix, layer->Height, layer->Material->Id) ;
+    fprintf (stream,
+        "%s %7.1f  %s ;\n",
+        prefix, layer->Height, layer->Material->Id) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_layer
 (
-  FILE*    stream,
-  String_t prefix,
-  Layer*   layer
+    FILE  *stream,
+    char  *prefix,
+    Layer *layer
 )
 {
-  fprintf (stream,
-           "%slayer                   = %p\n",
-           prefix, layer) ;
+    fprintf (stream,
+        "%slayer                   = %p\n",
+        prefix, layer) ;
 
-  fprintf (stream,
-           "%s  Height                = %.1f\n",
-           prefix, layer->Height) ;
+    fprintf (stream,
+        "%s  Height                = %.1f\n",
+        prefix, layer->Height) ;
 
-  fprintf (stream,
-           "%s  Material              = %p\n",
-           prefix, layer->Material) ;
+    fprintf (stream,
+        "%s  Material              = %p\n",
+        prefix, layer->Material) ;
 
-  fprintf (stream,
-           "%s  Next                  = %p\n",
-           prefix, layer->Next) ;
+    fprintf (stream,
+        "%s  Next                  = %p\n",
+        prefix, layer->Next) ;
 
-  fprintf (stream,
-           "%s  Prev                  = %p\n",
-           prefix, layer->Prev) ;
+    fprintf (stream,
+        "%s  Prev                  = %p\n",
+        prefix, layer->Prev) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_layers_list (FILE* stream, String_t prefix, Layer* list)
+void print_formatted_layers_list (FILE *stream, char *prefix, Layer *list)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, list)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, list)
 
-    print_formatted_layer (stream, prefix, layer) ;
+        print_formatted_layer (stream, prefix, layer) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_layers_list (FILE* stream, String_t prefix, Layer* list)
+void print_detailed_layers_list (FILE *stream, char *prefix, Layer *list)
 {
-  FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Layer, layer, list)
-  {
+    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Layer, layer, list)
+    {
+        print_detailed_layer (stream, prefix, layer) ;
+        fprintf (stream, "%s\n", prefix) ;
+    }
     print_detailed_layer (stream, prefix, layer) ;
-    fprintf (stream, "%s\n", prefix) ;
-  }
-  print_detailed_layer (stream, prefix, layer) ;
 }
 
 /******************************************************************************/
 
 void fill_thermal_cell_layer
 (
-    ThermalCell*     thermal_cells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Layer*           layer
+    ThermalCell *thermal_cells,
+    double       delta_time,
+    Dimensions  *dimensions,
+    uint32_t     layer_index,
+    Layer       *layer
 )
 {
-    void (*fill_cell) (ThermalCell *, Time_t,
-                       CellDimension_t, CellDimension_t, CellDimension_t,
-                       SolidTC_t, SolidVHC_t) ;
+    void (*fill_cell)
+
+        (ThermalCell *, double, double, double, double, double, double) ;
 
     if (IS_FIRST_LAYER (layer_index))
 
@@ -165,7 +167,7 @@ void fill_thermal_cell_layer
 
         fill_cell = fill_solid_cell_central ;
 
-    GridDimension_t cell_index
+    uint32_t cell_index
 
         = get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
@@ -197,10 +199,10 @@ void fill_thermal_cell_layer
 
 SystemMatrix fill_system_matrix_layer
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    SystemMatrix  system_matrix
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX

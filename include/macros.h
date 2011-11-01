@@ -159,7 +159,7 @@ extern "C"
 # define LAST_LAYER_INDEX(dim)        (get_number_of_layers (dim) - 1)
 
 # define IS_FIRST_LAYER(layer)        (layer == FIRST_LAYER_INDEX)
-# define IS_LAST_LAYER(layer, dim)    (layer == LAST_LAYER_INDEX(dim))
+# define IS_LAST_LAYER(layer, dim)    (layer == (unsigned int) LAST_LAYER_INDEX(dim))
 
 # define FOR_EVERY_LAYER(index, dim)                     \
                                                          \
