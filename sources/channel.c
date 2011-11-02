@@ -704,8 +704,7 @@ SystemMatrix fill_system_matrix_channel
     {
         typedef SystemMatrix (*add_column_fp)
 
-            (Dimensions*, ThermalCell*,
-             GridDimension_t, GridDimension_t, GridDimension_t, SystemMatrix)  ;
+            (Dimensions*, ThermalCell*, uint32_t, uint32_t, uint32_t, SystemMatrix)  ;
 
         add_column_fp bottom_layer ;
         add_column_fp virtual_layer ;
@@ -722,10 +721,10 @@ SystemMatrix fill_system_matrix_channel
         }
         else  // TDICE_CHANNEL_MODEL_MC_RM2
         {
-            bottom_layer  = &add_bottom_wall_column_mc_2rm ;
-            virtual_layer = &add_virtual_wall_column_mc_2rm ;
-            liquid_layer  = &add_liquid_column_mc_2rm ;
-            top_layer     = &add_top_wall_column_mc_2rm ;
+            bottom_layer  = &add_bottom_wall_column_mc_rm2 ;
+            virtual_layer = &add_virtual_wall_column_mc_rm2 ;
+            liquid_layer  = &add_liquid_column_mc_rm2 ;
+            top_layer     = &add_top_wall_column_mc_rm2 ;
         }
 
         // Bottom Wall

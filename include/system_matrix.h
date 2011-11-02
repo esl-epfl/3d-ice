@@ -36,6 +36,11 @@
 #ifndef _3DICE_SYSTEM_MATRIX_
 #define _3DICE_SYSTEM_MATRIX_
 
+/*! \file system_matrix.h
+ *  \brief File containing the definition and the interface to handle the matrix
+ *         used for the thermal simulation
+ */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -43,55 +48,104 @@ extern "C"
 
 /******************************************************************************/
 
+#include "stdint.h"
+
 #include "dimensions.h"
 #include "thermal_cell.h"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    /* Compressed Column Storage (CCS):                           */
-    /* the matrix stores non zero values as sequences of Columns. */
+    /*! \struct SystemMatrix
+     *
+     *  \brief Structure representing the squared matrix storing the coefficients of the
+     *         linear system that is solved tu run the thermal simulation
+     *
+     * Compressed Column Storage (CCS): the matrix stores non zero values as
+     * sequences of columns.
+     */
 
-    /* Storage for the column pointers */
+    struct SystemMatrix
+    {
 
-    SystemMatrixColumn_t* ColumnPointers ;
+        /*! Pointer to the array storing the column pointers.
+         *  If the matrix is nxn, then n+1 column pointer are needed.
+         */
 
-    /* Storage for the row indices. */
+        uint32_t *ColumnPointers ;
 
-    SystemMatrixRow_t* RowIndices ;
+        /*! Pointer to the array storing the row indexes
+         *  If the matrix has nnz elements, then nnz row indexes are needed */
 
-    /* Storage for the nonzero entries. */
+        uint32_t* RowIndices ;
 
-    SystemMatrixValue_t* Values ;
+        /*! Pointer to the array storing the non zeroes coefficient */
 
-    Quantity_t Size ;
-    Quantity_t NNz ;
+        double* Values ;
 
-  }  SystemMatrix ;
+        /*! The dimension n of the squared matrix nxn */
 
-/******************************************************************************/
+        uint32_t Size ;
 
-  void init_system_matrix (SystemMatrix* matrix) ;
+        /*! The number of nonzeroes coefficients */
 
-/******************************************************************************/
+        uint32_t NNz ;
 
-  int alloc_system_matrix
-  (
-    SystemMatrix* matrix,
-    Quantity_t    nvalues,
-    Quantity_t    nnz
-  ) ;
+    } ;
 
-/******************************************************************************/
+    /*! Definition of the type SystemMAtrix */
 
-  void free_system_matrix (SystemMatrix* matrix) ;
-
-/******************************************************************************/
-
-  void print_system_matrix (String_t filename, SystemMatrix matrix) ;
+    typedef struct SystemMatrix SystemMatrix ;
 
 /******************************************************************************/
+
+
+    /*! Sets all the fields of \a system_matrix to a default value (zero or \c NULL ).
+     *
+     * \param system_matrix the address of the system matrix to initialize
+     */
+
+    void init_system_matrix (SystemMatrix *system_matrix) ;
+
+
+
+    /*! Allocates memory to store indexes and coefficients of a SystemMatrix
+     *
+     * \param system_matrix the address of the system matrix
+     * \param size          the dimension of the matrix
+     * \param nnz           the number of nonzeroes coeffcients
+     *
+     * \return \c TDICE_SUCCESS if the memory allocation succeded
+     * \return \c TDICE_FAILURE if the memory allocation fails
+     */
+
+    Error_t alloc_system_matrix
+
+        (SystemMatrix *system_matrix, uint32_t size, uint32_t nnz) ;
+
+
+
+    /*! Frees the memory used to store indexes and coefficients of a system matrix
+     *
+     * \param system_matrix the address of the system matrix structure
+     */
+
+    void free_system_matrix (SystemMatrix *system_matrix) ;
+
+
+
+    /*! Generates a text file storing the nonzeroes coefficients
+     *
+     * The file will contain one row of the form row-column-value" for each
+     * zero coefficient (COO format). The first row (or column) has index 1
+     * (matlab compatibile)
+     *
+     * \param file_name     the name of the file to create
+     * \param system_matrix the system matrix structure
+     */
+
+    void print_system_matrix (char *file_name, SystemMatrix system_matrix) ;
+
+
 
     /*! Fills a column of the system matrix
      *
@@ -109,14 +163,14 @@ extern "C"
 
     SystemMatrix add_solid_column
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -137,14 +191,14 @@ extern "C"
 
     SystemMatrix add_liquid_column_mc_4rm
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -163,16 +217,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_liquid_column_mc_2rm
+    SystemMatrix add_liquid_column_mc_rm2
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -191,16 +245,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_bottom_wall_column_mc_2rm
+    SystemMatrix add_bottom_wall_column_mc_rm2
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -219,16 +273,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_top_wall_column_mc_2rm
+    SystemMatrix add_top_wall_column_mc_rm2
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -246,16 +300,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_virtual_wall_column_mc_2rm
+    SystemMatrix add_virtual_wall_column_mc_rm2
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -276,14 +330,14 @@ extern "C"
 
     SystemMatrix add_liquid_column_pf
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -304,14 +358,14 @@ extern "C"
 
     SystemMatrix add_bottom_wall_column_pf
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -332,14 +386,14 @@ extern "C"
 
     SystemMatrix add_top_wall_column_pf
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 
@@ -360,14 +414,14 @@ extern "C"
 
     SystemMatrix add_virtual_wall_column_pf
     (
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
 
-        GridDimension_t  layer_index,
-        GridDimension_t  row_index,
-        GridDimension_t  column_index,
+        uint32_t      layer_index,
+        uint32_t      row_index,
+        uint32_t      column_index,
 
-        SystemMatrix     system_matrix
+        SystemMatrix  system_matrix
     ) ;
 
 /******************************************************************************/

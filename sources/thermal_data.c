@@ -157,7 +157,7 @@ int fill_thermal_data
              get_number_of_non_zeroes(stkd->Dimensions)
            ) ;
 
-  if (result == 0)  goto system_matrix_fail ;
+  if (result == TDICE_FAILURE)  goto system_matrix_fail ;
 
   fill_system_matrix_stack_description
 
@@ -166,7 +166,7 @@ int fill_thermal_data
   dCreate_CompCol_Matrix
   (
     &tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-    tdata->SM_A.Values, tdata->SM_A.RowIndices, tdata->SM_A.ColumnPointers,
+    tdata->SM_A.Values, (int*) tdata->SM_A.RowIndices, (int*) tdata->SM_A.ColumnPointers,
     SLU_NC, SLU_D, SLU_GE
   ) ;
 
@@ -186,7 +186,6 @@ int fill_thermal_data
     = malloc (sizeof(*tdata->SLU_Etree) * tdata->Size) ;
 
   if (tdata->SLU_Etree == NULL)  goto slu_etree_fail ;
-
 
   get_perm_c (tdata->SLU_Options.ColPerm,
               &tdata->SLUMatrix_A,

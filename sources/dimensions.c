@@ -173,7 +173,7 @@ CellDimension_t get_cell_length
 
     return dimensions->Cell.FirstWallLength ;
 
-  else if (IS_LAST_COLUMN (column_index, dimensions))
+  else if (IS_LAST_COLUMN ((unsigned int)column_index, dimensions))
 
     return dimensions->Cell.LastWallLength ;
 

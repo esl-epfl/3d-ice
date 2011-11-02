@@ -41,107 +41,110 @@
 
 /******************************************************************************/
 
-void init_system_matrix (SystemMatrix* matrix)
+void init_system_matrix (SystemMatrix* system_matrix)
 {
-    matrix->ColumnPointers = NULL ;
-    matrix->RowIndices     = NULL;
-    matrix->Values         = NULL ;
-    matrix->Size           = QUANTITY_I ;
-    matrix->NNz            = QUANTITY_I ;
+    system_matrix->ColumnPointers = NULL ;
+    system_matrix->RowIndices     = NULL;
+    system_matrix->Values         = NULL ;
+    system_matrix->Size           = QUANTITY_I ;
+    system_matrix->NNz            = QUANTITY_I ;
 }
 
 /******************************************************************************/
 
-int alloc_system_matrix
+Error_t alloc_system_matrix
 (
-    SystemMatrix *matrix,
-    Quantity_t    size,
-    Quantity_t    nnz
+    SystemMatrix *system_matrix,
+    uint32_t      size,
+    uint32_t      nnz
 )
 {
-    matrix->Size = size ;
-    matrix->NNz  = nnz ;
+    system_matrix->Size = size ;
+    system_matrix->NNz  = nnz ;
 
-    matrix->RowIndices = malloc (sizeof(SystemMatrixRow_t) * nnz) ;
+    system_matrix->RowIndices = malloc (sizeof(uint32_t) * nnz) ;
 
-    if (matrix->RowIndices == NULL)
+    if (system_matrix->RowIndices == NULL)
 
-        return 0 ;
+        return TDICE_FAILURE ;
 
-    matrix->ColumnPointers = malloc (sizeof(SystemMatrixColumn_t) * (size + 1)) ;
+    system_matrix->ColumnPointers = malloc (sizeof(uint32_t) * (size + 1)) ;
 
-    if (matrix->ColumnPointers == NULL)
+    if (system_matrix->ColumnPointers == NULL)
     {
-        FREE_POINTER (free, matrix->RowIndices) ;
-        return 0 ;
+        FREE_POINTER (free, system_matrix->RowIndices) ;
+        return TDICE_FAILURE ;
     }
 
-    matrix->Values = malloc (sizeof(SystemMatrixValue_t) * nnz) ;
+    system_matrix->Values = malloc (sizeof(double) * nnz) ;
 
-    if (matrix->Values == NULL)
+    if (system_matrix->Values == NULL)
     {
-        FREE_POINTER (free, matrix->ColumnPointers) ;
-        FREE_POINTER (free, matrix->RowIndices) ;
-        return 0 ;
+        FREE_POINTER (free, system_matrix->ColumnPointers) ;
+        FREE_POINTER (free, system_matrix->RowIndices) ;
+        return TDICE_FAILURE ;
     }
 
-    return 1 ;
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-void free_system_matrix (SystemMatrix* matrix)
+void free_system_matrix (SystemMatrix* system_matrix)
 {
-    FREE_POINTER (free, matrix->ColumnPointers) ;
-    FREE_POINTER (free, matrix->RowIndices) ;
-    FREE_POINTER (free, matrix->Values) ;
+    FREE_POINTER (free, system_matrix->ColumnPointers) ;
+    FREE_POINTER (free, system_matrix->RowIndices) ;
+    FREE_POINTER (free, system_matrix->Values) ;
 }
 
 /******************************************************************************/
 
-void print_system_matrix (String_t filename, SystemMatrix matrix)
+void print_system_matrix (char *file_name, SystemMatrix system_matrix)
 {
-    FILE* file = fopen (filename, "w") ;
+    FILE* file = fopen (file_name, "w") ;
 
     if (file == NULL)
     {
-        fprintf(stderr, "Cannot open file %s\n", filename) ;
-        exit (-1) ;
+        fprintf(stderr, "Cannot open file %s\n", file_name) ;
+        return ;
     }
 
-    int row, column ;
+    uint32_t row, column ;
 
-    for (column = 0 ; column < matrix.Size ; column ++)
+    for (column = 0 ; column < system_matrix.Size ; column++)
 
-        for (row = matrix.ColumnPointers[column] ; row < matrix.ColumnPointers[column + 1] ; row++)
+        for (row = system_matrix.ColumnPointers[column] ;
+             row < system_matrix.ColumnPointers[column + 1] ;
+             row++)
 
-            fprintf (file, "%5d\t%5d\t%32.24f\n", matrix.RowIndices[row] + 1, column + 1, matrix.Values[row]) ;
+            fprintf (file, "%5d\t%5d\t%32.24f\n",
+                system_matrix.RowIndices[row] + 1, column + 1,
+                system_matrix.Values[row]) ;
 
     fclose (file) ;
 }
 
 /******************************************************************************/
-/******************************************************************************/
 
 SystemMatrix add_solid_column
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset  = get_layer_area (dimensions) ;
-    GridDimension_t row_offset    = get_number_of_columns (dimensions) ;
-    GridDimension_t column_offset = 1 ;
+    uint32_t layer_offset  = get_layer_area (dimensions) ;
+    uint32_t row_offset    = get_number_of_columns (dimensions) ;
+    uint32_t column_offset = 1 ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -325,27 +328,26 @@ SystemMatrix add_solid_column
 }
 
 /******************************************************************************/
-/******************************************************************************/
 
 SystemMatrix add_liquid_column_mc_4rm
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset  = get_layer_area (dimensions) ;
-    GridDimension_t row_offset    = get_number_of_columns (dimensions) ;
-    GridDimension_t column_offset = 1 ;
+    uint32_t layer_offset  = get_layer_area (dimensions) ;
+    uint32_t row_offset    = get_number_of_columns (dimensions) ;
+    uint32_t column_offset = 1 ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -513,26 +515,25 @@ SystemMatrix add_liquid_column_mc_4rm
 }
 
 /******************************************************************************/
-/******************************************************************************/
 
-SystemMatrix add_liquid_column_mc_2rm
+SystemMatrix add_liquid_column_mc_rm2
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
-    GridDimension_t row_offset   = get_number_of_columns (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t row_offset   = get_number_of_columns (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -541,7 +542,7 @@ SystemMatrix add_liquid_column_mc_2rm
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_liquid_column_2rm  l %2d r %4d c %4d [%7d]\n",
+        "add_liquid_column_rm2  l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -657,23 +658,23 @@ SystemMatrix add_liquid_column_mc_2rm
 
 /******************************************************************************/
 
-SystemMatrix add_bottom_wall_column_mc_2rm
+SystemMatrix add_bottom_wall_column_mc_rm2
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -682,7 +683,7 @@ SystemMatrix add_bottom_wall_column_mc_2rm
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_bottom_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
+        "add_bottom_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -782,23 +783,23 @@ SystemMatrix add_bottom_wall_column_mc_2rm
 
 /******************************************************************************/
 
-SystemMatrix add_top_wall_column_mc_2rm
+SystemMatrix add_top_wall_column_mc_rm2
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -807,7 +808,7 @@ SystemMatrix add_top_wall_column_mc_2rm
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_top_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
+        "add_top_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -908,24 +909,24 @@ SystemMatrix add_top_wall_column_mc_2rm
 
 /******************************************************************************/
 
-SystemMatrix add_virtual_wall_column_mc_2rm
+SystemMatrix add_virtual_wall_column_mc_rm2
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
-    GridDimension_t row_offset   = get_number_of_columns (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t row_offset   = get_number_of_columns (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -1064,22 +1065,22 @@ SystemMatrix add_virtual_wall_column_mc_2rm
 
 SystemMatrix add_liquid_column_pf
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
-    GridDimension_t row_offset   = get_number_of_columns (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t row_offset   = get_number_of_columns (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -1088,7 +1089,7 @@ SystemMatrix add_liquid_column_pf
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_liquid_column_2rm  l %2d r %4d c %4d [%7d]\n",
+        "add_liquid_column_rm2  l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -1206,21 +1207,21 @@ SystemMatrix add_liquid_column_pf
 
 SystemMatrix add_bottom_wall_column_pf
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -1229,7 +1230,7 @@ SystemMatrix add_bottom_wall_column_pf
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_bottom_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
+        "add_bottom_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -1332,21 +1333,21 @@ SystemMatrix add_bottom_wall_column_pf
 
 SystemMatrix add_top_wall_column_pf
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -1355,7 +1356,7 @@ SystemMatrix add_top_wall_column_pf
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_top_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
+        "add_top_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -1457,21 +1458,21 @@ SystemMatrix add_top_wall_column_pf
 
 SystemMatrix add_virtual_wall_column_pf
 (
-    Dimensions      *dimensions,
-    ThermalCell     *thermal_cells,
-    GridDimension_t  layer_index,
-    GridDimension_t  row_index,
-    GridDimension_t  column_index,
-    SystemMatrix     system_matrix
+    Dimensions   *dimensions,
+    ThermalCell  *thermal_cells,
+    uint32_t      layer_index,
+    uint32_t      row_index,
+    uint32_t      column_index,
+    SystemMatrix  system_matrix
 )
 {
-    SystemMatrixValue_t  conductance      = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t  diagonal_value   = SYSTEMMATRIXVALUE_I ;
-    SystemMatrixValue_t* diagonal_pointer = NULL ;
+    double  conductance      = 0.0 ;
+    double  diagonal_value   = 0.0 ;
+    double *diagonal_pointer = NULL ;
 
-    GridDimension_t layer_offset = get_layer_area (dimensions) ;
+    uint32_t layer_offset = get_layer_area (dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 

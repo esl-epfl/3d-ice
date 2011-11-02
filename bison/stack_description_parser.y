@@ -1019,6 +1019,14 @@ dimensions
                 * get_number_of_rows (stkd->Dimensions)
                 * get_number_of_columns (stkd->Dimensions) ;
 
+        if ((uint32_t) stkd->Dimensions->Grid.NCells >  INT32_MAX)
+        {
+            stack_description_error
+                (stkd, scanner, "Too many cells ... (SuperLU uses 'int')") ;
+
+            YYABORT ;
+        }
+
         if (   stkd->Channel == NULL
             || stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
         {

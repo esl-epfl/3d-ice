@@ -126,8 +126,8 @@ extern "C"
 # define FIRST_ROW_INDEX              GRIDDIMENSION_I
 # define LAST_ROW_INDEX(dim)          (get_number_of_rows (dim) - 1)
 
-# define IS_FIRST_ROW(row)            (row == FIRST_ROW_INDEX)
-# define IS_LAST_ROW(row, dim)        (row == LAST_ROW_INDEX(dim))
+# define IS_FIRST_ROW(row)            (row == (unsigned int) FIRST_ROW_INDEX)
+# define IS_LAST_ROW(row, dim)        (row == (unsigned int) LAST_ROW_INDEX(dim))
 
 # define FOR_EVERY_ROW(index, dim)                   \
                                                      \
@@ -139,8 +139,8 @@ extern "C"
 # define FIRST_COLUMN_INDEX           GRIDDIMENSION_I
 # define LAST_COLUMN_INDEX(dim)       (get_number_of_columns (dim) - 1)
 
-# define IS_FIRST_COLUMN(column)      (column == FIRST_COLUMN_INDEX)
-# define IS_LAST_COLUMN(column, dim)  (column == LAST_COLUMN_INDEX(dim))
+# define IS_FIRST_COLUMN(column)      (column == (unsigned int) FIRST_COLUMN_INDEX)
+# define IS_LAST_COLUMN(column, dim)  (column == (unsigned int) LAST_COLUMN_INDEX(dim))
 
 # define IS_CHANNEL_COLUMN(channel_model, column) \
                                                   \
@@ -158,7 +158,7 @@ extern "C"
 # define FIRST_LAYER_INDEX            GRIDDIMENSION_I
 # define LAST_LAYER_INDEX(dim)        (get_number_of_layers (dim) - 1)
 
-# define IS_FIRST_LAYER(layer)        (layer == FIRST_LAYER_INDEX)
+# define IS_FIRST_LAYER(layer)        (layer == (unsigned int) FIRST_LAYER_INDEX)
 # define IS_LAST_LAYER(layer, dim)    (layer == (unsigned int) LAST_LAYER_INDEX(dim))
 
 # define FOR_EVERY_LAYER(index, dim)                     \
