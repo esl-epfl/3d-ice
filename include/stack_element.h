@@ -36,6 +36,10 @@
 #ifndef _3DICE_STACK_ELEMENT_H_
 #define _3DICE_STACK_ELEMENT_H_
 
+/*! \file stack_element.h
+ *  \brief File containing the definition and the interface to handle stack elements
+ */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,6 +48,7 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "layer.h"
 #include "die.h"
@@ -52,85 +57,167 @@ extern "C"
 
 /******************************************************************************/
 
-  struct StackElement
-  {
-    /* The id (string) of the stack element */
+    /*! \union StackElement_p
+     *
+     *  A union of pointers to types that can be an instance of a StackElement
+     */
 
-    String_t Id ;
+    union StackElement_p
+    {
+        Layer   *Layer ;     /*!< Pointer to a Layer   */
+        Die     *Die ;       /*!< Pointer to a Die     */
+        Channel *Channel ;   /*!< Pointer to a Channel */
+    } ;
 
-    /* The type of the stack element */
+    /*! Definition of the type StackElement_p */
 
-    StackElement_t Type ;
-
-    /* The pointer to the effective stack element */
-    /* corresponding to the value in Type         */
-
-    union {
-
-      Layer*   Layer ;
-      Die*     Die ;
-      Channel* Channel ;
-
-    } Pointer ;
-
-    /* The number of layer composing the stack element */
-
-    GridDimension_t NLayers ;
-
-    /* A pointer to a Floorplan. This field is   */
-    /* used only if Type == TL_STACK_ELEMENT_DIE */
-
-    Floorplan* Floorplan ;
-
-    /* The offset (#of layers) counting from the */
-    /* first layer in the stack                  */
-
-    GridDimension_t Offset ;
-
-    /* To collect stack elements in a double linked list */
-
-    struct StackElement* Prev ;  // Towards the bottom of the stack
-    struct StackElement* Next ;  // Toward the top of the stack
-
-  } ;
-
-  typedef struct StackElement StackElement ;
+    typedef union StackElement_p StackElement_p ;
 
 /******************************************************************************/
 
-  void init_stack_element (StackElement* stack_element) ;
+    /*! \struct StackElement
+     *
+     *  \brief Structure used to store data about the stack element that compose the 2D/3D stack.
+     *
+     *  A stack element is the main componenent of a 3d stack. It can be a layer,
+     *  a die or a channel.
+     */
+
+    struct StackElement
+    {
+        /*! The id (string) of the stack element */
+
+        char *Id ;
+
+        /*! The type of the stack element (Layer, Die or Channel) */
+
+        StackElement_t Type ;
+
+        /*! Pointer to a data structure representing the type of a StackElement.
+         *  This pointer must be casted depending on the value stored in
+         *  StackElement::Type */
+
+        StackElement_p Pointer ;
+
+        /*! The number of layers composing the stack element */
+
+        uint32_t NLayers ;
+
+        /*! A pointer to a Floorplan. This field is
+         *  used only if StaclElement::Type is \c TDICE_STACK_ELEMENT_DIE */
+
+        Floorplan *Floorplan ;
+
+        /*! The offset (\# layers) of the first layer of the
+         *  stack element, counting from the first layer in the stack */
+
+        uint32_t Offset ;
+
+        /*! Pointer to the 'next' stack element (towards the top of the stack),
+         *  to collect stack elements in a double linked list */
+
+        struct StackElement *Next ;
+
+        /*! Pointer to the 'previous' stack element (towards the bottom of the stack),
+         *  to collect stack elements in a double linked list */
+
+        struct StackElement *Prev ;
+
+    } ;
+
+    /*! Definition of the type StackElement */
+
+    typedef struct StackElement StackElement ;
 
 /******************************************************************************/
 
-  StackElement* alloc_and_init_stack_element (void) ;
+    /*! Sets all the fields of \a stack \a element to a default value (zero or \c NULL ).
+     *
+     * \param stack_element the address of the stack element to initialize
+     */
 
-/******************************************************************************/
+    void init_stack_element (StackElement *stack_element) ;
 
-  void free_stack_element (StackElement* stack_element) ;
 
-/******************************************************************************/
 
-  void free_stack_elements_list (StackElement* list) ;
+    /*! Allocates a stack element in memory and sets its fields to their default
+     *  value with #init_stack_element
+     *
+     * \return the pointer to a new StackElement
+     * \return \c NULL if the memory allocation fails
+     */
 
-/******************************************************************************/
+    StackElement *alloc_and_init_stack_element (void) ;
 
-  void print_formatted_stack_elements_list
-  (
-    FILE*         stream,
-    String_t      prefix,
-    StackElement* list
-  ) ;
 
-/******************************************************************************/
 
-  void print_detailed_stack_elements_list
-  (
-    FILE*         stream,
-    String_t      prefix,
-    StackElement* list
-  ) ;
+    /*! Frees the memory related to \a stack \a element
+     *
+     * The parametrer \a stack_element must be a pointer previously obtained with
+     * #alloc_and_init_stack_element
+     *
+     * \param stack_element the address of the stack_element structure to free
+     */
 
-/******************************************************************************/
+    void free_stack_element (StackElement *stack_element) ;
+
+
+
+    /*! Frees a list of stack elements
+     *
+     * If frees, calling #free_stack_element, the stack element pointed by the
+     * parameter \a list and all the stack elements it finds following the
+     * linked list throught the field StackElement::Next .
+     *
+     * \param list the pointer to the first elment in the list to be freed
+     */
+
+    void free_stack_elements_list (StackElement *list) ;
+
+
+
+    /*! Searches for a StackElement in a linked list of stack elements.
+     *
+     * Id based search of a StackElement structure in a list.
+     *
+     * \param list the pointer to the list
+     * \param id   the identifier of the stack element to be found
+     *
+     * \return the address of a StackElement, if founded
+     * \return \c NULL if the search fails
+     */
+
+    StackElement *find_stack_element_in_list (StackElement *list, char *id) ;
+
+
+    // FIXME : what about print_formatted_stack_element ??
+    // FIXME : what about print_detailed_stack_element  ??
+
+    /*! Prints a list of stack elements as they look in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first stack element in the list
+     */
+
+    void print_formatted_stack_elements_list
+
+        (FILE *stream, char *prefix, StackElement *list) ;
+
+
+
+    /*! Prints a list of detailed information about all the fields of the stack elements
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first stack element in the list
+     */
+
+    void print_detailed_stack_elements_list
+
+        (FILE *stream, char *prefix, StackElement *list) ;
+
+
 
     /*! Fill the thermal cells corresponding to a stack element
      *
@@ -143,7 +230,7 @@ extern "C"
     void fill_thermal_cell_stack_element
     (
         ThermalCell  *thermal_cells,
-        Time_t        delta_time,
+        double        delta_time,
         Dimensions   *dimensions,
         StackElement *stack_element
     ) ;
@@ -155,31 +242,21 @@ extern "C"
      *  \param sources       pointer to the first element in the source vector
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param stack_element pointer to the stack element
+     *
+     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
+     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
+     *                           (at least one floorplan element with no power
+     *                            values in its queue)
      */
 
     Error_t fill_sources_stack_element
     (
-        Source_t     *sources,
+        double       *sources,
         Dimensions   *dimensions,
         StackElement *stack_element
     ) ;
 
-/******************************************************************************/
 
-  void init_power_values_stack_element
-  (
-    StackElement*         stack_element
-  ) ;
-
-/******************************************************************************/
-
-  void insert_power_values_stack_element
-  (
-    StackElement*         stack_element,
-    PowersQueue*          pvalues
-  ) ;
-
-/******************************************************************************/
 
     /*! Fills the system matrix
      *
@@ -201,7 +278,11 @@ extern "C"
 
 /******************************************************************************/
 
-  StackElement* find_stack_element_in_list (StackElement* list, String_t id) ;
+    void init_power_values_stack_element (StackElement *stack_element) ;
+
+    void insert_power_values_stack_element
+
+        (StackElement *stack_element, PowersQueue *pvalues) ;
 
 /******************************************************************************/
 

@@ -74,12 +74,12 @@ extern "C"
 
         Material *Material ;
 
-        /*! Pointer to the 'next' layer,
+        /*! Pointer to the 'next' layer (towards the top of the die),
          *  to collect layers in a double linked list */
 
         struct Layer *Next ;
 
-        /*! Pointer to the 'previous' layer,
+        /*! Pointer to the 'previous' layer (towards the bottom of the die),
          *  to collect layers in a double linked list */
 
         struct Layer *Prev ;
@@ -114,8 +114,6 @@ extern "C"
 
 
     /*! Frees the memory related to \a layer
-     *
-     * The function frees the memory pointed by \a layer .
      *
      * The parametrer \a layer must be a pointer previously obtained with
      * \c alloc_and_init_layer
@@ -197,7 +195,7 @@ extern "C"
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
      *  \param delta_time    the time resolution of the thermal simulation
      *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (# of layers) of the layer within the stack
+     *  \param layer_index   offset (\# layers) of the layer within the stack
      *  \param layer         pointer to the layer
      */
 
@@ -216,7 +214,7 @@ extern "C"
      *
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (# of layers) of the die within the stack
+     *  \param layer_index   offset (\# layers) of the die within the stack
      *  \param system_matrix copy of the system matrix structure
      *
      *  \return A matrix partially filled (FIXME)

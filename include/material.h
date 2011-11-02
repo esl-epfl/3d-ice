@@ -126,10 +126,6 @@ extern "C" {
 
     /*! Frees the memory related to \a material
      *
-     * The function frees the memory used to store the identifier
-     * Material::Id, if allocated, and then frees the memory pointed by
-     * material.
-     *
      * The parametrer \a material must be a pointer previously obtained with
      * \c alloc_and_init_material
      *
