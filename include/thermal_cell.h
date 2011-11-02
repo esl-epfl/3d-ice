@@ -36,9 +36,7 @@
 #ifndef _3DICE_THERMALCELL_H_
 #define _3DICE_THERMALCELL_H_
 
-/*! \file thermal_cell.h
- *  \brief File containing the definition and the interface to handle a thermal cell
- */
+/*! \file thermal_cell.h */
 
 #ifdef __cplusplus
 extern "C"

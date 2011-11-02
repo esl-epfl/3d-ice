@@ -36,9 +36,7 @@
 #ifndef _3DICE_CONVENTIONAL_HEAT_SINK_H_
 #define _3DICE_CONVENTIONAL_HEAT_SINK_H_
 
-/*! \file conventional_heat_sink.h
- *  \brief File containing the definition and the interface to handle the conventional heat sink
- */
+/*! \file conventional_heat_sink.h */
 
 #ifdef __cplusplus
 extern "C"

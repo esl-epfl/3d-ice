@@ -41,6 +41,8 @@ extern "C"
 {
 #endif
 
+#include <stdint.h> // FIXME
+
 /******************************************************************************/
 
 # define PI (3.14159265358979323846)
@@ -123,24 +125,24 @@ extern "C"
 
 /******************************************************************************/
 
-# define FIRST_ROW_INDEX              GRIDDIMENSION_I
+# define FIRST_ROW_INDEX              0u
 # define LAST_ROW_INDEX(dim)          (get_number_of_rows (dim) - 1)
 
-# define IS_FIRST_ROW(row)            (row == (unsigned int) FIRST_ROW_INDEX)
-# define IS_LAST_ROW(row, dim)        (row == (unsigned int) LAST_ROW_INDEX(dim))
+# define IS_FIRST_ROW(row)            (row == FIRST_ROW_INDEX)
+# define IS_LAST_ROW(row, dim)        (row == LAST_ROW_INDEX(dim))
 
 # define FOR_EVERY_ROW(index, dim)                   \
                                                      \
-    GridDimension_t index = GRIDDIMENSION_I ;        \
+    uint32_t index = 0u ;                            \
     for (index = FIRST_ROW_INDEX ; index <= LAST_ROW_INDEX(dim) ; index++)
 
 /******************************************************************************/
 
-# define FIRST_COLUMN_INDEX           GRIDDIMENSION_I
+# define FIRST_COLUMN_INDEX           0u
 # define LAST_COLUMN_INDEX(dim)       (get_number_of_columns (dim) - 1)
 
-# define IS_FIRST_COLUMN(column)      (column == (unsigned int) FIRST_COLUMN_INDEX)
-# define IS_LAST_COLUMN(column, dim)  (column == (unsigned int) LAST_COLUMN_INDEX(dim))
+# define IS_FIRST_COLUMN(column)      (column == FIRST_COLUMN_INDEX)
+# define IS_LAST_COLUMN(column, dim)  (column == LAST_COLUMN_INDEX(dim))
 
 # define IS_CHANNEL_COLUMN(channel_model, column) \
                                                   \
@@ -150,30 +152,30 @@ extern "C"
 
 # define FOR_EVERY_COLUMN(index, dim)                      \
                                                            \
-    GridDimension_t index = GRIDDIMENSION_I ;              \
+    uint32_t index = 0u ;                                  \
     for (index = FIRST_COLUMN_INDEX ; index <= LAST_COLUMN_INDEX(dim) ; index++)
 
 /******************************************************************************/
 
-# define FIRST_LAYER_INDEX            GRIDDIMENSION_I
+# define FIRST_LAYER_INDEX            0u
 # define LAST_LAYER_INDEX(dim)        (get_number_of_layers (dim) - 1)
 
-# define IS_FIRST_LAYER(layer)        (layer == (unsigned int) FIRST_LAYER_INDEX)
-# define IS_LAST_LAYER(layer, dim)    (layer == (unsigned int) LAST_LAYER_INDEX(dim))
+# define IS_FIRST_LAYER(layer)        (layer == FIRST_LAYER_INDEX)
+# define IS_LAST_LAYER(layer, dim)    (layer == LAST_LAYER_INDEX(dim))
 
 # define FOR_EVERY_LAYER(index, dim)                     \
                                                          \
-    GridDimension_t index = GRIDDIMENSION_I ;            \
+    uint32_t index = 0u ;                         \
     for (index = FIRST_LAYER_INDEX ; index <= LAST_LAYER_INDEX(dim) ; index++)
 
 /******************************************************************************/
 
-# define FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el) flp_el->SW_Row
-# define LAST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el)  flp_el->NE_Row
+# define FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el) (uint32_t)flp_el->SW_Row
+# define LAST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el)  (uint32_t)flp_el->NE_Row
 
 # define FOR_EVERY_FLOORPLAN_ELEMENT_ROW(index, flp_el)   \
                                                           \
-    GridDimension_t index = GRIDDIMENSION_I ;             \
+    uint32_t index = 0u ;                                 \
     for                                                   \
     (                                                     \
       index = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el) ; \
@@ -183,12 +185,12 @@ extern "C"
 
 /******************************************************************************/
 
-# define FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) flp_el->SW_Column
-# define LAST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el)  flp_el->NE_Column
+# define FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) (uint32_t)flp_el->SW_Column
+# define LAST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el)  (uint32_t)flp_el->NE_Column
 
 # define FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN(index, flp_el)   \
                                                              \
-    GridDimension_t index = GRIDDIMENSION_I ;                \
+    uint32_t index = 0u ;                                    \
     for                                                      \
     (                                                        \
       index = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) ; \
@@ -218,10 +220,10 @@ extern "C"
 
 # define CCONV_MC_4RM(nchannels, coolant_vhc, coolant_fr) \
                                                           \
-  (Cconv_t) (                                             \
+  (double)  (                                             \
                (coolant_vhc * coolant_fr)                 \
                /                                          \
-               ((Cconv_t) (nchannels * 2))                \
+               ((double) (nchannels * 2))                 \
             )
 
 /* 2RM for Microchannels
@@ -245,10 +247,10 @@ extern "C"
 
 # define CCONV_MC_2RM(nchannels, coolant_vhc, coolant_fr, porosity, cell_length, channel_length) \
                                                                                                  \
-  (Cconv_t) (                                                                                    \
+  (double) (                                                                                     \
                (coolant_vhc * coolant_fr * porosity)                                             \
                /                                                                                 \
-               ((Cconv_t) (nchannels * 2))                                                       \
+               ((double) (nchannels * 2))                                                        \
                *                                                                                 \
                (cell_length / channel_length)                                                    \
             )
@@ -261,12 +263,12 @@ extern "C"
  *                                * Porosity                             [ ]
  */
 
-# define CCONV_PF(coolant_vhc, darcy_velocity, cell_length, cavity_height)  \
-                                                                                                           \
-  (Cconv_t) (                                                                                              \
-                 (coolant_vhc * darcy_velocity * cell_length * cavity_height)   \
-                 /                                                              \
-                 ((Cconv_t) 2)                                                  \
+# define CCONV_PF(coolant_vhc, darcy_velocity, cell_length, cavity_height)    \
+                                                                              \
+  (double) (                                                                  \
+                 (coolant_vhc * darcy_velocity * cell_length * cavity_height) \
+                 /                                                            \
+                 ((double) 2)                                                 \
             )
 
 /******************************************************************************/
@@ -278,7 +280,7 @@ extern "C"
 
 # define EFFECTIVE_HTC_MC_2RM(htc, channel_width, cavity_height, channel_pitch)  \
                                                                                  \
-  (CoolantHTC_t) (                                                               \
+  (double) (                                                                     \
                    htc * (channel_width + cavity_height) / channel_pitch         \
                  )
 
@@ -289,7 +291,7 @@ extern "C"
 
 # define EFFECTIVE_HTC_PF_INLINE(darcy_velocity)                                      \
                                                                                       \
-  (CoolantHTC_t) (                                                                    \
+  (double) (                                                                          \
                    1e-12                                                              \
                    /                                                                  \
                    (2.527e-05 / pow((darcy_velocity/1e+06 + 1.35), 0.64) + 1.533e-06) \
@@ -300,8 +302,8 @@ extern "C"
 
 # define EFFECTIVE_HTC_PF_STAGGERED(darcy_velocity)                                   \
                                                                                       \
-  (CoolantHTC_t) (                                                                    \
-                   1e-12                                                      \
+  (double) (                                                                          \
+                   1e-12                                                              \
                    /                                                                  \
                    (2.527e-05 / pow((darcy_velocity/1e+06 + 1.35), 1.52) + 1.533e-06) \
                  )

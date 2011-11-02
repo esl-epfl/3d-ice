@@ -36,9 +36,7 @@
 #ifndef _3DICE_DIE_H_
 #define _3DICE_DIE_H_
 
-/*! \file die.h
- *  \brief File containing the definition and the interface to handle dies
- */
+/*! \file die.h */
 
 #ifdef __cplusplus
 extern "C"

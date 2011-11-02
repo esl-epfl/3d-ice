@@ -36,9 +36,7 @@
 #ifndef _3DICE_STACK_ELEMENT_H_
 #define _3DICE_STACK_ELEMENT_H_
 
-/*! \file stack_element.h
- *  \brief File containing the definition and the interface to handle stack elements
- */
+/*! \file stack_element.h */
 
 #ifdef __cplusplus
 extern "C"

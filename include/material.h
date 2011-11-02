@@ -36,9 +36,7 @@
 #ifndef _3DICE_MATERIAL_H_
 #define _3DICE_MATERIAL_H_
 
-/*! \file material.h
- *  \brief File containing the definition and the interface to handle materials
- */
+/*! \file material.h */
 
 #ifdef __cplusplus
 extern "C" {

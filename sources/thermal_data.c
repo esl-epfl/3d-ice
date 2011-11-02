@@ -151,11 +151,8 @@ int fill_thermal_data
   /* Alloc and set system matrix */
 
   result = alloc_system_matrix
-           (
-             &tdata->SM_A,
-             tdata->Size,
-             get_number_of_non_zeroes(stkd->Dimensions)
-           ) ;
+
+    (&tdata->SM_A, tdata->Size, get_number_of_connections(stkd->Dimensions)) ;
 
   if (result == TDICE_FAILURE)  goto system_matrix_fail ;
 
@@ -828,8 +825,7 @@ int get_cell_temperature
                          layer_index, row_index, column_index
                        ) ;
 
-  if (id < (GridDimension_t) 0
-      || id > get_number_of_cells(stkd->Dimensions))
+  if ((uint32_t) id > get_number_of_cells(stkd->Dimensions))
 
     return -1 ;
 

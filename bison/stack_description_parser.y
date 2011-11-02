@@ -36,6 +36,7 @@
 %{
 #include "types.h"
 #include "macros.h"
+#include "dimensions.h"
 #include "material.h"
 #include "die.h"
 #include "layer.h"
@@ -988,21 +989,21 @@ dimensions
                     YYABORT ;
                 }
 
+                // Check the number of columns
+
+                if (stkd->Dimensions->Grid.NColumns < 3)
+                {
+                    stack_description_error (stkd, scanner, "Error: not enough columns") ;
+
+                    YYABORT ;
+                }
+
                 stkd->Channel->NChannels = (Quantity_t) ((stkd->Dimensions->Grid.NColumns - 1 )  / 2) ;
             }
             else if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
             {
                 stkd->Channel->NChannels = (Quantity_t) (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
             }
-        }
-
-        // Check the number of columns
-
-        if (stkd->Dimensions->Grid.NColumns < 3)
-        {
-            stack_description_error (stkd, scanner, "Error: not enough columns") ;
-
-            YYABORT ;
         }
 
         // Counts the number of layers
@@ -1032,7 +1033,7 @@ dimensions
         {
             // NO CHANNEL OR IT IS TDICE_CHANNEL_MODEL_MC_4RM
 
-            stkd->Dimensions->Grid.NNz =
+            stkd->Dimensions->Grid.NConnections =
 
                     // number of coefficients in the diagonal
                     get_number_of_layers (stkd->Dimensions)
@@ -1063,7 +1064,7 @@ dimensions
 
             Quantity_t num_layers_except_channel = get_number_of_layers (stkd->Dimensions) - num_layers_for_channel ;
 
-            stkd->Dimensions->Grid.NNz =
+            stkd->Dimensions->Grid.NConnections =
                     // For Normal Cells
                     // Number of coefficients in the diagonal
                         num_layers_except_channel
@@ -1115,7 +1116,7 @@ dimensions
 
             Quantity_t num_layers_except_channel = get_number_of_layers (stkd->Dimensions) - num_layers_for_channel ;
 
-            stkd->Dimensions->Grid.NNz =
+            stkd->Dimensions->Grid.NConnections =
 
                     // For Normal Cells
                     // Number of coefficients in the diagonal

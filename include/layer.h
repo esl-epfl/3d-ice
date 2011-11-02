@@ -36,9 +36,7 @@
 #ifndef _3DICE_LAYER_H_
 #define _3DICE_LAYER_H_
 
-/*! \file layer.h
- *  \brief File containing the definition and the interface to handle layers
- */
+/*! \file layer.h */
 
 #ifdef __cplusplus
 extern "C"

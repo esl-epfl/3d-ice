@@ -285,7 +285,7 @@ SystemMatrix add_solid_column
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -473,7 +473,7 @@ SystemMatrix add_liquid_column_mc_4rm
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -616,7 +616,7 @@ SystemMatrix add_liquid_column_mc_rm2
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + 2 * layer_offset ;
 
@@ -725,7 +725,7 @@ SystemMatrix add_bottom_wall_column_mc_rm2
 
     /* Top connected to Virtual Wall */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -745,7 +745,7 @@ SystemMatrix add_bottom_wall_column_mc_rm2
 
     /* Top connected to Channel */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + 2 * layer_offset ;
 
@@ -870,7 +870,7 @@ SystemMatrix add_top_wall_column_mc_rm2
 
     /* Top connected to Silicon */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -1024,7 +1024,7 @@ SystemMatrix add_virtual_wall_column_mc_rm2
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -1163,7 +1163,7 @@ SystemMatrix add_liquid_column_pf
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -1273,7 +1273,7 @@ SystemMatrix add_bottom_wall_column_pf
 
     /* Top connected to Virtual Wall */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -1293,7 +1293,7 @@ SystemMatrix add_bottom_wall_column_pf
 
     /* Top connected to Channel */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + 2 * layer_offset ;
 
@@ -1418,7 +1418,7 @@ SystemMatrix add_top_wall_column_pf
 
     /* Top connected to Silicon */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + layer_offset ;
 
@@ -1523,7 +1523,7 @@ SystemMatrix add_virtual_wall_column_pf
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER((unsigned int)layer_index, dimensions) )
+    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
         *system_matrix.RowIndices++ = cell_index + 2 * layer_offset ;
 

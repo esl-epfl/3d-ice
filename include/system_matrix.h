@@ -36,10 +36,7 @@
 #ifndef _3DICE_SYSTEM_MATRIX_
 #define _3DICE_SYSTEM_MATRIX_
 
-/*! \file system_matrix.h
- *  \brief File containing the definition and the interface to handle the matrix
- *         used for the thermal simulation
- */
+/*! \file system_matrix.h */
 
 #ifdef __cplusplus
 extern "C"
