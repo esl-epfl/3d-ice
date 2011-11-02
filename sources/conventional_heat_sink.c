@@ -40,85 +40,81 @@
 
 /******************************************************************************/
 
-void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
+void init_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
 {
-  conventionalheatsink->AmbientHTC         = AMBIENTHTC_I ;
-  conventionalheatsink->AmbientTemperature = TEMPERATURE_I ;
-  conventionalheatsink->TopLayer           = NULL ;
-  conventionalheatsink->IsSourceLayer      = FALSE_V ;
+    conventional_heat_sink->AmbientHTC         = 0.0 ;
+    conventional_heat_sink->AmbientTemperature = 0.0 ;
+    conventional_heat_sink->TopLayer           = NULL ;
 }
 
 /******************************************************************************/
 
-ConventionalHeatSink* alloc_and_init_conventional_heat_sink (void)
+ConventionalHeatSink *alloc_and_init_conventional_heat_sink (void)
 {
-  ConventionalHeatSink* conventionalheatsink
-    = malloc (sizeof(ConventionalHeatSink)) ;
+    ConventionalHeatSink *conventional_heat_sink = (ConventionalHeatSink *)
 
-  if (conventionalheatsink != NULL)
+        malloc (sizeof(ConventionalHeatSink)) ;
 
-    init_conventional_heat_sink (conventionalheatsink) ;
+    if (conventional_heat_sink != NULL)
 
-  return conventionalheatsink ;
+        init_conventional_heat_sink (conventional_heat_sink) ;
+
+    return conventional_heat_sink ;
 }
 
 /******************************************************************************/
 
-void free_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink)
+void free_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
 {
-  FREE_POINTER (free, conventionalheatsink) ;
+    FREE_POINTER (free, conventional_heat_sink) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_conventional_heat_sink
 (
-  FILE*                 stream,
-  String_t              prefix,
-  ConventionalHeatSink* conventionalheatsink
+  FILE                 *stream,
+  char                 *prefix,
+  ConventionalHeatSink *conventional_heat_sink
 )
 {
-  fprintf (stream,
-           "%sconventional heat sink :\n",
-           prefix) ;
+    fprintf (stream,
+        "%sconventional heat sink :\n",
+        prefix) ;
 
-  fprintf (stream,
-           "%s   heat transfer coefficient %.4e ;\n",
-           prefix, conventionalheatsink->AmbientHTC) ;
+    fprintf (stream,
+        "%s   heat transfer coefficient %.4e ;\n",
+        prefix, conventional_heat_sink->AmbientHTC) ;
 
-  fprintf (stream,
-           "%s   ambient temperature       %.2f ;\n",
-           prefix, conventionalheatsink->AmbientTemperature) ;
+    fprintf (stream,
+        "%s   ambient temperature       %.2f ;\n",
+        prefix, conventional_heat_sink->AmbientTemperature) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_conventional_heat_sink
 (
-  FILE*                 stream,
-  String_t              prefix,
-  ConventionalHeatSink* conventionalheatsink
+  FILE                 *stream,
+  char                 *prefix,
+  ConventionalHeatSink *conventional_heat_sink
 )
 {
-  fprintf (stream,
-           "%sconventionalheatsink        = %p\n",
-           prefix,   conventionalheatsink) ;
+    fprintf (stream,
+        "%sconventional_heat_sink        = %p\n",
+        prefix,   conventional_heat_sink) ;
 
-  fprintf (stream,
-           "%s  AmbientHTC                = %.4e\n",
-           prefix,   conventionalheatsink->AmbientHTC) ;
+    fprintf (stream,
+        "%s  AmbientHTC                = %.4e\n",
+        prefix,   conventional_heat_sink->AmbientHTC) ;
 
-  fprintf (stream,
-           "%s  AmbientTemperature        = %.2f\n",
-           prefix,   conventionalheatsink->AmbientTemperature) ;
+    fprintf (stream,
+        "%s  AmbientTemperature        = %.2f\n",
+        prefix,   conventional_heat_sink->AmbientTemperature) ;
 
-  fprintf (stream,
-           "%s  TopLayer                  = %p\n",
-           prefix,   conventionalheatsink->TopLayer) ;
-
-  fprintf (stream,
-           "%s  IsSourceLayer             = %d\n",
-           prefix,   conventionalheatsink->IsSourceLayer) ;
+    fprintf (stream,
+        "%s  TopLayer                  = %p\n",
+        prefix,   conventional_heat_sink->TopLayer) ;
 }
 
 /******************************************************************************/
@@ -130,9 +126,9 @@ void fill_thermal_cell_conventional_heat_sink
     ConventionalHeatSink *conventional_heat_sink
 )
 {
-    GridDimension_t layer_index = LAST_LAYER_INDEX (dimensions) ;
+    uint32_t layer_index = LAST_LAYER_INDEX (dimensions) ;
 
-    GridDimension_t cell_index =
+    uint32_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
@@ -171,13 +167,13 @@ void fill_thermal_cell_conventional_heat_sink
 
 void fill_sources_conventional_heat_sink
 (
-    Source_t             *sources,
+    double            *sources,
     ThermalCell          *thermal_cells,
     Dimensions           *dimensions,
     ConventionalHeatSink *conventional_heat_sink
 )
 {
-    GridDimension_t layer_index = LAST_LAYER_INDEX (dimensions) ;
+    uint32_t layer_index = LAST_LAYER_INDEX (dimensions) ;
 
 #ifdef PRINT_SOURCES
     fprintf (stderr,
@@ -185,7 +181,7 @@ void fill_sources_conventional_heat_sink
         layer_index) ;
 #endif
 
-    GridDimension_t cell_index =
+    uint32_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
@@ -223,9 +219,9 @@ void fill_system_matrix_conventional_heat_sink
     ThermalCell  *thermal_cells
 )
 {
-    GridDimension_t ncells = get_number_of_cells(dimensions) ;
+    uint32_t ncells = get_number_of_cells(dimensions) ;
 
-    GridDimension_t cell_index = get_cell_offset_in_stack
+    uint32_t cell_index = get_cell_offset_in_stack
 
         (dimensions, LAST_LAYER_INDEX(dimensions), 0 ,0) ;
 
@@ -233,13 +229,13 @@ void fill_system_matrix_conventional_heat_sink
 
     while (cell_index < ncells)
     {
-        GridDimension_t row_index ;
+        uint32_t row_index ;
 
         for (row_index = system_matrix.ColumnPointers [ cell_index ] ;
-             row_index < system_matrix.ColumnPointers [ cell_index + 1 ] ;
+             row_index < (uint32_t) system_matrix.ColumnPointers [ cell_index + 1 ] ;
              row_index ++)
 
-            if ( system_matrix.RowIndices [ row_index ] == cell_index )
+            if ( (uint32_t) system_matrix.RowIndices [ row_index ] == cell_index )
 
                 system_matrix.Values [ row_index ] += thermal_cells++->Top ;
 

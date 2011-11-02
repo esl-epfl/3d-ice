@@ -36,6 +36,10 @@
 #ifndef _3DICE_CONVENTIONAL_HEAT_SINK_H_
 #define _3DICE_CONVENTIONAL_HEAT_SINK_H_
 
+/*! \file conventional_heat_sink.h
+ *  \brief File containing the definition and the interface to handle the conventional heat sink
+ */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -45,63 +49,99 @@ extern "C"
 
 #include <stdio.h>
 
-#include "types.h"
-#include "thermal_cell.h"
 #include "layer.h"
+#include "thermal_cell.h"
+#include "dimensions.h"
+#include "system_matrix.h"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    /* The heat transfert coefficient */
+     /*! \struct ConventionalHeatSink
+     *
+     *  \brief Structure used to store data about the conventional heat sink on
+     *         top of the 2D/3D stack.
+     */
 
-    AmbientHTC_t AmbientHTC ;
+    struct ConventionalHeatSink
+    {
+        /*! The heat transfert coefficient (from 3d stack to the environment) */
 
-    /* The temperarute of the environment in [K] */
+        double AmbientHTC ;
 
-    Temperature_t AmbientTemperature ;
+        /*! The temperarute of the environment in \f$ K \f$ */
 
-    /* Pointer to the top layer in the 3DIC */
+        double AmbientTemperature ;
 
-    Layer* TopLayer ;
+        /*! Pointer to the top-most layer in the 3D stack */
 
-    /* Is the top layer a source layer ? */
+        Layer *TopLayer ;
+    } ;
 
-    Bool_t IsSourceLayer ;
+    /*! Definition of the type ConventionalHeatSink */
 
-  } ConventionalHeatSink ;
-
-/******************************************************************************/
-
-  void init_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink) ;
-
-/******************************************************************************/
-
-  ConventionalHeatSink* alloc_and_init_conventional_heat_sink (void) ;
+    typedef struct ConventionalHeatSink ConventionalHeatSink ;
 
 /******************************************************************************/
 
-  void free_conventional_heat_sink (ConventionalHeatSink* conventionalheatsink) ;
 
-/******************************************************************************/
 
-  void print_formatted_conventional_heat_sink
-  (
-    FILE*                 stream,
-    String_t              prefix,
-    ConventionalHeatSink* conventionalheatsink
-  ) ;
+    /*! Sets all the fields of a conventional heat sink to a default value (zero or \c NULL ).
+     *
+     * \param conventional_heat_sink the address of the conventional heat sink element to initialize
+     */
 
-/******************************************************************************/
+    void init_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink) ;
 
-  void print_detailed_conventional_heat_sink
-  (
-    FILE*                 stream,
-    String_t              prefix,
-    ConventionalHeatSink* conventionalheatsink
-  ) ;
 
-/******************************************************************************/
+
+    /*! Allocates a conventional heat sink in memory and sets its fields to
+     *  their default value with #init_conventional_heat_sink
+     *
+     * \return the pointer to a new ConventionalHeatSink
+     * \return \c NULL if the memory allocation fails
+     */
+
+    ConventionalHeatSink *alloc_and_init_conventional_heat_sink (void) ;
+
+
+
+    /*! Frees the memory related to a conventional heat sink
+     *
+     * The parametrer \a conventional_heat_sink must be a pointer previously
+     * obtained with #alloc_and_init_conventional_heat_sink
+     *
+     * \param conventional_heat_sink the address of the conventional_heat_sink structure to free
+     */
+
+    void free_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink) ;
+
+
+
+    /*! Prints a conventional heat sink as it looks in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param conventional_heat_sink the pointer to the conventional heat sink to print
+     */
+
+    void print_formatted_conventional_heat_sink
+
+        (FILE *stream, char *prefix, ConventionalHeatSink *conventional_heat_sink) ;
+
+
+
+    /*! Prints a list of detailed information about all the fields of the conventional heat sink
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param conventional_heat_sink the pointer to the conventional heat sink
+     */
+
+    void print_detailed_conventional_heat_sink
+
+        (FILE *stream, char *prefix, ConventionalHeatSink *conventional_heat_sink) ;
+
+
 
     /*! Applies the conventional heat sink to the grid of thermal cells
      *
@@ -110,7 +150,7 @@ extern "C"
      *
      *  \param thermal_cells          pointer to the first thermal cell in the 3d grid
      *  \param dimensions             pointer to the structure storing the dimensions
-     *  \param conventional_heat_sink pointer to the heat sink structure
+     *  \param conventional_heat_sink pointer to the conventional heat sink structure
      */
 
     void fill_thermal_cell_conventional_heat_sink
@@ -120,19 +160,19 @@ extern "C"
        ConventionalHeatSink *conventional_heat_sink
     ) ;
 
-/******************************************************************************/
+
 
     /*! Fills the source vector to enable heat dissipation through the heat sink
      *
      *  \param sources                pointer to the first element in the source vector
      *  \param thermal_cells          pointer to the first thermal cell in the 3d grid
      *  \param dimensions             pointer to the structure storing the dimensions
-     *  \param conventional_heat_sink pointer to the heat sink structure
+     *  \param conventional_heat_sink pointer to the conventional heat sink structure
      */
 
     void fill_sources_conventional_heat_sink
     (
-        Source_t             *sources,
+        double               *sources,
         ThermalCell          *thermal_cells,
         Dimensions           *dimensions,
         ConventionalHeatSink *conventional_heat_sink
@@ -143,7 +183,7 @@ extern "C"
     /*! Fills the system matrix
      *
      *  Add the conductance in the Top direction for every coefficient in the
-     *  main diagonal of the matrix (only last layer)). This allow heat to flow
+     *  main diagonal of the matrix (only last layer). This allow heat to flow
      *  in the vertical direction.
      *
      *  \param system_matrix copy of the system matrix structure

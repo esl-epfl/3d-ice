@@ -704,9 +704,6 @@ stack
 
         if (stkd->ConventionalHeatSink != NULL)
         {
-
-            stkd->ConventionalHeatSink->IsSourceLayer = FALSE_V ;
-
             if (stkd->TopStackElement->Type == TDICE_STACK_ELEMENT_LAYER)
             {
                 stkd->ConventionalHeatSink->TopLayer = stkd->TopStackElement->Pointer.Layer ;
@@ -714,11 +711,6 @@ stack
             else
             {
                 stkd->ConventionalHeatSink->TopLayer = stkd->TopStackElement->Pointer.Die->TopLayer ;
-
-                if (   stkd->TopStackElement->Pointer.Die->TopLayer
-                    == stkd->TopStackElement->Pointer.Die->SourceLayer)
-
-                stkd->ConventionalHeatSink->IsSourceLayer = TRUE_V ;
             }
         }
 
