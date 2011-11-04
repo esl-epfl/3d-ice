@@ -361,7 +361,7 @@ Bool_t insert_power_values_by_powers_queue
   PowersQueue*      pvalues
 )
 {
-  if (pvalues->Length != get_total_number_of_floorplan_elements(stkd))
+  if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
     return FALSE_V;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,

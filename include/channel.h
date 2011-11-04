@@ -36,6 +36,8 @@
 #ifndef _3DICE_CHANNEL_H_
 #define _3DICE_CHANNEL_H_
 
+/*! \file channel.h */
+
 #ifdef __cplusplus
 extern "C"
 {

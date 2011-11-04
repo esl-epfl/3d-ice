@@ -36,6 +36,8 @@
 #ifndef _3DICE_FLOORPLAN_H_
 #define _3DICE_FLOORPLAN_H_
 
+/*! \file floorplan.h */
+
 #ifdef __cplusplus
 extern "C"
 {

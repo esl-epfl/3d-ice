@@ -36,6 +36,8 @@
 #ifndef _3DICE_STACK_DESCRIPTION_H_
 #define _3DICE_STACK_DESCRIPTION_H_
 
+/*! \file stack_description.h */
+
 #ifdef __cplusplus
 extern "C"
 {

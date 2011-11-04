@@ -36,6 +36,8 @@
 #ifndef _3DICE_POWERSQUEUE_H_
 #define _3DICE_POWERSQUEUE_H_
 
+/*! \file powers_queue.h */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,64 +46,156 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
-
-#include "types.h"
-
-/******************************************************************************/
-
-  struct PowerNode
-  {
-    Power_t Value ;
-    struct PowerNode* Next ;
-  } ;
-
-  typedef struct PowerNode PowerNode ;
+#include <stdbool.h>
+#include <stdint.h>
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    PowerNode* Head ;
-    PowerNode* Tail ;
-    Quantity_t Length ;
+    /*! \struct PowerNode
+     *  A containing a power value
+     */
 
-  } PowersQueue ;
+    struct PowerNode
+    {
+        /*! The power value */
 
-/******************************************************************************/
+        double Value ;
 
-  void init_powers_queue (PowersQueue* queue) ;
+        /*! Pointer to the following power node */
 
-/******************************************************************************/
+        struct PowerNode *Next ;
+    } ;
 
-  PowersQueue* alloc_and_init_powers_queue (void) ;
+    /*! Definition of the type PowerNode */
 
-/******************************************************************************/
-
-  Bool_t is_empty_powers_queue (PowersQueue* queue) ;
-
-/******************************************************************************/
-
-  void free_powers_queue (PowersQueue* queue) ;
+    typedef struct PowerNode PowerNode ;
 
 /******************************************************************************/
 
-  void put_into_powers_queue (PowersQueue* queue, Power_t power) ;
+    /*! \struct PowersQueue
+     * A First In - First Out list to store power values
+     */
+
+    struct PowersQueue
+    {
+        /*! Pointer to the first power value in the list */
+
+        PowerNode *Head ;
+
+        /*! Pointer to the last power value in the list */
+
+        PowerNode *Tail ;
+
+        /*! The number of power values in the list */
+
+        uint32_t Length ;
+
+    } ;
+
+    /*! Definition of the type PowersQueue */
+
+    typedef struct PowersQueue PowersQueue ;
 
 /******************************************************************************/
 
-  Power_t get_from_powers_queue (PowersQueue* queue) ;
 
-/******************************************************************************/
 
-  void pop_from_powers_queue (PowersQueue* queue) ;
+    /*! Sets all the fields of \a powers_queue to a default value (zero or \c NULL ).
+     *
+     * \param powers_queue the address of the material to initialize
+     */
 
-/******************************************************************************/
+    void init_powers_queue (PowersQueue *powers_queue) ;
 
-  void print_powers_queue (FILE* stream, String_t prefix, PowersQueue* queue) ;
 
-/******************************************************************************/
 
-  void print_formatted_powers_queue (FILE* stream, PowersQueue* queue) ;
+    /*! Allocates a PowersQueue in memory and sets its fields to their default
+     *  value with #init_powers_queue
+     *
+     * \return the pointer to a new PowersQueue
+     * \return \c NULL if the memory allocation fails
+     */
+
+    PowersQueue *alloc_and_init_powers_queue (void) ;
+
+
+
+    /*! Frees the memory related to \a powers_queue
+     *
+     * The parametrer \a powers_queue must be a pointer previously obtained with
+     * #alloc_and_init_powers_queue
+     *
+     * \param powers_queue the address of the powers queue structure to free
+     */
+
+    void free_powers_queue (PowersQueue *powers_queue) ;
+
+
+
+    /*! Prints detailed information about all the fields of a power queue
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param powers_queue the powers queue to print
+     */
+
+    void print_detailed_powers_queue
+
+        (FILE *stream, char *prefix, PowersQueue *powers_queue) ;
+
+
+
+    /*! Prints the list of power values as it looks in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param powers_queue the powers queue to print
+     */
+
+    void print_formatted_powers_queue
+
+        (FILE *stream, PowersQueue *powers_queue) ;
+
+
+
+    /*! Returns the state of the powers queue
+     *
+     * \param powers_queue the powers queue
+     *
+     * \return \c TRUE if the queue is empty
+     * \return \c FALSE otherwise
+     */
+
+    bool is_empty_powers_queue (PowersQueue *powers_queue) ;
+
+
+
+    /*! Inserts a power value at the end of the powers queue
+     *
+     * \param powers_queue the powers queue
+     * \param power the power value to insert
+     */
+
+    void put_into_powers_queue (PowersQueue *powers_queue, double power) ;
+
+
+
+    /*! Returns the power value at the beginning of a powers queue
+     *
+     * \param powers_queue the powers queue
+     *
+     * \return the first power value in the list \a powers_queue
+     */
+
+    double get_from_powers_queue (PowersQueue *powers_queue) ;
+
+
+
+    /*! Removes the power value at the beginning of a powers queue
+     *
+     * \param powers_queue the powers queue
+     */
+
+    void pop_from_powers_queue (PowersQueue *powers_queue) ;
 
 /******************************************************************************/
 

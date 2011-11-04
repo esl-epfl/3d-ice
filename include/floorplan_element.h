@@ -51,6 +51,7 @@ extern "C"
 
 #include "dimensions.h"
 #include "powers_queue.h"
+#include "types.h"
 
 /******************************************************************************/
 

@@ -120,7 +120,7 @@ void print_detailed_floorplan_element
         "%s  Power values ",
         prefix) ;
 
-    print_powers_queue(stream, prefix, floorplan_element->PowerValues) ;
+    print_detailed_powers_queue (stream, prefix, floorplan_element->PowerValues) ;
 }
 
 /******************************************************************************/

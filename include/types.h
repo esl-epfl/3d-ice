@@ -36,6 +36,8 @@
 #ifndef _3DICE_TYPES_H_
 #define _3DICE_TYPES_H_
 
+/*! \file types.h */
+
 #ifdef __cplusplus
 extern "C"
 {

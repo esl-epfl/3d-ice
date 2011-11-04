@@ -36,6 +36,8 @@
 #ifndef _3DICE_MACROS_H_
 #define _3DICE_MACROS_H_
 
+/*! \file macros.h */
+
 #ifdef __cplusplus
 extern "C"
 {

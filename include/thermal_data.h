@@ -36,6 +36,8 @@
 #ifndef _3DICE_THERMAL_DATA_H_
 #define _3DICE_THERMAL_DATA_H_
 
+/*! \file thermal_data.h */
+
 #ifdef __cplusplus
 extern "C"
 {
