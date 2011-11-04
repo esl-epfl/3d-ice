@@ -102,14 +102,6 @@ void process_channel_message
   ThermalData* tdata
 );
 
-void process_channel_outlet_message
-(
-  NetworkMessage message,
-  TemperaturesQueue* tqueue,
-  StackDescription* stkd,
-  ThermalData* tdata
-);
-
 void process_cell_message
 (
   NetworkMessage message,

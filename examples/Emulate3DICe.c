@@ -113,7 +113,7 @@ main(int argc, char** argv)
   // The do { } while () ; loop prints the temperatures at all the time points.
   ////////////////////////////////////////////////////////////////////////////
 
-  Temperature_t outlet, cell1, cell2 ;
+  Temperature_t cell1, cell2 ;
   clock_t Time = clock() ;
 
   do
@@ -125,15 +125,6 @@ main(int argc, char** argv)
          != 0 )
     {
       printf ("error getting max temps\n") ;
-      break ;
-    }
-    // get outlet temperature
-
-    if ( get_temperature_of_channel_outlet (&stkd, &tdata,
-                                            "channel1", 0, &outlet)
-         != 0 )
-    {
-      printf ("error getting oultet temp\n") ;
       break ;
     }
 
@@ -156,7 +147,7 @@ main(int argc, char** argv)
     for (counter = 0 ; counter < nfloorplanelements ; counter++)
       printf("%7.3f  ", max_results[counter]) ;
     /*printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;*/
-    printf("%7.3f\n", outlet) ;
+    printf("\n") ;
   }
   while (emulate_step (&tdata, &stkd) != 1) ;
   // while (emulate_slot (&tdata, &stkd) != 1) ;

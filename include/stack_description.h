@@ -270,14 +270,6 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Given a StackDescription, returns the number of channels outlets in a  */
-  /* channel layer (the number of channels is the number of liquid columns  */
-  /* and it is the same for every channel layer)                            */
-
-  Quantity_t get_number_of_channel_outlets (StackDescription* stkd) ;
-
-/******************************************************************************/
-
 #ifdef __cplusplus
 }
 #endif

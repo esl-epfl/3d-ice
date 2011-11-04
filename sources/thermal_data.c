@@ -585,49 +585,6 @@ int get_min_avg_max_temperatures_of_floorplan_element
 
 /******************************************************************************/
 
-int get_temperature_of_channel_outlet
-(
-  StackDescription* stkd,
-  ThermalData*      tdata,
-  String_t          channel_id,
-  GridDimension_t   outlet_number,
-  Temperature_t*    outlet_temperature
-)
-{
-  GridDimension_t offset = GRIDDIMENSION_I ;
-  StackElement*   stk_el = find_stack_element_in_list
-                           (
-                             stkd->BottomStackElement,
-                             channel_id
-                           ) ;
-  if (stk_el == NULL)
-
-    return -1 ;
-
-  if (stk_el->Type != TDICE_STACK_ELEMENT_CHANNEL)
-
-    return -2 ;
-
-  if (   outlet_number < 0
-      || outlet_number > get_number_of_channel_outlets (stkd) )
-
-    return -3 ;
-
-  offset = get_cell_offset_in_stack
-           (
-             stkd->Dimensions,
-             stk_el->Offset,
-             get_number_of_rows(stkd->Dimensions) - 1,
-             (outlet_number * 2) + 1
-           ) ;
-
-  *outlet_temperature = tdata->Temperatures [ offset ] ;
-
-  return 0 ;
-}
-
-/******************************************************************************/
-
 int get_all_max_temperatures_of_floorplan
 (
   StackDescription* stkd,

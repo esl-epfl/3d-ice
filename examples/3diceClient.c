@@ -72,7 +72,6 @@ int main(int argc, char** argv)
   nm_get_all_max_temperatures_of_floorplan (mqueue, tqueue, "die2", max_results, 4);
   nm_get_cell_temperature (mqueue, tqueue, 2, 11, 4, &cell1);
   nm_get_cell_temperature (mqueue, tqueue, 6, 34, 84, &cell2);
-  nm_get_temperature_of_channel_outlet (mqueue, tqueue, "channel1", 0, &outlet);
 
   // send_messages
   send_messages(sockfd, mqueue);

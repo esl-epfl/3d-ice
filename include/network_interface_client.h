@@ -119,15 +119,6 @@ void nm_get_avg_temperature_of_floorplan_element
   Temperature_t* temp_values
 );
 
-void nm_get_temperature_of_channel_outlet
-(
-  MessagesQueue* mqueue,
-  TemperaturesQueue* tqueue,
-  String_t          channel_id,
-  GridDimension_t   outlet_number,
-  Temperature_t* temp_values
-);
-
 void nm_get_cell_temperature
 (
   MessagesQueue* mqueue,

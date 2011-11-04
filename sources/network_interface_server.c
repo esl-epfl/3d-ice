@@ -191,10 +191,6 @@ void process_messages
       process_channel_message(message, tqueue, stkd, tdata);
       break;
 
-    case MT_CHANNEL_OUTLET:
-      process_channel_outlet_message(message, tqueue, stkd, tdata);
-      break;
-
     case MT_CELL:
       process_cell_message(message, tqueue, stkd, tdata);
       break;
@@ -323,27 +319,6 @@ void process_channel_message
     message.layer_index,
     message.row_index,
     message.column_index,
-    temp_values
-    );
-
-  put_into_temperatures_queue(tqueue, temp_values, message.num_results);
-}
-
-void process_channel_outlet_message
-(
-  NetworkMessage message,
-  TemperaturesQueue* tqueue,
-  StackDescription* stkd,
-  ThermalData* tdata
-)
-{
-  Temperature_t* temp_values = malloc(sizeof(Temperature_t) * message.num_results);
-
-  get_temperature_of_channel_outlet(
-    stkd,
-    tdata,
-    message.channel_id,
-    message.outlet_number,
     temp_values
     );
 

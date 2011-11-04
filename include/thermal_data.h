@@ -339,35 +339,6 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Get the temperature of the liquid when leaving the specific outlet of   */
-  /* a specific channel layer                                                */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* channel_id            the id of the channel (the stack element id)      */
-  /* outlet_number         the id (number) of the outlet. It must be an      */
-  /*                       integer between 0 (the west most channel) and the */
-  /*                       number of channels.                               */
-  /* temperatures          the address of the array temperature to access    */
-  /* outlet_temperature    the address where the temperature of the liquid   */
-  /*                       will be written                                   */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the id of the channel and the outlet are correct            */
-  /*  -1 if the stack element id channel_id does not exist                   */
-  /*  -2 if channel_id exists but it does not refer to a channel layer       */
-  /*  -3 if channel_id exists but outlet_number does not refer to a channel  */
-
-  int get_temperature_of_channel_outlet
-  (
-    StackDescription* stkd,
-    ThermalData*      tdata,
-    String_t          channel_id,
-    GridDimension_t   outlet_number,
-    Temperature_t*    outlet_temperature
-  ) ;
-
-/******************************************************************************/
-
   /* Get the maximum temperature of all the floorplan element in a floorplan */
   /*                                                                         */
   /* stkd                  the StackDescription structure to query           */

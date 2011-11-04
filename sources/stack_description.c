@@ -499,12 +499,4 @@ Quantity_t get_total_number_of_floorplan_elements
   return total_number_of_floorplan_elements;
 }
 
-
-/******************************************************************************/
-
-Quantity_t get_number_of_channel_outlets (StackDescription* stkd)
-{
-  return (get_number_of_columns(stkd->Dimensions) - 2) / (Quantity_t) 2 ;
-}
-
 /******************************************************************************/
