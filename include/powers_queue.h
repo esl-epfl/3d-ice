@@ -52,7 +52,7 @@ extern "C"
 /******************************************************************************/
 
     /*! \struct PowerNode
-     *  A containing a power value
+     *  \brief A node of a linked list to store a power value
      */
 
     struct PowerNode
@@ -73,7 +73,7 @@ extern "C"
 /******************************************************************************/
 
     /*! \struct PowersQueue
-     * A First In - First Out list to store power values
+     *  \brief A First In - First Out list to store power values
      */
 
     struct PowersQueue

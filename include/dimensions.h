@@ -183,7 +183,8 @@ extern "C"
 /******************************************************************************/
 
     /*! \struct Dimensions
-     *  Collections of all the structures that are needed for the thermal simulation */
+     *  \brief Collections of all the structures that are needed for the thermal simulation
+     */
 
     struct Dimensions
     {

@@ -57,7 +57,7 @@ extern "C"
 
     /*! \union StackElement_p
      *
-     *  A union of pointers to types that can be an instance of a StackElement
+     *  \brief A union of pointers to types that can be an instance of a StackElement
      */
 
     union StackElement_p

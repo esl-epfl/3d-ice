@@ -40,195 +40,198 @@
 
 /******************************************************************************/
 
-void init_channel (Channel* channel)
+void init_channel (Channel *channel)
 {
-  channel->ChannelModel     = CHANNELMODEL_I;
-  channel->Height           = CELLDIMENSION_I;
-  channel->Length           = CELLDIMENSION_I;
-  channel->Pitch            = CELLDIMENSION_I;
-  channel->Porosity         = POROSITY_I;
-  channel->NChannels        = GRIDDIMENSION_I;
-  channel->Coolant          = COOLANT_I ;
-  channel->CoolantFR        = COOLANTFR_I;
-  channel->DarcyVelocity    = DARCYVELOCITY_I;
-  channel->WallMaterial     = NULL;
+    channel->ChannelModel     = CHANNELMODEL_I;
+    channel->Height           = 0.0 ;
+    channel->Length           = 0.0 ;
+    channel->Pitch            = 0.0 ;
+    channel->Porosity         = 0.0 ;
+    channel->NChannels        = 0u ;
+    channel->Coolant          = COOLANT_I ;
+    channel->CoolantFR        = 0.0 ;
+    channel->DarcyVelocity    = 0.0 ;
+    channel->WallMaterial     = NULL ;
 }
 
 /******************************************************************************/
 
-Channel* alloc_and_init_channel (void)
+Channel *alloc_and_init_channel (void)
 {
-  Channel* channel = malloc (sizeof(*channel)) ;
+    Channel *channel = (Channel *) malloc (sizeof(Channel)) ;
 
-  if (channel != NULL) init_channel (channel) ;
+    if (channel != NULL)
 
-  return channel ;
+        init_channel (channel) ;
+
+    return channel ;
 }
 
 /******************************************************************************/
 
-void free_channel (Channel* channel)
+void free_channel (Channel *channel)
 {
-  FREE_POINTER (free, channel) ;
+    FREE_POINTER (free, channel) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_channel
 (
-  FILE*       stream,
-  String_t    prefix,
-  Channel*    channel,
-  Dimensions* dimensions
+    FILE       *stream,
+    char       *prefix,
+    Channel    *channel,
+    Dimensions *dimensions
 )
-{
-  fprintf (stream,
-           "%s   channel model type          %d ;\n",
-           prefix, channel->ChannelModel) ;
+{  // FIXME
+    fprintf (stream,
+        "%s   channel model type          %d ;\n",
+        prefix, channel->ChannelModel) ;
 
-  fprintf (stream,
-           "%schannel :\n",
-           prefix) ;
+    fprintf (stream,
+        "%schannel :\n",
+        prefix) ;
 
-  fprintf (stream,
-           "%s              height %7.1f ;\n",
-           prefix, channel->Height) ;
+    fprintf (stream,
+        "%s              height %7.1f ;\n",
+        prefix, channel->Height) ;
 
-  fprintf (stream,
-           "%s              length %7.1f ;\n",
-           prefix, channel->Length) ;
+    fprintf (stream,
+        "%s              length %7.1f ;\n",
+        prefix, channel->Length) ;
 
-  fprintf (stream,
-           "%s              pitch  %7.1f ;\n",
-           prefix, channel->Pitch) ;
+    fprintf (stream,
+        "%s              pitch  %7.1f ;\n",
+        prefix, channel->Pitch) ;
 
-  fprintf (stream,
-           "%s              porosity %7.1f ;\n",
-           prefix, channel->Porosity) ;
+    fprintf (stream,
+        "%s              porosity %7.1f ;\n",
+        prefix, channel->Porosity) ;
 
-  fprintf (stream,
-           "%s      channel length %7.1f ;\n",
-           prefix, dimensions->Cell.ChannelLength) ;
+    fprintf (stream,
+        "%s      channel length %7.1f ;\n",
+        prefix, dimensions->Cell.ChannelLength) ;
 
-  fprintf (stream,
-           "%s         wall length %7.1f ;\n",
+    fprintf (stream,
+        "%s         wall length %7.1f ;\n",
            prefix, dimensions->Cell.WallLength) ;
 
-  fprintf (stream,
-           "%s   first wall length %7.1f ;\n",
-           prefix, dimensions->Cell.FirstWallLength) ;
+    fprintf (stream,
+        "%s   first wall length %7.1f ;\n",
+        prefix, dimensions->Cell.FirstWallLength) ;
 
-  fprintf (stream,
-           "%s    last wall length %7.1f ;\n",
-           prefix, dimensions->Cell.LastWallLength) ;
+    fprintf (stream,
+        "%s    last wall length %7.1f ;\n",
+        prefix, dimensions->Cell.LastWallLength) ;
 
-  fprintf (stream,
-           "%s   wall material %s ;\n",
-           prefix, channel->WallMaterial->Id) ;
+    fprintf (stream,
+        "%s   wall material %s ;\n",
+        prefix, channel->WallMaterial->Id) ;
 
-  fprintf (stream,
-           "%s   coolant flow rate                       %.4e ;\n",
-           prefix, channel->CoolantFR) ;
+    fprintf (stream,
+        "%s   coolant flow rate                       %.4e ;\n",
+        prefix, channel->CoolantFR) ;
 
-  fprintf (stream,
-           "%s   coolant heat transfert coefficient side %.4e ,\n",
-           prefix, channel->Coolant.HTCSide) ;
+    fprintf (stream,
+        "%s   coolant heat transfert coefficient side %.4e ,\n",
+        prefix, channel->Coolant.HTCSide) ;
 
-  fprintf (stream,
-           "%s                                       top %.4e ,\n",
-           prefix, channel->Coolant.HTCTop) ;
+    fprintf (stream,
+        "%s                                       top %.4e ,\n",
+        prefix, channel->Coolant.HTCTop) ;
 
-  fprintf (stream,
-           "%s                                    bottom %.4e ;\n",
-           prefix, channel->Coolant.HTCBottom) ;
+    fprintf (stream,
+        "%s                                    bottom %.4e ;\n",
+        prefix, channel->Coolant.HTCBottom) ;
 
-  fprintf (stream,
-           "%s   coolant volumetric heat capacity        %.4e ;\n",
-           prefix, channel->Coolant.VHC) ;
+    fprintf (stream,
+        "%s   coolant volumetric heat capacity        %.4e ;\n",
+        prefix, channel->Coolant.VHC) ;
 
-  fprintf (stream,
-           "%s   coolant incoming temperature          %.2f ;\n",
-           prefix, channel->Coolant.TIn ) ;
+    fprintf (stream,
+        "%s   coolant incoming temperature          %.2f ;\n",
+        prefix, channel->Coolant.TIn ) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_channel
 (
-  FILE*       stream,
-  String_t    prefix,
-  Channel*    channel
+  FILE    *stream,
+  char    *prefix,
+  Channel *channel
 )
 {
-  fprintf (stream,
-           "%schannel                     = %p\n",
-           prefix,   channel) ;
+    fprintf (stream,
+        "%schannel                     = %p\n",
+        prefix,   channel) ;
 
-  fprintf (stream,
-           "%s  Model type                = %d\n",
-           prefix, channel->ChannelModel) ;
+    fprintf (stream,
+        "%s  Model type                = %d\n",
+        prefix, channel->ChannelModel) ;
 
-  fprintf (stream,
-           "%s  Height                    = %.1f\n",
-           prefix,  channel->Height) ;
+    fprintf (stream,
+        "%s  Height                    = %.1f\n",
+        prefix,  channel->Height) ;
 
-  fprintf (stream,
-           "%s  Length                    = %.1f\n",
-           prefix,  channel->Length) ;
+    fprintf (stream,
+        "%s  Length                    = %.1f\n",
+        prefix,  channel->Length) ;
 
-  fprintf (stream,
-           "%s  Pitch                     = %.1f\n",
-           prefix,  channel->Pitch) ;
+    fprintf (stream,
+        "%s  Pitch                     = %.1f\n",
+        prefix,  channel->Pitch) ;
 
-  fprintf (stream,
-           "%s  Porosity                  = %.1f\n",
-           prefix,  channel->Porosity) ;
+    fprintf (stream,
+        "%s  Porosity                  = %.1f\n",
+        prefix,  channel->Porosity) ;
 
-  fprintf (stream,
-           "%s  NChannels                 = %d\n",
-           prefix,  channel->NChannels) ;
+    fprintf (stream,
+        "%s  NChannels                 = %d\n",
+        prefix,  channel->NChannels) ;
 
-  fprintf (stream,
-           "%s  CoolantHTCs.Side          = %.4e\n",
-           prefix,  channel->Coolant.HTCSide) ;
+    fprintf (stream,
+        "%s  CoolantHTCs.Side          = %.4e\n",
+        prefix,  channel->Coolant.HTCSide) ;
 
-  fprintf (stream,
-           "%s  CoolantHTCs.Top           = %.4e\n",
-           prefix,  channel->Coolant.HTCTop) ;
+    fprintf (stream,
+        "%s  CoolantHTCs.Top           = %.4e\n",
+        prefix,  channel->Coolant.HTCTop) ;
 
-  fprintf (stream,
-           "%s  CoolantHTCs.Bottom        = %.4e\n",
-           prefix,  channel->Coolant.HTCBottom) ;
+    fprintf (stream,
+        "%s  CoolantHTCs.Bottom        = %.4e\n",
+        prefix,  channel->Coolant.HTCBottom) ;
 
-  fprintf (stream,
-           "%s  CoolantVHC                = %.4e\n",
-           prefix,  channel->Coolant.VHC) ;
+    fprintf (stream,
+        "%s  CoolantVHC                = %.4e\n",
+        prefix,  channel->Coolant.VHC) ;
 
-  fprintf (stream,
-           "%s  CoolantTIn                = %.2f\n",
-           prefix,  channel->Coolant.TIn) ;
+    fprintf (stream,
+        "%s  CoolantTIn                = %.2f\n",
+        prefix,  channel->Coolant.TIn) ;
 
-  fprintf (stream,
-           "%s  CoolantFR                 = %.4e\n",
-           prefix,  channel->CoolantFR) ;
+    fprintf (stream,
+        "%s  CoolantFR                 = %.4e\n",
+        prefix,  channel->CoolantFR) ;
 
-  fprintf (stream,
-           "%s  WallMaterial              = %p\n",
-           prefix,  channel->WallMaterial) ;
+    fprintf (stream,
+        "%s  WallMaterial              = %p\n",
+        prefix,  channel->WallMaterial) ;
 }
 
 /******************************************************************************/
 
-static void fill_thermal_cell_channel_4rm
+static
+void fill_thermal_cell_channel_4rm
 (
-    ThermalCell*     thermalcells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Channel*         channel
+    ThermalCell *thermalcells,
+    double       delta_time,
+    Dimensions  *dimensions,
+    uint32_t     layer_index,
+    Channel     *channel
 )
 {
-    GridDimension_t cell_index =
+    uint32_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
 
@@ -279,14 +282,14 @@ static void fill_thermal_cell_channel_4rm
 
 static void fill_thermal_cell_channel_2rm
 (
-    ThermalCell*     thermalcells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Channel*         channel
+    ThermalCell *thermalcells,
+    double       delta_time,
+    Dimensions  *dimensions,
+    uint32_t     layer_index,
+    Channel     *channel
 )
 {
-    GridDimension_t cell_index =
+    uint32_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
 
@@ -404,14 +407,14 @@ static void fill_thermal_cell_channel_2rm
 
 static void fill_thermal_cell_channel_pf
 (
-    ThermalCell*     thermalcells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Channel*         channel
+    ThermalCell *thermalcells,
+    double       delta_time,
+    Dimensions  *dimensions,
+    uint32_t     layer_index,
+    Channel     *channel
 )
 {
-    GridDimension_t cell_index =
+    uint32_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
 
@@ -529,11 +532,11 @@ static void fill_thermal_cell_channel_pf
 
 void fill_thermal_cell_channel
 (
-    ThermalCell*     thermalcells,
-    Time_t           delta_time,
-    Dimensions*      dimensions,
-    GridDimension_t  layer_index,
-    Channel*         channel
+    ThermalCell *thermalcells,
+    double       delta_time,
+    Dimensions  *dimensions,
+    uint32_t     layer_index,
+    Channel     *channel
 )
 {
     switch (channel->ChannelModel)
@@ -575,9 +578,9 @@ void fill_thermal_cell_channel
 
 void fill_sources_channel
 (
-    Source_t        *sources,
+    double        *sources,
     Dimensions      *dimensions,
-    GridDimension_t  layer_index,
+    uint32_t  layer_index,
     Channel         *channel
 )
 {
@@ -605,7 +608,7 @@ void fill_sources_channel
     // of the cell in the first column. Otherwise, the computation of C must
     // me put inside the column loop.
 
-    Cconv_t C;
+    double C;
 
     if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
         || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
@@ -637,7 +640,7 @@ void fill_sources_channel
 
     sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-    Source_t tmp = 2.0 * C * channel->Coolant.TIn ;
+    double tmp = 2.0 * C * channel->Coolant.TIn ;
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
@@ -667,7 +670,7 @@ SystemMatrix fill_system_matrix_channel
     Channel         *channel,
     Dimensions      *dimensions,
     ThermalCell     *thermalcells,
-    GridDimension_t  layer_index,
+    uint32_t  layer_index,
     SystemMatrix     system_matrix
 )
 {

@@ -46,92 +46,133 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include "types.h"
+#include "dimensions.h"
 #include "material.h"
 #include "thermal_cell.h"
 #include "system_matrix.h"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    /* The channel model */
+    /*! \struct Channel
+     *
+     *  \brief Structure used to store data about the channel that compose the 2D/3D stack.
+     *
+     *  Channel is one of the elements that can be used to build a 3d stack
+     */
 
-    ChannelModel_t ChannelModel ;
+    struct Channel
+    {
+        /*! The channel model (rm4 - rm2) */
 
-    /* The height of the channel in [um] (1 cell)    */
+        ChannelModel_t ChannelModel ;
 
-    CellDimension_t Height ;
+        /*! The height of the channel in \f$ \mu m \f$ (1 cell) */
 
-    /* The length of the channel in [um]             */
+        double Height ;
 
-    CellDimension_t Length ;
+        /*! The length of the channel in \f$ \mu m \f$ */
 
-    /* The pitch of the channel in [um]              */
+        double Length ;
 
-    CellDimension_t Pitch ;
+        /*! The pitch of the channel in \f$ \mu m \f$ */
 
-    /* Porosity */
+        double Pitch ;
 
-    Porosity_t Porosity ;
+        /*! Porosity */
 
-    /*  Number of channels (per cavity) along chip length */
+        double Porosity ;
 
-    GridDimension_t NChannels ;
+        /*!  Number of channels (per cavity) along chip length */
 
-    /* The properties of the fluid used as coolant */
+        uint32_t NChannels ;
 
-    Coolant_t Coolant ;
+        /*! The properties of the fluid used as coolant */
 
-    /* The flow rate per channel layer of the incolimg liquid   */
-    /* Specified in [ ml / min ] but stored in [ um3 / sec ]    */
-    /* Shared by all the channels for each layer in the 3DStack */
+        Coolant_t Coolant ;
 
-    CoolantFR_t CoolantFR ;
+        /*! The flow rate per channel layer of the incolimg liquid.
+         *  Specified in \f$ \frac{ml}{min} \f$ but stored in \f$ \frac{\mu m^3}{sec} \f$.
+         *  Shared by all the channels for each layer in the 3DStack.
+         */
 
-    /* Darcy Velocity [ um / sec ] */
+        double CoolantFR ;
 
-    DarcyVelocity_t DarcyVelocity ;
+        /*! Darcy Velocity \f$ \frac{\mu m}{sec} \f$ */
 
-    /* The material composing the wall */
+        double DarcyVelocity ;
 
-    Material* WallMaterial ;
+        /*! The material composing the wall */
 
-  } Channel ;
+        Material *WallMaterial ;
 
-/******************************************************************************/
+    } ;
 
-  void init_channel (Channel* channel) ;
+    /*! Definition of the type Channel */
 
-/******************************************************************************/
-
-  Channel* alloc_and_init_channel (void) ;
-
-/******************************************************************************/
-
-  void free_channel (Channel* channel) ;
-
-/******************************************************************************/
-
-  void print_formatted_channel
-  (
-    FILE*       stream,
-    String_t    prefix,
-    Channel*    channel,
-    Dimensions* dimensions
-  ) ;
+    typedef struct Channel Channel ;
 
 /******************************************************************************/
 
-  void print_detailed_channel
-  (
-    FILE*    stream,
-    String_t prefix,
-    Channel* channel
-  ) ;
 
-/******************************************************************************/
+
+    /*! Sets all the fields of \a channel to a default value (zero or \c NULL ).
+     *
+     * \param channel the address of the channel to initialize
+     */
+
+    void init_channel (Channel *channel) ;
+
+
+
+    /*! Allocates a channel in memory and sets its fields to their default
+     *  value with #init_channel
+     *
+     * \return the pointer to a new Channel
+     * \return \c NULL if the memory allocation fails
+     */
+
+    Channel *alloc_and_init_channel (void) ;
+
+
+    /*! Frees the memory related to \a channel
+     *
+     * The parametrer \a channel must be a pointer previously obtained with
+     * #alloc_and_init_channel
+     *
+     * \param channel the address of the channel structure to free
+     */
+
+    void free_channel (Channel *channel) ;
+
+
+
+    /*! Prints the channel as it looks in the stack file
+     *
+     * \param stream  the output stream (must be already open)
+     * \param prefix  a string to be printed as prefix at the beginning of each line
+     * \param channel the channel to print
+     *  \param dimensions pointer to the structure storing the dimensions
+     */
+
+    void print_formatted_channel
+
+        (FILE *stream, char *prefix, Channel *channel, Dimensions *dimensions) ;
+
+
+
+    /*! Prints detailed information about all the fields of a channel
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param channel the channel to print
+     */
+
+    void print_detailed_channel
+
+        (FILE *stream, char *prefix, Channel *channel) ;
 
     /*! Fills the thermal cells corresponding to a channel
      *
@@ -144,10 +185,10 @@ extern "C"
 
     void fill_thermal_cell_channel
     (
-        ThermalCell     *thermalcells,
-        Time_t           delta_time,
+        ThermalCell     *thermal_cells,
+        double           delta_time,
         Dimensions      *dimensions,
-        GridDimension_t  layer_index,
+        uint32_t         layer_index,
         Channel         *channel
     ) ;
 
@@ -163,10 +204,10 @@ extern "C"
 
     void fill_sources_channel
     (
-        Source_t        *sources,
-        Dimensions      *dimensions,
-        GridDimension_t  layer_index,
-        Channel         *channel
+        double     *sources,
+        Dimensions *dimensions,
+        uint32_t    layer_index,
+        Channel    *channel
     ) ;
 
 
@@ -176,7 +217,7 @@ extern "C"
      *  \param channel       pointer to the channel
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (\# layers) of the die within the stack
+     *  \param layer_index   offset (\# layers) of the channel within the stack
      *  \param system_matrix copy of the system matrix structure
      *
      *  \return A matrix partially filled (FIXME)
@@ -184,11 +225,11 @@ extern "C"
 
     SystemMatrix fill_system_matrix_channel
     (
-        Channel         *channel,
-        Dimensions      *dimensions,
-        ThermalCell     *thermal_cells,
-        GridDimension_t  layer_index,
-        SystemMatrix     system_matrix
+        Channel      *channel,
+        Dimensions   *dimensions,
+        ThermalCell  *thermal_cells,
+        uint32_t      layer_index,
+        SystemMatrix  system_matrix
     ) ;
 
 /******************************************************************************/
