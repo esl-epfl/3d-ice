@@ -255,7 +255,7 @@ void print_all_floorplans
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
-      print_floorplan(stream, prefix, stk_el->Floorplan) ;
+      print_detailed_floorplan (stream, prefix, stk_el->Floorplan) ;
   }
 }
 

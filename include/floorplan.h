@@ -46,50 +46,97 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
 
-#include "types.h"
 #include "dimensions.h"
 #include "floorplan_element.h"
+#include "powers_queue.h"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    /* The name of the file scanned to fill the floorplan */
+    /*! \struct Floorplan
+     *
+     *  \brief The floorplan representing the IC as a set of floorplan elements
+     */
 
-    String_t FileName ;
+    struct Floorplan
+    {
+        /*! The name of the file scanned to fill the floorplan */
 
-    /* The number of floorplan elements in the floorplan  */
+        char *FileName ;
 
-    Quantity_t NElements ;
+        /*! The number of floorplan elements in the floorplan  */
 
-    /* The list of floorplan elements */
+        uint8_t NElements ;
 
-    FloorplanElement* ElementsList ;
+        /*! Pointer to the list of floorplan elements */
 
-  } Floorplan ;
+        FloorplanElement *ElementsList ;
 
-/******************************************************************************/
+    } ;
 
-  void init_floorplan (Floorplan* floorplan) ;
+    /*! Definition of the type Floorplan */
 
-/******************************************************************************/
-
-  Floorplan* alloc_and_init_floorplan (void) ;
-
-/******************************************************************************/
-
-  void free_floorplan (Floorplan* floorplan) ;
+    typedef struct Floorplan Floorplan ;
 
 /******************************************************************************/
 
-  int fill_floorplan (Floorplan* floorplan, Dimensions* dim) ;
 
-/******************************************************************************/
 
-  void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan) ;
+    /*! Sets all the fields of \a floorplan to a default value (zero or \c NULL ).
+     *
+     * \param floorplan the address of the flooprlan to initialize
+     */
 
-/******************************************************************************/
+    void init_floorplan (Floorplan *floorplan) ;
+
+
+
+    /*! Allocates a Floorplan in memory and sets its fields to their
+     *  default value with #init_floorplan
+     *
+     * \return the pointer to a new Floorplan
+     * \return \c NULL if the memory allocation fails
+     */
+
+    Floorplan *alloc_and_init_floorplan (void) ;
+
+
+
+    /*! Frees the memory related to \a floorplan
+     *
+     * The parametrer \a floorplan must be a pointer previously
+     * obtained with #alloc_and_init_floorplan
+     *
+     * \param floorplan the address of the floorplan structure to free
+     */
+
+    void free_floorplan (Floorplan *floorplan) ;
+
+
+
+    /*! Prints detailed information about all the fields of a floorplan
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param floorplan the floorplan    to print
+     */
+
+    void print_detailed_floorplan (FILE *stream, char *prefix, Floorplan *floorplan) ;
+
+
+
+    /*! Parses the file pointed by Floorplan::FileName and fills the \a floorplan structure
+     *
+     * \param floorplan the floorplan structure to fill
+     * \param dimensions  pointer to the structure storing the dimensions of the stack
+     *
+     * \return FIXME
+     */
+
+    int fill_floorplan (Floorplan *floorplan, Dimensions *dimensions) ;
+
+
 
     /*! Fills the source vector corresponding to a floorplan
      *
@@ -107,113 +154,90 @@ extern "C"
 
     Error_t fill_sources_floorplan
     (
-        Source_t   *sources,
+        double     *sources,
         Dimensions *dimensions,
         Floorplan  *floorplan
     ) ;
 
-/******************************************************************************/
+    int get_max_temperature_floorplan
+    (
+        Floorplan  *floorplan,
+        char       *floorplan_element_id,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *max_temperature
+    ) ;
 
-  void init_power_values_floorplan
-  (
-    Floorplan*      floorplan
-  ) ;
+    int get_min_temperature_floorplan
+    (
+        Floorplan  *floorplan,
+        char       *floorplan_element_id,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *min_temperature
+    ) ;
 
-/******************************************************************************/
+    int get_avg_temperature_floorplan
+    (
+        Floorplan  *floorplan,
+        char       *floorplan_element_id,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *avg_temperature
+    ) ;
 
-  void insert_power_values_floorplan
-  (
-    Floorplan*      floorplan,
-    PowersQueue*    pvalues
-  ) ;
+    int get_min_avg_max_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        char       *floorplan_element_id,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *min_temperature,
+        double     *avg_temperature,
+        double     *max_temperature
+    ) ;
 
-/******************************************************************************/
+    int get_all_max_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *max_temperature
+    ) ;
 
-  int get_max_temperature_floorplan
-  (
-    Floorplan*     floorplan,
-    String_t       floorplan_element_id,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* max_temperature
-  ) ;
+    int get_all_min_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *min_temperature
+    ) ;
 
-/******************************************************************************/
+    int get_all_avg_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *avg_temperature
+    ) ;
 
-  int get_min_temperature_floorplan
-  (
-    Floorplan*     floorplan,
-    String_t       floorplan_element_id,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* min_temperature
-  ) ;
-
-/******************************************************************************/
-
-  int get_avg_temperature_floorplan
-  (
-    Floorplan*     floorplan,
-    String_t       floorplan_element_id,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* avg_temperature
-  ) ;
-
-/******************************************************************************/
-
-  int get_min_avg_max_temperatures_floorplan
-  (
-    Floorplan*     floorplan,
-    String_t       floorplan_element_id,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* min_temperature,
-    Temperature_t* avg_temperature,
-    Temperature_t* max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  int get_all_max_temperatures_floorplan
-  (
-    Floorplan*     floorplan,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  int get_all_min_temperatures_floorplan
-  (
-    Floorplan*     floorplan,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* min_temperature
-  ) ;
+    int get_all_min_avg_max_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        double     *min_temperature,
+        double     *avg_temperature,
+        double     *max_temperature
+    ) ;
 
 /******************************************************************************/
 
-  int get_all_avg_temperatures_floorplan
-  (
-    Floorplan*     floorplan,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* avg_temperature
-  ) ;
+    void init_power_values_floorplan (Floorplan *floorplan) ;
 
-/******************************************************************************/
+    void insert_power_values_floorplan
 
-  int get_all_min_avg_max_temperatures_floorplan
-  (
-    Floorplan*     floorplan,
-    Dimensions*    dimensions,
-    Temperature_t* temperatures,
-    Temperature_t* min_temperature,
-    Temperature_t* avg_temperature,
-    Temperature_t* max_temperature
-  ) ;
+        (Floorplan *floorplan, PowersQueue *pvalues) ;
 
 /******************************************************************************/
 

@@ -42,82 +42,91 @@
 
 extern int floorplan_parse
 (
-  Floorplan*  floorplan,
-  Dimensions* dimensions,
-  yyscan_t    scanner
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    yyscan_t    scanner
 ) ;
 
 /******************************************************************************/
 
-void init_floorplan (Floorplan* floorplan)
+void init_floorplan (Floorplan *floorplan)
 {
-  floorplan->FileName     = STRING_I ;
-  floorplan->NElements    = QUANTITY_I ;
-  floorplan->ElementsList = NULL ;
+    floorplan->FileName     = NULL ;
+    floorplan->NElements    = 0u ;
+    floorplan->ElementsList = NULL ;
 }
 
 /******************************************************************************/
 
-Floorplan* alloc_and_init_floorplan (void)
+Floorplan *alloc_and_init_floorplan (void)
 {
-  Floorplan* floorplan = malloc (sizeof(Floorplan));
+    Floorplan *floorplan = (Floorplan *) malloc (sizeof(Floorplan));
 
-  if (floorplan != NULL) init_floorplan (floorplan) ;
+    if (floorplan != NULL)
 
-  return floorplan ;
+        init_floorplan (floorplan) ;
+
+    return floorplan ;
 }
 
 /******************************************************************************/
 
-void free_floorplan (Floorplan* floorplan)
+void free_floorplan (Floorplan *floorplan)
 {
-  FREE_POINTER (free_floorplan_elements_list, floorplan->ElementsList) ;
-  FREE_POINTER (free,                         floorplan->FileName) ;
-  FREE_POINTER (free,                         floorplan) ;
+    FREE_POINTER (free_floorplan_elements_list, floorplan->ElementsList) ;
+    FREE_POINTER (free,                         floorplan->FileName) ;
+    FREE_POINTER (free,                         floorplan) ;
 }
 
 /******************************************************************************/
 
-int fill_floorplan (Floorplan* floorplan, Dimensions* dimensions)
+void print_detailed_floorplan
+(
+    FILE      *stream,
+    char      *prefix,
+    Floorplan *floorplan
+)
 {
-  FILE*    input ;
-  int      result ;
-  yyscan_t scanner ;
+    fprintf(stream,
+        "%sFloorplan read from file %s\n", prefix, floorplan->FileName) ;
 
-  input = fopen (floorplan->FileName, "r") ;
-  if(input == NULL)
-  {
-    perror(floorplan->FileName) ;
-    return 1 ;
-  }
+    print_detailed_floorplan_elements_list
 
-  floorplan_lex_init  (&scanner) ;
-  floorplan_set_in    (input, scanner) ;
-  //floorplan_set_debug (1, scanner) ;
-
-  result = floorplan_parse (floorplan, dimensions, scanner) ;
-
-  floorplan_lex_destroy (scanner) ;
-  fclose (input) ;
-
-  return result ;
+        (stream, prefix, floorplan->ElementsList) ;
 }
 
 /******************************************************************************/
 
-void print_floorplan (FILE* stream, String_t prefix, Floorplan* floorplan)
+int fill_floorplan (Floorplan *floorplan, Dimensions *dimensions)
 {
-  fprintf(stream,
-    "%sFloorplan read from file %s\n", prefix, floorplan->FileName) ;
+    FILE *input ;
+    int result ;
+    yyscan_t scanner ;
 
-  print_detailed_floorplan_elements_list (stream, prefix, floorplan->ElementsList) ;
+    input = fopen (floorplan->FileName, "r") ;
+    if(input == NULL)
+    {
+        perror(floorplan->FileName) ;
+        return 1 ;
+    }
+
+    floorplan_lex_init  (&scanner) ;
+    floorplan_set_in    (input, scanner) ;
+    //floorplan_set_debug (1, scanner) ;
+
+    result = floorplan_parse (floorplan, dimensions, scanner) ;
+
+    floorplan_lex_destroy (scanner) ;
+    fclose (input) ;
+
+    return result ;
 }
 
 /******************************************************************************/
 
 Error_t fill_sources_floorplan
 (
-    Source_t   *sources,
+    double     *sources,
     Dimensions *dimensions,
     Floorplan  *floorplan
 )
@@ -135,265 +144,212 @@ Error_t fill_sources_floorplan
 
 void init_power_values_floorplan
 (
-  Floorplan*   floorplan
+    Floorplan *floorplan
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
-                                     floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element, floorplan->ElementsList)
 
-    init_power_values_floorplan_element
-    (
-      floorplan_element
-    ) ;
+        init_power_values_floorplan_element (floorplan_element) ;
 }
 
 /******************************************************************************/
 
 void insert_power_values_floorplan
 (
-  Floorplan*   floorplan,
-  PowersQueue* pvalues
+    Floorplan   *floorplan,
+    PowersQueue *pvalues
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
                                      floorplan->ElementsList)
 
-    insert_power_values_floorplan_element
-    (
-      floorplan_element,
-      pvalues
-    ) ;
+        insert_power_values_floorplan_element (floorplan_element, pvalues) ;
 }
 
 /******************************************************************************/
 
 int get_max_temperature_floorplan
 (
-  Floorplan*     floorplan,
-  String_t       floorplan_element_id,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* max_temperature
+    Floorplan  *floorplan,
+    char       *floorplan_element_id,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *max_temperature
 )
 {
-  FloorplanElement* flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
-  if (flp_el == NULL)
+    FloorplanElement *flp_el = find_floorplan_element_in_list
 
-    return -3 ;
+        (floorplan->ElementsList, floorplan_element_id) ;
 
-  get_max_temperature_floorplan_element
-  (
-    flp_el,
-    dimensions,
-    temperatures,
-    max_temperature
-  ) ;
+    if (flp_el == NULL)
 
-  return 0 ;
+        return -3 ;
+
+    get_max_temperature_floorplan_element
+
+        (flp_el, dimensions, temperatures, max_temperature) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_min_temperature_floorplan
 (
-  Floorplan*     floorplan,
-  String_t       floorplan_element_id,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* min_temperature
+    Floorplan  *floorplan,
+    char       *floorplan_element_id,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *min_temperature
 )
 {
-  FloorplanElement* flp_el = find_floorplan_element_in_list
-                             (
-                                floorplan->ElementsList,
-                                floorplan_element_id
-                             ) ;
+    FloorplanElement *flp_el = find_floorplan_element_in_list
 
-  if (flp_el == NULL)
+        (floorplan->ElementsList, floorplan_element_id) ;
 
-    return -3 ;
+    if (flp_el == NULL)
 
-  get_min_temperature_floorplan_element
-  (
-    flp_el,
-    dimensions,
-    temperatures,
-    min_temperature
-  ) ;
+        return -3 ;
 
-  return 0 ;
+    get_min_temperature_floorplan_element
+
+        (flp_el, dimensions, temperatures, min_temperature) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_avg_temperature_floorplan
 (
-  Floorplan*     floorplan,
-  String_t       floorplan_element_id,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* avg_temperature
+    Floorplan  *floorplan,
+    char       *floorplan_element_id,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *avg_temperature
 )
 {
-  FloorplanElement* flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
+    FloorplanElement *flp_el = find_floorplan_element_in_list
 
-  if (flp_el == NULL)
+        (floorplan->ElementsList, floorplan_element_id) ;
 
-    return -3 ;
+    if (flp_el == NULL)
 
-  get_avg_temperature_floorplan_element
-  (
-    flp_el,
-    dimensions,
-    temperatures,
-    avg_temperature
-  ) ;
+        return -3 ;
 
-  return 0 ;
+    get_avg_temperature_floorplan_element
+
+        (flp_el, dimensions, temperatures, avg_temperature) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_min_avg_max_temperatures_floorplan
 (
-  Floorplan*     floorplan,
-  String_t       floorplan_element_id,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* min_temperature,
-  Temperature_t* avg_temperature,
-  Temperature_t* max_temperature
+    Floorplan  *floorplan,
+    char       *floorplan_element_id,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *min_temperature,
+    double     *avg_temperature,
+    double     *max_temperature
 )
 {
-  FloorplanElement* flp_el = find_floorplan_element_in_list
-                             (
-                               floorplan->ElementsList,
-                               floorplan_element_id
-                             ) ;
+    FloorplanElement *flp_el = find_floorplan_element_in_list
 
-  if (flp_el == NULL)
+        (floorplan->ElementsList, floorplan_element_id) ;
 
-    return -3 ;
+    if (flp_el == NULL)
 
-  get_min_avg_max_temperatures_floorplan_element
-  (
-    flp_el,
-    dimensions,
-    temperatures,
-    min_temperature, avg_temperature, max_temperature
-  ) ;
+        return -3 ;
 
-  return 0 ;
+    get_min_avg_max_temperatures_floorplan_element
+
+        (flp_el, dimensions, temperatures,
+         min_temperature, avg_temperature, max_temperature) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_all_max_temperatures_floorplan
 (
-  Floorplan*     floorplan,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* max_temperature
+  Floorplan  *floorplan,
+  Dimensions *dimensions,
+  double     *temperatures,
+  double     *max_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
-                                     flp_el,
-                                     floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
 
-    get_max_temperature_floorplan_element
-    (
-      flp_el,
-      dimensions,
-      temperatures,
-      max_temperature++
-    ) ;
+        get_max_temperature_floorplan_element
 
-  return 0 ;
+            (flp_el, dimensions, temperatures, max_temperature++) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_all_min_temperatures_floorplan
 (
-  Floorplan*     floorplan,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* min_temperature
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *min_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
-                                     flp_el,
-                                     floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
 
-    get_min_temperature_floorplan_element
-    (
-      flp_el,
-      dimensions,
-      temperatures,
-      min_temperature++
-    ) ;
+        get_min_temperature_floorplan_element
 
-  return 0 ;
+            (flp_el, dimensions, temperatures, min_temperature++) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_all_avg_temperatures_floorplan
 (
-  Floorplan*     floorplan,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* avg_temperature
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *avg_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
-                                     flp_el,
-                                     floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
 
-    get_avg_temperature_floorplan_element
-    (
-      flp_el,
-      dimensions,
-      temperatures,
-      avg_temperature++
-    ) ;
+        get_avg_temperature_floorplan_element
 
-  return 0 ;
+            (flp_el, dimensions, temperatures, avg_temperature++) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/
 
 int get_all_min_avg_max_temperatures_floorplan
 (
-  Floorplan*     floorplan,
-  Dimensions*    dimensions,
-  Temperature_t* temperatures,
-  Temperature_t* min_temperature,
-  Temperature_t* avg_temperature,
-  Temperature_t* max_temperature
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    double     *min_temperature,
+    double     *avg_temperature,
+    double     *max_temperature
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement,
-                                     flp_el,
-                                     floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
 
-    get_min_avg_max_temperatures_floorplan_element
-    (
-      flp_el,
-      dimensions,
-      temperatures,
-      min_temperature++, avg_temperature++, max_temperature++
-    ) ;
+        get_min_avg_max_temperatures_floorplan_element
 
-  return 0 ;
+            (flp_el, dimensions, temperatures,
+             min_temperature++, avg_temperature++, max_temperature++) ;
+
+    return 0 ;
 }
 
 /******************************************************************************/

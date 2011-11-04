@@ -921,7 +921,7 @@ stack_element
             YYABORT ;
         }
 
-        stack_element->Floorplan->FileName = $5 ;
+        stack_element->Floorplan->FileName = $5 ; // FIXME call the fill_floorplan here ...
 
         FREE_POINTER (free, $3) ;
     }
