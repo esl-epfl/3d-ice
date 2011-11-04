@@ -36,6 +36,8 @@
 #ifndef _3DICE_FLOORPLAN_ELEMENT_H_
 #define _3DICE_FLOORPLAN_ELEMENT_H_
 
+/*! \file floorplan_element.h */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,90 +46,286 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
-#include "types.h"
 #include "dimensions.h"
 #include "powers_queue.h"
 
 /******************************************************************************/
 
-  struct FloorplanElement
-  {
-    /* The id (string) of the floorplan element */
+    /*! \struct FloorplanElement
+     *  \brief  Structure containing information about a floorplan element
+     *
+     *  Floorplan elements represent ...
+     */
 
-    String_t Id ;
+    struct FloorplanElement
+    {
+        /*! The id (string) to identifiy the floorplan element */
 
-    /* The south-west X position [um] */
+        char *Id ;
 
-    CellDimension_t SW_X ;
+        /*! The south-west X coordinate in the floorplan, in \f$ \mu m \f$ */
 
-    /* The south-west Y position [um] */
+        double SW_X ;
 
-    CellDimension_t SW_Y ;
+        /*! The south-west Y coordinate in the floorplan, in \f$ \mu m \f$ */
 
-    /* The length of the floorplan element [um] */
+        double SW_Y ;
 
-    CellDimension_t Length ;
+        /*! The length (west <-> east) of the floorplan element, in \f$ \mu m \f$ */
 
-    /* The width of the floorplan element [um] */
+        double Length ;
 
-    CellDimension_t Width ;
+        /*! The width (south <-> north) of the floorplan element, in \f$ \mu m \f$ */
 
-    /* The length of the floorplan element [um] */
-    /* considering the distribution of cells    */
+        double Width ;
 
-    CellDimension_t EffectiveLength ;
+        /*! The length of the floorplan element, in \f$ \mu m \f$,
+         *  as the sum of all the lengths of the cells in the source layer that
+         *  receive power from the floorplan element */
 
-    /* The width of the floorplan element [um] */
-    /* considering the distribution of cells    */
+        double EffectiveLength ;
 
-    CellDimension_t EffectiveWidth ;
+        /*! The width of the floorplan element, in \f$ \mu m \f$,
+         *  as the sum of all the lengths of the cells in the source layer that
+         *  receive power from the floorplan element */
 
-    /* The south-west row index */
+        double EffectiveWidth ;
 
-    GridDimension_t SW_Row ;
+        /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
+         *  computed as FloorplanElement::EffectiveLength times
+         *  FloorplanElement::EffectiveWidth */
 
-    /* The south-west column index */
+        double EffectiveSurface ;
 
-    GridDimension_t SW_Column ;
+        /*! The index of the row of the thermal cell where the south-west
+         *  corner of the floroplan element is placed */
 
-    /* The north-east row index */
+        uint32_t SW_Row ;
 
-    GridDimension_t NE_Row ;
+        /*! The index of the column of the thermal cell where the south-west
+         *  corner of the floroplan element is placed */
 
-    /* The north-east column index */
+        uint32_t SW_Column ;
 
-    GridDimension_t NE_Column ;
+        /*! The index of the row of the thermal cell where the north-east
+         *  corner of the floroplan element is placed */
 
-    /* The list of power values */
+        uint32_t NE_Row ;
 
-    PowersQueue* PowerValues ;
+        /*! The index of the column of the thermal cell where the north-east
+         *  corner of the floroplan element is placed */
 
-    /* To collect floorplan elements in a linked list */
+        uint32_t NE_Column ;
 
-    struct FloorplanElement* Next ;
+        /*! The list of power values representing the power consumption of
+         *  the floorplan element during the thermal simulation */
 
-  } ;
+        PowersQueue *PowerValues ;
 
-  typedef struct FloorplanElement FloorplanElement ;
+        /*! Pointer to collect floorplan elements in a linked list */
+
+        struct FloorplanElement *Next ;
+
+    } ;
+
+    /*! Definition of the type FloorplanElement */
+
+    typedef struct FloorplanElement FloorplanElement ;
 
 /******************************************************************************/
 
-  void init_floorplan_element (FloorplanElement* floorplan_element) ;
 
-/******************************************************************************/
 
-  FloorplanElement* alloc_and_init_floorplan_element (void) ;
+    /*! Sets all the fields of \a floorplan_element to a default value (zero or \c NULL ).
+     *
+     * \param floorplan_element the address of the flooprlan element to initialize
+     */
 
-/******************************************************************************/
+    void init_floorplan_element (FloorplanElement *floorplan_element) ;
 
-  void free_floorplan_element (FloorplanElement* floorplan_element) ;
 
-/******************************************************************************/
 
-  void free_floorplan_elements_list (FloorplanElement* list) ;
+    /*! Allocates a FloorplanElement in memory and sets its fields to their
+     *   default value with #init_floorplan_element
+     *
+     * \return the pointer to a new FloorplanElement
+     * \return \c NULL if the memory allocation fails
+     */
 
-/******************************************************************************/
+    FloorplanElement *alloc_and_init_floorplan_element (void) ;
+
+
+
+    /*! Frees the memory related to \a floorplan_element
+     *
+     * The parametrer \a floorplan_element must be a pointer previously
+     *  obtained with #alloc_and_init_floorplan_element
+     *
+     * \param floorplan_element the address of the floorplan element structure to free
+     */
+
+    void free_floorplan_element (FloorplanElement *floorplan_element) ;
+
+
+
+    /*! Frees a list of floorplan elements
+     *
+     * If frees, calling #free_floorplan_element, the floorplan element pointed
+     * by the parameter \a list and all the floorplan elements it finds following
+     * the linked list throught the field FloorplanElement::Next .
+     *
+     * \param list the pointer to the first elment in the list to be freed
+     */
+
+    void free_floorplan_elements_list (FloorplanElement *list) ;
+
+
+
+    /*! Searches for a StackElement in a linked list of floorplan elements.
+     *
+     * Id based search of a StackElement structure in a list.
+     *
+     * \param list the pointer to the list
+     * \param id   the identifier of the floorplan element to be found
+     *
+     * \return the address of a StackElement, if founded
+     * \return \c NULL if the search fails
+     */
+
+    FloorplanElement *find_floorplan_element_in_list
+
+        (FloorplanElement *list, char *id) ;
+
+
+
+    /*! Prints the floorplan element as it looks in the stack file
+     *
+     * \param stream   the output stream (must be already open)
+     * \param prefix   a string to be printed as prefix at the beginning of each line
+     * \param floorplan_element the floorplan element to print
+     */
+
+    void print_formatted_floorplan_element
+
+        (FILE *stream, char *prefix, FloorplanElement *floorplan_element) ;
+
+
+
+    /*! Prints a list of floorplan elements as they look in the stack file
+     *
+     * \param stream  the output stream (must be already open)
+     * \param prefix  a string to be printed as prefix at the beginning of each line
+     * \param list    the pointer to the first floorplan element in the list
+     */
+
+    void print_formatted_floorplan_elements_list
+
+        (FILE *stream, char *prefix, FloorplanElement *list) ;
+
+
+
+    /*! Prints detailed information about all the fields of a floorplan element
+     *
+     * \param stream   the output stream (must be already open)
+     * \param prefix   a string to be printed as prefix at the beginning of each line
+     * \param floorplan_element the floorplan element to print
+     */
+
+    void print_detailed_floorplan_element
+
+        (FILE *stream, char *prefix, FloorplanElement *floorplan_element) ;
+
+
+
+    /*! Prints a list of detailed information about all the fields of the flooprlan elements
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list the pointer to the first floorplan element in the list
+     */
+
+    void print_detailed_floorplan_elements_list
+
+        (FILE *stream, char *prefix, FloorplanElement *list) ;
+
+
+
+    /*! Checks if two floorplan elements overlap
+     *
+     *  The control is based on the real coordinates of the floorplan, i.e. the
+     *  coordinates read from the floorplan file.
+     *
+     *  \param floorplan_element_a the first floorplan element to test
+     *  \param floorplan_element_b the second floorplan element to test
+     *
+     *  \return \c true if the two surfaces oevrlap
+     *  \return \c false otherwise
+     */
+
+    bool check_intersection
+
+        (FloorplanElement *floorplan_element_a, FloorplanElement *floorplan_element_b) ;
+
+
+
+    /*! Searches for an overlap between a floorplan element and other floorplan
+     *  elements in a list
+     *
+     *  The control is based on the real coordinates of the floorplan, i.e. the
+     *  coordinates read from the floorplan file.
+     *
+     *  \param list the list of floorplan elements
+     *  \param floorplan_element the floorplan element to test
+     *
+     *  \return the address of the first floorplan element in the \a list that
+     *          is found to overlap with \a floorplan_element
+     *  \return \c NULL if floorplan_element does not overlap with all the
+     *          floorplan elements in the \a list
+     */
+
+    FloorplanElement *find_intersection_in_list
+
+        (FloorplanElement *list, FloorplanElement *floorplan_element) ;
+
+
+
+    /*! Checks if the floorplan element is inside the IC
+     *
+     *  The control is based on the real coordinates of the floorplan, i.e. the
+     *  coordinates read from the floorplan file.
+     *
+     *  \param dimensions the structure storing the dimensions of the IC
+     *  \param floorplan_element the floorplan element to test
+     *
+     *  \return \c true if \a floorplan_element is outside of the IC
+     *  \return \c false otherwise
+     */
+
+    bool check_location
+
+        (Dimensions *dimensions, FloorplanElement* floorplan_element) ;
+
+
+
+    /*! Aligns the floorplan element to the mesh of the IC
+     *
+     *  The function translates the coordinates of the floorplan element as
+     *  they are in the floorplan file to coordinates in terms of rows and
+     *  columns to place the floorplan element on the surface of the active
+     *  layer. It also computes the effective dimensions.
+     *
+     *  \param dimensions the structure storing the dimensions of the IC
+     *  \param floorplan_element the floorplan element to align on the source layer
+     */
+
+    void align_to_grid
+
+        (Dimensions *dimensions, FloorplanElement* floorplan_element) ;
+
+
 
     /*! Fills the source vector corresponding to a floorplan element
      *
@@ -145,117 +343,52 @@ extern "C"
 
     Error_t fill_sources_floorplan_element
     (
-        Source_t         *sources,
+        double           *sources,
         Dimensions       *dimensions,
         FloorplanElement *floorplan_element
     ) ;
 
-/******************************************************************************/
+    void get_max_temperature_floorplan_element
+    (
+        FloorplanElement *floorplan_element,
+        Dimensions       *dimensions,
+        double           *temperatures,
+        double           *max_temperature
+    ) ;
 
-  void init_power_values_floorplan_element
-  (
-    FloorplanElement* floorplan_element
-  ) ;
+    void get_min_temperature_floorplan_element
+    (
+        FloorplanElement *floorplan_element,
+        Dimensions       *dimensions,
+        double           *temperatures,
+        double           *min_temperature
+    ) ;
 
-/******************************************************************************/
+    void get_avg_temperature_floorplan_element
+    (
+        FloorplanElement *floorplan_element,
+        Dimensions       *dimensions,
+        double           *temperatures,
+        double           *avg_temperature
+    ) ;
 
-  void insert_power_values_floorplan_element
-  (
-    FloorplanElement* floorplan_element,
-    PowersQueue*      pvalues
-  ) ;
-
-/******************************************************************************/
-
-  FloorplanElement* find_floorplan_element_in_list
-  (
-    FloorplanElement* list,
-    String_t id
-  ) ;
-
-/******************************************************************************/
-
-  void print_floorplan_element
-  (
-    FILE*             stream,
-    String_t          prefix,
-    FloorplanElement* floorplan_element
-  ) ;
-
-/******************************************************************************/
-
-  void print_formatted_floorplan_element
-  (
-    FILE*             stream,
-    FloorplanElement* floorplan_element
-  ) ;
+    void get_min_avg_max_temperatures_floorplan_element
+    (
+        FloorplanElement *floorplan_element,
+        Dimensions       *dimensions,
+        double           *temperatures,
+        double           *min_temperature,
+        double           *avg_temperature,
+        double           *max_temperature
+    ) ;
 
 /******************************************************************************/
 
-  void print_floorplan_elements_list
-  (
-    FILE*             stream,
-    String_t          prefix,
-    FloorplanElement* list
-  ) ;
+    void init_power_values_floorplan_element (FloorplanElement *floorplan_element) ;
 
-/******************************************************************************/
+    void insert_power_values_floorplan_element
 
-  void print_formatted_floorplan_elements_list
-  (
-    FILE*             stream,
-    FloorplanElement* list
-  ) ;
-
-/******************************************************************************/
-
-  Bool_t check_intersection
-  (
-    FloorplanElement* floorplan_element_a,
-    FloorplanElement* floorplan_element_b
-  ) ;
-
-/******************************************************************************/
-
-  void get_max_temperature_floorplan_element
-  (
-    FloorplanElement* floorplan_element,
-    Dimensions*       dimensions,
-    Temperature_t*    temperatures,
-    Temperature_t*    max_temperature
-  ) ;
-
-/******************************************************************************/
-
-  void get_min_temperature_floorplan_element
-  (
-    FloorplanElement* floorplan_element,
-    Dimensions*       dimensions,
-    Temperature_t*    temperatures,
-    Temperature_t*    min_temperature
-  ) ;
-
-/******************************************************************************/
-
-  void get_avg_temperature_floorplan_element
-  (
-    FloorplanElement* floorplan_element,
-    Dimensions*       dimensions,
-    Temperature_t*    temperatures,
-    Temperature_t*    avg_temperature
-  ) ;
-
-/******************************************************************************/
-
-  void get_min_avg_max_temperatures_floorplan_element
-  (
-    FloorplanElement* floorplan_element,
-    Dimensions*       dimensions,
-    Temperature_t*    temperatures,
-    Temperature_t*    min_temperature,
-    Temperature_t*    avg_temperature,
-    Temperature_t*    max_temperature
-  ) ;
+        (FloorplanElement *floorplan_element, PowersQueue *pvalues) ;
 
 /******************************************************************************/
 

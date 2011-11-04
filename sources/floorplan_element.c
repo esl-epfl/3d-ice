@@ -41,62 +41,153 @@
 
 /******************************************************************************/
 
-void init_floorplan_element (FloorplanElement* floorplan_element)
+void init_floorplan_element (FloorplanElement *floorplan_element)
 {
-  floorplan_element->Id              = STRING_I ;
+    floorplan_element->Id              = NULL ;
 
-  floorplan_element->SW_X            = CELLDIMENSION_I ;
-  floorplan_element->SW_Y            = CELLDIMENSION_I ;
+    floorplan_element->SW_X            = 0.0 ;
+    floorplan_element->SW_Y            = 0.0 ;
 
-  floorplan_element->Length          = CELLDIMENSION_I ;
-  floorplan_element->Width           = CELLDIMENSION_I ;
+    floorplan_element->Length          = 0.0 ;
+    floorplan_element->Width           = 0.0 ;
 
-  floorplan_element->EffectiveLength = CELLDIMENSION_I ;
-  floorplan_element->EffectiveWidth  = CELLDIMENSION_I ;
+    floorplan_element->EffectiveLength  = 0.0 ;
+    floorplan_element->EffectiveWidth   = 0.0 ;
+    floorplan_element->EffectiveSurface = 0.0 ;
 
-  floorplan_element->SW_Row          = GRIDDIMENSION_I ;
-  floorplan_element->SW_Column       = GRIDDIMENSION_I ;
+    floorplan_element->SW_Row          = 0u ;
+    floorplan_element->SW_Column       = 0u ;
+    floorplan_element->NE_Row          = 0u ;
+    floorplan_element->NE_Column       = 0u ;
 
-  floorplan_element->NE_Row          = GRIDDIMENSION_I ;
-  floorplan_element->NE_Column       = GRIDDIMENSION_I ;
+    floorplan_element->PowerValues     = NULL ;
 
-  floorplan_element->PowerValues     = NULL ;
-
-  floorplan_element->Next            = NULL ;
+    floorplan_element->Next            = NULL ;
 }
 
 /******************************************************************************/
 
-FloorplanElement* alloc_and_init_floorplan_element (void)
+FloorplanElement *alloc_and_init_floorplan_element (void)
 {
-  FloorplanElement* floorplan_element = malloc (sizeof(FloorplanElement));
+    FloorplanElement *floorplan_element = (FloorplanElement *)
 
-  if (floorplan_element != NULL)  init_floorplan_element(floorplan_element) ;
+        malloc (sizeof(FloorplanElement));
 
-  return floorplan_element ;
+    if (floorplan_element != NULL)
+
+        init_floorplan_element(floorplan_element) ;
+
+    return floorplan_element ;
 }
 
 /*****************************************************************************/
 
-void free_floorplan_element (FloorplanElement* floorplan_element)
+void free_floorplan_element (FloorplanElement *floorplan_element)
 {
-  FREE_POINTER (free_powers_queue, floorplan_element->PowerValues) ;
-  FREE_POINTER (free,              floorplan_element->Id) ;
-  FREE_POINTER (free,              floorplan_element) ;
+    FREE_POINTER (free_powers_queue, floorplan_element->PowerValues) ;
+    FREE_POINTER (free,              floorplan_element->Id) ;
+    FREE_POINTER (free,              floorplan_element) ;
 }
 
 /******************************************************************************/
 
-void free_floorplan_elements_list (FloorplanElement* list)
+void free_floorplan_elements_list (FloorplanElement *list)
 {
-  FREE_LIST (FloorplanElement, list, free_floorplan_element) ;
+    FREE_LIST (FloorplanElement, list, free_floorplan_element) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_floorplan_element
+(
+    FILE             *stream,
+    char             *prefix,
+    FloorplanElement *floorplan_element
+)
+{
+    fprintf (stream,
+        "%sFloorplan Element %s ( %.1f , %.1f ) %.1f x %.1f \n",
+        prefix, floorplan_element->Id,
+        floorplan_element->SW_X, floorplan_element->SW_Y,
+        floorplan_element->Length, floorplan_element->Width) ;
+
+    fprintf (stream,
+        "%s  Rows (%d - %d) Columns (%d - %d)",
+        prefix, floorplan_element->SW_Row, floorplan_element->NE_Row,
+        floorplan_element->SW_Column, floorplan_element->NE_Column) ;
+
+    fprintf (stream,
+        "%s  Power values ",
+        prefix) ;
+
+    print_powers_queue(stream, prefix, floorplan_element->PowerValues) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_floorplan_elements_list
+(
+    FILE             *stream,
+    char             *prefix,
+    FloorplanElement *list
+)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+
+        print_detailed_floorplan_element (stream, prefix, flp_el) ;
+}
+
+/******************************************************************************/
+
+void print_formatted_floorplan_element
+(
+    FILE             *stream,
+    char             *prefix,
+    FloorplanElement *floorplan_element
+)
+{
+    fprintf (stream,
+        "%s%s:\n",
+        prefix, floorplan_element->Id) ;
+
+    fprintf (stream,
+        "%s\tposition %.1f, %.1f ;\n",
+        prefix, floorplan_element->SW_X, floorplan_element->SW_Y) ;
+
+    fprintf (stream,
+        "%s\tdimension %.1f, %.1f ;\n",
+        prefix, floorplan_element->Length, floorplan_element->Width) ;
+
+    fprintf (stream,
+        "%s   power values ",
+        prefix) ;
+
+    print_formatted_powers_queue (stream, floorplan_element->PowerValues) ;
+
+    fprintf (stream, "\n") ;
+}
+
+/******************************************************************************/
+
+void print_formatted_floorplan_elements_list
+(
+    FILE             *stream,
+    char             *prefix,
+    FloorplanElement *list
+)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+    {
+        print_formatted_floorplan_element (stream, prefix, flp_el) ;
+        fprintf(stream, "\n") ;
+    }
 }
 
 /******************************************************************************/
 
 Error_t fill_sources_floorplan_element
 (
-    Source_t         *sources,
+    double           *sources,
     Dimensions       *dimensions,
     FloorplanElement *floorplan_element
 )
@@ -105,11 +196,9 @@ Error_t fill_sources_floorplan_element
 
         return TDICE_FAILURE ;
 
-    Power_t power = get_from_powers_queue(floorplan_element->PowerValues);
+    double power = get_from_powers_queue (floorplan_element->PowerValues);
 
-    CellDimension_t flp_el_surface
-      = (CellDimension_t) (floorplan_element->EffectiveLength
-                           * floorplan_element->EffectiveWidth) ;
+    double flp_el_surface = floorplan_element->EffectiveSurface ;
 
     // Here we ADD the power value to the source vector. It works as long as
     // the source vector is set to zero every time. This way the vale is added
@@ -148,290 +237,331 @@ Error_t fill_sources_floorplan_element
 
 void init_power_values_floorplan_element
 (
-  FloorplanElement* floorplan_element
+    FloorplanElement *floorplan_element
 )
 {
-  free_powers_queue(floorplan_element->PowerValues);
-  floorplan_element->PowerValues = alloc_and_init_powers_queue();
+    free_powers_queue (floorplan_element->PowerValues) ;
+
+    floorplan_element->PowerValues = alloc_and_init_powers_queue() ;
 }
 
 /******************************************************************************/
 
 void insert_power_values_floorplan_element
 (
-  FloorplanElement* floorplan_element,
-  PowersQueue*      pvalues
+    FloorplanElement *floorplan_element,
+    PowersQueue      *pvalues
 )
 {
-  Power_t power
-      = get_from_powers_queue(pvalues);
+    double power = get_from_powers_queue (pvalues);
 
-  put_into_powers_queue(floorplan_element->PowerValues, power);
+    put_into_powers_queue (floorplan_element->PowerValues, power);
 
-  pop_from_powers_queue (pvalues) ;
+    pop_from_powers_queue (pvalues) ;
 }
 
 /******************************************************************************/
 
-void print_floorplan_element
+FloorplanElement *find_floorplan_element_in_list
 (
-  FILE*             stream,
-  String_t          prefix,
-  FloorplanElement* floorplan_element
+    FloorplanElement *list,
+    char             *id
 )
 {
-  fprintf (stream, "%sFloorplan Element %s",  prefix, floorplan_element->Id) ;
-  fprintf (stream, " ( %.1f , %.1f ) %.1f x %.1f \n",
-    floorplan_element->SW_X, floorplan_element->SW_Y,
-    floorplan_element->Length, floorplan_element->Width) ;
-  fprintf (stream, "%s  Rows (%d - %d)",
-    prefix, floorplan_element->SW_Row, floorplan_element->NE_Row) ;
-  fprintf (stream, " Columns (%d - %d)\n",
-    floorplan_element->SW_Column, floorplan_element->NE_Column) ;
-
-  fprintf (stream,    "%s  Power values ", prefix) ;
-
-  print_powers_queue(stream, prefix, floorplan_element->PowerValues) ;
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+    {
+        if (strcmp (flp_el->Id, id) == 0) break ;
+    }
+    return flp_el ;
 }
 
 /******************************************************************************/
 
-void print_formatted_floorplan_element
+bool check_intersection
 (
-  FILE*             stream,
-  FloorplanElement* floorplan_element
+    FloorplanElement *floorplan_element_a,
+    FloorplanElement *floorplan_element_b
 )
 {
-  fprintf (stream, "%s:", floorplan_element->Id) ;
-  fprintf (stream, "   position %.1f, %.1f ;\n",
-                          floorplan_element->SW_X, floorplan_element->SW_Y) ;
-  fprintf (stream, "   dimension %.1f, %.1f ;\n",
-                          floorplan_element->Length,
-                          floorplan_element->Width) ;
-  fprintf (stream, "   power values ") ;
-  print_formatted_powers_queue(stream, floorplan_element->PowerValues) ;
-  fprintf (stream, "\n") ;
-}
-
-/******************************************************************************/
-
-void print_floorplan_elements_list
-(
-  FILE*             stream,
-  String_t          prefix,
-  FloorplanElement* list
-)
-{
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
-
-    print_floorplan_element (stream, prefix, flp_el) ;
-}
-
-/******************************************************************************/
-
-void print_formatted_floorplan_elements_list
-(
-  FILE*             stream,
-  FloorplanElement* list
-)
-{
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
-  {
-    print_formatted_floorplan_element (stream, flp_el) ;
-    fprintf(stream, "\n") ;
-  }
-}
-
-/******************************************************************************/
-
-FloorplanElement* find_floorplan_element_in_list
-(
-  FloorplanElement* list,
-  String_t          id
-)
-{
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
-
-    if (strcmp (flp_el->Id, id) == 0) break ;
-
-  return flp_el ;
-}
-
-/******************************************************************************/
-
-Bool_t check_intersection
-(
-  FloorplanElement* floorplan_element_a,
-  FloorplanElement* floorplan_element_b
-)
-{
-  if ((floorplan_element_a->SW_X + floorplan_element_a->Length)
-         <= floorplan_element_b->SW_X
-      || floorplan_element_a->SW_X
+    if (   (floorplan_element_a->SW_X + floorplan_element_a->Length)
+           <= floorplan_element_b->SW_X
+        || floorplan_element_a->SW_X
            >= (floorplan_element_b->SW_X + floorplan_element_b->Length))
 
-    return FALSE_V ;
+        return false ;
 
-  if ((floorplan_element_a->SW_Y + floorplan_element_a->Width)
-         <= floorplan_element_b->SW_Y
-      || floorplan_element_a->SW_Y
+    if (   (floorplan_element_a->SW_Y + floorplan_element_a->Width)
+           <= floorplan_element_b->SW_Y
+        || floorplan_element_a->SW_Y
            >= (floorplan_element_b->SW_Y + floorplan_element_b->Width))
 
-    return FALSE_V ;
+        return false ;
 
-  return TRUE_V ;
+    return true ;
+}
+
+/******************************************************************************/
+
+FloorplanElement *find_intersection_in_list
+(
+    FloorplanElement *list,
+    FloorplanElement *floorplan_element
+)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+
+        if (check_intersection(flp_el, floorplan_element) == true)
+
+            return flp_el ;
+
+    return NULL ;
+}
+/******************************************************************************/
+
+bool check_location
+(
+    Dimensions       *dimensions,
+    FloorplanElement *floorplan_element
+)
+{
+    return (   (floorplan_element->SW_X <  0)
+
+               || (floorplan_element->SW_X + floorplan_element->Length
+                  > get_chip_length (dimensions))
+
+            || (floorplan_element->SW_Y <  0)
+
+               || (floorplan_element->SW_Y + floorplan_element->Width
+                  > get_chip_width (dimensions)) ) ;
+}
+
+/******************************************************************************/
+
+void align_to_grid
+(
+    Dimensions       *dimensions,
+    FloorplanElement *floorplan_element
+)
+{
+    double cx = 0.0 ;
+    double cy = 0.0 ;
+    uint32_t column_index = 0u ;
+    uint32_t row_index    = 0u ;
+
+    /* West side */
+
+    cx = get_cell_length (dimensions, 0) / 2.0 ;
+
+    while (cx < floorplan_element->SW_X)
+    {
+        cx += get_cell_length (dimensions, column_index    ) / 2.0 ;
+        cx += get_cell_length (dimensions, column_index + 1) / 2.0 ;
+        column_index++ ;
+    }
+
+    floorplan_element->SW_Column = column_index ;
+
+    /* East side */
+
+    while (cx < floorplan_element->SW_X + floorplan_element->Length)
+    {
+        cx += get_cell_length (dimensions, column_index    ) / 2.0 ;
+        cx += get_cell_length (dimensions, column_index + 1) / 2.0 ;
+        column_index++ ;
+    }
+
+    floorplan_element->NE_Column = column_index - 1 ;
+
+    /* Effective length */
+
+    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (tmp_column_index, floorplan_element)
+    {
+        floorplan_element->EffectiveLength +=
+
+            get_cell_length (dimensions, tmp_column_index) ;
+    }
+
+    /* South side */
+
+    cy  = (get_cell_width (dimensions, 0) / 2.0) ;
+
+    while (cy < floorplan_element->SW_Y)
+    {
+        cy += get_cell_width (dimensions, row_index) ;  // CHECKME
+        row_index++ ;
+    }
+
+    floorplan_element->SW_Row = row_index ;
+
+    /* North side */
+
+    while (cy < floorplan_element->SW_Y + floorplan_element->Width)
+    {
+        cy += get_cell_width (dimensions, row_index) ;  // CHECKME
+        row_index++ ;
+    }
+
+    floorplan_element->NE_Row = row_index - 1 ;
+
+    /* Effective width */
+
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (tmp_row_index, floorplan_element)
+    {
+        floorplan_element->EffectiveWidth +=
+
+            get_cell_width (dimensions, tmp_row_index) ;  // CHECKME
+    }
+
+    floorplan_element->EffectiveSurface =
+
+        floorplan_element->EffectiveLength * floorplan_element->EffectiveWidth ;
+
+//    if (floorplan_element->NE_Row - floorplan_element->SW_Row == 0
+//        && floorplan_element->NE_Column - floorplan_element->SW_Column == 0)
+//    {
+//        fprintf (stderr,  FIXME
+//        "%s: no cells belong to floorplan element %s.\n",
+//        floorplan->FileName, floorplan_element->Id) ;
+//    }
 }
 
 /******************************************************************************/
 
 void get_max_temperature_floorplan_element
 (
-  FloorplanElement* floorplan_element,
-  Dimensions*       dimensions,
-  Temperature_t*    temperatures,
-  Temperature_t*    max_temperature
+    FloorplanElement *floorplan_element,
+    Dimensions       *dimensions,
+    double           *temperatures,
+    double           *max_temperature
 )
 {
-  *max_temperature = temperatures
-  [
-    get_cell_offset_in_layer
-    (
-      dimensions,
-      FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element),
-      FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element)
-    )
-  ] ;
+    uint32_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
+    uint32_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
-  {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+    *max_temperature =
+
+        *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
+
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
     {
+        FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+        {
 
-      *max_temperature = MAX
-      (
-        temperatures [get_cell_offset_in_layer (dimensions,
-                                                row_index, column_index)],
-        *max_temperature
-      ) ;
+            *max_temperature = MAX
+            (
+                *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index)),
+                *max_temperature
+            ) ;
 
-    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
-  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
-
+        } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 }
 
 /******************************************************************************/
 
 void get_min_temperature_floorplan_element
 (
-  FloorplanElement* floorplan_element,
-  Dimensions*       dimensions,
-  Temperature_t*    temperatures,
-  Temperature_t*    min_temperature
+    FloorplanElement *floorplan_element,
+    Dimensions       *dimensions,
+    double           *temperatures,
+    double           *min_temperature
 )
 {
-  *min_temperature = temperatures
-  [
-    get_cell_offset_in_layer
-    (
-      dimensions,
-      FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element),
-      FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element)
-    )
-  ] ;
+    uint32_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
+    uint32_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
-  {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+    *min_temperature =
+
+        *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
+
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
     {
+        FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+        {
 
-      *min_temperature = MIN
-      (
-        temperatures [get_cell_offset_in_layer (dimensions,
-                                                row_index, column_index)],
-        *min_temperature
-      ) ;
+            *min_temperature = MIN
+            (
+                *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index)),
+                *min_temperature
+            ) ;
 
-    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
-  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
-
+        } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 }
 
 /******************************************************************************/
 
 void get_avg_temperature_floorplan_element
 (
-  FloorplanElement* floorplan_element,
-  Dimensions*       dimensions,
-  Temperature_t*    temperatures,
-  Temperature_t*    avg_temperature
+    FloorplanElement *floorplan_element,
+    Dimensions       *dimensions,
+    double           *temperatures,
+    double           *avg_temperature
 )
 {
-  Quantity_t counter = QUANTITY_I ;
+    uint32_t counter = 0u ;
 
-  *avg_temperature = TEMPERATURE_I ;
+    *avg_temperature = 0.0 ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
-  {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
     {
+        FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+        {
 
-      *avg_temperature
-        += temperatures [get_cell_offset_in_layer (dimensions,
-                                                   row_index, column_index)] ;
+            *avg_temperature +=
 
-      counter++ ;
+                *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index)) ;
 
-    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
-  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
+            counter++ ;
 
-  *avg_temperature /= (Temperature_t) counter ;
+        } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
+
+    *avg_temperature /= (double) counter ;
 }
 
 /******************************************************************************/
 
 void get_min_avg_max_temperatures_floorplan_element
 (
-  FloorplanElement* floorplan_element,
-  Dimensions*       dimensions,
-  Temperature_t*    temperatures,
-  Temperature_t*    min_temperature,
-  Temperature_t*    avg_temperature,
-  Temperature_t*    max_temperature
+    FloorplanElement *floorplan_element,
+    Dimensions       *dimensions,
+    double           *temperatures,
+    double           *min_temperature,
+    double           *avg_temperature,
+    double           *max_temperature
 )
 {
-  Quantity_t    counter = QUANTITY_I ;
-  Temperature_t tmp     = TEMPERATURE_I ;
+    uint32_t counter = 0u ;
+    double tmp = 0.0 ;
 
-  *avg_temperature = TEMPERATURE_I ;
-  *max_temperature = *min_temperature = temperatures
-  [
-    get_cell_offset_in_layer
-    (
-      dimensions,
-      FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element),
-      FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element)
-    )
-  ] ;
+    uint32_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
+    uint32_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
 
-  FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
-  {
-    FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+    *avg_temperature = 0.0;
+
+    *max_temperature = *min_temperature =
+
+        *(temperatures + get_cell_offset_in_layer (dimensions, first_row, first_column)) ;
+
+    FOR_EVERY_FLOORPLAN_ELEMENT_ROW (row_index, floorplan_element)
     {
-      tmp = temperatures [get_cell_offset_in_layer (dimensions,
-                                                    row_index, column_index)] ;
+        FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN (column_index, floorplan_element)
+        {
+            tmp = *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index)) ;
 
-      *max_temperature = MAX (tmp, *max_temperature) ;
+            *max_temperature = MAX (tmp, *max_temperature) ;
 
-      *min_temperature = MIN (tmp, *min_temperature) ;
+            *min_temperature = MIN (tmp, *min_temperature) ;
 
-      *avg_temperature += tmp ;
+            *avg_temperature += tmp ;
 
-      counter++ ;
+            counter++ ;
 
-    } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
-  } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
+        } // FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN
+    } // FOR_EVERY_FLOORPLAN_ELEMENT_ROW
 
-  *avg_temperature /= (Temperature_t) counter ;
+    *avg_temperature /= (double) counter ;
 }
 
 /******************************************************************************/

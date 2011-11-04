@@ -127,32 +127,6 @@ extern "C"
 
 /******************************************************************************/
 
-  Bool_t check_intersections
-  (
-    Floorplan*        floorplan,
-    FloorplanElement* floorplan_element
-  ) ;
-
-/******************************************************************************/
-
-  Bool_t check_location
-  (
-    Floorplan*        floorplan,
-    FloorplanElement* floorplan_element,
-    Dimensions*       dimensions
-  ) ;
-
-/******************************************************************************/
-
-  Bool_t align_to_grid
-  (
-    Floorplan*        floorplan,
-    FloorplanElement* floorplan_element,
-    Dimensions*       dimensions
-  ) ;
-
-/******************************************************************************/
-
   int get_max_temperature_floorplan
   (
     Floorplan*     floorplan,

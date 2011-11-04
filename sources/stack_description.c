@@ -80,7 +80,7 @@ int fill_stack_description
     return -1 ;
   }
 
-  stkd->FileName = strdup (filename) ;
+  stkd->FileName = strdup (filename) ;  // FIXME memory leak (awa in case of floorplan error)
 
   stack_description_lex_init (&scanner) ;
   stack_description_set_in (input, scanner) ;

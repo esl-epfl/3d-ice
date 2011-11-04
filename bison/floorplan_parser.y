@@ -34,9 +34,9 @@
  ******************************************************************************/
 
 %{
-#include "dimensions.h"
 #include "floorplan.h"
 #include "floorplan_element.h"
+#include "dimensions.h"
 #include "macros.h"
 %}
 
@@ -61,6 +61,8 @@ void floorplan_error
 ) ;
 
 static char error_message [100] ;
+
+static bool local_abort ;
 %}
 
 %type <p_floorplan_element> floorplan_element ;
@@ -90,9 +92,27 @@ static char error_message [100] ;
 
 %lex-param   { yyscan_t scanner       }
 
-%start floorplan_element_list
+%initial-action
+{
+    local_abort = false ;
+} ;
+
+%start floorplan_file
 
 %%
+
+floorplan_file
+
+  : floorplan_element_list
+    {
+        if (local_abort == true)
+        {
+            FREE_POINTER (free_floorplan, floorplan) ;
+
+            YYABORT ;
+        }
+    }
+  ;
 
 /******************************************************************************/
 /************************* List of floorplan elements *************************/
@@ -102,17 +122,16 @@ floorplan_element_list
 
   : floorplan_element             // $1 : pointer to the first floorplan element found
     {
-        Bool_t tmp_1 = check_location (floorplan, $1, dimensions) ;
-        Bool_t tmp_2 = align_to_grid  (floorplan, $1, dimensions) ;
-
-        if (tmp_1 || tmp_2)
+        if (check_location (dimensions, $1) == TRUE_V)
         {
-            FREE_POINTER (free_floorplan_element, $1) ;
+            sprintf (error_message, "Floorplan element %s is outside of the IC", $1->Id) ;
 
-            floorplan_error (floorplan, dimensions, scanner, "") ;
+            floorplan_error (floorplan, dimensions, scanner, error_message) ;
 
-            YYABORT ;
+            local_abort = true ;
         }
+
+        align_to_grid  (dimensions, $1) ;
 
         floorplan->ElementsList = $1 ;
         floorplan->NElements    = 1 ;
@@ -122,30 +141,44 @@ floorplan_element_list
   | floorplan_element_list floorplan_element // $1 : pointer to the last element in the list
                                              // $2 : pointer to the element to add in the list
     {
-        if (find_floorplan_element_in_list($1, $2->Id) != NULL)
+        if (find_floorplan_element_in_list(floorplan->ElementsList, $2->Id) != NULL)
         {
             sprintf (error_message, "Floorplan element %s already declared", $2->Id) ;
 
             floorplan_error (floorplan, dimensions, scanner, error_message) ;
 
-            FREE_POINTER (free_floorplan_element, $2) ;
-
-            YYABORT ;
+            local_abort = true ;
         }
 
-
-        Bool_t tmp_1 = check_intersections (floorplan, $2) ;
-        Bool_t tmp_2 = check_location      (floorplan, $2, dimensions) ;
-        Bool_t tmp_3 = align_to_grid       (floorplan, $2, dimensions) ;
-
-        if (tmp_1 || tmp_2 || tmp_3 )
+        if (check_location (dimensions, $2) == TRUE_V)
         {
-            FREE_POINTER (free_floorplan_element, $2) ;
+            sprintf (error_message, "Floorplan element %s is outside of the IC", $2->Id) ;
 
-            floorplan_error (floorplan, dimensions, scanner, "") ;
+            floorplan_error (floorplan, dimensions, scanner, error_message) ;
 
-            YYABORT ;
+            local_abort = true ;
         }
+
+        FloorplanElement *flp_el = floorplan->ElementsList ;
+
+        do
+        {
+            flp_el = find_intersection_in_list (flp_el, $2) ;
+
+            if (flp_el != NULL)
+            {
+                sprintf (error_message, "Found intersection between %s and %s", $2->Id, flp_el->Id) ;
+
+                floorplan_error (floorplan, dimensions, scanner, error_message) ;
+
+                flp_el = flp_el->Next ;
+
+                local_abort = true ;
+            }
+
+        }   while (flp_el != NULL) ;
+
+        align_to_grid (dimensions, $2) ;
 
         floorplan->NElements++ ;
 
