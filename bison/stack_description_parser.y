@@ -42,6 +42,7 @@
 #include "layer.h"
 #include "stack_element.h"
 #include "stack_description.h"
+#include "analysis.h"
 %}
 
 // The YYSTYPE union used to collect the types of tokens and rules
@@ -95,6 +96,7 @@
 %token HEAT                  "keyword heat"
 %token HEIGHT                "keyword height"
 %token INCOMING              "keyword incoming"
+%token INITIAL_              "keyword initial"
 %token INLINE                "keyword inline"
 %token LAST                  "keyword last"
 %token LAYER                 "keyword layer"
@@ -109,13 +111,19 @@
 %token RM4                   "keyword rm4"
 %token SIDE                  "keyword side"
 %token SINK                  "keywork sink"
+%token SLOT                  "keyword slot"
+%token SOLVER                "keyword solver"
 %token SOURCE                "keyword source"
 %token STACK                 "keyword stack"
 %token STAGGERED             "keyword staggered"
+%token STATE                 "keyword state"
+%token STEADY                "keyword steady"
+%token STEP                  "keyword step"
 %token TEMPERATURE           "keyword temperature"
 %token THERMAL               "keyword thermal"
 %token TOP                   "keyword top"
 %token TRANSFER              "keyword transfer"
+%token TRANSIENT             "keyword transient"
 %token VELOCITY              "keyword velocity"
 %token VOLUMETRIC            "keywork volumetric"
 %token WALL                  "keyword wall"
@@ -133,7 +141,8 @@
 
 void stack_description_error
 (
-    StackDescription* stack,
+    StackDescription *stack,
+    Analysis         *analysis,
     yyscan_t          scanner,
     String_t          message
 ) ;
@@ -153,8 +162,11 @@ static Quantity_t      num_dies          = QUANTITY_I ;
 
 %pure-parser
 %error-verbose
-%parse-param { StackDescription *stkd }
-%parse-param { yyscan_t scanner }
+
+%parse-param { StackDescription *stkd     }
+%parse-param { Analysis         *analysis }
+%parse-param { yyscan_t          scanner }
+
 %lex-param   { yyscan_t scanner }
 
 %initial-action
@@ -183,6 +195,8 @@ stack_description_file
     dies_list
     stack
     dimensions
+    solver
+    initial_temperature
   ;
 
 /******************************************************************************/
@@ -207,7 +221,7 @@ materials_list
 
             FREE_POINTER (free_material, $2) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -229,7 +243,7 @@ material
         {
             FREE_POINTER (free, $2) ;
 
-            stack_description_error (stkd, scanner, "Malloc material failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc material failed") ;
 
             YYABORT ;
         }
@@ -256,7 +270,7 @@ conventional_heat_sink
 
         if (stkd->ConventionalHeatSink == NULL)
         {
-            stack_description_error (stkd, scanner, "Malloc conventional heat sink failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc conventional heat sink failed") ;
 
             YYABORT ;
         }
@@ -292,7 +306,7 @@ microchannel
         {
             FREE_POINTER (free, $19) ;
 
-            stack_description_error (stkd, scanner, "Malloc channel failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc channel failed") ;
 
             YYABORT ;
         }
@@ -318,7 +332,7 @@ microchannel
 
             FREE_POINTER (free, $19) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -344,7 +358,7 @@ microchannel
         {
             FREE_POINTER (free, $17) ;
 
-            stack_description_error (stkd, scanner, "Malloc channel failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc channel failed") ;
 
             YYABORT ;
         }
@@ -368,7 +382,7 @@ microchannel
 
             FREE_POINTER (free, $17) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -394,7 +408,7 @@ microchannel
         {
             FREE_POINTER (free, $20) ;
 
-            stack_description_error (stkd, scanner, "Malloc channel failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc channel failed") ;
 
             YYABORT ;
         }
@@ -416,7 +430,7 @@ microchannel
 
             FREE_POINTER (free, $20) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -511,7 +525,7 @@ layer_content :
         {
             FREE_POINTER (free, $2) ;
 
-            stack_description_error (stkd, scanner, "Malloc layer failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc layer failed") ;
 
             YYABORT ;
         }
@@ -526,7 +540,7 @@ layer_content :
             FREE_POINTER (free,       $2) ;
             FREE_POINTER (free_layer, layer) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -558,7 +572,7 @@ dies_list
 
             FREE_POINTER (free_die, $2) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -584,7 +598,7 @@ die
             FREE_POINTER (free_layer,       $5) ;
             FREE_POINTER (free_layers_list, $6);
 
-            stack_description_error (stkd, scanner, "Malloc die failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc die failed") ;
 
             YYABORT ;
         }
@@ -673,14 +687,14 @@ stack
     {
         if (num_dies == 0)
         {
-            stack_description_error (stkd, scanner, "Error: stack must contain at least one die") ;
+            stack_description_error (stkd, analysis, scanner, "Error: stack must contain at least one die") ;
 
             YYABORT ;
         }
 
         if (stkd->BottomStackElement->Type == TDICE_STACK_ELEMENT_CHANNEL)
         {
-            stack_description_error (stkd, scanner, "Error: cannot declare a channel as bottom-most stack element") ;
+            stack_description_error (stkd, analysis, scanner, "Error: cannot declare a channel as bottom-most stack element") ;
 
             YYABORT ;
         }
@@ -735,7 +749,7 @@ stack_elements
     {
         if (   stkd->TopStackElement == NULL && $1->Type == TDICE_STACK_ELEMENT_CHANNEL)
         {
-            stack_description_error (stkd, scanner, "Error: cannot declare a channel as top-most stack element") ;
+            stack_description_error (stkd, analysis, scanner, "Error: cannot declare a channel as top-most stack element") ;
 
             YYABORT ;
         }
@@ -753,7 +767,7 @@ stack_elements
 
             FREE_POINTER (free_stack_element, $2) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -761,7 +775,7 @@ stack_elements
         if (   $1->Type == TDICE_STACK_ELEMENT_CHANNEL
             && $2->Type == TDICE_STACK_ELEMENT_CHANNEL)
         {
-            stack_description_error (stkd, scanner, "Error: cannot declare two consecutive channels") ;
+            stack_description_error (stkd, analysis, scanner, "Error: cannot declare two consecutive channels") ;
 
             YYABORT ;
         }
@@ -786,7 +800,7 @@ stack_element
             FREE_POINTER (free, $2) ;
             FREE_POINTER (free, $4) ;
 
-            stack_description_error (stkd, scanner, "Malloc stack element failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc stack element failed") ;
 
             YYABORT ;
         }
@@ -799,7 +813,7 @@ stack_element
             FREE_POINTER (free,               $4) ;
             FREE_POINTER (free_stack_element, stack_element) ;
 
-            stack_description_error (stkd, scanner, "Malloc layer failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc layer failed") ;
 
             YYABORT ;
         }
@@ -816,7 +830,7 @@ stack_element
             FREE_POINTER (free_stack_element, stack_element) ;
             FREE_POINTER (free_layer,         layer) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -837,7 +851,7 @@ stack_element
 
         if (stkd->Channel == NULL)
         {
-            stack_description_error (stkd, scanner, "Error: channel used in stack but not declared") ;
+            stack_description_error (stkd, analysis, scanner, "Error: channel used in stack but not declared") ;
 
             YYABORT ;
         }
@@ -848,7 +862,7 @@ stack_element
         {
             FREE_POINTER (free, $2) ;
 
-            stack_description_error (stkd, scanner, "Malloc stack element failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc stack element failed") ;
 
             YYABORT ;
         }
@@ -883,7 +897,7 @@ stack_element
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
-            stack_description_error (stkd, scanner, "Malloc stack element failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc stack element failed") ;
 
             YYABORT ;
         }
@@ -900,7 +914,7 @@ stack_element
             FREE_POINTER (free,               $5) ;
             FREE_POINTER (free_stack_element, stack_element) ;
 
-            stack_description_error (stkd, scanner, error_message) ;
+            stack_description_error (stkd, analysis, scanner, error_message) ;
 
             YYABORT ;
         }
@@ -916,7 +930,7 @@ stack_element
             FREE_POINTER (free,               $5) ;
             FREE_POINTER (free_stack_element, stack_element) ;
 
-            stack_description_error (stkd, scanner, "Malloc floorplan failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc floorplan failed") ;
 
             YYABORT ;
         }
@@ -941,7 +955,7 @@ dimensions
 
         if (stkd->Dimensions == NULL)
         {
-            stack_description_error (stkd, scanner, "Malloc dimensions failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc dimensions failed") ;
             YYABORT ;
         }
 
@@ -975,7 +989,7 @@ dimensions
 
                 if ( ratio - (int) ratio != 0)
                 {
-                    stack_description_error (stkd, scanner, "Error: cell dimensions does not fit the chip length correctly") ;
+                    stack_description_error (stkd, analysis, scanner, "Error: cell dimensions does not fit the chip length correctly") ;
 
                     YYABORT ;
                 }
@@ -984,7 +998,7 @@ dimensions
 
                 if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
                 {
-                    stack_description_error (stkd, scanner, "Error: colum number must be odd when channel is declared") ;
+                    stack_description_error (stkd, analysis, scanner, "Error: colum number must be odd when channel is declared") ;
 
                     YYABORT ;
                 }
@@ -993,7 +1007,7 @@ dimensions
 
                 if (stkd->Dimensions->Grid.NColumns < 3)
                 {
-                    stack_description_error (stkd, scanner, "Error: not enough columns") ;
+                    stack_description_error (stkd, analysis, scanner, "Error: not enough columns") ;
 
                     YYABORT ;
                 }
@@ -1023,7 +1037,7 @@ dimensions
         if ((uint32_t) stkd->Dimensions->Grid.NCells >  INT32_MAX)
         {
             stack_description_error
-                (stkd, scanner, "Too many cells ... (SuperLU uses 'int')") ;
+                (stkd, analysis, scanner, "Too many cells ... (SuperLU uses 'int')") ;
 
             YYABORT ;
         }
@@ -1163,11 +1177,78 @@ dimensions
     }
   ;
 
+/******************************************************************************/
+/******************************* Solevr type **********************************/
+/******************************************************************************/
+
+solver
+
+  : SOLVER ':' STEADY ';'
+    {
+        // StepTime is set to 1 to avoid division by zero when computing
+        // the capacitance of a thermal cell
+
+        analysis->AnalysisType = TDICE_STEADY ;
+        analysis->StepTime     = 1.0 ;
+        analysis->SlotTime     = 0.0 ;
+        analysis->SlotLength   = 1u ; // CHECKME
+    }
+
+  | SOLVER ':' TRANSIENT STEP DVALUE ',' SLOT DVALUE ';'  // $5 StepTime
+                                                          // $8 SlotTime
+    {
+        if ($8 < $5)
+        {
+            stack_description_error
+
+                (stkd, analysis, scanner, "Slot time must be higher than StepTime") ;
+
+            YYABORT ;
+        }
+
+        if ($5 <= 0.0)
+        {
+            stack_description_error
+
+                (stkd, analysis, scanner, "StepTime must be a positive value") ;
+
+            YYABORT ;
+        }
+
+        if ($8 <= 0.0)
+        {
+            stack_description_error
+
+                (stkd, analysis, scanner, "SlotTime must be a positive value") ;
+
+            YYABORT ;
+        }
+
+        analysis->AnalysisType = TDICE_TRANSIENT ;
+        analysis->StepTime     = $5 ;
+        analysis->SlotTime     = $8 ;
+        analysis->SlotLength   = (uint32_t) ( $8 / $5 ) ;
+    }
+  ;
+
+/******************************************************************************/
+/*************************** Initial Temperature ******************************/
+/******************************************************************************/
+
+initial_temperature
+
+  : INITIAL_ TEMPERATURE DVALUE ';'
+    {
+        analysis->InitialTemperature = $3;
+    }
+  ;
+
 %%
 
 void stack_description_error
 (
-    StackDescription* stkd,
+    StackDescription *stkd,
+    Analysis         __attribute__ ((unused)) *analysis,
     yyscan_t          scanner,
     String_t          message
 )

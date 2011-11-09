@@ -247,6 +247,20 @@ extern "C"
 
 /******************************************************************************/
 
+  /* Type of analysis */
+
+  enum AnalysisType_t
+  {
+    TDICE_TRANSIENT = 0,
+    TDICE_STEADY  
+  } ;
+
+  typedef enum AnalysisType_t AnalysisType_t ;
+# define                      ANALYSISTYPE_I TDICE_TRANSIENT
+
+
+/******************************************************************************/
+
 #ifdef __cplusplus
 }
 #endif

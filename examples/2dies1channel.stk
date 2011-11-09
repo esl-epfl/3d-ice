@@ -88,3 +88,6 @@ dimensions :
     chip length 10000 , width  10000 ;
     cell length   100 , width    100 ;
 
+solver : transient step 0.02, slot 0.2 ;
+
+initial temperature 300.0 ;

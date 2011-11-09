@@ -53,6 +53,7 @@ extern "C"
 #include "stack_element.h"
 #include "dimensions.h"
 #include "conventional_heat_sink.h"
+#include "analysis.h"
 
 /******************************************************************************/
 
@@ -115,7 +116,7 @@ extern "C"
   /* section (from bottom to top). It stops as soon as it finds an error    */
   /* and it returns 1, discarding the remaining files to parse.             */
 
-  int fill_stack_description (StackDescription* stkd, String_t filename) ;
+  int fill_stack_description (StackDescription* stkd, Analysis *analysis, String_t filename) ;
 
 /******************************************************************************/
 
@@ -156,17 +157,18 @@ extern "C"
      *  The function fills all the thermal cells representing the 3d volume
      *  of the IC stack, starting from the bottom-most stack element. If the
      *  heat sink is used, it adapts the top-most layer to connect it to
-     *  the enviroment and enable heat dissipation.
+     *  the enviroment and enable heat dissipation. If the simulation typed
+     *  is steady state it resets the capacitance of each thermal cell.
      *
      *  \param thermal_cells pointer to the first thermal cell in the 3d grid
-     *  \param delta_time    the time resolution of the thermal simulation
+     *  \param analysis      pointer to the steructure containing info about the type of analysis
      *  \param stkd          pointer to the stack descritpion structure
      */
 
     void fill_thermal_cell_stack_description
     (
         ThermalCell      *thermal_cells,
-        Time_t            delta_time,
+        Analysis         *analysis,
         StackDescription *stkd
     ) ;
 

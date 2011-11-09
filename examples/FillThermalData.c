@@ -35,19 +35,21 @@
 
 #include "stack_description.h"
 #include "thermal_data.h"
+#include "analysis.h"
 
 int
 main(int argc, char** argv)
 {
   StackDescription stkd ;
+  Analysis         analysis ;
   ThermalData      tdata ;
 
   // Checks if there are the all the arguments
   ////////////////////////////////////////////////////////////////////////////
 
-  if (argc != 4)
+  if (argc != 2)
   {
-    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]) ;
+    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]) ;
     return EXIT_FAILURE ;
   }
 
@@ -56,7 +58,9 @@ main(int argc, char** argv)
 
   init_stack_description (&stkd) ;
 
-  if (fill_stack_description (&stkd, argv[1]) != 0)
+  init_analysis (&analysis) ;
+
+  if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
 
     return EXIT_FAILURE ;
 
@@ -69,9 +73,9 @@ main(int argc, char** argv)
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
 
-  init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
+  init_thermal_data (&tdata) ;
 
-  if (fill_thermal_data  (&tdata, &stkd) != 0)
+  if (fill_thermal_data  (&tdata, &stkd, &analysis) != 0)
   {
     fprintf (stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
@@ -85,7 +89,7 @@ main(int argc, char** argv)
   // print_all_floorplans(stdout, "", &stkd) ;
 
   // This is to consume a power value (to see the effect of PRINT_SOURCES
-  emulate_step(&tdata, &stkd) ;
+  emulate_step(&tdata, &stkd, &analysis) ;
 
   // free all data
   ////////////////////////////////////////////////////////////////////////////

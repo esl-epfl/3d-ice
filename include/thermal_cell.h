@@ -112,6 +112,14 @@ extern "C"
 
     void init_thermal_cell (ThermalCell *thermal_cell) ;
 
+    /*! Set to zero the capacity in a vector of thermal cells
+     *
+     * \param thermal_cell pointer to the first thermal cell in the vector
+     * \param ncells number of thermal cells in the vector
+     */
+
+    void reset_capacities (ThermalCell *thermal_cell, uint32_t ncells) ;
+
 
     /*! Fill a solid thermal cell that belongs to the bottom-most layer of a stack
      *

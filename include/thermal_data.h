@@ -48,6 +48,7 @@ extern "C"
 #include "types.h"
 #include "thermal_cell.h"
 #include "stack_description.h"
+#include "analysis.h"
 #include "system_matrix.h"
 #include "slu_ddefs.h"
 
@@ -63,24 +64,9 @@ extern "C"
 
     ThermalCell*   ThermalCells ;
 
-    /* The initial (homogeneous) temperature of the chip (every cell) */
-
-    Temperature_t InitialTemperature ;
-
     /* The number of cells in the 3D grid to be emulated */
 
     Quantity_t    Size ;
-
-    /* Time Values */
-
-    Time_t StepTime ;
-    Time_t SlotTime ;
-
-    /* Quantities used for simulation */
-
-    Quantity_t SlotLength ;
-
-    Quantity_t CurrentTime ;
 
     /* The matrix A representing the linear system */
 
@@ -128,13 +114,7 @@ extern "C"
   /*                     domain for the numerical integration of the system */
   /*                     of differential equations                          */
 
-  void init_thermal_data
-  (
-    ThermalData*      tdata,
-    Temperature_t     initial_temperature,
-    Time_t            slot_time,
-    Time_t            step_time
-  ) ;
+  void init_thermal_data (ThermalData *tdata) ;
 
 /******************************************************************************/
 
@@ -156,21 +136,15 @@ extern "C"
   /* >0 otherwise (factorization error). Please see the "output" field of   */
   /*     the function "dgstrf" in SuperLU                                   */
 
-  int fill_thermal_data  (ThermalData* tdata, StackDescription* stkd) ;
+  int fill_thermal_data
+
+    (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
 
 /******************************************************************************/
 
   /* Frees all the memory                                                   */
 
   void free_thermal_data  (ThermalData* tdata) ;
-
-/******************************************************************************/
-
-  /* Returns the time, in [seconds], sum of the time steps emulated         */
-
-  Time_t get_current_time (ThermalData* tdata) ;
-
-  Bool_t is_slot_time (ThermalData* tdata) ;
 
 /******************************************************************************/
 
@@ -184,7 +158,7 @@ extern "C"
   /*     of the linear system. See the "info" prameter of "dgstrs" in       */
   /*     SuperLU.                                                           */
 
-  int emulate_step (ThermalData* tdata, StackDescription* stkd) ;
+  int emulate_step (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
 
 /******************************************************************************/
 
@@ -198,7 +172,21 @@ extern "C"
   /*     of the linear system. See the "info" prameter of "dgstrs"          */
   /*     in SuperLU.                                                        */
 
-  int emulate_slot (ThermalData* tdata, StackDescription* stkd) ;
+  int emulate_slot (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
+
+/******************************************************************************/
+
+  /* Consumes the first power value of heat injection and dissipation       */
+  /* and does steady state simulation.                                      */
+  /* Returns                                                                */
+  /*                                                                        */
+  /*   1 if the emulation succeeded (power value consumed),                 */
+  /*     or if no power values are mentioned at all (error)                 */
+  /*  <0 if there have been a problem with the computation of the solution  */
+  /*     of the linear system. See the "info" prameter of "dgstrs"          */
+  /*     in SuperLU.                                                        */
+
+  int emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
 
 /******************************************************************************/
 

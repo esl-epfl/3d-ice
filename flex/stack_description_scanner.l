@@ -148,6 +148,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "heat"                       return HEAT ;
 "height"                     return HEIGHT ;
 "incoming"                   return INCOMING ;
+"initial"                    return INITIAL_ ;
 "inline"                     return INLINE ;
 "last"                       return LAST ;
 "layer"                      return LAYER ;
@@ -162,13 +163,19 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "rm4"                        return RM4 ;
 "side"                       return SIDE ;
 "sink"                       return SINK ;
+"slot"                       return SLOT ;
+"solver"                     return SOLVER ;
 "source"                     return SOURCE ;
 "stack"                      return STACK ;
 "staggered"                  return STAGGERED ;
+"state"                      return STATE ;
+"steady"                     return STEADY ;
+"step"                       return STEP ;
 "temperature"                return TEMPERATURE ;
 "thermal"                    return THERMAL ;
 "top"                        return TOP ;
 "transfer"                   return TRANSFER ;
+"transient"                  return TRANSIENT ;
 "velocity"                   return VELOCITY ;
 "volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;

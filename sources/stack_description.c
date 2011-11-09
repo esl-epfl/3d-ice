@@ -44,7 +44,7 @@
 
 /******************************************************************************/
 
-extern int  stack_description_parse (StackDescription* stkd, yyscan_t scanner) ;
+extern int  stack_description_parse (StackDescription* stkd, Analysis *analysis, yyscan_t scanner) ;
 static int  fill_floorplans         (StackDescription* stkd) ;
 
 /******************************************************************************/
@@ -65,7 +65,8 @@ void init_stack_description (StackDescription* stkd)
 
 int fill_stack_description
 (
-  StackDescription* stkd,
+  StackDescription *stkd,
+  Analysis         *analysis,
   String_t          filename
 )
 {
@@ -85,7 +86,7 @@ int fill_stack_description
   stack_description_lex_init (&scanner) ;
   stack_description_set_in (input, scanner) ;
 
-  result = stack_description_parse (stkd, scanner) ;
+  result = stack_description_parse (stkd, analysis, scanner) ;
 
   stack_description_lex_destroy (scanner) ;
   fclose (input) ;
@@ -239,6 +240,10 @@ void print_detailed_stack_description
         fprintf (stream, "%s\n", prefix) ;
     }
 
+    fprintf (stream,
+             "%s  Dimensions                    = %p\n",
+             prefix, stkd->Dimensions) ;
+
     FREE_POINTER (free, new_prefix) ;
 }
 
@@ -280,7 +285,7 @@ int fill_floorplans (StackDescription* stkd)
 void fill_thermal_cell_stack_description
 (
     ThermalCell      *thermal_cells,
-    Time_t            delta_time,
+    Analysis         *analysis,
     StackDescription *stkd
 )
 {
@@ -288,13 +293,17 @@ void fill_thermal_cell_stack_description
 
         fill_thermal_cell_stack_element
 
-            (thermal_cells, delta_time, stkd->Dimensions, stack_element) ;
+            (thermal_cells, analysis->StepTime, stkd->Dimensions, stack_element) ;
 
     if (stkd->ConventionalHeatSink)
 
         fill_thermal_cell_conventional_heat_sink
 
             (thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
+
+    if (analysis->AnalysisType == TDICE_STEADY)
+
+        reset_capacities (thermal_cells, get_number_of_cells(stkd->Dimensions)) ;
 }
 
 /******************************************************************************/

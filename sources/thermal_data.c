@@ -48,24 +48,9 @@ static void init_data (double* data, Quantity_t size, double init_value)
 
 /******************************************************************************/
 
-void init_thermal_data
-(
-  ThermalData*      tdata,
-  Temperature_t     initial_temperature,
-  Time_t            slot_time,
-  Time_t            step_time
-)
+void init_thermal_data (ThermalData *tdata)
 {
   tdata->Size = QUANTITY_I ;
-
-  tdata->StepTime = step_time ;
-  tdata->SlotTime = slot_time ;
-
-  tdata->SlotLength = (Quantity_t) ( slot_time / step_time ) ;
-
-  tdata->CurrentTime      = QUANTITY_I ;
-
-  tdata->InitialTemperature = initial_temperature ;
 
   tdata->Temperatures = NULL ;
   tdata->Sources      = NULL ;
@@ -102,8 +87,9 @@ void init_thermal_data
 
 int fill_thermal_data
 (
-  ThermalData*      tdata,
-  StackDescription* stkd
+  ThermalData      *tdata,
+  StackDescription *stkd,
+  Analysis         *analysis
 )
 {
   int result ;
@@ -119,7 +105,7 @@ int fill_thermal_data
 
   /* Set Temperatures and SLU vector B */
 
-  init_data (tdata->Temperatures, tdata->Size, tdata->InitialTemperature) ;
+  init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
 
   dCreate_Dense_Matrix  /* Vector B */
   (
@@ -137,7 +123,7 @@ int fill_thermal_data
 
   fill_thermal_cell_stack_description
 
-      (tdata->ThermalCells, tdata->StepTime, stkd) ;
+      (tdata->ThermalCells, analysis, stkd) ;
 
   /* Alloc and set sources */
 
@@ -253,20 +239,6 @@ void free_thermal_data (ThermalData* tdata)
 
 /******************************************************************************/
 
-Time_t get_current_time(ThermalData* tdata)
-{
-  return tdata->CurrentTime * tdata->StepTime ;
-}
-
-/******************************************************************************/
-
-Bool_t is_slot_time(ThermalData* tdata)
-{
-  return (tdata->CurrentTime % tdata->SlotLength == 0) ? TRUE_V : FALSE_V;
-}
-
-/******************************************************************************/
-
 static void
 fill_system_vector
 (
@@ -314,11 +286,50 @@ fill_system_vector
 
 }
 
-int emulate_step (ThermalData* tdata, StackDescription* stkd)
+/******************************************************************************/
+
+static void
+fill_system_vector_steady
+(
+  Dimensions*          dimensions,
+  SystemMatrixValue_t* vector,
+  Source_t*            sources
+)
 {
-  if (tdata->CurrentTime % tdata->SlotLength == 0)
+  FOR_EVERY_LAYER (layer, dimensions)
   {
-    if (fill_sources_stack_description (tdata->Sources, tdata->ThermalCells, stkd) != 0)
+    FOR_EVERY_ROW (row, dimensions)
+    {
+      FOR_EVERY_COLUMN (column, dimensions)
+      {
+          *vector++ =   *sources++ ;
+
+#ifdef PRINT_SYSTEM_VECTOR
+        fprintf (stderr,
+            " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
+            layer, row, column,
+            get_cell_offset_in_stack (dimensions, layer, row, column),
+            *(vector-1), *(sources-1)) ;
+#endif
+
+      } // FOR_EVERY_COLUMN
+    } // FOR_EVERY_ROW
+  } // FOR_EVERY_LAYER
+
+}
+
+/******************************************************************************/
+
+int emulate_step (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
+{
+  if (analysis->AnalysisType == TDICE_STEADY) // FIXME
+
+        return 2 ;
+
+  if (slot_completed (analysis) == TRUE_V) // CHECKME
+  {
+    if (fill_sources_stack_description
+            (tdata->Sources, tdata->ThermalCells, stkd) == TDICE_FAILURE)
 
       return 1 ;
   }
@@ -347,26 +358,71 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd)
     return tdata->SLU_Info ;
   }
 
-  tdata->CurrentTime++ ;
+  analysis->CurrentTime++ ;
 
   return 0 ;
 }
 
 /******************************************************************************/
 
-int emulate_slot (ThermalData* tdata, StackDescription* stkd)
+int emulate_slot (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
 {
   int result = 0 ;
 
+  if (analysis->AnalysisType == TDICE_STEADY)  // FIXME
+
+        return 2 ;
+
   do
   {
-    result = emulate_step(tdata, stkd) ;
 
-    if (result != 0)  break ;
+    result = emulate_step (tdata, stkd, analysis) ;
 
-  } while (tdata->CurrentTime % tdata->SlotLength != 0) ;
+  } while (result == 0) ; // CHECKME
 
   return result ;
+}
+
+/******************************************************************************/
+
+int emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
+{
+  if (analysis->AnalysisType == TDICE_TRANSIENT)  // FIXME
+
+        return 2 ;
+
+  if (fill_sources_stack_description
+        (tdata->Sources, tdata->ThermalCells, stkd) == TDICE_FAILURE)
+  {
+    fprintf (stderr, "Warning: no power values given for steady state simulation... Nothing to simulate\n") ;
+    return 1 ;
+  }
+
+  fill_system_vector_steady
+
+        (stkd->Dimensions, tdata->Temperatures, tdata->Sources) ;
+
+  dgstrs
+  (
+    NOTRANS,
+    &tdata->SLUMatrix_L,
+    &tdata->SLUMatrix_U,
+    tdata->SLU_PermutationMatrixC,
+    tdata->SLU_PermutationMatrixR,
+    &tdata->SLUMatrix_B,
+    &tdata->SLU_Stat,
+    &tdata->SLU_Info
+  ) ;
+
+  if (tdata->SLU_Info < 0)
+  {
+    fprintf (stderr, "Error while solving linear system\n") ;
+    return tdata->SLU_Info ;
+  }
+
+  analysis->CurrentTime += analysis->SlotLength ; // FIXME
+
+  return 1 ;
 }
 
 /******************************************************************************/

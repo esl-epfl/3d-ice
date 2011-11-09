@@ -54,6 +54,15 @@ void init_thermal_cell (ThermalCell *thermal_cell)
 
 /******************************************************************************/
 
+void reset_capacities (ThermalCell *thermal_cell, uint32_t ncells)
+{
+    uint32_t index = 0 ;
+
+    while (index++ != ncells) thermal_cell++->Capacity = 0.0 ;
+}
+
+/******************************************************************************/
+
 void fill_solid_cell_bottom
 (
     ThermalCell           *thermal_cell,

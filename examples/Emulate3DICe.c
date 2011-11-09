@@ -38,19 +38,21 @@
 
 #include "stack_description.h"
 #include "thermal_data.h"
+#include "analysis.h"
 
 int
 main(int argc, char** argv)
 {
   StackDescription stkd ;
+  Analysis         analysis ;
   ThermalData      tdata ;
 
   // Checks if there are the all the arguments
   ////////////////////////////////////////////////////////////////////////////
 
-  if (argc != 4)
+  if (argc != 2)
   {
-    fprintf(stderr, "Usage: \"%s file.stk slot_time step_time\"\n", argv[0]) ;
+    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]) ;
     return EXIT_FAILURE ;
   }
 
@@ -61,7 +63,9 @@ main(int argc, char** argv)
 
   init_stack_description (&stkd) ;
 
-  if (fill_stack_description (&stkd, argv[1]) != 0)
+  init_analysis (&analysis) ;
+
+  if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
 
     return EXIT_FAILURE ;
 
@@ -70,9 +74,9 @@ main(int argc, char** argv)
 
   fprintf (stdout, "Preparing thermal data ...\n") ;
 
-  init_thermal_data (&tdata, 300.00, atof(argv[2]), atof(argv[3])) ;
+  init_thermal_data (&tdata) ;
 
-  if (fill_thermal_data (&tdata, &stkd) != 0)
+  if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
   {
     fprintf(stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
@@ -143,14 +147,14 @@ main(int argc, char** argv)
 */
     // Print results
 
-    printf("%5.3fs  ", get_current_time(&tdata)) ;
+    printf("%5.3fs  ", get_simulated_time(&analysis)) ;
     for (counter = 0 ; counter < nfloorplanelements ; counter++)
       printf("%7.3f  ", max_results[counter]) ;
     /*printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;*/
     printf("\n") ;
   }
-  while (emulate_step (&tdata, &stkd) != 1) ;
-  // while (emulate_slot (&tdata, &stkd) != 1) ;
+  //while (emulate_step (&tdata, &stkd, &analysis) != 1) ;
+  while (emulate_slot (&tdata, &stkd, &analysis) != 1) ;
 
   fprintf (stdout, "emulation took %.3f sec\n",
            ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;

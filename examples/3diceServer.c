@@ -37,6 +37,7 @@
 #include <time.h>
 
 #include "stack_description.h"
+#include "analysis.h"
 #include "thermal_data.h"
 
 #include "network_interface_server.h"
@@ -46,13 +47,14 @@ int
 main(int argc, char** argv)
 {
   StackDescription stkd ;
+  Analysis         analysis ;
   ThermalData      tdata ;
 
   int sockfd;
   Time_t slot_time;
   Time_t step_time;
   Bool_t is_transient;
-  int (*emulate)(ThermalData*, StackDescription*) = NULL;
+  int (*emulate)(ThermalData*, StackDescription*, Analysis*) = NULL;
 
   MessagesQueue*     mqueue;
   TemperaturesQueue* tqueue;
@@ -87,7 +89,9 @@ main(int argc, char** argv)
 
   init_stack_description (&stkd) ;
 
-  if (fill_stack_description (&stkd, argv[1]) != 0)
+  init_analysis (&analysis) ;
+
+  if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
 
     return EXIT_FAILURE ;
 
@@ -96,9 +100,9 @@ main(int argc, char** argv)
 
   fprintf (stdout, "Preparing thermal data ...\n") ;
 
-  init_thermal_data (&tdata, 300.00, slot_time, step_time) ;
+  init_thermal_data (&tdata) ;
 
-  if (fill_thermal_data (&tdata, &stkd) != 0)
+  if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
   {
     fprintf(stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
@@ -125,7 +129,7 @@ main(int argc, char** argv)
 
   do {
 
-    if (is_slot_time(&tdata)) {
+    if (slot_completed(&analysis)) {  // CHECKME
       pvalues = get_power_values_from_network(
         sockfd,
         pvalues,
@@ -146,7 +150,7 @@ main(int argc, char** argv)
     // send results
     send_results(sockfd, tqueue);
 
-  } while (*is_terminating == FALSE_V && (*emulate)(&tdata, &stkd) != 1) ;
+  } while (*is_terminating == FALSE_V && (*emulate)(&tdata, &stkd, &analysis) != 1) ;
 
   // close server
   close_server(sockfd);
