@@ -76,6 +76,7 @@
 %type <stack_element_p> stack_elements
 
 %token AMBIENT               "keyword ambient"
+%token AVERAGE               "keyword average"
 %token BOTTOM                "keyword bottom"
 %token CAPACITY              "keyword capacity"
 %token CELL                  "keyword cell"
@@ -90,6 +91,7 @@
 %token DIE                   "keyword die"
 %token DIMENSIONS            "keyword dimensions"
 %token DISTRIBUTION          "keyword distribution"
+%token FINAL                 "keyword final"
 %token FIRST                 "keyword first"
 %token FLOORPLAN             "keyword floorplan"
 %token FLOW                  "keyword flow"
@@ -102,7 +104,10 @@
 %token LAYER                 "keyword layer"
 %token LENGTH                "keyword length"
 %token MATERIAL              "keyword material"
+%token MAXIMUM               "keyword maximum"
 %token MICROCHANNEL          "keyword microchannel"
+%token MINIMUM               "keyword minimum"
+%token OUTPUT                "keyword output"
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
@@ -119,8 +124,12 @@
 %token STATE                 "keyword state"
 %token STEADY                "keyword steady"
 %token STEP                  "keyword step"
+%token TCELL                 "keyword T"
 %token TEMPERATURE           "keyword temperature"
+%token TFLP                  "keyword Tflp"
+%token TFLPEL                "keyword Tflpel"
 %token THERMAL               "keyword thermal"
+%token TMAP                  "keyword Tmap"
 %token TOP                   "keyword top"
 %token TRANSFER              "keyword transfer"
 %token TRANSIENT             "keyword transient"
@@ -197,6 +206,7 @@ stack_description_file
     dimensions
     solver
     initial_temperature
+    desired_output
   ;
 
 /******************************************************************************/
@@ -1241,6 +1251,94 @@ initial_temperature
     {
         analysis->InitialTemperature = $3;
     }
+  ;
+
+/******************************************************************************/
+/****************************** Desired Output ********************************/
+/******************************************************************************/
+
+desired_output
+
+  :  // Declaring the output section is not mandatory
+
+  |  OUTPUT ':' output_list
+
+  ;
+
+output_list
+
+  :  output_item
+
+  |  output_list output_item
+
+  ;
+
+output_item
+
+  :  TCELL '(' IDENTIFIER ',' DVALUE ',' DVALUE ',' PATH when ')' ';'
+
+     // $3       Identifier of the stack element (layer, channel or die)
+     // ($5, $7) Coordinates of the cell to monitor
+     // $9       Path of the output file
+     // $10      when to generate output for this observation
+
+     {
+        FREE_POINTER (free, $3) ;
+        FREE_POINTER (free, $9) ;
+     }
+
+  |  TFLP  '(' IDENTIFIER ',' PATH ',' maxminavg when ')'  ';'
+
+     // $3 Identifier of the stack element (must be a die)
+     // $5 Path of the output file
+     // $7 temperature type
+     // $8 when to generate output for this observation
+
+     {
+        FREE_POINTER (free, $3) ;
+        FREE_POINTER (free, $5) ;
+     }
+
+  |  TFLPEL '(' IDENTIFIER '.' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
+
+     // $3  Identifier of the stack element (must be a die)
+     // $5  Identifier of the floorplan element
+     // $7  Path of the output file
+     // $9  temperature type
+     // $10 when to generate output for this observation
+
+     {
+        FREE_POINTER (free, $3) ;
+        FREE_POINTER (free, $5) ;
+        FREE_POINTER (free, $7) ;
+     }
+
+  |  TMAP '(' IDENTIFIER ',' PATH when ')' ';'
+
+     // $3 Identifier of the stack element (layer, channel or die)
+     // $5 Path of the output file
+     // $6 when to generate output for this observation
+
+     {
+        FREE_POINTER (free, $3) ;
+        FREE_POINTER (free, $5) ;
+     }
+
+  ;
+
+maxminavg
+
+  :  MAXIMUM
+  |  MINIMUM
+  |  AVERAGE
+  ;
+
+when
+
+  :  // Declaring the instance option is not mandatory (final is assumed)
+  |  ',' STEP
+  |  ',' SLOT
+  |  ',' FINAL
   ;
 
 %%

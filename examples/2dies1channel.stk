@@ -91,3 +91,28 @@ dimensions :
 solver : transient step 0.02, slot 0.2 ;
 
 initial temperature 300.0 ;
+
+output:
+
+  T( channel1, 5000, 3000, "output01.txt",  step  );
+  T( die1,     5000, 3000, "output02.txt",  slot  );
+  T( die2,     5000, 4000, "output03.txt",  final );
+  T( die1,     2000, 5000, "output04.txt"         );
+  
+
+  Tflp( die1, "output05.txt" , maximum, step ) ;
+  Tflp( die2, "output06.txt" , minimum, slot ) ;
+  Tflp( die1, "output07.txt" , average, final) ;
+  Tflp( die2, "output08.txt" , average       ) ;
+
+
+  Tflpel( die1.Background1, "output09.txt"  , maximum, step ) ;
+  Tflpel( die2.Hotspot1,    "output10.txt" , minimum, slot ) ;
+  Tflpel( die1.Background2, "output11.txt" , average, final) ;
+  Tflpel( die2.Hotspot2,    "output12.txt" , average       ) ;
+
+  Tmap( die1,     "output13.txt" , step ) ;
+  Tmap( die2,     "output14.txt" , slot ) ;
+  Tmap( channel1, "output15.txt" , final) ;
+  Tmap( die1,     "output16.txt"        ) ;
+

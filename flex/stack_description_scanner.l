@@ -120,14 +120,18 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 
 [[:space:]]*                 ;
 
+"("                          return yytext[0] ;
+")"                          return yytext[0] ;
 ","                          return yytext[0] ;
-";"                          return yytext[0] ;
+"."                          return yytext[0] ;
 ":"                          return yytext[0] ;
+";"                          return yytext[0] ;
 
 "//"                         BEGIN(ONE_LINE_COMMENT) ;
 "/*"                         BEGIN(MULTIPLE_LINE_COMMENT) ;
 
 "ambient"                    return AMBIENT ;
+"average"                    return AVERAGE ;
 "bottom"                     return BOTTOM ;
 "capacity"                   return CAPACITY ;
 "cell"                       return CELL ;
@@ -142,6 +146,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
 "distribution"               return DISTRIBUTION ;
+"final"                      return FINAL ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
 "flow"                       return FLOW ;
@@ -154,7 +159,10 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "layer"                      return LAYER ;
 "length"                     return LENGTH ;
 "material"                   return MATERIAL ;
+"maximum"                    return MAXIMUM ;
 "microchannel"               return MICROCHANNEL ;
+"minimum"                    return MINIMUM ;
+"output"                     return OUTPUT ;
 "pin"                        return PIN ;
 "pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
@@ -171,9 +179,13 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "state"                      return STATE ;
 "steady"                     return STEADY ;
 "step"                       return STEP ;
+"T"                          return TCELL ;
 "temperature"                return TEMPERATURE ;
+"Tflp"                       return TFLP ;
+"Tflpel"                     return TFLPEL ;
 "thermal"                    return THERMAL ;
 "top"                        return TOP ;
+"Tmap"                       return TMAP ;
 "transfer"                   return TRANSFER ;
 "transient"                  return TRANSIENT ;
 "velocity"                   return VELOCITY ;
