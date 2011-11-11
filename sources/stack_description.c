@@ -44,8 +44,12 @@
 
 /******************************************************************************/
 
-extern int  stack_description_parse (StackDescription* stkd, Analysis *analysis, yyscan_t scanner) ;
-static int  fill_floorplans         (StackDescription* stkd) ;
+extern int stack_description_parse
+(
+    StackDescription *stkd,
+    Analysis         *analysis,
+    yyscan_t          scanner
+) ;
 
 /******************************************************************************/
 
@@ -81,7 +85,7 @@ int fill_stack_description
     return -1 ;
   }
 
-  stkd->FileName = strdup (filename) ;  // FIXME memory leak (awa in case of floorplan error)
+  stkd->FileName = strdup (filename) ;  // FIXME memory leak
 
   stack_description_lex_init (&scanner) ;
   stack_description_set_in (input, scanner) ;
@@ -91,9 +95,7 @@ int fill_stack_description
   stack_description_lex_destroy (scanner) ;
   fclose (input) ;
 
-  if (result == 1) return result ;
-
-  return fill_floorplans (stkd) ;
+  return result ;
 }
 
 /******************************************************************************/
@@ -262,22 +264,6 @@ void print_all_floorplans
 
       print_detailed_floorplan (stream, prefix, stk_el->Floorplan) ;
   }
-}
-
-/******************************************************************************/
-
-int fill_floorplans (StackDescription* stkd)
-{
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
-  {
-    if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
-
-      if (fill_floorplan (stk_el->Floorplan, stkd->Dimensions) == 1)
-
-        return 1 ;
-  }
-
-  return 0 ;
 }
 
 /******************************************************************************/

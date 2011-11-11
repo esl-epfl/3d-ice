@@ -97,18 +97,25 @@ void print_detailed_floorplan
 
 /******************************************************************************/
 
-int fill_floorplan (Floorplan *floorplan, Dimensions *dimensions)
+int fill_floorplan
+(
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    char       *file_name
+)
 {
     FILE *input ;
     int result ;
     yyscan_t scanner ;
 
-    input = fopen (floorplan->FileName, "r") ;
+    input = fopen (file_name, "r") ;
     if(input == NULL)
     {
-        perror(floorplan->FileName) ;
-        return 1 ;
+        perror(file_name) ;
+        return -1 ;
     }
+
+    floorplan->FileName = strdup (file_name) ;  // FIXME memory leak
 
     floorplan_lex_init  (&scanner) ;
     floorplan_set_in    (input, scanner) ;

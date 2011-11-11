@@ -128,13 +128,14 @@ extern "C"
 
     /*! Parses the file pointed by Floorplan::FileName and fills the \a floorplan structure
      *
-     * \param floorplan the floorplan structure to fill
-     * \param dimensions  pointer to the structure storing the dimensions of the stack
+     * \param floorplan  the floorplan structure to fill
+     * \param dimensions pointer to the structure storing the dimensions of the stack
+     * \param file_name  path to the floorplan file to parse
      *
      * \return FIXME
      */
 
-    int fill_floorplan (Floorplan *floorplan, Dimensions *dimensions) ;
+    int fill_floorplan (Floorplan *floorplan, Dimensions *dimensions, char *file_name) ;
 
 
 

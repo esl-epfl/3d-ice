@@ -1057,8 +1057,16 @@ stack_element
             YYABORT ;
         }
 
-        stack_element->Floorplan->FileName = $5 ; // FIXME call the fill_floorplan here ...
+        if (fill_floorplan(stack_element->Floorplan, stkd->Dimensions, $5) == 1)
+        {
+            FREE_POINTER (free,                   $3) ;
+            FREE_POINTER (free,                   $5) ;
+            FREE_POINTER (free_stack_description, stkd) ;
 
+            YYABORT ; // CHECKME error messages printed in this case ....
+        }
+
+        FREE_POINTER (free, $5) ;  // FIXME check memory leak
         FREE_POINTER (free, $3) ;
     }
   ;
