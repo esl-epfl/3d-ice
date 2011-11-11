@@ -253,12 +253,55 @@ extern "C"
   enum AnalysisType_t
   {
     TDICE_TRANSIENT = 0,
-    TDICE_STEADY  
+    TDICE_STEADY
   } ;
 
   typedef enum AnalysisType_t AnalysisType_t ;
 # define                      ANALYSISTYPE_I TDICE_TRANSIENT
 
+
+/******************************************************************************/
+
+  /* Quantity of Output */
+
+  enum OutputQuantity_t
+  {
+    TDICE_OUTPUT_AVERAGE = 0,
+    TDICE_OUTPUT_MAXIMUM,
+    TDICE_OUTPUT_MINIMUM
+  } ;
+
+  typedef enum OutputQuantity_t OutputQuantity_t ;
+# define                        OUTPUTQUANTITY_I TDICE_OUTPUT_AVERAGE
+
+/******************************************************************************/
+
+  /* Type of output */
+
+  enum OutputType_t
+  {
+    TDICE_OUTPUT_TCELL = 0,
+    TDICE_OUTPUT_TFLP,
+    TDICE_OUTPUT_TFLPEL,
+    TDICE_OUTPUT_TMAP
+  } ;
+
+  typedef enum OutputType_t OutputType_t ;
+# define                    OUTPUTTYPE_I TDICE_OUTPUT_TCELL
+
+/******************************************************************************/
+
+  /* Type of output instance */
+
+  enum OutputInstanceType_t
+  {
+    TDICE_OUTPUT_FINAL = 0,
+    TDICE_OUTPUT_SLOT,
+    TDICE_OUTPUT_STEP	
+  } ;
+
+  typedef enum OutputInstanceType_t OutputInstanceType_t ;
+# define                            OUTPUTINSTANCETYPE_I TDICE_OUTPUT_FINAL
 
 /******************************************************************************/
 
