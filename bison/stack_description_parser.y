@@ -1167,6 +1167,22 @@ output_item
      // $10      when to generate output for this observation
 
      {
+        StackElement *stack_element =
+
+            find_stack_element_in_list (stkd->BottomStackElement, $3) ;
+
+        if (stack_element == NULL)
+        {
+            sprintf (error_message, "Unknown stack element %s", $3) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $9) ;
+
+            YYABORT ;
+        }
+
         FREE_POINTER (free, $3) ;
         FREE_POINTER (free, $9) ;
      }
@@ -1179,6 +1195,34 @@ output_item
      // $8 when to generate output for this observation
 
      {
+        StackElement *stack_element =
+
+            find_stack_element_in_list (stkd->BottomStackElement, $3) ;
+
+        if (stack_element == NULL)
+        {
+            sprintf (error_message, "Unknown stack element %s", $3) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            YYABORT ;
+        }
+
+        if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)
+        {
+            sprintf (error_message, "The stack element %s must be a die", $3) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            YYABORT ;
+        }
+
         FREE_POINTER (free, $3) ;
         FREE_POINTER (free, $5) ;
      }
@@ -1192,6 +1236,53 @@ output_item
      // $10 when to generate output for this observation
 
      {
+        StackElement *stack_element =
+
+            find_stack_element_in_list (stkd->BottomStackElement, $3) ;
+
+        if (stack_element == NULL)
+        {
+            sprintf (error_message, "Unknown stack element %s", $3) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $7) ;
+
+            YYABORT ;
+        }
+
+        if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)
+        {
+            sprintf (error_message, "The stack element %s must be a die", $3) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $7) ;
+
+            YYABORT ;
+        }
+
+        FloorplanElement *floorplan_element = find_floorplan_element_in_list
+
+            (stack_element->Floorplan->ElementsList, $5) ;
+
+        if (floorplan_element == NULL)
+        {
+            sprintf (error_message, "Unknown floorplan element %s", $5) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $7) ;
+
+            YYABORT ;
+        }
+
         FREE_POINTER (free, $3) ;
         FREE_POINTER (free, $5) ;
         FREE_POINTER (free, $7) ;
@@ -1204,6 +1295,22 @@ output_item
      // $6 when to generate output for this observation
 
      {
+        StackElement *stack_element =
+
+            find_stack_element_in_list (stkd->BottomStackElement, $3) ;
+
+        if (stack_element == NULL)
+        {
+            sprintf (error_message, "Unknown stack element %s", $3) ;
+
+            stack_description_error (stkd, analysis, scanner, error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            YYABORT ;
+        }
+
         FREE_POINTER (free, $3) ;
         FREE_POINTER (free, $5) ;
      }
