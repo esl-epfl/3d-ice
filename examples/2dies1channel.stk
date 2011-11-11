@@ -77,16 +77,16 @@ die topdie :
 	source	 2	silicon ;
 	layer	48	silicon ;
 
+dimensions :
+
+    chip length 10000 , width  10000 ;
+    cell length   100 , width    100 ;
+
 stack:
     die     die2     topdie    floorplan "four_elements.flp" ;
     channel channel1 ;
     die     die1     bottomdie floorplan "four_elements.flp" ;
 
-
-dimensions :
-
-    chip length 10000 , width  10000 ;
-    cell length   100 , width    100 ;
 
 solver : transient step 0.02, slot 0.2 ;
 

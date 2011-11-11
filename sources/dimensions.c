@@ -163,6 +163,122 @@ void free_dimensions (Dimensions *dimensions)
 
 /******************************************************************************/
 
+void compute_number_of_connections
+(
+    Dimensions     *dimensions,
+    uint32_t        num_channels,
+    ChannelModel_t  channel_model
+)
+{
+    uint32_t nlayers  = dimensions->Grid.NLayers ;
+    uint32_t nrows    = dimensions->Grid.NRows ;
+    uint32_t ncolumns = dimensions->Grid.NColumns ;
+
+    uint32_t num_layers_for_channel    = num_channels * NUM_LAYERS_2RM ;
+    uint32_t num_layers_except_channel = nlayers - num_layers_for_channel ;
+
+    switch (channel_model)
+    {
+        case TDICE_CHANNEL_MODEL_NO_CHANNEL :
+        case TDICE_CHANNEL_MODEL_MC_RM4 :
+        {
+            dimensions->Grid.NConnections =
+
+                // All Normal Cells
+
+                // number of coefficients in the diagonal
+                nlayers * nrows * ncolumns
+                +
+                // number of coefficients bottom <-> top
+                2 * (nlayers - 1) * nrows * ncolumns
+                +
+                // Number of coefficients North <-> South
+                2 * nlayers * (nrows - 1) * ncolumns
+                +
+                // Number of coefficients East <-> West
+                2 * nlayers * nrows * (ncolumns - 1) ;
+
+            break ;
+        }
+        case TDICE_CHANNEL_MODEL_PF_INLINE :
+        case TDICE_CHANNEL_MODEL_PF_STAGGERED :
+        {
+            dimensions->Grid.NConnections =
+
+                // For Normal Cells
+
+                // Number of coefficients in the diagonal
+                num_layers_except_channel * nrows * ncolumns
+                +
+                // Number of coefficients Bottom <-> Top
+                2 * num_layers_except_channel * nrows * ncolumns
+                +
+                // Number of coefficients North <-> South
+                2 * num_layers_except_channel * (nrows - 1) * ncolumns
+                +
+                // Number of coefficients East <-> West
+                2 * num_layers_except_channel * nrows * (ncolumns - 1)
+                +
+
+                // For Channel Cells
+
+                // Number of coefficients in the diagonal
+                num_layers_for_channel * nrows * ncolumns
+                +
+                // Number of coefficients Bottom <-> Top
+                2 * (num_layers_for_channel + num_channels) * nrows * ncolumns
+                +
+                // Number of coefficients North <-> South
+                2 * num_channels * (nrows - 1 ) * ncolumns
+                +
+                // Number of coefficients East <-> West
+                0
+                ;
+
+            break ;
+        }
+        case TDICE_CHANNEL_MODEL_MC_RM2 :
+        {
+            dimensions->Grid.NConnections =
+
+                // For Normal Cells
+
+                // Number of coefficients in the diagonal
+                num_layers_except_channel * nrows * ncolumns
+                +
+                // Number of coefficients Bottom <-> Top
+                2 * num_layers_except_channel * nrows * ncolumns
+                +
+                // Number of coefficients North <-> South
+                2 * num_layers_except_channel * (nrows - 1) * ncolumns
+                +
+                // Number of coefficients East <-> West
+                2 * num_layers_except_channel * nrows * (ncolumns - 1)
+                +
+
+                // For Channel Cells
+
+                // Number of coefficients in the diagonal
+                num_layers_for_channel * nrows * ncolumns
+                +
+                // Number of coefficients Bottom <-> Top
+                2 * (num_layers_for_channel + num_channels) * nrows * ncolumns
+                +
+                // Number of coefficients North <-> South
+                4 * num_channels * (nrows - 1) * ncolumns
+                +
+                // Number of coefficients East <-> West
+                0
+                ;
+        }
+        default :
+
+            fprintf (stderr, "Error: unknown channel model %d\n", channel_model) ;
+    }
+}
+
+/******************************************************************************/
+
 double get_cell_length
 (
   Dimensions *dimensions,

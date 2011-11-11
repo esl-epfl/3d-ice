@@ -153,8 +153,8 @@ main(int argc, char** argv)
     /*printf("%7.3f  %7.3f  %7.3f\n", cell1, cell2, outlet) ;*/
     printf("\n") ;
   }
-  //while (emulate_step (&tdata, &stkd, &analysis) != 1) ;
-  while (emulate_slot (&tdata, &stkd, &analysis) != 1) ;
+  while (emulate_step (&tdata, &stkd, &analysis) != 1) ;
+  //while (emulate_slot (&tdata, &stkd, &analysis) != 1) ;
 
   fprintf (stdout, "emulation took %.3f sec\n",
            ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;

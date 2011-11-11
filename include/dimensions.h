@@ -48,6 +48,8 @@ extern "C"
 #include <stdio.h>
 #include <stdint.h>
 
+#include "types.h"
+
 /******************************************************************************/
 
     /*! \struct CellDimensions
@@ -259,7 +261,7 @@ extern "C"
      *
      * \param stream     the output stream (must be already open)
      * \param prefix     a string to be printed as prefix at the beginning of each line
-     * \param dimensions the material to print
+     * \param dimensions the dimensions to print
      */
 
    void print_detailed_dimensions
@@ -267,6 +269,19 @@ extern "C"
         (FILE *stream, char *prefix, Dimensions *dimensions) ;
 
 
+
+    /*! Computes the number of connections between the thermal cells in the stack
+     *
+     *  Sets the content of the field Dimensions::NConnections
+     *
+     *  \param dimensions the address of the dimensions structure
+     *  \param num_channels number of channels (as stack element) in the stack
+     *  \param channel_model the model of the channel used in the stack
+     */
+
+    void compute_number_of_connections
+
+        (Dimensions *dimensions, uint32_t num_channels, ChannelModel_t channel_model) ;
 
     /*! Returns the length of a thermal cell
      *

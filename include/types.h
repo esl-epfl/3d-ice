@@ -223,7 +223,8 @@ extern "C"
 
   enum ChannelModel_t
   {
-    TDICE_CHANNEL_MODEL_MC_RM4 = 0,
+    TDICE_CHANNEL_MODEL_NO_CHANNEL = 0,
+    TDICE_CHANNEL_MODEL_MC_RM4,
     TDICE_CHANNEL_MODEL_MC_RM2,
     TDICE_CHANNEL_MODEL_PF_INLINE,
     TDICE_CHANNEL_MODEL_PF_STAGGERED
@@ -231,7 +232,7 @@ extern "C"
 
   typedef enum ChannelModel_t ChannelModel_t ;
 
-# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_MC_RM4
+# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_NO_CHANNEL
 # define                      NUM_LAYERS_4RM 1
 # define                      NUM_LAYERS_2RM 4
 
