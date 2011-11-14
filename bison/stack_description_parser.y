@@ -334,6 +334,8 @@ microchannel
         last_wall_length  = ($16 != 0.0) ? $16 : $13 ;
 
         stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM4 ;
+        stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_4RM ;
+        stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_4RM ;
         stkd->Channel->Height            = $5 ;
         stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE ($24) ;
         stkd->Channel->Coolant.HTCSide   = $26.HTCSide ;
@@ -381,6 +383,8 @@ microchannel
         }
 
         stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM2 ;
+        stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_2RM ;
+        stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_2RM ;
         stkd->Channel->Height            = $5 ;
         stkd->Channel->Length            = $9 ;
         stkd->Channel->Pitch             = $13 + $9 ;
@@ -433,6 +437,8 @@ microchannel
         stkd->Channel->Height            = $4 ;
         stkd->Channel->Porosity          = 1.0 - (PI * $8 * $8 / 4.0) / ($12 * $12) ;
         stkd->Channel->ChannelModel      = $16 ;
+        stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_2RM ;
+        stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_2RM ;
         stkd->Channel->DarcyVelocity     = $24 ;
         stkd->Channel->Coolant.HTCSide   = COOLANTHTC_I ;
         stkd->Channel->Coolant.HTCTop    = COOLANTHTC_I ;
@@ -999,17 +1005,7 @@ stack_element
         stack_element->Type            = TDICE_STACK_ELEMENT_CHANNEL ;
         stack_element->Pointer.Channel = stkd->Channel ; // This might be NULL !!!
         stack_element->Id              = $2 ;
-
-        switch (stkd->Channel->ChannelModel)
-        {
-            case TDICE_CHANNEL_MODEL_MC_RM2 :
-            case TDICE_CHANNEL_MODEL_PF_INLINE :
-            case TDICE_CHANNEL_MODEL_PF_STAGGERED :
-                stack_element->NLayers = NUM_LAYERS_2RM ;
-                break;
-            default : // TDICE_CHANNEL_MODEL_MC_4RM
-                stack_element->NLayers = NUM_LAYERS_4RM ;
-        }
+        stack_element->NLayers         = stkd->Channel->NLayers ;
     }
 
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'  // $2 Identifier for the stack element

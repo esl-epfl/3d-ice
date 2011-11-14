@@ -231,10 +231,12 @@ extern "C"
   } ;
 
   typedef enum ChannelModel_t ChannelModel_t ;
-
 # define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_NO_CHANNEL
-# define                      NUM_LAYERS_4RM 1
-# define                      NUM_LAYERS_2RM 4
+
+# define NUM_LAYERS_CHANNEL_4RM 1
+# define NUM_LAYERS_CHANNEL_2RM 4
+# define SOURCE_OFFSET_CHANNEL_4RM 0
+# define SOURCE_OFFSET_CHANNEL_2RM 2
 
 /******************************************************************************/
 

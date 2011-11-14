@@ -207,7 +207,7 @@ void compute_number_of_connections
     uint32_t nrows    = dimensions->Grid.NRows ;
     uint32_t ncolumns = dimensions->Grid.NColumns ;
 
-    uint32_t num_layers_for_channel    = num_channels * NUM_LAYERS_2RM ;
+    uint32_t num_layers_for_channel    = num_channels * NUM_LAYERS_CHANNEL_2RM ;
     uint32_t num_layers_except_channel = nlayers - num_layers_for_channel ;
 
     switch (channel_model)

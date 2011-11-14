@@ -175,6 +175,10 @@ void print_detailed_die (FILE  *stream, char *prefix, Die *die)
         prefix, die->NLayers) ;
 
     fprintf (stream,
+        "%s  SourceLayerOffset         = %d\n",
+        prefix, die->SourceLayerOffset) ;
+
+    fprintf (stream,
         "%s  TopLayer                  = %p\n",
         prefix, die->TopLayer) ;
 

@@ -42,16 +42,18 @@
 
 void init_channel (Channel *channel)
 {
-    channel->ChannelModel     = CHANNELMODEL_I;
-    channel->Height           = 0.0 ;
-    channel->Length           = 0.0 ;
-    channel->Pitch            = 0.0 ;
-    channel->Porosity         = 0.0 ;
-    channel->NChannels        = 0u ;
-    channel->Coolant          = COOLANT_I ;
-    channel->CoolantFR        = 0.0 ;
-    channel->DarcyVelocity    = 0.0 ;
-    channel->WallMaterial     = NULL ;
+    channel->ChannelModel      = CHANNELMODEL_I;
+    channel->Height            = 0.0 ;
+    channel->Length            = 0.0 ;
+    channel->Pitch             = 0.0 ;
+    channel->Porosity          = 0.0 ;
+    channel->NChannels         = 0u ;
+    channel->NLayers           = 0u ;
+    channel->SourceLayerOffset = 0u ;
+    channel->Coolant           = COOLANT_I ;
+    channel->CoolantFR         = 0.0 ;
+    channel->DarcyVelocity     = 0.0 ;
+    channel->WallMaterial      = NULL ;
 }
 
 /******************************************************************************/
@@ -85,12 +87,12 @@ void print_formatted_channel
 )
 {  // FIXME
     fprintf (stream,
-        "%s   channel model type          %d ;\n",
-        prefix, channel->ChannelModel) ;
-
-    fprintf (stream,
         "%schannel :\n",
         prefix) ;
+
+    fprintf (stream,
+        "%s   channel model type          %d ;\n",
+        prefix, channel->ChannelModel) ;
 
     fprintf (stream,
         "%s              height %7.1f ;\n",
@@ -189,6 +191,14 @@ void print_detailed_channel
     fprintf (stream,
         "%s  NChannels                 = %d\n",
         prefix,  channel->NChannels) ;
+
+    fprintf (stream,
+        "%s  NLayers                   = %d\n",
+        prefix,  channel->NLayers) ;
+
+    fprintf (stream,
+        "%s  SourceLayerOffset         = %d\n",
+        prefix, channel->SourceLayerOffset) ;
 
     fprintf (stream,
         "%s  CoolantHTCs.Side          = %.4e\n",
@@ -578,22 +588,17 @@ void fill_thermal_cell_channel
 
 void fill_sources_channel
 (
-    double        *sources,
-    Dimensions      *dimensions,
-    uint32_t  layer_index,
-    Channel         *channel
+    double     *sources,
+    Dimensions *dimensions,
+    uint32_t    layer_index,
+    Channel    *channel
 )
 {
-  if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2
-      || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
-      || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
-    {
-        // In 2RM, the channel offset is the layer index of the bottom wall,
-        // so we need to add the offset of channel to "layer_index", which
-        // represents the layer index of the channel.
+    // In 2RM, the channel offset is the layer index of the bottom wall,
+    // so we need to add the offset of channel to "layer_index", which
+    // represents the layer index of the channel.
 
-        layer_index += 2;
-    }
+    layer_index += channel->SourceLayerOffset ;
 
 # ifdef PRINT_SOURCES
     fprintf (stderr,

@@ -89,6 +89,14 @@ extern "C"
 
         uint32_t NChannels ;
 
+        /*! The number of layer composing the channel */
+
+        uint32_t NLayers ;
+
+        /*! The offset (\# layers) of the source layer within the channel */
+
+        uint32_t SourceLayerOffset ;
+
         /*! The properties of the fluid used as coolant */
 
         Coolant_t Coolant ;
