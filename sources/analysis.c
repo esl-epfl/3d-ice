@@ -43,12 +43,15 @@
 
 void init_analysis (Analysis *analysis)
 {
-    analysis->AnalysisType        = ANALYSISTYPE_I;
-    analysis->StepTime            = 0.0 ;
-    analysis->SlotTime            = 0.0 ;
-    analysis->SlotLength          = 0u ;
-    analysis->CurrentTime         = 0u ;
-    analysis->InitialTemperature  = 0.0 ;
+    analysis->AnalysisType         = ANALYSISTYPE_I;
+    analysis->StepTime             = 0.0 ;
+    analysis->SlotTime             = 0.0 ;
+    analysis->SlotLength           = 0u ;
+    analysis->CurrentTime          = 0u ;
+    analysis->InitialTemperature   = 0.0 ;
+    analysis->PrintOutputListFinal = NULL ;
+    analysis->PrintOutputListSlot  = NULL ;
+    analysis->PrintOutputListStep  = NULL ;
 }
 
 /******************************************************************************/
@@ -68,6 +71,10 @@ Analysis *alloc_and_init_analysis (void)
 
 void free_analysis (Analysis *analysis)
 {
+    FREE_POINTER (free_print_output, analysis->PrintOutputListFinal) ;
+    FREE_POINTER (free_print_output, analysis->PrintOutputListSlot) ;
+    FREE_POINTER (free_print_output, analysis->PrintOutputListStep) ;
+
     FREE_POINTER (free, analysis) ;
 }
 
@@ -115,6 +122,18 @@ void print_formatted_analysis
 
     fprintf (stream, "\n%sinitial tempreature  %.2f ;\n",
         prefix, analysis->InitialTemperature) ;
+
+    print_formatted_print_output_list
+
+        (stream, prefix, analysis->PrintOutputListFinal) ;
+
+    print_formatted_print_output_list
+
+        (stream, prefix, analysis->PrintOutputListSlot) ;
+
+    print_formatted_print_output_list
+
+        (stream, prefix, analysis->PrintOutputListStep) ;
 }
 
 /******************************************************************************/
@@ -145,7 +164,62 @@ void print_detailed_analysis
     fprintf (stream,
         "%s  InitialTemperature        = %.2f\n",
         prefix, analysis->InitialTemperature) ;
+
+    fprintf (stream,
+        "%s  PrintOutputListFinal      = %pf\n",
+        prefix, analysis->PrintOutputListFinal) ;
+
+    if (analysis->PrintOutputListFinal != NULL)
+
+        print_detailed_print_output_list
+
+            (stream, prefix, analysis->PrintOutputListFinal) ;
+
+    fprintf (stream,
+        "%s  PrintOutputListSlot       = %pf\n",
+        prefix, analysis->PrintOutputListSlot) ;
+
+    if (analysis->PrintOutputListSlot != NULL)
+
+        print_detailed_print_output_list
+
+            (stream, prefix, analysis->PrintOutputListSlot) ;
+
+    fprintf (stream,
+        "%s  PrintOutputListStep       = %pf\n",
+        prefix, analysis->PrintOutputListStep) ;
+
+    if (analysis->PrintOutputListStep != NULL)
+
+        print_detailed_print_output_list
+
+            (stream, prefix, analysis->PrintOutputListStep) ;
 }
 
-
 /******************************************************************************/
+
+void add_print_output_to_analysis
+(
+    Analysis    *analysis,
+    PrintOutput *print_output
+)
+{
+    PrintOutput **list = NULL ;
+
+    if (   analysis->AnalysisType == TDICE_STEADY
+        || print_output->InstanceType == TDICE_OUTPUT_FINAL)
+
+        list = &analysis->PrintOutputListFinal ;
+
+    else if (print_output->InstanceType==TDICE_OUTPUT_SLOT)
+
+        list = &analysis->PrintOutputListSlot ;
+
+    else if (print_output->InstanceType==TDICE_OUTPUT_STEP)
+
+        list = &analysis->PrintOutputListStep ;
+
+    while (*list != NULL) list = &( (*list)->Next ) ;
+
+    *list = print_output ;
+}

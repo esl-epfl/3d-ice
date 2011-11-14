@@ -352,7 +352,7 @@ void print_detailed_print_output_list
              prefix,   prt_out->Type);
 
         fprintf (stream,
-             "%s FileName                   = \"%s\"\n",
+             "%s  FileName                  = \"%s\"\n",
              prefix,   prt_out->FileName);
 
         switch(prt_out->Type)

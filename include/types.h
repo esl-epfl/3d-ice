@@ -297,7 +297,7 @@ extern "C"
   {
     TDICE_OUTPUT_FINAL = 0,
     TDICE_OUTPUT_SLOT,
-    TDICE_OUTPUT_STEP	
+    TDICE_OUTPUT_STEP
   } ;
 
   typedef enum OutputInstanceType_t OutputInstanceType_t ;

@@ -47,7 +47,9 @@ extern "C"
 
 #include <stdio.h>
 #include <stdint.h>
+
 #include "types.h"
+#include "print_output.h"
 
 /******************************************************************************/
 
@@ -81,6 +83,21 @@ extern "C"
         /*! Initial Temperature if the IC stack */
 
         double InitialTemperature ;
+
+        /*! Pointer to the list of inspection points to print
+         *  at the end of the simulation */
+
+        PrintOutput *PrintOutputListFinal ;
+
+        /*! Pointer to the list of inspection points to print
+         *  at the end of the time slot */
+
+        PrintOutput *PrintOutputListSlot ;
+
+        /*! Pointer to the list of inspection points to print
+         *  at every time step */
+
+        PrintOutput *PrintOutputListStep ;
 
     } ;
 
@@ -166,6 +183,18 @@ extern "C"
     void print_detailed_analysis
 
         (FILE *stream, char *prefix, Analysis *analysis) ;
+
+
+    /*! Inserts a print output instance into the corresponding print output queue
+     *
+     * \param analysis     pointer to the analysis structure
+     * \param print_output pointer to print output structure to add
+     */
+
+    void add_print_output_to_analysis
+
+        (Analysis *analysis, PrintOutput *print_output) ;
+
 
 /******************************************************************************/
 

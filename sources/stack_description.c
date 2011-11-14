@@ -38,6 +38,7 @@
 #include "macros.h"
 #include "layer.h"
 #include "system_matrix.h"
+#include "print_output.h"
 
 #include "../bison/stack_description_parser.h"
 #include "../flex/stack_description_scanner.h"

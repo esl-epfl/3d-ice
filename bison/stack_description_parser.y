@@ -41,6 +41,7 @@
 #include "die.h"
 #include "layer.h"
 #include "stack_element.h"
+#include "print_output.h"
 #include "stack_description.h"
 #include "analysis.h"
 %}
@@ -49,31 +50,37 @@
 
 %union
 {
-    double         double_v ;
-    String_t       char_p ;
-    Material*      material_p ;
-    Coolant_t      coolant_v ;
-    ChannelModel_t channel_model_v ;
-    Die*           die_p ;
-    Layer*         layer_p ;
-    StackElement*  stack_element_p ;
+    double                double_v ;
+    char                 *char_p ;
+    Material             *material_p ;
+    Coolant_t             coolant_v ;
+    ChannelModel_t        channel_model_v ;
+    Die                  *die_p ;
+    Layer                *layer_p ;
+    StackElement         *stack_element_p ;
+    PrintOutput          *print_output_p ;
+    OutputInstanceType_t  output_instance_v ;
+    OutputQuantity_t      output_quantity_v ;
 }
 
-%type <double_v>        first_wall_length
-%type <double_v>        last_wall_length
-%type <channel_model_v> distribution
-%type <coolant_v>       coolant_heat_transfer_coefficients_rm4
-%type <coolant_v>       coolant_heat_transfer_coefficients_rm2
-%type <material_p>      material
-%type <material_p>      materials_list
-%type <die_p>           die
-%type <die_p>           dies_list
-%type <layer_p>         layer
-%type <layer_p>         layers_list
-%type <layer_p>         source_layer
-%type <layer_p>         layer_content
-%type <stack_element_p> stack_element
-%type <stack_element_p> stack_elements
+%type <double_v>          first_wall_length
+%type <double_v>          last_wall_length
+%type <channel_model_v>   distribution
+%type <coolant_v>         coolant_heat_transfer_coefficients_rm4
+%type <coolant_v>         coolant_heat_transfer_coefficients_rm2
+%type <material_p>        material
+%type <material_p>        materials_list
+%type <die_p>             die
+%type <die_p>             dies_list
+%type <layer_p>           layer
+%type <layer_p>           layers_list
+%type <layer_p>           source_layer
+%type <layer_p>           layer_content
+%type <stack_element_p>   stack_element
+%type <stack_element_p>   stack_elements
+%type <print_output_p>    output_item
+%type <output_instance_v> when
+%type <output_quantity_v> maxminavg
 
 %token AMBIENT               "keyword ambient"
 %token AVERAGE               "keyword average"
@@ -328,7 +335,7 @@ microchannel
 
         stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM4 ;
         stkd->Channel->Height            = $5 ;
-        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE($24) ;
+        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE ($24) ;
         stkd->Channel->Coolant.HTCSide   = $26.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $26.HTCTop ;
         stkd->Channel->Coolant.HTCBottom = $26.HTCBottom ;
@@ -378,7 +385,7 @@ microchannel
         stkd->Channel->Length            = $9 ;
         stkd->Channel->Pitch             = $13 + $9 ;
         stkd->Channel->Porosity          = stkd->Channel->Length / stkd->Channel->Pitch ;
-        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE($22) ;
+        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE ($22) ;
         stkd->Channel->Coolant.HTCSide   = $24.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $24.HTCTop ;
         stkd->Channel->Coolant.HTCBottom = $24.HTCBottom ;
@@ -515,7 +522,7 @@ layers_list
                        // $2 : pointer to the layer to add in the list
     {
         if ($1 != NULL)
-            JOIN_ELEMENTS($2, $1) ;  // this reverse the order !
+            JOIN_ELEMENTS ($2, $1) ; // this reverse the order !
         $$ = $2 ;                    // $2 will be the new reference to the list
     }
   ;
@@ -529,7 +536,7 @@ layer_content :
     DVALUE IDENTIFIER ';' // $1 and $2
 
     {
-        Layer* layer = $$ = alloc_and_init_layer () ;
+        Layer *layer = $$ = alloc_and_init_layer () ;
 
         if (layer == NULL)
         {
@@ -599,7 +606,7 @@ die
         source_layer           // $5 source layer
         layers_list            // $6 list of layers (bottom -> below source)
     {
-        Die* die = $$ = alloc_and_init_die () ;
+        Die *die = $$ = alloc_and_init_die () ;
 
         if (die == NULL)
         {
@@ -915,7 +922,7 @@ stack_element
                                               // $3 Height of the layer
                                               // $4 Identifier of the material
     {
-        StackElement* stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -927,7 +934,7 @@ stack_element
             YYABORT ;
         }
 
-        Layer* layer = alloc_and_init_layer () ;
+        Layer *layer = alloc_and_init_layer () ;
 
         if (layer == NULL)
         {
@@ -978,7 +985,7 @@ stack_element
             YYABORT ;
         }
 
-        StackElement* stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1011,7 +1018,7 @@ stack_element
     {
         num_dies++ ;
 
-        StackElement* stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1057,7 +1064,7 @@ stack_element
             YYABORT ;
         }
 
-        if (fill_floorplan(stack_element->Floorplan, stkd->Dimensions, $5) == 1)
+        if (fill_floorplan (stack_element->Floorplan, stkd->Dimensions, $5) == 1)
         {
             FREE_POINTER (free,                   $3) ;
             FREE_POINTER (free,                   $5) ;
@@ -1151,10 +1158,16 @@ desired_output
 
 output_list
 
-  :  output_item
+  :  output_item                // $1 : pointer to the first print output found
+     {
+        add_print_output_to_analysis (analysis, $1) ;
+     }
 
-  |  output_list output_item
-
+  |  output_list output_item    // $1 : not used
+                                // $2 : pointer to the print output to add in the list
+     {
+        add_print_output_to_analysis (analysis, $2) ;
+     }
   ;
 
 output_item
@@ -1183,8 +1196,42 @@ output_item
             YYABORT ;
         }
 
-        FREE_POINTER (free, $3) ;
-        FREE_POINTER (free, $9) ;
+        Tcell *tcell = alloc_and_init_tcell () ;
+
+        if (tcell == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $9) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc tcell failed") ;
+
+            YYABORT ;
+        }
+
+        tcell->Id   = $3 ;
+        tcell->Xval = $5 ;
+        tcell->Yval = $7 ;
+
+        // TODO align the tcell
+
+        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+
+        if (print_output == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $9) ;
+
+            FREE_POINTER (free_tcell, tcell) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+
+            YYABORT ;
+        }
+
+        print_output->Type          = TDICE_OUTPUT_TCELL ;
+        print_output->InstanceType  = $10 ;
+        print_output->FileName      = $9 ;
+        print_output->Pointer.Tcell = tcell ;
      }
 
   |  TFLP  '(' IDENTIFIER ',' PATH ',' maxminavg when ')'  ';'
@@ -1223,8 +1270,39 @@ output_item
             YYABORT ;
         }
 
-        FREE_POINTER (free, $3) ;
-        FREE_POINTER (free, $5) ;
+        Tflp *tflp = alloc_and_init_tflp () ;
+
+        if (tflp == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc tflp failed") ;
+
+            YYABORT ;
+        }
+
+        tflp->Id       = $3 ;
+        tflp->Quantity = $7 ;
+
+        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+
+        if (print_output == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            FREE_POINTER (free_tflp, tflp) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+
+            YYABORT ;
+        }
+
+        print_output->Type         = TDICE_OUTPUT_TFLP ;
+        print_output->InstanceType = $8 ;
+        print_output->FileName     = $5 ;
+        print_output->Pointer.Tflp = tflp ;
      }
 
   |  TFLPEL '(' IDENTIFIER '.' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
@@ -1283,9 +1361,42 @@ output_item
             YYABORT ;
         }
 
-        FREE_POINTER (free, $3) ;
-        FREE_POINTER (free, $5) ;
-        FREE_POINTER (free, $7) ;
+        Tflpel *tflpel = alloc_and_init_tflpel () ;
+
+        if (tflpel == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $7) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc Tflpel failed") ;
+
+            YYABORT ;
+        }
+
+        tflpel->Id       = $3 ;
+        tflpel->FlpId    = $5 ;
+        tflpel->Quantity = $9 ;
+
+        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+
+        if (print_output == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $7) ;
+
+            FREE_POINTER (free_tflpel, tflpel) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+
+            YYABORT ;
+        }
+
+        print_output->Type           = TDICE_OUTPUT_TFLPEL ;
+        print_output->InstanceType   = $10 ;
+        print_output->FileName       = $7 ;
+        print_output->Pointer.Tflpel = tflpel ;
      }
 
   |  TMAP '(' IDENTIFIER ',' PATH when ')' ';'
@@ -1311,25 +1422,56 @@ output_item
             YYABORT ;
         }
 
-        FREE_POINTER (free, $3) ;
-        FREE_POINTER (free, $5) ;
+        Tmap *tmap = alloc_and_init_tmap () ;
+
+        if (tmap == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc tmap failed") ;
+
+            YYABORT ;
+        }
+
+        tmap->Id = $3 ;
+
+        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+
+        if (print_output == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            FREE_POINTER (free_tmap, tmap) ;
+
+            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+
+            YYABORT ;
+        }
+
+        print_output->Type         = TDICE_OUTPUT_TMAP ;
+        print_output->InstanceType = $6 ;
+        print_output->FileName     = $5 ;
+        print_output->Pointer.Tmap = tmap ;
      }
 
   ;
 
 maxminavg
 
-  :  MAXIMUM
-  |  MINIMUM
-  |  AVERAGE
+  :  MAXIMUM { $$ =  TDICE_OUTPUT_MAXIMUM ; }
+  |  MINIMUM { $$ =  TDICE_OUTPUT_MINIMUM ; }
+  |  AVERAGE { $$ =  TDICE_OUTPUT_AVERAGE ; }
   ;
 
 when
 
   :  // Declaring the instance option is not mandatory (final is assumed)
-  |  ',' STEP
-  |  ',' SLOT
-  |  ',' FINAL
+                { $$ =  TDICE_OUTPUT_FINAL ; }
+  |  ',' STEP   { $$ =  TDICE_OUTPUT_STEP ;  }
+  |  ',' SLOT   { $$ =  TDICE_OUTPUT_SLOT ;  }
+  |  ',' FINAL  { $$ =  TDICE_OUTPUT_FINAL ; }
   ;
 
 %%
