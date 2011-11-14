@@ -163,6 +163,39 @@ void free_dimensions (Dimensions *dimensions)
 
 /******************************************************************************/
 
+void print_axes (Dimensions *dimensions)
+{
+    FILE *file = fopen ("xaxis.txt", "w") ;
+
+    if (file == NULL)
+    {
+        fprintf (stderr, "Cannot create text file for x axis\n") ;
+        return ;
+    }
+
+    FOR_EVERY_COLUMN (column_index, dimensions)
+
+        fprintf (file, "%5.2f\n", get_cell_center_x (dimensions, column_index)) ;
+
+    fclose (file) ;
+
+    file = fopen ("yaxis.txt", "w") ;
+
+    if (file == NULL)
+    {
+        fprintf (stderr, "Cannot create text file for y axis\n") ;
+        return ;
+    }
+
+    FOR_EVERY_ROW (row_index, dimensions)
+
+        fprintf (file, "%5.2f\n", get_cell_center_y (dimensions, row_index)) ;
+
+    fclose (file) ;
+}
+
+/******************************************************************************/
+
 void compute_number_of_connections
 (
     Dimensions     *dimensions,
@@ -313,6 +346,74 @@ double get_cell_width
 )
 {
   return dimensions->Cell.Width ;
+}
+
+/******************************************************************************/
+
+double get_cell_center_x
+(
+    Dimensions *dimensions,
+    uint32_t    column_index
+)
+{
+    if (IS_FIRST_COLUMN (column_index))
+
+        return dimensions->Cell.FirstWallLength / 2.0 ;
+
+    else if (IS_LAST_COLUMN (column_index, dimensions))
+
+        return   (dimensions->Cell.FirstWallLength      )
+               + (dimensions->Cell.ChannelLength   / 2.0) * (column_index    )
+               + (dimensions->Cell.WallLength      / 2.0) * (column_index - 2)
+               + (dimensions->Cell.LastWallLength  / 2.0) ;
+
+    else
+
+        return   (dimensions->Cell.FirstWallLength      )
+               + (dimensions->Cell.ChannelLength   / 2.0) * (column_index    )
+               + (dimensions->Cell.WallLength      / 2.0) * (column_index - 1) ;
+}
+
+/******************************************************************************/
+
+double get_cell_center_y
+(
+    Dimensions *dimensions,
+    uint32_t    row_index
+)
+{
+    return    dimensions->Cell.Width / 2.0
+           +  dimensions->Cell.Width * row_index ;
+}
+
+/******************************************************************************/
+
+double get_cell_location_x
+(
+    Dimensions *dimensions,
+    uint32_t    column_index
+)
+{
+    if (IS_FIRST_COLUMN (column_index))
+
+        return 0.0 ;
+
+    else
+
+        return   (dimensions->Cell.FirstWallLength)
+               + (dimensions->Cell.ChannelLength  ) * ((column_index    ) / 2u)
+               + (dimensions->Cell.WallLength     ) * ((column_index - 1) / 2u) ;
+}
+
+/******************************************************************************/
+
+double get_cell_location_y
+(
+    Dimensions *dimensions,
+    uint32_t    row_index
+)
+{
+    return dimensions->Cell.Width * row_index ;
 }
 
 /******************************************************************************/

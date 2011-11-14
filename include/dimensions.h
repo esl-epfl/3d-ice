@@ -270,6 +270,15 @@ extern "C"
 
 
 
+    /*! Creates two text files containing the X and Y coordinates of the thermal cells
+     *
+     *  \param dimensions the address of the dimensions structure
+     */
+
+    void print_axes (Dimensions *dimensions) ;
+
+
+
     /*! Computes the number of connections between the thermal cells in the stack
      *
      *  Sets the content of the field Dimensions::NConnections
@@ -304,6 +313,54 @@ extern "C"
      */
 
     double get_cell_width (Dimensions *dimensions, uint32_t row_index) ;
+
+
+
+    /*! Returns the X coordinate of the center of the cell at \a column_index
+     *
+     * \param dimensions   the address of the structure containing all the dimensions
+     * \param column_index the column index of the thermal cell
+     *
+     * \return the X coordinate of the center of thermal cell in position \a column_index
+     */
+
+    double get_cell_center_x (Dimensions *dimensions, uint32_t column_index) ;
+
+
+
+    /*! Returns the Y coordinate of the center of the cell at \a row_index
+     *
+     * \param dimensions the address of the structure containing all the dimensions
+     * \param row_index  the row index of the thermal cell
+     *
+     * \return the Y coordinate of the center of thermal cell in position \a row_index
+     */
+
+    double get_cell_center_y (Dimensions *dimensions, uint32_t row_index) ;
+
+
+
+    /*! Returns the X coordinate of the south-west corner of the cell at \a column_index
+     *
+     * \param dimensions   the address of the structure containing all the dimensions
+     * \param column_index the column index of the thermal cell
+     *
+     * \return the X coordinate of the south-west corner of thermal cell in position \a column_index
+     */
+
+    double get_cell_location_x (Dimensions *dimensions, uint32_t column_index) ;
+
+
+
+    /*! Returns the Y coordinate of the south-west corner of the cell at \a row_index
+     *
+     * \param dimensions the address of the structure containing all the dimensions
+     * \param row_index  the row index of the thermal cell
+     *
+     * \return the X coordinate of the south-west corner of thermal cell in position \a row_index
+     */
+
+    double get_cell_location_y (Dimensions *dimensions, uint32_t row_index) ;
 
 
 
