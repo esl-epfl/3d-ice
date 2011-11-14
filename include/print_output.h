@@ -49,6 +49,7 @@ extern "C"
 #include <stdbool.h>
 
 #include "types.h"
+#include "dimensions.h"
 #include "stack_element.h"
 
 /******************************************************************************/
@@ -70,7 +71,7 @@ extern "C"
 
         /*! Actual nearest X coordinate of the thermal cell */
 
-        double Actual_Xval ;
+        double ActualXval ;
 
         /*! Y coordnate of the thermal cell as specified in the stack file */
 
@@ -78,19 +79,19 @@ extern "C"
 
         /*! Actual nearest Y coordnate of the thermal cell */
 
-        double Actual_Yval ;
+        double ActualYval ;
 
         /*! Layer Index of the thermal cell */
 
-        uint32_t layer_index ;
+        uint32_t LayerIndex ;
 
         /*! Row Index of the thermal cell */
 
-        uint32_t row_index ;
+        uint32_t RowIndex ;
 
         /*! Column Index of the thermal cell */
 
-        uint32_t column_index ;
+        uint32_t ColumnIndex ;
     } ;
 
     /*! Definition of the type Tcell */
@@ -128,6 +129,24 @@ extern "C"
      */
 
     void free_tcell (Tcell *tcell) ;
+
+
+
+    /*! Aligns the thermal cell to the grid of thermal cells
+     *
+     *  The function computes the values Tcell:ActualXval, Tcell:ActualYval,
+     *  Tcell:RowIndex and Tcell:ColumnIndex while Tcell:XVal and Tcell:YVal
+     *  are set as \a xval and \a yval
+     *
+     *  \param tcell the pointer to the Tcell to align
+     *  \param xval  the requested X coordinate of the cell
+     *  \param yval  the requested Y coordinate of the cell
+     *  \param dimensions pointer to the structure containing the dimensions of the IC
+     */
+
+    void align_tcell
+
+        (Tcell *tcell, double xval, double yval, Dimensions *dimensions) ;
 
 /******************************************************************************/
 

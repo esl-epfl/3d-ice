@@ -43,14 +43,14 @@
 
 void init_tcell (Tcell *tcell)
 {
-    tcell->Id           = NULL ;
-    tcell->Xval         = 0.0 ;
-    tcell->Actual_Xval  = 0.0 ;
-    tcell->Yval         = 0.0 ;
-    tcell->Actual_Xval  = 0.0 ;
-    tcell->layer_index  = 0u ;
-    tcell->row_index    = 0u ;
-    tcell->column_index = 0u ;
+    tcell->Id          = NULL ;
+    tcell->Xval        = 0.0 ;
+    tcell->ActualXval  = 0.0 ;
+    tcell->Yval        = 0.0 ;
+    tcell->ActualYval  = 0.0 ;
+    tcell->LayerIndex  = 0u ;
+    tcell->RowIndex    = 0u ;
+    tcell->ColumnIndex = 0u ;
 }
 
 /******************************************************************************/
@@ -72,6 +72,43 @@ void free_tcell (Tcell *tcell)
 {
     FREE_POINTER(free, tcell->Id) ;
     FREE_POINTER(free, tcell) ;
+}
+
+/******************************************************************************/
+
+void align_tcell
+(
+    Tcell      *tcell,
+    double      xval,
+    double      yval,
+    Dimensions *dimensions
+)
+{
+    // FIXME
+
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+        tcell->RowIndex   = row_index ;
+        tcell->ActualYval = get_cell_location_y (dimensions, row_index) ;
+
+        if (tcell->ActualYval > yval)
+
+            break ;
+    }
+
+    tcell->Yval = yval ;
+
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+        tcell->ColumnIndex   = column_index ;
+        tcell->ActualXval = get_cell_location_x (dimensions, column_index) ;
+
+        if (tcell->ActualXval > xval)
+
+            break ;
+    }
+
+    tcell->Xval = xval ;
 }
 
 /******************************************************************************/
@@ -421,7 +458,7 @@ int initialize_print_output
         case TDICE_OUTPUT_TCELL :
         {
             fprintf(output_stream, "Cell temperature for the location [%s, x=%5.3f,y=%5.3f]\n", print_output->Pointer.Tcell->Id, print_output->Pointer.Tcell->Xval, print_output->Pointer.Tcell->Yval) ;
-            fprintf(output_stream, "Nearest [column, row] indices found= [%d,%d] (locations [x=%5.3f,y=%5.3f])\n", print_output->Pointer.Tcell->column_index, print_output->Pointer.Tcell->row_index, print_output->Pointer.Tcell->Actual_Xval, print_output->Pointer.Tcell->Actual_Yval);
+            fprintf(output_stream, "Nearest [column, row] indices found= [%d,%d] (locations [x=%5.3f,y=%5.3f])\n", print_output->Pointer.Tcell->ColumnIndex, print_output->Pointer.Tcell->RowIndex, print_output->Pointer.Tcell->ActualXval, print_output->Pointer.Tcell->ActualYval);
             fprintf(output_stream, "Time(s) \t Temperature(K)\n");
             break ;
         }

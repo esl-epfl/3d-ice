@@ -1204,11 +1204,21 @@ output_item
             YYABORT ;
         }
 
-        tcell->Id   = $3 ;
-        tcell->Xval = $5 ;
-        tcell->Yval = $7 ;
+        tcell->Id = $3 ;
 
-        // TODO align the tcell
+        align_tcell (tcell, $5, $7, stkd->Dimensions) ;
+
+        tcell->LayerIndex = stack_element->Offset ;
+
+        // FIXME this must be a function in StackElement
+
+        if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+
+            tcell->LayerIndex += stack_element->Pointer.Die->SourceLayerOffset ;
+
+        else if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
+
+            tcell->LayerIndex += stack_element->Pointer.Channel->SourceLayerOffset ;
 
         PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
 
