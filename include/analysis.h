@@ -50,6 +50,7 @@ extern "C"
 
 #include "types.h"
 #include "print_output.h"
+#include "stack_element.h"
 
 /******************************************************************************/
 
@@ -131,8 +132,7 @@ extern "C"
 
     /*! Frees the memory related to \a analysis
      *
-     * The parametrer \a analysis must be a pointer previously obtained with
-     * %alloc_and_init_analysis
+     *  \a analysis must be the address of an automatic variable
      *
      * \param analysis the address of the structure to free
      */
@@ -194,6 +194,21 @@ extern "C"
     void add_print_output_to_analysis
 
         (Analysis *analysis, PrintOutput *print_output) ;
+
+
+    /*! Initializes output files
+     *
+     * Generates, for every inspection point, the output file and print the header
+     * If the target output file is already there, it will be overwritten.
+     *
+     * \param analysis pointer to the analysis structure
+     * \param list FIXME can we remove it ?????
+     *
+     * \return \c TDICE_SUCCESS if the operation terminates with success
+     * \return \c TDICE_FAILURE if one of the files can not be created
+     */
+
+    Error_t initialize_print_output_instructions (Analysis* analysis, StackElement *list) ;
 
 
 /******************************************************************************/

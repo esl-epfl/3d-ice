@@ -69,6 +69,16 @@ main(int argc, char** argv)
 
     return EXIT_FAILURE ;
 
+  // Generate output files
+  ////////////////////////////////////////////////////////////////////////////
+
+  if (initialize_print_output_instructions (&analysis, stkd.BottomStackElement) != TDICE_SUCCESS)
+  {
+    fprintf(stderr, "error in initializing output files \n ");
+    free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
+  }
+
   // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
 
@@ -80,6 +90,7 @@ main(int argc, char** argv)
   {
     fprintf(stderr, "fill thermal data failed\n") ;
     free_thermal_data (&tdata) ;
+    free_analysis (&analysis) ;
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
   }
@@ -96,6 +107,7 @@ main(int argc, char** argv)
   {
     printf ("no element die2 found\n") ;
     free_thermal_data (&tdata) ;
+    free_analysis (&analysis) ;
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
   }
@@ -107,6 +119,7 @@ main(int argc, char** argv)
   {
     printf ("alloc memory failed\n") ;
     free_thermal_data      (&tdata) ;
+    free_analysis (&analysis) ;
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
   }
@@ -171,6 +184,7 @@ main(int argc, char** argv)
 
   free                   (max_results) ;
   free_thermal_data      (&tdata) ;
+  free_analysis          (&analysis) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS ;

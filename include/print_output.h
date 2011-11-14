@@ -445,7 +445,9 @@ extern "C"
      *  \return FIXME
      */
 
-    int initialize_print_output (PrintOutput *print_output, StackElement *list) ;
+    // FIXME: can we remove the list ?
+
+    Error_t initialize_print_output (PrintOutput *print_output, StackElement *list) ;
 
 
 
@@ -457,7 +459,7 @@ extern "C"
      *  \return \c false otherwise
      */
 
-    bool there_is_map_in_list (PrintOutput *list) ;
+    bool there_is_tmap_in_list (PrintOutput *list) ;
 
 /******************************************************************************/
 

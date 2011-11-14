@@ -71,11 +71,9 @@ Analysis *alloc_and_init_analysis (void)
 
 void free_analysis (Analysis *analysis)
 {
-    FREE_POINTER (free_print_output, analysis->PrintOutputListFinal) ;
-    FREE_POINTER (free_print_output, analysis->PrintOutputListSlot) ;
-    FREE_POINTER (free_print_output, analysis->PrintOutputListStep) ;
-
-    FREE_POINTER (free, analysis) ;
+    FREE_LIST (PrintOutput, analysis->PrintOutputListFinal, free_print_output) ;
+    FREE_LIST (PrintOutput, analysis->PrintOutputListSlot, free_print_output) ;
+    FREE_LIST (PrintOutput, analysis->PrintOutputListStep, free_print_output) ;
 }
 
 /******************************************************************************/
@@ -223,3 +221,38 @@ void add_print_output_to_analysis
 
     *list = print_output ;
 }
+
+/******************************************************************************/
+
+Error_t initialize_print_output_instructions (Analysis* analysis, StackElement *list)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, final, analysis->PrintOutputListFinal)
+
+        if (initialize_print_output (final, list) != TDICE_SUCCESS)
+
+            return TDICE_FAILURE ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, slot, analysis->PrintOutputListSlot)
+
+        if (initialize_print_output (slot, list) != TDICE_SUCCESS)
+
+            return TDICE_FAILURE ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, step, analysis->PrintOutputListStep)
+
+        if (initialize_print_output (step, list) != TDICE_SUCCESS)
+
+            return TDICE_FAILURE ;
+
+//   FIXME
+//
+//   if (   there_is_tmap_in_list (analysis->PrintOutputListFinal)
+//       || there_is_tmap_in_list (analysis->PrintOutputListSlot)
+//       || there_is_tmap_in_list (analysis->PrintOutputListStep))
+//
+//     print_axes (analysis) ;
+
+   return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/

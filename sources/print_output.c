@@ -438,7 +438,7 @@ void print_detailed_print_output_list
 
 /******************************************************************************/
 
-int initialize_print_output
+Error_t initialize_print_output
 (
     PrintOutput  *print_output ,
     StackElement *list
@@ -449,7 +449,8 @@ int initialize_print_output
     if ((output_stream = fopen(print_output->FileName, "w")) == NULL)
     {
         fprintf(stderr, "Print Output: Cannot open %s\n", print_output->FileName);
-        return -2 ;
+
+        return TDICE_FAILURE ;
     }
 
     switch (print_output->Type)
@@ -476,7 +477,7 @@ int initialize_print_output
             { 
                 fprintf(stderr, "Print Output: Error reading output quantity for Tflp\n") ;
                 fclose(output_stream) ;
-                return -1 ;
+                return TDICE_FAILURE ;
             }
             fprintf(output_stream, "temperatures for the floorplan of the die %s\n", print_output->Pointer.Tflp->Id) ;
 
@@ -485,7 +486,7 @@ int initialize_print_output
             { 
                 fprintf(stderr, "Print Output: Error reading floorplan for the die %s\n", print_output->Pointer.Tflp->Id) ;
                 fclose(output_stream) ;
-                return -1 ;
+                return TDICE_FAILURE ;
             }
 
             fprintf(output_stream, "Time(s) \t ");
@@ -510,7 +511,7 @@ int initialize_print_output
             { 
                 fprintf(stderr, "Print Output: Error reading output quantity for Tflpel\n") ;
                 fclose(output_stream) ;
-                return -1 ;
+                return TDICE_FAILURE ;
             }
             fprintf(output_stream, "temperatures for the floorplan element %s of the die %s\n", print_output->Pointer.Tflpel->FlpId, print_output->Pointer.Tflpel->Id) ;
             fprintf(output_stream, "Time(s) \t %s.%s(K)\n", print_output->Pointer.Tflpel->Id, print_output->Pointer.Tflpel->FlpId) ;
@@ -528,13 +529,14 @@ int initialize_print_output
         {
             fprintf (stderr, "Error reading output instruction\n") ;
             fclose(output_stream) ;
-            return -1 ;
+            return TDICE_FAILURE ;
             break ;
         }
     }
 
     fclose (output_stream) ;
-    return 0 ;
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
