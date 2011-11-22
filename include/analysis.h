@@ -46,9 +46,9 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
-#include <stdint.h>
 
 #include "types.h"
+
 #include "print_output.h"
 #include "stack_element.h"
 

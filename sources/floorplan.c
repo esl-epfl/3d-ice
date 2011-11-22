@@ -33,19 +33,17 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <stdlib.h>
+
 #include "floorplan.h"
 #include "macros.h"
+
 #include "../bison/floorplan_parser.h"
 #include "../flex/floorplan_scanner.h"
 
-/******************************************************************************/
-
 extern int floorplan_parse
-(
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    yyscan_t    scanner
-) ;
+
+    (Floorplan  *floorplan, Dimensions *dimensions, yyscan_t scanner) ;
 
 /******************************************************************************/
 

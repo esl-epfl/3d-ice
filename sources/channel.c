@@ -42,7 +42,7 @@
 
 void init_channel (Channel *channel)
 {
-    channel->ChannelModel      = CHANNELMODEL_I;
+    channel->ChannelModel      = TDICE_CHANNEL_MODEL_NO_CHANNEL ;
     channel->Height            = 0.0 ;
     channel->Length            = 0.0 ;
     channel->Pitch             = 0.0 ;
@@ -50,7 +50,11 @@ void init_channel (Channel *channel)
     channel->NChannels         = 0u ;
     channel->NLayers           = 0u ;
     channel->SourceLayerOffset = 0u ;
-    channel->Coolant           = COOLANT_I ;
+    channel->Coolant.HTCSide   = 0.0 ;
+    channel->Coolant.HTCTop    = 0.0 ;
+    channel->Coolant.HTCBottom = 0.0 ;
+    channel->Coolant.VHC       = 0.0 ;
+    channel->Coolant.TIn       = 0.0 ;
     channel->CoolantFR         = 0.0 ;
     channel->DarcyVelocity     = 0.0 ;
     channel->WallMaterial      = NULL ;

@@ -33,24 +33,17 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <stdlib.h>
+
 #include "stack_description.h"
-#include "thermal_cell.h"
 #include "macros.h"
-#include "layer.h"
-#include "system_matrix.h"
-#include "print_output.h"
 
 #include "../bison/stack_description_parser.h"
 #include "../flex/stack_description_scanner.h"
 
-/******************************************************************************/
-
 extern int stack_description_parse
-(
-    StackDescription *stkd,
-    Analysis         *analysis,
-    yyscan_t          scanner
-) ;
+
+    (StackDescription *stkd, Analysis *analysis, yyscan_t scanner) ;
 
 /******************************************************************************/
 

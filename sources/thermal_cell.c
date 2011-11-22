@@ -34,7 +34,6 @@
  ******************************************************************************/
 
 #include <stdlib.h>
-#include <math.h>
 
 #include "thermal_cell.h"
 #include "macros.h"

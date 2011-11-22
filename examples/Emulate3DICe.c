@@ -33,7 +33,6 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
 #include <time.h>
 
 #include "stack_description.h"
@@ -99,8 +98,8 @@ main(int argc, char** argv)
   // in the floorplan on die "die2"
   ////////////////////////////////////////////////////////////////////////////
 
-  Quantity_t counter ;
-  Quantity_t nfloorplanelements
+  uint8_t counter ;
+  uint32_t nfloorplanelements
     = get_number_of_floorplan_elements (&stkd, "die2") ;
 
   if (nfloorplanelements < 0)
@@ -112,8 +111,8 @@ main(int argc, char** argv)
     return EXIT_FAILURE ;
   }
 
-  Temperature_t* max_results
-    = malloc (sizeof(Temperature_t) * nfloorplanelements) ;
+  double* max_results
+    = malloc (sizeof(double) * nfloorplanelements) ;
 
   if (max_results == NULL)
   {
@@ -130,7 +129,7 @@ main(int argc, char** argv)
   // The do { } while () ; loop prints the temperatures at all the time points.
   ////////////////////////////////////////////////////////////////////////////
 
-  Temperature_t cell1, cell2 ;
+  double cell1, cell2 ;
   clock_t Time = clock() ;
 
   do

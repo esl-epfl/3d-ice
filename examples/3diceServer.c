@@ -33,9 +33,6 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <time.h>
-
 #include "stack_description.h"
 #include "analysis.h"
 #include "thermal_data.h"
@@ -43,17 +40,16 @@
 #include "network_interface_server.h"
 #include "NIPreamble.h"
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
   StackDescription stkd ;
   Analysis         analysis ;
   ThermalData      tdata ;
 
   int sockfd;
-  Time_t slot_time;
-  Time_t step_time;
-  Bool_t is_transient;
+  double slot_time;
+  double step_time;
+  double is_transient;
   int (*emulate)(ThermalData*, StackDescription*, Analysis*) = NULL;
 
   MessagesQueue*     mqueue;
@@ -119,10 +115,10 @@ main(int argc, char** argv)
     // FIXME is it really needed ???
 
   // this is used for terminating the simulation
-  Bool_t * is_terminating = malloc(sizeof(Bool_t));
+  bool *is_terminating = malloc(sizeof(bool));
 
-  Quantity_t num_floorplan_elements = get_total_number_of_floorplan_elements(&stkd);
-  Power_t* pvalues = malloc(num_floorplan_elements * sizeof(Power_t));
+  uint32_t num_floorplan_elements = get_total_number_of_floorplan_elements(&stkd);
+  double* pvalues = malloc(num_floorplan_elements * sizeof(Power_t));
 
   // get network messages
   get_messages(sockfd, mqueue);

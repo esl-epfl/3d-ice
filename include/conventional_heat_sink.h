@@ -47,10 +47,12 @@ extern "C"
 
 #include <stdio.h>
 
-#include "layer.h"
-#include "thermal_cell.h"
+#include "types.h"
+
 #include "dimensions.h"
+#include "layer.h"
 #include "system_matrix.h"
+#include "thermal_cell.h"
 
 /******************************************************************************/
 

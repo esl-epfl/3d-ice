@@ -33,37 +33,38 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-%{
-#include "floorplan.h"
-#include "floorplan_element.h"
-#include "dimensions.h"
-#include "macros.h"
-%}
+%code requires
+{
+    #include "types.h"
+    #include "floorplan_element.h"
+    #include "powers_queue.h"
+}
 
 %union
 {
-  Power_t  power_value ;
-  String_t identifier ;
-
-  FloorplanElement  *p_floorplan_element ;
-  PowersQueue       *p_powers_queue ;
+    double            power_value ;
+    char             *identifier ;
+    FloorplanElement *p_floorplan_element ;
+    PowersQueue      *p_powers_queue ;
 }
 
-%{
-#include "../flex/floorplan_scanner.h"
+%code
+{
+    #include "dimensions.h"
+    #include "floorplan.h"
+    #include "macros.h"
 
-void floorplan_error
-(
-   Floorplan*  floorplan,
-   Dimensions *dimensions,
-   yyscan_t    yyscanner,
-   char const *msg
-) ;
+    #include "../flex/floorplan_scanner.h"
 
-static char error_message [100] ;
+    void floorplan_error
 
-static bool local_abort ;
-%}
+        (Floorplan *floorplan, Dimensions *dimensions,
+         yyscan_t yyscanner, char const *msg) ;
+
+    static char error_message [100] ;
+
+    static bool local_abort ;
+}
 
 %type <p_floorplan_element> floorplan_element ;
 %type <p_floorplan_element> floorplan_element_list ;

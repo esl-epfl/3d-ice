@@ -46,12 +46,11 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
-#include <stdint.h>
-#include <stdbool.h>
+
+#include "types.h"
 
 #include "dimensions.h"
 #include "powers_queue.h"
-#include "types.h"
 
 /******************************************************************************/
 

@@ -46,7 +46,6 @@ extern "C"
 /******************************************************************************/
 
 #include "types.h"
-#include "dimensions.h"
 
 /******************************************************************************/
 
@@ -71,31 +70,31 @@ extern "C"
     {
         /*! The conductance of the resistor in the \a Top direction */
 
-        Conductance_t Top ;
+        double Top ;
 
         /*! The conductance of the resistor in the \a Bottom direction */
 
-        Conductance_t Bottom ;
+        double Bottom ;
 
         /*! The conductance of the resistor in the \a North direction */
 
-        Conductance_t North ;
+        double North ;
 
         /*! The conductance of the resistor in the \a South direction */
 
-        Conductance_t South ;
+        double South ;
 
         /*! The conductance of the resistor in the \a East direction */
 
-        Conductance_t East ;
+        double East ;
 
         /*! The conductance of the resistor in the \a West direction */
 
-        Conductance_t West ;
+        double West ;
 
         /*! The capacity of the thermal cell */
 
-        Capacity_t Capacity ;
+        double Capacity ;
 
     } ;
 

@@ -46,7 +46,8 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
-#include <stdint.h>
+
+#include "types.h"
 
 #include "dimensions.h"
 #include "floorplan_element.h"

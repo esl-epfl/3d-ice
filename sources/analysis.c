@@ -34,7 +34,6 @@
  ******************************************************************************/
 
 #include <stdlib.h>
-#include <stdbool.h>
 
 #include "analysis.h"
 #include "macros.h"

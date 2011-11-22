@@ -34,7 +34,6 @@
  ******************************************************************************/
 
 #include <stdlib.h>
-#include <stdio.h>
 
 #include "thermal_data.h"
 #include "macros.h"

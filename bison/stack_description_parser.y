@@ -33,18 +33,15 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-%{
-#include "types.h"
-#include "macros.h"
-#include "dimensions.h"
-#include "material.h"
-#include "die.h"
-#include "layer.h"
-#include "stack_element.h"
-#include "print_output.h"
-#include "stack_description.h"
-#include "analysis.h"
-%}
+%code requires
+{
+    #include "types.h"
+
+    #include "material.h"
+    #include "die.h"
+    #include "stack_element.h"
+    #include "print_output.h"
+}
 
 // The YYSTYPE union used to collect the types of tokens and rules
 
@@ -61,6 +58,34 @@
     PrintOutput          *print_output_p ;
     OutputInstanceType_t  output_instance_v ;
     OutputQuantity_t      output_quantity_v ;
+}
+
+%code
+{
+    #include "analysis.h"
+    #include "channel.h"
+    #include "conventional_heat_sink.h"
+    #include "dimensions.h"
+    #include "floorplan_element.h"
+    #include "floorplan.h"
+    #include "layer.h"
+    #include "macros.h"
+    #include "stack_description.h"
+
+    #include "../flex/stack_description_scanner.h"
+
+    void stack_description_error
+
+        (StackDescription *stack, Analysis *analysis, yyscan_t scanner, char *message) ;
+
+    static char error_message [100] ;
+
+    static double   first_wall_length ;
+    static double   last_wall_length ;
+    static double   wall_length ;
+    static double   channel_length ;
+    static uint32_t num_channels ;
+    static uint8_t  num_dies ;
 }
 
 %type <double_v>          first_wall_length
@@ -152,27 +177,6 @@
 %destructor { FREE_POINTER (free,                     $$) ; } <char_p>
 %destructor { FREE_POINTER (free_layers_list,         $$) ; } <layer_p>
 
-%{
-#include "../flex/stack_description_scanner.h"
-
-void stack_description_error
-(
-    StackDescription *stack,
-    Analysis         *analysis,
-    yyscan_t          scanner,
-    String_t          message
-) ;
-
-static char error_message [100] ;
-
-static CellDimension_t first_wall_length = CELLDIMENSION_I ;
-static CellDimension_t last_wall_length  = CELLDIMENSION_I ;
-static CellDimension_t wall_length       = CELLDIMENSION_I ;
-static CellDimension_t channel_length    = CELLDIMENSION_I ;
-static Quantity_t      num_channels      = QUANTITY_I ;
-static Quantity_t      num_dies          = QUANTITY_I ;
-%}
-
 %name-prefix "stack_description_"
 %output      "stack_description_parser.c"
 
@@ -187,12 +191,12 @@ static Quantity_t      num_dies          = QUANTITY_I ;
 
 %initial-action
 {
-    first_wall_length = CELLDIMENSION_I ;
-    last_wall_length  = CELLDIMENSION_I ;
-    wall_length       = CELLDIMENSION_I ;
-    channel_length    = CELLDIMENSION_I ;
-    num_channels      = QUANTITY_I ;
-    num_dies          = QUANTITY_I ;
+    first_wall_length = 0.0 ;
+    last_wall_length  = 0.0 ;
+    wall_length       = 0.0 ;
+    channel_length    = 0.0 ;
+    num_channels      = 0u ;
+    num_dies          = 0u ;
 } ;
 
 %start stack_description_file
@@ -553,7 +557,7 @@ layer_content :
             YYABORT ;
         }
 
-        layer->Height   = (CellDimension_t) $1 ;
+        layer->Height   = $1 ;
         layer->Material = find_material_in_list (stkd->MaterialsList, $2) ;
 
         if (layer->Material == NULL)
@@ -717,18 +721,18 @@ dimensions
             YYABORT ;
         }
 
-        stkd->Dimensions->Chip.Length = (ChipDimension_t) $5 ;
-        stkd->Dimensions->Chip.Width  = (ChipDimension_t) $8 ;
+        stkd->Dimensions->Chip.Length = $5 ;
+        stkd->Dimensions->Chip.Width  = $8 ;
 
         stkd->Dimensions->Cell.ChannelLength   = $12 ;
         stkd->Dimensions->Cell.FirstWallLength = $12 ;
         stkd->Dimensions->Cell.LastWallLength  = $12 ;
         stkd->Dimensions->Cell.WallLength      = $12 ;
 
-        stkd->Dimensions->Cell.Width  = (CellDimension_t) $15 ;
+        stkd->Dimensions->Cell.Width  = $15 ;
 
-        stkd->Dimensions->Grid.NRows    = (GridDimension_t) ($8 / $15) ;
-        stkd->Dimensions->Grid.NColumns = (GridDimension_t) ($5 / $12) ;
+        stkd->Dimensions->Grid.NRows    = ($8 / $15) ;
+        stkd->Dimensions->Grid.NColumns = ($5 / $12) ;
 
 
         if (stkd->Channel != NULL)
@@ -740,7 +744,7 @@ dimensions
                 stkd->Dimensions->Cell.LastWallLength  = last_wall_length ;
                 stkd->Dimensions->Cell.WallLength      = wall_length ;
 
-                CellDimension_t ratio
+                double ratio
                     = ($5 - first_wall_length - last_wall_length -channel_length)
                     /
                     (channel_length + wall_length) ;
@@ -770,11 +774,11 @@ dimensions
                     YYABORT ;
                 }
 
-                stkd->Channel->NChannels = (Quantity_t) ((stkd->Dimensions->Grid.NColumns - 1 )  / 2) ;
+                stkd->Channel->NChannels = ((stkd->Dimensions->Grid.NColumns - 1 )  / 2) ;
             }
             else if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
             {
-                stkd->Channel->NChannels = (Quantity_t) (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
+                stkd->Channel->NChannels = (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
             }
         }
     }
@@ -789,7 +793,7 @@ stack
   : STACK ':'
         stack_elements
     {
-        if (num_dies == 0)
+        if (num_dies == 0u)
         {
             stack_description_error (stkd, analysis, scanner, "Error: stack must contain at least one die") ;
 
@@ -837,7 +841,7 @@ stack
         // the bottom most element in the stack. This operation can be done only
         // here since the parser processes elements in the stack from the top most.
 
-        GridDimension_t layer_index = GRIDDIMENSION_I ;
+        uint32_t layer_index = GRIDDIMENSION_I ;
 
         FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
         {
@@ -854,7 +858,7 @@ stack
                 * get_number_of_rows (stkd->Dimensions)
                 * get_number_of_columns (stkd->Dimensions) ;
 
-        if ((uint32_t) stkd->Dimensions->Grid.NCells >  INT32_MAX)
+        if (stkd->Dimensions->Grid.NCells >  INT32_MAX)
         {
             sprintf (error_message, "%d are too many cells ... (SuperLU uses 'int')", stkd->Dimensions->Grid.NCells) ;
 
@@ -953,7 +957,7 @@ stack_element
             YYABORT ;
         }
 
-        layer->Height   = (CellDimension_t) $3 ;
+        layer->Height   = $3 ;
         layer->Material = find_material_in_list (stkd->MaterialsList, $4) ;
 
         if (layer->Material == NULL)
@@ -1485,9 +1489,9 @@ when
 void stack_description_error
 (
     StackDescription *stkd,
-    Analysis         __attribute__ ((unused)) *analysis,
+    Analysis          __attribute__ ((unused)) *analysis,
     yyscan_t          scanner,
-    String_t          message
+    char             *message
 )
 {
     fprintf (stack_description_get_out (scanner),

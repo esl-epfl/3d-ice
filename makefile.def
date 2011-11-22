@@ -73,8 +73,6 @@
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/material.c                 \
                   $(3DICE_SOURCES)/messages_queue.c           \
-                  $(3DICE_SOURCES)/network_interface_client.c \
-                  $(3DICE_SOURCES)/network_interface_server.c \
                   $(3DICE_SOURCES)/powers_queue.c             \
                   $(3DICE_SOURCES)/print_output.c             \
                   $(3DICE_SOURCES)/stack_description.c        \

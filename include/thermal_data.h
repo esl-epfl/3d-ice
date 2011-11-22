@@ -45,11 +45,15 @@ extern "C"
 
 /******************************************************************************/
 
+#include <stdio.h>
+
 #include "types.h"
-#include "thermal_cell.h"
-#include "stack_description.h"
+
 #include "analysis.h"
+#include "stack_description.h"
 #include "system_matrix.h"
+#include "thermal_cell.h"
+
 #include "slu_ddefs.h"
 
 /******************************************************************************/

@@ -34,15 +34,6 @@
  ******************************************************************************/
 
 %{
-#include <string.h>
-#include <stdlib.h>
-
-#include "types.h"
-#include "material.h"
-#include "die.h"
-#include "stack_element.h"
-#include "print_output.h"
-
 #include "../bison/stack_description_parser.h"
 %}
 

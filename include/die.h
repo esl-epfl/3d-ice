@@ -46,14 +46,14 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
-#include <stdint.h>
 
-#include "layer.h"
-#include "thermal_cell.h"
+#include "types.h"
+
 #include "dimensions.h"
 #include "floorplan.h"
-#include "powers_queue.h"
+#include "layer.h"
 #include "system_matrix.h"
+#include "thermal_cell.h"
 
 /******************************************************************************/
 

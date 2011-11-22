@@ -45,7 +45,9 @@ extern "C"
 
 /******************************************************************************/
 
-#include "stdint.h"
+#include <stdio.h>
+
+#include "types.h"
 
 #include "dimensions.h"
 #include "thermal_cell.h"

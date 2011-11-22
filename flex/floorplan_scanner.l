@@ -34,10 +34,6 @@
  ******************************************************************************/
 
 %{
-#include <string.h>
-#include <stdlib.h>
-
-#include "floorplan_element.h"
 #include "../bison/floorplan_parser.h"
 %}
 

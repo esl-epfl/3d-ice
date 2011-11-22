@@ -33,8 +33,6 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 
 #include "stack_description.h"

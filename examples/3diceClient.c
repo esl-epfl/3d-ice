@@ -50,8 +50,8 @@ int main(int argc, char** argv)
 
   srand(time(NULL));
 
-  Quantity_t counter = QUANTITY_I;
-  Power_t* pvalues = malloc(sizeof(Power_t) * NUM_POWER_VALUES);
+  uint8_t counter = QUANTITY_I;
+  double* pvalues = malloc(sizeof(Power_t) * NUM_POWER_VALUES);
   TimeInfo* time_info = alloc_and_init_time_info(atof(argv[1]), atof(argv[2]), strcmp(argv[3], "SLOT"));
 
   MessagesQueue*     mqueue = alloc_and_init_messages_queue();
@@ -66,8 +66,8 @@ int main(int argc, char** argv)
   send_client_info(sockfd, time_info->SlotTime, time_info->StepTime, time_info->IsTransient);
 
   // create network messages
-  Temperature_t* max_results = malloc(sizeof(Temperature_t) * 4);
-  Temperature_t cell1, cell2, outlet;
+  double* max_results = malloc(sizeof(Temperature_t) * 4);
+  double cell1, cell2, outlet;
 
   nm_get_all_max_temperatures_of_floorplan (mqueue, tqueue, "die2", max_results, 4);
   nm_get_cell_temperature (mqueue, tqueue, 2, 11, 4, &cell1);
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
   // send_messages
   send_messages(sockfd, mqueue);
 
-  Bool_t is_terminating = FALSE_V;
+  bool is_terminating = FALSE_V;
 
   do {
     if (is_slot_time_client(time_info)) {

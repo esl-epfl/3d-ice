@@ -47,13 +47,18 @@ extern "C"
 
 #include <stdio.h>
 
-#include "material.h"
-#include "channel.h"
-#include "die.h"
-#include "stack_element.h"
-#include "dimensions.h"
-#include "conventional_heat_sink.h"
+#include "types.h"
+
 #include "analysis.h"
+#include "channel.h"
+#include "conventional_heat_sink.h"
+#include "die.h"
+#include "dimensions.h"
+#include "material.h"
+#include "powers_queue.h"
+#include "stack_element.h"
+#include "system_matrix.h"
+#include "thermal_cell.h"
 
 /******************************************************************************/
 

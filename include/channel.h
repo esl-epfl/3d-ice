@@ -46,13 +46,13 @@ extern "C"
 /******************************************************************************/
 
 #include <stdio.h>
-#include <stdint.h>
 
 #include "types.h"
+
 #include "dimensions.h"
 #include "material.h"
-#include "thermal_cell.h"
 #include "system_matrix.h"
+#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -162,7 +162,7 @@ extern "C"
      * \param stream  the output stream (must be already open)
      * \param prefix  a string to be printed as prefix at the beginning of each line
      * \param channel the channel to print
-     *  \param dimensions pointer to the structure storing the dimensions
+     * \param dimensions pointer to the structure storing the dimensions
      */
 
     void print_formatted_channel
