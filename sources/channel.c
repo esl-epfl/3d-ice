@@ -89,74 +89,88 @@ void print_formatted_channel
     Channel    *channel,
     Dimensions *dimensions
 )
-{  // FIXME
-    fprintf (stream,
-        "%schannel :\n",
-        prefix) ;
+{
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
+    {
+        fprintf (stream, "%smicrochannel rm4 :\n", prefix) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, dimensions->Cell.ChannelLength) ;
+        fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, dimensions->Cell.WallLength) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   first wall length %7.1f ;\n", prefix, dimensions->Cell.FirstWallLength) ;
+        fprintf (stream, "%s    last wall length %7.1f ;\n", prefix, dimensions->Cell.LastWallLength) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->CoolantFR)) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant heat transfer coefficient side   %.4e ,\n", prefix, channel->Coolant.HTCSide) ;
+        fprintf (stream, "%s                                     top    %.4e ,\n", prefix, channel->Coolant.HTCTop) ;
+        fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, channel->Coolant.HTCBottom) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
+    }
 
-    fprintf (stream,
-        "%s   channel model type          %d ;\n",
-        prefix, channel->ChannelModel) ;
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
+    {
+        fprintf (stream, "%smicrochannel rm2 :\n", prefix) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, channel->Length) ;
+        fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, channel->Pitch - channel->Length) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->CoolantFR)) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant heat transfer coefficient top    %.4e ,\n", prefix, channel->Coolant.HTCTop) ;
+        fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, channel->Coolant.HTCBottom) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
+    }
 
-    fprintf (stream,
-        "%s              height %7.1f ;\n",
-        prefix, channel->Height) ;
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE)
+    {
+        fprintf (stream, "%spinfin :\n", prefix) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(channel->Porosity, channel->Pitch)) ;
+        fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, channel->Pitch) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   pin distribution inline ;\n", prefix) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->DarcyVelocity) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
+    }
 
-    fprintf (stream,
-        "%s              length %7.1f ;\n",
-        prefix, channel->Length) ;
-
-    fprintf (stream,
-        "%s              pitch  %7.1f ;\n",
-        prefix, channel->Pitch) ;
-
-    fprintf (stream,
-        "%s              porosity %7.1f ;\n",
-        prefix, channel->Porosity) ;
-
-    fprintf (stream,
-        "%s      channel length %7.1f ;\n",
-        prefix, dimensions->Cell.ChannelLength) ;
-
-    fprintf (stream,
-        "%s         wall length %7.1f ;\n",
-           prefix, dimensions->Cell.WallLength) ;
-
-    fprintf (stream,
-        "%s   first wall length %7.1f ;\n",
-        prefix, dimensions->Cell.FirstWallLength) ;
-
-    fprintf (stream,
-        "%s    last wall length %7.1f ;\n",
-        prefix, dimensions->Cell.LastWallLength) ;
-
-    fprintf (stream,
-        "%s   wall material %s ;\n",
-        prefix, channel->WallMaterial->Id) ;
-
-    fprintf (stream,
-        "%s   coolant flow rate                       %.4e ;\n",
-        prefix, channel->CoolantFR) ;
-
-    fprintf (stream,
-        "%s   coolant heat transfert coefficient side %.4e ,\n",
-        prefix, channel->Coolant.HTCSide) ;
-
-    fprintf (stream,
-        "%s                                       top %.4e ,\n",
-        prefix, channel->Coolant.HTCTop) ;
-
-    fprintf (stream,
-        "%s                                    bottom %.4e ;\n",
-        prefix, channel->Coolant.HTCBottom) ;
-
-    fprintf (stream,
-        "%s   coolant volumetric heat capacity        %.4e ;\n",
-        prefix, channel->Coolant.VHC) ;
-
-    fprintf (stream,
-        "%s   coolant incoming temperature          %.2f ;\n",
-        prefix, channel->Coolant.TIn ) ;
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
+    {
+        fprintf (stream, "%spinfin :\n", prefix) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(channel->Porosity, channel->Pitch)) ;
+        fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, channel->Pitch) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   pin distribution staggered ;\n", prefix) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->DarcyVelocity) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
+        fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
+    }
 }
 
 /******************************************************************************/
@@ -173,7 +187,7 @@ void print_detailed_channel
         prefix,   channel) ;
 
     fprintf (stream,
-        "%s  Model type                = %d\n",
+        "%s  ChannelModel              = %d\n",
         prefix, channel->ChannelModel) ;
 
     fprintf (stream,
@@ -205,28 +219,32 @@ void print_detailed_channel
         prefix, channel->SourceLayerOffset) ;
 
     fprintf (stream,
-        "%s  CoolantHTCs.Side          = %.4e\n",
+        "%s  Coolant.HTCSide           = %.4e\n",
         prefix,  channel->Coolant.HTCSide) ;
 
     fprintf (stream,
-        "%s  CoolantHTCs.Top           = %.4e\n",
+        "%s  Coolant.HTCTop            = %.4e\n",
         prefix,  channel->Coolant.HTCTop) ;
 
     fprintf (stream,
-        "%s  CoolantHTCs.Bottom        = %.4e\n",
+        "%s  Coolant.HTCBottom         = %.4e\n",
         prefix,  channel->Coolant.HTCBottom) ;
 
     fprintf (stream,
-        "%s  CoolantVHC                = %.4e\n",
+        "%s  Coolant.VHC               = %.4e\n",
         prefix,  channel->Coolant.VHC) ;
 
     fprintf (stream,
-        "%s  CoolantTIn                = %.2f\n",
+        "%s  Coolant.TIn               = %.2f\n",
         prefix,  channel->Coolant.TIn) ;
 
     fprintf (stream,
         "%s  CoolantFR                 = %.4e\n",
         prefix,  channel->CoolantFR) ;
+
+    fprintf (stream,
+        "%s  DarcyVelocity             = %.4e\n",
+        prefix,  channel->DarcyVelocity) ;
 
     fprintf (stream,
         "%s  WallMaterial              = %p\n",

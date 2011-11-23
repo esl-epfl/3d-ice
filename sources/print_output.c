@@ -76,6 +76,47 @@ void free_tcell (Tcell *tcell)
 
 /******************************************************************************/
 
+void print_detailed_tcell (FILE  *stream, char *prefix, Tcell *tcell)
+{
+    fprintf (stream,
+        "%sTcell                   = %p\n",
+        prefix, tcell) ;
+
+    fprintf (stream,
+        "%s  Id                    = %s\n",
+        prefix, tcell->Id) ;
+
+    fprintf (stream,
+        "%s  Xval                  = %.2f\n",
+        prefix, tcell->Xval) ;
+
+    fprintf (stream,
+        "%s  actualXval            = %.2f\n",
+        prefix, tcell->ActualXval) ;
+
+    fprintf (stream,
+        "%s  Yval                  = %.2f\n",
+        prefix, tcell->Yval) ;
+
+    fprintf (stream,
+        "%s  actualYval            = %.2f\n",
+        prefix, tcell->ActualYval) ;
+
+    fprintf (stream,
+        "%s  LayerIndex            = %d\n",
+        prefix, tcell->LayerIndex) ;
+
+    fprintf (stream,
+        "%s  RowIndex              = %d\n",
+        prefix, tcell->RowIndex) ;
+
+    fprintf (stream,
+        "%s  ColumnIndex           = %d\n",
+        prefix, tcell->ColumnIndex) ;
+}
+
+/******************************************************************************/
+
 void align_tcell
 (
     Tcell      *tcell,
@@ -100,8 +141,8 @@ void align_tcell
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-        tcell->ColumnIndex   = column_index ;
-        tcell->ActualXval = get_cell_location_x (dimensions, column_index) ;
+        tcell->ColumnIndex = column_index ;
+        tcell->ActualXval  = get_cell_location_x (dimensions, column_index) ;
 
         if (tcell->ActualXval > xval)
 
@@ -111,6 +152,8 @@ void align_tcell
     tcell->Xval = xval ;
 }
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 void init_tflp (Tflp *tflp)
@@ -140,6 +183,25 @@ void free_tflp (Tflp *tflp)
     FREE_POINTER(free, tflp) ;
 }
 
+/******************************************************************************/
+
+void print_detailed_tflp (FILE  *stream, char *prefix, Tflp *tflp)
+{
+    fprintf (stream,
+        "%sTflp                    = %p\n",
+        prefix, tflp) ;
+
+    fprintf (stream,
+        "%s  Id                    = %s\n",
+        prefix, tflp->Id) ;
+
+    fprintf (stream,
+        "%s  Quantity              = %d\n",
+        prefix, tflp->Quantity) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 void init_tflpel (Tflpel *tflpel)
@@ -173,6 +235,29 @@ void free_tflpel (Tflpel *tflpel)
 
 /******************************************************************************/
 
+void print_detailed_tflpel (FILE  *stream, char *prefix, Tflpel *tflpel)
+{
+    fprintf (stream,
+        "%sTflpel                  = %p\n",
+        prefix, tflpel) ;
+
+    fprintf (stream,
+        "%s  Id                    = %s\n",
+        prefix, tflpel->Id) ;
+
+    fprintf (stream,
+        "%s  FlpId                 = %s\n",
+        prefix, tflpel->FlpId) ;
+
+    fprintf (stream,
+        "%s  Quantity              = %d\n",
+        prefix, tflpel->Quantity) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
 void init_tmap(Tmap *tmap)
 {
     tmap->Id = NULL ;
@@ -199,6 +284,21 @@ void free_tmap (Tmap *tmap)
     FREE_POINTER(free, tmap) ;
 }
 
+/******************************************************************************/
+
+void print_detailed_tmap (FILE  *stream, char *prefix, Tmap *tmap)
+{
+    fprintf (stream,
+        "%sTmap                    = %p\n",
+        prefix, tmap) ;
+
+    fprintf (stream,
+        "%s  Id                    = %s\n",
+        prefix, tmap->Id) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 void init_print_output (PrintOutput *print_output)
@@ -270,93 +370,67 @@ void print_formatted_print_output_list
     PrintOutput *list
 )
 {
-    unsigned int max_stk_el_id_length = 0 ;
-    unsigned int max_flp_el_id_length = 0 ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, prt_out, list)
-    {
-        switch (prt_out->Type)
-        {
-            case TDICE_OUTPUT_TCELL :
-
-                max_stk_el_id_length =
-                    MAX (max_stk_el_id_length, strlen(prt_out->Pointer.Tcell->Id)) ;
-
-                break ;
-
-            case TDICE_OUTPUT_TFLP :
-
-                max_stk_el_id_length =
-                    MAX (max_stk_el_id_length, strlen(prt_out->Pointer.Tflp->Id)) ;
-
-                break ;
-
-            case TDICE_OUTPUT_TFLPEL :
-
-                max_stk_el_id_length =
-                    MAX (max_stk_el_id_length, strlen(prt_out->Pointer.Tflpel->Id)) ;
-
-                max_flp_el_id_length =
-                    MAX (max_flp_el_id_length, strlen(prt_out->Pointer.Tflpel->FlpId)) ;
-
-                break ;
-
-            case TDICE_OUTPUT_TMAP :
-
-                max_stk_el_id_length =
-                    MAX (max_stk_el_id_length, strlen(prt_out->Pointer.Tmap->Id)) ;
-                break ;
-
-            default :
-                fprintf (stderr, "Undefined print output command type %d\n", prt_out->Type) ;
-                break ;
-        }
-    } //FOR_EVERY_ELEMENT_IN_LIST
-
-    fprintf (stream, "%sprint output list : \n", prefix) ;
-
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, print_output, list)
     {
         switch (print_output->Type)
         {
             case TDICE_OUTPUT_TCELL :
 
-                fprintf (stream,
-                    "%s   Tcell  layer of %-*s xloc %.4f yloc %.4f FileName \"%s\";\n",
-                    prefix, 
-                    max_stk_el_id_length, print_output->Pointer.Tcell->Id, 
-                    print_output->Pointer.Tcell->Xval, print_output->Pointer.Tcell->Yval ,
+                fprintf (stream, "%sT      (%s, %.1f, %.1f, \"%s\", ",
+                    prefix, print_output->Pointer.Tcell->Id,
+                    print_output->Pointer.Tcell->Xval,
+                    print_output->Pointer.Tcell->Yval,
                     print_output->FileName) ;
+
                 break ;
 
             case TDICE_OUTPUT_TFLP :
 
-                fprintf (stream,
-                    "%s   Tflp  die %-*s quantity %d FileName \"%s\";\n",
-                    prefix, 
-                    max_stk_el_id_length, print_output->Pointer.Tflp->Id, 
-                    print_output->Pointer.Tflp->Quantity ,
+                fprintf (stream, "%sTflp   (%s, \"%s\", ",
+                    prefix, print_output->Pointer.Tflp->Id,
                     print_output->FileName) ;
+
+                if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_MAXIMUM)
+
+                    fprintf(stream, "maximum, ");
+
+                else if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_MINIMUM)
+
+                    fprintf(stream, "minimum, ");
+
+                else
+
+                    fprintf(stream, "average, ");
+
                 break ;
 
             case TDICE_OUTPUT_TFLPEL :
 
-                fprintf (stream,
-                    "%s   Tflpel  die %-*s floorplan element %-*s quantity %d FileName \"%s\";\n",
-                    prefix, 
-                    max_stk_el_id_length, print_output->Pointer.Tflpel->Id, 
-                    max_flp_el_id_length, print_output->Pointer.Tflpel->FlpId ,
-                    print_output->Pointer.Tflpel->Quantity ,
+                fprintf (stream, "%sTflpel (%s.%s, \"%s\", ",
+                    prefix, print_output->Pointer.Tflpel->Id,
+                    print_output->Pointer.Tflpel->FlpId,
                     print_output->FileName) ;
+
+                if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MAXIMUM)
+
+                    fprintf(stream, "maximum, ");
+
+                else if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MINIMUM)
+
+                    fprintf(stream, "minimum, ");
+
+                else
+
+                    fprintf(stream, "average, ");
+
                 break ;
 
             case TDICE_OUTPUT_TMAP :
 
-                fprintf (stream,
-                    "%s   Tmap  stack element %-*s FileName \"%s\";\n",
-                    prefix, 
-                    max_stk_el_id_length, print_output->Pointer.Tmap->Id ,
+                fprintf (stream, "%sTmap   (%s, \"%s\", ",
+                    prefix, print_output->Pointer.Tmap->Id,
                     print_output->FileName) ;
+
                 break ;
 
             default :
@@ -364,6 +438,18 @@ void print_formatted_print_output_list
                 fprintf (stderr, "Undefined print output command type %d\n", print_output->Type) ;
                 break ;
         }
+
+        if (print_output->InstanceType == TDICE_OUTPUT_SLOT)
+
+            fprintf(stream, "slot );\n");
+
+        else if (print_output->InstanceType == TDICE_OUTPUT_STEP)
+
+            fprintf(stream, "step );\n");
+
+        else
+
+            fprintf(stream, "final );\n");
 
     } // FOR_EVERY_ELEMENT_IN_LIST
 }
@@ -377,63 +463,110 @@ void print_detailed_print_output_list
     PrintOutput *list
 )
 {
+    char *new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+
+    if (new_prefix == NULL) return ;
+
+    sprintf (new_prefix, "%s    ", prefix) ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, prt_out, list)
     {
         fprintf (stream,
-            "%sprt_out                     = %p\n",
+            "%sprint_output                = %p\n",
             prefix,   prt_out);
 
         fprintf (stream,
-             "%s  Type                      = %d\n",
-             prefix,   prt_out->Type);
+            "%s  FileName                  = %s\n",
+            prefix,   prt_out->FileName);
 
         fprintf (stream,
-             "%s  FileName                  = \"%s\"\n",
-             prefix,   prt_out->FileName);
+            "%s  InstanceType              = %d\n",
+            prefix,   prt_out->InstanceType);
+
+        fprintf (stream,
+            "%s  Type                      = %d\n",
+            prefix,   prt_out->Type);
 
         switch(prt_out->Type)
         {
             case TDICE_OUTPUT_TCELL :
 
                 fprintf (stream,
-                    "%s  Pointer.Tcell               = %p\n",
-                    prefix,   prt_out->Pointer.Tcell); 
+                    "%s  Pointer.Tcell             = %p\n",
+                    prefix,   prt_out->Pointer.Tcell);
+
+                    fprintf (stream, "%s\n", prefix) ;
+
+                    print_detailed_tcell
+
+                        (stream, new_prefix, prt_out->Pointer.Tcell) ;
+
+                    fprintf (stream, "%s\n", prefix) ;
+
                 break ;
 
             case TDICE_OUTPUT_TFLP :
 
                 fprintf (stream,
-                    "%s  Pointer.Tflp                = %p\n",
+                    "%s  Pointer.Tflp              = %p\n",
                     prefix,   prt_out->Pointer.Tflp); 
+
+                    fprintf (stream, "%s\n", prefix) ;
+
+                    print_detailed_tflp
+
+                        (stream, new_prefix, prt_out->Pointer.Tflp) ;
+
+                    fprintf (stream, "%s\n", prefix) ;
+
                 break ;
 
             case TDICE_OUTPUT_TFLPEL :
 
                 fprintf (stream,
-                    "%s  Pointer.Tflpel              = %p\n",
+                    "%s  Pointer.Tflpel            = %p\n",
                     prefix,   prt_out->Pointer.Tflpel); 
+
+                    fprintf (stream, "%s\n", prefix) ;
+
+                    print_detailed_tflpel
+
+                        (stream, new_prefix, prt_out->Pointer.Tflpel) ;
+
+                    fprintf (stream, "%s\n", prefix) ;
+
                 break ;
 
             case TDICE_OUTPUT_TMAP :
 
                 fprintf (stream,
-                    "%s  Pointer.Tmap                = %p\n",
+                    "%s  Pointer.Tmap              = %p\n",
                     prefix,   prt_out->Pointer.Tmap); 
+
+                    fprintf (stream, "%s\n", prefix) ;
+
+                    print_detailed_tmap
+
+                        (stream, new_prefix, prt_out->Pointer.Tmap) ;
+
+                    fprintf (stream, "%s\n", prefix) ;
+
                 break ;
 
             default :
                 fprintf (stream, "Undefined print output command Type %d\n", prt_out->Type) ;
                 break ;
-    }
+        }
 
-    fprintf (stream,
-        "%s  Next                      = %p\n",
-        prefix,   prt_out->Next);
+        fprintf (stream,
+            "%s  Next                      = %p\n",
+            prefix,   prt_out->Next);
 
-    fprintf (stream, "%s\n", prefix) ;
+        fprintf (stream, "%s\n", prefix) ;
 
-  } // FOR_EVERY_ELEMENT_IN_LIST
+    } // FOR_EVERY_ELEMENT_IN_LIST
+
+    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

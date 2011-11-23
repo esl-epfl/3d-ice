@@ -433,7 +433,7 @@ int update_coolant_flow_rate
   CoolantFR_t       new_coolant_fr
 )
 {
-  stkd->Channel->CoolantFR = CONVERT_COOLANT_FLOW_RATE(new_coolant_fr) ;
+  stkd->Channel->CoolantFR = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_coolant_fr) ;
 
   fill_system_matrix_stack_description
 

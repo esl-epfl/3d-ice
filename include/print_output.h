@@ -132,6 +132,19 @@ extern "C"
 
 
 
+    /*! Prints a list of detailed information about all the fields of \a tcell
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param tcell  the address of the Tcell structure to print
+     */
+
+    void print_detailed_tcell
+
+        (FILE *stream, char *prefix, Tcell *tcell) ;
+
+
+
     /*! Aligns the thermal cell to the grid of thermal cells
      *
      *  The function computes the values Tcell:ActualXval, Tcell:ActualYval,
@@ -148,6 +161,8 @@ extern "C"
 
         (Tcell *tcell, double xval, double yval, Dimensions *dimensions) ;
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
     /*! \struct Tflp
@@ -201,6 +216,21 @@ extern "C"
 
     void free_tflp (Tflp *tflp) ;
 
+
+
+    /*! Prints a list of detailed information about all the fields of \a tflp
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param tflp   the address of the Tflp structure to print
+     */
+
+    void print_detailed_tflp
+
+        (FILE *stream, char *prefix, Tflp *tflp) ;
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
     /*! \struct Tflpel
@@ -259,6 +289,21 @@ extern "C"
 
     void free_tflpel (Tflpel *tflpel) ;
 
+
+
+    /*! Prints a list of detailed information about all the fields of \a tflpel
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param tflpel the address of the Tflpel structure to print
+     */
+
+    void print_detailed_tflpel
+
+        (FILE *stream, char *prefix, Tflpel *tflpel) ;
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
     /*! \struct Tmap
@@ -309,6 +354,21 @@ extern "C"
 
     void free_tmap (Tmap *tmap) ;
 
+
+
+    /*! Prints a list of detailed information about all the fields of \a tmap
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param tmap   the address of the Tmap structure to print
+     */
+
+    void print_detailed_tmap
+
+        (FILE *stream, char *prefix, Tmap *tmap) ;
+
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
     /*! \union PrintOutput_p
@@ -337,17 +397,17 @@ extern "C"
 
     struct PrintOutput
     {
-        /*! Type of Output requested */
-
-        OutputType_t Type ;
-
-        /*! The type of output instancing */
-
-        OutputInstanceType_t InstanceType ;
-
         /*! The path of the file used to store the output */
 
         char *FileName ;
+
+        /*! The type of output instance (final, slot, step) */
+
+        OutputInstanceType_t InstanceType ;
+
+        /*! Type of Output requested (cell, flp, flpel, map) */
+
+        OutputType_t Type ;
 
         /*! Pointer to a data structure representing the type of a PrintOutput.
          *  This pointer must be casted depending on the value stored in

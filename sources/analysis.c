@@ -34,6 +34,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "analysis.h"
 #include "macros.h"
@@ -117,20 +118,34 @@ void print_formatted_analysis
         fprintf (stream, "transient step %.2f, slot %.2f ;\n",
             analysis->StepTime, analysis->SlotTime) ;
 
-    fprintf (stream, "\n%sinitial tempreature  %.2f ;\n",
+    fprintf (stream, "%s\n", prefix) ;
+
+    fprintf (stream, "%sinitial temperature  %.2f ;\n",
         prefix, analysis->InitialTemperature) ;
+
+    fprintf (stream, "%s\n", prefix) ;
+
+    fprintf (stream, "%soutput :\n", prefix) ;
+
+    fprintf (stream, "%s\n", prefix) ;
 
     print_formatted_print_output_list
 
         (stream, prefix, analysis->PrintOutputListFinal) ;
 
+    fprintf (stream, "%s\n", prefix) ;
+
     print_formatted_print_output_list
 
         (stream, prefix, analysis->PrintOutputListSlot) ;
 
+    fprintf (stream, "%s\n", prefix) ;
+
     print_formatted_print_output_list
 
         (stream, prefix, analysis->PrintOutputListStep) ;
+
+    fprintf (stream, "%s\n", prefix) ;
 }
 
 /******************************************************************************/
@@ -142,55 +157,86 @@ void print_detailed_analysis
   Analysis *analysis
 )
 {
+    char *new_prefix = malloc (sizeof(char) * (5 + strlen(prefix))) ;
+
+    if (new_prefix == NULL) return ;
+
+    sprintf (new_prefix, "%s    ", prefix) ;
+
     fprintf (stream,
-        "%sAnalysis                    = %p\n",
+        "%sAnalysis                        = %p\n",
         prefix, analysis) ;
 
     fprintf (stream,
-        "%s  AnalysisType              = %d\n",
+        "%s  AnalysisType                  = %d\n",
         prefix, analysis->AnalysisType) ;
 
     fprintf (stream,
-        "%s  StepTime                  = %.2f\n",
+        "%s  StepTime                      = %.2f\n",
         prefix, analysis->StepTime) ;
 
     fprintf (stream,
-        "%s  SlotTime                  = %.2f\n",
+        "%s  SlotTime                      = %.2f\n",
         prefix, analysis->SlotTime) ;
 
     fprintf (stream,
-        "%s  InitialTemperature        = %.2f\n",
+        "%s  SlotLength                    = %d\n",
+        prefix, analysis->SlotLength) ;
+
+    fprintf (stream,
+        "%s  CurrentTime                   = %d\n",
+        prefix, analysis->CurrentTime) ;
+
+    fprintf (stream,
+        "%s  InitialTemperature            = %.2f\n",
         prefix, analysis->InitialTemperature) ;
 
     fprintf (stream,
-        "%s  PrintOutputListFinal      = %pf\n",
+        "%s  PrintOutputListFinal          = %p\n",
         prefix, analysis->PrintOutputListFinal) ;
 
     if (analysis->PrintOutputListFinal != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
 
         print_detailed_print_output_list
 
-            (stream, prefix, analysis->PrintOutputListFinal) ;
+            (stream, new_prefix, analysis->PrintOutputListFinal) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
     fprintf (stream,
-        "%s  PrintOutputListSlot       = %pf\n",
+        "%s  PrintOutputListSlot           = %p\n",
         prefix, analysis->PrintOutputListSlot) ;
 
     if (analysis->PrintOutputListSlot != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
 
         print_detailed_print_output_list
 
-            (stream, prefix, analysis->PrintOutputListSlot) ;
+            (stream, new_prefix, analysis->PrintOutputListSlot) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
 
     fprintf (stream,
-        "%s  PrintOutputListStep       = %pf\n",
+        "%s  PrintOutputListStep           = %p\n",
         prefix, analysis->PrintOutputListStep) ;
 
     if (analysis->PrintOutputListStep != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
 
         print_detailed_print_output_list
 
-            (stream, prefix, analysis->PrintOutputListStep) ;
+            (stream, new_prefix, analysis->PrintOutputListStep) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

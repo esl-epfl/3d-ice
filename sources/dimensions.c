@@ -303,6 +303,8 @@ void compute_number_of_connections
                 // Number of coefficients East <-> West
                 0
                 ;
+
+            break ;
         }
         default :
 

@@ -154,12 +154,12 @@ void print_detailed_material
              prefix, material->Used) ;
 
     fprintf (stream,
-             "%s  ThermalConductivity       = %.4e\n",
-             prefix, material->ThermalConductivity) ;
-
-    fprintf (stream,
              "%s  VolumetricHeatCapacity    = %.4e\n",
              prefix, material->VolumetricHeatCapacity) ;
+
+    fprintf (stream,
+             "%s  ThermalConductivity       = %.4e\n",
+             prefix, material->ThermalConductivity) ;
 
     fprintf (stream,
              "%s  Next                      = %p\n",

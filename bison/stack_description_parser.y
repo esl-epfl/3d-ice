@@ -341,7 +341,7 @@ microchannel
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_4RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_4RM ;
         stkd->Channel->Height            = $5 ;
-        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE ($24) ;
+        stkd->Channel->CoolantFR         = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($24) ;
         stkd->Channel->Coolant.HTCSide   = $26.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $26.HTCTop ;
         stkd->Channel->Coolant.HTCBottom = $26.HTCBottom ;
@@ -393,7 +393,7 @@ microchannel
         stkd->Channel->Length            = $9 ;
         stkd->Channel->Pitch             = $13 + $9 ;
         stkd->Channel->Porosity          = stkd->Channel->Length / stkd->Channel->Pitch ;
-        stkd->Channel->CoolantFR         = CONVERT_COOLANT_FLOW_RATE ($22) ;
+        stkd->Channel->CoolantFR         = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($22) ;
         stkd->Channel->Coolant.HTCSide   = $24.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $24.HTCTop ;
         stkd->Channel->Coolant.HTCBottom = $24.HTCBottom ;
@@ -439,7 +439,8 @@ microchannel
         }
 
         stkd->Channel->Height            = $4 ;
-        stkd->Channel->Porosity          = 1.0 - (PI * $8 * $8 / 4.0) / ($12 * $12) ;
+        stkd->Channel->Porosity          = POROSITY ($8, $12) ;
+        stkd->Channel->Pitch             = $12 ;
         stkd->Channel->ChannelModel      = $16 ;
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_2RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_2RM ;

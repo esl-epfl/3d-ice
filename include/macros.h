@@ -316,7 +316,14 @@ extern "C"
   * "FlowRate[um3/sec]" = ( "FlowRate[ml/min]" * 1e+12 ) / 60.0
   */
 
-# define CONVERT_COOLANT_FLOW_RATE(fr) (( fr * 1e+12 ) / 60.0)
+# define FLOW_RATE_FROM_MLMIN_TO_UM3SEC(fr) (( fr * 1e+12 ) / 60.0)
+
+# define FLOW_RATE_FROM_UM3SEC_TO_MLMIN(fr) (( fr * 60.0 ) / 1e+12)
+
+
+# define POROSITY(diameter, pitch) (1.0 - (PI * diameter * diameter / 4.0) / (pitch * pitch))
+
+#define DIAMETER(porosity, pitch) (sqrt (abs(( (porosity - 1.0) * pitch*pitch * 4.0 ) / PI )))
 
 /******************************************************************************/
 

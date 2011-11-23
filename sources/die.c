@@ -190,15 +190,15 @@ void print_detailed_die (FILE  *stream, char *prefix, Die *die)
         "%s  BottomLayer               = %p\n",
         prefix, die->BottomLayer) ;
 
-    fprintf (stream,
-        "%s  Next                      = %p\n",
-        prefix, die->Next) ;
-
     fprintf (stream, "%s\n", prefix) ;
 
     print_detailed_layers_list (stream, new_prefix, die->BottomLayer) ;
 
     fprintf (stream, "%s\n", prefix) ;
+
+    fprintf (stream,
+        "%s  Next                      = %p\n",
+        prefix, die->Next) ;
 
     FREE_POINTER (free, new_prefix) ;
 }

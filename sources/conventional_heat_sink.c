@@ -101,7 +101,7 @@ void print_detailed_conventional_heat_sink
 )
 {
     fprintf (stream,
-        "%sconventional_heat_sink        = %p\n",
+        "%sconventional_heat_sink      = %p\n",
         prefix,   conventional_heat_sink) ;
 
     fprintf (stream,

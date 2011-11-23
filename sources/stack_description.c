@@ -133,13 +133,16 @@ void print_formatted_stack_description
   }
 
   print_formatted_dies_list (stream, prefix, stkd->DiesList) ;
-  fprintf (stream, "%s\n", prefix) ;
 
-  print_formatted_stack_elements_list (stream, prefix,
-                                       stkd->TopStackElement) ;
   fprintf (stream, "%s\n", prefix) ;
 
   print_formatted_dimensions (stream, prefix, stkd->Dimensions) ;
+
+  fprintf (stream, "%s\n", prefix) ;
+
+  print_formatted_stack_elements_list (stream, prefix, stkd->TopStackElement) ;
+
+  fprintf (stream, "%s\n", prefix) ;
 }
 
 /******************************************************************************/
@@ -158,7 +161,7 @@ void print_detailed_stack_description
     sprintf (new_prefix, "%s    ", prefix) ;
 
     fprintf (stream,
-             "%sstkd                            = %p\n",
+             "%sStackDescription                = %p\n",
              prefix, stkd) ;
 
     fprintf (stream,
@@ -172,7 +175,11 @@ void print_detailed_stack_description
     if (stkd->MaterialsList != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
-        print_detailed_materials_list (stream, new_prefix, stkd->MaterialsList) ;
+
+        print_detailed_materials_list
+
+            (stream, new_prefix, stkd->MaterialsList) ;
+
         fprintf (stream, "%s\n", prefix) ;
     }
 
@@ -183,8 +190,11 @@ void print_detailed_stack_description
     if (stkd->ConventionalHeatSink != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
-        print_detailed_conventional_heat_sink (stream, new_prefix,
-                                           stkd->ConventionalHeatSink) ;
+
+        print_detailed_conventional_heat_sink
+
+            (stream, new_prefix, stkd->ConventionalHeatSink) ;
+
         fprintf (stream, "%s\n", prefix) ;
     }
 
@@ -206,7 +216,11 @@ void print_detailed_stack_description
     if (stkd->DiesList != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
-        print_detailed_dies_list (stream, new_prefix, stkd->DiesList) ;
+
+        print_detailed_dies_list
+
+            (stream, new_prefix, stkd->DiesList) ;
+
         fprintf (stream, "%s\n", prefix) ;
     }
 
@@ -221,7 +235,11 @@ void print_detailed_stack_description
     if (stkd->TopStackElement != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
-        print_detailed_stack_elements_list (stream, new_prefix, stkd->TopStackElement) ;
+
+        print_detailed_stack_elements_list
+
+            (stream, new_prefix, stkd->TopStackElement) ;
+
         fprintf (stream, "%s\n", prefix) ;
     }
 
@@ -232,13 +250,13 @@ void print_detailed_stack_description
     if (stkd->Dimensions != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
-        print_detailed_dimensions (stream, new_prefix, stkd->Dimensions) ;
+
+        print_detailed_dimensions
+
+            (stream, new_prefix, stkd->Dimensions) ;
+
         fprintf (stream, "%s\n", prefix) ;
     }
-
-    fprintf (stream,
-             "%s  Dimensions                    = %p\n",
-             prefix, stkd->Dimensions) ;
 
     FREE_POINTER (free, new_prefix) ;
 }

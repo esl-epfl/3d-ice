@@ -52,8 +52,8 @@ init_stack_element (StackElement *stack_element)
     stack_element->Id              = NULL ;
     stack_element->NLayers         = 0u ;
     stack_element->Offset          = 0u ;
-    stack_element->Prev            = NULL ;
     stack_element->Next            = NULL ;
+    stack_element->Prev            = NULL ;
 }
 
 /******************************************************************************/
@@ -146,7 +146,7 @@ void print_formatted_stack_elements_list
             case TDICE_STACK_ELEMENT_DIE :
 
                 fprintf (stream,
-                    "%s   die      %-*s %-*s floorplan \"%s\"\n",
+                    "%s   die      %-*s %-*s floorplan \"%s\" ;\n",
                     prefix,
                     max_stk_el_id_length, stack_element->Id,
                     max_die_id_length, stack_element->Pointer.Die->Id,
@@ -156,13 +156,16 @@ void print_formatted_stack_elements_list
             case TDICE_STACK_ELEMENT_LAYER :
 
                 fprintf (stream,
-                    "%s   layer    %-*s ;\n",
+                    "%s   layer    %-*s ",
                     prefix, max_stk_el_id_length, stack_element->Id) ;
+
+                print_formatted_layer (stream, "", stack_element->Pointer.Layer) ;
+
                 break ;
 
             case TDICE_STACK_ELEMENT_NONE :
 
-                fprintf (stderr, "Warining: found stack element type none\n") ;
+                fprintf (stderr, "Warning: found stack element type none\n") ;
                 break ;
 
             default :
@@ -239,12 +242,12 @@ void print_detailed_stack_elements_list
             prefix,   stk_el->Offset);
 
         fprintf (stream,
-            "%s  Prev                      = %p\n",
-            prefix,   stk_el->Prev);
-
-        fprintf (stream,
             "%s  Next                      = %p\n",
             prefix,   stk_el->Next);
+
+        fprintf (stream,
+            "%s  Prev                      = %p\n",
+            prefix,   stk_el->Prev);
 
         fprintf (stream, "%s\n", prefix) ;
 
