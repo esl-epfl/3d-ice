@@ -77,7 +77,6 @@
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \
                   $(3DICE_SOURCES)/system_matrix.c            \
-                  $(3DICE_SOURCES)/temperatures_queue.c       \
                   $(3DICE_SOURCES)/thermal_cell.c             \
                   $(3DICE_SOURCES)/thermal_data.c
 
