@@ -433,6 +433,24 @@ extern "C"
 
 
 
+    /*! Generates the output implemented by the inspection point
+     *
+     * \param inspection_point the address of the InspectionPoint structure
+     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param temperatures pointer to the first element of the temparature array
+     * \param current_time time instant of the measurement
+     *
+     * \return FIXME
+     */
+
+    Error_t generate_inspection_point_output
+    (
+        InspectionPoint *inspection_point,
+        Dimensions      *dimensions,
+        double          *temperatures,
+        double           current_time
+    ) ;
+
     /*! Tells if there is at least one Tmap instruction in the \a list
      *
      *  \param list pointer to the first (list)) stack element the stack

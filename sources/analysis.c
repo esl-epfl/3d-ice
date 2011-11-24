@@ -301,3 +301,42 @@ Error_t generate_analysis_headers (Analysis* analysis)
 }
 
 /******************************************************************************/
+
+Error_t generate_analysis_output
+(
+    Analysis             *analysis,
+    Dimensions           *dimensions,
+    double               *temperatures,
+    OutputInstanceType_t  output_instance
+)
+{
+    double current_time = get_simulated_time (analysis) ;
+
+    InspectionPoint *list ;
+
+    if (output_instance == TDICE_OUTPUT_FINAL)
+
+        list = analysis->InspectionPointListFinal ;
+
+    else if (output_instance == TDICE_OUTPUT_STEP)
+
+        list = analysis->InspectionPointListStep ;
+
+    else if (output_instance == TDICE_OUTPUT_FINAL)
+
+        list = analysis->InspectionPointListSlot ;
+
+    else
+
+        return EXIT_FAILURE ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, ipoint, list)
+
+        if (generate_inspection_point_output (ipoint, dimensions, temperatures, current_time) != TDICE_SUCCESS)
+
+            return TDICE_FAILURE ;
+
+   return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/

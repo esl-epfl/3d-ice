@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "inspection_point.h"
+#include "floorplan.h"
 #include "macros.h"
 
 /******************************************************************************/
@@ -627,6 +628,130 @@ Error_t generate_inspection_point_header (InspectionPoint *inspection_point)
     return TDICE_SUCCESS ;
 
 header_error :
+
+    fclose (output_stream) ;
+
+    return TDICE_FAILURE ;
+}
+
+/******************************************************************************/
+
+Error_t generate_inspection_point_output
+(
+    InspectionPoint *inspection_point,
+    Dimensions      *dimensions,
+    double          *temperatures,
+    double           current_time
+)
+{
+    uint32_t cell_index ;
+    double   temperature ;
+
+    FILE *output_stream = fopen (inspection_point->FileName, "a") ;
+
+    if (output_stream == NULL)
+    {
+        fprintf (stderr,
+            "Inspection Point: Cannot open output file %s\n",
+            inspection_point->FileName);
+
+        return TDICE_FAILURE ;
+    }
+
+    switch (inspection_point->Type)
+    {
+        case TDICE_OUTPUT_TCELL :
+
+            cell_index = get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(inspection_point->StackElement),
+                 inspection_point->Pointer.Tcell->RowIndex,
+                 inspection_point->Pointer.Tcell->ColumnIndex) ;
+
+            fprintf (output_stream,
+                "%5.3f \t %7.3f\n", current_time, *(temperatures + cell_index)) ;
+
+            break ;
+
+        case TDICE_OUTPUT_TFLP :
+
+            fprintf (output_stream, "%5.3f \t ", current_time) ;
+
+            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MAXIMUM)
+
+                print_all_max_temperatures_floorplan
+
+                    (inspection_point->StackElement->Floorplan,
+                     dimensions, temperatures, output_stream) ;
+
+            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MINIMUM)
+
+                print_all_min_temperatures_floorplan
+
+                    (inspection_point->StackElement->Floorplan,
+                     dimensions, temperatures, output_stream) ;
+
+            else
+
+                print_all_avg_temperatures_floorplan
+
+                    (inspection_point->StackElement->Floorplan,
+                     dimensions, temperatures, output_stream) ;
+
+            fprintf (output_stream, "\n") ;
+
+            break ;
+
+        case TDICE_OUTPUT_TFLPEL :
+
+            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MAXIMUM)
+
+                get_max_temperature_floorplan_element
+
+                    (inspection_point->Pointer.Tflpel->FloorplanElement,
+                     dimensions, temperatures, &temperature) ;
+
+            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MINIMUM)
+
+                get_min_temperature_floorplan_element
+
+                    (inspection_point->Pointer.Tflpel->FloorplanElement,
+                     dimensions, temperatures, &temperature) ;
+
+            else
+
+                get_avg_temperature_floorplan_element
+
+                    (inspection_point->Pointer.Tflpel->FloorplanElement,
+                     dimensions, temperatures, &temperature) ;
+
+            fprintf (output_stream,
+                "%5.3f \t %7.3f\n", current_time, temperature) ;
+
+            break ;
+
+        case TDICE_OUTPUT_TMAP :
+
+            print_thermal_map_stack_element
+
+                (inspection_point->StackElement, dimensions,
+                 temperatures, output_stream) ;
+
+            break ;
+
+        default :
+
+            fprintf (stderr, "Error reading inspection point instruction\n") ;
+
+            goto output_error ;
+    }
+
+    fclose (output_stream) ;
+
+    return TDICE_SUCCESS ;
+
+output_error :
 
     fclose (output_stream) ;
 

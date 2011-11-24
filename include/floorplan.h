@@ -207,6 +207,14 @@ extern "C"
         double     *max_temperature
     ) ;
 
+    void print_all_max_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        FILE       *stream
+    ) ;
+
     int get_all_min_temperatures_floorplan
     (
         Floorplan  *floorplan,
@@ -215,12 +223,28 @@ extern "C"
         double     *min_temperature
     ) ;
 
+    void print_all_min_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        FILE       *stream
+    ) ;
+
     int get_all_avg_temperatures_floorplan
     (
         Floorplan  *floorplan,
         Dimensions *dimensions,
         double     *temperatures,
         double     *avg_temperature
+    ) ;
+
+    void print_all_avg_temperatures_floorplan
+    (
+        Floorplan  *floorplan,
+        Dimensions *dimensions,
+        double     *temperatures,
+        FILE       *stream
     ) ;
 
     int get_all_min_avg_max_temperatures_floorplan

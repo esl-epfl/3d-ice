@@ -49,6 +49,7 @@ extern "C"
 
 #include "types.h"
 
+#include "dimensions.h"
 #include "inspection_point.h"
 
 /******************************************************************************/
@@ -208,6 +209,26 @@ extern "C"
 
     Error_t generate_analysis_headers (Analysis* analysis) ;
 
+
+
+    /*! Generates thermal outputs for each inspection point
+     *
+     * \param analysis pointer to the analysis structure
+     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param temperatures pointer to the first element of the temparature array
+     * \param output_instance the type of output (slot, step, final)
+     *
+     * \return \c TDICE_SUCCESS if the operation terminates with success
+     * \return \c TDICE_FAILURE if one of the output cannot be generated
+     */
+
+    Error_t generate_analysis_output
+    (
+        Analysis             *analysis,
+        Dimensions           *dimensions,
+        double               *temperatures,
+        OutputInstanceType_t  output_instance
+    ) ;
 
 /******************************************************************************/
 

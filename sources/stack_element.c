@@ -258,6 +258,23 @@ void print_detailed_stack_elements_list
 
 /******************************************************************************/
 
+uint32_t get_source_layer_offset (StackElement *stack_element)
+{
+    uint32_t layer_offset = stack_element->Offset ;
+
+    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+
+        layer_offset += stack_element->Pointer.Die->SourceLayerOffset ;
+
+    else if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
+
+        layer_offset += stack_element->Pointer.Channel->SourceLayerOffset ;
+
+    return layer_offset ;
+}
+
+/******************************************************************************/
+
 void fill_thermal_cell_stack_element
 (
     ThermalCell  *thermal_cells,
@@ -406,6 +423,31 @@ SystemMatrix fill_system_matrix_stack_element
     } /* stk_el->Type */
 
     return system_matrix ;
+}
+
+/******************************************************************************/
+
+void print_thermal_map_stack_element
+(
+    StackElement *stack_element,
+    Dimensions   *dimensions,
+    double       *temperatures,
+    FILE         *stream
+)
+{
+    temperatures += get_cell_offset_in_stack
+
+        (dimensions, get_source_layer_offset (stack_element), 0, 0) ;
+
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+        FOR_EVERY_COLUMN (column_index, dimensions)
+        {
+            fprintf (stream, "%7.3f  ", *temperatures++) ;
+        }
+
+        fprintf (stream, "\n") ;
+    }
 }
 
 /******************************************************************************/

@@ -299,6 +299,28 @@ int get_all_max_temperatures_floorplan
 
 /******************************************************************************/
 
+void print_all_max_temperatures_floorplan
+(
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    FILE       *stream
+)
+{
+    double temperature ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    {
+        get_max_temperature_floorplan_element
+
+            (flp_el, dimensions, temperatures, &temperature) ;
+
+        fprintf (stream, "%7.3f ", temperature) ;
+    }
+}
+
+/******************************************************************************/
+
 int get_all_min_temperatures_floorplan
 (
     Floorplan  *floorplan,
@@ -318,6 +340,28 @@ int get_all_min_temperatures_floorplan
 
 /******************************************************************************/
 
+void print_all_min_temperatures_floorplan
+(
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    FILE       *stream
+)
+{
+    double temperature ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    {
+        get_min_temperature_floorplan_element
+
+            (flp_el, dimensions, temperatures, &temperature) ;
+
+        fprintf (stream, "%7.3f ", temperature) ;
+    }
+}
+
+/******************************************************************************/
+
 int get_all_avg_temperatures_floorplan
 (
     Floorplan  *floorplan,
@@ -333,6 +377,28 @@ int get_all_avg_temperatures_floorplan
             (flp_el, dimensions, temperatures, avg_temperature++) ;
 
     return 0 ;
+}
+
+/******************************************************************************/
+
+void print_all_avg_temperatures_floorplan
+(
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    FILE       *stream
+)
+{
+    double temperature ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    {
+        get_avg_temperature_floorplan_element
+
+            (flp_el, dimensions, temperatures, &temperature) ;
+
+        fprintf (stream, "%7.3f ", temperature) ;
+    }
 }
 
 /******************************************************************************/

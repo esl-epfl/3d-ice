@@ -222,6 +222,15 @@ extern "C"
 
 
 
+    /*! Returns the offset of the source layer of the stack element within the stack
+     *
+     *  \param stack_element pointer to the stack element
+     *
+     *  \return the offset (\# layers) of the source layer within the stack
+     */
+
+    uint32_t get_source_layer_offset (StackElement *stack_element) ;
+
     /*! Fill the thermal cells corresponding to a stack element
      *
      *  \param thermal_cells pointer to the first thermal cell in the 3d grid
@@ -277,6 +286,24 @@ extern "C"
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
         StackElement *stack_element
+    ) ;
+
+
+
+    /*! Prints a matrix of temperatures as the thermal map of the stack element
+     *
+     * \param stack_element pointer to the stack element to print
+     * \param dimensions    pointer to the structure storing the dimensions
+     * \param temperatures  pointer to the first element of the temparature array
+     * \param stream        the reference to the (already opened) stream
+     */
+
+    void print_thermal_map_stack_element
+    (
+        StackElement *stack_element,
+        Dimensions   *dimensions,
+        double       *temperatures,
+        FILE         *stream
     ) ;
 
 /******************************************************************************/
