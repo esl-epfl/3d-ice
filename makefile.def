@@ -70,11 +70,10 @@
                   $(3DICE_SOURCES)/dimensions.c               \
                   $(3DICE_SOURCES)/floorplan_element.c        \
                   $(3DICE_SOURCES)/floorplan.c                \
+                  $(3DICE_SOURCES)/inspection_point.c         \
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/material.c                 \
-                  $(3DICE_SOURCES)/messages_queue.c           \
                   $(3DICE_SOURCES)/powers_queue.c             \
-                  $(3DICE_SOURCES)/print_output.c             \
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \
                   $(3DICE_SOURCES)/system_matrix.c            \
