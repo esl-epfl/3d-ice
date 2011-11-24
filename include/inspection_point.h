@@ -50,6 +50,7 @@ extern "C"
 #include "types.h"
 
 #include "dimensions.h"
+#include "floorplan_element.h"
 #include "stack_element.h"
 
 /******************************************************************************/
@@ -61,10 +62,6 @@ extern "C"
 
     struct Tcell 
     {
-        /*! The Stack Element Id (could be a layer, a die or a channel) */
-
-        char *Id ;
-
         /*! X coordinate of the thermal cell as specified in the stack file */
 
         double Xval ;
@@ -80,10 +77,6 @@ extern "C"
         /*! Actual nearest Y coordnate of the thermal cell */
 
         double ActualYval ;
-
-        /*! Layer Index of the thermal cell */
-
-        uint32_t LayerIndex ;
 
         /*! Row Index of the thermal cell */
 
@@ -172,9 +165,6 @@ extern "C"
 
     struct Tflp 
     {
-        /*! The Stack Element Id (it must be a die) */
-        char *Id ;
-
         /*! The kind of quantity to be measured */
 
         OutputQuantity_t Quantity ;
@@ -240,13 +230,9 @@ extern "C"
 
     struct Tflpel 
     {
-        /*! The Stack Element Id (must be a die) */
+        /*! Pointer to the Floorplan Element */
 
-        char *Id ;
-
-        /*! The Floorplan Element Id (must exist in the flp file) */
-
-        char *FlpId ;
+        FloorplanElement *FloorplanElement ;
 
         /*! The kind of quantity to be measured */
 
@@ -306,71 +292,6 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \struct Tmap
-     *
-     * \brief Thermal map of a Stack Element
-     */
-
-    struct Tmap 
-    {
-        /*! The Stack Element Id (could be a layer, a die or a channel) */
-
-        char *Id ;
-    } ;
-
-    /*! Definition of the type Tmap */
-
-    typedef struct Tmap Tmap ;
-
-
-
-    /*! Sets all the fields of \a tmap to a default value (zero or \c NULL ).
-     *
-     * \param tmap the address of the tmap to initialize
-     */
-
-    void init_tmap (Tmap *tmap) ;
-
-
-
-    /*! Allocates a Tmap in memory and sets its fields to their default
-     *  value with #init_tmap
-     *
-     * \return the pointer to a new TFlp
-     * \return \c NULL if the memory allocation fails
-     */
-
-    Tmap *alloc_and_init_tmap (void) ;
-
-
-
-    /*! Frees the memory related to \a tmap
-     *
-     * The parametrer \a tmap must be a pointer previously obtained with
-     * #alloc_and_init_tmap
-     *
-     * \param tmap the address of the Tmap structure to free
-     */
-
-    void free_tmap (Tmap *tmap) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of \a tmap
-     *
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param tmap   the address of the Tmap structure to print
-     */
-
-    void print_detailed_tmap
-
-        (FILE *stream, char *prefix, Tmap *tmap) ;
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-
     /*! \union InspectionPoint_p
      *
      *  \brief A union of pointers to types that can be an instance of InspectionPoint
@@ -381,7 +302,6 @@ extern "C"
         Tcell  *Tcell ;   /*!< Pointer to a Tcell */
         Tflp   *Tflp ;    /*!< Pointer to a Tflp */
         Tflpel *Tflpel ;  /*!< Pointer to a Tflpel */
-        Tmap   *Tmap ;    /*!< Pointer to a Tmap */
     } ;
 
     /*! Definition of the type InspectionPoint_p */
@@ -414,6 +334,11 @@ extern "C"
          *  InspectionPoint::Type */
 
         InspectionPoint_p Pointer ;
+
+        /*! Pointer to the StackElement that will be used to print the outputs.
+         *  The inspection point will be applied to this stack element */
+
+        StackElement *StackElement ;
 
         /*! To collect inspection points in a linked list */
 
@@ -500,14 +425,11 @@ extern "C"
     /*! Generates the file in which a particular inspection point will be printed
      *
      *  \param inspection_point the address of the InspectionPoint structure
-     *  \param list pointer to the first (as a list) stack element the stack
      *
      *  \return FIXME
      */
 
-    // FIXME: can we remove the list ?
-
-    Error_t generate_inspection_point_header (InspectionPoint *inspection_point, StackElement *list) ;
+    Error_t generate_inspection_point_header (InspectionPoint *inspection_point) ;
 
 
 

@@ -269,23 +269,23 @@ void add_inspection_point_to_analysis
 
 /******************************************************************************/
 
-Error_t generate_analysis_headers (Analysis* analysis, StackElement *list)
+Error_t generate_analysis_headers (Analysis* analysis)
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, final, analysis->InspectionPointListFinal)
 
-        if (generate_inspection_point_header (final, list) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (final) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, slot, analysis->InspectionPointListSlot)
 
-        if (generate_inspection_point_header (slot, list) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (slot) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, step, analysis->InspectionPointListStep)
 
-        if (generate_inspection_point_header (step, list) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (step) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 

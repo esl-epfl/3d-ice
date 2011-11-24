@@ -50,7 +50,6 @@ extern "C"
 #include "types.h"
 
 #include "inspection_point.h"
-#include "stack_element.h"
 
 /******************************************************************************/
 
@@ -202,13 +201,12 @@ extern "C"
      * If the target output file is already there, it will be overwritten.
      *
      * \param analysis pointer to the analysis structure
-     * \param list FIXME can we remove it ?????
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
      * \return \c TDICE_FAILURE if one of the files can not be created
      */
 
-    Error_t generate_analysis_headers (Analysis* analysis, StackElement *list) ;
+    Error_t generate_analysis_headers (Analysis* analysis) ;
 
 
 /******************************************************************************/

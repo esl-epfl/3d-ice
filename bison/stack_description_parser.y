@@ -1210,21 +1210,7 @@ inspection_point
             YYABORT ;
         }
 
-        tcell->Id = $3 ;
-
         align_tcell (tcell, $5, $7, stkd->Dimensions) ;
-
-        tcell->LayerIndex = stack_element->Offset ;
-
-        // FIXME this must be a function in StackElement
-
-        if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
-
-            tcell->LayerIndex += stack_element->Pointer.Die->SourceLayerOffset ;
-
-        else if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
-
-            tcell->LayerIndex += stack_element->Pointer.Channel->SourceLayerOffset ;
 
         InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
@@ -1244,6 +1230,9 @@ inspection_point
         inspection_point->InstanceType  = $10 ;
         inspection_point->FileName      = $9 ;
         inspection_point->Pointer.Tcell = tcell ;
+        inspection_point->StackElement  = stack_element ;
+
+        FREE_POINTER (free, $3) ;
      }
 
   |  TFLP  '(' IDENTIFIER ',' PATH ',' maxminavg when ')'  ';'
@@ -1294,7 +1283,6 @@ inspection_point
             YYABORT ;
         }
 
-        tflp->Id       = $3 ;
         tflp->Quantity = $7 ;
 
         InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
@@ -1315,6 +1303,9 @@ inspection_point
         inspection_point->InstanceType = $8 ;
         inspection_point->FileName     = $5 ;
         inspection_point->Pointer.Tflp = tflp ;
+        inspection_point->StackElement = stack_element ;
+
+        FREE_POINTER (free, $3) ;
      }
 
   |  TFLPEL '(' IDENTIFIER '.' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
@@ -1386,9 +1377,8 @@ inspection_point
             YYABORT ;
         }
 
-        tflpel->Id       = $3 ;
-        tflpel->FlpId    = $5 ;
-        tflpel->Quantity = $9 ;
+        tflpel->FloorplanElement = floorplan_element ;
+        tflpel->Quantity         = $9 ;
 
         InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
@@ -1409,6 +1399,10 @@ inspection_point
         inspection_point->InstanceType   = $10 ;
         inspection_point->FileName       = $7 ;
         inspection_point->Pointer.Tflpel = tflpel ;
+        inspection_point->StackElement   = stack_element ;
+
+        FREE_POINTER (free, $3) ;
+        FREE_POINTER (free, $5) ;
      }
 
   |  TMAP '(' IDENTIFIER ',' PATH when ')' ';'
@@ -1434,28 +1428,12 @@ inspection_point
             YYABORT ;
         }
 
-        Tmap *tmap = alloc_and_init_tmap () ;
-
-        if (tmap == NULL)
-        {
-            FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $5) ;
-
-            stack_description_error (stkd, analysis, scanner, "Malloc tmap failed") ;
-
-            YYABORT ;
-        }
-
-        tmap->Id = $3 ;
-
         InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
-
-            FREE_POINTER (free_tmap, tmap) ;
 
             stack_description_error (stkd, analysis, scanner, "Malloc inspection point out command failed") ;
 
@@ -1465,7 +1443,9 @@ inspection_point
         inspection_point->Type         = TDICE_OUTPUT_TMAP ;
         inspection_point->InstanceType = $6 ;
         inspection_point->FileName     = $5 ;
-        inspection_point->Pointer.Tmap = tmap ;
+        inspection_point->StackElement = stack_element ;
+
+        FREE_POINTER (free, $3) ;
      }
 
   ;
