@@ -323,7 +323,7 @@ extern "C"
 
 # define POROSITY(diameter, pitch) (1.0 - (PI * diameter * diameter / 4.0) / (pitch * pitch))
 
-#define DIAMETER(porosity, pitch) (sqrt (abs(( (porosity - 1.0) * pitch*pitch * 4.0 ) / PI )))
+#define DIAMETER(porosity, pitch) (sqrt (( (1.0 - porosity) * pitch*pitch * 4.0 ) / PI ))
 
 /******************************************************************************/
 
