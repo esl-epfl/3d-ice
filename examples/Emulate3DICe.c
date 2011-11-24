@@ -71,7 +71,7 @@ main(int argc, char** argv)
   // Generate output files
   ////////////////////////////////////////////////////////////////////////////
 
-  if (initialize_print_output_instructions (&analysis, stkd.BottomStackElement) != TDICE_SUCCESS)
+  if (generate_analysis_headers (&analysis, stkd.BottomStackElement) != TDICE_SUCCESS)
   {
     fprintf(stderr, "error in initializing output files \n ");
     free_stack_description (&stkd) ;

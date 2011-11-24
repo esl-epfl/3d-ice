@@ -36,7 +36,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "print_output.h"
+#include "inspection_point.h"
 #include "macros.h"
 
 /******************************************************************************/
@@ -301,100 +301,100 @@ void print_detailed_tmap (FILE  *stream, char *prefix, Tmap *tmap)
 /******************************************************************************/
 /******************************************************************************/
 
-void init_print_output (PrintOutput *print_output)
+void init_inspection_point (InspectionPoint *inspection_point)
 {
-    print_output->Type           = OUTPUTTYPE_I ;
-    print_output->InstanceType   = OUTPUTINSTANCETYPE_I ;
-    print_output->FileName       = NULL ;
-    print_output->Pointer.Tcell  = NULL ;
-    print_output->Pointer.Tflp   = NULL ;
-    print_output->Pointer.Tflpel = NULL ;
-    print_output->Pointer.Tmap   = NULL ;
-    print_output->Next           = NULL ;
+    inspection_point->Type           = OUTPUTTYPE_I ;
+    inspection_point->InstanceType   = OUTPUTINSTANCETYPE_I ;
+    inspection_point->FileName       = NULL ;
+    inspection_point->Pointer.Tcell  = NULL ;
+    inspection_point->Pointer.Tflp   = NULL ;
+    inspection_point->Pointer.Tflpel = NULL ;
+    inspection_point->Pointer.Tmap   = NULL ;
+    inspection_point->Next           = NULL ;
 }
 
 /******************************************************************************/
 
-PrintOutput *alloc_and_init_print_output (void)
+InspectionPoint *alloc_and_init_inspection_point (void)
 {
-    PrintOutput *print_output = (PrintOutput *) malloc (sizeof(PrintOutput)) ;
+    InspectionPoint *inspection_point = (InspectionPoint *) malloc (sizeof(InspectionPoint)) ;
 
-    if (print_output != NULL)
+    if (inspection_point != NULL)
 
-        init_print_output(print_output) ;
+        init_inspection_point(inspection_point) ;
 
-    return print_output ;
+    return inspection_point ;
 }
 
 /******************************************************************************/
 
-void free_print_output (PrintOutput *print_output)
+void free_inspection_point (InspectionPoint *inspection_point)
 {
-    if (   print_output->Type == TDICE_OUTPUT_TCELL
-        && print_output->Pointer.Tcell != NULL)
+    if (   inspection_point->Type == TDICE_OUTPUT_TCELL
+        && inspection_point->Pointer.Tcell != NULL)
 
-        FREE_POINTER (free_tcell, print_output->Pointer.Tcell) ;
+        FREE_POINTER (free_tcell, inspection_point->Pointer.Tcell) ;
 
-    else if (   print_output->Type == TDICE_OUTPUT_TFLP
-             && print_output->Pointer.Tflp != NULL)
+    else if (   inspection_point->Type == TDICE_OUTPUT_TFLP
+             && inspection_point->Pointer.Tflp != NULL)
 
-        FREE_POINTER (free_tflp, print_output->Pointer.Tflp) ;
+        FREE_POINTER (free_tflp, inspection_point->Pointer.Tflp) ;
 
-    else if (   print_output->Type == TDICE_OUTPUT_TFLPEL
-             && print_output->Pointer.Tflpel != NULL)
+    else if (   inspection_point->Type == TDICE_OUTPUT_TFLPEL
+             && inspection_point->Pointer.Tflpel != NULL)
 
-        FREE_POINTER (free_tflpel, print_output->Pointer.Tflpel) ;
+        FREE_POINTER (free_tflpel, inspection_point->Pointer.Tflpel) ;
 
-    else if (   print_output->Type == TDICE_OUTPUT_TMAP
-             && print_output->Pointer.Tmap != NULL)
+    else if (   inspection_point->Type == TDICE_OUTPUT_TMAP
+             && inspection_point->Pointer.Tmap != NULL)
 
-        FREE_POINTER (free_tmap, print_output->Pointer.Tmap) ;
+        FREE_POINTER (free_tmap, inspection_point->Pointer.Tmap) ;
 
-    FREE_POINTER (free, print_output->FileName) ;
-    FREE_POINTER (free, print_output) ;
+    FREE_POINTER (free, inspection_point->FileName) ;
+    FREE_POINTER (free, inspection_point) ;
 }
 
 /******************************************************************************/
 
-void free_print_output_list (PrintOutput *list)
+void free_inspection_point_list (InspectionPoint *list)
 {
-    FREE_LIST (PrintOutput, list, free_print_output) ;
+    FREE_LIST (InspectionPoint, list, free_inspection_point) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_print_output_list
+void print_formatted_inspection_point_list
 (
     FILE        *stream,
     char        *prefix,
-    PrintOutput *list
+    InspectionPoint *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, print_output, list)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, inspection_point, list)
     {
-        switch (print_output->Type)
+        switch (inspection_point->Type)
         {
             case TDICE_OUTPUT_TCELL :
 
                 fprintf (stream, "%sT      (%s, %.1f, %.1f, \"%s\", ",
-                    prefix, print_output->Pointer.Tcell->Id,
-                    print_output->Pointer.Tcell->Xval,
-                    print_output->Pointer.Tcell->Yval,
-                    print_output->FileName) ;
+                    prefix, inspection_point->Pointer.Tcell->Id,
+                    inspection_point->Pointer.Tcell->Xval,
+                    inspection_point->Pointer.Tcell->Yval,
+                    inspection_point->FileName) ;
 
                 break ;
 
             case TDICE_OUTPUT_TFLP :
 
                 fprintf (stream, "%sTflp   (%s, \"%s\", ",
-                    prefix, print_output->Pointer.Tflp->Id,
-                    print_output->FileName) ;
+                    prefix, inspection_point->Pointer.Tflp->Id,
+                    inspection_point->FileName) ;
 
-                if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_MAXIMUM)
+                if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_MAXIMUM)
 
                     fprintf(stream, "maximum, ");
 
-                else if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_MINIMUM)
+                else if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_MINIMUM)
 
                     fprintf(stream, "minimum, ");
 
@@ -407,15 +407,15 @@ void print_formatted_print_output_list
             case TDICE_OUTPUT_TFLPEL :
 
                 fprintf (stream, "%sTflpel (%s.%s, \"%s\", ",
-                    prefix, print_output->Pointer.Tflpel->Id,
-                    print_output->Pointer.Tflpel->FlpId,
-                    print_output->FileName) ;
+                    prefix, inspection_point->Pointer.Tflpel->Id,
+                    inspection_point->Pointer.Tflpel->FlpId,
+                    inspection_point->FileName) ;
 
-                if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MAXIMUM)
+                if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MAXIMUM)
 
                     fprintf(stream, "maximum, ");
 
-                else if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MINIMUM)
+                else if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MINIMUM)
 
                     fprintf(stream, "minimum, ");
 
@@ -428,22 +428,22 @@ void print_formatted_print_output_list
             case TDICE_OUTPUT_TMAP :
 
                 fprintf (stream, "%sTmap   (%s, \"%s\", ",
-                    prefix, print_output->Pointer.Tmap->Id,
-                    print_output->FileName) ;
+                    prefix, inspection_point->Pointer.Tmap->Id,
+                    inspection_point->FileName) ;
 
                 break ;
 
             default :
 
-                fprintf (stderr, "Undefined print output command type %d\n", print_output->Type) ;
+                fprintf (stderr, "Undefined inspection point command type %d\n", inspection_point->Type) ;
                 break ;
         }
 
-        if (print_output->InstanceType == TDICE_OUTPUT_SLOT)
+        if (inspection_point->InstanceType == TDICE_OUTPUT_SLOT)
 
             fprintf(stream, "slot );\n");
 
-        else if (print_output->InstanceType == TDICE_OUTPUT_STEP)
+        else if (inspection_point->InstanceType == TDICE_OUTPUT_STEP)
 
             fprintf(stream, "step );\n");
 
@@ -456,11 +456,11 @@ void print_formatted_print_output_list
 
 /******************************************************************************/
 
-void print_detailed_print_output_list
+void print_detailed_inspection_point_list
 (
     FILE        *stream,
     char        *prefix,
-    PrintOutput *list
+    InspectionPoint *list
 )
 {
     char *new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
@@ -469,10 +469,10 @@ void print_detailed_print_output_list
 
     sprintf (new_prefix, "%s    ", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, prt_out, list)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, prt_out, list)
     {
         fprintf (stream,
-            "%sprint_output                = %p\n",
+            "%sinspection_point                = %p\n",
             prefix,   prt_out);
 
         fprintf (stream,
@@ -554,7 +554,7 @@ void print_detailed_print_output_list
                 break ;
 
             default :
-                fprintf (stream, "Undefined print output command Type %d\n", prt_out->Type) ;
+                fprintf (stream, "Undefined inspection point command Type %d\n", prt_out->Type) ;
                 break ;
         }
 
@@ -571,28 +571,28 @@ void print_detailed_print_output_list
 
 /******************************************************************************/
 
-Error_t initialize_print_output
+Error_t generate_inspection_point_header
 (
-    PrintOutput  *print_output ,
+    InspectionPoint  *inspection_point ,
     StackElement *list
 )
 {
     FILE *output_stream ;
 
-    if ((output_stream = fopen(print_output->FileName, "w")) == NULL)
+    if ((output_stream = fopen(inspection_point->FileName, "w")) == NULL)
     {
-        fprintf(stderr, "Print Output: Cannot open %s\n", print_output->FileName);
+        fprintf(stderr, "Inspection Point: Cannot open %s\n", inspection_point->FileName);
 
         return TDICE_FAILURE ;
     }
 
-    switch (print_output->Type)
+    switch (inspection_point->Type)
     {
         // Tcell
         case TDICE_OUTPUT_TCELL :
         {
-            fprintf(output_stream, "Cell temperature for the location [%s, x=%5.3f,y=%5.3f]\n", print_output->Pointer.Tcell->Id, print_output->Pointer.Tcell->Xval, print_output->Pointer.Tcell->Yval) ;
-            fprintf(output_stream, "Nearest [column, row] indices found= [%d,%d] (locations [x=%5.3f,y=%5.3f])\n", print_output->Pointer.Tcell->ColumnIndex, print_output->Pointer.Tcell->RowIndex, print_output->Pointer.Tcell->ActualXval, print_output->Pointer.Tcell->ActualYval);
+            fprintf(output_stream, "Cell temperature for the location [%s, x=%5.3f,y=%5.3f]\n", inspection_point->Pointer.Tcell->Id, inspection_point->Pointer.Tcell->Xval, inspection_point->Pointer.Tcell->Yval) ;
+            fprintf(output_stream, "Nearest [column, row] indices found= [%d,%d] (locations [x=%5.3f,y=%5.3f])\n", inspection_point->Pointer.Tcell->ColumnIndex, inspection_point->Pointer.Tcell->RowIndex, inspection_point->Pointer.Tcell->ActualXval, inspection_point->Pointer.Tcell->ActualYval);
             fprintf(output_stream, "Time(s) \t Temperature(K)\n");
             break ;
         }
@@ -600,11 +600,11 @@ Error_t initialize_print_output
         // Tflp
         case TDICE_OUTPUT_TFLP :
         {
-            if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_MAXIMUM)
+            if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_MAXIMUM)
                 fprintf(output_stream, "Maximum ");
-            else if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_MINIMUM)
+            else if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_MINIMUM)
                 fprintf(output_stream, "Minimum ");
-            else if (print_output->Pointer.Tflp->Quantity==TDICE_OUTPUT_AVERAGE)
+            else if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_AVERAGE)
                 fprintf(output_stream, "Average ");
             else
             { 
@@ -612,12 +612,12 @@ Error_t initialize_print_output
                 fclose(output_stream) ;
                 return TDICE_FAILURE ;
             }
-            fprintf(output_stream, "temperatures for the floorplan of the die %s\n", print_output->Pointer.Tflp->Id) ;
+            fprintf(output_stream, "temperatures for the floorplan of the die %s\n", inspection_point->Pointer.Tflp->Id) ;
 
-            StackElement *stk_el = find_stack_element_in_list (list, print_output->Pointer.Tflp->Id) ;
+            StackElement *stk_el = find_stack_element_in_list (list, inspection_point->Pointer.Tflp->Id) ;
             if (stk_el->Floorplan == NULL)
             { 
-                fprintf(stderr, "Print Output: Error reading floorplan for the die %s\n", print_output->Pointer.Tflp->Id) ;
+                fprintf(stderr, "Print Output: Error reading floorplan for the die %s\n", inspection_point->Pointer.Tflp->Id) ;
                 fclose(output_stream) ;
                 return TDICE_FAILURE ;
             }
@@ -634,11 +634,11 @@ Error_t initialize_print_output
         //Tflpel 
         case TDICE_OUTPUT_TFLPEL :
         {
-            if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MAXIMUM)
+            if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MAXIMUM)
                 fprintf(output_stream, "Maximum ");
-            else if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MINIMUM)
+            else if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MINIMUM)
                 fprintf(output_stream, "Minimum ");
-            else if (print_output->Pointer.Tflpel->Quantity==TDICE_OUTPUT_AVERAGE)
+            else if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_AVERAGE)
                 fprintf(output_stream, "Average ");
             else
             { 
@@ -646,21 +646,21 @@ Error_t initialize_print_output
                 fclose(output_stream) ;
                 return TDICE_FAILURE ;
             }
-            fprintf(output_stream, "temperatures for the floorplan element %s of the die %s\n", print_output->Pointer.Tflpel->FlpId, print_output->Pointer.Tflpel->Id) ;
-            fprintf(output_stream, "Time(s) \t %s.%s(K)\n", print_output->Pointer.Tflpel->Id, print_output->Pointer.Tflpel->FlpId) ;
+            fprintf(output_stream, "temperatures for the floorplan element %s of the die %s\n", inspection_point->Pointer.Tflpel->FlpId, inspection_point->Pointer.Tflpel->Id) ;
+            fprintf(output_stream, "Time(s) \t %s.%s(K)\n", inspection_point->Pointer.Tflpel->Id, inspection_point->Pointer.Tflpel->FlpId) ;
             break ;
         }
 
         //Tmap
         case TDICE_OUTPUT_TMAP :
         {
-            fprintf(output_stream, "Thermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n", print_output->Pointer.Tmap->Id);
+            fprintf(output_stream, "Thermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n", inspection_point->Pointer.Tmap->Id);
             break ;
         }
 
         default :
         {
-            fprintf (stderr, "Error reading output instruction\n") ;
+            fprintf (stderr, "Error reading inspection point instruction\n") ;
             fclose(output_stream) ;
             return TDICE_FAILURE ;
             break ;
@@ -674,9 +674,9 @@ Error_t initialize_print_output
 
 /******************************************************************************/
 
-bool there_is_tmap_in_list (PrintOutput *list)
+bool there_is_tmap_in_list (InspectionPoint *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, prt_out, list)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, prt_out, list)
 
         if (prt_out->Type == TDICE_OUTPUT_TMAP)
 

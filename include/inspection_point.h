@@ -33,10 +33,10 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_PRINT_OUTPUT_H_
-#define _3DICE_PRINT_OUTPUT_H_
+#ifndef _3DICE_INSPECTION_POINT_H_
+#define _3DICE_INSPECTION_POINT_H_
 
-/*! \file print_output.h */
+/*! \file inspection_point.h */
 
 #ifdef __cplusplus
 extern "C"
@@ -371,12 +371,12 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \union PrintOutput_p
+    /*! \union InspectionPoint_p
      *
-     *  \brief A union of pointers to types that can be an instance of PrintOutput
+     *  \brief A union of pointers to types that can be an instance of InspectionPoint
      */
 
-    union PrintOutput_p
+    union InspectionPoint_p
     {
         Tcell  *Tcell ;   /*!< Pointer to a Tcell */
         Tflp   *Tflp ;    /*!< Pointer to a Tflp */
@@ -384,18 +384,18 @@ extern "C"
         Tmap   *Tmap ;    /*!< Pointer to a Tmap */
     } ;
 
-    /*! Definition of the type PrintOutput_p */
+    /*! Definition of the type InspectionPoint_p */
 
-    typedef union PrintOutput_p PrintOutput_p ;
+    typedef union InspectionPoint_p InspectionPoint_p ;
 
 /******************************************************************************/
 
-    /*! \struct PrintOutput
+    /*! \struct InspectionPoint
      *
      *  \brief Structure containing info about the output to be ptrinted while simulating
      */
 
-    struct PrintOutput
+    struct InspectionPoint
     {
         /*! The path of the file used to store the output */
 
@@ -409,97 +409,97 @@ extern "C"
 
         OutputType_t Type ;
 
-        /*! Pointer to a data structure representing the type of a PrintOutput.
+        /*! Pointer to a data structure representing the type of a InspectionPoint.
          *  This pointer must be casted depending on the value stored in
-         *  PrintOutput::Type */
+         *  InspectionPoint::Type */
 
-        PrintOutput_p Pointer ;
+        InspectionPoint_p Pointer ;
 
-        /*! To collect output instructions in a linked list */
+        /*! To collect inspection points in a linked list */
 
-        struct PrintOutput *Next ;
+        struct InspectionPoint *Next ;
 
     } ;
 
-    /*! definition of the type PrintOutput */
+    /*! definition of the type InspectionPoint */
 
-    typedef struct PrintOutput PrintOutput ;
+    typedef struct InspectionPoint InspectionPoint ;
 
 
 
-    /*! Sets all the fields of \a print_output to a default value (zero or \c NULL ).
+    /*! Sets all the fields of \a inspection_point to a default value (zero or \c NULL ).
      *
-     * \param print_output the address of the print output to initialize
+     * \param inspection_point the address of the inspection point to initialize
      */
 
-    void init_print_output (PrintOutput *print_output) ;
+    void init_inspection_point (InspectionPoint *inspection_point) ;
 
 
 
-    /*! Allocates a PrintOutput in memory and sets its fields to their default
-     *  value with #init_print_output
+    /*! Allocates a InspectionPoint in memory and sets its fields to their default
+     *  value with #init_inspection_point
      *
-     * \return the pointer to a new PrintOutput
+     * \return the pointer to a new InspectionPoint
      * \return \c NULL if the memory allocation fails
      */
 
-    PrintOutput *alloc_and_init_print_output (void) ;
+    InspectionPoint *alloc_and_init_inspection_point (void) ;
 
 
 
-    /*! Frees the memory related to \a print_output
+    /*! Frees the memory related to \a inspection_point
      *
-     * The parametrer \a print_output must be a pointer previously obtained with
-     * #alloc_and_init_print_output
+     * The parametrer \a inspection_point must be a pointer previously obtained with
+     * #alloc_and_init_inspection_point
      *
-     * \param print_output the address of the PrintOutput structure to free
+     * \param inspection_point the address of the InspectionPoint structure to free
      */
 
-    void free_print_output (PrintOutput *print_output) ;
+    void free_inspection_point (InspectionPoint *inspection_point) ;
 
 
 
-    /*! Frees a list of print output
+    /*! Frees a list of inspection points
      *
-     * If frees, calling #free_print_output, the print output pointed by the
-     * parameter \a list and all the print outputs it finds following the
-     * linked list throught the field PrintOutput::Next .
+     * If frees, calling #free_inspection_point, the inspection point pointed by the
+     * parameter \a list and all the inspection points it finds following the
+     * linked list throught the field InspectionPoint::Next .
      *
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_print_output_list (PrintOutput *list) ;
+    void free_inspection_point_list (InspectionPoint *list) ;
 
 
 
-    /*! Prints a list of print outputs as they look in the stack file
+    /*! Prints a list of inspection points as they look in the stack file
      *
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first print output in the list
+     * \param list   the pointer to the first inspection point in the list
      */
 
-    void print_formatted_print_output_list
+    void print_formatted_inspection_point_list
 
-        (FILE *stream, char *prefix, PrintOutput *list) ;
+        (FILE *stream, char *prefix, InspectionPoint *list) ;
 
 
 
-    /*! Prints a list of detailed information about all the fields of the print outputs
+    /*! Prints a list of detailed information about all the fields of the inspection points
      *
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first print output in the list
+     * \param list   the pointer to the first inspection point in the list
      */
 
-    void print_detailed_print_output_list
+    void print_detailed_inspection_point_list
 
-        (FILE *stream, char *prefix, PrintOutput *list) ;
+        (FILE *stream, char *prefix, InspectionPoint *list) ;
 
 
-    /*! Initializes the file in which a particular output has to be printed
+    /*! Generates the file in which a particular inspection point will be printed
      *
-     *  \param print_output the address of the PrintOutput structure
+     *  \param inspection_point the address of the InspectionPoint structure
      *  \param list pointer to the first (as a list) stack element the stack
      *
      *  \return FIXME
@@ -507,7 +507,7 @@ extern "C"
 
     // FIXME: can we remove the list ?
 
-    Error_t initialize_print_output (PrintOutput *print_output, StackElement *list) ;
+    Error_t generate_inspection_point_header (InspectionPoint *inspection_point, StackElement *list) ;
 
 
 
@@ -519,7 +519,7 @@ extern "C"
      *  \return \c false otherwise
      */
 
-    bool there_is_tmap_in_list (PrintOutput *list) ;
+    bool there_is_tmap_in_list (InspectionPoint *list) ;
 
 /******************************************************************************/
 
@@ -527,4 +527,4 @@ extern "C"
 }
 #endif
 
-#endif /* _3DICE_STACK_ELEMENT_H_ */
+#endif /* _3DICE_INSPECTION_POINT_H_ */

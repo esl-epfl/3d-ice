@@ -49,9 +49,9 @@ void init_analysis (Analysis *analysis)
     analysis->SlotLength           = 0u ;
     analysis->CurrentTime          = 0u ;
     analysis->InitialTemperature   = 0.0 ;
-    analysis->PrintOutputListFinal = NULL ;
-    analysis->PrintOutputListSlot  = NULL ;
-    analysis->PrintOutputListStep  = NULL ;
+    analysis->InspectionPointListFinal = NULL ;
+    analysis->InspectionPointListSlot  = NULL ;
+    analysis->InspectionPointListStep  = NULL ;
 }
 
 /******************************************************************************/
@@ -71,9 +71,9 @@ Analysis *alloc_and_init_analysis (void)
 
 void free_analysis (Analysis *analysis)
 {
-    FREE_LIST (PrintOutput, analysis->PrintOutputListFinal, free_print_output) ;
-    FREE_LIST (PrintOutput, analysis->PrintOutputListSlot, free_print_output) ;
-    FREE_LIST (PrintOutput, analysis->PrintOutputListStep, free_print_output) ;
+    FREE_LIST (InspectionPoint, analysis->InspectionPointListFinal, free_inspection_point) ;
+    FREE_LIST (InspectionPoint, analysis->InspectionPointListSlot, free_inspection_point) ;
+    FREE_LIST (InspectionPoint, analysis->InspectionPointListStep, free_inspection_point) ;
 }
 
 /******************************************************************************/
@@ -129,21 +129,21 @@ void print_formatted_analysis
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_print_output_list
+    print_formatted_inspection_point_list
 
-        (stream, prefix, analysis->PrintOutputListFinal) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    print_formatted_print_output_list
-
-        (stream, prefix, analysis->PrintOutputListSlot) ;
+        (stream, prefix, analysis->InspectionPointListFinal) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_print_output_list
+    print_formatted_inspection_point_list
 
-        (stream, prefix, analysis->PrintOutputListStep) ;
+        (stream, prefix, analysis->InspectionPointListSlot) ;
+
+    fprintf (stream, "%s\n", prefix) ;
+
+    print_formatted_inspection_point_list
+
+        (stream, prefix, analysis->InspectionPointListStep) ;
 
     fprintf (stream, "%s\n", prefix) ;
 }
@@ -192,46 +192,46 @@ void print_detailed_analysis
         prefix, analysis->InitialTemperature) ;
 
     fprintf (stream,
-        "%s  PrintOutputListFinal          = %p\n",
-        prefix, analysis->PrintOutputListFinal) ;
+        "%s  InspectionPointListFinal          = %p\n",
+        prefix, analysis->InspectionPointListFinal) ;
 
-    if (analysis->PrintOutputListFinal != NULL)
+    if (analysis->InspectionPointListFinal != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
-        print_detailed_print_output_list
+        print_detailed_inspection_point_list
 
-            (stream, new_prefix, analysis->PrintOutputListFinal) ;
+            (stream, new_prefix, analysis->InspectionPointListFinal) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     fprintf (stream,
-        "%s  PrintOutputListSlot           = %p\n",
-        prefix, analysis->PrintOutputListSlot) ;
+        "%s  InspectionPointListSlot           = %p\n",
+        prefix, analysis->InspectionPointListSlot) ;
 
-    if (analysis->PrintOutputListSlot != NULL)
+    if (analysis->InspectionPointListSlot != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
-        print_detailed_print_output_list
+        print_detailed_inspection_point_list
 
-            (stream, new_prefix, analysis->PrintOutputListSlot) ;
+            (stream, new_prefix, analysis->InspectionPointListSlot) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     fprintf (stream,
-        "%s  PrintOutputListStep           = %p\n",
-        prefix, analysis->PrintOutputListStep) ;
+        "%s  InspectionPointListStep           = %p\n",
+        prefix, analysis->InspectionPointListStep) ;
 
-    if (analysis->PrintOutputListStep != NULL)
+    if (analysis->InspectionPointListStep != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
-        print_detailed_print_output_list
+        print_detailed_inspection_point_list
 
-            (stream, new_prefix, analysis->PrintOutputListStep) ;
+            (stream, new_prefix, analysis->InspectionPointListStep) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
@@ -241,59 +241,59 @@ void print_detailed_analysis
 
 /******************************************************************************/
 
-void add_print_output_to_analysis
+void add_inspection_point_to_analysis
 (
     Analysis    *analysis,
-    PrintOutput *print_output
+    InspectionPoint *inspection_point
 )
 {
-    PrintOutput **list = NULL ;
+    InspectionPoint **list = NULL ;
 
     if (   analysis->AnalysisType == TDICE_STEADY
-        || print_output->InstanceType == TDICE_OUTPUT_FINAL)
+        || inspection_point->InstanceType == TDICE_OUTPUT_FINAL)
 
-        list = &analysis->PrintOutputListFinal ;
+        list = &analysis->InspectionPointListFinal ;
 
-    else if (print_output->InstanceType==TDICE_OUTPUT_SLOT)
+    else if (inspection_point->InstanceType==TDICE_OUTPUT_SLOT)
 
-        list = &analysis->PrintOutputListSlot ;
+        list = &analysis->InspectionPointListSlot ;
 
-    else if (print_output->InstanceType==TDICE_OUTPUT_STEP)
+    else if (inspection_point->InstanceType==TDICE_OUTPUT_STEP)
 
-        list = &analysis->PrintOutputListStep ;
+        list = &analysis->InspectionPointListStep ;
 
     while (*list != NULL) list = &( (*list)->Next ) ;
 
-    *list = print_output ;
+    *list = inspection_point ;
 }
 
 /******************************************************************************/
 
-Error_t initialize_print_output_instructions (Analysis* analysis, StackElement *list)
+Error_t generate_analysis_headers (Analysis* analysis, StackElement *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, final, analysis->PrintOutputListFinal)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, final, analysis->InspectionPointListFinal)
 
-        if (initialize_print_output (final, list) != TDICE_SUCCESS)
-
-            return TDICE_FAILURE ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, slot, analysis->PrintOutputListSlot)
-
-        if (initialize_print_output (slot, list) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (final, list) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (PrintOutput, step, analysis->PrintOutputListStep)
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, slot, analysis->InspectionPointListSlot)
 
-        if (initialize_print_output (step, list) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (slot, list) != TDICE_SUCCESS)
+
+            return TDICE_FAILURE ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, step, analysis->InspectionPointListStep)
+
+        if (generate_inspection_point_header (step, list) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
 //   FIXME
 //
-//   if (   there_is_tmap_in_list (analysis->PrintOutputListFinal)
-//       || there_is_tmap_in_list (analysis->PrintOutputListSlot)
-//       || there_is_tmap_in_list (analysis->PrintOutputListStep))
+//   if (   there_is_tmap_in_list (analysis->InspectionPointListFinal)
+//       || there_is_tmap_in_list (analysis->InspectionPointListSlot)
+//       || there_is_tmap_in_list (analysis->InspectionPointListStep))
 //
 //     print_axes (analysis) ;
 

@@ -49,7 +49,7 @@ extern "C"
 
 #include "types.h"
 
-#include "print_output.h"
+#include "inspection_point.h"
 #include "stack_element.h"
 
 /******************************************************************************/
@@ -88,17 +88,17 @@ extern "C"
         /*! Pointer to the list of inspection points to print
          *  at the end of the simulation */
 
-        PrintOutput *PrintOutputListFinal ;
+        InspectionPoint *InspectionPointListFinal ;
 
         /*! Pointer to the list of inspection points to print
          *  at the end of the time slot */
 
-        PrintOutput *PrintOutputListSlot ;
+        InspectionPoint *InspectionPointListSlot ;
 
         /*! Pointer to the list of inspection points to print
          *  at every time step */
 
-        PrintOutput *PrintOutputListStep ;
+        InspectionPoint *InspectionPointListStep ;
 
     } ;
 
@@ -185,18 +185,18 @@ extern "C"
         (FILE *stream, char *prefix, Analysis *analysis) ;
 
 
-    /*! Inserts a print output instance into the corresponding print output queue
+    /*! Inserts an inspection point into the corresponding queue
      *
      * \param analysis     pointer to the analysis structure
-     * \param print_output pointer to print output structure to add
+     * \param inspection_point pointer to the inspection point to add
      */
 
-    void add_print_output_to_analysis
+    void add_inspection_point_to_analysis
 
-        (Analysis *analysis, PrintOutput *print_output) ;
+        (Analysis *analysis, InspectionPoint *inspection_point) ;
 
 
-    /*! Initializes output files
+    /*! Initializes output files for each inspection point
      *
      * Generates, for every inspection point, the output file and print the header
      * If the target output file is already there, it will be overwritten.
@@ -208,7 +208,7 @@ extern "C"
      * \return \c TDICE_FAILURE if one of the files can not be created
      */
 
-    Error_t initialize_print_output_instructions (Analysis* analysis, StackElement *list) ;
+    Error_t generate_analysis_headers (Analysis* analysis, StackElement *list) ;
 
 
 /******************************************************************************/

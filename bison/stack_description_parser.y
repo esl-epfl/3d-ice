@@ -40,7 +40,7 @@
     #include "material.h"
     #include "die.h"
     #include "stack_element.h"
-    #include "print_output.h"
+    #include "inspection_point.h"
 }
 
 // The YYSTYPE union used to collect the types of tokens and rules
@@ -55,7 +55,7 @@
     Die                  *die_p ;
     Layer                *layer_p ;
     StackElement         *stack_element_p ;
-    PrintOutput          *print_output_p ;
+    InspectionPoint      *inspection_point_p ;
     OutputInstanceType_t  output_instance_v ;
     OutputQuantity_t      output_quantity_v ;
 }
@@ -88,24 +88,24 @@
     static uint8_t  num_dies ;
 }
 
-%type <double_v>          first_wall_length
-%type <double_v>          last_wall_length
-%type <channel_model_v>   distribution
-%type <coolant_v>         coolant_heat_transfer_coefficients_rm4
-%type <coolant_v>         coolant_heat_transfer_coefficients_rm2
-%type <material_p>        material
-%type <material_p>        materials_list
-%type <die_p>             die
-%type <die_p>             dies_list
-%type <layer_p>           layer
-%type <layer_p>           layers_list
-%type <layer_p>           source_layer
-%type <layer_p>           layer_content
-%type <stack_element_p>   stack_element
-%type <stack_element_p>   stack_elements
-%type <print_output_p>    output_item
-%type <output_instance_v> when
-%type <output_quantity_v> maxminavg
+%type <double_v>           first_wall_length
+%type <double_v>           last_wall_length
+%type <channel_model_v>    distribution
+%type <coolant_v>          coolant_heat_transfer_coefficients_rm4
+%type <coolant_v>          coolant_heat_transfer_coefficients_rm2
+%type <material_p>         material
+%type <material_p>         materials_list
+%type <die_p>              die
+%type <die_p>              dies_list
+%type <layer_p>            layer
+%type <layer_p>            layers_list
+%type <layer_p>            source_layer
+%type <layer_p>            layer_content
+%type <stack_element_p>    stack_element
+%type <stack_element_p>    stack_elements
+%type <inspection_point_p> inspection_point
+%type <output_instance_v>  when
+%type <output_quantity_v>  maxminavg
 
 %token AMBIENT               "keyword ambient"
 %token AVERAGE               "keyword average"
@@ -217,7 +217,7 @@ stack_description_file
     stack
     solver
     initial_temperature
-    desired_output
+    inspection_points
   ;
 
 /******************************************************************************/
@@ -1149,29 +1149,30 @@ initial_temperature
 /****************************** Desired Output ********************************/
 /******************************************************************************/
 
-desired_output
+inspection_points
 
-  :  // Declaring the output section is not mandatory
+  :  // Declaring this section is not mandatory
 
-  |  OUTPUT ':' output_list
+  |  OUTPUT ':' inspection_points_list
 
   ;
 
-output_list
+inspection_points_list
 
-  :  output_item                // $1 : pointer to the first print output found
+  :  inspection_point // $1 : pointer to the first inspection point found
      {
-        add_print_output_to_analysis (analysis, $1) ;
+        add_inspection_point_to_analysis (analysis, $1) ;
      }
 
-  |  output_list output_item    // $1 : not used
-                                // $2 : pointer to the print output to add in the list
+  |  inspection_points_list inspection_point
+                      // $1 : not used
+                      // $2 : pointer to the inspection point to add in the list
      {
-        add_print_output_to_analysis (analysis, $2) ;
+        add_inspection_point_to_analysis (analysis, $2) ;
      }
   ;
 
-output_item
+inspection_point
 
   :  TCELL '(' IDENTIFIER ',' DVALUE ',' DVALUE ',' PATH when ')' ';'
 
@@ -1225,24 +1226,24 @@ output_item
 
             tcell->LayerIndex += stack_element->Pointer.Channel->SourceLayerOffset ;
 
-        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
-        if (print_output == NULL)
+        if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $9) ;
 
             FREE_POINTER (free_tcell, tcell) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
 
             YYABORT ;
         }
 
-        print_output->Type          = TDICE_OUTPUT_TCELL ;
-        print_output->InstanceType  = $10 ;
-        print_output->FileName      = $9 ;
-        print_output->Pointer.Tcell = tcell ;
+        inspection_point->Type          = TDICE_OUTPUT_TCELL ;
+        inspection_point->InstanceType  = $10 ;
+        inspection_point->FileName      = $9 ;
+        inspection_point->Pointer.Tcell = tcell ;
      }
 
   |  TFLP  '(' IDENTIFIER ',' PATH ',' maxminavg when ')'  ';'
@@ -1296,24 +1297,24 @@ output_item
         tflp->Id       = $3 ;
         tflp->Quantity = $7 ;
 
-        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
-        if (print_output == NULL)
+        if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
             FREE_POINTER (free_tflp, tflp) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
 
             YYABORT ;
         }
 
-        print_output->Type         = TDICE_OUTPUT_TFLP ;
-        print_output->InstanceType = $8 ;
-        print_output->FileName     = $5 ;
-        print_output->Pointer.Tflp = tflp ;
+        inspection_point->Type         = TDICE_OUTPUT_TFLP ;
+        inspection_point->InstanceType = $8 ;
+        inspection_point->FileName     = $5 ;
+        inspection_point->Pointer.Tflp = tflp ;
      }
 
   |  TFLPEL '(' IDENTIFIER '.' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
@@ -1389,9 +1390,9 @@ output_item
         tflpel->FlpId    = $5 ;
         tflpel->Quantity = $9 ;
 
-        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
-        if (print_output == NULL)
+        if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1399,15 +1400,15 @@ output_item
 
             FREE_POINTER (free_tflpel, tflpel) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
 
             YYABORT ;
         }
 
-        print_output->Type           = TDICE_OUTPUT_TFLPEL ;
-        print_output->InstanceType   = $10 ;
-        print_output->FileName       = $7 ;
-        print_output->Pointer.Tflpel = tflpel ;
+        inspection_point->Type           = TDICE_OUTPUT_TFLPEL ;
+        inspection_point->InstanceType   = $10 ;
+        inspection_point->FileName       = $7 ;
+        inspection_point->Pointer.Tflpel = tflpel ;
      }
 
   |  TMAP '(' IDENTIFIER ',' PATH when ')' ';'
@@ -1447,24 +1448,24 @@ output_item
 
         tmap->Id = $3 ;
 
-        PrintOutput *print_output = $$ = alloc_and_init_print_output () ;
+        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
-        if (print_output == NULL)
+        if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
             FREE_POINTER (free_tmap, tmap) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc print out command failed") ;
+            stack_description_error (stkd, analysis, scanner, "Malloc inspection point out command failed") ;
 
             YYABORT ;
         }
 
-        print_output->Type         = TDICE_OUTPUT_TMAP ;
-        print_output->InstanceType = $6 ;
-        print_output->FileName     = $5 ;
-        print_output->Pointer.Tmap = tmap ;
+        inspection_point->Type         = TDICE_OUTPUT_TMAP ;
+        inspection_point->InstanceType = $6 ;
+        inspection_point->FileName     = $5 ;
+        inspection_point->Pointer.Tmap = tmap ;
      }
 
   ;
