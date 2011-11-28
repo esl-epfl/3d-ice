@@ -148,7 +148,7 @@ extern "C"
 
 # define IS_CHANNEL_COLUMN(channel_model, column) \
                                                   \
-        (channel_model == TDICE_CHANNEL_MODEL_MC_RM4 ? column & 1 : TRUE_V)
+        (channel_model == TDICE_CHANNEL_MODEL_MC_RM4 ? column & 1 : true)
 
 # define IS_WALL_COLUMN(column)       (! IS_CHANNEL_COLUMN(column))
 

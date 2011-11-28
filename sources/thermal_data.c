@@ -40,7 +40,7 @@
 
 /******************************************************************************/
 
-static void init_data (double* data, Quantity_t size, double init_value)
+static void init_data (double* data, uint32_t size, double init_value)
 {
   while (size--) *data++ = init_value ;
 }
@@ -49,7 +49,7 @@ static void init_data (double* data, Quantity_t size, double init_value)
 
 void init_thermal_data (ThermalData *tdata)
 {
-  tdata->Size = QUANTITY_I ;
+  tdata->Size = 0u ;
 
   tdata->Temperatures = NULL ;
   tdata->Sources      = NULL ;
@@ -93,12 +93,12 @@ int fill_thermal_data
 {
   int result ;
 
-  tdata->Size = (Quantity_t) get_number_of_cells(stkd->Dimensions) ;
+  tdata->Size = get_number_of_cells(stkd->Dimensions) ;
 
   /* Alloc and set temperatures */
 
   tdata->Temperatures
-    = malloc (sizeof(Temperature_t) * tdata->Size) ;
+    = malloc (sizeof(double) * tdata->Size) ;
 
   if (tdata->Temperatures == NULL)  goto temperatures_fail ;
 
@@ -127,7 +127,7 @@ int fill_thermal_data
   /* Alloc and set sources */
 
   tdata->Sources
-    = malloc (sizeof(Source_t) * tdata->Size) ;
+    = malloc (sizeof(double) * tdata->Size) ;
 
   if (tdata->Sources == NULL)  goto sources_fail ;
 
@@ -242,14 +242,14 @@ static void
 fill_system_vector
 (
   Dimensions*          dimensions,
-  SystemMatrixValue_t* vector,
-  Source_t*            sources,
+  double       *vector,
+  double*            sources,
   ThermalCell*         thermalcells,
-  Temperature_t*       temperatures
+  double*       temperatures
 )
 {
 # ifdef PRINT_SYSTEM_VECTOR
-  Temperature_t old ;
+  double old ;
 # endif
 
   FOR_EVERY_LAYER (layer, dimensions)
@@ -291,8 +291,8 @@ static void
 fill_system_vector_steady
 (
   Dimensions*          dimensions,
-  SystemMatrixValue_t* vector,
-  Source_t*            sources
+  double* vector,
+  double*            sources
 )
 {
   FOR_EVERY_LAYER (layer, dimensions)
@@ -325,7 +325,7 @@ int emulate_step (ThermalData* tdata, StackDescription* stkd, Analysis *analysis
 
         return 2 ;
 
-  if (slot_completed (analysis) == TRUE_V) // CHECKME
+  if (slot_completed (analysis) == true) // CHECKME
   {
     if (fill_sources_stack_description
             (tdata->Sources, tdata->ThermalCells, stkd) == TDICE_FAILURE)
@@ -430,7 +430,7 @@ int update_coolant_flow_rate
 (
   ThermalData*      tdata,
   StackDescription* stkd,
-  CoolantFR_t       new_coolant_fr
+  double       new_coolant_fr
 )
 {
   stkd->Channel->CoolantFR = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_coolant_fr) ;
@@ -464,12 +464,12 @@ int get_max_temperature_of_floorplan_element
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  String_t          floorplan_element_id,
-  Temperature_t*    max_temperature
+  char *          floorplan_id,
+  char *          floorplan_element_id,
+  double*    max_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement* stk_el   = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -507,12 +507,12 @@ int get_min_temperature_of_floorplan_element
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  String_t          floorplan_element_id,
-  Temperature_t*    min_temperature
+  char *          floorplan_id,
+  char *          floorplan_element_id,
+  double*    min_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -550,12 +550,12 @@ int get_avg_temperature_of_floorplan_element
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  String_t          floorplan_element_id,
-  Temperature_t*    avg_temperature
+  char *          floorplan_id,
+  char *          floorplan_element_id,
+  double*    avg_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -593,14 +593,14 @@ int get_min_avg_max_temperatures_of_floorplan_element
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  String_t          floorplan_element_id,
-  Temperature_t*    min_temperature,
-  Temperature_t*    avg_temperature,
-  Temperature_t*    max_temperature
+  char *          floorplan_id,
+  char *          floorplan_element_id,
+  double*    min_temperature,
+  double*    avg_temperature,
+  double*    max_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -640,11 +640,11 @@ int get_all_max_temperatures_of_floorplan
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  Temperature_t*    max_temperature
+  char *          floorplan_id,
+  double*    max_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -683,11 +683,11 @@ int get_all_min_temperatures_of_floorplan
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  Temperature_t*    min_temperature
+  char *          floorplan_id,
+  double*    min_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -726,11 +726,11 @@ int get_all_avg_temperatures_of_floorplan
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  Temperature_t*    avg_temperature
+  char *          floorplan_id,
+  double*    avg_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -769,13 +769,13 @@ int get_all_min_avg_max_temperatures_of_floorplan
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          floorplan_id,
-  Temperature_t*    min_temperature,
-  Temperature_t*    avg_temperature,
-  Temperature_t*    max_temperature
+  char *          floorplan_id,
+  double*    min_temperature,
+  double*    avg_temperature,
+  double*    max_temperature
 )
 {
-  GridDimension_t offset = GRIDDIMENSION_I ;
+  uint32_t offset = 0u ;
   StackElement*   stk_el = find_stack_element_in_list
                            (
                              stkd->BottomStackElement,
@@ -817,13 +817,13 @@ int get_cell_temperature
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  GridDimension_t   layer_index,
-  GridDimension_t   row_index,
-  GridDimension_t   column_index,
-  Temperature_t*    cell_temperature
+  uint32_t   layer_index,
+  uint32_t   row_index,
+  uint32_t   column_index,
+  double*    cell_temperature
 )
 {
-  GridDimension_t id = get_cell_offset_in_stack
+  uint32_t id = get_cell_offset_in_stack
                        (
                          stkd->Dimensions,
                          layer_index, row_index, column_index
@@ -844,8 +844,8 @@ int print_thermal_map
 (
   StackDescription* stkd,
   ThermalData*      tdata,
-  String_t          stack_element_id,
-  String_t          file_name
+  char *          stack_element_id,
+  char *          file_name
 )
 {
   FILE*           output_file ;
@@ -864,7 +864,7 @@ int print_thermal_map
     return -2 ;
   }
 
-  Temperature_t* temperature_offset =
+  double* temperature_offset =
     tdata->Temperatures
     + get_cell_offset_in_stack (stkd->Dimensions, get_source_layer_offset(stk_el), 0, 0) ;
 

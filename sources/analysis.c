@@ -89,13 +89,13 @@ bool slot_completed (Analysis *analysis)
 {
   if (analysis->AnalysisType == TDICE_STEADY)
 
-    return FALSE_V ;
+    return false ;
 
   if (analysis->CurrentTime % analysis->SlotLength == 0)
 
-    return TRUE_V ;
+    return true ;
 
-  return FALSE_V ;
+  return false ;
 }
 
 /******************************************************************************/
@@ -243,7 +243,7 @@ void print_detailed_analysis
 
 void add_inspection_point_to_analysis
 (
-    Analysis    *analysis,
+    Analysis        *analysis,
     InspectionPoint *inspection_point
 )
 {
@@ -265,6 +265,8 @@ void add_inspection_point_to_analysis
     while (*list != NULL) list = &( (*list)->Next ) ;
 
     *list = inspection_point ;
+
+    // CHECKME any warning when using the same filename twice?
 }
 
 /******************************************************************************/

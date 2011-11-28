@@ -133,16 +133,16 @@ extern "C"
 
     void fill_solid_cell_bottom
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        SolidTC_t           solid_tc,
-        SolidVHC_t          solid_vhc
+        double       solid_tc,
+        double       solid_vhc
     ) ;
 
 
@@ -160,16 +160,16 @@ extern "C"
 
     void fill_solid_cell_central
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        SolidTC_t           solid_tc,
-        SolidVHC_t          solid_vhc
+        double       solid_tc,
+        double       solid_vhc
     ) ;
 
 
@@ -187,16 +187,16 @@ extern "C"
 
     void fill_solid_cell_top
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        SolidTC_t           solid_tc,
-        SolidVHC_t          solid_vhc
+        double       solid_tc,
+        double       solid_vhc
     ) ;
 
 
@@ -213,14 +213,14 @@ extern "C"
 
     void fill_solid_cell_conventional_heat_sink
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        SolidTC_t           solid_tc,
-        AmbientHTC_t        ambient_htc
+        double       solid_tc,
+        double       ambient_htc
     ) ;
 
 
@@ -239,17 +239,17 @@ extern "C"
 
     void fill_liquid_cell_mc_4rm
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        GridDimension_t     nchannels,
-        Coolant_t           coolant,
-        CoolantFR_t         coolant_fr
+        uint32_t     nchannels,
+        Coolant_t    coolant,
+        double       coolant_fr
     ) ;
 
 
@@ -271,21 +271,21 @@ extern "C"
 
     void fill_liquid_cell_mc_2rm
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        GridDimension_t     nchannels,
-        CellDimension_t     channel_length,
-        CellDimension_t     channel_pitch,
+        uint32_t     nchannels,
+        double       channel_length,
+        double       channel_pitch,
 
-        Porosity_t          porosity,
-        Coolant_t           coolant,
-        CoolantFR_t         coolant_fr
+        double       porosity,
+        Coolant_t    coolant,
+        double       coolant_fr
     ) ;
 
 
@@ -305,19 +305,19 @@ extern "C"
 
     void fill_liquid_cell_pf
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell   *thermal_cell,
 
-        Time_t              delta_time,
+        double         delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double         cell_length,
+        double         cell_width,
+        double         cell_height,
 
-        ChannelModel_t      pin_distribution,
+        ChannelModel_t pin_distribution,
 
-        Porosity_t          porosity,
-        Coolant_t           coolant,
-        DarcyVelocity_t     darcy_velocity
+        double         porosity,
+        Coolant_t      coolant,
+        double         darcy_velocity
     ) ;
 
 
@@ -336,17 +336,17 @@ extern "C"
 
     void fill_virtual_wall_cell_mc_2rm
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        Porosity_t          porosity,
-        SolidTC_t           solid_tc,
-        SolidVHC_t          solid_vhc
+        double       porosity,
+        double       solid_tc,
+        double       solid_vhc
     ) ;
 
 
@@ -365,17 +365,17 @@ extern "C"
 
     void fill_virtual_wall_cell_pf
     (
-        ThermalCell         *thermal_cell,
+        ThermalCell *thermal_cell,
 
-        Time_t              delta_time,
+        double       delta_time,
 
-        CellDimension_t     cell_length,
-        CellDimension_t     cell_width,
-        CellDimension_t     cell_height,
+        double       cell_length,
+        double       cell_width,
+        double       cell_height,
 
-        Porosity_t          porosity,
-        SolidTC_t           solid_tc,
-        SolidVHC_t          solid_vhc
+        double       porosity,
+        double       solid_tc,
+        double       solid_vhc
     ) ;
 
 /******************************************************************************/

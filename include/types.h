@@ -50,82 +50,82 @@ extern "C"
 
   /* Boolean value */
 
-  typedef int Bool_t ;
-# define      FALSE_V (0)
-# define      TRUE_V  (!FALSE_V)
-
-  /* Quantity */
-
-  typedef int Quantity_t ;
-# define      QUANTITY_I 0
-
-  /* String */
-
-  typedef char* String_t ;
-# define        STRING_I NULL
+//   typedef int Bool_t ;
+// # define      FALSE_V (0)
+// # define      TRUE_V  (!FALSE_V)
+//
+//   /* Quantity */
+//
+//   typedef int Quantity_t ;
+// # define      QUANTITY_I 0
+//
+//   /* String */
+//
+//   typedef char* String_t ;
+// # define        STRING_I NULL
 
 /******************************************************************************/
 
   /* Conductance */
 
-  typedef double Conductance_t ;
-# define         CONDUCTANCE_I 0.0
-
-  /* Capacity */
-
-  typedef double Capacity_t ;
-# define         CAPACITY_I 0.0
-
-  /* Source */
-
-  typedef double Source_t ;
-# define         SOURCE_I 0.0
-
-  /* Power */
-
-  typedef double Power_t ;
-# define         POWER_I 0.0
-
-  /* Temperature */
-
-  typedef double Temperature_t ;
-# define         TEMPERATURE_I 0.0
-
-  /* Time */
-
-  typedef double Time_t ;
-# define         TIME_I 0.0
+//   typedef double Conductance_t ;
+// # define         CONDUCTANCE_I 0.0
+//
+//   /* Capacity */
+//
+//   typedef double Capacity_t ;
+// # define         CAPACITY_I 0.0
+//
+//   /* Source */
+//
+//   typedef double Source_t ;
+// # define         SOURCE_I 0.0
+//
+//   /* Power */
+//
+//   typedef double Power_t ;
+// # define         POWER_I 0.0
+//
+//   /* Temperature */
+//
+//   typedef double Temperature_t ;
+// # define         TEMPERATURE_I 0.0
+//
+//   /* Time */
+//
+//   typedef double Time_t ;
+// # define         TIME_I 0.0
 
 /******************************************************************************/
 
   /* Solid volumetric heat capacity */
 
-  typedef double SolidVHC_t ;
-# define         SOLIDVHC_I 0.0
-
-  /* Solid thermal conductivity */
-
-  typedef double SolidTC_t ;
-# define         SOLIDTC_I 0.0
+//   typedef double SolidVHC_t ;
+// # define         SOLIDVHC_I 0.0
+//
+//   /* Solid thermal conductivity */
+//
+//   typedef double SolidTC_t ;
+// # define         SOLIDTC_I 0.0
 
 /******************************************************************************/
 
   /* Ambient heat transfer coefficient */
 
-  typedef double AmbientHTC_t ;
-# define         AMBIENTHTC_I 0.0
+//   typedef double AmbientHTC_t ;
+// # define         AMBIENTHTC_I 0.0
 
 /******************************************************************************/
 
   /* Coolant heat transfer coefficient */
 
-  typedef double CoolantHTC_t ;
-# define         COOLANTHTC_I 0.0
-
-  /* Coolant volumetric heat capacity */
-
-  typedef double CoolantVHC_t ;
-# define         COOLANTVHC_I 0.0
+//   typedef double CoolantHTC_t ;
+// # define         COOLANTHTC_I 0.0
+//
+//   /* Coolant volumetric heat capacity */
+//
+//   typedef double CoolantVHC_t ;
+// # define         COOLANTVHC_I 0.0
 
   /* the collection of parameters describing a cooling fluid */
 
@@ -133,17 +133,17 @@ extern "C"
   {
     /* The heat transfert coefficients in [ (W / ( um2 * K ) ] */
 
-    CoolantHTC_t HTCSide ;
-    CoolantHTC_t HTCTop ;
-    CoolantHTC_t HTCBottom ;
+    double HTCSide ;
+    double HTCTop ;
+    double HTCBottom ;
 
     /* The volumetric heat capacity in [ J / ( um3 * K ) ] */
 
-    CoolantVHC_t VHC ;
+    double VHC ;
 
     /* The temperarute at the channel inlet in [K]  */
 
-    Temperature_t TIn ;
+    double TIn ;
 
   } ;
 
@@ -153,57 +153,57 @@ extern "C"
 
   /* Coolant flow rate */
 
-  typedef double CoolantFR_t ;
-# define         COOLANTFR_I 0.0
-
-  /* Darcy Velocity  */
-
-  typedef double DarcyVelocity_t ;
-# define         DARCYVELOCITY_I 0.0
-
-  /* C convection coefficient */
-
-  typedef double Cconv_t ;
-# define         CCONV_I 0.0
-
-  /* Porosity */
-
-  typedef double Porosity_t ;
-# define         POROSITY_I 0.0
+//   typedef double CoolantFR_t ;
+// # define         COOLANTFR_I 0.0
+//
+//   /* Darcy Velocity  */
+//
+//   typedef double DarcyVelocity_t ;
+// # define         DARCYVELOCITY_I 0.0
+//
+//   /* C convection coefficient */
+//
+//   typedef double Cconv_t ;
+// # define         CCONV_I 0.0
+//
+//   /* Porosity */
+//
+//   typedef double Porosity_t ;
+// # define         POROSITY_I 0.0
 
 /******************************************************************************/
 
   /* Grid dimension (number and index of layer, row, column) */
 
-  typedef int GridDimension_t ;
-# define      GRIDDIMENSION_I 0
-
-  /* Cell dimension (for cell length, height, width) */
-
-  typedef double CellDimension_t ;
-# define         CELLDIMENSION_I 0.0
-
-  /* Chip dimension (for chip length, width) */
-
-# define ChipDimension_t CellDimension_t
-# define CHIPDIMENSION_I CELLDIMENSION_I
+//   typedef int GridDimension_t ;
+// # define      GRIDDIMENSION_I 0
+//
+//   /* Cell dimension (for cell length, height, width) */
+//
+//   typedef double CellDimension_t ;
+// # define         CELLDIMENSION_I 0.0
+//
+//   /* Chip dimension (for chip length, width) */
+//
+// # define ChipDimension_t CellDimension_t
+// # define CHIPDIMENSION_I CELLDIMENSION_I
 
 /******************************************************************************/
 
   /* System matrix coefficients */
 
-  typedef double SystemMatrixValue_t ;
-# define         SYSTEMMATRIXVALUE_I 0.0
-
-  /* System matrix column indexes */
-
-  typedef int SystemMatrixColumn_t ;
-# define      SYSTEMMATRIXCOLUMN_I 0
-
-  /* System matrix row indexes */
-
-  typedef int SystemMatrixRow_t ;
-# define      SYSTEMMATRIXROW_I 0
+//   typedef double SystemMatrixValue_t ;
+// # define         SYSTEMMATRIXVALUE_I 0.0
+//
+//   /* System matrix column indexes */
+//
+//   typedef int SystemMatrixColumn_t ;
+// # define      SYSTEMMATRIXCOLUMN_I 0
+//
+//   /* System matrix row indexes */
+//
+//   typedef int SystemMatrixRow_t ;
+// # define      SYSTEMMATRIXROW_I 0
 
 /******************************************************************************/
 

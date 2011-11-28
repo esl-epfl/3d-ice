@@ -123,7 +123,7 @@ floorplan_element_list
 
   : floorplan_element             // $1 : pointer to the first floorplan element found
     {
-        if (check_location (dimensions, $1) == TRUE_V)
+        if (check_location (dimensions, $1) == true)
         {
             sprintf (error_message, "Floorplan element %s is outside of the IC", $1->Id) ;
 
@@ -151,7 +151,7 @@ floorplan_element_list
             local_abort = true ;
         }
 
-        if (check_location (dimensions, $2) == TRUE_V)
+        if (check_location (dimensions, $2) == true)
         {
             sprintf (error_message, "Floorplan element %s is outside of the IC", $2->Id) ;
 

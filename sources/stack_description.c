@@ -49,7 +49,7 @@ extern int stack_description_parse
 
 void init_stack_description (StackDescription* stkd)
 {
-  stkd->FileName             = STRING_I ;
+  stkd->FileName             = NULL ;
   stkd->MaterialsList        = NULL ;
   stkd->ConventionalHeatSink = NULL ;
   stkd->Channel              = NULL ;
@@ -65,7 +65,7 @@ int fill_stack_description
 (
   StackDescription *stkd,
   Analysis         *analysis,
-  String_t          filename
+  char *          filename
 )
 {
   FILE*    input ;
@@ -112,7 +112,7 @@ void free_stack_description (StackDescription* stkd)
 void print_formatted_stack_description
 (
   FILE*             stream,
-  String_t          prefix,
+  char *          prefix,
   StackDescription* stkd
 )
 {
@@ -150,11 +150,11 @@ void print_formatted_stack_description
 void print_detailed_stack_description
 (
   FILE*             stream,
-  String_t          prefix,
+  char *          prefix,
   StackDescription* stkd
 )
 {
-    String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+    char * new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -266,7 +266,7 @@ void print_detailed_stack_description
 void print_all_floorplans
 (
   FILE*             stream,
-  String_t          prefix,
+  char *          prefix,
   StackDescription* stkd
 )
 {
@@ -308,7 +308,7 @@ void fill_thermal_cell_stack_description
 
 Error_t fill_sources_stack_description
 (
-    Source_t         *sources,
+    double         *sources,
     ThermalCell      *thermal_cells,
     StackDescription *stkd
 )
@@ -323,12 +323,12 @@ Error_t fill_sources_stack_description
 
     // reset all the source vector to 0
 
-    Quantity_t ccounter ;
-    Quantity_t ncells = get_number_of_cells (stkd->Dimensions) ;
+    uint32_t ccounter ;
+    uint32_t ncells = get_number_of_cells (stkd->Dimensions) ;
 
     for (ccounter = 0 ; ccounter != ncells ; ccounter++)
 
-        sources [ ccounter ] = SOURCE_I ;
+        sources [ ccounter ] = 0.0 ;
 
     // set the sources due to the heatsink (overwrites all cells in the last layer)
 
@@ -362,38 +362,38 @@ void init_power_values
 
 /******************************************************************************/
 
-Bool_t insert_power_values_by_powers_queue
+bool insert_power_values_by_powers_queue
 (
   StackDescription* stkd,
   PowersQueue*      pvalues
 )
 {
   if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
-    return FALSE_V;
+    return false ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
                                      stkd->BottomStackElement)
 
     insert_power_values_stack_element (stack_element, pvalues) ;
 
-  return TRUE_V;
+  return true ;
 }
 
 /******************************************************************************/
 
-Bool_t insert_power_values
+bool insert_power_values
 (
   StackDescription* stkd,
-  Power_t*          pvalues
+  double*          pvalues
 )
 {
   PowersQueue* pvalues_queue;
   pvalues_queue = alloc_and_init_powers_queue();
   if (pvalues == NULL)
-    return FALSE_V;
+    return false;
 
-  Quantity_t index;
-  Quantity_t totalNFloorplanElements = get_total_number_of_floorplan_elements(stkd);
+  uint32_t index;
+  uint32_t totalNFloorplanElements = get_total_number_of_floorplan_elements(stkd);
 
   for (index = 0; index < totalNFloorplanElements; index++)
     put_into_powers_queue(pvalues_queue, pvalues[index]);
@@ -405,7 +405,7 @@ Bool_t insert_power_values
 
 void update_channel_inlet_stack_description
 (
-  Source_t*         sources,
+  double*         sources,
   StackDescription* stkd
 )
 {
@@ -450,7 +450,7 @@ void fill_system_matrix_stack_description
 
     SystemMatrix tmp_system_matrix = system_matrix ;
 
-    *system_matrix.ColumnPointers++ = SYSTEMMATRIXCOLUMN_I ;
+    *system_matrix.ColumnPointers++ = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
 
@@ -467,10 +467,10 @@ void fill_system_matrix_stack_description
 
 /******************************************************************************/
 
-Quantity_t get_number_of_floorplan_elements
+uint32_t get_number_of_floorplan_elements
 (
   StackDescription* stkd,
-  String_t          floorplan_id
+  char *          floorplan_id
 )
 {
   StackElement* stk_el = find_stack_element_in_list
@@ -491,12 +491,12 @@ Quantity_t get_number_of_floorplan_elements
 
 /******************************************************************************/
 
-Quantity_t get_total_number_of_floorplan_elements
+uint32_t get_total_number_of_floorplan_elements
 (
   StackDescription* stkd
 )
 {
-  Quantity_t total_number_of_floorplan_elements = QUANTITY_I;
+  uint32_t total_number_of_floorplan_elements = 0u ;
 
   FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
                                      stkd->BottomStackElement)

@@ -66,7 +66,7 @@ extern "C"
   {
     /* The name of the file used to fill the stack description */
 
-    String_t FileName ;
+    char *FileName ;
 
     /* The list of materials componing the layers and channels */
 
@@ -121,7 +121,7 @@ extern "C"
   /* section (from bottom to top). It stops as soon as it finds an error    */
   /* and it returns 1, discarding the remaining files to parse.             */
 
-  int fill_stack_description (StackDescription* stkd, Analysis *analysis, String_t filename) ;
+  int fill_stack_description (StackDescription* stkd, Analysis *analysis, char* filename) ;
 
 /******************************************************************************/
 
@@ -142,7 +142,7 @@ extern "C"
   void print_formatted_stack_description
   (
     FILE*             stream,
-    String_t          prefix,
+    char*          prefix,
     StackDescription* stkd
   ) ;
 
@@ -151,7 +151,7 @@ extern "C"
   void print_detailed_stack_description
   (
     FILE*             stream,
-    String_t          prefix,
+    char*          prefix,
     StackDescription* stkd
   ) ;
 
@@ -196,7 +196,7 @@ extern "C"
 
     Error_t fill_sources_stack_description
     (
-        Source_t         *sources,
+        double         *sources,
         ThermalCell      *thermal_cells,
         StackDescription *stkd
     ) ;
@@ -205,7 +205,7 @@ extern "C"
 
   void update_channel_inlet_stack_description
   (
-    Source_t*         sources,
+    double*         sources,
     StackDescription* stkd
   ) ;
 
@@ -230,9 +230,9 @@ extern "C"
 
   void init_power_values (StackDescription* stkd) ;  // FIXME These are needed here??
 
-  Bool_t insert_power_values_by_powers_queue (StackDescription* stkd, PowersQueue* pvalues) ;
+  bool insert_power_values_by_powers_queue (StackDescription* stkd, PowersQueue* pvalues) ;
 
-  Bool_t insert_power_values (StackDescription* stkd, Power_t* pvalues) ;
+  bool insert_power_values (StackDescription* stkd, double* pvalues) ;
 
 /******************************************************************************/
 
@@ -244,7 +244,7 @@ extern "C"
   void print_all_floorplans
   (
     FILE*             stream,
-    String_t          prefix,
+    char*          prefix,
     StackDescription* stkd
   ) ;
 
@@ -262,15 +262,15 @@ extern "C"
   /*      belongs to a die but the floorplan itself does not exist          */
   /* >= 0 the number of floorplan elements in floorplan_id                  */
 
-  Quantity_t get_number_of_floorplan_elements
+  uint32_t get_number_of_floorplan_elements
   (
     StackDescription* stkd,
-    String_t floorplan_id
+    char* floorplan_id
   ) ;
 
 /******************************************************************************/
 
-  Quantity_t get_total_number_of_floorplan_elements
+  uint32_t get_total_number_of_floorplan_elements
   (
     StackDescription* stkd
   ) ;

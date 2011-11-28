@@ -63,14 +63,14 @@ extern "C"
     /* The following pointers point to memory used to store, for every cell  */
     /* in the 3D grid, the temperature and the source values                 */
 
-    Temperature_t* Temperatures ;
-    Source_t*      Sources ;
+    double* Temperatures ;
+    double*      Sources ;
 
     ThermalCell*   ThermalCells ;
 
     /* The number of cells in the 3D grid to be emulated */
 
-    Quantity_t    Size ;
+    uint32_t    Size ;
 
     /* The matrix A representing the linear system */
 
@@ -210,7 +210,7 @@ extern "C"
   (
     ThermalData*      tdata,
     StackDescription* stkd,
-    CoolantFR_t       new_coolant_fr
+    double       new_coolant_fr
   ) ;
 
 /******************************************************************************/
@@ -236,9 +236,9 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    max_temperature
+    char *          floorplan_id,
+    char *          floorplan_element_id,
+    double*    max_temperature
   ) ;
 
 /******************************************************************************/
@@ -263,9 +263,9 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    min_temperature
+    char *          floorplan_id,
+    char *          floorplan_element_id,
+    double*    min_temperature
   ) ;
 
 /******************************************************************************/
@@ -290,9 +290,9 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    avg_temperature
+    char *          floorplan_id,
+    char *          floorplan_element_id,
+    double*    avg_temperature
   ) ;
 
 /******************************************************************************/
@@ -322,11 +322,11 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    String_t          floorplan_element_id,
-    Temperature_t*    min_temperature,
-    Temperature_t*    avg_temperature,
-    Temperature_t*    max_temperature
+    char *          floorplan_id,
+    char *          floorplan_element_id,
+    double*    min_temperature,
+    double*    avg_temperature,
+    double*    max_temperature
   ) ;
 
 /******************************************************************************/
@@ -346,7 +346,7 @@ extern "C"
   /*     to a die but the floorplan itself does not exist                    */
   /*                                                                         */
   /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
+  /* function will access n elements of type double starting from     */
   /* max_temperatures (i.e. the memory must be allocated before calling this */
   /* function). Temperatures will be written following the same order of     */
   /* declaration found in the corresponding .flp file (max_temperature[0] is */
@@ -357,8 +357,8 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    Temperature_t*    max_temperature
+    char *          floorplan_id,
+    double*    max_temperature
   ) ;
 
 /******************************************************************************/
@@ -378,7 +378,7 @@ extern "C"
   /*     to a die but the Floorplan itself does not exist                    */
   /*                                                                         */
   /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
+  /* function will access n elements of type double starting from     */
   /* min_temperatures (i.e. the memory must be allocated before calling this */
   /* function). Temperatures will be written following the same order of     */
   /* declaration found in the corresponding .flp file (max_temperature[0] is */
@@ -389,8 +389,8 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    Temperature_t*    min_temperature
+    char *          floorplan_id,
+    double*    min_temperature
   ) ;
 
 /******************************************************************************/
@@ -410,7 +410,7 @@ extern "C"
   /*     to a die but the Floorplan itself does not exist                    */
   /*                                                                         */
   /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
+  /* function will access n elements of type double starting from     */
   /* avg_temperatures (i.e. the memory must be allocated before calling this */
   /* function). Temperatures will be written following the same order of     */
   /* declaration found in the corresponding .flp file (max_temperature[0] is */
@@ -421,8 +421,8 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    Temperature_t*    avg_temperature
+    char *          floorplan_id,
+    double*    avg_temperature
   ) ;
 
 /******************************************************************************/
@@ -447,7 +447,7 @@ extern "C"
   /*     to a die but the Floorplan itself does not exist                    */
   /*                                                                         */
   /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type Temperature_t starting from     */
+  /* function will access n elements of type double starting from     */
   /* min_temperatures, avg_temperatures, etc. (i.e. the memory must be       */
   /* allocated before calling this function). Temperatures will be written   */
   /* following the same order of declaration found in the corresponding .flp */
@@ -458,10 +458,10 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          floorplan_id,
-    Temperature_t*    min_temperature,
-    Temperature_t*    avg_temperature,
-    Temperature_t*    max_temperature
+    char *          floorplan_id,
+    double*    min_temperature,
+    double*    avg_temperature,
+    double*    max_temperature
   ) ;
 
 /******************************************************************************/
@@ -477,10 +477,10 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    GridDimension_t   layer_index,
-    GridDimension_t   row_index,
-    GridDimension_t   column_index,
-    Temperature_t*    cell_temperature
+    uint32_t   layer_index,
+    uint32_t   row_index,
+    uint32_t   column_index,
+    double*    cell_temperature
   ) ;
 
 /******************************************************************************/
@@ -503,8 +503,8 @@ extern "C"
   (
     StackDescription* stkd,
     ThermalData*      tdata,
-    String_t          stack_element_id,
-    String_t          file_name
+    char *          stack_element_id,
+    char *          file_name
   ) ;
 
 /******************************************************************************/

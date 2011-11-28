@@ -192,7 +192,7 @@ Error_t fill_sources_floorplan_element
     FloorplanElement *floorplan_element
 )
 {
-    if (is_empty_powers_queue (floorplan_element->PowerValues) == TRUE_V)
+    if (is_empty_powers_queue (floorplan_element->PowerValues) == true)
 
         return TDICE_FAILURE ;
 

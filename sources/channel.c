@@ -279,7 +279,7 @@ void fill_thermal_cell_channel_4rm
                 layer_index, row_index, column_index, cell_index++) ;
 #endif
 
-            if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == TRUE_V)
+            if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
 
                 fill_liquid_cell_mc_4rm
                 (
@@ -671,7 +671,7 @@ void fill_sources_channel
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-        if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == TRUE_V)
+        if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == true)
         {
             *sources = tmp ;
 
@@ -713,7 +713,7 @@ SystemMatrix fill_system_matrix_channel
         {
             FOR_EVERY_COLUMN (column_index, dimensions)
             {
-                if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == TRUE_V)
+                if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == true)
 
                     system_matrix = add_liquid_column_mc_4rm
 

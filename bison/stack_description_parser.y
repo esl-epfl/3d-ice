@@ -445,9 +445,9 @@ microchannel
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_2RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_2RM ;
         stkd->Channel->DarcyVelocity     = $24 ;
-        stkd->Channel->Coolant.HTCSide   = COOLANTHTC_I ;
-        stkd->Channel->Coolant.HTCTop    = COOLANTHTC_I ;
-        stkd->Channel->Coolant.HTCBottom = COOLANTHTC_I ;
+        stkd->Channel->Coolant.HTCSide   = 0.0 ;
+        stkd->Channel->Coolant.HTCTop    = 0.0 ;
+        stkd->Channel->Coolant.HTCBottom = 0.0 ;
         stkd->Channel->Coolant.VHC       = $30 ;
         stkd->Channel->Coolant.TIn       = $35 ;
         stkd->Channel->WallMaterial      = find_material_in_list (stkd->MaterialsList, $20) ;
@@ -491,27 +491,27 @@ coolant_heat_transfer_coefficients_rm2
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
-        $$.HTCSide   = COOLANTHTC_I ;
+        $$.HTCSide   = 0.0 ;
         $$.HTCTop    = $5 ;
         $$.HTCBottom = $5 ;
     }
   | COOLANT HEAT TRANSFER COEFFICIENT TOP    DVALUE ','
                                       BOTTOM DVALUE ';'
     {
-        $$.HTCSide   = COOLANTHTC_I ;
+        $$.HTCSide   = 0.0 ;
         $$.HTCTop    = $6 ;
         $$.HTCBottom = $9 ;
     }
   ;
 
 first_wall_length
-  :                              { $$ = CELLDIMENSION_I ; } // Not mandatory
-  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ;              }
+  :                              { $$ = 0.0 ; } // Not mandatory
+  | FIRST WALL LENGTH DVALUE ';' { $$ = $4 ;  }
   ;
 
 last_wall_length
-  :                             { $$ = CELLDIMENSION_I ; } // Not mandatory
-  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ;              }
+  :                             { $$ = 0.0 ; } // Not mandatory
+  | LAST WALL LENGTH DVALUE ';' { $$ = $4 ;  }
   ;
 
 distribution
@@ -842,7 +842,7 @@ stack
         // the bottom most element in the stack. This operation can be done only
         // here since the parser processes elements in the stack from the top most.
 
-        uint32_t layer_index = GRIDDIMENSION_I ;
+        uint32_t layer_index = 0u ;
 
         FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
         {
@@ -1177,8 +1177,8 @@ inspection_point
   :  TCELL '(' IDENTIFIER ',' PATH ',' DVALUE ',' DVALUE when ')' ';'
 
      // $3       Identifier of the stack element (layer, channel or die)
-     // ($5, $7) Coordinates of the cell to monitor
-     // $9       Path of the output file
+     // $5       Path of the output file
+     // ($7, $9) Coordinates of the cell to monitor
      // $10      when to generate output for this observation
 
      {
@@ -1193,7 +1193,7 @@ inspection_point
             stack_description_error (stkd, analysis, scanner, error_message) ;
 
             FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $9) ;
+            FREE_POINTER (free, $5) ;
 
             YYABORT ;
         }
@@ -1203,21 +1203,21 @@ inspection_point
         if (tcell == NULL)
         {
             FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $9) ;
+            FREE_POINTER (free, $5) ;
 
             stack_description_error (stkd, analysis, scanner, "Malloc tcell failed") ;
 
             YYABORT ;
         }
 
-        align_tcell (tcell, $5, $7, stkd->Dimensions) ;
+        align_tcell (tcell, $7, $9, stkd->Dimensions) ;
 
         InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $9) ;
+            FREE_POINTER (free, $5) ;
 
             FREE_POINTER (free_tcell, tcell) ;
 
@@ -1228,7 +1228,7 @@ inspection_point
 
         inspection_point->Type          = TDICE_OUTPUT_TCELL ;
         inspection_point->InstanceType  = $10 ;
-        inspection_point->FileName      = $9 ;
+        inspection_point->FileName      = $5 ;
         inspection_point->Pointer.Tcell = tcell ;
         inspection_point->StackElement  = stack_element ;
 

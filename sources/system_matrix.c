@@ -45,8 +45,8 @@ void init_system_matrix (SystemMatrix* system_matrix)
     system_matrix->ColumnPointers = NULL ;
     system_matrix->RowIndices     = NULL;
     system_matrix->Values         = NULL ;
-    system_matrix->Size           = QUANTITY_I ;
-    system_matrix->NNz            = QUANTITY_I ;
+    system_matrix->Size           = 0u ;
+    system_matrix->NNz            = 0u ;
 }
 
 /******************************************************************************/
