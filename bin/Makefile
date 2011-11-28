@@ -37,33 +37,18 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-all: FillThermalData Emulate3DICe ThermalEvolution
+all: 3D-ICE-Emulator
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 
--include FillThermalData.d
+-include 3D-ICE-Emulator.d
 
-FillThermalData: FillThermalData.o $(3DICE_LIB_A)
-	$(CC) $< $(CLIBS) -o $@
-
--include Emulate3DICe.d
-
-Emulate3DICe: Emulate3DICe.o $(3DICE_LIB_A)
-	$(CC) $< $(CLIBS) -o $@
-
--include ThermalEvolution.d
-
-ThermalEvolution: ThermalEvolution.o $(3DICE_LIB_A)
+3D-ICE-Emulator: 3D-ICE-Emulator.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
 clean:
-	@$(RM) $(RMFLAGS) FillThermalData
-	@$(RM) $(RMFLAGS) FillThermalData.o
-	@$(RM) $(RMFLAGS) FillThermalData.d
-	@$(RM) $(RMFLAGS) Emulate3DICe
-	@$(RM) $(RMFLAGS) Emulate3DICe.o
-	@$(RM) $(RMFLAGS) Emulate3DICe.d
-	@$(RM) $(RMFLAGS) ThermalEvolution
-	@$(RM) $(RMFLAGS) ThermalEvolution.o
-	@$(RM) $(RMFLAGS) ThermalEvolution.d
+	@$(RM) $(RMFLAGS) 3D-ICE-Emulator
+	@$(RM) $(RMFLAGS) 3D-ICE-Emulator.o
+	@$(RM) $(RMFLAGS) 3D-ICE-Emulator.d
+

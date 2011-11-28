@@ -1,0 +1,53 @@
+material SILICON :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ; 
+
+material BEOL :
+   thermal conductivity     2.25e-6 ;
+   volumetric heat capacity 2.175e-12 ; 
+
+conventional heat sink :
+   heat transfer coefficient 1.0e-7 ;
+   ambient temperature 300 ;
+
+microchannel rm2 :
+   height 100 ;
+   channel length 50 ;
+   wall    length 50 ;
+   wall material SILICON ;
+   coolant flow rate 42 ;
+   coolant heat transfer coefficient top 5.7132e-8 ,
+                                  bottom 4.7132e-8 ;
+   coolant volumetric heat capacity 4.172e-12 ;
+   coolant incoming temperature 300.0 ;
+
+die TOP_IC :
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+die BOTTOM_IC :
+   layer  10 BEOL ;
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+dimensions :
+   chip length 10000, width 10000 ; 
+   cell length   100, width   100 ;
+
+stack:
+   die     MEMORY_DIE     TOP_IC    floorplan "./mem.flp" ;
+   channel TOP_CHANNEL    ;
+   die     CORE_DIE       BOTTOM_IC floorplan "./core.flp" ;
+   channel BOTTOM_CHANNEL ;
+   layer   BOTTOM_MOST    10 BEOL ;
+
+solver:
+   transient step 0.02, slot 0.2 ;
+   initial temperature 300.0 ;
+
+output:
+   T      ( MEMORY_DIE, 5000, 3000, "output1.txt",          step ) ;
+   Tmap   (   CORE_DIE,             "output2.txt",          slot ) ;
+   Tflp   ( MEMORY_DIE,             "output3.txt", minimum, step ) ;
+   Tflpel (   CORE_DIE.Core1,       "output4.txt", average, final) ;
+

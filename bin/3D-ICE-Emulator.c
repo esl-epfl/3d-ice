@@ -33,6 +33,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <time.h>
+
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
@@ -56,45 +58,57 @@ main(int argc, char** argv)
   // Init StackDescription and parse the input file
   ////////////////////////////////////////////////////////////////////////////
 
-  init_stack_description (&stkd) ;
+  fprintf (stdout, "Preparing stk data ...\n") ;
 
-  init_analysis (&analysis) ;
+  init_stack_description (&stkd) ;
+  init_analysis          (&analysis) ;
 
   if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
 
     return EXIT_FAILURE ;
 
-  fprintf (stdout, "----------------------------------------------\n");
-  print_detailed_stack_description (stdout, "", &stkd) ;
-  fprintf (stdout, "----------------------------------------------\n");
-  print_formatted_stack_description (stdout, "", &stkd) ;
-  fprintf (stdout, "----------------------------------------------\n");
-
-  // Init thermal data and fill it using the StackDescription
+  // Generate output files
   ////////////////////////////////////////////////////////////////////////////
 
-  init_thermal_data (&tdata) ;
-
-  if (fill_thermal_data  (&tdata, &stkd, &analysis) != 0)
+  if (generate_analysis_headers (&analysis) != TDICE_SUCCESS)
   {
-    fprintf (stderr, "fill thermal data failed\n") ;
-    free_thermal_data (&tdata) ;
+    fprintf(stderr, "error in initializing output files \n ");
     free_stack_description (&stkd) ;
     return EXIT_FAILURE ;
   }
 
-  // Here we can do something ... emulating? printing info ??
+  // Init thermal data and fill it using the StackDescription
   ////////////////////////////////////////////////////////////////////////////
 
-  // print_all_floorplans(stdout, "", &stkd) ;
+  fprintf (stdout, "Preparing thermal data ...\n") ;
 
-  // This is to consume a power value (to see the effect of PRINT_SOURCES
-  emulate_step(&tdata, &stkd, &analysis) ;
+  init_thermal_data (&tdata) ;
+
+  if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
+  {
+    fprintf(stderr, "fill thermal data failed\n") ;
+
+    free_analysis          (&analysis) ;
+    free_stack_description (&stkd) ;
+    return EXIT_FAILURE ;
+  }
+
+  clock_t Time = clock() ;
+
+  do
+  {
+
+  }
+  while (emulate_step (&tdata, &stkd, &analysis) != 1) ;
+
+  fprintf (stdout, "emulation took %.3f sec\n",
+           ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
 
   // free all data
   ////////////////////////////////////////////////////////////////////////////
 
-  free_thermal_data (&tdata) ;
+  free_thermal_data      (&tdata) ;
+  free_analysis          (&analysis) ;
   free_stack_description (&stkd) ;
 
   return EXIT_SUCCESS ;

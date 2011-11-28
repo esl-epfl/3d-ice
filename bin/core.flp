@@ -1,0 +1,91 @@
+Core0 :
+
+  position       0,    0 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core1 :
+
+  position    2500,    0 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core2 :
+
+  position    5000,    0 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core3 :
+
+  position    7500,    0 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core4 :
+
+  position       0, 6500 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core5 :
+
+  position    2500, 6500 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core6 :
+
+  position    5000, 6500 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Core7 :
+
+  position    7500, 6500 ;
+  dimension   2500, 3500 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Cache0 :
+
+  position       0, 3500 ;
+  dimension   1250, 3000 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+Cache1 :
+
+  position    8750, 3500 ;
+  dimension   1250, 3000 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+CLK :
+
+  position    1250, 3500 ;
+  dimension   1250, 3000 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+FPU :
+
+  position    7500, 3500 ;
+  dimension   1250, 3000 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+
+CrossBar :
+
+  position    2500, 3500 ;
+  dimension   5000, 3000 ;
+
+  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+

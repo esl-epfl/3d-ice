@@ -37,9 +37,9 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib examples doc clean
+.PHONY: all lib bin doc clean
 
-all: lib examples
+all: lib bin
 
 lib:
 	cd $(3DICE_FLEX)    ; make ;
@@ -47,17 +47,17 @@ lib:
 	cd $(3DICE_SOURCES) ; make ;
 	cd $(3DICE_LIB)     ; make ;
 
-examples: lib
-	cd $(3DICE_EXAMPLES) ; make ;
+bin: lib
+	cd $(3DICE_BIN) ; make ;
 
 doc:
 	cd $(3DICE_DOC) ; make doc ;
 
 clean:
-	cd $(3DICE_FLEX)       ; make clean ;
-	cd $(3DICE_BISON)      ; make clean ;
-	cd $(3DICE_SOURCES)    ; make clean ;
-	cd $(3DICE_LIB)        ; make clean ;
-	cd $(3DICE_EXAMPLES)   ; make clean ;
-	cd $(3DICE_DOC)        ; make clean ;
+	cd $(3DICE_FLEX)    ; make clean ;
+	cd $(3DICE_BISON)   ; make clean ;
+	cd $(3DICE_SOURCES) ; make clean ;
+	cd $(3DICE_LIB)     ; make clean ;
+	cd $(3DICE_BIN)     ; make clean ;
+	cd $(3DICE_DOC)     ; make clean ;
 
