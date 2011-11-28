@@ -495,7 +495,8 @@ void print_detailed_inspection_point_list
 Error_t generate_inspection_point_header
 (
     InspectionPoint *inspection_point,
-    Dimensions      *dimensions
+    Dimensions      *dimensions,
+    char            *prefix
 )
 {
     FILE *output_stream = fopen (inspection_point->FileName, "w") ;
@@ -514,24 +515,28 @@ Error_t generate_inspection_point_header
         case TDICE_OUTPUT_TCELL :
 
             fprintf (output_stream,
-                "Cell temperature for the location [%s, x=%5.3f,y=%5.3f]\n",
+                "%sCell temperature for the location [%s, x=%5.3f,y=%5.3f]\n",
+                prefix,
                 inspection_point->StackElement->Id,
                 inspection_point->Pointer.Tcell->Xval,
                 inspection_point->Pointer.Tcell->Yval) ;
 
             fprintf (output_stream,
-                "Nearest [column, row] indices found= [%d,%d] (locations [x=%5.3f,y=%5.3f])\n",
+                "%sNearest [column, row] indices found= [%d,%d] (locations [x=%5.3f,y=%5.3f])\n",
+                prefix,
                 inspection_point->Pointer.Tcell->ColumnIndex,
                 inspection_point->Pointer.Tcell->RowIndex,
                 inspection_point->Pointer.Tcell->ActualXval,
                 inspection_point->Pointer.Tcell->ActualYval);
 
             fprintf (output_stream,
-                "Time(s) \t Temperature(K)\n");
+                "%sTime(s) \t Temperature(K)\n", prefix);
 
             break ;
 
         case TDICE_OUTPUT_TFLP :
+
+            fprintf (output_stream, "%s", prefix) ;
 
             if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_MAXIMUM)
 
@@ -554,8 +559,8 @@ Error_t generate_inspection_point_header
             }
 
             fprintf (output_stream,
-                "temperatures for the floorplan of the die %s\n",
-                inspection_point->StackElement->Id) ;
+                "%stemperatures for the floorplan of the die %s\n",
+                prefix, inspection_point->StackElement->Id) ;
 
             if (inspection_point->StackElement->Floorplan == NULL)
             {
@@ -566,7 +571,7 @@ Error_t generate_inspection_point_header
                 goto header_error ;
             }
 
-            fprintf (output_stream, "Time(s) \t ");
+            fprintf (output_stream, "%sTime(s) \t ", prefix);
 
             FOR_EVERY_ELEMENT_IN_LIST_FORWARD
 
@@ -579,6 +584,8 @@ Error_t generate_inspection_point_header
             break ;
 
         case TDICE_OUTPUT_TFLPEL :
+
+            fprintf (output_stream, "%s", prefix) ;
 
             if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MAXIMUM)
 
@@ -606,7 +613,8 @@ Error_t generate_inspection_point_header
                 inspection_point->StackElement->Id) ;
 
             fprintf (output_stream,
-                "Time(s) \t %s.%s(K)\n",
+                "%sTime(s) \t %s.%s(K)\n",
+                prefix,
                 inspection_point->StackElement->Id,
                 inspection_point->Pointer.Tflpel->FloorplanElement->Id) ;
 
@@ -615,8 +623,8 @@ Error_t generate_inspection_point_header
         case TDICE_OUTPUT_TMAP :
 
             fprintf (output_stream,
-                "Thermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
-                inspection_point->StackElement->Id);
+                "%sThermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
+                prefix, inspection_point->StackElement->Id);
 
             print_axes (dimensions) ;
 

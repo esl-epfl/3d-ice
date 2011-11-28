@@ -203,6 +203,7 @@ extern "C"
      *
      * \param analysis pointer to the analysis structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param prefix string to be printed as suffix for every line in the header
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
      * \return \c TDICE_FAILURE if one of the files can not be created
@@ -210,7 +211,7 @@ extern "C"
 
     Error_t generate_analysis_headers
 
-        (Analysis* analysis, Dimensions *dimensions) ;
+        (Analysis* analysis, Dimensions *dimensions, char *prefix) ;
 
 
 

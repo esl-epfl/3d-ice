@@ -70,7 +70,9 @@ main(int argc, char** argv)
   // Generate output files
   ////////////////////////////////////////////////////////////////////////////
 
-  if (generate_analysis_headers (&analysis, stkd.Dimensions) != TDICE_SUCCESS)
+  // We use "% " as prefix for matlab compatibility (header will be a comment)
+
+  if (generate_analysis_headers (&analysis, stkd.Dimensions, "% ") != TDICE_SUCCESS)
   {
     fprintf(stderr, "error in initializing output files \n ");
     free_stack_description (&stkd) ;

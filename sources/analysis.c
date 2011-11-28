@@ -269,23 +269,28 @@ void add_inspection_point_to_analysis
 
 /******************************************************************************/
 
-Error_t generate_analysis_headers (Analysis* analysis, Dimensions *dimensions)
+Error_t generate_analysis_headers
+(
+    Analysis   *analysis,
+    Dimensions *dimensions,
+    char       *prefix
+)
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, final, analysis->InspectionPointListFinal)
 
-        if (generate_inspection_point_header (final, dimensions) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (final, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, slot, analysis->InspectionPointListSlot)
 
-        if (generate_inspection_point_header (slot, dimensions) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (slot, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, step, analysis->InspectionPointListStep)
 
-        if (generate_inspection_point_header (step, dimensions) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (step, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 

@@ -426,13 +426,14 @@ extern "C"
      *
      * \param inspection_point the address of the InspectionPoint structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param prefix string to be printed as suffix for every line in the header
      *
      *  \return FIXME
      */
 
     Error_t generate_inspection_point_header
 
-        (InspectionPoint *inspection_point, Dimensions *dimensions) ;
+        (InspectionPoint *inspection_point, Dimensions *dimensions, char *prefix) ;
 
 
 
