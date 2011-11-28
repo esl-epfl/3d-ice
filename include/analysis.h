@@ -202,12 +202,15 @@ extern "C"
      * If the target output file is already there, it will be overwritten.
      *
      * \param analysis pointer to the analysis structure
+     * \param dimensions pointer to the structure containing the dimensions of the IC
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
      * \return \c TDICE_FAILURE if one of the files can not be created
      */
 
-    Error_t generate_analysis_headers (Analysis* analysis) ;
+    Error_t generate_analysis_headers
+
+        (Analysis* analysis, Dimensions *dimensions) ;
 
 
 

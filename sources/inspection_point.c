@@ -492,7 +492,11 @@ void print_detailed_inspection_point_list
 
 /******************************************************************************/
 
-Error_t generate_inspection_point_header (InspectionPoint *inspection_point)
+Error_t generate_inspection_point_header
+(
+    InspectionPoint *inspection_point,
+    Dimensions      *dimensions
+)
 {
     FILE *output_stream = fopen (inspection_point->FileName, "w") ;
 
@@ -613,6 +617,8 @@ Error_t generate_inspection_point_header (InspectionPoint *inspection_point)
             fprintf (output_stream,
                 "Thermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
                 inspection_point->StackElement->Id);
+
+            print_axes (dimensions) ;
 
             break ;
 
@@ -756,19 +762,6 @@ output_error :
     fclose (output_stream) ;
 
     return TDICE_FAILURE ;
-}
-
-/******************************************************************************/
-
-bool there_is_tmap_in_list (InspectionPoint *list)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, ipoint, list)
-
-        if (ipoint->Type == TDICE_OUTPUT_TMAP)
-
-            return true ;
-
-    return false ;
 }
 
 /******************************************************************************/

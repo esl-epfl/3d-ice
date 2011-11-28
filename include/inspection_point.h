@@ -60,7 +60,7 @@ extern "C"
      *  \brief Temperature of an individual thermal cell
      */
 
-    struct Tcell 
+    struct Tcell
     {
         /*! X coordinate of the thermal cell as specified in the stack file */
 
@@ -163,7 +163,7 @@ extern "C"
      *  \brief Temperature of all elements in a floorplan
      */
 
-    struct Tflp 
+    struct Tflp
     {
         /*! The kind of quantity to be measured */
 
@@ -228,7 +228,7 @@ extern "C"
      * \brief Temperature of a single floorplan element
      */
 
-    struct Tflpel 
+    struct Tflpel
     {
         /*! Pointer to the Floorplan Element */
 
@@ -424,12 +424,15 @@ extern "C"
 
     /*! Generates the file in which a particular inspection point will be printed
      *
-     *  \param inspection_point the address of the InspectionPoint structure
+     * \param inspection_point the address of the InspectionPoint structure
+     * \param dimensions pointer to the structure containing the dimensions of the IC
      *
      *  \return FIXME
      */
 
-    Error_t generate_inspection_point_header (InspectionPoint *inspection_point) ;
+    Error_t generate_inspection_point_header
+
+        (InspectionPoint *inspection_point, Dimensions *dimensions) ;
 
 
 
@@ -450,16 +453,6 @@ extern "C"
         double          *temperatures,
         double           current_time
     ) ;
-
-    /*! Tells if there is at least one Tmap instruction in the \a list
-     *
-     *  \param list pointer to the first (list)) stack element the stack
-     *
-     *  \return \c true if there is a Tmap instance in \a list
-     *  \return \c false otherwise
-     */
-
-    bool there_is_tmap_in_list (InspectionPoint *list) ;
 
 /******************************************************************************/
 

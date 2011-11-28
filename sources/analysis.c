@@ -269,35 +269,27 @@ void add_inspection_point_to_analysis
 
 /******************************************************************************/
 
-Error_t generate_analysis_headers (Analysis* analysis)
+Error_t generate_analysis_headers (Analysis* analysis, Dimensions *dimensions)
 {
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, final, analysis->InspectionPointListFinal)
 
-        if (generate_inspection_point_header (final) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (final, dimensions) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, slot, analysis->InspectionPointListSlot)
 
-        if (generate_inspection_point_header (slot) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (slot, dimensions) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, step, analysis->InspectionPointListStep)
 
-        if (generate_inspection_point_header (step) != TDICE_SUCCESS)
+        if (generate_inspection_point_header (step, dimensions) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-//   FIXME
-//
-//   if (   there_is_tmap_in_list (analysis->InspectionPointListFinal)
-//       || there_is_tmap_in_list (analysis->InspectionPointListSlot)
-//       || there_is_tmap_in_list (analysis->InspectionPointListStep))
-//
-//     print_axes (analysis) ;
-
-   return TDICE_SUCCESS ;
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
