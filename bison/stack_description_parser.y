@@ -923,7 +923,7 @@ stack_elements
         JOIN_ELEMENTS ($2, $1) ;
 
         stkd->BottomStackElement = $2 ;
-        $$ = $2 ;                 // $2 will be the last stack element in the list 
+        $$ = $2 ;                 // $2 will be the last stack element in the list
     }
   ;
 
@@ -1174,7 +1174,7 @@ inspection_points_list
 
 inspection_point
 
-  :  TCELL '(' IDENTIFIER ',' DVALUE ',' DVALUE ',' PATH when ')' ';'
+  :  TCELL '(' IDENTIFIER ',' PATH ',' DVALUE ',' DVALUE when ')' ';'
 
      // $3       Identifier of the stack element (layer, channel or die)
      // ($5, $7) Coordinates of the cell to monitor
