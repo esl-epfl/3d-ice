@@ -136,7 +136,7 @@ Error_t fill_sources_floorplan
     Floorplan  *floorplan
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, floorplan_element, floorplan->ElementsList)
 
         if (fill_sources_floorplan_element (sources, dimensions, floorplan_element) == TDICE_FAILURE)
 
@@ -152,7 +152,9 @@ void init_power_values_floorplan
     Floorplan *floorplan
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, floorplan_element, floorplan->ElementsList)
 
         init_power_values_floorplan_element (floorplan_element) ;
 }
@@ -165,8 +167,9 @@ void insert_power_values_floorplan
     PowersQueue *pvalues
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, floorplan_element,
-                                     floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, floorplan_element, floorplan->ElementsList)
 
         insert_power_values_floorplan_element (floorplan_element, pvalues) ;
 }
@@ -288,7 +291,9 @@ int get_all_max_temperatures_floorplan
   double     *max_temperature
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
 
         get_max_temperature_floorplan_element
 
@@ -309,7 +314,9 @@ void print_all_max_temperatures_floorplan
 {
     double temperature ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
     {
         get_max_temperature_floorplan_element
 
@@ -329,7 +336,9 @@ int get_all_min_temperatures_floorplan
     double     *min_temperature
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
 
         get_min_temperature_floorplan_element
 
@@ -350,7 +359,9 @@ void print_all_min_temperatures_floorplan
 {
     double temperature ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
     {
         get_min_temperature_floorplan_element
 
@@ -370,7 +381,9 @@ int get_all_avg_temperatures_floorplan
     double     *avg_temperature
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
 
         get_avg_temperature_floorplan_element
 
@@ -391,7 +404,9 @@ void print_all_avg_temperatures_floorplan
 {
     double temperature ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
     {
         get_avg_temperature_floorplan_element
 
@@ -413,7 +428,9 @@ int get_all_min_avg_max_temperatures_floorplan
     double     *max_temperature
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
 
         get_min_avg_max_temperatures_floorplan_element
 

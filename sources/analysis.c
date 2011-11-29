@@ -278,19 +278,19 @@ Error_t generate_analysis_headers
     char       *prefix
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, final, analysis->InspectionPointListFinal)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, final, analysis->InspectionPointListFinal)
 
         if (generate_inspection_point_header (final, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, slot, analysis->InspectionPointListSlot)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, slot, analysis->InspectionPointListSlot)
 
         if (generate_inspection_point_header (slot, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, step, analysis->InspectionPointListStep)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, step, analysis->InspectionPointListStep)
 
         if (generate_inspection_point_header (step, dimensions, prefix) != TDICE_SUCCESS)
 
@@ -329,7 +329,7 @@ Error_t generate_analysis_output
 
         return EXIT_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, ipoint, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
 
         if (generate_inspection_point_output (ipoint, dimensions, temperatures, current_time) != TDICE_SUCCESS)
 

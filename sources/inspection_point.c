@@ -301,7 +301,7 @@ void print_formatted_inspection_point_list
     InspectionPoint *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, inspection_point, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, inspection_point, list)
     {
         switch (inspection_point->Type)
         {
@@ -400,7 +400,7 @@ void print_detailed_inspection_point_list
 
     sprintf (new_prefix, "%s    ", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (InspectionPoint, ipoint, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
     {
         fprintf (stream,
             "%sinspection_point                = %p\n",
@@ -573,9 +573,9 @@ Error_t generate_inspection_point_header
 
             fprintf (output_stream, "%sTime(s) \t ", prefix);
 
-            FOR_EVERY_ELEMENT_IN_LIST_FORWARD
+            FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-                (FloorplanElement, flp_el, inspection_point->StackElement->Floorplan->ElementsList)
+            (FloorplanElement, flp_el, inspection_point->StackElement->Floorplan->ElementsList)
 
                 fprintf (output_stream, "%s(K) \t ", flp_el->Id);
 

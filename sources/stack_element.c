@@ -98,7 +98,7 @@ void free_stack_elements_list (StackElement *list)
 
 StackElement *find_stack_element_in_list (StackElement *list, char *id)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement, stk_el, list)
     {
         if (strcmp(stk_el->Id, id) == 0)  break ;
     }
@@ -117,7 +117,7 @@ void print_formatted_stack_elements_list
     uint8_t max_stk_el_id_length = 0 ;
     uint8_t max_die_id_length = 0 ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (StackElement, stk_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stk_el, list)
     {
         max_stk_el_id_length =
 
@@ -132,7 +132,7 @@ void print_formatted_stack_elements_list
 
     fprintf (stream, "%sstack : \n", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (StackElement, stack_element, list)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stack_element, list)
     {
         switch (stack_element->Type)
         {
@@ -190,7 +190,7 @@ void print_detailed_stack_elements_list
 
     sprintf (new_prefix, "%s    ", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (StackElement, stk_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stk_el, list)
     {
         fprintf (stream,
             "%sstk_el                      = %p\n",

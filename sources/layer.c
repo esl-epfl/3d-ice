@@ -123,7 +123,7 @@ void print_detailed_layer
 
 void print_formatted_layers_list (FILE *stream, char *prefix, Layer *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, list)
 
         print_formatted_layer (stream, prefix, layer) ;
 }
@@ -132,11 +132,17 @@ void print_formatted_layers_list (FILE *stream, char *prefix, Layer *list)
 
 void print_detailed_layers_list (FILE *stream, char *prefix, Layer *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Layer, layer, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, list)
     {
         print_detailed_layer (stream, prefix, layer) ;
+
         fprintf (stream, "%s\n", prefix) ;
+
+        if (layer->Next != NULL && layer->Next->Next == NULL)
+
+            break ;
     }
+
     print_detailed_layer (stream, prefix, layer) ;
 }
 

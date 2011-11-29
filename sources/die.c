@@ -91,7 +91,7 @@ void free_dies_list (Die *list)
 
 Die *find_die_in_list (Die *list, char *id)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
         if (strcmp(die->Id, id) == 0) break ;
     }
@@ -119,7 +119,7 @@ void print_formatted_die (FILE  *stream, char *prefix, Die *die)
 
     fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_BACKWARD (Layer, layer, die->TopLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer, layer, die->TopLayer)
     {
         if (layer == die->SourceLayer)
 
@@ -138,11 +138,17 @@ void print_formatted_die (FILE  *stream, char *prefix, Die *die)
 
 void print_formatted_dies_list (FILE  *stream, char *prefix, Die *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
         print_formatted_die (stream, prefix, die) ;
+
         fprintf (stream, "%s\n", prefix) ;
+
+        if (die->Next != NULL && die->Next->Next == NULL)
+
+            break ;
     }
+
     print_formatted_die (stream, prefix, die) ;
 }
 
@@ -207,11 +213,17 @@ void print_detailed_die (FILE  *stream, char *prefix, Die *die)
 
 void print_detailed_dies_list (FILE  *stream, char *prefix, Die *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Die, die, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
         print_detailed_die (stream, prefix, die) ;
+
         fprintf (stream, "%s\n", prefix) ;
+
+        if (die->Next != NULL && die->Next->Next == NULL)
+
+            break ;
     }
+
     print_detailed_die (stream, prefix, die) ;
 }
 
@@ -226,7 +238,7 @@ void fill_thermal_cell_die
     Die         *die
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, die->BottomLayer)
 
         fill_thermal_cell_layer
 
@@ -272,7 +284,7 @@ SystemMatrix fill_system_matrix_die
     fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
 # endif
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Layer, layer, die->BottomLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, die->BottomLayer)
 
         system_matrix = fill_system_matrix_layer
 

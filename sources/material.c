@@ -85,7 +85,7 @@ void free_materials_list (Material *list)
 
 Material *find_material_in_list (Material *list, char *id)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
     {
         if (strcmp(material->Id, id) == 0)
             break ;
@@ -124,11 +124,17 @@ void print_formatted_materials_list
     Material *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
     {
         print_formatted_material (stream, prefix, material) ;
+
         fprintf (stream, "%s\n", prefix) ;
+
+        if (material->Next != NULL && material->Next->Next == NULL)
+
+            break ;
     }
+
     print_formatted_material (stream, prefix, material) ;
 }
 
@@ -175,11 +181,17 @@ void print_detailed_materials_list
     Material *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_EXCEPT_LAST (Material, material, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
     {
         print_detailed_material (stream, prefix, material) ;
+
         fprintf (stream, "%s\n", prefix) ;
+
+        if (material->Next != NULL && material->Next->Next == NULL)
+
+            break ;
     }
+
     print_detailed_material (stream, prefix, material) ;
 }
 

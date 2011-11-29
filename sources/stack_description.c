@@ -270,7 +270,9 @@ void print_all_floorplans
   StackDescription* stkd
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
+  FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+  (StackElement, stk_el, stkd->BottomStackElement)
   {
     if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -287,7 +289,9 @@ void fill_thermal_cell_stack_description
     StackDescription *stkd
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
 
         fill_thermal_cell_stack_element
 
@@ -338,7 +342,9 @@ Error_t fill_sources_stack_description
 
             (sources, thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
 
         if (fill_sources_stack_element (sources, stkd->Dimensions, stack_element) == TDICE_FAILURE)
 
@@ -354,10 +360,11 @@ void init_power_values
   StackDescription* stkd
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    init_power_values_stack_element (stack_element) ;
+    (StackElement, stack_element, stkd->BottomStackElement)
+
+        init_power_values_stack_element (stack_element) ;
 }
 
 /******************************************************************************/
@@ -368,13 +375,15 @@ bool insert_power_values_by_powers_queue
   PowersQueue*      pvalues
 )
 {
-  if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
-    return false ;
+    if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
+        return false ;
 
-    insert_power_values_stack_element (stack_element, pvalues) ;
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
+
+        insert_power_values_stack_element (stack_element, pvalues) ;
 
   return true ;
 }
@@ -417,8 +426,9 @@ void update_channel_inlet_stack_description
     get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
 
     if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
 
@@ -452,7 +462,9 @@ void fill_system_matrix_stack_description
 
     *system_matrix.ColumnPointers++ = 0u ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element, stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
 
         system_matrix = fill_system_matrix_stack_element
 
@@ -498,9 +510,12 @@ uint32_t get_total_number_of_floorplan_elements
 {
   uint32_t total_number_of_floorplan_elements = 0u ;
 
-  FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stack_element,
-                                     stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
+
     if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+
       total_number_of_floorplan_elements += stack_element->Floorplan->NElements;
 
   return total_number_of_floorplan_elements;

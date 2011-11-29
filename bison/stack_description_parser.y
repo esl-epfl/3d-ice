@@ -813,14 +813,14 @@ stack
             fprintf (stderr, "Warning: neither heat sink nor channel has been declared\n") ;
 
 
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Material, material, stkd->MaterialsList)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, stkd->MaterialsList)
 
             if (material->Used == 0)
 
                 fprintf (stderr, "Warning: material %s declared but not used\n", material->Id) ;
 
 
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (Die, die, stkd->DiesList)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, stkd->DiesList)
 
             if (die->Used == 0)
 
@@ -844,7 +844,7 @@ stack
 
         uint32_t layer_index = 0u ;
 
-        FOR_EVERY_ELEMENT_IN_LIST_FORWARD (StackElement, stk_el, stkd->BottomStackElement)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement, stk_el, stkd->BottomStackElement)
         {
             stk_el->Offset = layer_index ;
             layer_index   += stk_el->NLayers ;

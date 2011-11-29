@@ -132,7 +132,7 @@ void print_detailed_floorplan_elements_list
     FloorplanElement *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, list)
 
         print_detailed_floorplan_element (stream, prefix, flp_el) ;
 }
@@ -176,7 +176,7 @@ void print_formatted_floorplan_elements_list
     FloorplanElement *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, list)
     {
         print_formatted_floorplan_element (stream, prefix, flp_el) ;
         fprintf(stream, "\n") ;
@@ -268,7 +268,7 @@ FloorplanElement *find_floorplan_element_in_list
     char             *id
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, list)
     {
         if (strcmp (flp_el->Id, id) == 0) break ;
     }
@@ -308,7 +308,7 @@ FloorplanElement *find_intersection_in_list
     FloorplanElement *floorplan_element
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_FORWARD (FloorplanElement, flp_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, list)
 
         if (check_intersection(flp_el, floorplan_element) == true)
 
