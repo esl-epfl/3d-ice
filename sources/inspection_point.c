@@ -148,7 +148,7 @@ void align_tcell
 
 void init_tflp (Tflp *tflp)
 {
-    tflp->Quantity = OUTPUTQUANTITY_I ;
+    tflp->Quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 }
 
 /******************************************************************************/
@@ -191,7 +191,7 @@ void print_detailed_tflp (FILE  *stream, char *prefix, Tflp *tflp)
 void init_tflpel (Tflpel *tflpel)
 {
     tflpel->FloorplanElement = NULL ;
-    tflpel->Quantity         = OUTPUTQUANTITY_I ;
+    tflpel->Quantity         = TDICE_OUTPUT_QUANTITY_NONE ;
 }
 
 /******************************************************************************/
@@ -237,8 +237,8 @@ void print_detailed_tflpel (FILE  *stream, char *prefix, Tflpel *tflpel)
 
 void init_inspection_point (InspectionPoint *inspection_point)
 {
-    inspection_point->Type           = OUTPUTTYPE_I ;
-    inspection_point->InstanceType   = OUTPUTINSTANCETYPE_I ;
+    inspection_point->Type           = TDICE_OUTPUT_TYPE_NONE ;
+    inspection_point->Instant        = TDICE_OUTPUT_INSTANT_NONE ;
     inspection_point->FileName       = NULL ;
     inspection_point->Pointer.Tcell  = NULL ;
     inspection_point->Pointer.Tflp   = NULL ;
@@ -264,17 +264,17 @@ InspectionPoint *alloc_and_init_inspection_point (void)
 
 void free_inspection_point (InspectionPoint *inspection_point)
 {
-    if (   inspection_point->Type == TDICE_OUTPUT_TCELL
+    if (   inspection_point->Type == TDICE_OUTPUT_TYPE_TCELL
         && inspection_point->Pointer.Tcell != NULL)
 
         FREE_POINTER (free_tcell, inspection_point->Pointer.Tcell) ;
 
-    else if (   inspection_point->Type == TDICE_OUTPUT_TFLP
+    else if (   inspection_point->Type == TDICE_OUTPUT_TYPE_TFLP
              && inspection_point->Pointer.Tflp != NULL)
 
         FREE_POINTER (free_tflp, inspection_point->Pointer.Tflp) ;
 
-    else if (   inspection_point->Type == TDICE_OUTPUT_TFLPEL
+    else if (   inspection_point->Type == TDICE_OUTPUT_TYPE_TFLPEL
              && inspection_point->Pointer.Tflpel != NULL)
 
         FREE_POINTER (free_tflpel, inspection_point->Pointer.Tflpel) ;
@@ -305,7 +305,7 @@ void print_formatted_inspection_point_list
     {
         switch (inspection_point->Type)
         {
-            case TDICE_OUTPUT_TCELL :
+            case TDICE_OUTPUT_TYPE_TCELL :
 
                 fprintf (stream, "%sT      (%s, %.1f, %.1f, \"%s\", ",
                     prefix, inspection_point->StackElement->Id,
@@ -315,17 +315,17 @@ void print_formatted_inspection_point_list
 
                 break ;
 
-            case TDICE_OUTPUT_TFLP :
+            case TDICE_OUTPUT_TYPE_TFLP :
 
                 fprintf (stream, "%sTflp   (%s, \"%s\", ",
                     prefix, inspection_point->StackElement->Id,
                     inspection_point->FileName) ;
 
-                if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_MAXIMUM)
+                if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                     fprintf(stream, "maximum, ");
 
-                else if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_MINIMUM)
+                else if (inspection_point->Pointer.Tflp->Quantity==TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                     fprintf(stream, "minimum, ");
 
@@ -335,18 +335,18 @@ void print_formatted_inspection_point_list
 
                 break ;
 
-            case TDICE_OUTPUT_TFLPEL :
+            case TDICE_OUTPUT_TYPE_TFLPEL :
 
                 fprintf (stream, "%sTflpel (%s.%s, \"%s\", ",
                     prefix, inspection_point->StackElement->Id,
                     inspection_point->Pointer.Tflpel->FloorplanElement->Id,
                     inspection_point->FileName) ;
 
-                if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MAXIMUM)
+                if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                     fprintf(stream, "maximum, ");
 
-                else if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_MINIMUM)
+                else if (inspection_point->Pointer.Tflpel->Quantity==TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                     fprintf(stream, "minimum, ");
 
@@ -356,7 +356,7 @@ void print_formatted_inspection_point_list
 
                 break ;
 
-            case TDICE_OUTPUT_TMAP :
+            case TDICE_OUTPUT_TYPE_TMAP :
 
                 fprintf (stream, "%sTmap   (%s, \"%s\", ",
                     prefix, inspection_point->StackElement->Id,
@@ -370,11 +370,11 @@ void print_formatted_inspection_point_list
                 break ;
         }
 
-        if (inspection_point->InstanceType == TDICE_OUTPUT_SLOT)
+        if (inspection_point->Instant == TDICE_OUTPUT_SLOT)
 
             fprintf(stream, "slot );\n");
 
-        else if (inspection_point->InstanceType == TDICE_OUTPUT_STEP)
+        else if (inspection_point->Instant == TDICE_OUTPUT_STEP)
 
             fprintf(stream, "step );\n");
 
@@ -411,8 +411,8 @@ void print_detailed_inspection_point_list
             prefix, ipoint->FileName);
 
         fprintf (stream,
-            "%s  InstanceType              = %d\n",
-            prefix, ipoint->InstanceType);
+            "%s  Instant                   = %d\n",
+            prefix, ipoint->Instant);
 
         fprintf (stream,
             "%s  Type                      = %d\n",
@@ -420,7 +420,7 @@ void print_detailed_inspection_point_list
 
         switch(ipoint->Type)
         {
-            case TDICE_OUTPUT_TCELL :
+            case TDICE_OUTPUT_TYPE_TCELL :
 
                 fprintf (stream,
                     "%s  Pointer.Tcell             = %p\n",
@@ -436,7 +436,7 @@ void print_detailed_inspection_point_list
 
                 break ;
 
-            case TDICE_OUTPUT_TFLP :
+            case TDICE_OUTPUT_TYPE_TFLP :
 
                 fprintf (stream,
                     "%s  Pointer.Tflp              = %p\n",
@@ -452,7 +452,7 @@ void print_detailed_inspection_point_list
 
                 break ;
 
-            case TDICE_OUTPUT_TFLPEL :
+            case TDICE_OUTPUT_TYPE_TFLPEL :
 
                 fprintf (stream,
                     "%s  Pointer.Tflpel            = %p\n",
@@ -512,7 +512,7 @@ Error_t generate_inspection_point_header
 
     switch (inspection_point->Type)
     {
-        case TDICE_OUTPUT_TCELL :
+        case TDICE_OUTPUT_TYPE_TCELL :
 
             fprintf (output_stream,
                 "%sCell temperature for the location [%s, x=%5.3f,y=%5.3f]\n",
@@ -534,19 +534,19 @@ Error_t generate_inspection_point_header
 
             break ;
 
-        case TDICE_OUTPUT_TFLP :
+        case TDICE_OUTPUT_TYPE_TFLP :
 
             fprintf (output_stream, "%s", prefix) ;
 
-            if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_MAXIMUM)
+            if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                 fprintf (output_stream, "Maximum ");
 
-            else if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_MINIMUM)
+            else if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                 fprintf (output_stream, "Minimum ");
 
-            else if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_AVERAGE)
+            else if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 fprintf (output_stream, "Average ");
 
@@ -583,19 +583,19 @@ Error_t generate_inspection_point_header
 
             break ;
 
-        case TDICE_OUTPUT_TFLPEL :
+        case TDICE_OUTPUT_TYPE_TFLPEL :
 
             fprintf (output_stream, "%s", prefix) ;
 
-            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MAXIMUM)
+            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                 fprintf (output_stream, "Maximum ");
 
-            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MINIMUM)
+            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                 fprintf (output_stream, "Minimum ");
 
-            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_AVERAGE)
+            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 fprintf (output_stream, "Average ");
 
@@ -620,7 +620,7 @@ Error_t generate_inspection_point_header
 
             break ;
 
-        case TDICE_OUTPUT_TMAP :
+        case TDICE_OUTPUT_TYPE_TMAP :
 
             fprintf (output_stream,
                 "%sThermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
@@ -674,7 +674,7 @@ Error_t generate_inspection_point_output
 
     switch (inspection_point->Type)
     {
-        case TDICE_OUTPUT_TCELL :
+        case TDICE_OUTPUT_TYPE_TCELL :
 
             cell_index = get_cell_offset_in_stack
 
@@ -688,18 +688,18 @@ Error_t generate_inspection_point_output
 
             break ;
 
-        case TDICE_OUTPUT_TFLP :
+        case TDICE_OUTPUT_TYPE_TFLP :
 
             fprintf (output_stream, "%5.3f \t ", current_time) ;
 
-            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MAXIMUM)
+            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                 print_all_max_temperatures_floorplan
 
                     (inspection_point->StackElement->Floorplan,
                      dimensions, temperatures, output_stream) ;
 
-            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MINIMUM)
+            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                 print_all_min_temperatures_floorplan
 
@@ -717,16 +717,16 @@ Error_t generate_inspection_point_output
 
             break ;
 
-        case TDICE_OUTPUT_TFLPEL :
+        case TDICE_OUTPUT_TYPE_TFLPEL :
 
-            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MAXIMUM)
+            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                 get_max_temperature_floorplan_element
 
                     (inspection_point->Pointer.Tflpel->FloorplanElement,
                      dimensions, temperatures, &temperature) ;
 
-            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_MINIMUM)
+            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                 get_min_temperature_floorplan_element
 
@@ -745,7 +745,7 @@ Error_t generate_inspection_point_output
 
             break ;
 
-        case TDICE_OUTPUT_TMAP :
+        case TDICE_OUTPUT_TYPE_TMAP :
 
             print_thermal_map_stack_element
 

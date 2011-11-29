@@ -323,7 +323,7 @@ extern "C"
 
         /*! The type of output instance (final, slot, step) */
 
-        OutputInstanceType_t InstanceType ;
+        OutputInstant_t Instant ;
 
         /*! Type of Output requested (cell, flp, flpel, map) */
 

@@ -44,7 +44,7 @@
 void
 init_stack_element (StackElement *stack_element)
 {
-    stack_element->Type            = STACKELEMENT_I ;
+    stack_element->Type            = TDICE_STACK_ELEMENT_NONE ;
     stack_element->Pointer.Layer   = NULL ;
     stack_element->Pointer.Die     = NULL ;
     stack_element->Pointer.Channel = NULL ;

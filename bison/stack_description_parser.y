@@ -56,7 +56,7 @@
     Layer                *layer_p ;
     StackElement         *stack_element_p ;
     InspectionPoint      *inspection_point_p ;
-    OutputInstanceType_t  output_instance_v ;
+    OutputInstant_t       output_instant_v ;
     OutputQuantity_t      output_quantity_v ;
 }
 
@@ -104,7 +104,7 @@
 %type <stack_element_p>    stack_element
 %type <stack_element_p>    stack_elements
 %type <inspection_point_p> inspection_point
-%type <output_instance_v>  when
+%type <output_instant_v>   when
 %type <output_quantity_v>  maxminavg
 
 %token AMBIENT               "keyword ambient"
@@ -872,7 +872,7 @@ stack
 
             compute_number_of_connections
 
-                (stkd->Dimensions, num_channels, TDICE_CHANNEL_MODEL_NO_CHANNEL) ;
+                (stkd->Dimensions, num_channels, TDICE_CHANNEL_MODEL_NONE) ;
 
         else
 
@@ -1090,7 +1090,7 @@ solver
         // StepTime is set to 1 to avoid division by zero when computing
         // the capacitance of a thermal cell
 
-        analysis->AnalysisType = TDICE_STEADY ;
+        analysis->AnalysisType = TDICE_ANALYSIS_TYPE_STEADY ;
         analysis->StepTime     = 1.0 ;
         analysis->SlotTime     = 0.0 ;
         analysis->SlotLength   = 1u ; // CHECKME
@@ -1126,7 +1126,7 @@ solver
             YYABORT ;
         }
 
-        analysis->AnalysisType = TDICE_TRANSIENT ;
+        analysis->AnalysisType = TDICE_ANALYSIS_TYPE_TRANSIENT ;
         analysis->StepTime     = $5 ;
         analysis->SlotTime     = $8 ;
         analysis->SlotLength   = (uint32_t) ( $8 / $5 ) ;
@@ -1226,8 +1226,8 @@ inspection_point
             YYABORT ;
         }
 
-        inspection_point->Type          = TDICE_OUTPUT_TCELL ;
-        inspection_point->InstanceType  = $10 ;
+        inspection_point->Type          = TDICE_OUTPUT_TYPE_TCELL ;
+        inspection_point->Instant       = $10 ;
         inspection_point->FileName      = $5 ;
         inspection_point->Pointer.Tcell = tcell ;
         inspection_point->StackElement  = stack_element ;
@@ -1299,8 +1299,8 @@ inspection_point
             YYABORT ;
         }
 
-        inspection_point->Type         = TDICE_OUTPUT_TFLP ;
-        inspection_point->InstanceType = $8 ;
+        inspection_point->Type         = TDICE_OUTPUT_TYPE_TFLP ;
+        inspection_point->Instant      = $8 ;
         inspection_point->FileName     = $5 ;
         inspection_point->Pointer.Tflp = tflp ;
         inspection_point->StackElement = stack_element ;
@@ -1395,8 +1395,8 @@ inspection_point
             YYABORT ;
         }
 
-        inspection_point->Type           = TDICE_OUTPUT_TFLPEL ;
-        inspection_point->InstanceType   = $10 ;
+        inspection_point->Type           = TDICE_OUTPUT_TYPE_TFLPEL ;
+        inspection_point->Instant        = $10 ;
         inspection_point->FileName       = $7 ;
         inspection_point->Pointer.Tflpel = tflpel ;
         inspection_point->StackElement   = stack_element ;
@@ -1440,8 +1440,8 @@ inspection_point
             YYABORT ;
         }
 
-        inspection_point->Type         = TDICE_OUTPUT_TMAP ;
-        inspection_point->InstanceType = $6 ;
+        inspection_point->Type         = TDICE_OUTPUT_TYPE_TMAP ;
+        inspection_point->Instant      = $6 ;
         inspection_point->FileName     = $5 ;
         inspection_point->StackElement = stack_element ;
 
@@ -1452,9 +1452,9 @@ inspection_point
 
 maxminavg
 
-  :  MAXIMUM { $$ =  TDICE_OUTPUT_MAXIMUM ; }
-  |  MINIMUM { $$ =  TDICE_OUTPUT_MINIMUM ; }
-  |  AVERAGE { $$ =  TDICE_OUTPUT_AVERAGE ; }
+  :  MAXIMUM { $$ =  TDICE_OUTPUT_QUANTITY_MAXIMUM ; }
+  |  MINIMUM { $$ =  TDICE_OUTPUT_QUANTITY_MINIMUM ; }
+  |  AVERAGE { $$ =  TDICE_OUTPUT_QUANTITY_AVERAGE ; }
   ;
 
 when

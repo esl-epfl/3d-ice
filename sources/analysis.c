@@ -43,7 +43,7 @@
 
 void init_analysis (Analysis *analysis)
 {
-    analysis->AnalysisType         = ANALYSISTYPE_I;
+    analysis->AnalysisType         = TDICE_ANALYSIS_TYPE_NONE ;
     analysis->StepTime             = 0.0 ;
     analysis->SlotTime             = 0.0 ;
     analysis->SlotLength           = 0u ;
@@ -87,7 +87,7 @@ double get_simulated_time (Analysis *analysis)
 
 bool slot_completed (Analysis *analysis)
 {
-  if (analysis->AnalysisType == TDICE_STEADY)
+  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
     return false ;
 
@@ -109,7 +109,7 @@ void print_formatted_analysis
 {
     fprintf (stream, "%ssolver : ", prefix) ;
 
-    if (analysis->AnalysisType == TDICE_STEADY)
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
         fprintf (stream, "steady ;\n") ;
 
@@ -249,16 +249,16 @@ void add_inspection_point_to_analysis
 {
     InspectionPoint **list = NULL ;
 
-    if (   analysis->AnalysisType == TDICE_STEADY
-        || inspection_point->InstanceType == TDICE_OUTPUT_FINAL)
+    if (   analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY
+        || inspection_point->Instant == TDICE_OUTPUT_FINAL)
 
         list = &analysis->InspectionPointListFinal ;
 
-    else if (inspection_point->InstanceType==TDICE_OUTPUT_SLOT)
+    else if (inspection_point->Instant == TDICE_OUTPUT_SLOT)
 
         list = &analysis->InspectionPointListSlot ;
 
-    else if (inspection_point->InstanceType==TDICE_OUTPUT_STEP)
+    else if (inspection_point->Instant == TDICE_OUTPUT_STEP)
 
         list = &analysis->InspectionPointListStep ;
 
@@ -303,25 +303,25 @@ Error_t generate_analysis_headers
 
 Error_t generate_analysis_output
 (
-    Analysis             *analysis,
-    Dimensions           *dimensions,
-    double               *temperatures,
-    OutputInstanceType_t  output_instance
+    Analysis        *analysis,
+    Dimensions      *dimensions,
+    double          *temperatures,
+    OutputInstant_t  output_instant
 )
 {
     double current_time = get_simulated_time (analysis) ;
 
     InspectionPoint *list ;
 
-    if (output_instance == TDICE_OUTPUT_FINAL)
+    if (output_instant == TDICE_OUTPUT_FINAL)
 
         list = analysis->InspectionPointListFinal ;
 
-    else if (output_instance == TDICE_OUTPUT_STEP)
+    else if (output_instant == TDICE_OUTPUT_STEP)
 
         list = analysis->InspectionPointListStep ;
 
-    else if (output_instance == TDICE_OUTPUT_FINAL)
+    else if (output_instant == TDICE_OUTPUT_FINAL)
 
         list = analysis->InspectionPointListSlot ;
 

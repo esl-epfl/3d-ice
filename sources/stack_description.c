@@ -303,7 +303,7 @@ void fill_thermal_cell_stack_description
 
             (thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
 
-    if (analysis->AnalysisType == TDICE_STEADY)
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
         reset_capacities (thermal_cells, get_number_of_cells(stkd->Dimensions)) ;
 }

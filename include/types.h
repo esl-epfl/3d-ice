@@ -127,32 +127,49 @@ extern "C"
 //   typedef double CoolantVHC_t ;
 // # define         COOLANTVHC_I 0.0
 
-  /* the collection of parameters describing a cooling fluid */
+    /*! \struct Coolant_t
+     * A collection of parameters describing the properties cooling fluid
+     */
 
-  struct Coolant_t
-  {
-    /* The heat transfert coefficients in [ (W / ( um2 * K ) ] */
+    struct Coolant_t
+    {
+        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
+         *  between the liquid in the channel and the walls/pins
+         */
 
-    double HTCSide ;
-    double HTCTop ;
-    double HTCBottom ;
+        double HTCSide ;
 
-    /* The volumetric heat capacity in [ J / ( um3 * K ) ] */
+        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
+         *  between the liquid in the channel and the top wall
+         */
 
-    double VHC ;
+        double HTCTop ;
 
-    /* The temperarute at the channel inlet in [K]  */
+        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
+         *  between the liquid in the channel and the bottom wall
+         */
 
-    double TIn ;
+        double HTCBottom ;
 
-  } ;
+        /*! The volumetric heat capacity in \f$ J / ( \mu m^3 * K ) \f$ */
 
-  typedef struct Coolant_t Coolant_t ;
-# define         COOLANT_I (Coolant_t) { COOLANTHTC_I, COOLANTHTC_I, COOLANTHTC_I, \
-                                         COOLANTVHC_I, TEMPERATURE_I }
+        double VHC ;
 
-  /* Coolant flow rate */
+        /*! The temperarute of the coolant at the channel inlet in \f$ K \f$ */
 
+        double TIn ;
+
+    } ;
+
+    /*! Definition of the type Coolant_t */
+
+    typedef struct Coolant_t Coolant_t ;
+
+
+//#   define COOLANT_I ((Coolant_t) { double, double, double, double, double })
+//
+//  /* Coolant flow rate */
+//
 //   typedef double CoolantFR_t ;
 // # define         COOLANTFR_I 0.0
 //
@@ -207,106 +224,187 @@ extern "C"
 
 /******************************************************************************/
 
-  /* The type of a stack element */
+    /*! \enum StackElement_t
+     *
+     * Enumeration to collect the types of a stack element
+     */
 
-  enum StackElement_t
-  {
-    TDICE_STACK_ELEMENT_NONE = 0,
-    TDICE_STACK_ELEMENT_LAYER   ,
-    TDICE_STACK_ELEMENT_CHANNEL ,
-    TDICE_STACK_ELEMENT_DIE
-  } ;
+    enum StackElement_t
+    {
+        TDICE_STACK_ELEMENT_NONE = 0, //!< Undefined type
+        TDICE_STACK_ELEMENT_LAYER   , //!< Layer
+        TDICE_STACK_ELEMENT_CHANNEL , //!< Channel
+        TDICE_STACK_ELEMENT_DIE       //!< Die
+    } ;
 
-  typedef enum StackElement_t StackElement_t ;
-# define                      STACKELEMENT_I TDICE_STACK_ELEMENT_NONE
+    /*! The definition of the type StackElement_t */
 
-/******************************************************************************/
+    typedef enum StackElement_t StackElement_t ;
 
-  /* The type of a channel model type */
-
-  enum ChannelModel_t
-  {
-    TDICE_CHANNEL_MODEL_NO_CHANNEL = 0,
-    TDICE_CHANNEL_MODEL_MC_RM4,
-    TDICE_CHANNEL_MODEL_MC_RM2,
-    TDICE_CHANNEL_MODEL_PF_INLINE,
-    TDICE_CHANNEL_MODEL_PF_STAGGERED
-  } ;
-
-  typedef enum ChannelModel_t ChannelModel_t ;
-# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_NO_CHANNEL
-
-# define NUM_LAYERS_CHANNEL_4RM 1
-# define NUM_LAYERS_CHANNEL_2RM 4
-# define SOURCE_OFFSET_CHANNEL_4RM 0
-# define SOURCE_OFFSET_CHANNEL_2RM 2
+//# define                      STACKELEMENT_I TDICE_STACK_ELEMENT_NONE
 
 /******************************************************************************/
 
-  enum Error_t
-  {
-    TDICE_SUCCESS,
-    TDICE_FAILURE
-  } ;
+    /*! \enum ChannelModel_t
+     *
+     * Enumeration to collect the available thermal models that can be used
+     * to implement the microchannel. If no channels are declared in the
+     * stack, the 4 resistors model is used for solid only stacks.
+     */
 
-  typedef enum Error_t Error_t ;
+    enum ChannelModel_t
+    {
+        TDICE_CHANNEL_MODEL_NONE = 0,      //!< Undefined type
+        TDICE_CHANNEL_MODEL_MC_RM4,        //!< Microchannel - 4 Resistors model
+        TDICE_CHANNEL_MODEL_MC_RM2,        //!< Microchannel - 2 Resistors model
+        TDICE_CHANNEL_MODEL_PF_INLINE,     //!< Inline pin fins - 2 Resistors model
+        TDICE_CHANNEL_MODEL_PF_STAGGERED   //!< Staggered pin fins - 2 Resistors model
+    } ;
+
+    /*! The definition of the type ChannelModel_t */
+
+    typedef enum ChannelModel_t ChannelModel_t ;
+
+//# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_NO_CHANNEL
+
+    /*! \def NUM_LAYERS_CHANNEL_4RM
+     *
+     *  The number of layers of thermal cells needed to model a microchannel
+     *  stack elenment according to the 4 resistors model
+     */
+
+#   define NUM_LAYERS_CHANNEL_4RM 1
+
+    /*! \def NUM_LAYERS_CHANNEL_2RM
+     *
+     *  The number of layers of thermal cells needed to model a microchannel
+     *  or pin fins stack elenment according to the 2 resistors model
+     */
+
+#   define NUM_LAYERS_CHANNEL_2RM 4
+
+    /*! \def SOURCE_OFFSET_CHANNEL_4RM
+     *
+     *  The offset (\# layers) within a channel stack elenment modeled with
+     *  4 resistors to be added to locate the source layer
+     */
+
+#   define SOURCE_OFFSET_CHANNEL_4RM 0
+
+    /*! \def SOURCE_OFFSET_CHANNEL_2RM
+     *
+     *  The offset (\# layers) within a channel stack elenment modeled with
+     *  4 resistors to be added to locate the source layer
+     */
+
+#   define SOURCE_OFFSET_CHANNEL_2RM 2
 
 /******************************************************************************/
 
-  /* Type of analysis */
+    /*! \enum Error_t
+     *
+     *  Enumeration to collect the possible values returned by functions in
+     *  the library to indicate errors or success.
+     */
 
-  enum AnalysisType_t
-  {
-    TDICE_TRANSIENT = 0,
-    TDICE_STEADY
-  } ;
+    enum Error_t
+    {
+        TDICE_SUCCESS = 0,  //!< The function returns with success
+        TDICE_FAILURE       //!< The function retuerns with a generic error
+    } ;
 
-  typedef enum AnalysisType_t AnalysisType_t ;
-# define                      ANALYSISTYPE_I TDICE_TRANSIENT
+    /*! Definition of the type Error_t */
 
-
-/******************************************************************************/
-
-  /* Quantity of Output */
-
-  enum OutputQuantity_t
-  {
-    TDICE_OUTPUT_AVERAGE = 0,
-    TDICE_OUTPUT_MAXIMUM,
-    TDICE_OUTPUT_MINIMUM
-  } ;
-
-  typedef enum OutputQuantity_t OutputQuantity_t ;
-# define                        OUTPUTQUANTITY_I TDICE_OUTPUT_AVERAGE
+    typedef enum Error_t Error_t ;
 
 /******************************************************************************/
 
-  /* Type of output */
+    /*! \enum AnalysisType_t
+     *
+     *  Enumeration to collect the possible types of thermal analysis
+     *  that can be run with 3D-ICE.
+     */
 
-  enum OutputType_t
-  {
-    TDICE_OUTPUT_TCELL = 0,
-    TDICE_OUTPUT_TFLP,
-    TDICE_OUTPUT_TFLPEL,
-    TDICE_OUTPUT_TMAP
-  } ;
+    enum AnalysisType_t
+    {
+        TDICE_ANALYSIS_TYPE_NONE = 0,  //!< Undefined analysis type
+        TDICE_ANALYSIS_TYPE_TRANSIENT, //!< Transient analysis
+        TDICE_ANALYSIS_TYPE_STEADY     //!< Steady state analysis
+    } ;
 
-  typedef enum OutputType_t OutputType_t ;
-# define                    OUTPUTTYPE_I TDICE_OUTPUT_TCELL
 
-/******************************************************************************/
 
-  /* Type of output instance */
+    /*! the definition of the type AnalysisType_t */
 
-  enum OutputInstanceType_t
-  {
-    TDICE_OUTPUT_FINAL = 0,
-    TDICE_OUTPUT_SLOT,
-    TDICE_OUTPUT_STEP
-  } ;
+    typedef enum AnalysisType_t AnalysisType_t ;
 
-  typedef enum OutputInstanceType_t OutputInstanceType_t ;
-# define                            OUTPUTINSTANCETYPE_I TDICE_OUTPUT_FINAL
+
+
+    /*! \enum OutputQuantity_t
+     *
+     *  The "type" of temperature measurement that can be reported with
+     *  an inspection point during a thermal simulation. It is used when
+     *  the measurement is related to a surface.
+     */
+
+    enum OutputQuantity_t
+    {
+        TDICE_OUTPUT_QUANTITY_NONE = 0,  //!< Undefined type
+        TDICE_OUTPUT_QUANTITY_AVERAGE,   //!< Average temperature
+        TDICE_OUTPUT_QUANTITY_MAXIMUM,   //!< Maximum temperature
+        TDICE_OUTPUT_QUANTITY_MINIMUM    //!< Minimum temperature
+    } ;
+
+
+
+    /*! Definition of the type OutputQuantity_t */
+
+    typedef enum OutputQuantity_t OutputQuantity_t ;
+
+
+
+    /*! \enum OutputType_t
+     *
+     * The "stack object" that can be monitored with an ispection point
+     * during a thermal simulation.
+     */
+
+    enum OutputType_t
+    {
+        TDICE_OUTPUT_TYPE_NONE = 0,   //!< Undefined object
+        TDICE_OUTPUT_TYPE_TCELL,      //!< Single thermal cell
+        TDICE_OUTPUT_TYPE_TFLP,       //!< All the element in a floorplan
+        TDICE_OUTPUT_TYPE_TFLPEL,     //!< A single floorplan element
+        TDICE_OUTPUT_TYPE_TMAP        //!< The thermal map of a stack element
+    } ;
+
+
+
+    /*! Definition of the type OutputType_t */
+
+    typedef enum OutputType_t OutputType_t ;
+
+
+
+    /*! \enum OutputInstant_t
+     *
+     * Enumeration to collect the possible istant of time at which the
+     * inspection points generate the output
+     */
+
+    enum OutputInstant_t
+    {
+        TDICE_OUTPUT_INSTANT_NONE = 0,  //!< Undefined instant
+        TDICE_OUTPUT_FINAL,             //!< At the end of the simulation
+        TDICE_OUTPUT_SLOT,              //!< At the end of each time slot
+        TDICE_OUTPUT_STEP               //!< At every internal time step
+    } ;
+
+
+
+    /*! Definition of the type OutputInstant_t */
+
+    typedef enum OutputInstant_t OutputInstant_t ;
 
 /******************************************************************************/
 

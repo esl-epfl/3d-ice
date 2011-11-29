@@ -42,7 +42,7 @@
 
 void init_channel (Channel *channel)
 {
-    channel->ChannelModel      = TDICE_CHANNEL_MODEL_NO_CHANNEL ;
+    channel->ChannelModel      = TDICE_CHANNEL_MODEL_NONE ;
     channel->Height            = 0.0 ;
     channel->Length            = 0.0 ;
     channel->Pitch             = 0.0 ;

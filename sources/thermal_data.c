@@ -321,7 +321,7 @@ fill_system_vector_steady
 
 int emulate_step (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
 {
-  if (analysis->AnalysisType == TDICE_STEADY) // FIXME
+  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY) // FIXME
 
         return 2 ;
 
@@ -368,7 +368,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd, Analysis *analysis
 {
   int result = 0 ;
 
-  if (analysis->AnalysisType == TDICE_STEADY)  // FIXME
+  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)  // FIXME
 
         return 2 ;
 
@@ -386,7 +386,7 @@ int emulate_slot (ThermalData* tdata, StackDescription* stkd, Analysis *analysis
 
 int emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
 {
-  if (analysis->AnalysisType == TDICE_TRANSIENT)  // FIXME
+  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)  // FIXME
 
         return 2 ;
 
