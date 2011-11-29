@@ -124,6 +124,8 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "//"                         BEGIN(ONE_LINE_COMMENT) ;
 "/*"                         BEGIN(MULTIPLE_LINE_COMMENT) ;
 
+"2rm"                        return _2RM ;
+"4rm"                        return _4RM ;
 "ambient"                    return AMBIENT ;
 "average"                    return AVERAGE ;
 "bottom"                     return BOTTOM ;
@@ -161,8 +163,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
 "rate"                       return RATE ;
-"rm2"                        return RM2 ;
-"rm4"                        return RM4 ;
 "side"                       return SIDE ;
 "sink"                       return SINK ;
 "slot"                       return SLOT ;

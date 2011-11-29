@@ -213,7 +213,7 @@ void compute_number_of_connections
     switch (channel_model)
     {
         case TDICE_CHANNEL_MODEL_NONE :
-        case TDICE_CHANNEL_MODEL_MC_RM4 :
+        case TDICE_CHANNEL_MODEL_MC_4RM :
         {
             dimensions->Grid.NConnections =
 
@@ -270,7 +270,7 @@ void compute_number_of_connections
 
             break ;
         }
-        case TDICE_CHANNEL_MODEL_MC_RM2 :
+        case TDICE_CHANNEL_MODEL_MC_2RM :
         {
             dimensions->Grid.NConnections =
 

@@ -255,8 +255,8 @@ extern "C"
     enum ChannelModel_t
     {
         TDICE_CHANNEL_MODEL_NONE = 0,      //!< Undefined type
-        TDICE_CHANNEL_MODEL_MC_RM4,        //!< Microchannel - 4 Resistors model
-        TDICE_CHANNEL_MODEL_MC_RM2,        //!< Microchannel - 2 Resistors model
+        TDICE_CHANNEL_MODEL_MC_4RM,        //!< Microchannel - 4 Resistors model
+        TDICE_CHANNEL_MODEL_MC_2RM,        //!< Microchannel - 2 Resistors model
         TDICE_CHANNEL_MODEL_PF_INLINE,     //!< Inline pin fins - 2 Resistors model
         TDICE_CHANNEL_MODEL_PF_STAGGERED   //!< Staggered pin fins - 2 Resistors model
     } ;

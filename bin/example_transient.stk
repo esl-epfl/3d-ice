@@ -10,7 +10,7 @@ conventional heat sink :
    heat transfer coefficient 1.0e-7 ;
    ambient temperature 300 ;
 
-microchannel rm2 :
+microchannel 2rm :
    height 100 ;
    channel length 50 ;
    wall    length 50 ;

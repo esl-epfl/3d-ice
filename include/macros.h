@@ -285,13 +285,13 @@ extern "C"
     /*! \def IS_CHANNEL_COLUMN(channel_model,column)
      *
      * Returns \c TRUE if \a column is the index of a channel column. If
-     * \a channel_model is RM4, then odd indeces are channel columns.
-     *  Otherwise, all indexes are channels (RM2 microchannel or pin fins).
+     * \a channel_model is 4RM, then odd indeces are channel columns.
+     *  Otherwise, all indexes are channels (2RM microchannel or pin fins).
      */
 
 #   define IS_CHANNEL_COLUMN(channel_model, column) \
                                                     \
-        (channel_model == TDICE_CHANNEL_MODEL_MC_RM4 ? (column) & 1 : true)
+        (channel_model == TDICE_CHANNEL_MODEL_MC_4RM ? (column) & 1 : true)
 
 /******************************************************************************/
 /******************************************************************************/

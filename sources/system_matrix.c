@@ -515,7 +515,7 @@ SystemMatrix add_liquid_column_mc_4rm
 
 /******************************************************************************/
 
-SystemMatrix add_liquid_column_mc_rm2
+SystemMatrix add_liquid_column_mc_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
@@ -541,7 +541,7 @@ SystemMatrix add_liquid_column_mc_rm2
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_liquid_column_rm2  l %2d r %4d c %4d [%7d]\n",
+        "add_liquid_column_2rm  l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -657,7 +657,7 @@ SystemMatrix add_liquid_column_mc_rm2
 
 /******************************************************************************/
 
-SystemMatrix add_bottom_wall_column_mc_rm2
+SystemMatrix add_bottom_wall_column_mc_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
@@ -682,7 +682,7 @@ SystemMatrix add_bottom_wall_column_mc_rm2
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_bottom_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
+        "add_bottom_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -782,7 +782,7 @@ SystemMatrix add_bottom_wall_column_mc_rm2
 
 /******************************************************************************/
 
-SystemMatrix add_top_wall_column_mc_rm2
+SystemMatrix add_top_wall_column_mc_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
@@ -807,7 +807,7 @@ SystemMatrix add_top_wall_column_mc_rm2
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_top_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
+        "add_top_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -908,7 +908,7 @@ SystemMatrix add_top_wall_column_mc_rm2
 
 /******************************************************************************/
 
-SystemMatrix add_virtual_wall_column_mc_rm2
+SystemMatrix add_virtual_wall_column_mc_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
@@ -1088,7 +1088,7 @@ SystemMatrix add_liquid_column_pf
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_liquid_column_rm2  l %2d r %4d c %4d [%7d]\n",
+        "add_liquid_column_2rm  l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -1229,7 +1229,7 @@ SystemMatrix add_bottom_wall_column_pf
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_bottom_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
+        "add_bottom_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 
@@ -1355,7 +1355,7 @@ SystemMatrix add_top_wall_column_pf
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_top_wall_column_rm2   l %2d r %4d c %4d [%7d]\n",
+        "add_top_wall_column_2rm   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index, cell_index) ;
 #endif
 

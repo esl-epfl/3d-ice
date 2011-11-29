@@ -90,9 +90,9 @@ void print_formatted_channel
     Dimensions *dimensions
 )
 {
-    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM)
     {
-        fprintf (stream, "%smicrochannel rm4 :\n", prefix) ;
+        fprintf (stream, "%smicrochannel 4rm :\n", prefix) ;
         fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, dimensions->Cell.ChannelLength) ;
@@ -114,9 +114,9 @@ void print_formatted_channel
         fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
     }
 
-    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM)
     {
-        fprintf (stream, "%smicrochannel rm2 :\n", prefix) ;
+        fprintf (stream, "%smicrochannel 2rm :\n", prefix) ;
         fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, channel->Length) ;
@@ -573,7 +573,7 @@ void fill_thermal_cell_channel
 {
     switch (channel->ChannelModel)
     {
-        case TDICE_CHANNEL_MODEL_MC_RM4 :
+        case TDICE_CHANNEL_MODEL_MC_4RM :
 
             fill_thermal_cell_channel_4rm
 
@@ -581,7 +581,7 @@ void fill_thermal_cell_channel
 
             break ;
 
-        case TDICE_CHANNEL_MODEL_MC_RM2 :
+        case TDICE_CHANNEL_MODEL_MC_2RM :
 
             fill_thermal_cell_channel_2rm
 
@@ -647,7 +647,7 @@ void fill_sources_channel
              get_cell_length (dimensions, 0), channel->Height);
 
     }
-    else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
+    else if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM)
     {
 
         C = CCONV_MC_2RM
@@ -707,7 +707,7 @@ SystemMatrix fill_system_matrix_channel
         layer_index, channel->WallMaterial->Id) ;
 # endif
 
-    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM)
     {
         FOR_EVERY_ROW (row_index, dimensions)
         {
@@ -749,12 +749,12 @@ SystemMatrix fill_system_matrix_channel
             liquid_layer  = &add_liquid_column_pf ;
             top_layer     = &add_top_wall_column_pf ;
         }
-        else  // TDICE_CHANNEL_MODEL_MC_RM2
+        else  // TDICE_CHANNEL_MODEL_MC_2RM
         {
-            bottom_layer  = &add_bottom_wall_column_mc_rm2 ;
-            virtual_layer = &add_virtual_wall_column_mc_rm2 ;
-            liquid_layer  = &add_liquid_column_mc_rm2 ;
-            top_layer     = &add_top_wall_column_mc_rm2 ;
+            bottom_layer  = &add_bottom_wall_column_mc_2rm ;
+            virtual_layer = &add_virtual_wall_column_mc_2rm ;
+            liquid_layer  = &add_liquid_column_mc_2rm ;
+            top_layer     = &add_top_wall_column_mc_2rm ;
         }
 
         // Bottom Wall

@@ -65,7 +65,7 @@ extern "C"
 
     struct Channel
     {
-        /*! The channel model (rm4 - rm2) */
+        /*! The channel model (4rm - 2rm) */
 
         ChannelModel_t ChannelModel ;
 

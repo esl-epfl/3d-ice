@@ -216,7 +216,7 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_liquid_column_mc_rm2
+    SystemMatrix add_liquid_column_mc_2rm
     (
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
@@ -244,7 +244,7 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_bottom_wall_column_mc_rm2
+    SystemMatrix add_bottom_wall_column_mc_2rm
     (
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
@@ -272,7 +272,7 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_top_wall_column_mc_rm2
+    SystemMatrix add_top_wall_column_mc_2rm
     (
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
@@ -299,7 +299,7 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_virtual_wall_column_mc_rm2
+    SystemMatrix add_virtual_wall_column_mc_2rm
     (
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,

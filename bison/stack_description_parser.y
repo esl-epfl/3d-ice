@@ -91,8 +91,8 @@
 %type <double_v>           first_wall_length
 %type <double_v>           last_wall_length
 %type <channel_model_v>    distribution
-%type <coolant_v>          coolant_heat_transfer_coefficients_rm4
-%type <coolant_v>          coolant_heat_transfer_coefficients_rm2
+%type <coolant_v>          coolant_heat_transfer_coefficients_4rm
+%type <coolant_v>          coolant_heat_transfer_coefficients_2rm
 %type <material_p>         material
 %type <material_p>         materials_list
 %type <die_p>              die
@@ -107,6 +107,8 @@
 %type <output_instant_v>   when
 %type <output_quantity_v>  maxminavg
 
+%token _2RM                  "keyword 2rm"
+%token _4RM                  "keyword 4rm"
 %token AMBIENT               "keyword ambient"
 %token AVERAGE               "keyword average"
 %token BOTTOM                "keyword bottom"
@@ -144,8 +146,6 @@
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
 %token RATE                  "keyword rate"
-%token RM2                   "keyword rm2"
-%token RM4                   "keyword rm4"
 %token SIDE                  "keyword side"
 %token SINK                  "keywork sink"
 %token SLOT                  "keyword slot"
@@ -309,7 +309,7 @@ microchannel
 
   : // Declaring the channel section is not mandatory
 
-  |  MICROCHANNEL RM4 ':'
+  |  MICROCHANNEL _4RM ':'
         HEIGHT DVALUE ';'                             //  $5
         CHANNEL LENGTH DVALUE ';'                     //  $9
         WALL    LENGTH DVALUE ';'                     //  $13
@@ -317,7 +317,7 @@ microchannel
         last_wall_length                              //  $16
         WALL MATERIAL IDENTIFIER ';'                  //  $19
         COOLANT FLOW RATE DVALUE ';'                  //  $24
-        coolant_heat_transfer_coefficients_rm4        //  $26
+        coolant_heat_transfer_coefficients_4rm        //  $26
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'   //  $31
         COOLANT INCOMING TEMPERATURE DVALUE ';'       //  $36
     {
@@ -337,7 +337,7 @@ microchannel
         first_wall_length = ($15 != 0.0) ? $15 : $13 ;
         last_wall_length  = ($16 != 0.0) ? $16 : $13 ;
 
-        stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM4 ;
+        stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_4RM ;
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_4RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_4RM ;
         stkd->Channel->Height            = $5 ;
@@ -365,13 +365,13 @@ microchannel
         FREE_POINTER (free, $19) ;
     }
 
-  |  MICROCHANNEL RM2 ':'
+  |  MICROCHANNEL _2RM ':'
         HEIGHT DVALUE ';'                            //  $5
         CHANNEL LENGTH DVALUE ';'                    //  $9
         WALL    LENGTH DVALUE ';'                    //  $13
         WALL MATERIAL IDENTIFIER ';'                 //  $17
         COOLANT FLOW RATE DVALUE ';'                 //  $22
-        coolant_heat_transfer_coefficients_rm2       //  $24
+        coolant_heat_transfer_coefficients_2rm       //  $24
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'  //  $29
         COOLANT INCOMING TEMPERATURE DVALUE ';'      //  $34
     {
@@ -386,7 +386,7 @@ microchannel
             YYABORT ;
         }
 
-        stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_RM2 ;
+        stkd->Channel->ChannelModel      = TDICE_CHANNEL_MODEL_MC_2RM ;
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_2RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_2RM ;
         stkd->Channel->Height            = $5 ;
@@ -469,7 +469,7 @@ microchannel
     }
   ;
 
-coolant_heat_transfer_coefficients_rm4
+coolant_heat_transfer_coefficients_4rm
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
@@ -487,7 +487,7 @@ coolant_heat_transfer_coefficients_rm4
     }
   ;
 
-coolant_heat_transfer_coefficients_rm2
+coolant_heat_transfer_coefficients_2rm
 
   : COOLANT HEAT TRANSFER COEFFICIENT DVALUE ';'
     {
@@ -738,7 +738,7 @@ dimensions
 
         if (stkd->Channel != NULL)
         {
-            if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM4)
+            if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM)
             {
                 stkd->Dimensions->Cell.ChannelLength   = channel_length ;
                 stkd->Dimensions->Cell.FirstWallLength = first_wall_length ;
@@ -777,7 +777,7 @@ dimensions
 
                 stkd->Channel->NChannels = ((stkd->Dimensions->Grid.NColumns - 1 )  / 2) ;
             }
-            else if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_RM2)
+            else if (stkd->Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM)
             {
                 stkd->Channel->NChannels = (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
             }
