@@ -188,17 +188,6 @@ extern "C"
         double     *avg_temperature
     ) ;
 
-    int get_min_avg_max_temperatures_floorplan
-    (
-        Floorplan  *floorplan,
-        char       *floorplan_element_id,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *min_temperature,
-        double     *avg_temperature,
-        double     *max_temperature
-    ) ;
-
     int get_all_max_temperatures_floorplan
     (
         Floorplan  *floorplan,
@@ -245,16 +234,6 @@ extern "C"
         Dimensions *dimensions,
         double     *temperatures,
         FILE       *stream
-    ) ;
-
-    int get_all_min_avg_max_temperatures_floorplan
-    (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *min_temperature,
-        double     *avg_temperature,
-        double     *max_temperature
     ) ;
 
 /******************************************************************************/

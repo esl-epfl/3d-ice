@@ -589,53 +589,6 @@ int get_avg_temperature_of_floorplan_element
 
 /******************************************************************************/
 
-int get_min_avg_max_temperatures_of_floorplan_element
-(
-  StackDescription* stkd,
-  ThermalData*      tdata,
-  char *          floorplan_id,
-  char *          floorplan_element_id,
-  double*    min_temperature,
-  double*    avg_temperature,
-  double*    max_temperature
-)
-{
-  uint32_t offset = 0u ;
-  StackElement*   stk_el = find_stack_element_in_list
-                           (
-                             stkd->BottomStackElement,
-                             floorplan_id
-                           ) ;
-  if (stk_el == NULL)
-
-    return -1 ;
-
-  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
-      || stk_el->Floorplan == NULL)
-
-    return -2 ;
-
-  offset = get_cell_offset_in_stack
-           (
-             stkd->Dimensions,
-             get_source_layer_offset (stk_el),
-             0, 0
-           ) ;
-
-  return get_min_avg_max_temperatures_floorplan
-         (
-           stk_el->Floorplan,
-           floorplan_element_id,
-           stkd->Dimensions,
-           tdata->Temperatures + offset,
-           min_temperature,
-           avg_temperature,
-           max_temperature
-         ) ;
-}
-
-/******************************************************************************/
-
 int get_all_max_temperatures_of_floorplan
 (
   StackDescription* stkd,
@@ -761,54 +714,6 @@ int get_all_avg_temperatures_of_floorplan
   ) ;
 
   return 0 ;
-}
-
-/******************************************************************************/
-
-int get_all_min_avg_max_temperatures_of_floorplan
-(
-  StackDescription* stkd,
-  ThermalData*      tdata,
-  char *          floorplan_id,
-  double*    min_temperature,
-  double*    avg_temperature,
-  double*    max_temperature
-)
-{
-  uint32_t offset = 0u ;
-  StackElement*   stk_el = find_stack_element_in_list
-                           (
-                             stkd->BottomStackElement,
-                             floorplan_id
-                           ) ;
-
-  if (stk_el == NULL)
-
-    return -1 ;
-
-  if (   stk_el->Type      != TDICE_STACK_ELEMENT_DIE
-      || stk_el->Floorplan == NULL)
-
-    return -2 ;
-
-  offset = get_cell_offset_in_stack
-           (
-             stkd->Dimensions,
-             get_source_layer_offset (stk_el),
-             0, 0
-           ) ;
-
-  get_all_min_avg_max_temperatures_floorplan
-  (
-    stk_el->Floorplan,
-    stkd->Dimensions,
-    tdata->Temperatures + offset,
-    min_temperature,
-    avg_temperature,
-    max_temperature
-  ) ;
-
- return 0 ;
 }
 
 /******************************************************************************/

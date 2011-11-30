@@ -297,40 +297,6 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Get the minimum, average and maximum temperature of a given floorplan   */
-  /* element                                                                 */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* floorplan_element_id  the id of the floorplan element                   */
-  /* temperatures          the address of the array temperature to access    */
-  /* min_temperature       the address where the min temperature will be     */
-  /*                       written                                           */
-  /* avg_temperature       the address where the avg temperature will be     */
-  /*                       written                                           */
-  /* max_temperature       the address where the max temperature will be     */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if both the ids are correct                                         */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the floorplan itself does not exist                    */
-  /*  -3 if floorplan_id exists but floorplan_element_id do not              */
-
-  int get_min_avg_max_temperatures_of_floorplan_element
-  (
-    StackDescription* stkd,
-    ThermalData*      tdata,
-    char *          floorplan_id,
-    char *          floorplan_element_id,
-    double*    min_temperature,
-    double*    avg_temperature,
-    double*    max_temperature
-  ) ;
-
-/******************************************************************************/
-
   /* Get the maximum temperature of all the floorplan element in a floorplan */
   /*                                                                         */
   /* stkd                  the StackDescription structure to query           */
@@ -423,45 +389,6 @@ extern "C"
     ThermalData*      tdata,
     char *          floorplan_id,
     double*    avg_temperature
-  ) ;
-
-/******************************************************************************/
-
-  /* Get the minimum, average and maximum temperature of all the floorplan   */
-  /* element in a floorplan                                                  */
-  /*                                                                         */
-  /* stkd                  the StackDescription structure to query           */
-  /* floorplan_id          the id of the floorplan (the stack element id)    */
-  /* temperatures          the address of the array temperature to access    */
-  /* min_temperature       the address where the min temperatures will be    */
-  /*                       written                                           */
-  /* avg_temperature       the address where the avg temperatures will be    */
-  /*                       written                                           */
-  /* max_temperature       the address where the max temperatures will be    */
-  /*                       written                                           */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if floorplan_id exists but it is not the id of a die or it belongs  */
-  /*     to a die but the Floorplan itself does not exist                    */
-  /*                                                                         */
-  /* If the floorplan named floorplan_id has n floorplan element, then the   */
-  /* function will access n elements of type double starting from     */
-  /* min_temperatures, avg_temperatures, etc. (i.e. the memory must be       */
-  /* allocated before calling this function). Temperatures will be written   */
-  /* following the same order of declaration found in the corresponding .flp */
-  /* file (min_temperature[0] is the minimum temperature of the first        */
-  /* floorplan element found in the file, etc...).                           */
-
-  int get_all_min_avg_max_temperatures_of_floorplan
-  (
-    StackDescription* stkd,
-    ThermalData*      tdata,
-    char *          floorplan_id,
-    double*    min_temperature,
-    double*    avg_temperature,
-    double*    max_temperature
   ) ;
 
 /******************************************************************************/

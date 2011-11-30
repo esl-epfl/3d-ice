@@ -372,16 +372,6 @@ extern "C"
         double           *avg_temperature
     ) ;
 
-    void get_min_avg_max_temperatures_floorplan_element
-    (
-        FloorplanElement *floorplan_element,
-        Dimensions       *dimensions,
-        double           *temperatures,
-        double           *min_temperature,
-        double           *avg_temperature,
-        double           *max_temperature
-    ) ;
-
 /******************************************************************************/
 
     void init_power_values_floorplan_element (FloorplanElement *floorplan_element) ;

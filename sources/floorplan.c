@@ -254,35 +254,6 @@ int get_avg_temperature_floorplan
 
 /******************************************************************************/
 
-int get_min_avg_max_temperatures_floorplan
-(
-    Floorplan  *floorplan,
-    char       *floorplan_element_id,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *min_temperature,
-    double     *avg_temperature,
-    double     *max_temperature
-)
-{
-    FloorplanElement *flp_el = find_floorplan_element_in_list
-
-        (floorplan->ElementsList, floorplan_element_id) ;
-
-    if (flp_el == NULL)
-
-        return -3 ;
-
-    get_min_avg_max_temperatures_floorplan_element
-
-        (flp_el, dimensions, temperatures,
-         min_temperature, avg_temperature, max_temperature) ;
-
-    return 0 ;
-}
-
-/******************************************************************************/
-
 int get_all_max_temperatures_floorplan
 (
   Floorplan  *floorplan,
@@ -414,30 +385,6 @@ void print_all_avg_temperatures_floorplan
 
         fprintf (stream, "%7.3f ", temperature) ;
     }
-}
-
-/******************************************************************************/
-
-int get_all_min_avg_max_temperatures_floorplan
-(
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *min_temperature,
-    double     *avg_temperature,
-    double     *max_temperature
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (FloorplanElement, flp_el, floorplan->ElementsList)
-
-        get_min_avg_max_temperatures_floorplan_element
-
-            (flp_el, dimensions, temperatures,
-             min_temperature++, avg_temperature++, max_temperature++) ;
-
-    return 0 ;
 }
 
 /******************************************************************************/
