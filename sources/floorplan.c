@@ -193,9 +193,9 @@ int get_max_temperature_floorplan
 
         return -3 ;
 
-    get_max_temperature_floorplan_element
+    *max_temperature = get_max_temperature_floorplan_element
 
-        (flp_el, dimensions, temperatures, max_temperature) ;
+                           (flp_el, dimensions, temperatures) ;
 
     return 0 ;
 }
@@ -219,9 +219,9 @@ int get_min_temperature_floorplan
 
         return -3 ;
 
-    get_min_temperature_floorplan_element
+    *min_temperature = get_min_temperature_floorplan_element
 
-        (flp_el, dimensions, temperatures, min_temperature) ;
+                           (flp_el, dimensions, temperatures) ;
 
     return 0 ;
 }
@@ -245,9 +245,9 @@ int get_avg_temperature_floorplan
 
         return -3 ;
 
-    get_avg_temperature_floorplan_element
+    *avg_temperature = get_avg_temperature_floorplan_element
 
-        (flp_el, dimensions, temperatures, avg_temperature) ;
+                           (flp_el, dimensions, temperatures) ;
 
     return 0 ;
 }
@@ -266,9 +266,9 @@ int get_all_max_temperatures_floorplan
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
 
-        get_max_temperature_floorplan_element
+        *max_temperature++ = get_max_temperature_floorplan_element
 
-            (flp_el, dimensions, temperatures, max_temperature++) ;
+                                 (flp_el, dimensions, temperatures) ;
 
     return 0 ;
 }
@@ -289,9 +289,9 @@ void print_all_max_temperatures_floorplan
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
     {
-        get_max_temperature_floorplan_element
+        temperature = get_max_temperature_floorplan_element
 
-            (flp_el, dimensions, temperatures, &temperature) ;
+                          (flp_el, dimensions, temperatures) ;
 
         fprintf (stream, "%7.3f ", temperature) ;
     }
@@ -311,9 +311,9 @@ int get_all_min_temperatures_floorplan
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
 
-        get_min_temperature_floorplan_element
+        *min_temperature++ = get_min_temperature_floorplan_element
 
-            (flp_el, dimensions, temperatures, min_temperature++) ;
+                                 (flp_el, dimensions, temperatures) ;
 
     return 0 ;
 }
@@ -334,9 +334,9 @@ void print_all_min_temperatures_floorplan
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
     {
-        get_min_temperature_floorplan_element
+        temperature = get_min_temperature_floorplan_element
 
-            (flp_el, dimensions, temperatures, &temperature) ;
+                          (flp_el, dimensions, temperatures) ;
 
         fprintf (stream, "%7.3f ", temperature) ;
     }
@@ -356,9 +356,9 @@ int get_all_avg_temperatures_floorplan
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
 
-        get_avg_temperature_floorplan_element
+        *avg_temperature++ = get_avg_temperature_floorplan_element
 
-            (flp_el, dimensions, temperatures, avg_temperature++) ;
+                                 (flp_el, dimensions, temperatures) ;
 
     return 0 ;
 }
@@ -379,9 +379,9 @@ void print_all_avg_temperatures_floorplan
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
     {
-        get_avg_temperature_floorplan_element
+        temperature = get_avg_temperature_floorplan_element
 
-            (flp_el, dimensions, temperatures, &temperature) ;
+                          (flp_el, dimensions, temperatures) ;
 
         fprintf (stream, "%7.3f ", temperature) ;
     }

@@ -348,28 +348,67 @@ extern "C"
         FloorplanElement *floorplan_element
     ) ;
 
-    void get_max_temperature_floorplan_element
+
+
+    /*! Returns the maximum temperature of the floorplan element
+     *
+     *  \param floorplan_element pointer to the floorplan element
+     *  \param dimensions        pointer to the structure storing the dimensions
+     *  \param temperatures      pointer to the temperature of the first thermal
+     *                           cell in the layer where \a floorplan_element
+     *                           is placed
+     *
+     *  \return the maximum temperature among the thermal cells on the stack
+     *          layer where \a floorplan_element is placed
+     */
+
+    double get_max_temperature_floorplan_element
     (
         FloorplanElement *floorplan_element,
         Dimensions       *dimensions,
-        double           *temperatures,
-        double           *max_temperature
+        double           *temperatures
     ) ;
 
-    void get_min_temperature_floorplan_element
+
+
+    /*! Returns the minimum temperature of the floorplan element
+     *
+     *  \param floorplan_element pointer to the floorplan element
+     *  \param dimensions        pointer to the structure storing the dimensions
+     *  \param temperatures      pointer to the temperature of the first thermal
+     *                           cell in the layer where \a floorplan_element
+     *                           is placed
+     *
+     *  \return the minimum temperature among the thermal cells on the stack
+     *          layer where \a floorplan_element is placed
+     */
+
+    double get_min_temperature_floorplan_element
     (
         FloorplanElement *floorplan_element,
         Dimensions       *dimensions,
-        double           *temperatures,
-        double           *min_temperature
+        double           *temperatures
     ) ;
 
-    void get_avg_temperature_floorplan_element
+
+
+    /*! Returns the average temperature of the floorplan element
+     *
+     *  \param floorplan_element pointer to the floorplan element
+     *  \param dimensions        pointer to the structure storing the dimensions
+     *  \param temperatures      pointer to the temperature of the first thermal
+     *                           cell in the layer where \a floorplan_element
+     *                           is placed
+     *
+     *  \return the average temperature among the thermal cells on the stack
+     *          layer where \a floorplan_element is placed
+     */
+
+    double get_avg_temperature_floorplan_element
     (
         FloorplanElement *floorplan_element,
         Dimensions       *dimensions,
-        double           *temperatures,
-        double           *avg_temperature
+        double           *temperatures
     ) ;
 
 /******************************************************************************/

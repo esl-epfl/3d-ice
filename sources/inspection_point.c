@@ -692,6 +692,11 @@ Error_t generate_inspection_point_output
 
             fprintf (output_stream, "%5.3f \t ", current_time) ;
 
+            temperatures += get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(inspection_point->StackElement), 0, 0) ;
+
             if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                 print_all_max_temperatures_floorplan
@@ -719,26 +724,31 @@ Error_t generate_inspection_point_output
 
         case TDICE_OUTPUT_TYPE_TFLPEL :
 
+            temperatures += get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(inspection_point->StackElement), 0, 0) ;
+
             if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
-                get_max_temperature_floorplan_element
+                temperature = get_max_temperature_floorplan_element
 
                     (inspection_point->Pointer.Tflpel->FloorplanElement,
-                     dimensions, temperatures, &temperature) ;
+                     dimensions, temperatures) ;
 
             else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
-                get_min_temperature_floorplan_element
+                temperature = get_min_temperature_floorplan_element
 
                     (inspection_point->Pointer.Tflpel->FloorplanElement,
-                     dimensions, temperatures, &temperature) ;
+                     dimensions, temperatures) ;
 
             else
 
-                get_avg_temperature_floorplan_element
+                temperature = get_avg_temperature_floorplan_element
 
                     (inspection_point->Pointer.Tflpel->FloorplanElement,
-                     dimensions, temperatures, &temperature) ;
+                     dimensions, temperatures) ;
 
             fprintf (output_stream,
                 "%5.3f \t %7.3f\n", current_time, temperature) ;
