@@ -39,79 +39,112 @@
 #include "thermal_data.h"
 #include "analysis.h"
 
-int
-main(int argc, char** argv)
+int main(int argc, char** argv)
 {
-  StackDescription stkd ;
-  Analysis         analysis ;
-  ThermalData      tdata ;
+    StackDescription stkd ;
+    Analysis         analysis ;
+    ThermalData      tdata ;
 
-  // Checks if there are the all the arguments
-  ////////////////////////////////////////////////////////////////////////////
+    // Checks if there are the all the arguments
+    ////////////////////////////////////////////////////////////////////////////
 
-  if (argc != 2)
-  {
-    fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]) ;
-    return EXIT_FAILURE ;
-  }
+    if (argc != 2)
+    {
+        fprintf(stderr, "Usage: \"%s file.stk\"\n", argv[0]) ;
+        return EXIT_FAILURE ;
+    }
 
-  // Init StackDescription and parse the input file
-  ////////////////////////////////////////////////////////////////////////////
+    // Init StackDescription and parse the input file
+    ////////////////////////////////////////////////////////////////////////////
 
-  fprintf (stdout, "Preparing stk data ...\n") ;
+    fprintf (stdout, "Preparing stk data ... ") ; fflush (stdout) ;
 
-  init_stack_description (&stkd) ;
-  init_analysis          (&analysis) ;
+    init_stack_description (&stkd) ;
+    init_analysis          (&analysis) ;
 
-  if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
+    if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
 
-    return EXIT_FAILURE ;
+        return EXIT_FAILURE ;
 
-  // Generate output files
-  ////////////////////////////////////////////////////////////////////////////
+    fprintf (stdout, "done !\n") ;
 
-  // We use "% " as prefix for matlab compatibility (header will be a comment)
+    // Generate output files
+    ////////////////////////////////////////////////////////////////////////////
 
-  if (generate_analysis_headers (&analysis, stkd.Dimensions, "% ") != TDICE_SUCCESS)
-  {
-    fprintf(stderr, "error in initializing output files \n ");
-    free_stack_description (&stkd) ;
-    return EXIT_FAILURE ;
-  }
+    // We use "% " as prefix for matlab compatibility (header will be a comment)
 
-  // Init thermal data and fill it using the StackDescription
-  ////////////////////////////////////////////////////////////////////////////
+    if (generate_analysis_headers (&analysis, stkd.Dimensions, "% ") != TDICE_SUCCESS)
+    {
+        fprintf(stderr, "error in initializing output files \n ");
+        free_stack_description (&stkd) ;
+        return EXIT_FAILURE ;
+    }
 
-  fprintf (stdout, "Preparing thermal data ...\n") ;
+    // Init thermal data and fill it using the StackDescription
+    ////////////////////////////////////////////////////////////////////////////
 
-  init_thermal_data (&tdata) ;
+    fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
 
-  if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
-  {
-    fprintf(stderr, "fill thermal data failed\n") ;
+    init_thermal_data (&tdata) ;
 
+    if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
+    {
+        fprintf(stderr, "fill thermal data failed\n") ;
+
+        free_analysis          (&analysis) ;
+        free_stack_description (&stkd) ;
+
+        return EXIT_FAILURE ;
+    }
+
+    fprintf (stdout, "done !\n") ;
+
+    // Run the simulation and print the output
+    ////////////////////////////////////////////////////////////////////////////
+
+    clock_t Time = clock() ;
+
+    SimResult_t result ;
+
+    do
+    {
+        result = emulate_step (&tdata, &stkd, &analysis) ;
+
+        if (result == TDICE_STEP_DONE || result == TDICE_SLOT_DONE)
+        {
+            fprintf (stdout, "%.2f ", get_simulated_time (&analysis)) ;
+
+            fflush (stdout) ;
+
+            generate_analysis_output
+
+                (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_STEP) ;
+        }
+
+        if (result == TDICE_SLOT_DONE)
+        {
+            fprintf (stdout, "\n") ;
+
+            generate_analysis_output
+
+                (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_SLOT) ;
+        }
+
+    } while (result != TDICE_END_OF_SIMULATION) ;
+
+    generate_analysis_output
+
+        (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_FINAL) ;
+
+    fprintf (stdout, "emulation took %.3f sec\n",
+        ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+
+    // free all data
+    ////////////////////////////////////////////////////////////////////////////
+
+    free_thermal_data      (&tdata) ;
     free_analysis          (&analysis) ;
     free_stack_description (&stkd) ;
-    return EXIT_FAILURE ;
-  }
 
-  clock_t Time = clock() ;
-
-  do
-  {
-
-  }
-  while (emulate_step (&tdata, &stkd, &analysis) != 1) ;
-
-  fprintf (stdout, "emulation took %.3f sec\n",
-           ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
-
-  // free all data
-  ////////////////////////////////////////////////////////////////////////////
-
-  free_thermal_data      (&tdata) ;
-  free_analysis          (&analysis) ;
-  free_stack_description (&stkd) ;
-
-  return EXIT_SUCCESS ;
+    return EXIT_SUCCESS ;
 }

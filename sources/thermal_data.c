@@ -319,72 +319,82 @@ fill_system_vector_steady
 
 /******************************************************************************/
 
-int emulate_step (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
+SimResult_t emulate_step
+(
+    ThermalData      *tdata,
+    StackDescription *stkd,
+    Analysis         *analysis
+)
 {
-  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY) // FIXME
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
-        return 2 ;
+        return TDICE_WRONG_CONFIG ;
 
-  if (slot_completed (analysis) == true) // CHECKME
-  {
-    if (fill_sources_stack_description
-            (tdata->Sources, tdata->ThermalCells, stkd) == TDICE_FAILURE)
+    if (slot_completed (analysis) == true)
+    {
+        Error_t result = fill_sources_stack_description
 
-      return 1 ;
-  }
+            (tdata->Sources, tdata->ThermalCells, stkd) ;
 
-  fill_system_vector
-  (
-    stkd->Dimensions, tdata->Temperatures,
-    tdata->Sources, tdata->ThermalCells, tdata->Temperatures
-  ) ;
+        if (result == TDICE_FAILURE)
 
-  dgstrs
-  (
-    NOTRANS,
-    &tdata->SLUMatrix_L,
-    &tdata->SLUMatrix_U,
-    tdata->SLU_PermutationMatrixC,
-    tdata->SLU_PermutationMatrixR,
-    &tdata->SLUMatrix_B,
-    &tdata->SLU_Stat,
-    &tdata->SLU_Info
-  ) ;
+            return TDICE_END_OF_SIMULATION ;
+    }
 
-  if (tdata->SLU_Info < 0)
-  {
-    fprintf (stderr, "Error while solving linear system\n") ;
-    return tdata->SLU_Info ;
-  }
+    fill_system_vector
 
-  analysis->CurrentTime++ ;
+        (stkd->Dimensions, tdata->Temperatures,
+         tdata->Sources, tdata->ThermalCells, tdata->Temperatures) ;
 
-  return 0 ;
+    dgstrs
+
+        (NOTRANS, &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+         &tdata->SLUMatrix_B, &tdata->SLU_Stat, &tdata->SLU_Info) ;
+
+    if (tdata->SLU_Info < 0)
+    {
+        fprintf (stderr,
+            "Error (%d) while solving linear system\n", tdata->SLU_Info) ;
+
+        return TDICE_SOLVER_ERROR ;
+    }
+
+    analysis->CurrentTime++ ;
+
+    if (slot_completed (analysis) == false)
+
+        return TDICE_STEP_DONE ;
+
+    else
+
+        return TDICE_SLOT_DONE ;
 }
 
 /******************************************************************************/
 
-int emulate_slot (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
+SimResult_t emulate_slot
+(
+    ThermalData      *tdata,
+    StackDescription *stkd,
+    Analysis         *analysis
+)
 {
-  int result = 0 ;
+    SimResult_t result ;
 
-  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)  // FIXME
+    do
+    {
 
-        return 2 ;
+        result = emulate_step (tdata, stkd, analysis) ;
 
-  do
-  {
+    }   while (result == TDICE_STEP_DONE) ;
 
-    result = emulate_step (tdata, stkd, analysis) ;
-
-  } while (result == 0) ; // CHECKME
-
-  return result ;
+    return result ;
 }
 
 /******************************************************************************/
 
-int emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
+SimResult_t emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
 {
   if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)  // FIXME
 

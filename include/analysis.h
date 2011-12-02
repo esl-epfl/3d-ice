@@ -150,15 +150,20 @@ extern "C"
     double get_simulated_time (Analysis *analysis) ;
 
 
+
     /*! Returns the state of the slot simulation
      *
      * \param analysis the address of the analysis structure
      *
-     * \return \c TRUE if simulation for a slot is completed
+     * \return \c TRUE  if the number of simulation steps done so far matches a
+     *                  multiple of the slot length, i.e. it is time to update
+     *                  the source vector with new power values
      * \return \c FALSE otherwise
      */
 
     bool slot_completed (Analysis *analysis) ;
+
+
 
     /*! Prints the analysis informations as they look in the stack file
      *
@@ -185,6 +190,7 @@ extern "C"
         (FILE *stream, char *prefix, Analysis *analysis) ;
 
 
+
     /*! Inserts an inspection point into the corresponding queue
      *
      * \param analysis     pointer to the analysis structure
@@ -194,6 +200,7 @@ extern "C"
     void add_inspection_point_to_analysis
 
         (Analysis *analysis, InspectionPoint *inspection_point) ;
+
 
 
     /*! Initializes output files for each inspection point

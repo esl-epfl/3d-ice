@@ -87,15 +87,11 @@ double get_simulated_time (Analysis *analysis)
 
 bool slot_completed (Analysis *analysis)
 {
-  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+    if (analysis->CurrentTime % analysis->SlotLength == 0u)
+
+        return true ;
 
     return false ;
-
-  if (analysis->CurrentTime % analysis->SlotLength == 0)
-
-    return true ;
-
-  return false ;
 }
 
 /******************************************************************************/
@@ -321,7 +317,7 @@ Error_t generate_analysis_output
 
         list = analysis->InspectionPointListStep ;
 
-    else if (output_instant == TDICE_OUTPUT_FINAL)
+    else if (output_instant == TDICE_OUTPUT_SLOT)
 
         list = analysis->InspectionPointListSlot ;
 

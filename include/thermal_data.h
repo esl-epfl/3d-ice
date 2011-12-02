@@ -152,45 +152,57 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Consumes a time step emulating heat injection and dissipation.         */
-  /*                                                                        */
-  /* Returns                                                                */
-  /*                                                                        */
-  /*   1 if the time slots are over,                                        */
-  /*   0 if the emulation succeeded (step consumed),                        */
-  /*  <0 if there have been a problem with the computation of the solution  */
-  /*     of the linear system. See the "info" prameter of "dgstrs" in       */
-  /*     SuperLU.                                                           */
 
-  int emulate_step (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
+    /*! Simulates a time step
+     *
+     * \param tdata     address of the ThermalData structure
+     * \param stkd      address of the StackDescription structure used to
+     *                  fill the content of \a tdata and \a analysys
+     * \param analysis  address of the Analysis structure
+     *
+     * \return \c TDICE_WRONG_CONFIG if the parameters refers to a steady
+     *                               state simulation
+     * \return \c TDICE_SOLVER_ERROR if the SLU functions report an error in
+     *                               the structure of the system matrix.
+     * \return \c TDICE_END_OF_SIMULATION if the simulation time at the moment of
+     *                               the function call matches the beginning
+     *                               of a new slot but power values are over.
+     * \return \c TDICE_STEP_DONE    if the time step has been simulated
+     *                               correclty
+     * \return \c TDICE_SLOT_DONE    if the time step has been simulated
+     *                               correclty and the slot has been completed
+     */
 
-/******************************************************************************/
+    SimResult_t emulate_step
 
-  /* Consumes a time slot emulating heat injection and dissipation.         */
-  /*                                                                        */
-  /* Returns                                                                */
-  /*                                                                        */
-  /*   1 if the time slots are over                                         */
-  /*   0 if the emulation succeeded (slot consumed),                        */
-  /*  <0 if there have been a problem with the computation of the solution  */
-  /*     of the linear system. See the "info" prameter of "dgstrs"          */
-  /*     in SuperLU.                                                        */
+        (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
 
-  int emulate_slot (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
 
-/******************************************************************************/
 
-  /* Consumes the first power value of heat injection and dissipation       */
-  /* and does steady state simulation.                                      */
-  /* Returns                                                                */
-  /*                                                                        */
-  /*   1 if the emulation succeeded (power value consumed),                 */
-  /*     or if no power values are mentioned at all (error)                 */
-  /*  <0 if there have been a problem with the computation of the solution  */
-  /*     of the linear system. See the "info" prameter of "dgstrs"          */
-  /*     in SuperLU.                                                        */
+    /*! Simulates a time slot
+     *
+     * \param tdata     address of the ThermalData structure
+     * \param stkd      address of the StackDescription structure used to
+     *                  fill the content of \a tdata and \a analysys
+     * \param analysis  address of the Analysis structure
+     *
+     * \return \c TDICE_WRONG_CONFIG if the parameters refers to a steady
+     *                               state simulation
+     * \return \c TDICE_SOLVER_ERROR if the SLU functions report an error in
+     *                               the structure of the system matrix.
+     * \return \c TDICE_END_OF_SIMULATION if the simulation time at the moment of
+     *                               the function call matches the beginning
+     *                               of a new slot but power values are over.
+     * \return \c TDICE_SLOT_DONE    the slot has been completed correclty
+     */
 
-  int emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
+    SimResult_t emulate_slot
+
+        (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
+
+    SimResult_t emulate_steady
+
+        (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
 
 /******************************************************************************/
 

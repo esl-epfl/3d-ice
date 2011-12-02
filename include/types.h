@@ -317,6 +317,37 @@ extern "C"
 
     typedef enum Error_t Error_t ;
 
+
+
+    /*! \enum
+     *
+     */
+
+    enum SimResult_t
+    {
+        /*! The power values are over */
+
+        TDICE_END_OF_SIMULATION = 0,
+
+        /*! The emulation function does not match the configuration */
+
+        TDICE_WRONG_CONFIG,
+
+        /*! The solver routine failed */
+
+        TDICE_SOLVER_ERROR,
+
+        /*! The time step has been simulated correctly */
+
+        TDICE_STEP_DONE,
+
+        /*! The time slot has been simulated correctly */
+
+        TDICE_SLOT_DONE
+    } ;
+
+    typedef enum SimResult_t SimResult_t ;
+
 /******************************************************************************/
 
     /*! \enum AnalysisType_t

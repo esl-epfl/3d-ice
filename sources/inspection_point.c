@@ -159,7 +159,7 @@ Tflp *alloc_and_init_tflp (void)
 
     if (tflp != NULL)
 
-        init_tflp(tflp) ;
+        init_tflp (tflp) ;
 
     return tflp ;
 }
@@ -559,8 +559,8 @@ Error_t generate_inspection_point_header
             }
 
             fprintf (output_stream,
-                "%stemperatures for the floorplan of the die %s\n",
-                prefix, inspection_point->StackElement->Id) ;
+                "temperatures for the floorplan of the die %s\n",
+                inspection_point->StackElement->Id) ;
 
             if (inspection_point->StackElement->Floorplan == NULL)
             {
@@ -602,7 +602,7 @@ Error_t generate_inspection_point_header
             else
             {
                 fprintf (stderr,
-                    "Inspection Point: Error reading output quantity for Tflp\n") ;
+                    "Inspection Point: Error reading output quantity for Tflpel\n") ;
 
                 goto header_error ;
             }
@@ -697,14 +697,14 @@ Error_t generate_inspection_point_output
                 (dimensions,
                  get_source_layer_offset(inspection_point->StackElement), 0, 0) ;
 
-            if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
+            if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
                 print_all_max_temperatures_floorplan
 
                     (inspection_point->StackElement->Floorplan,
                      dimensions, temperatures, output_stream) ;
 
-            else if (inspection_point->Pointer.Tflpel->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
+            else if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                 print_all_min_temperatures_floorplan
 
@@ -761,6 +761,8 @@ Error_t generate_inspection_point_output
 
                 (inspection_point->StackElement, dimensions,
                  temperatures, output_stream) ;
+
+            fprintf (output_stream, "\n") ;
 
             break ;
 
