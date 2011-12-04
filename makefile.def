@@ -106,7 +106,7 @@ AR        = ar
 ARFLAGS   = rsv
 
 CC        = gcc
-CFLAGS    = -MD -O3
+CFLAGS    = -MD -g
 CINCLUDES = -I$(3DICE_INCLUDE)
 
 YACC      = bison

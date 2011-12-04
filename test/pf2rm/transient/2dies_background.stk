@@ -38,5 +38,5 @@ solver:
   initial temperature 300.0 ;
 
 output:
-  T( die2, "pf2rm/transient/background_node1.txt", 5000, 3000, final );
-  T( die2, "pf2rm/transient/background_node2.txt",    0,    0, final );
+  T( die2, "pf2rm/transient/background_node1.txt", 5000, 3000, step );
+  T( die2, "pf2rm/transient/background_node2.txt",    0,    0, step );

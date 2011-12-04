@@ -37,7 +37,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-all: GenerateSystemMatrix CompareSystemMatrix exec
+all: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures runtest
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
@@ -52,20 +52,53 @@ GenerateSystemMatrix: GenerateSystemMatrix.o
 CompareSystemMatrix: CompareSystemMatrix.o
 	$(CC) $< $(CLIBS) -o $@
 
-exec:	GenerateSystemMatrix CompareSystemMatrix
+-include CompareTemperatures.d
+
+CompareTemperatures: CompareTemperatures.o
+	$(CC) $< $(CLIBS) -o $@
+
+runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-ICE-Emulator
 	@echo "Comparison of system matrices ...."
 	@echo -n "mc4rm : "
-	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk sm_fe.txt
-	@./CompareSystemMatrix  sm_fe.txt mc4rm/transient/system_matrix.txt
-	@$(RM) sm_fe.txt
+	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk sm_4rm.txt
+	@./CompareSystemMatrix  sm_4rm.txt mc4rm/transient/system_matrix.txt
 	@echo -n "mc2rm : "
-	@./GenerateSystemMatrix mc2rm/transient/2dies_four_elements.stk sm_fe.txt
-	@./CompareSystemMatrix  sm_fe.txt mc2rm/transient/system_matrix.txt
-	@$(RM) sm_fe.txt
+	@./GenerateSystemMatrix mc2rm/transient/2dies_four_elements.stk sm_2rm.txt
+	@./CompareSystemMatrix  sm_2rm.txt mc2rm/transient/system_matrix.txt
 	@echo -n "pf2rm : "
-	@./GenerateSystemMatrix pf2rm/transient/2dies_four_elements.stk sm_fe.txt
-	@./CompareSystemMatrix  sm_fe.txt pf2rm/transient/system_matrix.txt
-	@$(RM) sm_fe.txt
+	@./GenerateSystemMatrix pf2rm/transient/2dies_four_elements.stk sm_pf.txt
+	@./CompareSystemMatrix  sm_pf.txt pf2rm/transient/system_matrix.txt
+	@echo "Comparison of transient results ...."
+	@echo "--------"
+	@echo "mc4rm 4e"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator mc4rm/transient/2dies_four_elements.stk
+	@./CompareTemperatures mc4rm/transient/four_elements_node1.txt mc4rm/transient/four_elements_node2.txt mc4rm/transient/output_four_elements.txt
+	@echo "--------"
+	@echo "mc4rm bg"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator mc4rm/transient/2dies_background.stk
+	@./CompareTemperatures mc4rm/transient/background_node1.txt mc4rm/transient/background_node2.txt mc4rm/transient/output_background.txt
+	@echo "--------"
+	@echo "mc2rm 4e"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator mc2rm/transient/2dies_four_elements.stk
+	@./CompareTemperatures mc2rm/transient/four_elements_node1.txt mc2rm/transient/four_elements_node2.txt mc2rm/transient/output_four_elements.txt
+	@echo "--------"
+	@echo "mc2rm bg"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator mc2rm/transient/2dies_background.stk
+	@./CompareTemperatures mc2rm/transient/background_node1.txt mc2rm/transient/background_node2.txt mc2rm/transient/output_background.txt
+	@echo "--------"
+	@echo "pf2rm 4e"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator pf2rm/transient/2dies_four_elements.stk
+	@./CompareTemperatures pf2rm/transient/four_elements_node1.txt pf2rm/transient/four_elements_node2.txt pf2rm/transient/output_four_elements.txt
+	@echo "--------"
+	@echo "pf2rm bg"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator pf2rm/transient/2dies_background.stk
+	@./CompareTemperatures pf2rm/transient/background_node1.txt pf2rm/transient/background_node2.txt pf2rm/transient/output_background.txt
 
 clean:
 	@$(RM) $(RMFLAGS) GenerateSystemMatrix
@@ -74,3 +107,20 @@ clean:
 	@$(RM) $(RMFLAGS) CompareSystemMatrix
 	@$(RM) $(RMFLAGS) CompareSystemMatrix.o
 	@$(RM) $(RMFLAGS) CompareSystemMatrix.d
+	@$(RM) $(RMFLAGS) CompareTemperatures
+	@$(RM) $(RMFLAGS) CompareTemperatures.o
+	@$(RM) $(RMFLAGS) CompareTemperatures.d
+	@$(RM) $(RMFLAGS) sm_4rm.txt sm_pf.txt sm_2rm.txt
+	@$(RM) $(RMFLAGS) mc2rm/transient/background_node1.txt
+	@$(RM) $(RMFLAGS) mc2rm/transient/background_node2.txt
+	@$(RM) $(RMFLAGS) mc2rm/transient/four_elements_node1.txt
+	@$(RM) $(RMFLAGS) mc2rm/transient/four_elements_node2.txt
+	@$(RM) $(RMFLAGS) mc4rm/transient/background_node1.txt
+	@$(RM) $(RMFLAGS) mc4rm/transient/background_node2.txt
+	@$(RM) $(RMFLAGS) mc4rm/transient/four_elements_node1.txt
+	@$(RM) $(RMFLAGS) mc4rm/transient/four_elements_node2.txt
+	@$(RM) $(RMFLAGS) pf2rm/transient/background_node1.txt
+	@$(RM) $(RMFLAGS) pf2rm/transient/background_node2.txt
+	@$(RM) $(RMFLAGS) pf2rm/transient/four_elements_node1.txt
+	@$(RM) $(RMFLAGS) pf2rm/transient/four_elements_node2.txt
+

@@ -39,95 +39,146 @@
 
 int main(int argc, char** argv)
 {
-    FILE *totest, *reference ;
-
-    fpos_t start_totest, start_reference ;
+    FILE *node1, *node2, *reference ;
 
     char *line ;
 
     size_t  len ;
     ssize_t read ;
 
-    int counter, counter1, counter2, max_ref ;
+    fpos_t start_node1, start_node2 ;
 
-    int row1, column1, row2, column2 ;
+    int counter, counter1, counter2, counter3 ;
 
-    double value1, value2, tmp, max_difference ;
+    double time1, time2, time3, temp1, temp2, temp3, temp4 ;
+
+    double tmp, max_node1, max_node2, time_node1, time_node2 ;
 
     // Checks if there are the all the arguments
     ////////////////////////////////////////////////////////////////////////////
 
-    if (argc != 3)
+    if (argc != 4)
     {
-        fprintf(stdout, "Usage: \"%s totest.txt reference.txt\"\n", argv[0]) ;
+        fprintf(stdout, "Usage: \"%s node1.txt node2.txt reference.txt\"\n", argv[0]) ;
 
         return EXIT_FAILURE ;
     }
 
-    // Open the two files
+    // Open the three files
     ////////////////////////////////////////////////////////////////////////////
 
-    totest = fopen (argv[1], "r") ;
+    node1 = fopen (argv[1], "r") ;
 
-    if (totest == NULL)
+    if (node1 == NULL)
     {
         fprintf (stdout, "Unable to open file %s\n", argv[1]) ;
 
         return EXIT_FAILURE ;
     }
 
-    fgetpos (totest, &start_totest) ;
+    // read three lines
 
-    reference = fopen (argv[2], "r") ;
+    for (line = NULL, len = 0, counter = 0 ; counter != 3 ; counter++)
 
-    if (reference == NULL)
+        read = getline(&line, &len, node1) ;
+
+    free (line) ;
+
+    fgetpos (node1, &start_node1) ;
+
+    //
+
+    node2 = fopen (argv[2], "r") ;
+
+    if (node2 == NULL)
     {
         fprintf (stdout, "Unable to open file %s\n", argv[2]) ;
 
-        fclose (totest) ;
+        fclose (node1) ;
 
         return EXIT_FAILURE ;
     }
 
-    fgetpos (reference, &start_reference) ;
+    // read three lines
 
-    // Count the number of lines in file totest
+    for (line = NULL, len = 0, counter = 0 ; counter != 3 ; counter++)
+
+        read = getline(&line, &len, node2) ;
+
+    free (line) ;
+
+    fgetpos (node2, &start_node2) ;
+
+    //
+
+    reference = fopen (argv[3], "r") ;
+
+    if (reference == NULL)
+    {
+        fprintf (stdout, "Unable to open file %s\n", argv[3]) ;
+
+        fclose (node1) ;
+        fclose (node2) ;
+
+        return EXIT_FAILURE ;
+    }
+
+    // Count the number of lines in file node1
     ////////////////////////////////////////////////////////////////////////////
+
+    fsetpos (node1, &start_node1) ;
 
     for ( line = NULL, len  = 0, counter1 = 0 ;
 
-          (read = getline(&line, &len, totest)) != -1 ;
+          (read = getline(&line, &len, node1)) != -1 ;
 
           counter1 ++ ) ;
 
     free (line) ;
 
-    fsetpos (totest, &start_totest) ;
+    fsetpos (node1, &start_node1) ;
+
+    // fprintf (stdout, "File %s contains %d lines\n", argv[1], counter1) ;
+
+    // Count the number of lines in file node2
+    ////////////////////////////////////////////////////////////////////////////
+
+    fsetpos (node2, &start_node2) ;
+
+    for ( line = NULL, len  = 0, counter2 = 0 ;
+
+          (read = getline(&line, &len, node2)) != -1 ;
+
+          counter2 ++ ) ;
+
+    free (line) ;
+
+    fsetpos (node2, &start_node2) ;
 
     // fprintf (stdout, "File %s contains %d lines\n", argv[1], counter1) ;
 
     // Count the number of lines in file reference
     ////////////////////////////////////////////////////////////////////////////
 
-    for ( line = NULL, len  = 0, counter2 = 0 ;
+    for ( line = NULL, len  = 0, counter3 = 0 ;
 
           (read = getline(&line, &len, reference)) != -1 ;
 
-          counter2 ++ ) ;
+          counter3 ++ ) ;
 
     free (line) ;
 
-    fsetpos (reference, &start_reference) ;
+    rewind (reference) ;
 
     // fprintf (stdout, "File %s contains %d lines\n", argv[2], counter2) ;
 
     // Check if the lengths are the same
     ////////////////////////////////////////////////////////////////////////////
 
-    if (counter1 != counter2)
+    if (counter1 != counter2 || counter2 != counter3)
     {
-        fprintf (stdout, "Files %s:%d and %s:%d have different # lines\n",
-            argv[1], counter1, argv[2], counter2) ;
+        fprintf (stdout, "Files %s:%d, %s:%d and %s:%d have different # lines\n",
+            argv[1], counter1, argv[2], counter2, argv[3], counter3) ;
 
         goto error ;
     }
@@ -135,59 +186,67 @@ int main(int argc, char** argv)
     // Compare the content
     ////////////////////////////////////////////////////////////////////////////
 
-    max_difference = 0.0 ;
+    max_node1 = 0.0 ;
+    max_node2 = 0.0 ;
 
     for (counter = 0 ; counter != counter1 ; counter++)
     {
-        if (fscanf (totest, "%d %d %lf\n", &row1, &column1, &value1) != 3)
+        if (fscanf (node1, "%lf %lf\n", &time1, &temp1) != 2)
         {
-            fprintf (stdout, "Error reading line %d from %s\n", counter + 1, argv[1]) ;
+            fprintf (stdout, "Error reading line %d from %s\n", counter, argv[1]) ;
 
             break ;
         }
 
-        if (fscanf (reference, "%d %d %lf\n", &row2, &column2, &value2) != 3)
+        if (fscanf (node2, "%lf %lf\n", &time2, &temp2) != 2)
         {
-            fprintf (stdout, "Error reading line %d from %s\n", counter + 1, argv[2]) ;
+            fprintf (stdout, "Error reading line %d from %s\n", counter, argv[2]) ;
 
             break ;
         }
 
-        if (row1 != row2 || column1 != column2)
+        if (fscanf (reference, "%lf %lf %lf\n", &time3, &temp3, &temp4) != 3)
         {
-            fprintf (stdout, "Coordinate mismatch at line %d\n", counter + 1) ;
+            fprintf (stdout, "Error reading line %d from %s\n", counter, argv[3]) ;
 
             break ;
         }
 
-        if (   (value1 < 0.0 && value2 > 0.0)
-            || (value1 > 0.0 && value2 < 0.0))
+        if (time1 != time2 || time2 != time3)
         {
-            fprintf (stdout, "Sign mismatch at line %d\n", counter + 1) ;
+            fprintf (stdout, "Time mismatch at line %d (%.3f %.3f %.3f)\n",
+                counter, time1, time2, time3) ;
 
             break ;
         }
 
-        tmp = fabs (value1 - value2) ;
+        tmp = fabs (temp1 - temp3) ;
 
-        if (tmp > max_difference) { max_difference = tmp ; max_ref = counter ; }
+        if (tmp > max_node1) { max_node1 = tmp ; time_node1 = time1 ; }
+
+        tmp = fabs (temp2 - temp4) ;
+
+        if (tmp > max_node2) { max_node2 = tmp ; time_node2 = time1 ; }
     }
 
     if (counter == counter1)
 
-        fprintf (stdout, "%.3e\t@%5d\n", max_difference, max_ref) ;
+        fprintf (stdout, "%.3f (@%.3f) \t%.3f @%.3f)\n",
+            max_node1, time_node1, max_node2, time_node2) ;
 
     // Closes ...
     ////////////////////////////////////////////////////////////////////////////
 
-    fclose (totest) ;
+    fclose (node1) ;
+    fclose (node2) ;
     fclose (reference) ;
 
     return EXIT_SUCCESS ;
 
 error :
 
-    fclose (totest) ;
+    fclose (node1) ;
+    fclose (node2) ;
     fclose (reference) ;
 
     return EXIT_FAILURE ;
