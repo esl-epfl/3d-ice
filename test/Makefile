@@ -33,35 +33,44 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
-3DICE_MAIN = .
+3DICE_MAIN = ..
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib bin test doc clean
+all: GenerateSystemMatrix CompareSystemMatrix exec
 
-all: lib bin
+CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
+CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 
-lib:
-	cd $(3DICE_FLEX)    ; make ;
-	cd $(3DICE_BISON)   ; make ;
-	cd $(3DICE_SOURCES) ; make ;
-	cd $(3DICE_LIB)     ; make ;
+-include GenerateSystemMatrix.d
 
-bin: lib
-	cd $(3DICE_BIN) ; make ;
+GenerateSystemMatrix: GenerateSystemMatrix.o
+	$(CC) $< $(CLIBS) -o $@
 
-test: lib bin
-	cd $(3DICE_TEST) ; make ;
+-include CompareSystemMatrix.d
 
-doc:
-	cd $(3DICE_DOC) ; make doc ;
+CompareSystemMatrix: CompareSystemMatrix.o
+	$(CC) $< $(CLIBS) -o $@
+
+exec:	GenerateSystemMatrix CompareSystemMatrix
+	@echo "Comparison of system matrices ...."
+	@echo -n "mc4rm : "
+	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk sm_fe.txt
+	@./CompareSystemMatrix  sm_fe.txt mc4rm/transient/system_matrix.txt
+	@$(RM) sm_fe.txt
+	@echo -n "mc2rm : "
+	@./GenerateSystemMatrix mc2rm/transient/2dies_four_elements.stk sm_fe.txt
+	@./CompareSystemMatrix  sm_fe.txt mc2rm/transient/system_matrix.txt
+	@$(RM) sm_fe.txt
+	@echo -n "pf2rm : "
+	@./GenerateSystemMatrix pf2rm/transient/2dies_four_elements.stk sm_fe.txt
+	@./CompareSystemMatrix  sm_fe.txt pf2rm/transient/system_matrix.txt
+	@$(RM) sm_fe.txt
 
 clean:
-	cd $(3DICE_FLEX)    ; make clean ;
-	cd $(3DICE_BISON)   ; make clean ;
-	cd $(3DICE_SOURCES) ; make clean ;
-	cd $(3DICE_LIB)     ; make clean ;
-	cd $(3DICE_BIN)     ; make clean ;
-	cd $(3DICE_TEST)    ; make clean ;
-	cd $(3DICE_DOC)     ; make clean ;
-
+	@$(RM) $(RMFLAGS) GenerateSystemMatrix
+	@$(RM) $(RMFLAGS) GenerateSystemMatrix.o
+	@$(RM) $(RMFLAGS) GenerateSystemMatrix.d
+	@$(RM) $(RMFLAGS) CompareSystemMatrix
+	@$(RM) $(RMFLAGS) CompareSystemMatrix.o
+	@$(RM) $(RMFLAGS) CompareSystemMatrix.d

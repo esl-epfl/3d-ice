@@ -2,12 +2,13 @@ material silicon :
    thermal conductivity     1.30e-04 ;
    volumetric heat capacity 1.63566e-12 ;
 
-pinfin_inline :
+pinfin :
 
-  height 100 ;
+   height 100 ;
    pin diameter   50 ;
    pin pitch     100 ;
-   wall material silicon ;
+   pin distribution inline ;
+   pin material silicon ;
    darcy velocity                           1.1066e+06 ;
    coolant volumetric heat capacity         4.172638e-12 ;
    coolant incoming temperature             300.0 ;
@@ -21,21 +22,21 @@ die topdie :
         source   2      silicon ;
         layer   48      silicon ;
 
+dimensions :
+
+  chip length 10000 , width  10000 ;
+  cell length   200 , width    200 ;
+
 stack:
 
    die     die2     topdie    floorplan "four_elements.flp" ;
    channel channel1 ;
    die     die1     bottomdie floorplan "four_elements.flp" ;
 
-dimensions :
-
-  chip length 10000 , width  10000 ;
-  cell length   200 , width    200 ;
-
 solver:
   steady ;
   initial temperature 300.0 ;
 
 output:
-  T( die2, 5000, 3000, "four_elements_node1.txt",  final );
-  T( die2,    0,    0, "four_elements_node2.txt",  final );
+  T( die2, "pf2rm/steady/four_elements_node1.txt", 5000, 3000, final );
+  T( die2, "pf2rm/steady/four_elements_node2.txt",    0,    0, final );

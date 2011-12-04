@@ -48,6 +48,7 @@
 3DICE_LIB       = $(3DICE_MAIN)/lib
 3DICE_BIN       = $(3DICE_MAIN)/bin
 3DICE_DOC       = $(3DICE_MAIN)/doc
+3DICE_TEST      = $(3DICE_MAIN)/test
 
 3DICE_FLEX_L    = $(3DICE_FLEX)/floorplan_scanner.l         \
                   $(3DICE_FLEX)/stack_description_scanner.l

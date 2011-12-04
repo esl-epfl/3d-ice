@@ -319,8 +319,9 @@ extern "C"
 
 
 
-    /*! \enum
+    /*! \enum SimResult_t
      *
+     * Collection of possible values returned bt the eulation functions
      */
 
     enum SimResult_t
