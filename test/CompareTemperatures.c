@@ -193,21 +193,21 @@ int main(int argc, char** argv)
     {
         if (fscanf (node1, "%lf %lf\n", &time1, &temp1) != 2)
         {
-            fprintf (stdout, "Error reading line %d from %s\n", counter, argv[1]) ;
+            fprintf (stdout, "Error reading line %d from %s\n", counter + 1, argv[1]) ;
 
             break ;
         }
 
         if (fscanf (node2, "%lf %lf\n", &time2, &temp2) != 2)
         {
-            fprintf (stdout, "Error reading line %d from %s\n", counter, argv[2]) ;
+            fprintf (stdout, "Error reading line %d from %s\n", counter + 1, argv[2]) ;
 
             break ;
         }
 
         if (fscanf (reference, "%lf %lf %lf\n", &time3, &temp3, &temp4) != 3)
         {
-            fprintf (stdout, "Error reading line %d from %s\n", counter, argv[3]) ;
+            fprintf (stdout, "Error reading line %d from %s\n", counter + 1, argv[3]) ;
 
             break ;
         }
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
         if (time1 != time2 || time2 != time3)
         {
             fprintf (stdout, "Time mismatch at line %d (%.3f %.3f %.3f)\n",
-                counter, time1, time2, time3) ;
+                counter + 1, time1, time2, time3) ;
 
             break ;
         }
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
 
     if (counter == counter1)
 
-        fprintf (stdout, "%.3f (@%.3f) \t%.3f @%.3f)\n",
+        fprintf (stdout, "%.3f (@%.3f) \t%.3f (@%.3f)\n",
             max_node1, time_node1, max_node2, time_node2) ;
 
     // Closes ...

@@ -50,7 +50,7 @@ int main(int argc, char** argv)
 
     int counter, counter1, counter2, max_ref ;
 
-    int row1, column1, row2, column2 ;
+    int row1, column1, row2, column2, max_row, max_column ;
 
     double value1, value2, tmp, max_difference ;
 
@@ -170,12 +170,19 @@ int main(int argc, char** argv)
 
         tmp = fabs (value1 - value2) ;
 
-        if (tmp > max_difference) { max_difference = tmp ; max_ref = counter ; }
+        if (tmp > max_difference)
+        {
+            max_difference = tmp ;
+            max_ref        = counter ;
+            max_row        = row1 ;
+            max_column     = column1 ;
+        }
     }
 
     if (counter == counter1)
 
-        fprintf (stdout, "%.3e\t@%5d\n", max_difference, max_ref) ;
+        fprintf (stdout, "%.3e\t@%5d (%d,%d)\n",
+            max_difference, max_ref + 1, max_row, max_column) ;
 
     // Closes ...
     ////////////////////////////////////////////////////////////////////////////

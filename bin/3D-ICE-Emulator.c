@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 
         if (result == TDICE_STEP_DONE || result == TDICE_SLOT_DONE)
         {
-            fprintf (stdout, "%.2f ", get_simulated_time (&analysis)) ;
+            fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
 
             fflush (stdout) ;
 
