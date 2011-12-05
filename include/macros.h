@@ -503,16 +503,16 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \def EFFECTIVE_HTC_MC_2RM(htc,channel_w,cavity_h,channel_pitch)
+    /*! \def EFFECTIVE_HTC_MC_2RM(htc,channel_l,cavity_h,channel_pitch)
      *
      * Returns the Effective HTC for Microchannels with 2RM model
      *
-     * HTC_eff = HTC * (ChannelWidth + CavityHeight) / ChannelPitch
+     * HTC_eff = HTC * (ChannelLength + CavityHeight) / ChannelPitch
      */
 
-#   define EFFECTIVE_HTC_MC_2RM(htc, channel_w, cavity_h, channel_pitch)  \
+#   define EFFECTIVE_HTC_MC_2RM(htc, channel_l, cavity_h, channel_pitch)  \
                                                                           \
-        ((double) (htc * (channel_w + cavity_h) / channel_pitch))
+        ((double) (htc * (channel_l + cavity_h) / channel_pitch))
 
 
 

@@ -437,8 +437,6 @@ SimResult_t emulate_steady
         return TDICE_SOLVER_ERROR ;
     }
 
-    analysis->CurrentTime += analysis->SlotLength ;
-
     return TDICE_END_OF_SIMULATION ;
 }
 
