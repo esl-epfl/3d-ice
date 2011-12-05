@@ -43,5 +43,5 @@ solver:
 
 output:
 
-  T ( die2, "pf2rm/steady/background_node1.txt", 5000, 5000, final ) ;
+  T ( die1, "pf2rm/steady/background_node1.txt", 5000, 4800, final ) ;
   T ( die2, "pf2rm/steady/background_node2.txt",    0,    0, final ) ;
