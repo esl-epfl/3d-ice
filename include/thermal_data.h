@@ -164,9 +164,7 @@ extern "C"
      *                               state simulation
      * \return \c TDICE_SOLVER_ERROR if the SLU functions report an error in
      *                               the structure of the system matrix.
-     * \return \c TDICE_END_OF_SIMULATION if the simulation time at the moment of
-     *                               the function call matches the beginning
-     *                               of a new slot but power values are over.
+     * \return \c TDICE_END_OF_SIMULATION if power values are over.
      * \return \c TDICE_STEP_DONE    if the time step has been simulated
      *                               correclty
      * \return \c TDICE_SLOT_DONE    if the time step has been simulated
@@ -190,15 +188,30 @@ extern "C"
      *                               state simulation
      * \return \c TDICE_SOLVER_ERROR if the SLU functions report an error in
      *                               the structure of the system matrix.
-     * \return \c TDICE_END_OF_SIMULATION if the simulation time at the moment of
-     *                               the function call matches the beginning
-     *                               of a new slot but power values are over.
-     * \return \c TDICE_SLOT_DONE    the slot has been completed correclty
+     * \return \c TDICE_END_OF_SIMULATION if power values are over.
+     * \return \c TDICE_SLOT_DONE    the slot has been simulated correclty
      */
 
     SimResult_t emulate_slot
 
         (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
+
+
+
+    /*! Execute steady state simulation
+     *
+     * \param tdata     address of the ThermalData structure
+     * \param stkd      address of the StackDescription structure used to
+     *                  fill the content of \a tdata and \a analysys
+     * \param analysis  address of the Analysis structure
+     *
+     * \return \c TDICE_WRONG_CONFIG if the parameters refers to a transient
+     *                               simulation
+     * \return \c TDICE_SOLVER_ERROR if the SLU functions report an error in
+     *                               the structure of the system matrix.
+     * \return \c TDICE_END_OF_SIMULATION if no power values are given or if
+     *                                    the simulation suceeded
+     */
 
     SimResult_t emulate_steady
 

@@ -45,6 +45,8 @@ int main(int argc, char** argv)
     Analysis         analysis ;
     ThermalData      tdata ;
 
+    SimResult_t (*emulate) (ThermalData*, StackDescription*, Analysis*) ;
+
     // Checks if there are the all the arguments
     ////////////////////////////////////////////////////////////////////////////
 
@@ -66,6 +68,23 @@ int main(int argc, char** argv)
 
         return EXIT_FAILURE ;
 
+    if (analysis.AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+
+        emulate = &emulate_step ;
+
+    else if (analysis.AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+
+        emulate = &emulate_steady ;
+
+    else
+    {
+        fprintf (stderr, "unknown analysis type!\n ");
+
+        free_stack_description (&stkd) ;
+
+        return EXIT_FAILURE ;
+    }
+
     fprintf (stdout, "done !\n") ;
 
     // Generate output files
@@ -75,8 +94,10 @@ int main(int argc, char** argv)
 
     if (generate_analysis_headers (&analysis, stkd.Dimensions, "% ") != TDICE_SUCCESS)
     {
-        fprintf(stderr, "error in initializing output files \n ");
+        fprintf (stderr, "error in initializing output files \n ");
+
         free_stack_description (&stkd) ;
+
         return EXIT_FAILURE ;
     }
 
@@ -108,7 +129,7 @@ int main(int argc, char** argv)
 
     do
     {
-        result = emulate_step (&tdata, &stkd, &analysis) ;
+        result = emulate (&tdata, &stkd, &analysis) ;
 
         if (result == TDICE_STEP_DONE || result == TDICE_SLOT_DONE)
         {

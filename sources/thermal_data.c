@@ -326,7 +326,7 @@ SimResult_t emulate_step
     Analysis         *analysis
 )
 {
-    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+    if (analysis->AnalysisType != TDICE_ANALYSIS_TYPE_TRANSIENT)
 
         return TDICE_WRONG_CONFIG ;
 
@@ -394,44 +394,52 @@ SimResult_t emulate_slot
 
 /******************************************************************************/
 
-SimResult_t emulate_steady (ThermalData* tdata, StackDescription* stkd, Analysis *analysis)
+SimResult_t emulate_steady
+(
+    ThermalData      *tdata,
+    StackDescription *stkd,
+    Analysis         *analysis
+)
 {
-  if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)  // FIXME
+    if (analysis->AnalysisType != TDICE_ANALYSIS_TYPE_STEADY)
 
-        return 2 ;
+        return TDICE_WRONG_CONFIG ;
 
-  if (fill_sources_stack_description
-        (tdata->Sources, tdata->ThermalCells, stkd) == TDICE_FAILURE)
-  {
-    fprintf (stderr, "Warning: no power values given for steady state simulation... Nothing to simulate\n") ;
-    return 1 ;
-  }
+    Error_t result = fill_sources_stack_description
 
-  fill_system_vector_steady
+        (tdata->Sources, tdata->ThermalCells, stkd) ;
+
+    if (result == TDICE_FAILURE)
+    {
+        fprintf (stderr,
+
+            "Warning: no power trace given for steady state simulation\n") ;
+
+        return TDICE_END_OF_SIMULATION ;
+    }
+
+    fill_system_vector_steady
 
         (stkd->Dimensions, tdata->Temperatures, tdata->Sources) ;
 
-  dgstrs
-  (
-    NOTRANS,
-    &tdata->SLUMatrix_L,
-    &tdata->SLUMatrix_U,
-    tdata->SLU_PermutationMatrixC,
-    tdata->SLU_PermutationMatrixR,
-    &tdata->SLUMatrix_B,
-    &tdata->SLU_Stat,
-    &tdata->SLU_Info
-  ) ;
+    dgstrs
 
-  if (tdata->SLU_Info < 0)
-  {
-    fprintf (stderr, "Error while solving linear system\n") ;
-    return tdata->SLU_Info ;
-  }
+        (NOTRANS, &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
+         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
+         &tdata->SLUMatrix_B, &tdata->SLU_Stat, &tdata->SLU_Info) ;
 
-  analysis->CurrentTime += analysis->SlotLength ; // FIXME
+    if (tdata->SLU_Info < 0)
+    {
+        fprintf (stderr,
 
-  return 1 ;
+            "Error (%d) while solving linear system\n", tdata->SLU_Info) ;
+
+        return TDICE_SOLVER_ERROR ;
+    }
+
+    analysis->CurrentTime += analysis->SlotLength ;
+
+    return TDICE_END_OF_SIMULATION ;
 }
 
 /******************************************************************************/
