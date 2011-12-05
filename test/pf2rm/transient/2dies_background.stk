@@ -1,4 +1,5 @@
 material silicon :
+
    thermal conductivity     1.30e-04 ;
    volumetric heat capacity 1.63566e-12 ;
 
@@ -15,12 +16,14 @@ pinfin :
 
 
 die bottomdie :
-        layer    48     silicon ;
-        source    2     silicon ;
+
+   layer  48 silicon ;
+   source  2 silicon ;
 
 die topdie :
-        source   2      silicon ;
-        layer   48      silicon ;
+
+   source  2 silicon ;
+   layer  48 silicon ;
 
 dimensions :
 
@@ -34,9 +37,11 @@ stack:
    die     die1     bottomdie floorplan "background.flp" ;
 
 solver:
+
   transient step 0.002, slot 0.02 ;
   initial temperature 300.0 ;
 
 output:
-  T( die2, "pf2rm/transient/background_node1.txt", 5000, 3000, step );
-  T( die2, "pf2rm/transient/background_node2.txt",    0,    0, step );
+
+  T ( die2, "pf2rm/transient/background_node1.txt", 5000, 5000, step ) ;
+  T ( die2, "pf2rm/transient/background_node2.txt",    0,    0, step ) ;
