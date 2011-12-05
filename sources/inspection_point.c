@@ -115,16 +115,16 @@ void align_tcell
     Dimensions *dimensions
 )
 {
-    // CHECKME
-
     FOR_EVERY_ROW (row_index, dimensions)
     {
         tcell->RowIndex   = row_index ;
-        tcell->ActualYval = get_cell_location_y (dimensions, row_index) ;
 
-        if (tcell->ActualYval > yval)
-
+        if (   yval >= get_cell_location_y (dimensions, row_index)
+            && yval <  get_cell_location_y (dimensions, row_index + 1))
+        {
+            tcell->ActualYval = get_cell_location_y (dimensions, row_index) ;
             break ;
+        }
     }
 
     tcell->Yval = yval ;
@@ -132,11 +132,13 @@ void align_tcell
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
         tcell->ColumnIndex = column_index ;
-        tcell->ActualXval  = get_cell_location_x (dimensions, column_index) ;
 
-        if (tcell->ActualXval > xval)
-
+        if (   xval >= get_cell_location_x (dimensions, column_index)
+            && xval <  get_cell_location_x (dimensions, column_index + 1))
+        {
+            tcell->ActualXval = get_cell_location_x (dimensions, column_index) ;
             break ;
+        }
     }
 
     tcell->Xval = xval ;
