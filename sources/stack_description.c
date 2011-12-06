@@ -444,45 +444,26 @@ uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd)
 
 /******************************************************************************/
 
-bool insert_power_values_by_powers_queue
+Error_t insert_power_values
 (
-  StackDescription* stkd,
-  PowersQueue*      pvalues
+    StackDescription *stkd,
+    PowersQueue      *pvalues
 )
 {
-    if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
-
-        return false ;
+    Error_t result ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
     (StackElement, stack_element, stkd->BottomStackElement)
+    {
+        result = insert_power_values_stack_element (stack_element, pvalues) ;
 
-        insert_power_values_stack_element (stack_element, pvalues) ;
+        if (result == TDICE_FAILURE)
 
-  return true ;
-}
+            return TDICE_FAILURE ;
+    }
 
-/******************************************************************************/
-
-bool insert_power_values
-(
-  StackDescription* stkd,
-  double*          pvalues
-)
-{
-  PowersQueue* pvalues_queue;
-  pvalues_queue = alloc_and_init_powers_queue();
-  if (pvalues == NULL)
-    return false;
-
-  uint32_t index;
-  uint32_t totalNFloorplanElements = get_total_number_of_floorplan_elements(stkd);
-
-  for (index = 0; index < totalNFloorplanElements; index++)
-    put_into_powers_queue(pvalues_queue, pvalues[index]);
-
-  return insert_power_values_by_powers_queue(stkd, pvalues_queue);
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

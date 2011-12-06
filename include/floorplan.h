@@ -178,6 +178,25 @@ extern "C"
 
 
 
+    /*! Inserts power values from \a pvaluse into each floorplan element
+     *
+     *  The queue \a pvalues must contain at least as many power values
+     *  as floorplan elements in \a floorplan
+     *
+     *  \param floorplan pointer to the floorplan
+     *  \param pvalues pointer to the list of power values
+     *
+     *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
+     *                           power values
+     *  \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t insert_power_values_floorplan
+
+        (Floorplan *floorplan, PowersQueue *pvalues) ;
+
+
+
     int get_max_temperature_floorplan
     (
         Floorplan  *floorplan,
@@ -252,12 +271,6 @@ extern "C"
         double     *temperatures,
         FILE       *stream
     ) ;
-
-/******************************************************************************/
-
-    void insert_power_values_floorplan
-
-        (Floorplan *floorplan, PowersQueue *pvalues) ;
 
 /******************************************************************************/
 

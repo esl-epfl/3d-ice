@@ -235,17 +235,23 @@ Error_t fill_sources_floorplan_element
 
 /******************************************************************************/
 
-void insert_power_values_floorplan_element
+Error_t insert_power_values_floorplan_element
 (
     FloorplanElement *floorplan_element,
     PowersQueue      *pvalues
 )
 {
-    double power = get_from_powers_queue (pvalues);
+    if (is_empty_powers_queue(pvalues) == true)
+
+        return TDICE_FAILURE ;
+
+    double power = get_from_powers_queue (pvalues) ;
 
     put_into_powers_queue (floorplan_element->PowerValues, power);
 
     pop_from_powers_queue (pvalues) ;
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

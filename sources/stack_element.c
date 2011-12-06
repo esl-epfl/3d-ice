@@ -470,15 +470,21 @@ uint32_t get_number_of_floorplan_elements_stack_element
 
 /******************************************************************************/
 
-void insert_power_values_stack_element
+Error_t insert_power_values_stack_element
 (
-  StackElement *stack_element,
-  PowersQueue  *pvalues
+    StackElement *stack_element,
+    PowersQueue  *pvalues
 )
 {
-  if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
 
-      insert_power_values_floorplan (stack_element->Floorplan, pvalues) ;
+        return insert_power_values_floorplan
+
+            (stack_element->Floorplan, pvalues) ;
+
+    else
+
+        return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

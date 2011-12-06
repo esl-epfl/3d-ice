@@ -170,17 +170,28 @@ Error_t fill_sources_floorplan
 
 /******************************************************************************/
 
-void insert_power_values_floorplan
+Error_t insert_power_values_floorplan
 (
     Floorplan   *floorplan,
     PowersQueue *pvalues
 )
 {
+    Error_t result ;
+
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
     (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    {
+        result = insert_power_values_floorplan_element
 
-        insert_power_values_floorplan_element (floorplan_element, pvalues) ;
+                    (floorplan_element, pvalues) ;
+
+        if (result == TDICE_FAILURE)
+
+            return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

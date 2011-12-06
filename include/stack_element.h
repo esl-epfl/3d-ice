@@ -321,7 +321,23 @@ extern "C"
 
 
 
-    void insert_power_values_stack_element
+    /*! Moves power values from \a pvaluse into a \a stack_element
+     *
+     *  The function works only if \a stack_element is a die. Otherwise, the
+     *  queue \a pvalues remains unchanged. The queue \a pvalues must contain
+     *  at least as many power values as floorplan elements in the floorplan
+     *  of the stack element.
+     *
+     *  \param stack_element address of the StackElement structure
+     *  \param pvalues pointer to the list of power values
+     *
+     *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
+     *                           power values
+     *  \return \c TDICE_SUCCESS if the power values have been copied or if
+     *                           \a stack_element is not a die
+     */
+
+    Error_t insert_power_values_stack_element
 
         (StackElement *stack_element, PowersQueue *pvalues) ;
 

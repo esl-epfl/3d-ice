@@ -411,9 +411,20 @@ extern "C"
         double           *temperatures
     ) ;
 
-/******************************************************************************/
 
-    void insert_power_values_floorplan_element
+
+    /*! Moves one power value from \a pvalues into \a floorplan_element
+     *
+     *  The queue \a pvalues must contain at least one power value
+     *
+     *  \param floorplan_element pointer to the floorplan element
+     *  \param pvalues pointer to the list of power values
+     *
+     *  \return \c TDICE_FAILURE if the queue \a pvalues is empty
+     *  \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t insert_power_values_floorplan_element
 
         (FloorplanElement *floorplan_element, PowersQueue *pvalues) ;
 

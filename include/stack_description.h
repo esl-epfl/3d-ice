@@ -285,11 +285,23 @@ extern "C"
 
     uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd) ;
 
-/******************************************************************************/
 
-  bool insert_power_values_by_powers_queue (StackDescription* stkd, PowersQueue* pvalues) ;
 
-  bool insert_power_values (StackDescription* stkd, double* pvalues) ;
+    /*! Inserts one power values from \a pvaluse into each floorplan element
+     *  in the stack
+     *
+     *  The queue \a pvalues must contain at least as many power values as
+     *  the number of floorplan elements in the entire stack.
+     *
+     *  \param stkd address of the StackDescription structure
+     *  \param pvalues pointer to the list of power values
+     *
+     *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
+     *                           power values
+     *  \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t insert_power_values (StackDescription *stkd, PowersQueue *pvalues) ;
 
 /******************************************************************************/
 
