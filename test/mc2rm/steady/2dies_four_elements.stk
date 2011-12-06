@@ -43,5 +43,5 @@ solver:
 
 output:
 
-  T ( die1, "mc2rm/steady/four_elements_node1.txt", 5000, 5000, final ) ;
+  T ( die1, "mc2rm/steady/four_elements_node1.txt", 4800, 4800, final ) ;
   T ( die2, "mc2rm/steady/four_elements_node2.txt",    0,    0, final ) ;

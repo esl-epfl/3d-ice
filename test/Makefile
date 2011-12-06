@@ -138,6 +138,20 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-
                                mc4rm/steady/background_node2.txt  \
                                mc4rm/steady/output_background.txt
 	@echo "--------"
+	@echo "mc2rm 4e"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator mc2rm/steady/2dies_four_elements.stk
+	@./CompareTemperatures mc2rm/steady/four_elements_node1.txt \
+                               mc2rm/steady/four_elements_node2.txt \
+                               mc2rm/steady/output_four_elements.txt
+	@echo "--------"
+	@echo "mc2rm bg"
+	@echo "--------"
+	@../bin/3D-ICE-Emulator mc2rm/steady/2dies_background.stk
+	@./CompareTemperatures mc2rm/steady/background_node1.txt  \
+                               mc2rm/steady/background_node2.txt  \
+                               mc2rm/steady/output_background.txt
+	@echo "--------"
 	@echo "pf2rm 4e"
 	@echo "--------"
 	@../bin/3D-ICE-Emulator pf2rm/steady/2dies_four_elements.stk
@@ -180,6 +194,10 @@ clean:
 	@$(RM) $(RMFLAGS) mc4rm/steady/background_node2.txt
 	@$(RM) $(RMFLAGS) mc4rm/steady/four_elements_node1.txt
 	@$(RM) $(RMFLAGS) mc4rm/steady/four_elements_node2.txt
+	@$(RM) $(RMFLAGS) mc2rm/steady/background_node1.txt
+	@$(RM) $(RMFLAGS) mc2rm/steady/background_node2.txt
+	@$(RM) $(RMFLAGS) mc2rm/steady/four_elements_node1.txt
+	@$(RM) $(RMFLAGS) mc2rm/steady/four_elements_node2.txt
 	@$(RM) $(RMFLAGS) pf2rm/steady/background_node1.txt
 	@$(RM) $(RMFLAGS) pf2rm/steady/background_node2.txt
 	@$(RM) $(RMFLAGS) pf2rm/steady/four_elements_node1.txt
