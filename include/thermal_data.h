@@ -447,48 +447,53 @@ extern "C"
     double*    avg_temperature
   ) ;
 
-/******************************************************************************/
 
-  /* Get the themperature of a given thermal cell                            */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the cell exists                                                  */
-  /*  -1 if the cell does not exist                                          */
-  /*  -2 if there has been an error when opening the file file_name          */
 
-  int get_cell_temperature
-  (
-    StackDescription* stkd,
-    ThermalData*      tdata,
-    uint32_t   layer_index,
-    uint32_t   row_index,
-    uint32_t   column_index,
-    double*    cell_temperature
-  ) ;
+    /*! Returns the temperature of a thermal cell (\c L, \c R, \c C )
+     *
+     * Coordinates of the cell must be within the ranges
+     *
+     * \param tdata        address of the ThermalData structure
+     * \param stkd         address of the StackDescription structure
+     * \param layer_index  the index \c L of the thermal cell
+     * \param row_index    the index \c R of the thermal cell
+     * \param column_index the index \c C of the thermal cell
+     *
+     * \return \c 0 if the thermal cell (\c L, \c R, \c C ) does not exist
+     * \return the temperature of the thermal cell (\c L, \c R, \c C )
+     */
 
-/******************************************************************************/
+    double get_cell_temperature
+    (
+        ThermalData      *tdata,
+        StackDescription *stkd,
+        uint32_t          layer_index,
+        uint32_t          row_index,
+        uint32_t          column_index
+    ) ;
 
-  /* Given the address of a StackDescrption structure and the array of       */
-  /* temperatures, print to file_name the thermal map of stack_element_id.   */
-  /* stack_element_id is the id given to one of the stack element composing  */
-  /* the 3D stack. If it refers to a die, the active source layer will be    */
-  /* printed.                                                                */
-  /*                                                                         */
-  /* Returns:                                                                */
-  /*   0 if the ids is correct                                               */
-  /*  -1 if the stack element id floorplan_id does not exist                 */
-  /*  -2 if there has been an error when opening the file file_name          */
-  /*                                                                         */
-  /* The thermal map is printex as a matrix with get_number_of_columns ()    */
-  /* columns and get_number_of_rows () rows.                                 */
 
-  int print_thermal_map
-  (
-    StackDescription* stkd,
-    ThermalData*      tdata,
-    char *          stack_element_id,
-    char *          file_name
-  ) ;
+
+    /*! Generate a text file with the thermal map of a stack element
+     *
+     * \param tdata     address of the ThermalData structure
+     * \param stkd      address of the StackDescription structure
+     * \param stack_element_id the id of the stack element as it appears in the
+                        stack file
+     * \param file_name the path of the file to be generated
+     *
+     * \return \c TDICE_FAILURE if the file cannot be opened or if the stack
+     *                  element \a stack_element_id does not exist
+     * \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t print_thermal_map
+    (
+        ThermalData      *tdata,
+        StackDescription *stkd,
+        char             *stack_element_id,
+        char             *file_name
+    ) ;
 
 /******************************************************************************/
 

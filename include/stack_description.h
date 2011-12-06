@@ -291,7 +291,14 @@ extern "C"
      *  in the stack
      *
      *  The queue \a pvalues must contain at least as many power values as
-     *  the number of floorplan elements in the entire stack.
+     *  the number of floorplan elements in the entire stack. \a pvalues is a
+     *  FIFO queue and, whithin the stack, elements are considered from the
+     *  bottom (the last element declared in the stack section of the
+     *  stack description file). If the stack has two dies \c A (bottom) and
+     *  \c B (top) and A has a floorplan with \c n elements while \c B has \c m
+     *  elements, then \a pvalues must contain at least \c nm elements. The
+     *  first \c n power values will be given to \c A and the remaining will
+     *  be assigned to \c B
      *
      *  \param stkd address of the StackDescription structure
      *  \param pvalues pointer to the list of power values

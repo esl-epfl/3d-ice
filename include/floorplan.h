@@ -181,7 +181,10 @@ extern "C"
     /*! Inserts power values from \a pvaluse into each floorplan element
      *
      *  The queue \a pvalues must contain at least as many power values
-     *  as floorplan elements in \a floorplan
+     *  as floorplan elements in \a floorplan . Floorplan elements are
+     *  considered in the same order as they appear in the floorplan file: the
+     *  first element popped from \a pvalues (a fifo queue) goes to the first
+     *  floorplan element in the flp file, the second to the second, etc ...
      *
      *  \param floorplan pointer to the floorplan
      *  \param pvalues pointer to the list of power values

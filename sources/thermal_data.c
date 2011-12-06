@@ -783,72 +783,60 @@ int get_all_avg_temperatures_of_floorplan
 
 /******************************************************************************/
 
-int get_cell_temperature
+double get_cell_temperature
 (
-  StackDescription* stkd,
-  ThermalData*      tdata,
-  uint32_t   layer_index,
-  uint32_t   row_index,
-  uint32_t   column_index,
-  double*    cell_temperature
+    ThermalData      *tdata,
+    StackDescription *stkd,
+    uint32_t          layer_index,
+    uint32_t          row_index,
+    uint32_t          column_index
 )
 {
-  uint32_t id = get_cell_offset_in_stack
-                       (
-                         stkd->Dimensions,
-                         layer_index, row_index, column_index
-                       ) ;
+    uint32_t id = get_cell_offset_in_stack
 
-  if ((uint32_t) id > get_number_of_cells(stkd->Dimensions))
+                  (stkd->Dimensions, layer_index, row_index, column_index) ;
 
-    return -1 ;
+    if (id >= get_number_of_cells (stkd->Dimensions))
 
-  *cell_temperature = tdata->Temperatures [ id ] ;
+        return 0.0 ;
 
-  return 0 ;
+    else
+
+        return *(tdata->Temperatures + id) ;
 }
 
 /******************************************************************************/
 
-int print_thermal_map
+Error_t print_thermal_map
 (
-  StackDescription* stkd,
-  ThermalData*      tdata,
-  char *          stack_element_id,
-  char *          file_name
+    ThermalData      *tdata,
+    StackDescription *stkd,
+    char             *stack_element_id,
+    char             *file_name
 )
 {
-  FILE*           output_file ;
-  StackElement*   stk_el       = find_stack_element_in_list
-                                 (
-                                   stkd->BottomStackElement,
-                                   stack_element_id
-                                 ) ;
-  if (stk_el == NULL)
-    return -1 ;
+    StackElement *stack_element = find_stack_element_in_list
 
-  output_file = fopen (file_name, "w") ;
-  if (output_file == NULL)
-  {
-    fprintf (stderr, "Unable to open output file %s\n", file_name) ;
-    return -2 ;
-  }
+         (stkd->BottomStackElement, stack_element_id) ;
 
-  double* temperature_offset =
-    tdata->Temperatures
-    + get_cell_offset_in_stack (stkd->Dimensions, get_source_layer_offset(stk_el), 0, 0) ;
+    if (stack_element == NULL)
 
-  FOR_EVERY_ROW (row_index, stkd->Dimensions)
-  {
-    FOR_EVERY_COLUMN (column_index, stkd->Dimensions)
+        return TDICE_FAILURE ;
+
+    FILE *output_file = fopen (file_name, "w") ;
+
+    if (output_file == NULL)
     {
-      fprintf(output_file, "%7.3f  ", *temperature_offset) ;
-      temperature_offset++ ;
+        fprintf (stderr, "Unable to open output file %s\n", file_name) ;
+
+        return TDICE_FAILURE ;
     }
-    fprintf(output_file, "\n") ;
-  }
 
-  fclose (output_file) ;
+    print_thermal_map_stack_element
 
-  return 0 ;
+        (stack_element, stkd->Dimensions, tdata->Temperatures, output_file) ;
+
+    fclose (output_file) ;
+
+    return TDICE_SUCCESS ;
 }
