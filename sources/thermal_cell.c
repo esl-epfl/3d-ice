@@ -35,6 +35,10 @@
 
 #include <stdlib.h>
 
+#ifdef PRINT_THERMAL_CELLS
+#include <stdio.h>
+#endif
+
 #include "thermal_cell.h"
 #include "macros.h"
 
@@ -262,7 +266,6 @@ void fill_liquid_cell_mc_2rm
     double       cell_height,
     uint32_t     nchannels,
     double       channel_length,
-    double       channel_pitch,
     double       porosity,
     Coolant_t    coolant,
     double       coolant_fr
@@ -276,16 +279,13 @@ void fill_liquid_cell_mc_2rm
 
     thermal_cell->East = thermal_cell->West = 0.0 ;
 
-    double eff_htc_top = EFFECTIVE_HTC_MC_2RM(coolant.HTCTop, channel_length, cell_height, channel_pitch);
+    thermal_cell->Top    = coolant.HTCTop    * cell_width * cell_length ;
 
-    thermal_cell->Top = eff_htc_top * cell_width * cell_length ;
-
-    double eff_htc_bottom = EFFECTIVE_HTC_MC_2RM(coolant.HTCBottom, channel_length, cell_height, channel_pitch);
-
-    thermal_cell->Bottom = eff_htc_bottom * cell_width * cell_length ;
+    thermal_cell->Bottom = coolant.HTCBottom * cell_width * cell_length ;
 
     thermal_cell->Capacity
-        = ((cell_length * cell_width * cell_height) * coolant.VHC) * porosity / delta_time ;
+        = ((cell_length * cell_width * cell_height) * coolant.VHC) * porosity
+          / delta_time ;
 
 #ifdef PRINT_THERMAL_CELLS
     fprintf (stderr,

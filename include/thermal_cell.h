@@ -263,7 +263,6 @@ extern "C"
      * \param cell_height    the height \a h of the thermal cell
      * \param nchannels      the number of microchannels in the channel layer
      * \param channel_length the length of the channel
-     * \param channel_pitch  the pitch of the channel
      * \param porosity       FIXME
      * \param coolant        the thermal properties of the coolant
      * \param coolant_fr     the flow rate of the coolant
@@ -281,7 +280,6 @@ extern "C"
 
         uint32_t     nchannels,
         double       channel_length,
-        double       channel_pitch,
 
         double       porosity,
         Coolant_t    coolant,

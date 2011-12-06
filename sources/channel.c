@@ -401,7 +401,7 @@ static void fill_thermal_cell_channel_2rm
                     get_cell_length(dimensions, column_index),
                     get_cell_width(dimensions, row_index),
                     channel->Height,
-                    channel->NChannels, channel->Length, channel->Pitch,
+                    channel->NChannels, channel->Length,
                     channel->Porosity, channel->Coolant, channel->CoolantFR
                 ) ;
 

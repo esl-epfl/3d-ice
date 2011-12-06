@@ -461,6 +461,7 @@ extern "C"
      *
      * Returns the \c C convective term for the 2RM model of microchannels
      *
+     *
      * FlowRatePerChannel [ um3 / sec ] = FlowRate                            [ um3 / sec ]
      *                                    / \#Channels                        [ ]
      *
@@ -475,13 +476,14 @@ extern "C"
      *
      * CoolantVelocity = FlowRate / (\#Channels * CavityHeight * ChannelLength)
      *
-     * Cconv           = (CoolantVHC * FlowRate * Porosity) / (\#Channels * 2) * (CellLength / ChannelLength)
+     * Cconv           = (CoolantVHC * FlowRate * Porosity * CellLength)
+     *                   / (\#Channels * 2 * ChannelLength)
      */
 
 #   define CCONV_MC_2RM(nchannels, vhc, fr, porosity, cell_l, channel_l)     \
                                                                              \
-        ((double) (  (vhc * fr * porosity)                                   \
-                   / (((double) (nchannels * 2.0)) * (cell_l / channel_l))))
+        ((double) (  (vhc * fr * porosity * cell_l)                          \
+                   / ( (double) nchannels * 2.0 * channel_l) ))
 
 
 
@@ -502,17 +504,6 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-
-    /*! \def EFFECTIVE_HTC_MC_2RM(htc,channel_l,cavity_h,channel_pitch)
-     *
-     * Returns the Effective HTC for Microchannels with 2RM model
-     *
-     * HTC_eff = HTC * (ChannelLength + CavityHeight) / ChannelPitch
-     */
-
-#   define EFFECTIVE_HTC_MC_2RM(htc, channel_l, cavity_h, channel_pitch)  \
-                                                                          \
-        ((double) (htc * (channel_l + cavity_h) / channel_pitch))
 
 
 
