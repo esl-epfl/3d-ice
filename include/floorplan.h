@@ -133,10 +133,14 @@ extern "C"
      * \param dimensions pointer to the structure storing the dimensions of the stack
      * \param file_name  path to the floorplan file to parse
      *
-     * \return FIXME
+     * \return \c TDICE_FAILURE if the file cannot be opened or if the parsing
+     *                  of the floorplan fails
+     * \return \c TDICE_FAILURE otherwise
      */
 
-    int fill_floorplan (Floorplan *floorplan, Dimensions *dimensions, char *file_name) ;
+    Error_t fill_floorplan
+
+        (Floorplan *floorplan, Dimensions *dimensions, char *file_name) ;
 
 
 

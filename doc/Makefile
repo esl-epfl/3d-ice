@@ -45,4 +45,4 @@ doc:	$(DOXYFILE)
 
 clean:
 	@$(RM) $(RMFLAGS) html
-
+	@$(RM) $(RMFLAGS) warnings

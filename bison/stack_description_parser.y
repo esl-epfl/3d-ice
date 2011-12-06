@@ -1065,7 +1065,8 @@ stack_element
             YYABORT ;
         }
 
-        if (fill_floorplan (stack_element->Floorplan, stkd->Dimensions, $5) == 1)
+        if (   fill_floorplan (stack_element->Floorplan, stkd->Dimensions, $5)
+            == TDICE_FAILURE)
         {
             FREE_POINTER (free,                   $3) ;
             FREE_POINTER (free,                   $5) ;

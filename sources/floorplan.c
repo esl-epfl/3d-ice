@@ -41,6 +41,11 @@
 #include "../bison/floorplan_parser.h"
 #include "../flex/floorplan_scanner.h"
 
+// From Bison manual:
+// The value returned by yyparse is 0 if parsing was successful (return is
+// due to end-of-input). The value is 1 if parsing failed (return is due to
+// a syntax error).
+
 extern int floorplan_parse
 
     (Floorplan  *floorplan, Dimensions *dimensions, yyscan_t scanner) ;
@@ -95,7 +100,7 @@ void print_detailed_floorplan
 
 /******************************************************************************/
 
-int fill_floorplan
+Error_t fill_floorplan
 (
     Floorplan  *floorplan,
     Dimensions *dimensions,
@@ -107,10 +112,12 @@ int fill_floorplan
     yyscan_t scanner ;
 
     input = fopen (file_name, "r") ;
-    if(input == NULL)
+
+    if (input == NULL)
     {
-        perror(file_name) ;
-        return -1 ;
+        fprintf (stderr, "Unable to open floorplan file %s\n", file_name) ;
+
+        return EXIT_FAILURE ;
     }
 
     floorplan->FileName = strdup (file_name) ;  // FIXME memory leak
@@ -124,7 +131,13 @@ int fill_floorplan
     floorplan_lex_destroy (scanner) ;
     fclose (input) ;
 
-    return result ;
+    if (result == 0)
+
+        return TDICE_SUCCESS ;
+
+    else
+
+        return TDICE_FAILURE ;
 }
 
 /******************************************************************************/

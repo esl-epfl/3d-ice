@@ -62,100 +62,132 @@ extern "C"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    /* The name of the file used to fill the stack description */
+    /*! \struct StackDescription
+     *
+     * \brief Structure containing all the informations related to the 3d stack
+     */
 
-    char *FileName ;
+    struct StackDescription
+    {
+        /*! The name of the file used to fill the stack description */
 
-    /* The list of materials componing the layers and channels */
+        char *FileName ;
 
-    Material* MaterialsList ;
+        /*! The list of materials componing the layers and channel walls */
 
-    /* Information (if present) about the heat dissipation */
-    /* throught the top surface                            */
+        Material *MaterialsList ;
 
-    ConventionalHeatSink* ConventionalHeatSink ;
+        /*! Information about the heat dissipation throught the top surface */
 
-    /* The (if present) single type of channel used to compose the 3d stack */
+        ConventionalHeatSink *ConventionalHeatSink ;
 
-    Channel* Channel ;
+        /*! Information about the (unique) type of channel used in the 3d stack */
 
-    /* The list of dies available to compose the 3d stack */
+        Channel *Channel ;
 
-    Die* DiesList ;
+        /*! The list of dies available to compose the 3d stack */
 
-    /* Pointer to the top-most stack elements componing the 3Dstack */
+        Die *DiesList ;
 
-    StackElement* TopStackElement ;
+        /*! Pointer to the top-most stack elements componing the 3Dstack */
 
-    /* Pointer to the bottom-most stack elements componing the 3Dstack */
+        StackElement *TopStackElement ;
 
-    StackElement* BottomStackElement ;
+        /*! Pointer to the bottom-most stack elements componing the 3Dstack */
 
-    /* Collection of all the dimensions (chip, grid of cells, cell) */
+        StackElement *BottomStackElement ;
 
-    Dimensions* Dimensions ;
+        /*! Collection of all the dimensions (chip, grid of cells, cell) */
 
-  } StackDescription ;
+        Dimensions *Dimensions ;
+    } ;
 
-/******************************************************************************/
 
-  /* Sets all the fields of stkd to a default value                         */
 
-  void init_stack_description (StackDescription* stkd) ;
+    /*! Definition of the type StackDescription */
 
-/******************************************************************************/
-
-  /* Fills the stkd structure parsing the *.stk file                        */
-  /*                                                                        */
-  /* Returns:                                                               */
-  /*                                                                        */
-  /* -1 if the .stk file does not exist                                     */
-  /*  0 if the parsing succeeds                                             */
-  /*  1 if there is an error in the .stk file or in one of the .flp files   */
-  /*       used in it (message printed to stderr).                          */
-  /*                                                                        */
-  /* Note: The function parses the .stk file first and then all the .flp    */
-  /* files related to the floorplans following the order used in the stack  */
-  /* section (from bottom to top). It stops as soon as it finds an error    */
-  /* and it returns 1, discarding the remaining files to parse.             */
-
-  int fill_stack_description (StackDescription* stkd, Analysis *analysis, char* filename) ;
+    typedef struct StackDescription StackDescription ;
 
 /******************************************************************************/
 
-  /* Frees all the memory                                                   */
 
-  void free_stack_description (StackDescription* stkd) ;
 
-/******************************************************************************/
+    /*! Sets all the fields of \a stkd to a default value (zero or \c NULL ).
+     *
+     * \param stkd the address of the StackDescription to initialize
+     */
 
-  /* Print on stream (stdout, stderr or a given opened output file) all the */
-  /* data related to the stkd structure previously filled. Prefix is a      */
-  /* string (it can be empty as "") printed as prefix at the beginning of   */
-  /* every line.                                                            */
-  /*                                                                        */
-  /* To print the content of only one of the fields of stkd, use the        */
-  /* printing function in the corresponding header file                     */
+    void init_stack_description (StackDescription* stkd) ;
 
-  void print_formatted_stack_description
-  (
-    FILE*             stream,
-    char*          prefix,
-    StackDescription* stkd
-  ) ;
 
-/******************************************************************************/
 
-  void print_detailed_stack_description
-  (
-    FILE*             stream,
-    char*          prefix,
-    StackDescription* stkd
-  ) ;
+    /*! Fills the \a stkd and \a analysis structures with the content
+     *  of a stack file
+     *
+     * \param stkd the address of the StackDescription structure to fill
+     * \param analysis the address of the Analysis structure to fill
+     * \param filename the path of the stack file
+     *
+     * \return \c TDICE_FAILURE if the file cannot be opened or if the parsing
+     *                  of the stack description fails
+     * \return \c TDICE_FAILURE otherwise
+     */
 
-/******************************************************************************/
+    int fill_stack_description
+
+        (StackDescription* stkd, Analysis *analysis, char* filename) ;
+
+
+
+    /*! Frees the memory related to \a stkd
+     *
+     * The parametrer \a stkd must be the address of a static variable
+     *
+     * \param stkd the address of the StackDescription structure to free
+     */
+
+    void free_stack_description (StackDescription* stkd) ;
+
+
+
+    /*! Prints the stack descritpion as it looks in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param stkd   the pointer to the StackDescription to print
+     */
+
+    void print_formatted_stack_description
+
+        (FILE *stream, char *prefix, StackDescription *stkd) ;
+
+
+
+    /*! Prints a list of detailed information about the stack descritpion
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param stkd   the pointer to the StackDescription to print
+     */
+
+    void print_detailed_stack_description
+
+        (FILE *stream, char *prefix, StackDescription* stkd) ;
+
+
+
+    /*! Prints the floorplans (detilaed info) used in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param stkd   the pointer to the StackDescription
+     */
+
+    void print_floorplans
+
+        (FILE *stream, char *prefix, StackDescription *stkd) ;
+
+
 
     /*! Fills the 3d grid of thermal cells
      *
@@ -176,6 +208,8 @@ extern "C"
         Analysis         *analysis,
         StackDescription *stkd
     ) ;
+
+
 
     /*! Fills the source vector
      *
@@ -201,13 +235,7 @@ extern "C"
         StackDescription *stkd
     ) ;
 
-  /* Update the only source value corresponding to the channel inlets */
 
-  void update_channel_inlet_stack_description
-  (
-    double*         sources,
-    StackDescription* stkd
-  ) ;
 
     /*! Fills the system matrix
      *
@@ -233,20 +261,6 @@ extern "C"
   bool insert_power_values_by_powers_queue (StackDescription* stkd, PowersQueue* pvalues) ;
 
   bool insert_power_values (StackDescription* stkd, double* pvalues) ;
-
-/******************************************************************************/
-
-  /* Print on stream (stdout, stderr or a given opened output file) all the */
-  /* data related to the floorplan structures contained in the dies.        */
-  /* Prefix is a string (it can be empty as "") printed as prefix at the    */
-  /* beginning of every line.                                               */
-
-  void print_all_floorplans
-  (
-    FILE*             stream,
-    char*          prefix,
-    StackDescription* stkd
-  ) ;
 
 /******************************************************************************/
 

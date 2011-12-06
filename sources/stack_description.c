@@ -41,6 +41,11 @@
 #include "../bison/stack_description_parser.h"
 #include "../flex/stack_description_scanner.h"
 
+// From Bison manual:
+// The value returned by yyparse is 0 if parsing was successful (return is
+// due to end-of-input). The value is 1 if parsing failed (return is due to
+// a syntax error).
+
 extern int stack_description_parse
 
     (StackDescription *stkd, Analysis *analysis, yyscan_t scanner) ;
@@ -65,93 +70,106 @@ int fill_stack_description
 (
   StackDescription *stkd,
   Analysis         *analysis,
-  char *          filename
+  char             *filename
 )
 {
-  FILE*    input ;
-  int      result ;
-  yyscan_t scanner ;
+    FILE*    input ;
+    int      result ;
+    yyscan_t scanner ;
 
-  input = fopen (filename, "r") ;
-  if(input == NULL)
-  {
-    perror(filename) ;
-    return -1 ;
-  }
+    input = fopen (filename, "r") ;
+    if (input == NULL)
+    {
+        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
 
-  stkd->FileName = strdup (filename) ;  // FIXME memory leak
+        return EXIT_FAILURE ;
+    }
 
-  stack_description_lex_init (&scanner) ;
-  stack_description_set_in (input, scanner) ;
+    stkd->FileName = strdup (filename) ;  // FIXME memory leak
 
-  result = stack_description_parse (stkd, analysis, scanner) ;
+    stack_description_lex_init (&scanner) ;
+    stack_description_set_in (input, scanner) ;
 
-  stack_description_lex_destroy (scanner) ;
-  fclose (input) ;
+    result = stack_description_parse (stkd, analysis, scanner) ;
 
-  return result ;
+    stack_description_lex_destroy (scanner) ;
+    fclose (input) ;
+
+    if (result == 0)
+
+        return TDICE_SUCCESS ;
+
+    else
+
+        return TDICE_FAILURE ;
 }
 
 /******************************************************************************/
 
 void free_stack_description (StackDescription* stkd)
 {
-  FREE_POINTER (free_materials_list,         stkd->MaterialsList) ;
-  FREE_POINTER (free_channel,                stkd->Channel) ;
-  FREE_POINTER (free_dies_list,              stkd->DiesList) ;
-  FREE_POINTER (free_conventional_heat_sink, stkd->ConventionalHeatSink) ;
-  FREE_POINTER (free_stack_elements_list,    stkd->BottomStackElement) ;
-  FREE_POINTER (free_dimensions,             stkd->Dimensions) ;
-  FREE_POINTER (free,                        stkd->FileName) ;
+    FREE_POINTER (free_materials_list,         stkd->MaterialsList) ;
+    FREE_POINTER (free_channel,                stkd->Channel) ;
+    FREE_POINTER (free_dies_list,              stkd->DiesList) ;
+    FREE_POINTER (free_conventional_heat_sink, stkd->ConventionalHeatSink) ;
+    FREE_POINTER (free_stack_elements_list,    stkd->BottomStackElement) ;
+    FREE_POINTER (free_dimensions,             stkd->Dimensions) ;
+    FREE_POINTER (free,                        stkd->FileName) ;
 
-  stkd->TopStackElement = NULL ;
+    stkd->TopStackElement = NULL ;
 }
 
 /******************************************************************************/
 
 void print_formatted_stack_description
 (
-  FILE*             stream,
-  char *          prefix,
-  StackDescription* stkd
+  FILE             *stream,
+  char             *prefix,
+  StackDescription *stkd
 )
 {
-  print_formatted_materials_list (stream, prefix, stkd->MaterialsList) ;
-  fprintf (stream, "%s\n", prefix) ;
+    print_formatted_materials_list (stream, prefix, stkd->MaterialsList) ;
 
-  if (stkd->ConventionalHeatSink != NULL)
-  {
-    print_formatted_conventional_heat_sink (stream, prefix,
-                                            stkd->ConventionalHeatSink) ;
     fprintf (stream, "%s\n", prefix) ;
-  }
 
-  if (stkd->Channel != NULL)
-  {
-    print_formatted_channel (stream, prefix, stkd->Channel, stkd->Dimensions) ;
+    if (stkd->ConventionalHeatSink != NULL)
+    {
+        print_formatted_conventional_heat_sink
+
+            (stream, prefix, stkd->ConventionalHeatSink) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    if (stkd->Channel != NULL)
+    {
+        print_formatted_channel
+
+            (stream, prefix, stkd->Channel, stkd->Dimensions) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    print_formatted_dies_list (stream, prefix, stkd->DiesList) ;
+
     fprintf (stream, "%s\n", prefix) ;
-  }
 
-  print_formatted_dies_list (stream, prefix, stkd->DiesList) ;
+    print_formatted_dimensions (stream, prefix, stkd->Dimensions) ;
 
-  fprintf (stream, "%s\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
 
-  print_formatted_dimensions (stream, prefix, stkd->Dimensions) ;
+    print_formatted_stack_elements_list (stream, prefix, stkd->TopStackElement) ;
 
-  fprintf (stream, "%s\n", prefix) ;
-
-  print_formatted_stack_elements_list (stream, prefix, stkd->TopStackElement) ;
-
-  fprintf (stream, "%s\n", prefix) ;
+    fprintf (stream, "%s\n", prefix) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_stack_description
 (
-  FILE*             stream,
-  char *          prefix,
-  StackDescription* stkd
+  FILE             *stream,
+  char             *prefix,
+  StackDescription *stkd
 )
 {
     char * new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
@@ -205,7 +223,9 @@ void print_detailed_stack_description
     if (stkd->Channel != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
+
         print_detailed_channel (stream, new_prefix, stkd->Channel) ;
+
         fprintf (stream, "%s\n", prefix) ;
     }
 
@@ -263,21 +283,20 @@ void print_detailed_stack_description
 
 /******************************************************************************/
 
-void print_all_floorplans
+void print_floorplans
 (
-  FILE*             stream,
-  char *          prefix,
-  StackDescription* stkd
+    FILE             *stream,
+    char             *prefix,
+    StackDescription *stkd
 )
 {
-  FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-  (StackElement, stk_el, stkd->BottomStackElement)
-  {
-    if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
+    (StackElement, stk_el, stkd->BottomStackElement)
 
-      print_detailed_floorplan (stream, prefix, stk_el->Floorplan) ;
-  }
+        if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
+
+            print_detailed_floorplan (stream, prefix, stk_el->Floorplan) ;
 }
 
 /******************************************************************************/
@@ -312,7 +331,7 @@ void fill_thermal_cell_stack_description
 
 Error_t fill_sources_stack_description
 (
-    double         *sources,
+    double           *sources,
     ThermalCell      *thermal_cells,
     StackDescription *stkd
 )
@@ -351,94 +370,6 @@ Error_t fill_sources_stack_description
             return TDICE_FAILURE ;
 
     return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-void init_power_values
-(
-  StackDescription* stkd
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement, stack_element, stkd->BottomStackElement)
-
-        init_power_values_stack_element (stack_element) ;
-}
-
-/******************************************************************************/
-
-bool insert_power_values_by_powers_queue
-(
-  StackDescription* stkd,
-  PowersQueue*      pvalues
-)
-{
-    if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
-
-        return false ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement, stack_element, stkd->BottomStackElement)
-
-        insert_power_values_stack_element (stack_element, pvalues) ;
-
-  return true ;
-}
-
-/******************************************************************************/
-
-bool insert_power_values
-(
-  StackDescription* stkd,
-  double*          pvalues
-)
-{
-  PowersQueue* pvalues_queue;
-  pvalues_queue = alloc_and_init_powers_queue();
-  if (pvalues == NULL)
-    return false;
-
-  uint32_t index;
-  uint32_t totalNFloorplanElements = get_total_number_of_floorplan_elements(stkd);
-
-  for (index = 0; index < totalNFloorplanElements; index++)
-    put_into_powers_queue(pvalues_queue, pvalues[index]);
-
-  return insert_power_values_by_powers_queue(stkd, pvalues_queue);
-}
-
-/******************************************************************************/
-
-void update_channel_inlet_stack_description
-(
-  double*         sources,
-  StackDescription* stkd
-)
-{
-#ifdef PRINT_SOURCES
-  fprintf (stderr,
-    "update_channel_inlet_stack_description ( l %d r %d c %d )\n",
-    get_number_of_layers  (stkd->Dimensions),
-    get_number_of_rows    (stkd->Dimensions),
-    get_number_of_columns (stkd->Dimensions)) ;
-#endif
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement, stack_element, stkd->BottomStackElement)
-
-    if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
-
-      fill_sources_channel
-      (
-        sources,
-        stkd->Dimensions,
-        stack_element->Offset,
-        stack_element->Pointer.Channel
-      ) ;
 }
 
 /******************************************************************************/
@@ -519,6 +450,63 @@ uint32_t get_total_number_of_floorplan_elements
       total_number_of_floorplan_elements += stack_element->Floorplan->NElements;
 
   return total_number_of_floorplan_elements;
+}
+
+/******************************************************************************/
+
+void init_power_values
+(
+    StackDescription* stkd
+)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
+
+        init_power_values_stack_element (stack_element) ;
+}
+
+/******************************************************************************/
+
+bool insert_power_values_by_powers_queue
+(
+  StackDescription* stkd,
+  PowersQueue*      pvalues
+)
+{
+    if (pvalues->Length != (unsigned int) get_total_number_of_floorplan_elements(stkd))
+
+        return false ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (StackElement, stack_element, stkd->BottomStackElement)
+
+        insert_power_values_stack_element (stack_element, pvalues) ;
+
+  return true ;
+}
+
+/******************************************************************************/
+
+bool insert_power_values
+(
+  StackDescription* stkd,
+  double*          pvalues
+)
+{
+  PowersQueue* pvalues_queue;
+  pvalues_queue = alloc_and_init_powers_queue();
+  if (pvalues == NULL)
+    return false;
+
+  uint32_t index;
+  uint32_t totalNFloorplanElements = get_total_number_of_floorplan_elements(stkd);
+
+  for (index = 0; index < totalNFloorplanElements; index++)
+    put_into_powers_queue(pvalues_queue, pvalues[index]);
+
+  return insert_power_values_by_powers_queue(stkd, pvalues_queue);
 }
 
 /******************************************************************************/

@@ -502,7 +502,16 @@ Error_t update_coolant_flow_rate
     {
         tdata->SLU_Options.Fact = FACTORED ;
 
-        update_channel_inlet_stack_description (tdata->Sources, stkd) ;
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+            (StackElement, stack_element, stkd->BottomStackElement)
+
+            if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
+
+                fill_sources_channel
+
+                    (tdata->Sources, stkd->Dimensions,
+                    stack_element->Offset, stack_element->Pointer.Channel) ;
 
         return TDICE_SUCCESS ;
     }
@@ -821,7 +830,7 @@ int print_thermal_map
   output_file = fopen (file_name, "w") ;
   if (output_file == NULL)
   {
-    perror (file_name) ;
+    fprintf (stderr, "Unable to open output file %s\n", file_name) ;
     return -2 ;
   }
 
