@@ -58,99 +58,130 @@ extern "C"
 
 /******************************************************************************/
 
-  typedef struct
-  {
-    /* The following pointers point to memory used to store, for every cell  */
-    /* in the 3D grid, the temperature and the source values                 */
+    /*! \struct ThermalData
+     *
+     * \brief Structure to collect data to run thermal simulations
+     *
+     */
 
-    double* Temperatures ;
-    double*      Sources ;
+    struct ThermalData
+    {
+        /*! Array containing the temperature of each thermal cell */
 
-    ThermalCell*   ThermalCells ;
+        double *Temperatures ;
 
-    /* The number of cells in the 3D grid to be emulated */
+        /*! Array containing the source value of each thermal cell */
 
-    uint32_t    Size ;
+        double *Sources ;
 
-    /* The matrix A representing the linear system */
+        /*! Array of Thermal cells */
 
-    SystemMatrix SM_A ;
+        ThermalCell *ThermalCells ;
 
-    /* The right hand vector B is represented by the Temperatures array,     */
-    /* since the SuperLU routine used to solve the linear system overwrites  */
-    /* the B rhs vector with the result (temperatures).                      */
+        /*! The number of cells in the 3D grid */
 
-    /* Data used to interface with SuperLU */
+        uint32_t    Size ;
 
-    SuperMatrix SLUMatrix_A ,
-                SLUMatrix_A_Permuted ,
-                SLUMatrix_B ,
-                SLUMatrix_L ,
-                SLUMatrix_U ;
+        /*! The matrix A representing the linear system for thermal simulation
+         *
+         * The right hand vector B is represented by the Temperatures array,
+         * since the SuperLU routine dgstrs overwrites the B rhs vector with
+         * the computed result (temperatures).
+         */
 
-    SuperLUStat_t     SLU_Stat ;
-    superlu_options_t SLU_Options ;
+        SystemMatrix SM_A ;
 
-    int  SLU_Info ;
-    int* SLU_PermutationMatrixR ;
-    int* SLU_PermutationMatrixC ;
-    int* SLU_Etree ;
+        /*! SuperLU matrix A (wrapper arount our SystemMatrix SM_A )*/
 
-  } ThermalData ;
+        SuperMatrix SLUMatrix_A ;
 
-/******************************************************************************/
+        /*! SuperLU matrix A after the permutation */
 
-  /* Sets all the fields of tdata to a default value                        */
-  /*                                                                        */
-  /* tdata               The address of the ThermalData structure to init   */
-  /*                                                                        */
-  /* initial_temperature The initial temperature [K] for all the thermal    */
-  /*                     cells of the 3D grid                               */
-  /*                                                                        */
-  /* slot_time           the length [seconds] of each time slot, i.e. the   */
-  /*                     interval of time during which the power values of  */
-  /*                     of the floorplan elements are held constant. The   */
-  /*                     end of a time slot (and the beginning of the       */
-  /*                     following one) corresponds to the power switching  */
-  /*                     activity of a floorplan element                    */
-  /*                                                                        */
-  /* step_time           time discretization length [seconds] of the time   */
-  /*                     domain for the numerical integration of the system */
-  /*                     of differential equations                          */
+        SuperMatrix SLUMatrix_A_Permuted ;
 
-  void init_thermal_data (ThermalData *tdata) ;
+        /*! SuperLU vector B (wrapper around the Temperatures array) */
 
-/******************************************************************************/
+        SuperMatrix SLUMatrix_B ;
 
-  /* Allocs memory and fills it reading the structure of the 3D-IC from     */
-  /* StackDescription structure.                                            */
-  /*                                                                        */
-  /* At the end of the function, tdata.Temperatures will be filled with the */
-  /* initial temperature while tdata.Sources will be filled with zeroes.    */
-  /* tdata.Conductances and tdata.Capacities are filled with the            */
-  /* corresponding values. In case of success, the matrix tdata.SM_A will   */
-  /* be filled and factored (see fields related to the usage of SuperLU).   */
-  /* The right hand side vector is not stored since we use the Temperature  */
-  /* array for this purpose                                                 */
-  /*                                                                        */
-  /* Returns                                                                */
-  /*                                                                        */
-  /*  0 if success,                                                         */
-  /* -1 if memory allocation error,                                         */
-  /* >0 otherwise (factorization error). Please see the "output" field of   */
-  /*     the function "dgstrf" in SuperLU                                   */
+        /*! SuperLU matrix L after the A=LU factorization */
 
-  int fill_thermal_data
+        SuperMatrix SLUMatrix_L ;
 
-    (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
+        /*! SuperLU matrix U after the A=LU factorization */
+
+        SuperMatrix SLUMatrix_U ;
+
+        /*! SuperLU structure for statistics */
+
+        SuperLUStat_t     SLU_Stat ;
+
+        /*! SuperLU structure for factorization options */
+
+        superlu_options_t SLU_Options ;
+
+        /*! SuperLU integer to code the result of the SLU routines */
+
+        int  SLU_Info ;
+
+        /*! SuperLU matrix R for permutation RAC = LU. */
+
+        int* SLU_PermutationMatrixR ;
+
+        /*! SuperLU matrix C for permutation RAC = LU. */
+
+        int* SLU_PermutationMatrixC ;
+
+        /*! SuperLU elimination tree */
+
+        int* SLU_Etree ;
+
+    } ;
+
+
+    /*! Definition of the type ThermalData */
+
+    typedef struct ThermalData ThermalData ;
 
 /******************************************************************************/
 
-  /* Frees all the memory                                                   */
+    /*! Sets all the fields of \a tdata to a default value (zero or \c NULL )
+     *  and configure the SLU fields to run a factorization
+     *
+     * \param tdata the address of the thermal data to initialize
+     */
 
-  void free_thermal_data  (ThermalData* tdata) ;
+    void init_thermal_data (ThermalData *tdata) ;
 
-/******************************************************************************/
+
+
+    /*! Allocs and initialize memory and prepares the LU factorization
+     *
+     * \param tdata the address of the ThermalData to fill
+     * \param stkd  the address of the StackDescription previously filled
+     *              through the parsing of the stack file
+     * \param analysis the address of the Analysis previously filled trough
+     *                  the parsing of the stack file
+     *
+     * \return \c TDICE_FAILURE if the memory allocation fails or the syatem
+     *              matrix cannot be split in A=LU.
+     * \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t fill_thermal_data
+
+        (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
+
+
+
+    /*! Frees the memory related to \a tdata
+     *
+     * The parametrer \a tdata must be the address of a static variable
+     *
+     * \param tdata the address of the ThermalData structure to free
+     */
+
+    void free_thermal_data  (ThermalData* tdata) ;
+
 
 
     /*! Simulates a time step
@@ -217,26 +248,26 @@ extern "C"
 
         (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
 
-/******************************************************************************/
 
-  /* Update the flow rate.                                                  */
-  /*                                                                        */
-  /* Sets the new value and then re-fill the system matrix A and update     */
-  /* only the (channel) inlet source values. Then, it re-factor the System  */
-  /* matrix.                                                                */
-  /*                                                                        */
-  /* Returns                                                                */
-  /*                                                                        */
-  /*  0 if success,                                                         */
-  /* >0 otherwise (factorization error). Please see the "output" field of   */
-  /*     the function "dgstrf" in SuperLU                                   */
 
-  int update_coolant_flow_rate
-  (
-    ThermalData*      tdata,
-    StackDescription* stkd,
-    double       new_coolant_fr
-  ) ;
+    /*! Update the flow rate
+     *
+     * Sets the new value in the Channel structure, re-fill the system
+     * matrix A and then execute the factorization A=LU again. If this
+     * succeeds then the source vector will be upadted with the new inlet
+     * source value.
+     *
+     * \param tdata address of the ThermalData structure
+     * \param stkd  address of the StackDescription structure
+     * \param new_flow_rate the new flow rate (in ml/min)
+     *
+     * \return \c TDICE_FAILURE if the syatem matrix cannot be split in A=LU.
+     * \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t update_coolant_flow_rate
+
+        (ThermalData *tdata, StackDescription *stkd, double new_flow_rate) ;
 
 /******************************************************************************/
 

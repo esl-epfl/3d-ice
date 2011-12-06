@@ -128,7 +128,8 @@ extern "C"
 // # define         COOLANTVHC_I 0.0
 
     /*! \struct Coolant_t
-     * A collection of parameters describing the properties cooling fluid
+     *
+     *  \brief A collection of parameters describing the properties cooling fluid
      */
 
     struct Coolant_t
@@ -346,6 +347,10 @@ extern "C"
 
         TDICE_SLOT_DONE
     } ;
+
+
+
+    /*! Definition of the type SimResult_t */
 
     typedef enum SimResult_t SimResult_t ;
 

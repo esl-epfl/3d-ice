@@ -108,10 +108,8 @@ int main(int argc, char** argv)
 
     init_thermal_data (&tdata) ;
 
-    if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
+    if (fill_thermal_data (&tdata, &stkd, &analysis) == TDICE_FAILURE)
     {
-        fprintf(stderr, "fill thermal data failed\n") ;
-
         free_analysis          (&analysis) ;
         free_stack_description (&stkd) ;
 
