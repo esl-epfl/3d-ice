@@ -715,7 +715,7 @@ SystemMatrix fill_system_matrix_channel
             {
                 if (IS_CHANNEL_COLUMN (channel->ChannelModel, column_index) == true)
 
-                    system_matrix = add_liquid_column_mc_4rm
+                    system_matrix = add_liquid_column_4rm
 
                         (dimensions, thermalcells,
                          layer_index, row_index, column_index, system_matrix) ;
@@ -736,26 +736,16 @@ SystemMatrix fill_system_matrix_channel
 
             (Dimensions*, ThermalCell*, uint32_t, uint32_t, uint32_t, SystemMatrix)  ;
 
-        add_column_fp bottom_layer ;
         add_column_fp virtual_layer ;
-        add_column_fp liquid_layer ;
-        add_column_fp top_layer ;
 
         if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
             || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
-        {
-            bottom_layer  = &add_bottom_wall_column_pf ;
-            virtual_layer = &add_virtual_wall_column_pf ;
-            liquid_layer  = &add_liquid_column_pf ;
-            top_layer     = &add_top_wall_column_pf ;
-        }
+
+            virtual_layer = &add_virtual_wall_column_2rm_pf ;
+
         else  // TDICE_CHANNEL_MODEL_MC_2RM
-        {
-            bottom_layer  = &add_bottom_wall_column_mc_2rm ;
-            virtual_layer = &add_virtual_wall_column_mc_2rm ;
-            liquid_layer  = &add_liquid_column_mc_2rm ;
-            top_layer     = &add_top_wall_column_mc_2rm ;
-        }
+
+            virtual_layer = &add_virtual_wall_column_2rm_mc ;
 
         // Bottom Wall
 
@@ -764,7 +754,7 @@ SystemMatrix fill_system_matrix_channel
             {
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
-                    system_matrix = bottom_layer
+                    system_matrix = add_bottom_wall_column_2rm
 
                         (dimensions, thermalcells,
                          layer_index, row_index, column_index, system_matrix) ;
@@ -799,7 +789,7 @@ SystemMatrix fill_system_matrix_channel
             {
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
-                    system_matrix = liquid_layer
+                    system_matrix = add_liquid_column_2rm
 
                         (dimensions, thermalcells,
                          layer_index, row_index, column_index, system_matrix) ;
@@ -816,7 +806,7 @@ SystemMatrix fill_system_matrix_channel
             {
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
-                    system_matrix = top_layer
+                    system_matrix = add_top_wall_column_2rm
 
                         (dimensions, thermalcells,
                          layer_index, row_index, column_index, system_matrix) ;
