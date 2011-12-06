@@ -413,8 +413,6 @@ extern "C"
 
 /******************************************************************************/
 
-    void init_power_values_floorplan_element (FloorplanElement *floorplan_element) ;
-
     void insert_power_values_floorplan_element
 
         (FloorplanElement *floorplan_element, PowersQueue *pvalues) ;

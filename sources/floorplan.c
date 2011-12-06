@@ -160,20 +160,6 @@ Error_t fill_sources_floorplan
 
 /******************************************************************************/
 
-void init_power_values_floorplan
-(
-    Floorplan *floorplan
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (FloorplanElement, floorplan_element, floorplan->ElementsList)
-
-        init_power_values_floorplan_element (floorplan_element) ;
-}
-
-/******************************************************************************/
-
 void insert_power_values_floorplan
 (
     Floorplan   *floorplan,

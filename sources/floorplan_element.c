@@ -235,18 +235,6 @@ Error_t fill_sources_floorplan_element
 
 /******************************************************************************/
 
-void init_power_values_floorplan_element
-(
-    FloorplanElement *floorplan_element
-)
-{
-    free_powers_queue (floorplan_element->PowerValues) ;
-
-    floorplan_element->PowerValues = alloc_and_init_powers_queue() ;
-}
-
-/******************************************************************************/
-
 void insert_power_values_floorplan_element
 (
     FloorplanElement *floorplan_element,

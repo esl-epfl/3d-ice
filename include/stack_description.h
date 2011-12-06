@@ -256,8 +256,6 @@ extern "C"
     ) ;
 
 
-  void init_power_values (StackDescription* stkd) ;  // FIXME These are needed here??
-
   bool insert_power_values_by_powers_queue (StackDescription* stkd, PowersQueue* pvalues) ;
 
   bool insert_power_values (StackDescription* stkd, double* pvalues) ;

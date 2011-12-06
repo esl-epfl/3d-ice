@@ -454,20 +454,6 @@ uint32_t get_total_number_of_floorplan_elements
 
 /******************************************************************************/
 
-void init_power_values
-(
-    StackDescription* stkd
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement, stack_element, stkd->BottomStackElement)
-
-        init_power_values_stack_element (stack_element) ;
-}
-
-/******************************************************************************/
-
 bool insert_power_values_by_powers_queue
 (
   StackDescription* stkd,

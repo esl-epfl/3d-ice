@@ -452,15 +452,6 @@ void print_thermal_map_stack_element
 
 /******************************************************************************/
 
-void init_power_values_stack_element (StackElement *stack_element)
-{
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
-
-        init_power_values_floorplan (stack_element->Floorplan) ;
-}
-
-/******************************************************************************/
-
 void insert_power_values_stack_element
 (
   StackElement *stack_element,
