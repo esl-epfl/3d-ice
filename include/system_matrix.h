@@ -294,6 +294,8 @@ extern "C"
      *
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param thermal_cells pointer to the first thermal cell in the 3d stack
+     *  \param channel_model the model of the channel, to distinguish between
+     *                       2rm microchannel or 2rm pinfins
      *  \param layer_index   layer index of the thermal cell
      *  \param row_index     row index of the thermal cell
      *  \param column_index  column index of the thermal cell
@@ -302,44 +304,18 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_virtual_wall_column_2rm_mc
+    SystemMatrix add_virtual_wall_column_2rm
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
+        Dimensions    *dimensions,
+        ThermalCell   *thermal_cells,
 
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
+        ChannelModel_t channel_model,
 
-        SystemMatrix  system_matrix
-    ) ;
+        uint32_t       layer_index,
+        uint32_t       row_index,
+        uint32_t       column_index,
 
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a virtual wall layer (pin fin model)
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix add_virtual_wall_column_2rm_pf
-    (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
-
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
-
-        SystemMatrix  system_matrix
+        SystemMatrix   system_matrix
     ) ;
 
 /******************************************************************************/

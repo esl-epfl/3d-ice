@@ -732,21 +732,6 @@ SystemMatrix fill_system_matrix_channel
     }
     else
     {
-        typedef SystemMatrix (*add_column_fp)
-
-            (Dimensions*, ThermalCell*, uint32_t, uint32_t, uint32_t, SystemMatrix)  ;
-
-        add_column_fp virtual_layer ;
-
-        if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
-            || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
-
-            virtual_layer = &add_virtual_wall_column_2rm_pf ;
-
-        else  // TDICE_CHANNEL_MODEL_MC_2RM
-
-            virtual_layer = &add_virtual_wall_column_2rm_mc ;
-
         // Bottom Wall
 
         {
@@ -771,9 +756,9 @@ SystemMatrix fill_system_matrix_channel
             {
                 FOR_EVERY_COLUMN (column_index, dimensions)
                 {
-                    system_matrix = virtual_layer
+                    system_matrix = add_virtual_wall_column_2rm
 
-                        (dimensions, thermalcells,
+                        (dimensions, thermalcells, channel->ChannelModel,
                          layer_index, row_index, column_index, system_matrix) ;
 
                 } // FOR_EVERY_COLUMN
