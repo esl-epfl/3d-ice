@@ -306,7 +306,20 @@ extern "C"
         FILE         *stream
     ) ;
 
-/******************************************************************************/
+
+
+    /*! Returns the total number of floorplan elements in \a stack_element
+     *
+     * \param stack_element address of the StackElement structure
+     *
+     * \return the total nyumber of floorplan elements in \a stack_element
+     */
+
+    uint32_t get_number_of_floorplan_elements_stack_element
+
+        (StackElement *stack_element) ;
+
+
 
     void insert_power_values_stack_element
 

@@ -452,6 +452,24 @@ void print_thermal_map_stack_element
 
 /******************************************************************************/
 
+uint32_t get_number_of_floorplan_elements_stack_element
+(
+    StackElement *stack_element
+)
+{
+    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+
+        return get_number_of_floorplan_elements_floorplan
+
+            (stack_element->Floorplan) ;
+
+    else
+
+        return 0u ;
+}
+
+/******************************************************************************/
+
 void insert_power_values_stack_element
 (
   StackElement *stack_element,

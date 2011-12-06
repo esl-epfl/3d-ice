@@ -165,6 +165,19 @@ extern "C"
         Floorplan  *floorplan
     ) ;
 
+
+
+    /*! Returns the total number of floorplan elements in \a floorplan
+     *
+     * \param floorplan address of the Floorplan structure
+     *
+     * \return the total nyumber of floorplan elements in \a floorplan
+     */
+
+    uint32_t get_number_of_floorplan_elements_floorplan (Floorplan *floorplan) ;
+
+
+
     int get_max_temperature_floorplan
     (
         Floorplan  *floorplan,

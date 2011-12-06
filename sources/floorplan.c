@@ -142,6 +142,16 @@ Error_t fill_floorplan
 
 /******************************************************************************/
 
+uint32_t get_number_of_floorplan_elements_floorplan
+(
+    Floorplan *floorplan
+)
+{
+    return floorplan->NElements ;
+}
+
+/******************************************************************************/
+
 Error_t fill_sources_floorplan
 (
     double     *sources,

@@ -412,44 +412,34 @@ void fill_system_matrix_stack_description
 
 uint32_t get_number_of_floorplan_elements
 (
-  StackDescription* stkd,
-  char *          floorplan_id
+  StackDescription *stkd,
+  char             *stack_element_id
 )
 {
-  StackElement* stk_el = find_stack_element_in_list
-                         (
-                           stkd->BottomStackElement,
-                           floorplan_id
-                         ) ;
-  if (stk_el == NULL)
+    StackElement *stack_element = find_stack_element_in_list
 
-    return -1 ;
+        (stkd->BottomStackElement, stack_element_id) ;
 
-  if (stk_el->Type != TDICE_STACK_ELEMENT_DIE || stk_el->Floorplan == NULL)
+    if (stack_element == NULL)
 
-    return -2 ;
+        return 0 ;
 
-  return stk_el->Floorplan->NElements ;
+    return get_number_of_floorplan_elements_stack_element (stack_element) ;
 }
 
 /******************************************************************************/
 
-uint32_t get_total_number_of_floorplan_elements
-(
-  StackDescription* stkd
-)
+uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd)
 {
-  uint32_t total_number_of_floorplan_elements = 0u ;
+    uint32_t tmp = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (StackElement, stack_element, stkd->BottomStackElement)
+        (StackElement, stack_element, stkd->BottomStackElement)
 
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+        tmp += get_number_of_floorplan_elements_stack_element (stack_element) ;
 
-      total_number_of_floorplan_elements += stack_element->Floorplan->NElements;
-
-  return total_number_of_floorplan_elements;
+    return tmp ;
 }
 
 /******************************************************************************/
