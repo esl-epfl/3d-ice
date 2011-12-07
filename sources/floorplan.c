@@ -209,137 +209,107 @@ Error_t insert_power_values_floorplan
 
 /******************************************************************************/
 
-int get_all_max_temperatures_floorplan
-(
-  Floorplan  *floorplan,
-  Dimensions *dimensions,
-  double     *temperatures,
-  double     *max_temperature
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (FloorplanElement, flp_el, floorplan->ElementsList)
-
-        *max_temperature++ = get_max_temperature_floorplan_element
-
-                                 (flp_el, dimensions, temperatures) ;
-
-    return 0 ;
-}
-
-/******************************************************************************/
-
-void print_all_max_temperatures_floorplan
+double *get_all_max_temperatures_floorplan
 (
     Floorplan  *floorplan,
     Dimensions *dimensions,
     double     *temperatures,
-    FILE       *stream
+    uint32_t   *n_floorplan_elements,
+    double     *max_temperatures
 )
 {
-    double temperature ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (FloorplanElement, flp_el, floorplan->ElementsList)
+    if (max_temperatures == NULL)
     {
-        temperature = get_max_temperature_floorplan_element
+        *n_floorplan_elements =
 
-                          (flp_el, dimensions, temperatures) ;
+            get_number_of_floorplan_elements_floorplan (floorplan) ;
 
-        fprintf (stream, "%7.3f ", temperature) ;
+        max_temperatures =
+
+            (double *) malloc (sizeof (double) * *n_floorplan_elements) ;
     }
-}
 
-/******************************************************************************/
-
-int get_all_min_temperatures_floorplan
-(
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *min_temperature
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (FloorplanElement, flp_el, floorplan->ElementsList)
-
-        *min_temperature++ = get_min_temperature_floorplan_element
-
-                                 (flp_el, dimensions, temperatures) ;
-
-    return 0 ;
-}
-
-/******************************************************************************/
-
-void print_all_min_temperatures_floorplan
-(
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    FILE       *stream
-)
-{
-    double temperature ;
+    double *tmp = max_temperatures ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
+
+        *tmp++ = get_max_temperature_floorplan_element
+
+                     (flp_el, dimensions, temperatures) ;
+
+    return max_temperatures ;
+}
+
+/******************************************************************************/
+
+double *get_all_min_temperatures_floorplan
+(
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    uint32_t   *n_floorplan_elements,
+    double     *min_temperatures
+)
+{
+    if (min_temperatures == NULL)
     {
-        temperature = get_min_temperature_floorplan_element
+        *n_floorplan_elements =
 
-                          (flp_el, dimensions, temperatures) ;
+            get_number_of_floorplan_elements_floorplan (floorplan) ;
 
-        fprintf (stream, "%7.3f ", temperature) ;
+        min_temperatures =
+
+            (double *) malloc (sizeof (double) * *n_floorplan_elements) ;
     }
-}
 
-/******************************************************************************/
-
-int get_all_avg_temperatures_floorplan
-(
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *avg_temperature
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (FloorplanElement, flp_el, floorplan->ElementsList)
-
-        *avg_temperature++ = get_avg_temperature_floorplan_element
-
-                                 (flp_el, dimensions, temperatures) ;
-
-    return 0 ;
-}
-
-/******************************************************************************/
-
-void print_all_avg_temperatures_floorplan
-(
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    FILE       *stream
-)
-{
-    double temperature ;
+    double *tmp = min_temperatures ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
     (FloorplanElement, flp_el, floorplan->ElementsList)
+
+        *tmp++ = get_min_temperature_floorplan_element
+
+                     (flp_el, dimensions, temperatures) ;
+
+    return min_temperatures ;
+}
+
+/******************************************************************************/
+
+double *get_all_avg_temperatures_floorplan
+(
+    Floorplan  *floorplan,
+    Dimensions *dimensions,
+    double     *temperatures,
+    uint32_t   *n_floorplan_elements,
+    double     *avg_temperatures
+)
+{
+    if (avg_temperatures == NULL)
     {
-        temperature = get_avg_temperature_floorplan_element
+        *n_floorplan_elements =
 
-                          (flp_el, dimensions, temperatures) ;
+            get_number_of_floorplan_elements_floorplan (floorplan) ;
 
-        fprintf (stream, "%7.3f ", temperature) ;
+        avg_temperatures =
+
+            (double *) malloc (sizeof (double) * *n_floorplan_elements) ;
     }
+
+    double *tmp = avg_temperatures ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+    (FloorplanElement, flp_el, floorplan->ElementsList)
+
+        *tmp++ = get_avg_temperature_floorplan_element
+
+                     (flp_el, dimensions, temperatures) ;
+
+    return avg_temperatures ;
 }
 
 /******************************************************************************/

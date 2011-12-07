@@ -216,52 +216,86 @@ extern "C"
 
 
 
-    int get_all_max_temperatures_floorplan
+    /*! Returns the maximum temperature of each floorplan element
+     *  in the given floorplan
+     *
+     *  \param floorplan pointer to the floorplan
+     *  \param dimensions pointer to the structure storing the dimensions
+     *  \param temperatures pointer to the temperature of the first thermal
+     *                      cell in the layer where \a floorplan is placed
+     *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
+     *  \param max_temperatures (\c IN/OUT) addres to the memory where
+     *                      temperatures will be written into.
+     *
+     *  \return the same address as \a max_temperatures if \a max_temperatures
+     *          is not \c NULL.
+     *  \return the address of a memory containing \a n_floorplan_elements
+     *          temperatures if \a max_temperatures is \c NULL
+     */
+
+    double *get_all_max_temperatures_floorplan
     (
         Floorplan  *floorplan,
         Dimensions *dimensions,
         double     *temperatures,
-        double     *max_temperature
+        uint32_t   *n_floorplan_elements,
+        double     *max_temperatures
     ) ;
 
-    void print_all_max_temperatures_floorplan
+
+
+    /*! Returns the minimum temperature of each floorplan element
+     *  in the given floorplan
+     *
+     *  \param floorplan pointer to the floorplan
+     *  \param dimensions pointer to the structure storing the dimensions
+     *  \param temperatures pointer to the temperature of the first thermal
+     *                      cell in the layer where \a floorplan is placed
+     *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
+     *  \param min_temperatures (\c IN/OUT) addres to the memory where
+     *                      temperatures will be written into.
+     *
+     *  \return the same address as \a min_temperatures if \a min_temperatures
+     *          is not \c NULL.
+     *  \return the address of a memory containing \a n_floorplan_elements
+     *          temperatures if \a min_temperatures is \c NULL
+     */
+
+    double *get_all_min_temperatures_floorplan
     (
         Floorplan  *floorplan,
         Dimensions *dimensions,
         double     *temperatures,
-        FILE       *stream
+        uint32_t   *n_floorplan_elements,
+        double     *min_temperatures
     ) ;
 
-    int get_all_min_temperatures_floorplan
-    (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *min_temperature
-    ) ;
 
-    void print_all_min_temperatures_floorplan
-    (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        FILE       *stream
-    ) ;
 
-    int get_all_avg_temperatures_floorplan
-    (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *avg_temperature
-    ) ;
+    /*! Returns the average temperature of each floorplan element
+     *  in the given floorplan
+     *
+     *  \param floorplan pointer to the floorplan
+     *  \param dimensions pointer to the structure storing the dimensions
+     *  \param temperatures pointer to the temperature of the first thermal
+     *                      cell in the layer where \a floorplan is placed
+     *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
+     *  \param avg_temperatures (\c IN/OUT) addres to the memory where
+     *                      temperatures will be written into.
+     *
+     *  \return the same address as \a avg_temperatures if \a avg_temperatures
+     *          is not \c NULL.
+     *  \return the address of a memory containing \a n_floorplan_elements
+     *          temperatures if \a avg_temperatures is \c NULL
+     */
 
-    void print_all_avg_temperatures_floorplan
+    double *get_all_avg_temperatures_floorplan
     (
         Floorplan  *floorplan,
         Dimensions *dimensions,
         double     *temperatures,
-        FILE       *stream
+        uint32_t   *n_floorplan_elements,
+        double     *avg_temperatures
     ) ;
 
 /******************************************************************************/

@@ -308,6 +308,8 @@ extern "C"
         (StackDescription *stkd,
          char *stack_element_id, char *floorplan_element_id) ;
 
+
+
     /*! Inserts one power values from \a pvaluse into each floorplan element
      *  in the stack
      *

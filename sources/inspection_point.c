@@ -660,8 +660,8 @@ Error_t generate_inspection_point_output
     double           current_time
 )
 {
-    uint32_t cell_index ;
-    double   temperature ;
+    uint32_t index, n_flp_el ;
+    double   temperature, *result ;
 
     FILE *output_stream = fopen (inspection_point->FileName, "a") ;
 
@@ -678,7 +678,7 @@ Error_t generate_inspection_point_output
     {
         case TDICE_OUTPUT_TYPE_TCELL :
 
-            cell_index = get_cell_offset_in_stack
+            index = get_cell_offset_in_stack
 
                 (dimensions,
                  get_source_layer_offset(inspection_point->StackElement),
@@ -686,7 +686,7 @@ Error_t generate_inspection_point_output
                  inspection_point->Pointer.Tcell->ColumnIndex) ;
 
             fprintf (output_stream,
-                "%5.3f \t %7.3f\n", current_time, *(temperatures + cell_index)) ;
+                "%5.3f \t %7.3f\n", current_time, *(temperatures + index)) ;
 
             break ;
 
@@ -699,28 +699,36 @@ Error_t generate_inspection_point_output
                 (dimensions,
                  get_source_layer_offset(inspection_point->StackElement), 0, 0) ;
 
+            result = NULL ;
+
             if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
-                print_all_max_temperatures_floorplan
+                result = get_all_max_temperatures_floorplan
 
                     (inspection_point->StackElement->Floorplan,
-                     dimensions, temperatures, output_stream) ;
+                     dimensions, temperatures, &n_flp_el, NULL) ;
 
             else if (inspection_point->Pointer.Tflp->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
-                print_all_min_temperatures_floorplan
+                result = get_all_min_temperatures_floorplan
 
                     (inspection_point->StackElement->Floorplan,
-                     dimensions, temperatures, output_stream) ;
+                     dimensions, temperatures, &n_flp_el, NULL) ;
 
             else
 
-                print_all_avg_temperatures_floorplan
+                result = get_all_avg_temperatures_floorplan
 
                     (inspection_point->StackElement->Floorplan,
-                     dimensions, temperatures, output_stream) ;
+                     dimensions, temperatures, &n_flp_el, NULL) ;
+
+            for (index = 0 ; index != n_flp_el ; index++)
+
+                fprintf (output_stream, "%5.3f \t ", result [index]) ;
 
             fprintf (output_stream, "\n") ;
+
+            FREE_POINTER (free, result) ;
 
             break ;
 
