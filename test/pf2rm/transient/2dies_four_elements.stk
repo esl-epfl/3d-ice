@@ -43,5 +43,5 @@ solver:
 
 output:
 
-  T ( die1, "pf2rm/transient/four_elements_node1.txt", 4800, 4800, step ) ;
-  T ( die2, "pf2rm/transient/four_elements_node2.txt",    0,    0, step ) ;
+  T ( die1, 4800, 4800, "pf2rm/transient/four_elements_node1.txt", step ) ;
+  T ( die2,    0,    0, "pf2rm/transient/four_elements_node2.txt", step ) ;

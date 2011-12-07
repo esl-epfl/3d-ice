@@ -1179,11 +1179,11 @@ inspection_points_list
 
 inspection_point
 
-  :  TCELL '(' IDENTIFIER ',' PATH ',' DVALUE ',' DVALUE when ')' ';'
+  :  TCELL '(' IDENTIFIER ',' DVALUE ',' DVALUE ',' PATH when ')' ';'
 
      // $3       Identifier of the stack element (layer, channel or die)
-     // $5       Path of the output file
-     // ($7, $9) Coordinates of the cell to monitor
+     // ($5, $7) Coordinates of the cell to monitor
+     // $9       Path of the output file
      // $10      when to generate output for this observation
 
      {
@@ -1198,7 +1198,7 @@ inspection_point
             stack_description_error (stkd, analysis, scanner, error_message) ;
 
             FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $9) ;
 
             YYABORT ;
         }
@@ -1208,21 +1208,21 @@ inspection_point
         if (tcell == NULL)
         {
             FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $9) ;
 
             stack_description_error (stkd, analysis, scanner, "Malloc tcell failed") ;
 
             YYABORT ;
         }
 
-        align_tcell (tcell, $7, $9, stkd->Dimensions) ;
+        align_tcell (tcell, $5, $7, stkd->Dimensions) ;
 
         InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
             FREE_POINTER (free, $3) ;
-            FREE_POINTER (free, $5) ;
+            FREE_POINTER (free, $9) ;
 
             FREE_POINTER (free_tcell, tcell) ;
 
@@ -1233,7 +1233,7 @@ inspection_point
 
         inspection_point->Type          = TDICE_OUTPUT_TYPE_TCELL ;
         inspection_point->Instant       = $10 ;
-        inspection_point->FileName      = $5 ;
+        inspection_point->FileName      = $9 ;
         inspection_point->Pointer.Tcell = tcell ;
         inspection_point->StackElement  = stack_element ;
 
