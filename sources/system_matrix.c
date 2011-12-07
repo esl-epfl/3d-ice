@@ -54,20 +54,20 @@ void init_system_matrix (SystemMatrix* system_matrix)
 Error_t alloc_system_matrix
 (
     SystemMatrix *system_matrix,
-    uint32_t      size,
-    uint32_t      nnz
+    CellIndex_t   size,
+    CellIndex_t   nnz
 )
 {
     system_matrix->Size = size ;
     system_matrix->NNz  = nnz ;
 
-    system_matrix->RowIndices = malloc (sizeof(uint32_t) * nnz) ;
+    system_matrix->RowIndices = malloc (sizeof(CellIndex_t) * nnz) ;
 
     if (system_matrix->RowIndices == NULL)
 
         return TDICE_FAILURE ;
 
-    system_matrix->ColumnPointers = malloc (sizeof(uint32_t) * (size + 1)) ;
+    system_matrix->ColumnPointers = malloc (sizeof(CellIndex_t) * (size + 1)) ;
 
     if (system_matrix->ColumnPointers == NULL)
     {
@@ -108,7 +108,7 @@ void print_system_matrix (String_t file_name, SystemMatrix system_matrix)
         return ;
     }
 
-    uint32_t row, column ;
+    CellIndex_t row, column ;
 
     for (column = 0 ; column < system_matrix.Size ; column++)
 
@@ -129,9 +129,9 @@ SystemMatrix add_solid_column
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
-    uint32_t      row_index,
-    uint32_t      column_index,
+    CellIndex_t   layer_index,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
     SystemMatrix  system_matrix
 )
 {
@@ -139,11 +139,11 @@ SystemMatrix add_solid_column
     double  diagonal_value    = 0.0 ;
     double *diagonal_pointer  = NULL ;
 
-    uint32_t layer_offset  = get_layer_area (dimensions) ;
-    uint32_t row_offset    = get_number_of_columns (dimensions) ;
-    uint32_t column_offset = 1 ;
+    CellIndex_t layer_offset  = get_layer_area (dimensions) ;
+    CellIndex_t row_offset    = get_number_of_columns (dimensions) ;
+    CellIndex_t column_offset = 1 ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -332,9 +332,9 @@ SystemMatrix add_liquid_column_4rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
-    uint32_t      row_index,
-    uint32_t      column_index,
+    CellIndex_t   layer_index,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
     SystemMatrix  system_matrix
 )
 {
@@ -342,11 +342,11 @@ SystemMatrix add_liquid_column_4rm
     double  diagonal_value    = 0.0 ;
     double *diagonal_pointer  = NULL ;
 
-    uint32_t layer_offset  = get_layer_area (dimensions) ;
-    uint32_t row_offset    = get_number_of_columns (dimensions) ;
-    uint32_t column_offset = 1 ;
+    CellIndex_t layer_offset  = get_layer_area (dimensions) ;
+    CellIndex_t row_offset    = get_number_of_columns (dimensions) ;
+    CellIndex_t column_offset = 1 ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -519,9 +519,9 @@ SystemMatrix add_liquid_column_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
-    uint32_t      row_index,
-    uint32_t      column_index,
+    CellIndex_t   layer_index,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
     SystemMatrix  system_matrix
 )
 {
@@ -529,10 +529,10 @@ SystemMatrix add_liquid_column_2rm
     double  diagonal_value    = 0.0 ;
     double *diagonal_pointer  = NULL ;
 
-    uint32_t layer_offset = get_layer_area (dimensions) ;
-    uint32_t row_offset   = get_number_of_columns (dimensions) ;
+    CellIndex_t layer_offset = get_layer_area (dimensions) ;
+    CellIndex_t row_offset   = get_number_of_columns (dimensions) ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -661,9 +661,9 @@ SystemMatrix add_bottom_wall_column_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
-    uint32_t      row_index,
-    uint32_t      column_index,
+    CellIndex_t   layer_index,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
     SystemMatrix  system_matrix
 )
 {
@@ -671,9 +671,9 @@ SystemMatrix add_bottom_wall_column_2rm
     double  diagonal_value    = 0.0 ;
     double *diagonal_pointer  = NULL ;
 
-    uint32_t layer_offset = get_layer_area (dimensions) ;
+    CellIndex_t layer_offset = get_layer_area (dimensions) ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -786,9 +786,9 @@ SystemMatrix add_top_wall_column_2rm
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
-    uint32_t      row_index,
-    uint32_t      column_index,
+    CellIndex_t   layer_index,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
     SystemMatrix  system_matrix
 )
 {
@@ -796,9 +796,9 @@ SystemMatrix add_top_wall_column_2rm
     double  diagonal_value    = 0.0 ;
     double *diagonal_pointer  = NULL ;
 
-    uint32_t layer_offset = get_layer_area (dimensions) ;
+    CellIndex_t layer_offset = get_layer_area (dimensions) ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
@@ -913,9 +913,9 @@ SystemMatrix add_virtual_wall_column_2rm
     Dimensions    *dimensions,
     ThermalCell   *thermal_cells,
     ChannelModel_t channel_model,
-    uint32_t       layer_index,
-    uint32_t       row_index,
-    uint32_t       column_index,
+    CellIndex_t    layer_index,
+    CellIndex_t    row_index,
+    CellIndex_t    column_index,
     SystemMatrix   system_matrix
 )
 {
@@ -923,10 +923,10 @@ SystemMatrix add_virtual_wall_column_2rm
     double  diagonal_value    = 0.0 ;
     double *diagonal_pointer  = NULL ;
 
-    uint32_t layer_offset = get_layer_area (dimensions) ;
-    uint32_t row_offset   = get_number_of_columns (dimensions) ;
+    CellIndex_t layer_offset = get_layer_area (dimensions) ;
+    CellIndex_t row_offset   = get_number_of_columns (dimensions) ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 

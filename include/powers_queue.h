@@ -88,7 +88,7 @@ extern "C"
 
         /*! The number of power values in the list */
 
-        uint32_t Length ;
+        Quantity_t Length ;
 
     } ;
 

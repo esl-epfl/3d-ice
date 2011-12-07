@@ -203,7 +203,7 @@ extern "C"
         ThermalCell *thermal_cells,
         Time_t       delta_time,
         Dimensions  *dimensions,
-        uint32_t     layer_index,
+        CellIndex_t  layer_index,
         Layer       *layer
     ) ;
 
@@ -223,7 +223,7 @@ extern "C"
     (
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
-        uint32_t      layer_index,
+        CellIndex_t   layer_index,
         SystemMatrix  system_matrix
     ) ;
 

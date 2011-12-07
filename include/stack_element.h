@@ -105,7 +105,7 @@ extern "C"
 
         /*! The number of layers composing the stack element */
 
-        uint32_t NLayers ;
+        CellIndex_t NLayers ;
 
         /*! A pointer to a Floorplan. This field is
          *  used only if StaclElement::Type is \c TDICE_STACK_ELEMENT_DIE */
@@ -115,7 +115,7 @@ extern "C"
         /*! The offset (\# layers) of the first layer of the
          *  stack element, counting from the first layer in the stack */
 
-        uint32_t Offset ;
+        CellIndex_t Offset ;
 
         /*! Pointer to the 'next' stack element (towards the top of the stack),
          *  to collect stack elements in a double linked list */
@@ -230,7 +230,7 @@ extern "C"
      *  \return the offset (\# layers) of the source layer within the stack
      */
 
-    uint32_t get_source_layer_offset (StackElement *stack_element) ;
+    CellIndex_t get_source_layer_offset (StackElement *stack_element) ;
 
     /*! Fill the thermal cells corresponding to a stack element
      *
@@ -316,7 +316,7 @@ extern "C"
      * \return the total nyumber of floorplan elements in \a stack_element
      */
 
-    uint32_t get_number_of_floorplan_elements_stack_element
+    Quantity_t get_number_of_floorplan_elements_stack_element
 
         (StackElement *stack_element) ;
 

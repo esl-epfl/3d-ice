@@ -271,7 +271,7 @@ extern "C"
      * \return the number of floorplan elements in \a stack_element_id
      */
 
-    uint32_t get_number_of_floorplan_elements
+    Quantity_t get_number_of_floorplan_elements
 
         (StackDescription* stkd, String_t stack_element_id) ;
 
@@ -284,7 +284,7 @@ extern "C"
      * \return the total nyumber of floorplan elements in the 3d stack
      */
 
-    uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd) ;
+    Quantity_t get_total_number_of_floorplan_elements (StackDescription *stkd) ;
 
 
 

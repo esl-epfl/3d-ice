@@ -126,9 +126,9 @@ void fill_thermal_cell_conventional_heat_sink
     ConventionalHeatSink *conventional_heat_sink
 )
 {
-    uint32_t layer_index = LAST_LAYER_INDEX (dimensions) ;
+    CellIndex_t layer_index = LAST_LAYER_INDEX (dimensions) ;
 
-    uint32_t cell_index =
+    CellIndex_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
@@ -173,7 +173,7 @@ void fill_sources_conventional_heat_sink
     ConventionalHeatSink *conventional_heat_sink
 )
 {
-    uint32_t layer_index = LAST_LAYER_INDEX (dimensions) ;
+    CellIndex_t layer_index = LAST_LAYER_INDEX (dimensions) ;
 
 #ifdef PRINT_SOURCES
     fprintf (stderr,
@@ -181,7 +181,7 @@ void fill_sources_conventional_heat_sink
         layer_index) ;
 #endif
 
-    uint32_t cell_index =
+    CellIndex_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
@@ -219,9 +219,9 @@ void fill_system_matrix_conventional_heat_sink
     ThermalCell  *thermal_cells
 )
 {
-    uint32_t ncells = get_number_of_cells(dimensions) ;
+    CellIndex_t ncells = get_number_of_cells(dimensions) ;
 
-    uint32_t cell_index = get_cell_offset_in_stack
+    CellIndex_t cell_index = get_cell_offset_in_stack
 
         (dimensions, LAST_LAYER_INDEX(dimensions), 0 ,0) ;
 
@@ -229,13 +229,13 @@ void fill_system_matrix_conventional_heat_sink
 
     while (cell_index < ncells)
     {
-        uint32_t row_index ;
+        CellIndex_t row_index ;
 
         for (row_index = system_matrix.ColumnPointers [ cell_index ] ;
-             row_index < (uint32_t) system_matrix.ColumnPointers [ cell_index + 1 ] ;
+             row_index < (CellIndex_t) system_matrix.ColumnPointers [ cell_index + 1 ] ;
              row_index ++)
 
-            if ( (uint32_t) system_matrix.RowIndices [ row_index ] == cell_index )
+            if ( (CellIndex_t) system_matrix.RowIndices [ row_index ] == cell_index )
 
                 system_matrix.Values [ row_index ] += thermal_cells++->Top ;
 

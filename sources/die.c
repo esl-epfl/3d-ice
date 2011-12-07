@@ -234,7 +234,7 @@ void fill_thermal_cell_die
     ThermalCell *thermal_cells,
     Time_t       delta_time,
     Dimensions  *dimensions,
-    uint32_t     layer_index,
+    CellIndex_t  layer_index,
     Die         *die
 )
 {
@@ -251,7 +251,7 @@ Error_t fill_sources_die
 (
     Source_t   *sources,
     Dimensions *dimensions,
-    uint32_t    layer_index,
+    CellIndex_t layer_index,
     Floorplan  *floorplan,
     Die        *die
 )
@@ -276,7 +276,7 @@ SystemMatrix fill_system_matrix_die
     Die          *die,
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
+    CellIndex_t   layer_index,
     SystemMatrix  system_matrix
 )
 {

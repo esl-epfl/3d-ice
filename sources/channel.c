@@ -259,11 +259,11 @@ void fill_thermal_cell_channel_4rm
     ThermalCell *thermalcells,
     Time_t       delta_time,
     Dimensions  *dimensions,
-    uint32_t     layer_index,
+    CellIndex_t  layer_index,
     Channel     *channel
 )
 {
-    uint32_t cell_index =
+    CellIndex_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
 
@@ -316,11 +316,11 @@ static void fill_thermal_cell_channel_2rm
     ThermalCell *thermalcells,
     Time_t       delta_time,
     Dimensions  *dimensions,
-    uint32_t     layer_index,
+    CellIndex_t  layer_index,
     Channel     *channel
 )
 {
-    uint32_t cell_index =
+    CellIndex_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
 
@@ -441,11 +441,11 @@ static void fill_thermal_cell_channel_pf
     ThermalCell *thermalcells,
     Time_t       delta_time,
     Dimensions  *dimensions,
-    uint32_t     layer_index,
+    CellIndex_t  layer_index,
     Channel     *channel
 )
 {
-    uint32_t cell_index =
+    CellIndex_t cell_index =
 
         get_cell_offset_in_stack (dimensions, layer_index , 0, 0) ;
 
@@ -566,7 +566,7 @@ void fill_thermal_cell_channel
     ThermalCell *thermalcells,
     Time_t       delta_time,
     Dimensions  *dimensions,
-    uint32_t     layer_index,
+    CellIndex_t  layer_index,
     Channel     *channel
 )
 {
@@ -611,7 +611,7 @@ void fill_sources_channel
 (
     Source_t   *sources,
     Dimensions *dimensions,
-    uint32_t    layer_index,
+    CellIndex_t layer_index,
     Channel    *channel
 )
 {
@@ -693,11 +693,11 @@ void fill_sources_channel
 
 SystemMatrix fill_system_matrix_channel
 (
-    Channel         *channel,
-    Dimensions      *dimensions,
-    ThermalCell     *thermalcells,
-    uint32_t  layer_index,
-    SystemMatrix     system_matrix
+    Channel      *channel,
+    Dimensions   *dimensions,
+    ThermalCell  *thermalcells,
+    CellIndex_t   layer_index,
+    SystemMatrix  system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX

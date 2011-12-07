@@ -57,9 +57,9 @@ void init_thermal_cell (ThermalCell *thermal_cell)
 
 /******************************************************************************/
 
-void reset_capacities (ThermalCell *thermal_cell, uint32_t ncells)
+void reset_capacities (ThermalCell *thermal_cell, CellIndex_t ncells)
 {
-    uint32_t index = 0u ;
+    CellIndex_t index = 0u ;
 
     while (index++ != ncells) thermal_cell++->Capacity = (Capacity_t) 0.0 ;
 }
@@ -224,7 +224,7 @@ void fill_liquid_cell_mc_4rm
     CellDimension_t  cell_length,
     CellDimension_t  cell_width,
     CellDimension_t  cell_height,
-    uint32_t         nchannels,
+    Quantity_t       nchannels,
     Coolant_t        coolant
 )
 {
@@ -263,7 +263,7 @@ void fill_liquid_cell_mc_2rm
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,
     CellDimension_t     cell_height,
-    uint32_t            nchannels,
+    Quantity_t          nchannels,
     ChannelDimension_t  channel_length,
     ChannelDimension_t  porosity,
     Coolant_t           coolant

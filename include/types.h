@@ -54,6 +54,14 @@ extern "C"
 
 
 
+    /*! Definition of the type Quantity_t
+     *
+     *  For small quantities as \#channels or \#floorplan elements */
+
+    typedef uint32_t Quantity_t ;
+
+
+
     /*! Definition of the primitive type Time_t */
 
     typedef double Time_t ;
@@ -232,6 +240,15 @@ extern "C"
      */
 
     typedef double ChannelDimension_t ;
+
+
+
+    /*! Definition of the type CellIndex_t
+     *
+     * For cell, layer, row, columns indexes and for counting too */
+
+    typedef uint32_t CellIndex_t ;
+
 
 /******************************************************************************/
 

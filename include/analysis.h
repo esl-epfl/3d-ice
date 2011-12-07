@@ -75,11 +75,11 @@ extern "C"
 
         /*! Number of steps to do to complete a slot */
 
-        uint32_t SlotLength ;
+        Quantity_t SlotLength ;
 
         /*! Number of steps simulated so far ... */
 
-        uint32_t CurrentTime ;
+        Quantity_t CurrentTime ;
 
         /*! Initial Temperature if the IC stack */
 

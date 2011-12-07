@@ -114,8 +114,8 @@ void print_formatted_stack_elements_list
     StackElement *list
 )
 {
-    uint8_t max_stk_el_id_length = 0 ;
-    uint8_t max_die_id_length = 0 ;
+    Quantity_t max_stk_el_id_length = 0 ;
+    Quantity_t max_die_id_length = 0 ;
 
     FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stk_el, list)
     {
@@ -260,9 +260,9 @@ void print_detailed_stack_elements_list
 
 /******************************************************************************/
 
-uint32_t get_source_layer_offset (StackElement *stack_element)
+CellIndex_t get_source_layer_offset (StackElement *stack_element)
 {
-    uint32_t layer_offset = stack_element->Offset ;
+    CellIndex_t layer_offset = stack_element->Offset ;
 
     if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -454,7 +454,7 @@ void print_thermal_map_stack_element
 
 /******************************************************************************/
 
-uint32_t get_number_of_floorplan_elements_stack_element
+Quantity_t get_number_of_floorplan_elements_stack_element
 (
     StackElement *stack_element
 )

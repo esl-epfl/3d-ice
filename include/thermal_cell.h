@@ -117,7 +117,7 @@ extern "C"
      * \param ncells number of thermal cells in the vector
      */
 
-    void reset_capacities (ThermalCell *thermal_cell, uint32_t ncells) ;
+    void reset_capacities (ThermalCell *thermal_cell, CellIndex_t ncells) ;
 
 
     /*! Fill a solid thermal cell that belongs to the bottom-most layer of a stack
@@ -246,7 +246,7 @@ extern "C"
         CellDimension_t  cell_width,
         CellDimension_t  cell_height,
 
-        uint32_t         nchannels,
+        Quantity_t       nchannels,
         Coolant_t        coolant
     ) ;
 
@@ -275,7 +275,7 @@ extern "C"
         CellDimension_t     cell_width,
         CellDimension_t     cell_height,
 
-        uint32_t            nchannels,
+        Quantity_t          nchannels,
         ChannelDimension_t  channel_length,
         ChannelDimension_t  porosity,
         Coolant_t           coolant

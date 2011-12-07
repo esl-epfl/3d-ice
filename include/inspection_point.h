@@ -80,11 +80,11 @@ extern "C"
 
         /*! Row Index of the thermal cell */
 
-        uint32_t RowIndex ;
+        CellIndex_t RowIndex ;
 
         /*! Column Index of the thermal cell */
 
-        uint32_t ColumnIndex ;
+        CellIndex_t ColumnIndex ;
     } ;
 
     /*! Definition of the type Tcell */

@@ -199,16 +199,16 @@ void print_axes (Dimensions *dimensions)
 void compute_number_of_connections
 (
     Dimensions     *dimensions,
-    uint32_t        num_channels,
+    Quantity_t      num_channels,
     ChannelModel_t  channel_model
 )
 {
-    uint32_t nlayers  = dimensions->Grid.NLayers ;
-    uint32_t nrows    = dimensions->Grid.NRows ;
-    uint32_t ncolumns = dimensions->Grid.NColumns ;
+    CellIndex_t nlayers  = dimensions->Grid.NLayers ;
+    CellIndex_t nrows    = dimensions->Grid.NRows ;
+    CellIndex_t ncolumns = dimensions->Grid.NColumns ;
 
-    uint32_t num_layers_for_channel    = num_channels * NUM_LAYERS_CHANNEL_2RM ;
-    uint32_t num_layers_except_channel = nlayers - num_layers_for_channel ;
+    CellIndex_t num_layers_for_channel    = num_channels * NUM_LAYERS_CHANNEL_2RM ;
+    CellIndex_t num_layers_except_channel = nlayers - num_layers_for_channel ;
 
     switch (channel_model)
     {
@@ -317,7 +317,7 @@ void compute_number_of_connections
 CellDimension_t get_cell_length
 (
   Dimensions *dimensions,
-  uint32_t    column_index
+  CellIndex_t column_index
 )
 {
   if (IS_FIRST_COLUMN (column_index))
@@ -344,7 +344,7 @@ CellDimension_t get_cell_length
 CellDimension_t get_cell_width
 (
     Dimensions *dimensions,
-    uint32_t    __attribute__ ((unused)) row_index
+    CellIndex_t __attribute__ ((unused)) row_index
 )
 {
   return dimensions->Cell.Width ;
@@ -355,7 +355,7 @@ CellDimension_t get_cell_width
 ChipDimension_t get_cell_center_x
 (
     Dimensions *dimensions,
-    uint32_t    column_index
+    CellIndex_t column_index
 )
 {
     if (IS_FIRST_COLUMN (column_index))
@@ -381,7 +381,7 @@ ChipDimension_t get_cell_center_x
 ChipDimension_t get_cell_center_y
 (
     Dimensions *dimensions,
-    uint32_t    row_index
+    CellIndex_t row_index
 )
 {
     return    dimensions->Cell.Width / 2.0
@@ -393,7 +393,7 @@ ChipDimension_t get_cell_center_y
 ChipDimension_t get_cell_location_x
 (
     Dimensions *dimensions,
-    uint32_t    column_index
+    CellIndex_t column_index
 )
 {
     if (IS_FIRST_COLUMN (column_index))
@@ -412,7 +412,7 @@ ChipDimension_t get_cell_location_x
 ChipDimension_t get_cell_location_y
 (
     Dimensions *dimensions,
-    uint32_t    row_index
+    CellIndex_t row_index
 )
 {
     return dimensions->Cell.Width * row_index ;
@@ -420,53 +420,53 @@ ChipDimension_t get_cell_location_y
 
 /******************************************************************************/
 
-uint32_t get_number_of_layers (Dimensions *dimensions)
+CellIndex_t get_number_of_layers (Dimensions *dimensions)
 {
   return dimensions->Grid.NLayers ;
 }
 
 /******************************************************************************/
 
-uint32_t get_number_of_rows (Dimensions *dimensions)
+CellIndex_t get_number_of_rows (Dimensions *dimensions)
 {
   return dimensions->Grid.NRows ;
 }
 
 /******************************************************************************/
 
-uint32_t get_number_of_columns (Dimensions *dimensions)
+CellIndex_t get_number_of_columns (Dimensions *dimensions)
 {
   return dimensions->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
-uint32_t get_number_of_cells (Dimensions *dimensions)
+CellIndex_t get_number_of_cells (Dimensions *dimensions)
 {
   return dimensions->Grid.NCells ;
 }
 
 /******************************************************************************/
 
-uint32_t get_number_of_connections (Dimensions *dimensions)
+CellIndex_t get_number_of_connections (Dimensions *dimensions)
 {
   return dimensions->Grid.NConnections ;
 }
 
 /******************************************************************************/
 
-uint32_t get_layer_area (Dimensions *dimensions)
+CellIndex_t get_layer_area (Dimensions *dimensions)
 {
   return dimensions->Grid.NRows * dimensions->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
-uint32_t get_cell_offset_in_layer
+CellIndex_t get_cell_offset_in_layer
 (
   Dimensions *dimensions,
-  uint32_t    row_index,
-  uint32_t    column_index
+  CellIndex_t row_index,
+  CellIndex_t column_index
 )
 {
   return row_index * get_number_of_columns (dimensions) + column_index ;
@@ -474,12 +474,12 @@ uint32_t get_cell_offset_in_layer
 
 /******************************************************************************/
 
-uint32_t get_cell_offset_in_stack
+CellIndex_t get_cell_offset_in_stack
 (
   Dimensions *dimensions,
-  uint32_t    layer_index,
-  uint32_t    row_index,
-  uint32_t    column_index
+  CellIndex_t layer_index,
+  CellIndex_t row_index,
+  CellIndex_t column_index
 )
 {
   return layer_index * get_layer_area (dimensions)

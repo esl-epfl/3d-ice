@@ -339,8 +339,8 @@ void align_to_grid
 {
     ChipDimension_t cx = 0.0 ;
     ChipDimension_t cy = 0.0 ;
-    uint32_t column_index = 0u ;
-    uint32_t row_index    = 0u ;
+    CellIndex_t column_index = 0u ;
+    CellIndex_t row_index    = 0u ;
 
     /* West side */
 
@@ -428,8 +428,8 @@ Temperature_t get_max_temperature_floorplan_element
     Temperature_t    *temperatures
 )
 {
-    uint32_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
-    uint32_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
+    CellIndex_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
+    CellIndex_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
 
     Temperature_t max_temperature =
 
@@ -461,8 +461,8 @@ Temperature_t get_min_temperature_floorplan_element
     Temperature_t    *temperatures
 )
 {
-    uint32_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
-    uint32_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
+    CellIndex_t first_row    = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(floorplan_element) ;
+    CellIndex_t first_column = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(floorplan_element) ;
 
     Temperature_t min_temperature =
 
@@ -494,7 +494,7 @@ Temperature_t get_avg_temperature_floorplan_element
     Temperature_t    *temperatures
 )
 {
-    uint32_t counter = 0u ;
+    CellIndex_t counter = 0u ;
 
     Temperature_t avg_temperature = 0.0 ;
 

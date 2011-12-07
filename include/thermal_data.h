@@ -80,7 +80,7 @@ extern "C"
 
         /*! The number of cells in the 3D grid */
 
-        uint32_t    Size ;
+        CellIndex_t Size ;
 
         /*! The matrix A representing the linear system for thermal simulation
          *
@@ -289,9 +289,9 @@ extern "C"
     (
         ThermalData      *tdata,
         StackDescription *stkd,
-        uint32_t          layer_index,
-        uint32_t          row_index,
-        uint32_t          column_index
+        CellIndex_t       layer_index,
+        CellIndex_t       row_index,
+        CellIndex_t       column_index
     ) ;
 
 

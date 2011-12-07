@@ -83,11 +83,11 @@ extern "C"
 
         /*! The dimension n of the squared matrix nxn */
 
-        uint32_t Size ;
+        CellIndex_t Size ;
 
         /*! The number of nonzeroes coefficients */
 
-        uint32_t NNz ;
+        CellIndex_t NNz ;
 
     } ;
 
@@ -119,7 +119,7 @@ extern "C"
 
     Error_t alloc_system_matrix
 
-        (SystemMatrix *system_matrix, uint32_t size, uint32_t nnz) ;
+        (SystemMatrix *system_matrix, CellIndex_t size, CellIndex_t nnz) ;
 
 
 
@@ -165,9 +165,9 @@ extern "C"
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
 
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
+        CellIndex_t   layer_index,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index,
 
         SystemMatrix  system_matrix
     ) ;
@@ -193,9 +193,9 @@ extern "C"
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
 
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
+        CellIndex_t   layer_index,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index,
 
         SystemMatrix  system_matrix
     ) ;
@@ -222,9 +222,9 @@ extern "C"
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
 
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
+        CellIndex_t   layer_index,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index,
 
         SystemMatrix  system_matrix
     ) ;
@@ -251,9 +251,9 @@ extern "C"
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
 
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
+        CellIndex_t   layer_index,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index,
 
         SystemMatrix  system_matrix
     ) ;
@@ -280,9 +280,9 @@ extern "C"
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
 
-        uint32_t      layer_index,
-        uint32_t      row_index,
-        uint32_t      column_index,
+        CellIndex_t   layer_index,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index,
 
         SystemMatrix  system_matrix
     ) ;
@@ -311,9 +311,9 @@ extern "C"
 
         ChannelModel_t channel_model,
 
-        uint32_t       layer_index,
-        uint32_t       row_index,
-        uint32_t       column_index,
+        CellIndex_t    layer_index,
+        CellIndex_t    row_index,
+        CellIndex_t    column_index,
 
         SystemMatrix   system_matrix
     ) ;

@@ -531,14 +531,14 @@ Temperature_t get_cell_temperature
 (
     ThermalData      *tdata,
     StackDescription *stkd,
-    uint32_t          layer_index,
-    uint32_t          row_index,
-    uint32_t          column_index
+    CellIndex_t       layer_index,
+    CellIndex_t       row_index,
+    CellIndex_t       column_index
 )
 {
-    uint32_t id = get_cell_offset_in_stack
+    CellIndex_t id = get_cell_offset_in_stack
 
-                  (stkd->Dimensions, layer_index, row_index, column_index) ;
+                     (stkd->Dimensions, layer_index, row_index, column_index) ;
 
     if (id >= get_number_of_cells (stkd->Dimensions))
 

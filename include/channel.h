@@ -87,15 +87,15 @@ extern "C"
 
         /*!  Number of channels (per cavity) along chip length */
 
-        uint32_t NChannels ;
+        Quantity_t NChannels ;
 
         /*! The number of layer composing the channel */
 
-        uint32_t NLayers ;
+        CellIndex_t NLayers ;
 
         /*! The offset (\# layers) of the source layer within the channel */
 
-        uint32_t SourceLayerOffset ;
+        CellIndex_t SourceLayerOffset ;
 
         /*! The properties of the fluid used as coolant */
 
@@ -185,7 +185,7 @@ extern "C"
         ThermalCell     *thermal_cells,
         Time_t           delta_time,
         Dimensions      *dimensions,
-        uint32_t         layer_index,
+        CellIndex_t      layer_index,
         Channel         *channel
     ) ;
 
@@ -201,10 +201,10 @@ extern "C"
 
     void fill_sources_channel
     (
-        Source_t   *sources,
-        Dimensions *dimensions,
-        uint32_t    layer_index,
-        Channel    *channel
+        Source_t    *sources,
+        Dimensions  *dimensions,
+        CellIndex_t  layer_index,
+        Channel     *channel
     ) ;
 
 
@@ -225,7 +225,7 @@ extern "C"
         Channel      *channel,
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
-        uint32_t      layer_index,
+        CellIndex_t   layer_index,
         SystemMatrix  system_matrix
     ) ;
 

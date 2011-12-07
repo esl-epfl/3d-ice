@@ -73,15 +73,15 @@ extern "C"
         /*! To know, after the parsing of a stack file, if a
          *  die has been declared but never used in the stack */
 
-        uint8_t Used ;
+        Quantity_t Used ;
 
         /*! The number of layer composing the die */
 
-        uint32_t NLayers ;
+        CellIndex_t NLayers ;
 
         /*! The offset (\# layers) of the source layer within the die */
 
-        uint32_t SourceLayerOffset ;
+        CellIndex_t SourceLayerOffset ;
 
         /*! Pointer to the top-most layer */
 
@@ -227,7 +227,7 @@ extern "C"
         ThermalCell *thermal_cells,
         Time_t       delta_time,
         Dimensions  *dimensions,
-        uint32_t     layer_index,
+        CellIndex_t  layer_index,
         Die         *die
     ) ;
 
@@ -251,7 +251,7 @@ extern "C"
     (
         Source_t   *sources,
         Dimensions *dimensions,
-        uint32_t    layer_index,
+        CellIndex_t layer_index,
         Floorplan  *floorplan,
         Die        *die
     ) ;
@@ -274,7 +274,7 @@ extern "C"
         Die          *die,
         Dimensions   *dimensions,
         ThermalCell  *thermal_cells,
-        uint32_t      layer_index,
+        CellIndex_t   layer_index,
         SystemMatrix  system_matrix
     ) ;
 

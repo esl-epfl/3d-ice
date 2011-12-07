@@ -103,22 +103,22 @@ extern "C"
         /*! The index of the row of the thermal cell where the south-west
          *  corner of the floroplan element is placed */
 
-        uint32_t SW_Row ;
+        CellIndex_t SW_Row ;
 
         /*! The index of the column of the thermal cell where the south-west
          *  corner of the floroplan element is placed */
 
-        uint32_t SW_Column ;
+        CellIndex_t SW_Column ;
 
         /*! The index of the row of the thermal cell where the north-east
          *  corner of the floroplan element is placed */
 
-        uint32_t NE_Row ;
+        CellIndex_t NE_Row ;
 
         /*! The index of the column of the thermal cell where the north-east
          *  corner of the floroplan element is placed */
 
-        uint32_t NE_Column ;
+        CellIndex_t NE_Column ;
 
         /*! The list of power values representing the power consumption of
          *  the floorplan element during the thermal simulation */

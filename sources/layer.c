@@ -143,7 +143,7 @@ void fill_thermal_cell_layer
     ThermalCell *thermal_cells,
     Time_t       delta_time,
     Dimensions  *dimensions,
-    uint32_t     layer_index,
+    CellIndex_t  layer_index,
     Layer       *layer
 )
 {
@@ -165,7 +165,7 @@ void fill_thermal_cell_layer
 
         fill_cell = fill_solid_cell_central ;
 
-    uint32_t cell_index
+    CellIndex_t cell_index
 
         = get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
@@ -199,7 +199,7 @@ SystemMatrix fill_system_matrix_layer
 (
     Dimensions   *dimensions,
     ThermalCell  *thermal_cells,
-    uint32_t      layer_index,
+    CellIndex_t   layer_index,
     SystemMatrix  system_matrix
 )
 {

@@ -68,7 +68,7 @@ extern "C"
 
         /*! The number of floorplan elements in the floorplan  */
 
-        uint8_t NElements ;
+        Quantity_t NElements ;
 
         /*! Pointer to the list of floorplan elements */
 
@@ -174,7 +174,7 @@ extern "C"
      * \return the total nyumber of floorplan elements in \a floorplan
      */
 
-    uint32_t get_number_of_floorplan_elements_floorplan (Floorplan *floorplan) ;
+    Quantity_t get_number_of_floorplan_elements_floorplan (Floorplan *floorplan) ;
 
 
 
@@ -238,7 +238,7 @@ extern "C"
         Floorplan     *floorplan,
         Dimensions    *dimensions,
         Temperature_t *temperatures,
-        uint32_t      *n_floorplan_elements,
+        Quantity_t    *n_floorplan_elements,
         Temperature_t *max_temperatures
     ) ;
 
@@ -266,7 +266,7 @@ extern "C"
         Floorplan     *floorplan,
         Dimensions    *dimensions,
         Temperature_t *temperatures,
-        uint32_t      *n_floorplan_elements,
+        Quantity_t    *n_floorplan_elements,
         Temperature_t *min_temperatures
     ) ;
 
@@ -294,7 +294,7 @@ extern "C"
         Floorplan     *floorplan,
         Dimensions    *dimensions,
         Temperature_t *temperatures,
-        uint32_t      *n_floorplan_elements,
+        Quantity_t    *n_floorplan_elements,
         Temperature_t *avg_temperatures
     ) ;
 

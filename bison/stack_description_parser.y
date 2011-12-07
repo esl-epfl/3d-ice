@@ -85,8 +85,8 @@
     static CellDimension_t last_wall_length ;
     static CellDimension_t wall_length ;
     static CellDimension_t channel_length ;
-    static uint32_t        num_channels ;
-    static uint8_t         num_dies ;
+    static Quantity_t      num_channels ;
+    static Quantity_t      num_dies ;
 }
 
 %type <double_v>           first_wall_length
@@ -843,7 +843,7 @@ stack
         // the bottom most element in the stack. This operation can be done only
         // here since the parser processes elements in the stack from the top most.
 
-        uint32_t layer_index = 0u ;
+        CellIndex_t layer_index = 0u ;
 
         FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement, stk_el, stkd->BottomStackElement)
         {
@@ -1131,7 +1131,7 @@ solver
         analysis->AnalysisType = TDICE_ANALYSIS_TYPE_TRANSIENT ;
         analysis->StepTime     = (Time_t) $5 ;
         analysis->SlotTime     = (Time_t) $8 ;
-        analysis->SlotLength   = (uint32_t) ( $8 / $5 ) ;
+        analysis->SlotLength   = (Quantity_t) ( $8 / $5 ) ;
     }
   ;
 

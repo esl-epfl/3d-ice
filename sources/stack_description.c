@@ -348,8 +348,8 @@ Error_t fill_sources_stack_description
 
     // reset all the source vector to 0
 
-    uint32_t ccounter ;
-    uint32_t ncells = get_number_of_cells (stkd->Dimensions) ;
+    CellIndex_t ccounter ;
+    CellIndex_t ncells = get_number_of_cells (stkd->Dimensions) ;
 
     for (ccounter = 0 ; ccounter != ncells ; ccounter++)
 
@@ -412,7 +412,7 @@ void fill_system_matrix_stack_description
 
 /******************************************************************************/
 
-uint32_t get_number_of_floorplan_elements
+Quantity_t get_number_of_floorplan_elements
 (
   StackDescription *stkd,
   String_t          stack_element_id
@@ -431,9 +431,9 @@ uint32_t get_number_of_floorplan_elements
 
 /******************************************************************************/
 
-uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd)
+Quantity_t get_total_number_of_floorplan_elements (StackDescription *stkd)
 {
-    uint32_t tmp = 0u ;
+    Quantity_t tmp = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 

@@ -72,7 +72,7 @@ extern "C"
          * material has been declared but never used
          */
 
-        uint8_t Used ;
+        Quantity_t Used ;
 
         /*!
          * The volume-specific heat capacity of the material,

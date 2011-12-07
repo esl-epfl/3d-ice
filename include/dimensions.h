@@ -118,7 +118,7 @@ extern "C"
          *  This value is computed as the sum of the number of layers used
          *  by each stack element (die, channel or layers) */
 
-        uint32_t NLayers ;
+        CellIndex_t NLayers ;
 
         /*! The number of rows along the south-north direction.
          *
@@ -127,7 +127,7 @@ extern "C"
          *  This value is computed as the ratio between the width of the IC
          *  and the width of the thermal cell */
 
-        uint32_t NRows ;
+        CellIndex_t NRows ;
 
         /*! The number of columns along the west-east direction.
          *
@@ -142,17 +142,17 @@ extern "C"
          *  resulting number of column is an integer value.
          */
 
-        uint32_t NColumns ;
+        CellIndex_t NColumns ;
 
         /*! The number of thermal cells into which the IC is divided.
          *
          *  This value is computed as NRows times NColumns times NLayers. */
 
-        uint32_t NCells ;
+        CellIndex_t NCells ;
 
         /*! The number of connections between the thermal cells. */
 
-        uint32_t NConnections ;
+        CellIndex_t NConnections ;
     } ;
 
     /*! The definition of the type GridDimensions */
@@ -289,7 +289,7 @@ extern "C"
 
     void compute_number_of_connections
 
-        (Dimensions *dimensions, uint32_t num_channels, ChannelModel_t channel_model) ;
+        (Dimensions *dimensions, Quantity_t num_channels, ChannelModel_t channel_model) ;
 
     /*! Returns the length of a thermal cell
      *
@@ -299,7 +299,7 @@ extern "C"
      * \return the length of the thermal cell in position \a coluimn_index
      */
 
-    CellDimension_t get_cell_length (Dimensions *dimensions, uint32_t column_index) ;
+    CellDimension_t get_cell_length (Dimensions *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -311,7 +311,7 @@ extern "C"
      * \return the width of the thermal cell in position \a row_index
      */
 
-    CellDimension_t get_cell_width (Dimensions *dimensions, uint32_t row_index) ;
+    CellDimension_t get_cell_width (Dimensions *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -323,7 +323,7 @@ extern "C"
      * \return the X coordinate of the center of thermal cell in position \a column_index
      */
 
-    ChipDimension_t get_cell_center_x (Dimensions *dimensions, uint32_t column_index) ;
+    ChipDimension_t get_cell_center_x (Dimensions *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -335,7 +335,7 @@ extern "C"
      * \return the Y coordinate of the center of thermal cell in position \a row_index
      */
 
-    ChipDimension_t get_cell_center_y (Dimensions *dimensions, uint32_t row_index) ;
+    ChipDimension_t get_cell_center_y (Dimensions *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -347,7 +347,7 @@ extern "C"
      * \return the X coordinate of the south-west corner of thermal cell in position \a column_index
      */
 
-    ChipDimension_t get_cell_location_x (Dimensions *dimensions, uint32_t column_index) ;
+    ChipDimension_t get_cell_location_x (Dimensions *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -359,7 +359,7 @@ extern "C"
      * \return the X coordinate of the south-west corner of thermal cell in position \a row_index
      */
 
-    ChipDimension_t get_cell_location_y (Dimensions *dimensions, uint32_t row_index) ;
+    ChipDimension_t get_cell_location_y (Dimensions *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -370,7 +370,7 @@ extern "C"
      * \return the number of layers
      */
 
-    uint32_t get_number_of_layers (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_layers (Dimensions *dimensions) ;
 
 
 
@@ -381,7 +381,7 @@ extern "C"
      * \return the number of rows
      */
 
-    uint32_t get_number_of_rows (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_rows (Dimensions *dimensions) ;
 
 
 
@@ -392,7 +392,7 @@ extern "C"
      * \return the number of columns
      */
 
-    uint32_t get_number_of_columns (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_columns (Dimensions *dimensions) ;
 
 
 
@@ -403,7 +403,7 @@ extern "C"
      * \return the number of thermal cells
      */
 
-    uint32_t get_number_of_cells (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_cells (Dimensions *dimensions) ;
 
 
 
@@ -414,7 +414,7 @@ extern "C"
      * \return the number of connections
      */
 
-    uint32_t get_number_of_connections (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_connections (Dimensions *dimensions) ;
 
 
 
@@ -425,7 +425,7 @@ extern "C"
      * \return the number of thermal cells in a layer
      */
 
-    uint32_t get_layer_area (Dimensions *dimensions) ;
+    CellIndex_t get_layer_area (Dimensions *dimensions) ;
 
 
 
@@ -441,9 +441,9 @@ extern "C"
      * \return the index of a thermal cell \f$ (r, c) \f$ in a layer
      */
 
-    uint32_t get_cell_offset_in_layer
+    CellIndex_t get_cell_offset_in_layer
 
-        (Dimensions *dimensions, uint32_t row_index, uint32_t column_index) ;
+        (Dimensions *dimensions, CellIndex_t row_index, CellIndex_t column_index) ;
 
 
 
@@ -461,10 +461,10 @@ extern "C"
      * \return the index of a thermal cell \f$ (l, r, c) \f$ in the 3d stack
      */
 
-    uint32_t get_cell_offset_in_stack
+    CellIndex_t get_cell_offset_in_stack
 
         (Dimensions *dimensions,
-         uint32_t layer_index, uint32_t row_index, uint32_t column_index) ;
+         CellIndex_t layer_index, CellIndex_t row_index, CellIndex_t column_index) ;
 
 
 
