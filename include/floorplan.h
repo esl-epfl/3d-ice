@@ -160,7 +160,7 @@ extern "C"
 
     Error_t fill_sources_floorplan
     (
-        double     *sources,
+        Source_t   *sources,
         Dimensions *dimensions,
         Floorplan  *floorplan
     ) ;
@@ -233,13 +233,13 @@ extern "C"
      *          temperatures if \a max_temperatures is \c NULL
      */
 
-    double *get_all_max_temperatures_floorplan
+    Temperature_t *get_all_max_temperatures_floorplan
     (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        uint32_t   *n_floorplan_elements,
-        double     *max_temperatures
+        Floorplan     *floorplan,
+        Dimensions    *dimensions,
+        Temperature_t *temperatures,
+        uint32_t      *n_floorplan_elements,
+        Temperature_t *max_temperatures
     ) ;
 
 
@@ -261,13 +261,13 @@ extern "C"
      *          temperatures if \a min_temperatures is \c NULL
      */
 
-    double *get_all_min_temperatures_floorplan
+    Temperature_t *get_all_min_temperatures_floorplan
     (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        uint32_t   *n_floorplan_elements,
-        double     *min_temperatures
+        Floorplan     *floorplan,
+        Dimensions    *dimensions,
+        Temperature_t *temperatures,
+        uint32_t      *n_floorplan_elements,
+        Temperature_t *min_temperatures
     ) ;
 
 
@@ -289,13 +289,13 @@ extern "C"
      *          temperatures if \a avg_temperatures is \c NULL
      */
 
-    double *get_all_avg_temperatures_floorplan
+    Temperature_t *get_all_avg_temperatures_floorplan
     (
-        Floorplan  *floorplan,
-        Dimensions *dimensions,
-        double     *temperatures,
-        uint32_t   *n_floorplan_elements,
-        double     *avg_temperatures
+        Floorplan     *floorplan,
+        Dimensions    *dimensions,
+        Temperature_t *temperatures,
+        uint32_t      *n_floorplan_elements,
+        Temperature_t *avg_temperatures
     ) ;
 
 /******************************************************************************/

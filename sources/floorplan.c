@@ -167,7 +167,7 @@ FloorplanElement *get_floorplan_element_floorplan
 
 Error_t fill_sources_floorplan
 (
-    double     *sources,
+    Source_t   *sources,
     Dimensions *dimensions,
     Floorplan  *floorplan
 )
@@ -209,13 +209,13 @@ Error_t insert_power_values_floorplan
 
 /******************************************************************************/
 
-double *get_all_max_temperatures_floorplan
+Temperature_t *get_all_max_temperatures_floorplan
 (
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    uint32_t   *n_floorplan_elements,
-    double     *max_temperatures
+    Floorplan     *floorplan,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures,
+    uint32_t      *n_floorplan_elements,
+    Temperature_t *max_temperatures
 )
 {
     if (max_temperatures == NULL)
@@ -226,10 +226,10 @@ double *get_all_max_temperatures_floorplan
 
         max_temperatures =
 
-            (double *) malloc (sizeof (double) * *n_floorplan_elements) ;
+            (Temperature_t *) malloc (sizeof (Temperature_t) * *n_floorplan_elements) ;
     }
 
-    double *tmp = max_temperatures ;
+    Temperature_t *tmp = max_temperatures ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
@@ -244,13 +244,13 @@ double *get_all_max_temperatures_floorplan
 
 /******************************************************************************/
 
-double *get_all_min_temperatures_floorplan
+Temperature_t *get_all_min_temperatures_floorplan
 (
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    uint32_t   *n_floorplan_elements,
-    double     *min_temperatures
+    Floorplan     *floorplan,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures,
+    uint32_t      *n_floorplan_elements,
+    Temperature_t *min_temperatures
 )
 {
     if (min_temperatures == NULL)
@@ -261,10 +261,10 @@ double *get_all_min_temperatures_floorplan
 
         min_temperatures =
 
-            (double *) malloc (sizeof (double) * *n_floorplan_elements) ;
+            (Temperature_t *) malloc (sizeof (Temperature_t) * *n_floorplan_elements) ;
     }
 
-    double *tmp = min_temperatures ;
+    Temperature_t *tmp = min_temperatures ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
@@ -279,13 +279,13 @@ double *get_all_min_temperatures_floorplan
 
 /******************************************************************************/
 
-double *get_all_avg_temperatures_floorplan
+Temperature_t *get_all_avg_temperatures_floorplan
 (
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    double     *temperatures,
-    uint32_t   *n_floorplan_elements,
-    double     *avg_temperatures
+    Floorplan     *floorplan,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures,
+    uint32_t      *n_floorplan_elements,
+    Temperature_t *avg_temperatures
 )
 {
     if (avg_temperatures == NULL)
@@ -296,10 +296,10 @@ double *get_all_avg_temperatures_floorplan
 
         avg_temperatures =
 
-            (double *) malloc (sizeof (double) * *n_floorplan_elements) ;
+            (Temperature_t *) malloc (sizeof (Temperature_t) * *n_floorplan_elements) ;
     }
 
-    double *tmp = avg_temperatures ;
+    Temperature_t *tmp = avg_temperatures ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 

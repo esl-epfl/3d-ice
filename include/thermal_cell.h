@@ -135,7 +135,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,
@@ -162,7 +162,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,
@@ -189,7 +189,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,
@@ -241,7 +241,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,
@@ -272,7 +272,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,
@@ -305,7 +305,7 @@ extern "C"
     (
         ThermalCell   *thermal_cell,
 
-        double         delta_time,
+        Time_t         delta_time,
 
         double         cell_length,
         double         cell_width,
@@ -336,7 +336,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,
@@ -365,7 +365,7 @@ extern "C"
     (
         ThermalCell *thermal_cell,
 
-        double       delta_time,
+        Time_t       delta_time,
 
         double       cell_length,
         double       cell_width,

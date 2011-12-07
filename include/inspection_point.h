@@ -451,8 +451,8 @@ extern "C"
     (
         InspectionPoint *inspection_point,
         Dimensions      *dimensions,
-        double          *temperatures,
-        double           current_time
+        Temperature_t   *temperatures,
+        Time_t           current_time
     ) ;
 
 /******************************************************************************/

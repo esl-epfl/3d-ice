@@ -257,7 +257,7 @@ static
 void fill_thermal_cell_channel_4rm
 (
     ThermalCell *thermalcells,
-    double       delta_time,
+    Time_t       delta_time,
     Dimensions  *dimensions,
     uint32_t     layer_index,
     Channel     *channel
@@ -315,7 +315,7 @@ void fill_thermal_cell_channel_4rm
 static void fill_thermal_cell_channel_2rm
 (
     ThermalCell *thermalcells,
-    double       delta_time,
+    Time_t       delta_time,
     Dimensions  *dimensions,
     uint32_t     layer_index,
     Channel     *channel
@@ -440,7 +440,7 @@ static void fill_thermal_cell_channel_2rm
 static void fill_thermal_cell_channel_pf
 (
     ThermalCell *thermalcells,
-    double       delta_time,
+    Time_t       delta_time,
     Dimensions  *dimensions,
     uint32_t     layer_index,
     Channel     *channel
@@ -565,7 +565,7 @@ static void fill_thermal_cell_channel_pf
 void fill_thermal_cell_channel
 (
     ThermalCell *thermalcells,
-    double       delta_time,
+    Time_t       delta_time,
     Dimensions  *dimensions,
     uint32_t     layer_index,
     Channel     *channel
@@ -610,7 +610,7 @@ void fill_thermal_cell_channel
 
 void fill_sources_channel
 (
-    double     *sources,
+    Source_t   *sources,
     Dimensions *dimensions,
     uint32_t    layer_index,
     Channel    *channel
@@ -667,7 +667,7 @@ void fill_sources_channel
 
     sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
 
-    double tmp = 2.0 * C * channel->Coolant.TIn ;
+    Source_t tmp = (Source_t) 2.0 * C * channel->Coolant.TIn ;
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {

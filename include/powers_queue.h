@@ -59,7 +59,7 @@ extern "C"
     {
         /*! The power value */
 
-        double Value ;
+        Power_t Value ;
 
         /*! Pointer to the following power node */
 
@@ -175,7 +175,7 @@ extern "C"
      * \param power the power value to insert
      */
 
-    void put_into_powers_queue (PowersQueue *powers_queue, double power) ;
+    void put_into_powers_queue (PowersQueue *powers_queue, Power_t power) ;
 
 
 
@@ -186,7 +186,7 @@ extern "C"
      * \return the first power value in the list \a powers_queue
      */
 
-    double get_from_powers_queue (PowersQueue *powers_queue) ;
+    Power_t get_from_powers_queue (PowersQueue *powers_queue) ;
 
 
 

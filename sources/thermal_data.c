@@ -97,7 +97,9 @@ Error_t fill_thermal_data
 
     /* Alloc and set temperatures */
 
-    tdata->Temperatures = malloc (sizeof(double) * tdata->Size) ;
+    tdata->Temperatures =
+
+        (Temperature_t*) malloc (sizeof(*tdata->Temperatures) * tdata->Size) ;
 
     if (tdata->Temperatures == NULL)
 
@@ -127,7 +129,7 @@ Error_t fill_thermal_data
 
     /* Alloc and set sources to zero */
 
-    tdata->Sources = malloc (sizeof(double) * tdata->Size) ;
+    tdata->Sources = malloc (sizeof(*tdata->Sources) * tdata->Size) ;
 
     if (tdata->Sources == NULL)
 
@@ -280,15 +282,15 @@ void free_thermal_data (ThermalData* tdata)
 
 static void fill_system_vector
 (
-    Dimensions  *dimensions,
-    double      *vector,
-    double      *sources,
-    ThermalCell *thermalcells,
-    double      *temperatures
+    Dimensions    *dimensions,
+    double        *vector,
+    Source_t      *sources,
+    ThermalCell   *thermalcells,
+    Temperature_t *temperatures
 )
 {
 #ifdef PRINT_SYSTEM_VECTOR
-    double old ;
+    Temperature_t old ;
 #endif
 
     FOR_EVERY_LAYER (layer, dimensions)
@@ -324,7 +326,7 @@ static void fill_system_vector_steady
 (
   Dimensions *dimensions,
   double     *vector,
-  double     *sources
+  Source_t   *sources
 )
 {
     FOR_EVERY_LAYER (layer, dimensions)
@@ -525,7 +527,7 @@ Error_t update_coolant_flow_rate
 
 /******************************************************************************/
 
-double get_cell_temperature
+Temperature_t get_cell_temperature
 (
     ThermalData      *tdata,
     StackDescription *stkd,

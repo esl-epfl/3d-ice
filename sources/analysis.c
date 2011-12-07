@@ -44,11 +44,11 @@
 void init_analysis (Analysis *analysis)
 {
     analysis->AnalysisType         = TDICE_ANALYSIS_TYPE_NONE ;
-    analysis->StepTime             = 0.0 ;
-    analysis->SlotTime             = 0.0 ;
+    analysis->StepTime             = (Time_t) 0.0 ;
+    analysis->SlotTime             = (Time_t) 0.0 ;
     analysis->SlotLength           = 0u ;
     analysis->CurrentTime          = 0u ;
-    analysis->InitialTemperature   = 0.0 ;
+    analysis->InitialTemperature   = (Temperature_t) 0.0 ;
     analysis->InspectionPointListFinal = NULL ;
     analysis->InspectionPointListSlot  = NULL ;
     analysis->InspectionPointListStep  = NULL ;
@@ -78,7 +78,7 @@ void free_analysis (Analysis *analysis)
 
 /******************************************************************************/
 
-double get_simulated_time (Analysis *analysis)
+Time_t get_simulated_time (Analysis *analysis)
 {
   return analysis->CurrentTime * analysis->StepTime ;
 }
@@ -301,11 +301,11 @@ Error_t generate_analysis_output
 (
     Analysis        *analysis,
     Dimensions      *dimensions,
-    double          *temperatures,
+    Temperature_t   *temperatures,
     OutputInstant_t  output_instant
 )
 {
-    double current_time = get_simulated_time (analysis) ;
+    Time_t current_time = get_simulated_time (analysis) ;
 
     InspectionPoint *list ;
 

@@ -67,11 +67,11 @@ extern "C"
 
         /*! The stepping time for Transient Analysis */
 
-        double StepTime ;
+        Time_t StepTime ;
 
         /*! The slot time for Transient Analysis */
 
-        double SlotTime ;
+        Time_t SlotTime ;
 
         /*! Number of steps to do to complete a slot */
 
@@ -83,7 +83,7 @@ extern "C"
 
         /*! Initial Temperature if the IC stack */
 
-        double InitialTemperature ;
+        Temperature_t InitialTemperature ;
 
         /*! Pointer to the list of inspection points to print
          *  at the end of the simulation */
@@ -147,7 +147,7 @@ extern "C"
      * \return the simulated amount of time in seconds
      */
 
-    double get_simulated_time (Analysis *analysis) ;
+    Time_t get_simulated_time (Analysis *analysis) ;
 
 
 
@@ -237,7 +237,7 @@ extern "C"
     (
         Analysis        *analysis,
         Dimensions      *dimensions,
-        double          *temperatures,
+        Temperature_t   *temperatures,
         OutputInstant_t  output_instant
     ) ;
 

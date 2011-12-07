@@ -70,7 +70,7 @@ extern "C"
 
         /*! The temperarute of the environment in \f$ K \f$ */
 
-        double AmbientTemperature ;
+        Temperature_t AmbientTemperature ;
 
         /*! Pointer to the top-most layer in the 3D stack */
 
@@ -172,7 +172,7 @@ extern "C"
 
     void fill_sources_conventional_heat_sink
     (
-        double               *sources,
+        Source_t             *sources,
         ThermalCell          *thermal_cells,
         Dimensions           *dimensions,
         ConventionalHeatSink *conventional_heat_sink

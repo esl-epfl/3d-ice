@@ -167,7 +167,7 @@ void fill_thermal_cell_conventional_heat_sink
 
 void fill_sources_conventional_heat_sink
 (
-    double            *sources,
+    Source_t             *sources,
     ThermalCell          *thermal_cells,
     Dimensions           *dimensions,
     ConventionalHeatSink *conventional_heat_sink

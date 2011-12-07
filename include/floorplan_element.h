@@ -343,7 +343,7 @@ extern "C"
 
     Error_t fill_sources_floorplan_element
     (
-        double           *sources,
+        Source_t         *sources,
         Dimensions       *dimensions,
         FloorplanElement *floorplan_element
     ) ;
@@ -362,11 +362,11 @@ extern "C"
      *          layer where \a floorplan_element is placed
      */
 
-    double get_max_temperature_floorplan_element
+    Temperature_t get_max_temperature_floorplan_element
     (
         FloorplanElement *floorplan_element,
         Dimensions       *dimensions,
-        double           *temperatures
+        Temperature_t    *temperatures
     ) ;
 
 
@@ -383,11 +383,11 @@ extern "C"
      *          layer where \a floorplan_element is placed
      */
 
-    double get_min_temperature_floorplan_element
+    Temperature_t get_min_temperature_floorplan_element
     (
         FloorplanElement *floorplan_element,
         Dimensions       *dimensions,
-        double           *temperatures
+        Temperature_t    *temperatures
     ) ;
 
 
@@ -404,11 +404,11 @@ extern "C"
      *          layer where \a floorplan_element is placed
      */
 
-    double get_avg_temperature_floorplan_element
+    Temperature_t get_avg_temperature_floorplan_element
     (
         FloorplanElement *floorplan_element,
         Dimensions       *dimensions,
-        double           *temperatures
+        Temperature_t    *temperatures
     ) ;
 
 

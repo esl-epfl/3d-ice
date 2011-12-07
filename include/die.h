@@ -225,7 +225,7 @@ extern "C"
     void fill_thermal_cell_die
     (
         ThermalCell *thermal_cells,
-        double       delta_time,
+        Time_t       delta_time,
         Dimensions  *dimensions,
         uint32_t     layer_index,
         Die         *die
@@ -249,7 +249,7 @@ extern "C"
 
     Error_t fill_sources_die
     (
-        double     *sources,
+        Source_t   *sources,
         Dimensions *dimensions,
         uint32_t    layer_index,
         Floorplan  *floorplan,

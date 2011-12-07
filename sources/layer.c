@@ -141,7 +141,7 @@ void print_detailed_layers_list (FILE *stream, String_t prefix, Layer *list)
 void fill_thermal_cell_layer
 (
     ThermalCell *thermal_cells,
-    double       delta_time,
+    Time_t       delta_time,
     Dimensions  *dimensions,
     uint32_t     layer_index,
     Layer       *layer
@@ -149,7 +149,7 @@ void fill_thermal_cell_layer
 {
     void (*fill_cell)
 
-        (ThermalCell *, double, double, double, double, double, double) ;
+        (ThermalCell *, Time_t, double, double, double, double, double) ;
 
     if (IS_FIRST_LAYER (layer_index))
 

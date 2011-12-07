@@ -42,7 +42,7 @@
 
 %union
 {
-    double            power_value ;
+    Power_t           power_value ;
     String_t          identifier ;
     FloorplanElement *p_floorplan_element ;
     PowersQueue      *p_powers_queue ;

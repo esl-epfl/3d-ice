@@ -333,7 +333,7 @@ void fill_thermal_cell_stack_description
 
 Error_t fill_sources_stack_description
 (
-    double           *sources,
+    Source_t         *sources,
     ThermalCell      *thermal_cells,
     StackDescription *stkd
 )
@@ -353,7 +353,7 @@ Error_t fill_sources_stack_description
 
     for (ccounter = 0 ; ccounter != ncells ; ccounter++)
 
-        sources [ ccounter ] = 0.0 ;
+        sources [ ccounter ] = (Source_t) 0.0 ;
 
     // set the sources due to the heatsink (overwrites all cells in the last layer)
 

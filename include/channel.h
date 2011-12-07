@@ -194,7 +194,7 @@ extern "C"
     void fill_thermal_cell_channel
     (
         ThermalCell     *thermal_cells,
-        double           delta_time,
+        Time_t           delta_time,
         Dimensions      *dimensions,
         uint32_t         layer_index,
         Channel         *channel
@@ -212,7 +212,7 @@ extern "C"
 
     void fill_sources_channel
     (
-        double     *sources,
+        Source_t   *sources,
         Dimensions *dimensions,
         uint32_t    layer_index,
         Channel    *channel

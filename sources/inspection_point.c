@@ -658,12 +658,12 @@ Error_t generate_inspection_point_output
 (
     InspectionPoint *inspection_point,
     Dimensions      *dimensions,
-    double          *temperatures,
-    double           current_time
+    Temperature_t   *temperatures,
+    Time_t           current_time
 )
 {
     uint32_t index, n_flp_el ;
-    double   temperature, *result ;
+    Temperature_t temperature, *result ;
 
     FILE *output_stream = fopen (inspection_point->FileName, "a") ;
 

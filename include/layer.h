@@ -201,7 +201,7 @@ extern "C"
     void fill_thermal_cell_layer
     (
         ThermalCell *thermal_cells,
-        double       delta_time,
+        Time_t       delta_time,
         Dimensions  *dimensions,
         uint32_t     layer_index,
         Layer       *layer

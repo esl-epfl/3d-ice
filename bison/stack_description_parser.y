@@ -1093,8 +1093,8 @@ solver
         // the capacitance of a thermal cell
 
         analysis->AnalysisType = TDICE_ANALYSIS_TYPE_STEADY ;
-        analysis->StepTime     = 1.0 ;
-        analysis->SlotTime     = 0.0 ;
+        analysis->StepTime     = (Time_t) 1.0 ;
+        analysis->SlotTime     = (Time_t) 0.0 ;
         analysis->SlotLength   = 1u ; // CHECKME
     }
 
@@ -1129,8 +1129,8 @@ solver
         }
 
         analysis->AnalysisType = TDICE_ANALYSIS_TYPE_TRANSIENT ;
-        analysis->StepTime     = $5 ;
-        analysis->SlotTime     = $8 ;
+        analysis->StepTime     = (Time_t) $5 ;
+        analysis->SlotTime     = (Time_t) $8 ;
         analysis->SlotLength   = (uint32_t) ( $8 / $5 ) ;
     }
   ;
@@ -1143,7 +1143,7 @@ initial_temperature
 
   : INITIAL_ TEMPERATURE DVALUE ';'
     {
-        analysis->InitialTemperature = $3;
+        analysis->InitialTemperature = (Temperature_t) $3;
     }
   ;
 

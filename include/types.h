@@ -48,21 +48,38 @@ extern "C"
 
 /******************************************************************************/
 
-  /* Boolean value */
-
-//   typedef int Bool_t ;
-// # define      FALSE_V (0)
-// # define      TRUE_V  (!FALSE_V)
-//
 //   /* Quantity */
 //
 //   typedef int Quantity_t ;
 // # define      QUANTITY_I 0
 //
-    /*! Definition of the primitive type String */
+    /*! Definition of the primitive type String_t */
 
     typedef char* String_t ;
 
+
+
+    /*! Definition of the primitive type Time_t */
+
+    typedef double Time_t ;
+
+
+
+    /*! Definition of the primitive type Temperature_t */
+
+    typedef double Temperature_t ;
+
+
+
+    /*! Definition of the primitive type Source_t */
+
+    typedef double Source_t ;
+
+
+
+    /*! Definition of the primitive type Power_t */
+
+    typedef double Power_t ;
 
 /******************************************************************************/
 
@@ -76,26 +93,7 @@ extern "C"
 //   typedef double Capacity_t ;
 // # define         CAPACITY_I 0.0
 //
-//   /* Source */
 //
-//   typedef double Source_t ;
-// # define         SOURCE_I 0.0
-//
-//   /* Power */
-//
-//   typedef double Power_t ;
-// # define         POWER_I 0.0
-//
-//   /* Temperature */
-//
-//   typedef double Temperature_t ;
-// # define         TEMPERATURE_I 0.0
-//
-//   /* Time */
-//
-//   typedef double Time_t ;
-// # define         TIME_I 0.0
-
 /******************************************************************************/
 
   /* Solid volumetric heat capacity */

@@ -68,11 +68,11 @@ extern "C"
     {
         /*! Array containing the temperature of each thermal cell */
 
-        double *Temperatures ;
+        Temperature_t *Temperatures ;
 
         /*! Array containing the source value of each thermal cell */
 
-        double *Sources ;
+        Source_t *Sources ;
 
         /*! Array of Thermal cells */
 
@@ -285,7 +285,7 @@ extern "C"
      * \return the temperature of the thermal cell (\c L, \c R, \c C )
      */
 
-    double get_cell_temperature
+    Temperature_t get_cell_temperature
     (
         ThermalData      *tdata,
         StackDescription *stkd,

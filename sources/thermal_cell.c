@@ -69,7 +69,7 @@ void reset_capacities (ThermalCell *thermal_cell, uint32_t ncells)
 void fill_solid_cell_bottom
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,
@@ -108,7 +108,7 @@ void fill_solid_cell_bottom
 void fill_solid_cell_central
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,
@@ -147,7 +147,7 @@ void fill_solid_cell_central
 void fill_solid_cell_top
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,
@@ -220,7 +220,7 @@ void fill_solid_cell_conventional_heat_sink
 void fill_liquid_cell_mc_4rm
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,
@@ -260,7 +260,7 @@ void fill_liquid_cell_mc_4rm
 void fill_liquid_cell_mc_2rm
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,
@@ -305,7 +305,7 @@ void fill_liquid_cell_mc_2rm
 void fill_liquid_cell_pf
 (
     ThermalCell   *thermal_cell,
-    double         delta_time,
+    Time_t         delta_time,
     double         cell_length,
     double         cell_width,
     double         cell_height,
@@ -354,7 +354,7 @@ void fill_liquid_cell_pf
 void fill_virtual_wall_cell_mc_2rm
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,
@@ -395,7 +395,7 @@ void fill_virtual_wall_cell_mc_2rm
 void fill_virtual_wall_cell_pf
 (
     ThermalCell *thermal_cell,
-    double       delta_time,
+    Time_t       delta_time,
     double       cell_length,
     double       cell_width,
     double       cell_height,

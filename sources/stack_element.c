@@ -280,7 +280,7 @@ uint32_t get_source_layer_offset (StackElement *stack_element)
 void fill_thermal_cell_stack_element
 (
     ThermalCell  *thermal_cells,
-    double        delta_time,
+    Time_t        delta_time,
     Dimensions   *dimensions,
     StackElement *stack_element
 )
@@ -330,7 +330,7 @@ void fill_thermal_cell_stack_element
 
 Error_t fill_sources_stack_element
 (
-    double     *sources,
+    Source_t     *sources,
     Dimensions   *dimensions,
     StackElement *stack_element
 )
@@ -431,10 +431,10 @@ SystemMatrix fill_system_matrix_stack_element
 
 void print_thermal_map_stack_element
 (
-    StackElement *stack_element,
-    Dimensions   *dimensions,
-    double       *temperatures,
-    FILE         *stream
+    StackElement  *stack_element,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures,
+    FILE          *stream
 )
 {
     temperatures += get_cell_offset_in_stack

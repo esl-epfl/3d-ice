@@ -231,7 +231,7 @@ extern "C"
 
     Error_t fill_sources_stack_description
     (
-        double         *sources,
+        Source_t         *sources,
         ThermalCell      *thermal_cells,
         StackDescription *stkd
     ) ;

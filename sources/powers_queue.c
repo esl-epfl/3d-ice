@@ -109,7 +109,7 @@ bool is_empty_powers_queue (PowersQueue *powers_queue)
 
 /******************************************************************************/
 
-void put_into_powers_queue (PowersQueue *powers_queue, double power)
+void put_into_powers_queue (PowersQueue *powers_queue, Power_t power)
 {
     PowerNode *tmp = powers_queue->Tail ;
 
@@ -137,7 +137,7 @@ void put_into_powers_queue (PowersQueue *powers_queue, double power)
 
 /******************************************************************************/
 
-double get_from_powers_queue (PowersQueue *powers_queue)
+Power_t get_from_powers_queue (PowersQueue *powers_queue)
 {
     return powers_queue->Head->Value ;
 }
