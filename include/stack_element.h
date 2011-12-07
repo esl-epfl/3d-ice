@@ -53,6 +53,7 @@ extern "C"
 #include "die.h"
 #include "dimensions.h"
 #include "floorplan.h"
+#include "floorplan_element.h"
 #include "layer.h"
 #include "powers_queue.h"
 #include "system_matrix.h"
@@ -318,6 +319,25 @@ extern "C"
     uint32_t get_number_of_floorplan_elements_stack_element
 
         (StackElement *stack_element) ;
+
+
+
+    /*! Returns a pointer to a floorplan element in the stack element
+     *
+     * \param stack_element address of the stack_element
+     * \param floorplan_element_id id of the floorplan element as in the
+     *                             floorplan file
+     *
+     * \return \c NULL if \a stack_element is not a die stack element
+     * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
+     * \return the pointer to the floorplan element \a floorplan_element_id
+     *         that belongs to the floorplan on the die stack element
+     *         \a stack_element
+     */
+
+    FloorplanElement *get_floorplan_element_stack_element
+
+        (StackElement *stack_element, char *floorplan_element_id) ;
 
 
 

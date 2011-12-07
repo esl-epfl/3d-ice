@@ -178,6 +178,22 @@ extern "C"
 
 
 
+    /*! Returns a pointer to a floorplan element in the floorplan
+     *
+     * \param floorplan address of the floorplan
+     * \param floorplan_element_id id of the floorplan element as in the
+     *                             floorplan file
+     *
+     * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
+     * \return the pointer to the floorplan element \a floorplan_element_id
+     */
+
+    FloorplanElement *get_floorplan_element_floorplan
+
+        (Floorplan *floorplan, char *floorplan_element_id) ;
+
+
+
     /*! Inserts power values from \a pvaluse into each floorplan element
      *
      *  The queue \a pvalues must contain at least as many power values
@@ -199,33 +215,6 @@ extern "C"
         (Floorplan *floorplan, PowersQueue *pvalues) ;
 
 
-
-    int get_max_temperature_floorplan
-    (
-        Floorplan  *floorplan,
-        char       *floorplan_element_id,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *max_temperature
-    ) ;
-
-    int get_min_temperature_floorplan
-    (
-        Floorplan  *floorplan,
-        char       *floorplan_element_id,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *min_temperature
-    ) ;
-
-    int get_avg_temperature_floorplan
-    (
-        Floorplan  *floorplan,
-        char       *floorplan_element_id,
-        Dimensions *dimensions,
-        double     *temperatures,
-        double     *avg_temperature
-    ) ;
 
     int get_all_max_temperatures_floorplan
     (

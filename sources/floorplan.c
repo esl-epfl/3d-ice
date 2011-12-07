@@ -152,6 +152,19 @@ uint32_t get_number_of_floorplan_elements_floorplan
 
 /******************************************************************************/
 
+FloorplanElement *get_floorplan_element_floorplan
+(
+    Floorplan *floorplan,
+    char      *floorplan_element_id
+)
+{
+    return find_floorplan_element_in_list
+
+        (floorplan->ElementsList, floorplan_element_id) ;
+}
+
+/******************************************************************************/
+
 Error_t fill_sources_floorplan
 (
     double     *sources,
@@ -192,84 +205,6 @@ Error_t insert_power_values_floorplan
     }
 
     return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-int get_max_temperature_floorplan
-(
-    Floorplan  *floorplan,
-    char       *floorplan_element_id,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *max_temperature
-)
-{
-    FloorplanElement *flp_el = find_floorplan_element_in_list
-
-        (floorplan->ElementsList, floorplan_element_id) ;
-
-    if (flp_el == NULL)
-
-        return -3 ;
-
-    *max_temperature = get_max_temperature_floorplan_element
-
-                           (flp_el, dimensions, temperatures) ;
-
-    return 0 ;
-}
-
-/******************************************************************************/
-
-int get_min_temperature_floorplan
-(
-    Floorplan  *floorplan,
-    char       *floorplan_element_id,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *min_temperature
-)
-{
-    FloorplanElement *flp_el = find_floorplan_element_in_list
-
-        (floorplan->ElementsList, floorplan_element_id) ;
-
-    if (flp_el == NULL)
-
-        return -3 ;
-
-    *min_temperature = get_min_temperature_floorplan_element
-
-                           (flp_el, dimensions, temperatures) ;
-
-    return 0 ;
-}
-
-/******************************************************************************/
-
-int get_avg_temperature_floorplan
-(
-    Floorplan  *floorplan,
-    char       *floorplan_element_id,
-    Dimensions *dimensions,
-    double     *temperatures,
-    double     *avg_temperature
-)
-{
-    FloorplanElement *flp_el = find_floorplan_element_in_list
-
-        (floorplan->ElementsList, floorplan_element_id) ;
-
-    if (flp_el == NULL)
-
-        return -3 ;
-
-    *avg_temperature = get_avg_temperature_floorplan_element
-
-                           (flp_el, dimensions, temperatures) ;
-
-    return 0 ;
 }
 
 /******************************************************************************/

@@ -444,6 +444,28 @@ uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd)
 
 /******************************************************************************/
 
+FloorplanElement *get_floorplan_element
+(
+    StackDescription *stkd,
+    char             *stack_element_id,
+    char             *floorplan_element_id
+)
+{
+    StackElement *stack_element = find_stack_element_in_list
+
+        (stkd->BottomStackElement, stack_element_id) ;
+
+    if (stack_element == NULL)
+
+        return NULL ;
+
+    return get_floorplan_element_stack_element
+
+        (stack_element, floorplan_element_id) ;
+}
+
+/******************************************************************************/
+
 Error_t insert_power_values
 (
     StackDescription *stkd,

@@ -54,6 +54,7 @@ extern "C"
 #include "conventional_heat_sink.h"
 #include "die.h"
 #include "dimensions.h"
+#include "floorplan_element.h"
 #include "material.h"
 #include "powers_queue.h"
 #include "stack_element.h"
@@ -286,6 +287,26 @@ extern "C"
     uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd) ;
 
 
+
+    /*! Returns a pointer to a floorplan element in the stack
+     *
+     * \param stkd address of the StackDescription structure
+     * \param stack_element_id id of the stack element as in the stack file
+     * \param floorplan_element_id id of the floorplan element as in the
+     *                             floorplan file
+     *
+     * \return \c NULL if \a stack_element_id does not exist in the stack
+     * \return \c NULL if \a stack_element_id is not a die stack element
+     * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
+     * \return the pointer to the floorplan element \a floorplan_element_id
+     *         that belongs to the floorplan on the die stack element
+     *         \a stack_element_id
+     */
+
+    FloorplanElement *get_floorplan_element
+
+        (StackDescription *stkd,
+         char *stack_element_id, char *floorplan_element_id) ;
 
     /*! Inserts one power values from \a pvaluse into each floorplan element
      *  in the stack

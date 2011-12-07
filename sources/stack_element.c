@@ -470,6 +470,23 @@ uint32_t get_number_of_floorplan_elements_stack_element
 
 /******************************************************************************/
 
+FloorplanElement *get_floorplan_element_stack_element
+(
+    StackElement *stack_element,
+    char         *floorplan_element_id
+)
+{
+    if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)
+
+        return NULL ;
+
+    return get_floorplan_element_floorplan
+
+        (stack_element->Floorplan, floorplan_element_id) ;
+}
+
+/******************************************************************************/
+
 Error_t insert_power_values_stack_element
 (
     StackElement *stack_element,
