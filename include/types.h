@@ -125,6 +125,12 @@ extern "C"
 
 
 
+    /*! Definition of the type SystemMatrixCoeff_t */
+
+    typedef double SystemMatrixCoeff_t ;
+
+
+
     /*! Definition of the type CoolantHTC_t
      *
      * Coolant heat transfer coefficient */

@@ -73,16 +73,16 @@ extern "C"
          *  If the matrix is nxn, then n+1 column pointer are needed.
          */
 
-        uint32_t *ColumnPointers ;
+        CellIndex_t *ColumnPointers ;
 
         /*! Pointer to the array storing the row indexes
          *  If the matrix has nnz elements, then nnz row indexes are needed */
 
-        uint32_t* RowIndices ;
+        CellIndex_t *RowIndices ;
 
         /*! Pointer to the array storing the non zeroes coefficient */
 
-        double* Values ;
+        SystemMatrixCoeff_t* Values ;
 
         /*! The dimension n of the squared matrix nxn */
 

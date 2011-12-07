@@ -78,7 +78,7 @@ Error_t alloc_system_matrix
         return TDICE_FAILURE ;
     }
 
-    system_matrix->Values = malloc (sizeof(double) * nnz) ;
+    system_matrix->Values = malloc (sizeof(SystemMatrixCoeff_t) * nnz) ;
 
     if (system_matrix->Values == NULL)
     {
@@ -139,8 +139,8 @@ SystemMatrix add_solid_column
 )
 {
     Conductance_t conductance = 0.0 ;
-    double  diagonal_value    = 0.0 ;
-    double *diagonal_pointer  = NULL ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
     CellIndex_t layer_offset  = get_layer_area (dimensions) ;
     CellIndex_t row_offset    = get_number_of_columns (dimensions) ;
@@ -342,8 +342,8 @@ SystemMatrix add_liquid_column_4rm
 )
 {
     Conductance_t conductance = 0.0 ;
-    double  diagonal_value    = 0.0 ;
-    double *diagonal_pointer  = NULL ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
     CellIndex_t layer_offset  = get_layer_area (dimensions) ;
     CellIndex_t row_offset    = get_number_of_columns (dimensions) ;
@@ -529,8 +529,8 @@ SystemMatrix add_liquid_column_2rm
 )
 {
     Conductance_t conductance = 0.0 ;
-    double  diagonal_value    = 0.0 ;
-    double *diagonal_pointer  = NULL ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
     CellIndex_t layer_offset = get_layer_area (dimensions) ;
     CellIndex_t row_offset   = get_number_of_columns (dimensions) ;
@@ -671,8 +671,8 @@ SystemMatrix add_bottom_wall_column_2rm
 )
 {
     Conductance_t conductance = 0.0 ;
-    double  diagonal_value    = 0.0 ;
-    double *diagonal_pointer  = NULL ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
     CellIndex_t layer_offset = get_layer_area (dimensions) ;
 
@@ -796,8 +796,8 @@ SystemMatrix add_top_wall_column_2rm
 )
 {
     Conductance_t conductance = 0.0 ;
-    double  diagonal_value    = 0.0 ;
-    double *diagonal_pointer  = NULL ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
     CellIndex_t layer_offset = get_layer_area (dimensions) ;
 
@@ -923,8 +923,8 @@ SystemMatrix add_virtual_wall_column_2rm
 )
 {
     Conductance_t conductance = 0.0 ;
-    double  diagonal_value    = 0.0 ;
-    double *diagonal_pointer  = NULL ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
     CellIndex_t layer_offset = get_layer_area (dimensions) ;
     CellIndex_t row_offset   = get_number_of_columns (dimensions) ;
