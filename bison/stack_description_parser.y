@@ -81,12 +81,12 @@
 
     static char error_message [100] ;
 
-    static double   first_wall_length ;
-    static double   last_wall_length ;
-    static double   wall_length ;
-    static double   channel_length ;
-    static uint32_t num_channels ;
-    static uint8_t  num_dies ;
+    static CellDimension_t first_wall_length ;
+    static CellDimension_t last_wall_length ;
+    static CellDimension_t wall_length ;
+    static CellDimension_t channel_length ;
+    static uint32_t        num_channels ;
+    static uint8_t         num_dies ;
 }
 
 %type <double_v>           first_wall_length
@@ -271,8 +271,8 @@ material
         }
 
         material->Id                     = $2 ;
-        material->ThermalConductivity    = $6 ;
-        material->VolumetricHeatCapacity = $11 ;
+        material->ThermalConductivity    = (SolidTC_t) $6 ;
+        material->VolumetricHeatCapacity = (SolidVHC_t) $11 ;
     }
   ;
 
@@ -297,7 +297,7 @@ conventional_heat_sink
             YYABORT ;
         }
 
-        stkd->ConventionalHeatSink->AmbientHTC         = $8 ;
+        stkd->ConventionalHeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
         stkd->ConventionalHeatSink->AmbientTemperature = $12 ;
     }
   ;
@@ -342,7 +342,7 @@ microchannel
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_4RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_4RM ;
         stkd->Channel->Height            = $5 ;
-        stkd->Channel->CoolantFR         = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($24) ;
+        stkd->Channel->Coolant.FlowRate  = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($24) ;
         stkd->Channel->Coolant.HTCSide   = $26.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $26.HTCTop ;
         stkd->Channel->Coolant.HTCBottom = $26.HTCBottom ;
@@ -394,7 +394,7 @@ microchannel
         stkd->Channel->Length            = $9 ;
         stkd->Channel->Pitch             = $13 + $9 ;
         stkd->Channel->Porosity          = stkd->Channel->Length / stkd->Channel->Pitch ;
-        stkd->Channel->CoolantFR         = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($22) ;
+        stkd->Channel->Coolant.FlowRate  = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($22) ;
         stkd->Channel->Coolant.HTCSide   = $24.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $24.HTCTop ;
         stkd->Channel->Coolant.HTCBottom = $24.HTCBottom ;
@@ -439,19 +439,19 @@ microchannel
             YYABORT ;
         }
 
-        stkd->Channel->Height            = $4 ;
-        stkd->Channel->Porosity          = POROSITY ($8, $12) ;
-        stkd->Channel->Pitch             = $12 ;
-        stkd->Channel->ChannelModel      = $16 ;
-        stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_2RM ;
-        stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_2RM ;
-        stkd->Channel->DarcyVelocity     = $24 ;
-        stkd->Channel->Coolant.HTCSide   = 0.0 ;
-        stkd->Channel->Coolant.HTCTop    = 0.0 ;
-        stkd->Channel->Coolant.HTCBottom = 0.0 ;
-        stkd->Channel->Coolant.VHC       = $30 ;
-        stkd->Channel->Coolant.TIn       = $35 ;
-        stkd->Channel->WallMaterial      = find_material_in_list (stkd->MaterialsList, $20) ;
+        stkd->Channel->Height                = $4 ;
+        stkd->Channel->Porosity              = POROSITY ($8, $12) ;
+        stkd->Channel->Pitch                 = $12 ;
+        stkd->Channel->ChannelModel          = $16 ;
+        stkd->Channel->NLayers               = NUM_LAYERS_CHANNEL_2RM ;
+        stkd->Channel->SourceLayerOffset     = SOURCE_OFFSET_CHANNEL_2RM ;
+        stkd->Channel->Coolant.DarcyVelocity = $24 ;
+        stkd->Channel->Coolant.HTCSide       = 0.0 ;
+        stkd->Channel->Coolant.HTCTop        = 0.0 ;
+        stkd->Channel->Coolant.HTCBottom     = 0.0 ;
+        stkd->Channel->Coolant.VHC           = $30 ;
+        stkd->Channel->Coolant.TIn           = $35 ;
+        stkd->Channel->WallMaterial          = find_material_in_list (stkd->MaterialsList, $20) ;
 
         if (stkd->Channel->WallMaterial == NULL)
         {
@@ -746,7 +746,7 @@ dimensions
                 stkd->Dimensions->Cell.LastWallLength  = last_wall_length ;
                 stkd->Dimensions->Cell.WallLength      = wall_length ;
 
-                double ratio
+                CellDimension_t ratio
                     = ($5 - first_wall_length - last_wall_length -channel_length)
                     /
                     (channel_length + wall_length) ;

@@ -324,9 +324,9 @@ static void fill_system_vector
 
 static void fill_system_vector_steady
 (
-  Dimensions *dimensions,
-  double     *vector,
-  Source_t   *sources
+    Dimensions *dimensions,
+    double     *vector,
+    Source_t   *sources
 )
 {
     FOR_EVERY_LAYER (layer, dimensions)
@@ -479,10 +479,10 @@ Error_t update_coolant_flow_rate
 (
   ThermalData      *tdata,
   StackDescription *stkd,
-  double            new_flow_rate
+  CoolantFR_t       new_flow_rate
 )
 {
-    stkd->Channel->CoolantFR = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
+    stkd->Channel->Coolant.FlowRate = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
 
     fill_system_matrix_stack_description
 

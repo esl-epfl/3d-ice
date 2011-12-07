@@ -68,37 +68,37 @@ extern "C"
 
         /*! The south-west X coordinate in the floorplan, in \f$ \mu m \f$ */
 
-        double SW_X ;
+        ChipDimension_t SW_X ;
 
         /*! The south-west Y coordinate in the floorplan, in \f$ \mu m \f$ */
 
-        double SW_Y ;
+        ChipDimension_t SW_Y ;
 
         /*! The length (west <-> east) of the floorplan element, in \f$ \mu m \f$ */
 
-        double Length ;
+        ChipDimension_t Length ;
 
         /*! The width (south <-> north) of the floorplan element, in \f$ \mu m \f$ */
 
-        double Width ;
+        ChipDimension_t Width ;
 
         /*! The length of the floorplan element, in \f$ \mu m \f$,
          *  as the sum of all the lengths of the cells in the source layer that
          *  receive power from the floorplan element */
 
-        double EffectiveLength ;
+        ChipDimension_t EffectiveLength ;
 
         /*! The width of the floorplan element, in \f$ \mu m \f$,
          *  as the sum of all the lengths of the cells in the source layer that
          *  receive power from the floorplan element */
 
-        double EffectiveWidth ;
+        ChipDimension_t EffectiveWidth ;
 
         /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
          *  computed as FloorplanElement::EffectiveLength times
          *  FloorplanElement::EffectiveWidth */
 
-        double EffectiveSurface ;
+        ChipDimension_t EffectiveSurface ;
 
         /*! The index of the row of the thermal cell where the south-west
          *  corner of the floroplan element is placed */

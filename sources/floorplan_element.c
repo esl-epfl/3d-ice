@@ -198,7 +198,7 @@ Error_t fill_sources_floorplan_element
 
     Power_t power = get_from_powers_queue (floorplan_element->PowerValues);
 
-    double flp_el_surface = floorplan_element->EffectiveSurface ;
+    ChipDimension_t flp_el_surface = floorplan_element->EffectiveSurface ;
 
     // Here we ADD the power value to the source vector. It works as long as
     // the source vector is set to zero every time. This way the vale is added
@@ -337,8 +337,8 @@ void align_to_grid
     FloorplanElement *floorplan_element
 )
 {
-    double cx = 0.0 ;
-    double cy = 0.0 ;
+    ChipDimension_t cx = 0.0 ;
+    ChipDimension_t cy = 0.0 ;
     uint32_t column_index = 0u ;
     uint32_t row_index    = 0u ;
 

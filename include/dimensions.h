@@ -73,28 +73,28 @@ extern "C"
          *  (west side of the 3D-IC). It corresponds to the length of all the
          *  cells in the first column */
 
-        double FirstWallLength ;
+        CellDimension_t FirstWallLength ;
 
         /*! The length of all the walls of a channel in \f$ \mu m \f$, except
          *  the first and the last. It corresponds to the length of all the
          *  cells with an even index */
 
-        double WallLength ;
+        CellDimension_t WallLength ;
 
         /*! The length of all the channel cavity of a channel in \f$ \mu m \f$.
          *  It corresponds to the length of all the cells with an odd index */
 
-        double ChannelLength ;
+        CellDimension_t ChannelLength ;
 
         /*! The length of the last wall of a channel in \f$ \mu m \f$ (east
          *  side of the 3D-IC). It corresponds to the length of all the cells
          *  in the last column */
 
-        double LastWallLength ;
+        CellDimension_t LastWallLength ;
 
         /*! The width of all the cells in \f$ \mu m \f$*/
 
-        double Width ;
+        CellDimension_t Width ;
 
     } ;
 
@@ -170,11 +170,11 @@ extern "C"
     {
         /*! The length of the IC (west-east) in \f$ \mu m \f$ */
 
-        double Length ;
+        ChipDimension_t Length ;
 
         /*! The width of the IC (south-north) in \f$ \mu m \f$ */
 
-        double Width ;
+        ChipDimension_t Width ;
     } ;
 
     /*! Definition of the type ChipDimension */
@@ -299,7 +299,7 @@ extern "C"
      * \return the length of the thermal cell in position \a coluimn_index
      */
 
-    double get_cell_length (Dimensions *dimensions, uint32_t column_index) ;
+    CellDimension_t get_cell_length (Dimensions *dimensions, uint32_t column_index) ;
 
 
 
@@ -311,7 +311,7 @@ extern "C"
      * \return the width of the thermal cell in position \a row_index
      */
 
-    double get_cell_width (Dimensions *dimensions, uint32_t row_index) ;
+    CellDimension_t get_cell_width (Dimensions *dimensions, uint32_t row_index) ;
 
 
 
@@ -323,7 +323,7 @@ extern "C"
      * \return the X coordinate of the center of thermal cell in position \a column_index
      */
 
-    double get_cell_center_x (Dimensions *dimensions, uint32_t column_index) ;
+    ChipDimension_t get_cell_center_x (Dimensions *dimensions, uint32_t column_index) ;
 
 
 
@@ -335,7 +335,7 @@ extern "C"
      * \return the Y coordinate of the center of thermal cell in position \a row_index
      */
 
-    double get_cell_center_y (Dimensions *dimensions, uint32_t row_index) ;
+    ChipDimension_t get_cell_center_y (Dimensions *dimensions, uint32_t row_index) ;
 
 
 
@@ -347,7 +347,7 @@ extern "C"
      * \return the X coordinate of the south-west corner of thermal cell in position \a column_index
      */
 
-    double get_cell_location_x (Dimensions *dimensions, uint32_t column_index) ;
+    ChipDimension_t get_cell_location_x (Dimensions *dimensions, uint32_t column_index) ;
 
 
 
@@ -359,7 +359,7 @@ extern "C"
      * \return the X coordinate of the south-west corner of thermal cell in position \a row_index
      */
 
-    double get_cell_location_y (Dimensions *dimensions, uint32_t row_index) ;
+    ChipDimension_t get_cell_location_y (Dimensions *dimensions, uint32_t row_index) ;
 
 
 
@@ -475,7 +475,7 @@ extern "C"
      * \return the length of the IC
      */
 
-    double get_chip_length (Dimensions *dimensions) ;
+    ChipDimension_t get_chip_length (Dimensions *dimensions) ;
 
 
 
@@ -486,7 +486,7 @@ extern "C"
      * \return the width of the IC
      */
 
-    double get_chip_width (Dimensions *dimensions) ;
+    ChipDimension_t get_chip_width (Dimensions *dimensions) ;
 
 /******************************************************************************/
 

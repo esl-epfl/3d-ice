@@ -46,13 +46,13 @@
 
 void init_thermal_cell (ThermalCell *thermal_cell)
 {
-    thermal_cell->Top      = 0.0 ;
-    thermal_cell->Bottom   = 0.0 ;
-    thermal_cell->North    = 0.0 ;
-    thermal_cell->South    = 0.0 ;
-    thermal_cell->East     = 0.0 ;
-    thermal_cell->West     = 0.0 ;
-    thermal_cell->Capacity = 0.0 ;
+    thermal_cell->Top      = (Conductance_t) 0.0 ;
+    thermal_cell->Bottom   = (Conductance_t) 0.0 ;
+    thermal_cell->North    = (Conductance_t) 0.0 ;
+    thermal_cell->South    = (Conductance_t) 0.0 ;
+    thermal_cell->East     = (Conductance_t) 0.0 ;
+    thermal_cell->West     = (Conductance_t) 0.0 ;
+    thermal_cell->Capacity = (Capacity_t) 0.0 ;
 }
 
 /******************************************************************************/
@@ -61,20 +61,20 @@ void reset_capacities (ThermalCell *thermal_cell, uint32_t ncells)
 {
     uint32_t index = 0u ;
 
-    while (index++ != ncells) thermal_cell++->Capacity = 0.0 ;
+    while (index++ != ncells) thermal_cell++->Capacity = (Capacity_t) 0.0 ;
 }
 
 /******************************************************************************/
 
 void fill_solid_cell_bottom
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    double       solid_tc,
-    double       solid_vhc
+    ThermalCell     *thermal_cell,
+    Time_t           delta_time,
+    CellDimension_t  cell_length,
+    CellDimension_t  cell_width,
+    CellDimension_t  cell_height,
+    SolidTC_t        solid_tc,
+    SolidVHC_t       solid_vhc
 )
 {
     thermal_cell->North = thermal_cell->South
@@ -85,7 +85,7 @@ void fill_solid_cell_bottom
         = (solid_tc * cell_width * cell_height )
           / (cell_length / 2.0) ;
 
-    thermal_cell->Bottom = 0.0 ;
+    thermal_cell->Bottom = (Conductance_t) 0.0 ;
 
     thermal_cell->Top = (solid_tc * cell_length * cell_width) / cell_height ;
 
@@ -107,13 +107,13 @@ void fill_solid_cell_bottom
 
 void fill_solid_cell_central
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    double       solid_tc,
-    double       solid_vhc
+    ThermalCell     *thermal_cell,
+    Time_t           delta_time,
+    CellDimension_t  cell_length,
+    CellDimension_t  cell_width,
+    CellDimension_t  cell_height,
+    SolidTC_t        solid_tc,
+    SolidVHC_t       solid_vhc
 )
 {
     thermal_cell->North = thermal_cell->South
@@ -146,13 +146,13 @@ void fill_solid_cell_central
 
 void fill_solid_cell_top
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    double       solid_tc,
-    double       solid_vhc
+    ThermalCell     *thermal_cell,
+    Time_t           delta_time,
+    CellDimension_t  cell_length,
+    CellDimension_t  cell_width,
+    CellDimension_t  cell_height,
+    SolidTC_t        solid_tc,
+    SolidVHC_t       solid_vhc
 )
 {
     thermal_cell->North = thermal_cell->South
@@ -165,7 +165,7 @@ void fill_solid_cell_top
 
     thermal_cell->Bottom = (solid_tc * cell_length * cell_width) / cell_height ;
 
-    thermal_cell->Top = 0.0 ;
+    thermal_cell->Top = (Conductance_t) 0.0 ;
 
     thermal_cell->Capacity
         = ((cell_length * cell_width * cell_height) * solid_vhc) / delta_time ;
@@ -185,12 +185,12 @@ void fill_solid_cell_top
 
 void fill_solid_cell_conventional_heat_sink
 (
-    ThermalCell *thermal_cell,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    double       solid_tc,
-    double       ambient_htc
+    ThermalCell     *thermal_cell,
+    CellDimension_t  cell_length,
+    CellDimension_t  cell_width,
+    CellDimension_t  cell_height,
+    SolidTC_t        solid_tc,
+    AmbientHTC_t     ambient_htc
 )
 {
     thermal_cell->Bottom
@@ -219,17 +219,16 @@ void fill_solid_cell_conventional_heat_sink
 
 void fill_liquid_cell_mc_4rm
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    uint32_t     nchannels,
-    Coolant_t    coolant,
-    double       coolant_fr
+    ThermalCell     *thermal_cell,
+    Time_t           delta_time,
+    CellDimension_t  cell_length,
+    CellDimension_t  cell_width,
+    CellDimension_t  cell_height,
+    uint32_t         nchannels,
+    Coolant_t        coolant
 )
 {
-    double C = CCONV_MC_4RM (nchannels, coolant.VHC, coolant_fr) ;
+    Cconv_t C = CCONV_MC_4RM (nchannels, coolant.VHC, coolant.FlowRate) ;
 
     thermal_cell->North =  C ;
     thermal_cell->South = -C ;
@@ -259,25 +258,24 @@ void fill_liquid_cell_mc_4rm
 
 void fill_liquid_cell_mc_2rm
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    uint32_t     nchannels,
-    double       channel_length,
-    double       porosity,
-    Coolant_t    coolant,
-    double       coolant_fr
+    ThermalCell        *thermal_cell,
+    Time_t              delta_time,
+    CellDimension_t     cell_length,
+    CellDimension_t     cell_width,
+    CellDimension_t     cell_height,
+    uint32_t            nchannels,
+    ChannelDimension_t  channel_length,
+    ChannelDimension_t  porosity,
+    Coolant_t           coolant
 )
 {
-    double C = CCONV_MC_2RM (nchannels, coolant.VHC, coolant_fr,
-                             porosity, cell_length, channel_length);
+    Cconv_t C = CCONV_MC_2RM (nchannels, coolant.VHC, coolant.FlowRate,
+                              porosity, cell_length, channel_length);
 
     thermal_cell->North =  C;
     thermal_cell->South = -C;
 
-    thermal_cell->East = thermal_cell->West = 0.0 ;
+    thermal_cell->East = thermal_cell->West = (Conductance_t) 0.0 ;
 
     thermal_cell->Top    = coolant.HTCTop    * cell_width * cell_length ;
 
@@ -304,33 +302,32 @@ void fill_liquid_cell_mc_2rm
 
 void fill_liquid_cell_pf
 (
-    ThermalCell   *thermal_cell,
-    Time_t         delta_time,
-    double         cell_length,
-    double         cell_width,
-    double         cell_height,
-    ChannelModel_t pin_distribution,
-    double         porosity,
-    Coolant_t      coolant,
-    double         darcy_velocity
+    ThermalCell        *thermal_cell,
+    Time_t              delta_time,
+    CellDimension_t     cell_length,
+    CellDimension_t     cell_width,
+    CellDimension_t     cell_height,
+    ChannelModel_t      pin_distribution,
+    ChannelDimension_t  porosity,
+    Coolant_t           coolant
 )
 {
-    double C = CCONV_PF (coolant.VHC, darcy_velocity, cell_length, cell_height);
+    Cconv_t C = CCONV_PF (coolant.VHC, coolant.DarcyVelocity, cell_length, cell_height);
 
     thermal_cell->North =   C;
     thermal_cell->South =  -C;
 
-    thermal_cell->East = thermal_cell->West = 0.0 ;
+    thermal_cell->East = thermal_cell->West = (Conductance_t) 0.0 ;
 
-    double eff_htc ;
+    DarcyVelocity_t eff_htc ;
 
     if (pin_distribution == TDICE_CHANNEL_MODEL_PF_INLINE)
 
-        eff_htc = EFFECTIVE_HTC_PF_INLINE(darcy_velocity) ;
+        eff_htc = EFFECTIVE_HTC_PF_INLINE(coolant.DarcyVelocity) ;
 
     else
 
-        eff_htc = EFFECTIVE_HTC_PF_STAGGERED(darcy_velocity) ;
+        eff_htc = EFFECTIVE_HTC_PF_STAGGERED(coolant.DarcyVelocity) ;
 
     thermal_cell->Top = thermal_cell->Bottom
         = eff_htc * cell_width * cell_length ;
@@ -353,17 +350,17 @@ void fill_liquid_cell_pf
 
 void fill_virtual_wall_cell_mc_2rm
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    double       porosity,
-    double       solid_tc,
-    double       solid_vhc
+    ThermalCell        *thermal_cell,
+    Time_t              delta_time,
+    CellDimension_t     cell_length,
+    CellDimension_t     cell_width,
+    CellDimension_t     cell_height,
+    ChannelDimension_t  porosity,
+    SolidTC_t           solid_tc,
+    SolidVHC_t          solid_vhc
 )
 {
-    thermal_cell->East = thermal_cell->West = 0.0 ;
+    thermal_cell->East = thermal_cell->West = (Conductance_t) 0.0 ;
 
     thermal_cell->Top = thermal_cell->Bottom
         = (solid_tc * cell_length * cell_width )
@@ -394,18 +391,18 @@ void fill_virtual_wall_cell_mc_2rm
 
 void fill_virtual_wall_cell_pf
 (
-    ThermalCell *thermal_cell,
-    Time_t       delta_time,
-    double       cell_length,
-    double       cell_width,
-    double       cell_height,
-    double       porosity,
-    double       solid_tc,
-    double       solid_vhc
+    ThermalCell        *thermal_cell,
+    Time_t              delta_time,
+    CellDimension_t     cell_length,
+    CellDimension_t     cell_width,
+    CellDimension_t     cell_height,
+    ChannelDimension_t  porosity,
+    SolidTC_t           solid_tc,
+    SolidVHC_t          solid_vhc
 )
 {
-    thermal_cell->North = thermal_cell->South = 0.0 ;
-    thermal_cell->East  = thermal_cell->West  = 0.0 ;
+    thermal_cell->North = thermal_cell->South = (Conductance_t) 0.0 ;
+    thermal_cell->East  = thermal_cell->West  = (Conductance_t) 0.0 ;
 
     thermal_cell->Top = thermal_cell->Bottom
         = (solid_tc * cell_length * cell_width )

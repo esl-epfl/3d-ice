@@ -66,7 +66,7 @@ extern "C"
     {
         /*! The heat transfert coefficient (from 3d stack to the environment) */
 
-        double AmbientHTC ;
+        AmbientHTC_t AmbientHTC ;
 
         /*! The temperarute of the environment in \f$ K \f$ */
 

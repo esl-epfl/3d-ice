@@ -48,11 +48,6 @@ extern "C"
 
 /******************************************************************************/
 
-//   /* Quantity */
-//
-//   typedef int Quantity_t ;
-// # define      QUANTITY_I 0
-//
     /*! Definition of the primitive type String_t */
 
     typedef char* String_t ;
@@ -81,49 +76,83 @@ extern "C"
 
     typedef double Power_t ;
 
-/******************************************************************************/
 
-  /* Conductance */
 
-//   typedef double Conductance_t ;
-// # define         CONDUCTANCE_I 0.0
-//
-//   /* Capacity */
-//
-//   typedef double Capacity_t ;
-// # define         CAPACITY_I 0.0
-//
-//
-/******************************************************************************/
+    /*! Definition of the type AmbientHTC_t
+     *
+     *  Ambient heat transfer coefficient */
 
-  /* Solid volumetric heat capacity */
+    typedef double AmbientHTC_t ;
 
-//   typedef double SolidVHC_t ;
-// # define         SOLIDVHC_I 0.0
-//
-//   /* Solid thermal conductivity */
-//
-//   typedef double SolidTC_t ;
-// # define         SOLIDTC_I 0.0
 
-/******************************************************************************/
 
-  /* Ambient heat transfer coefficient */
+    /*! Definition of the type SolidVHC_t
+     *
+     *  Solid volumetric heat capacity */
 
-//   typedef double AmbientHTC_t ;
-// # define         AMBIENTHTC_I 0.0
+    typedef double SolidVHC_t ;
 
-/******************************************************************************/
 
-  /* Coolant heat transfer coefficient */
 
-//   typedef double CoolantHTC_t ;
-// # define         COOLANTHTC_I 0.0
-//
-//   /* Coolant volumetric heat capacity */
-//
-//   typedef double CoolantVHC_t ;
-// # define         COOLANTVHC_I 0.0
+    /*! Definition of the type SolidTC_t
+     *
+     * Solid thermal conductivity */
+
+    typedef double SolidTC_t ;
+
+
+
+    /*! Definition of the type Conductance_t */
+
+    typedef double Conductance_t ;
+
+
+
+    /*! Definition of the type Capacity_t */
+
+    typedef double Capacity_t ;
+
+
+
+    /*! Definition of the type CoolantHTC_t
+     *
+     * Coolant heat transfer coefficient */
+
+    typedef double CoolantHTC_t ;
+
+
+
+    /*! Definition of the type CoolantVHC_t
+     *
+     * Coolant volumetric heat capacity */
+
+    typedef double CoolantVHC_t ;
+
+
+
+    /*! Definition of the type CoolantFR_t
+     *
+     *  Coolant flow rate */
+
+    typedef double CoolantFR_t ;
+
+
+
+    /*! Definition of the type DarcyVelocity_t
+     *
+     *  Cooland darcy veloocity */
+
+    typedef double DarcyVelocity_t ;
+
+
+
+    /*! Definition of the type Cconv_t
+     *
+     * C convection coefficient */
+
+    typedef double Cconv_t ;
+
+
 
     /*! \struct Coolant_t
      *
@@ -136,27 +165,38 @@ extern "C"
          *  between the liquid in the channel and the walls/pins
          */
 
-        double HTCSide ;
+        CoolantHTC_t HTCSide ;
 
         /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
          *  between the liquid in the channel and the top wall
          */
 
-        double HTCTop ;
+        CoolantHTC_t HTCTop ;
 
         /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
          *  between the liquid in the channel and the bottom wall
          */
 
-        double HTCBottom ;
+        CoolantHTC_t HTCBottom ;
 
         /*! The volumetric heat capacity in \f$ J / ( \mu m^3 * K ) \f$ */
 
-        double VHC ;
+        CoolantVHC_t VHC ;
+
+        /*! The flow rate per channel layer of the incolimg liquid.
+         *  Specified in \f$ \frac{ml}{min} \f$ but stored in \f$ \frac{\mu m^3}{sec} \f$.
+         *  Shared by all the channels for each layer in the 3DStack.
+         */
+
+        CoolantFR_t FlowRate ;
+
+        /*! Darcy Velocity \f$ \frac{\mu m}{sec} \f$ */
+
+        DarcyVelocity_t DarcyVelocity ;
 
         /*! The temperarute of the coolant at the channel inlet in \f$ K \f$ */
 
-        double TIn ;
+        Temperature_t TIn ;
 
     } ;
 
@@ -164,64 +204,38 @@ extern "C"
 
     typedef struct Coolant_t Coolant_t ;
 
+/******************************************************************************/
 
-//#   define COOLANT_I ((Coolant_t) { double, double, double, double, double })
-//
-//  /* Coolant flow rate */
-//
-//   typedef double CoolantFR_t ;
-// # define         COOLANTFR_I 0.0
-//
-//   /* Darcy Velocity  */
-//
-//   typedef double DarcyVelocity_t ;
-// # define         DARCYVELOCITY_I 0.0
-//
-//   /* C convection coefficient */
-//
-//   typedef double Cconv_t ;
-// # define         CCONV_I 0.0
-//
-//   /* Porosity */
-//
-//   typedef double Porosity_t ;
-// # define         POROSITY_I 0.0
+
+
+    /*! Definition of the type CellDimension_t
+     *
+     * For cell length, height, width */
+
+    typedef double CellDimension_t ;
+
+
+
+    /*! Definitio of the type ChipDimension_t
+     *
+     * For chip length and with and coordinates to a point on its surface.
+     * Also for floorplan elments dimensions ...
+     */
+
+    typedef double ChipDimension_t ;
+
+
+
+    /*! Definitio of the type ChannelDimension_t
+     *
+     * Channel length, pitch and porosity
+     */
+
+    typedef double ChannelDimension_t ;
 
 /******************************************************************************/
 
-  /* Grid dimension (number and index of layer, row, column) */
 
-//   typedef int GridDimension_t ;
-// # define      GRIDDIMENSION_I 0
-//
-//   /* Cell dimension (for cell length, height, width) */
-//
-//   typedef double CellDimension_t ;
-// # define         CELLDIMENSION_I 0.0
-//
-//   /* Chip dimension (for chip length, width) */
-//
-// # define ChipDimension_t CellDimension_t
-// # define CHIPDIMENSION_I CELLDIMENSION_I
-
-/******************************************************************************/
-
-  /* System matrix coefficients */
-
-//   typedef double SystemMatrixValue_t ;
-// # define         SYSTEMMATRIXVALUE_I 0.0
-//
-//   /* System matrix column indexes */
-//
-//   typedef int SystemMatrixColumn_t ;
-// # define      SYSTEMMATRIXCOLUMN_I 0
-//
-//   /* System matrix row indexes */
-//
-//   typedef int SystemMatrixRow_t ;
-// # define      SYSTEMMATRIXROW_I 0
-
-/******************************************************************************/
 
     /*! \enum StackElement_t
      *

@@ -135,9 +135,9 @@ SystemMatrix add_solid_column
     SystemMatrix  system_matrix
 )
 {
-    double  conductance      = 0.0 ;
-    double  diagonal_value   = 0.0 ;
-    double *diagonal_pointer = NULL ;
+    Conductance_t conductance = 0.0 ;
+    double  diagonal_value    = 0.0 ;
+    double *diagonal_pointer  = NULL ;
 
     uint32_t layer_offset  = get_layer_area (dimensions) ;
     uint32_t row_offset    = get_number_of_columns (dimensions) ;
@@ -338,9 +338,9 @@ SystemMatrix add_liquid_column_4rm
     SystemMatrix  system_matrix
 )
 {
-    double  conductance      = 0.0 ;
-    double  diagonal_value   = 0.0 ;
-    double *diagonal_pointer = NULL ;
+    Conductance_t conductance = 0.0 ;
+    double  diagonal_value    = 0.0 ;
+    double *diagonal_pointer  = NULL ;
 
     uint32_t layer_offset  = get_layer_area (dimensions) ;
     uint32_t row_offset    = get_number_of_columns (dimensions) ;
@@ -525,9 +525,9 @@ SystemMatrix add_liquid_column_2rm
     SystemMatrix  system_matrix
 )
 {
-    double  conductance      = 0.0 ;
-    double  diagonal_value   = 0.0 ;
-    double *diagonal_pointer = NULL ;
+    Conductance_t conductance = 0.0 ;
+    double  diagonal_value    = 0.0 ;
+    double *diagonal_pointer  = NULL ;
 
     uint32_t layer_offset = get_layer_area (dimensions) ;
     uint32_t row_offset   = get_number_of_columns (dimensions) ;
@@ -667,9 +667,9 @@ SystemMatrix add_bottom_wall_column_2rm
     SystemMatrix  system_matrix
 )
 {
-    double  conductance      = 0.0 ;
-    double  diagonal_value   = 0.0 ;
-    double *diagonal_pointer = NULL ;
+    Conductance_t conductance = 0.0 ;
+    double  diagonal_value    = 0.0 ;
+    double *diagonal_pointer  = NULL ;
 
     uint32_t layer_offset = get_layer_area (dimensions) ;
 
@@ -792,9 +792,9 @@ SystemMatrix add_top_wall_column_2rm
     SystemMatrix  system_matrix
 )
 {
-    double  conductance      = 0.0 ;
-    double  diagonal_value   = 0.0 ;
-    double *diagonal_pointer = NULL ;
+    Conductance_t conductance = 0.0 ;
+    double  diagonal_value    = 0.0 ;
+    double *diagonal_pointer  = NULL ;
 
     uint32_t layer_offset = get_layer_area (dimensions) ;
 
@@ -919,9 +919,9 @@ SystemMatrix add_virtual_wall_column_2rm
     SystemMatrix   system_matrix
 )
 {
-    double  conductance      = 0.0 ;
-    double  diagonal_value   = 0.0 ;
-    double *diagonal_pointer = NULL ;
+    Conductance_t conductance = 0.0 ;
+    double  diagonal_value    = 0.0 ;
+    double *diagonal_pointer  = NULL ;
 
     uint32_t layer_offset = get_layer_area (dimensions) ;
     uint32_t row_offset   = get_number_of_columns (dimensions) ;

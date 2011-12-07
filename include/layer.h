@@ -67,7 +67,7 @@ extern "C"
     {
         /*! The heigh of the layer in \f$ \mu m \f$ (1 cell) */
 
-        double Height ;
+        CellDimension_t Height ;
 
         /*! The material composing the layer */
 

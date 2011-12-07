@@ -267,7 +267,7 @@ extern "C"
 
     Error_t update_coolant_flow_rate
 
-        (ThermalData *tdata, StackDescription *stkd, double new_flow_rate) ;
+        (ThermalData *tdata, StackDescription *stkd, CoolantFR_t new_flow_rate) ;
 
 
 

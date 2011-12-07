@@ -314,7 +314,7 @@ void compute_number_of_connections
 
 /******************************************************************************/
 
-double get_cell_length
+CellDimension_t get_cell_length
 (
   Dimensions *dimensions,
   uint32_t    column_index
@@ -341,7 +341,7 @@ double get_cell_length
 
 /******************************************************************************/
 
-double get_cell_width
+CellDimension_t get_cell_width
 (
     Dimensions *dimensions,
     uint32_t    __attribute__ ((unused)) row_index
@@ -352,7 +352,7 @@ double get_cell_width
 
 /******************************************************************************/
 
-double get_cell_center_x
+ChipDimension_t get_cell_center_x
 (
     Dimensions *dimensions,
     uint32_t    column_index
@@ -378,7 +378,7 @@ double get_cell_center_x
 
 /******************************************************************************/
 
-double get_cell_center_y
+ChipDimension_t get_cell_center_y
 (
     Dimensions *dimensions,
     uint32_t    row_index
@@ -390,7 +390,7 @@ double get_cell_center_y
 
 /******************************************************************************/
 
-double get_cell_location_x
+ChipDimension_t get_cell_location_x
 (
     Dimensions *dimensions,
     uint32_t    column_index
@@ -409,7 +409,7 @@ double get_cell_location_x
 
 /******************************************************************************/
 
-double get_cell_location_y
+ChipDimension_t get_cell_location_y
 (
     Dimensions *dimensions,
     uint32_t    row_index
@@ -488,14 +488,14 @@ uint32_t get_cell_offset_in_stack
 
 /******************************************************************************/
 
-double get_chip_length (Dimensions *dimensions)
+ChipDimension_t get_chip_length (Dimensions *dimensions)
 {
   return dimensions->Chip.Length ;
 }
 
 /******************************************************************************/
 
-double get_chip_width (Dimensions *dimensions)
+ChipDimension_t get_chip_width (Dimensions *dimensions)
 {
   return dimensions->Chip.Width ;
 }

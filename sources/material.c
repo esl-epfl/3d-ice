@@ -45,8 +45,8 @@ void init_material (Material *material)
 {
     material->Id                     = NULL ;
     material->Used                   = 0u ;
-    material->VolumetricHeatCapacity = 0.0 ;
-    material->ThermalConductivity    = 0.0 ;
+    material->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
+    material->ThermalConductivity    = (SolidTC_t) 0.0 ;
     material->Next                   = NULL ;
 }
 

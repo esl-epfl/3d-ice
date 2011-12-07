@@ -149,7 +149,9 @@ void fill_thermal_cell_layer
 {
     void (*fill_cell)
 
-        (ThermalCell *, Time_t, double, double, double, double, double) ;
+        (ThermalCell *, Time_t,
+         CellDimension_t, CellDimension_t, CellDimension_t,
+         SolidTC_t, SolidVHC_t) ;
 
     if (IS_FIRST_LAYER (layer_index))
 

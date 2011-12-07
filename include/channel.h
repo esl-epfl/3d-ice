@@ -71,19 +71,19 @@ extern "C"
 
         /*! The height of the channel in \f$ \mu m \f$ (1 cell) */
 
-        double Height ;
+        CellDimension_t Height ;
 
         /*! The length of the channel in \f$ \mu m \f$ */
 
-        double Length ;
+        ChannelDimension_t Length ;
 
         /*! The pitch of the channel in \f$ \mu m \f$ */
 
-        double Pitch ;
+        ChannelDimension_t Pitch ;
 
         /*! Porosity */
 
-        double Porosity ;
+        ChannelDimension_t Porosity ;
 
         /*!  Number of channels (per cavity) along chip length */
 
@@ -100,17 +100,6 @@ extern "C"
         /*! The properties of the fluid used as coolant */
 
         Coolant_t Coolant ;
-
-        /*! The flow rate per channel layer of the incolimg liquid.
-         *  Specified in \f$ \frac{ml}{min} \f$ but stored in \f$ \frac{\mu m^3}{sec} \f$.
-         *  Shared by all the channels for each layer in the 3DStack.
-         */
-
-        double CoolantFR ;
-
-        /*! Darcy Velocity \f$ \frac{\mu m}{sec} \f$ */
-
-        double DarcyVelocity ;
 
         /*! The material composing the wall */
 

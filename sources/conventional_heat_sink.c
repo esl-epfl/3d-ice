@@ -42,7 +42,7 @@
 
 void init_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
 {
-    conventional_heat_sink->AmbientHTC         = 0.0 ;
+    conventional_heat_sink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
     conventional_heat_sink->AmbientTemperature = 0.0 ;
     conventional_heat_sink->TopLayer           = NULL ;
 }

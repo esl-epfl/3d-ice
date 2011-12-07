@@ -79,14 +79,14 @@ extern "C"
          * expressed as \f$ \frac{J}{\mu m^3 \cdot K } \f$
          */
 
-        double VolumetricHeatCapacity ;
+        SolidVHC_t VolumetricHeatCapacity ;
 
         /*!
          * The thermal conductivity of the material,
          * expressed as \f$ \frac{W}{\mu m \cdot K } \f$
          */
 
-        double ThermalConductivity ;
+        SolidTC_t ThermalConductivity ;
 
         /*!
          * Pointer to collect materials in a linked list

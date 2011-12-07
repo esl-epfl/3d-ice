@@ -109,10 +109,10 @@ void print_detailed_tcell (FILE  *stream, String_t prefix, Tcell *tcell)
 
 void align_tcell
 (
-    Tcell      *tcell,
-    double      xval,
-    double      yval,
-    Dimensions *dimensions
+    Tcell           *tcell,
+    ChipDimension_t  xval,
+    ChipDimension_t  yval,
+    Dimensions      *dimensions
 )
 {
     FOR_EVERY_ROW (row_index, dimensions)

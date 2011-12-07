@@ -64,19 +64,19 @@ extern "C"
     {
         /*! X coordinate of the thermal cell as specified in the stack file */
 
-        double Xval ;
+        ChipDimension_t Xval ;
 
         /*! Actual nearest X coordinate of the thermal cell */
 
-        double ActualXval ;
+        ChipDimension_t ActualXval ;
 
         /*! Y coordnate of the thermal cell as specified in the stack file */
 
-        double Yval ;
+        ChipDimension_t Yval ;
 
         /*! Actual nearest Y coordnate of the thermal cell */
 
-        double ActualYval ;
+        ChipDimension_t ActualYval ;
 
         /*! Row Index of the thermal cell */
 
@@ -151,8 +151,12 @@ extern "C"
      */
 
     void align_tcell
-
-        (Tcell *tcell, double xval, double yval, Dimensions *dimensions) ;
+    (
+        Tcell           *tcell,
+        ChipDimension_t  xval,
+        ChipDimension_t  yval,
+        Dimensions      *dimensions
+    ) ;
 
 /******************************************************************************/
 /******************************************************************************/

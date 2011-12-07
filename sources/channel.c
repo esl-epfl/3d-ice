@@ -42,22 +42,22 @@
 
 void init_channel (Channel *channel)
 {
-    channel->ChannelModel      = TDICE_CHANNEL_MODEL_NONE ;
-    channel->Height            = 0.0 ;
-    channel->Length            = 0.0 ;
-    channel->Pitch             = 0.0 ;
-    channel->Porosity          = 0.0 ;
-    channel->NChannels         = 0u ;
-    channel->NLayers           = 0u ;
-    channel->SourceLayerOffset = 0u ;
-    channel->Coolant.HTCSide   = 0.0 ;
-    channel->Coolant.HTCTop    = 0.0 ;
-    channel->Coolant.HTCBottom = 0.0 ;
-    channel->Coolant.VHC       = 0.0 ;
-    channel->Coolant.TIn       = 0.0 ;
-    channel->CoolantFR         = 0.0 ;
-    channel->DarcyVelocity     = 0.0 ;
-    channel->WallMaterial      = NULL ;
+    channel->ChannelModel          = TDICE_CHANNEL_MODEL_NONE ;
+    channel->Height                = 0.0 ;
+    channel->Length                = 0.0 ;
+    channel->Pitch                 = 0.0 ;
+    channel->Porosity              = 0.0 ;
+    channel->NChannels             = 0u ;
+    channel->NLayers               = 0u ;
+    channel->SourceLayerOffset     = 0u ;
+    channel->Coolant.HTCSide       = 0.0 ;
+    channel->Coolant.HTCTop        = 0.0 ;
+    channel->Coolant.HTCBottom     = 0.0 ;
+    channel->Coolant.VHC           = 0.0 ;
+    channel->Coolant.FlowRate      = 0.0 ;
+    channel->Coolant.DarcyVelocity = 0.0 ;
+    channel->Coolant.TIn           = 0.0 ;
+    channel->WallMaterial          = NULL ;
 }
 
 /******************************************************************************/
@@ -103,7 +103,7 @@ void print_formatted_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->CoolantFR)) ;
+        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->Coolant.FlowRate)) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant heat transfer coefficient side   %.4e ,\n", prefix, channel->Coolant.HTCSide) ;
         fprintf (stream, "%s                                     top    %.4e ,\n", prefix, channel->Coolant.HTCTop) ;
@@ -124,7 +124,7 @@ void print_formatted_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->CoolantFR)) ;
+        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->Coolant.FlowRate)) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant heat transfer coefficient top    %.4e ,\n", prefix, channel->Coolant.HTCTop) ;
         fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, channel->Coolant.HTCBottom) ;
@@ -146,7 +146,7 @@ void print_formatted_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->DarcyVelocity) ;
+        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->Coolant.DarcyVelocity) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -165,7 +165,7 @@ void print_formatted_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->DarcyVelocity) ;
+        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->Coolant.DarcyVelocity) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -240,11 +240,11 @@ void print_detailed_channel
 
     fprintf (stream,
         "%s  CoolantFR                 = %.4e\n",
-        prefix,  channel->CoolantFR) ;
+        prefix,  channel->Coolant.FlowRate) ;
 
     fprintf (stream,
         "%s  DarcyVelocity             = %.4e\n",
-        prefix,  channel->DarcyVelocity) ;
+        prefix,  channel->Coolant.DarcyVelocity) ;
 
     fprintf (stream,
         "%s  WallMaterial              = %p\n",
@@ -288,8 +288,7 @@ void fill_thermal_cell_channel_4rm
                     get_cell_width(dimensions, row_index),
                     channel->Height,
                     channel->NChannels,
-                    channel->Coolant,
-                    channel->CoolantFR
+                    channel->Coolant
                 ) ;
 
             else
@@ -402,7 +401,7 @@ static void fill_thermal_cell_channel_2rm
                     get_cell_width(dimensions, row_index),
                     channel->Height,
                     channel->NChannels, channel->Length,
-                    channel->Porosity, channel->Coolant, channel->CoolantFR
+                    channel->Porosity, channel->Coolant
                 ) ;
 
                 thermalcells++;
@@ -527,7 +526,7 @@ static void fill_thermal_cell_channel_pf
                     get_cell_width(dimensions, row_index),
                     channel->Height,
                     channel->ChannelModel,
-                    channel->Porosity, channel->Coolant, channel->DarcyVelocity
+                    channel->Porosity, channel->Coolant
                 ) ;
 
                 thermalcells++;
@@ -635,7 +634,7 @@ void fill_sources_channel
     // of the cell in the first column. Otherwise, the computation of C must
     // me put inside the column loop.
 
-    double C;
+    Cconv_t C;
 
     if (   channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE
         || channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
@@ -643,7 +642,7 @@ void fill_sources_channel
 
         C = CCONV_PF
 
-            (channel->Coolant.VHC, channel->DarcyVelocity,
+            (channel->Coolant.VHC, channel->Coolant.DarcyVelocity,
              get_cell_length (dimensions, 0), channel->Height);
 
     }
@@ -652,7 +651,7 @@ void fill_sources_channel
 
         C = CCONV_MC_2RM
 
-            (channel->NChannels, channel->Coolant.VHC, channel->CoolantFR,
+            (channel->NChannels, channel->Coolant.VHC, channel->Coolant.FlowRate,
              channel->Porosity, get_cell_length(dimensions,0), channel->Length) ;
 
     }
@@ -661,7 +660,7 @@ void fill_sources_channel
 
         C = CCONV_MC_4RM
 
-            (channel->NChannels, channel->Coolant.VHC, channel->CoolantFR);
+            (channel->NChannels, channel->Coolant.VHC, channel->Coolant.FlowRate);
 
     }
 

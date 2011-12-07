@@ -70,31 +70,31 @@ extern "C"
     {
         /*! The conductance of the resistor in the \a Top direction */
 
-        double Top ;
+        Conductance_t Top ;
 
         /*! The conductance of the resistor in the \a Bottom direction */
 
-        double Bottom ;
+        Conductance_t Bottom ;
 
         /*! The conductance of the resistor in the \a North direction */
 
-        double North ;
+        Conductance_t North ;
 
         /*! The conductance of the resistor in the \a South direction */
 
-        double South ;
+        Conductance_t South ;
 
         /*! The conductance of the resistor in the \a East direction */
 
-        double East ;
+        Conductance_t East ;
 
         /*! The conductance of the resistor in the \a West direction */
 
-        double West ;
+        Conductance_t West ;
 
         /*! The capacity of the thermal cell */
 
-        double Capacity ;
+        Capacity_t Capacity ;
 
     } ;
 
@@ -133,16 +133,16 @@ extern "C"
 
     void fill_solid_cell_bottom
     (
-        ThermalCell *thermal_cell,
+        ThermalCell     *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t           delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t  cell_length,
+        CellDimension_t  cell_width,
+        CellDimension_t  cell_height,
 
-        double       solid_tc,
-        double       solid_vhc
+        SolidTC_t        solid_tc,
+        SolidVHC_t       solid_vhc
     ) ;
 
 
@@ -160,16 +160,16 @@ extern "C"
 
     void fill_solid_cell_central
     (
-        ThermalCell *thermal_cell,
+        ThermalCell     *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t           delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t  cell_length,
+        CellDimension_t  cell_width,
+        CellDimension_t  cell_height,
 
-        double       solid_tc,
-        double       solid_vhc
+        SolidTC_t        solid_tc,
+        SolidVHC_t       solid_vhc
     ) ;
 
 
@@ -187,16 +187,16 @@ extern "C"
 
     void fill_solid_cell_top
     (
-        ThermalCell *thermal_cell,
+        ThermalCell     *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t           delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t  cell_length,
+        CellDimension_t  cell_width,
+        CellDimension_t  cell_height,
 
-        double       solid_tc,
-        double       solid_vhc
+        SolidTC_t        solid_tc,
+        SolidVHC_t       solid_vhc
     ) ;
 
 
@@ -213,14 +213,14 @@ extern "C"
 
     void fill_solid_cell_conventional_heat_sink
     (
-        ThermalCell *thermal_cell,
+        ThermalCell     *thermal_cell,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t  cell_length,
+        CellDimension_t  cell_width,
+        CellDimension_t  cell_height,
 
-        double       solid_tc,
-        double       ambient_htc
+        SolidTC_t        solid_tc,
+        AmbientHTC_t     ambient_htc
     ) ;
 
 
@@ -234,22 +234,20 @@ extern "C"
      * \param cell_height  the height \a h of the thermal cell
      * \param nchannels    the number of microchannels in the channel layer
      * \param coolant      the thermal properties of the coolant
-     * \param coolant_fr   the flow rate of the coolant
      */
 
     void fill_liquid_cell_mc_4rm
     (
-        ThermalCell *thermal_cell,
+        ThermalCell      *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t           delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t  cell_length,
+        CellDimension_t  cell_width,
+        CellDimension_t  cell_height,
 
-        uint32_t     nchannels,
-        Coolant_t    coolant,
-        double       coolant_fr
+        uint32_t         nchannels,
+        Coolant_t        coolant
     ) ;
 
 
@@ -265,25 +263,22 @@ extern "C"
      * \param channel_length the length of the channel
      * \param porosity       FIXME
      * \param coolant        the thermal properties of the coolant
-     * \param coolant_fr     the flow rate of the coolant
      */
 
     void fill_liquid_cell_mc_2rm
     (
-        ThermalCell *thermal_cell,
+        ThermalCell        *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t              delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t     cell_length,
+        CellDimension_t     cell_width,
+        CellDimension_t     cell_height,
 
-        uint32_t     nchannels,
-        double       channel_length,
-
-        double       porosity,
-        Coolant_t    coolant,
-        double       coolant_fr
+        uint32_t            nchannels,
+        ChannelDimension_t  channel_length,
+        ChannelDimension_t  porosity,
+        Coolant_t           coolant
     ) ;
 
 
@@ -298,24 +293,21 @@ extern "C"
      * \param pin_distribution the distribution of the pin fins
      * \param porosity         FIXME
      * \param coolant          the thermal properties of the coolant
-     * \param darcy_velocity   the darcy velocity of the coolant
      */
 
     void fill_liquid_cell_pf
     (
-        ThermalCell   *thermal_cell,
+        ThermalCell       *thermal_cell,
 
-        Time_t         delta_time,
+        Time_t             delta_time,
 
-        double         cell_length,
-        double         cell_width,
-        double         cell_height,
+        CellDimension_t    cell_length,
+        CellDimension_t    cell_width,
+        CellDimension_t    cell_height,
 
-        ChannelModel_t pin_distribution,
-
-        double         porosity,
-        Coolant_t      coolant,
-        double         darcy_velocity
+        ChannelModel_t     pin_distribution,
+        ChannelDimension_t porosity,
+        Coolant_t          coolant
     ) ;
 
 
@@ -334,17 +326,17 @@ extern "C"
 
     void fill_virtual_wall_cell_mc_2rm
     (
-        ThermalCell *thermal_cell,
+        ThermalCell       *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t             delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t    cell_length,
+        CellDimension_t    cell_width,
+        CellDimension_t    cell_height,
 
-        double       porosity,
-        double       solid_tc,
-        double       solid_vhc
+        ChannelDimension_t porosity,
+        SolidTC_t          solid_tc,
+        SolidVHC_t         solid_vhc
     ) ;
 
 
@@ -363,17 +355,17 @@ extern "C"
 
     void fill_virtual_wall_cell_pf
     (
-        ThermalCell *thermal_cell,
+        ThermalCell       *thermal_cell,
 
-        Time_t       delta_time,
+        Time_t             delta_time,
 
-        double       cell_length,
-        double       cell_width,
-        double       cell_height,
+        CellDimension_t    cell_length,
+        CellDimension_t    cell_width,
+        CellDimension_t    cell_height,
 
-        double       porosity,
-        double       solid_tc,
-        double       solid_vhc
+        ChannelDimension_t porosity,
+        SolidTC_t          solid_tc,
+        SolidVHC_t         solid_vhc
     ) ;
 
 /******************************************************************************/
