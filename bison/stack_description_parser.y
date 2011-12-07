@@ -48,7 +48,7 @@
 %union
 {
     double                double_v ;
-    char                 *char_p ;
+    String_t              string ;
     Material             *material_p ;
     Coolant_t             coolant_v ;
     ChannelModel_t        channel_model_v ;
@@ -76,7 +76,8 @@
 
     void stack_description_error
 
-        (StackDescription *stack, Analysis *analysis, yyscan_t scanner, char *message) ;
+        (StackDescription *stack, Analysis *analysis,
+         yyscan_t scanner, String_t message) ;
 
     static char error_message [100] ;
 
@@ -171,10 +172,10 @@
 %token WIDTH                 "keyword width"
 
 %token <double_v> DVALUE     "double value"
-%token <char_p>   IDENTIFIER "identifier"
-%token <char_p>   PATH       "path to file"
+%token <string>   IDENTIFIER "identifier"
+%token <string>   PATH       "path to file"
 
-%destructor { FREE_POINTER (free,                     $$) ; } <char_p>
+%destructor { FREE_POINTER (free,                     $$) ; } <string>
 %destructor { FREE_POINTER (free_layers_list,         $$) ; } <layer_p>
 
 %name-prefix "stack_description_"
@@ -1474,7 +1475,7 @@ void stack_description_error
     StackDescription *stkd,
     Analysis          __attribute__ ((unused)) *analysis,
     yyscan_t          scanner,
-    char             *message
+    String_t          message
 )
 {
     fprintf (stack_description_get_out (scanner),

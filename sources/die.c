@@ -89,7 +89,7 @@ void free_dies_list (Die *list)
 
 /******************************************************************************/
 
-Die *find_die_in_list (Die *list, char *id)
+Die *find_die_in_list (Die *list, String_t id)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
@@ -100,15 +100,15 @@ Die *find_die_in_list (Die *list, char *id)
 
 /******************************************************************************/
 
-void print_formatted_die (FILE  *stream, char *prefix, Die *die)
+void print_formatted_die (FILE  *stream, String_t prefix, Die *die)
 {
-    char *new_prefix_layer = (char *)
+    String_t new_prefix_layer = (String_t)
 
-        malloc (sizeof (char) * (10 + strlen(prefix))) ;
+        malloc (sizeof (*new_prefix_layer) * (10 + strlen(prefix))) ;
 
-    char *new_prefix_source = (char *)
+    String_t new_prefix_source = (String_t)
 
-        malloc (sizeof (char) * (10 + strlen(prefix))) ;
+        malloc (sizeof (*new_prefix_source) * (10 + strlen(prefix))) ;
 
     if (new_prefix_layer == NULL) return ;
 
@@ -136,7 +136,7 @@ void print_formatted_die (FILE  *stream, char *prefix, Die *die)
 
 /******************************************************************************/
 
-void print_formatted_dies_list (FILE  *stream, char *prefix, Die *list)
+void print_formatted_dies_list (FILE  *stream, String_t prefix, Die *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
@@ -154,11 +154,11 @@ void print_formatted_dies_list (FILE  *stream, char *prefix, Die *list)
 
 /******************************************************************************/
 
-void print_detailed_die (FILE  *stream, char *prefix, Die *die)
+void print_detailed_die (FILE  *stream, String_t prefix, Die *die)
 {
-    char *new_prefix = (char *)
+    String_t new_prefix = (String_t)
 
-        malloc (sizeof (char) * (5 + strlen(prefix))) ;
+        malloc (sizeof (*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -211,7 +211,7 @@ void print_detailed_die (FILE  *stream, char *prefix, Die *die)
 
 /******************************************************************************/
 
-void print_detailed_dies_list (FILE  *stream, char *prefix, Die *list)
+void print_detailed_dies_list (FILE  *stream, String_t prefix, Die *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {

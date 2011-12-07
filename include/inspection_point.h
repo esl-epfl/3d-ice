@@ -134,7 +134,7 @@ extern "C"
 
     void print_detailed_tcell
 
-        (FILE *stream, char *prefix, Tcell *tcell) ;
+        (FILE *stream, String_t prefix, Tcell *tcell) ;
 
 
 
@@ -217,7 +217,7 @@ extern "C"
 
     void print_detailed_tflp
 
-        (FILE *stream, char *prefix, Tflp *tflp) ;
+        (FILE *stream, String_t prefix, Tflp *tflp) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -286,7 +286,7 @@ extern "C"
 
     void print_detailed_tflpel
 
-        (FILE *stream, char *prefix, Tflpel *tflpel) ;
+        (FILE *stream, String_t prefix, Tflpel *tflpel) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -319,7 +319,7 @@ extern "C"
     {
         /*! The path of the file used to store the output */
 
-        char *FileName ;
+        String_t FileName ;
 
         /*! The type of output instance (final, slot, step) */
 
@@ -406,7 +406,7 @@ extern "C"
 
     void print_formatted_inspection_point_list
 
-        (FILE *stream, char *prefix, InspectionPoint *list) ;
+        (FILE *stream, String_t prefix, InspectionPoint *list) ;
 
 
 
@@ -419,7 +419,7 @@ extern "C"
 
     void print_detailed_inspection_point_list
 
-        (FILE *stream, char *prefix, InspectionPoint *list) ;
+        (FILE *stream, String_t prefix, InspectionPoint *list) ;
 
 
     /*! Generates the file in which a particular inspection point will be printed
@@ -433,7 +433,7 @@ extern "C"
 
     Error_t generate_inspection_point_header
 
-        (InspectionPoint *inspection_point, Dimensions *dimensions, char *prefix) ;
+        (InspectionPoint *inspection_point, Dimensions *dimensions, String_t prefix) ;
 
 
 

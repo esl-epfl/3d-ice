@@ -313,8 +313,8 @@ extern "C"
     (
         ThermalData      *tdata,
         StackDescription *stkd,
-        char             *stack_element_id,
-        char             *file_name
+        String_t          stack_element_id,
+        String_t          file_name
     ) ;
 
 /******************************************************************************/

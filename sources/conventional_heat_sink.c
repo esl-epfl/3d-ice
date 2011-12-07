@@ -74,7 +74,7 @@ void free_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
 void print_formatted_conventional_heat_sink
 (
   FILE                 *stream,
-  char                 *prefix,
+  String_t              prefix,
   ConventionalHeatSink *conventional_heat_sink
 )
 {
@@ -96,7 +96,7 @@ void print_formatted_conventional_heat_sink
 void print_detailed_conventional_heat_sink
 (
   FILE                 *stream,
-  char                 *prefix,
+  String_t              prefix,
   ConventionalHeatSink *conventional_heat_sink
 )
 {

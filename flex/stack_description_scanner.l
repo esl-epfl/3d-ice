@@ -193,7 +193,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
                    }
 
 {identifier}       {
-                     yylval->char_p = strdup(yytext) ;
+                     yylval->string = strdup(yytext) ;
                      return IDENTIFIER ;
                    }
 
@@ -205,17 +205,19 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 
                      // but we add one place for ‘\0’ when allocating
 
-                     yylval->char_p = (char *) malloc (sizeof(char) * (n + 1)) ;
+                     yylval->string =
+
+                         (String_t) malloc (sizeof(*yylval->string) * (n + 1)) ;
 
                      // we copy from the character after the first "
 
-                     strncpy (yylval->char_p,
-                              yytext + (1 * sizeof (char)),
-                              n * sizeof(char)) ;
+                     strncpy (yylval->string,
+                              yytext + (1 * sizeof (*yylval->string)),
+                              n * sizeof(*yylval->string)) ;
 
                      // We finally add the ‘\0’ at the and of the string
 
-                     yylval->char_p [n] = '\0' ;
+                     yylval->string [n] = '\0' ;
 
                      return PATH ;
                    }

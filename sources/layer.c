@@ -77,12 +77,7 @@ void free_layers_list (Layer *list)
 
 /******************************************************************************/
 
-void print_formatted_layer
-(
-    FILE  *stream,
-    char  *prefix,
-    Layer *layer
-)
+void print_formatted_layer (FILE *stream, String_t prefix, Layer *layer)
 {
     fprintf (stream,
         "%s %7.1f  %s ;\n",
@@ -91,12 +86,7 @@ void print_formatted_layer
 
 /******************************************************************************/
 
-void print_detailed_layer
-(
-    FILE  *stream,
-    char  *prefix,
-    Layer *layer
-)
+void print_detailed_layer (FILE *stream, String_t prefix, Layer *layer)
 {
     fprintf (stream,
         "%slayer                   = %p\n",
@@ -121,7 +111,7 @@ void print_detailed_layer
 
 /******************************************************************************/
 
-void print_formatted_layers_list (FILE *stream, char *prefix, Layer *list)
+void print_formatted_layers_list (FILE *stream, String_t prefix, Layer *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, list)
 
@@ -130,7 +120,7 @@ void print_formatted_layers_list (FILE *stream, char *prefix, Layer *list)
 
 /******************************************************************************/
 
-void print_detailed_layers_list (FILE *stream, char *prefix, Layer *list)
+void print_detailed_layers_list (FILE *stream, String_t prefix, Layer *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, list)
     {

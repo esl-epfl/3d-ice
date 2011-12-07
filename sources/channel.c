@@ -85,7 +85,7 @@ void free_channel (Channel *channel)
 void print_formatted_channel
 (
     FILE       *stream,
-    char       *prefix,
+    String_t    prefix,
     Channel    *channel,
     Dimensions *dimensions
 )
@@ -178,7 +178,7 @@ void print_formatted_channel
 void print_detailed_channel
 (
   FILE    *stream,
-  char    *prefix,
+  String_t prefix,
   Channel *channel
 )
 {

@@ -68,7 +68,7 @@ extern "C"
     {
         /*! The id (string) of the die */
 
-        char *Id ;
+        String_t Id ;
 
         /*! To know, after the parsing of a stack file, if a
          *  die has been declared but never used in the stack */
@@ -165,7 +165,7 @@ extern "C"
      * \return \c NULL if the search fails
      */
 
-    Die *find_die_in_list (Die *list, char *id) ;
+    Die *find_die_in_list (Die *list, String_t id) ;
 
 
 
@@ -176,7 +176,7 @@ extern "C"
      * \param die    the die to print
      */
 
-    void print_formatted_die (FILE *stream, char *prefix, Die *die) ;
+    void print_formatted_die (FILE *stream, String_t prefix, Die *die) ;
 
 
 
@@ -187,7 +187,7 @@ extern "C"
      * \param list   the pointer to the first die in the list
      */
 
-    void print_formatted_dies_list (FILE *stream, char *prefix, Die *list) ;
+    void print_formatted_dies_list (FILE *stream, String_t prefix, Die *list) ;
 
 
 
@@ -198,7 +198,7 @@ extern "C"
      * \param die    the die to print
      */
 
-    void print_detailed_die (FILE *stream, char *prefix, Die *die) ;
+    void print_detailed_die (FILE *stream, String_t prefix, Die *die) ;
 
 
 
@@ -209,7 +209,7 @@ extern "C"
      * \param list   the pointer to the first die in the list
      */
 
-    void print_detailed_dies_list (FILE *stream, char *prefix, Die *list) ;
+    void print_detailed_dies_list (FILE *stream, String_t prefix, Die *list) ;
 
 
 

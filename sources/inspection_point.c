@@ -74,7 +74,7 @@ void free_tcell (Tcell *tcell)
 
 /******************************************************************************/
 
-void print_detailed_tcell (FILE  *stream, char *prefix, Tcell *tcell)
+void print_detailed_tcell (FILE  *stream, String_t prefix, Tcell *tcell)
 {
     fprintf (stream,
         "%sTcell                   = %p\n",
@@ -175,7 +175,7 @@ void free_tflp (Tflp *tflp)
 
 /******************************************************************************/
 
-void print_detailed_tflp (FILE  *stream, char *prefix, Tflp *tflp)
+void print_detailed_tflp (FILE  *stream, String_t prefix, Tflp *tflp)
 {
     fprintf (stream,
         "%sTflp                    = %p\n",
@@ -218,7 +218,7 @@ void free_tflpel (Tflpel *tflpel)
 
 /******************************************************************************/
 
-void print_detailed_tflpel (FILE  *stream, char *prefix, Tflpel *tflpel)
+void print_detailed_tflpel (FILE  *stream, String_t prefix, Tflpel *tflpel)
 {
     fprintf (stream,
         "%sTflpel                  = %p\n",
@@ -298,8 +298,8 @@ void free_inspection_point_list (InspectionPoint *list)
 
 void print_formatted_inspection_point_list
 (
-    FILE        *stream,
-    char        *prefix,
+    FILE            *stream,
+    String_t         prefix,
     InspectionPoint *list
 )
 {
@@ -392,11 +392,13 @@ void print_formatted_inspection_point_list
 void print_detailed_inspection_point_list
 (
     FILE            *stream,
-    char            *prefix,
+    String_t         prefix,
     InspectionPoint *list
 )
 {
-    char *new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+    String_t new_prefix =
+
+        (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -498,7 +500,7 @@ Error_t generate_inspection_point_header
 (
     InspectionPoint *inspection_point,
     Dimensions      *dimensions,
-    char            *prefix
+    String_t         prefix
 )
 {
     FILE *output_stream = fopen (inspection_point->FileName, "w") ;

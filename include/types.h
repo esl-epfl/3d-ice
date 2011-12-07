@@ -59,10 +59,10 @@ extern "C"
 //   typedef int Quantity_t ;
 // # define      QUANTITY_I 0
 //
-//   /* String */
-//
-//   typedef char* String_t ;
-// # define        STRING_I NULL
+    /*! Definition of the primitive type String */
+
+    typedef char* String_t ;
+
 
 /******************************************************************************/
 
@@ -242,8 +242,6 @@ extern "C"
 
     typedef enum StackElement_t StackElement_t ;
 
-//# define                      STACKELEMENT_I TDICE_STACK_ELEMENT_NONE
-
 /******************************************************************************/
 
     /*! \enum ChannelModel_t
@@ -266,7 +264,7 @@ extern "C"
 
     typedef enum ChannelModel_t ChannelModel_t ;
 
-//# define                      CHANNELMODEL_I TDICE_CHANNEL_MODEL_NO_CHANNEL
+
 
     /*! \def NUM_LAYERS_CHANNEL_4RM
      *

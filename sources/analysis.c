@@ -99,7 +99,7 @@ bool slot_completed (Analysis *analysis)
 void print_formatted_analysis
 (
     FILE     *stream,
-    char     *prefix,
+    String_t  prefix,
     Analysis *analysis
 )
 {
@@ -149,11 +149,11 @@ void print_formatted_analysis
 void print_detailed_analysis
 (
   FILE     *stream,
-  char     *prefix,
+  String_t  prefix,
   Analysis *analysis
 )
 {
-    char *new_prefix = malloc (sizeof(char) * (5 + strlen(prefix))) ;
+    String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -271,7 +271,7 @@ Error_t generate_analysis_headers
 (
     Analysis   *analysis,
     Dimensions *dimensions,
-    char       *prefix
+    String_t    prefix
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, final, analysis->InspectionPointListFinal)

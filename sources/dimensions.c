@@ -75,7 +75,7 @@ Dimensions *alloc_and_init_dimensions (void)
 void print_formatted_dimensions
 (
   FILE       *stream,
-  char       *prefix,
+  String_t    prefix,
   Dimensions *dimensions
 )
 {
@@ -97,7 +97,7 @@ void print_formatted_dimensions
 void print_detailed_dimensions
 (
   FILE       *stream,
-  char       *prefix,
+  String_t    prefix,
   Dimensions *dimensions
 )
 {

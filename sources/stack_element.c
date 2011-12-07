@@ -96,7 +96,7 @@ void free_stack_elements_list (StackElement *list)
 
 /******************************************************************************/
 
-StackElement *find_stack_element_in_list (StackElement *list, char *id)
+StackElement *find_stack_element_in_list (StackElement *list, String_t id)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement, stk_el, list)
     {
@@ -110,7 +110,7 @@ StackElement *find_stack_element_in_list (StackElement *list, char *id)
 void print_formatted_stack_elements_list
 (
     FILE         *stream,
-    char         *prefix,
+    String_t      prefix,
     StackElement *list
 )
 {
@@ -180,11 +180,13 @@ void print_formatted_stack_elements_list
 void print_detailed_stack_elements_list
 (
     FILE         *stream,
-    char         *prefix,
+    String_t      prefix,
     StackElement *list
 )
 {
-    char *new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+    String_t new_prefix =
+
+        (String_t ) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -473,7 +475,7 @@ uint32_t get_number_of_floorplan_elements_stack_element
 FloorplanElement *get_floorplan_element_stack_element
 (
     StackElement *stack_element,
-    char         *floorplan_element_id
+    String_t      floorplan_element_id
 )
 {
     if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)

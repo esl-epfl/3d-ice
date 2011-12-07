@@ -174,7 +174,7 @@ extern "C"
 
     void print_formatted_analysis
 
-        (FILE *stream, char *prefix, Analysis *analysis) ;
+        (FILE *stream, String_t prefix, Analysis *analysis) ;
 
 
 
@@ -187,7 +187,7 @@ extern "C"
 
     void print_detailed_analysis
 
-        (FILE *stream, char *prefix, Analysis *analysis) ;
+        (FILE *stream, String_t prefix, Analysis *analysis) ;
 
 
 
@@ -218,7 +218,7 @@ extern "C"
 
     Error_t generate_analysis_headers
 
-        (Analysis* analysis, Dimensions *dimensions, char *prefix) ;
+        (Analysis* analysis, Dimensions *dimensions, String_t prefix) ;
 
 
 

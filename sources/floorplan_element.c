@@ -101,7 +101,7 @@ void free_floorplan_elements_list (FloorplanElement *list)
 void print_detailed_floorplan_element
 (
     FILE             *stream,
-    char             *prefix,
+    String_t          prefix,
     FloorplanElement *floorplan_element
 )
 {
@@ -128,7 +128,7 @@ void print_detailed_floorplan_element
 void print_detailed_floorplan_elements_list
 (
     FILE             *stream,
-    char             *prefix,
+    String_t          prefix,
     FloorplanElement *list
 )
 {
@@ -142,7 +142,7 @@ void print_detailed_floorplan_elements_list
 void print_formatted_floorplan_element
 (
     FILE             *stream,
-    char             *prefix,
+    String_t          prefix,
     FloorplanElement *floorplan_element
 )
 {
@@ -172,7 +172,7 @@ void print_formatted_floorplan_element
 void print_formatted_floorplan_elements_list
 (
     FILE             *stream,
-    char             *prefix,
+    String_t          prefix,
     FloorplanElement *list
 )
 {
@@ -259,7 +259,7 @@ Error_t insert_power_values_floorplan_element
 FloorplanElement *find_floorplan_element_in_list
 (
     FloorplanElement *list,
-    char             *id
+    String_t          id
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, list)

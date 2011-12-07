@@ -86,7 +86,7 @@ void free_floorplan (Floorplan *floorplan)
 void print_detailed_floorplan
 (
     FILE      *stream,
-    char      *prefix,
+    String_t   prefix,
     Floorplan *floorplan
 )
 {
@@ -104,7 +104,7 @@ Error_t fill_floorplan
 (
     Floorplan  *floorplan,
     Dimensions *dimensions,
-    char       *file_name
+    String_t    file_name
 )
 {
     FILE *input ;
@@ -155,7 +155,7 @@ uint32_t get_number_of_floorplan_elements_floorplan
 FloorplanElement *get_floorplan_element_floorplan
 (
     Floorplan *floorplan,
-    char      *floorplan_element_id
+    String_t   floorplan_element_id
 )
 {
     return find_floorplan_element_in_list

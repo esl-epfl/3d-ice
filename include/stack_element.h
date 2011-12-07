@@ -91,7 +91,7 @@ extern "C"
     {
         /*! The id (string) of the stack element */
 
-        char *Id ;
+        String_t Id ;
 
         /*! The type of the stack element (Layer, Die or Channel) */
 
@@ -191,7 +191,7 @@ extern "C"
      * \return \c NULL if the search fails
      */
 
-    StackElement *find_stack_element_in_list (StackElement *list, char *id) ;
+    StackElement *find_stack_element_in_list (StackElement *list, String_t id) ;
 
 
     // FIXME : what about print_formatted_stack_element ??
@@ -206,7 +206,7 @@ extern "C"
 
     void print_formatted_stack_elements_list
 
-        (FILE *stream, char *prefix, StackElement *list) ;
+        (FILE *stream, String_t prefix, StackElement *list) ;
 
 
 
@@ -219,7 +219,7 @@ extern "C"
 
     void print_detailed_stack_elements_list
 
-        (FILE *stream, char *prefix, StackElement *list) ;
+        (FILE *stream, String_t prefix, StackElement *list) ;
 
 
 
@@ -337,7 +337,7 @@ extern "C"
 
     FloorplanElement *get_floorplan_element_stack_element
 
-        (StackElement *stack_element, char *floorplan_element_id) ;
+        (StackElement *stack_element, String_t floorplan_element_id) ;
 
 
 

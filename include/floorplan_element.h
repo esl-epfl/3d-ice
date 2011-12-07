@@ -64,7 +64,7 @@ extern "C"
     {
         /*! The id (string) to identifiy the floorplan element */
 
-        char *Id ;
+        String_t Id ;
 
         /*! The south-west X coordinate in the floorplan, in \f$ \mu m \f$ */
 
@@ -197,7 +197,7 @@ extern "C"
 
     FloorplanElement *find_floorplan_element_in_list
 
-        (FloorplanElement *list, char *id) ;
+        (FloorplanElement *list, String_t id) ;
 
 
 
@@ -210,7 +210,7 @@ extern "C"
 
     void print_formatted_floorplan_element
 
-        (FILE *stream, char *prefix, FloorplanElement *floorplan_element) ;
+        (FILE *stream, String_t prefix, FloorplanElement *floorplan_element) ;
 
 
 
@@ -223,7 +223,7 @@ extern "C"
 
     void print_formatted_floorplan_elements_list
 
-        (FILE *stream, char *prefix, FloorplanElement *list) ;
+        (FILE *stream, String_t prefix, FloorplanElement *list) ;
 
 
 
@@ -236,7 +236,7 @@ extern "C"
 
     void print_detailed_floorplan_element
 
-        (FILE *stream, char *prefix, FloorplanElement *floorplan_element) ;
+        (FILE *stream, String_t prefix, FloorplanElement *floorplan_element) ;
 
 
 
@@ -249,7 +249,7 @@ extern "C"
 
     void print_detailed_floorplan_elements_list
 
-        (FILE *stream, char *prefix, FloorplanElement *list) ;
+        (FILE *stream, String_t prefix, FloorplanElement *list) ;
 
 
 

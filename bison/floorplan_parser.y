@@ -43,7 +43,7 @@
 %union
 {
     double            power_value ;
-    char             *identifier ;
+    String_t          identifier ;
     FloorplanElement *p_floorplan_element ;
     PowersQueue      *p_powers_queue ;
 }
@@ -59,7 +59,7 @@
     void floorplan_error
 
         (Floorplan *floorplan, Dimensions *dimensions,
-         yyscan_t yyscanner, char const *msg) ;
+         yyscan_t yyscanner, String_t msg) ;
 
     static char error_message [100] ;
 
@@ -255,9 +255,9 @@ power_values_list
 void floorplan_error
 (
     Floorplan  *floorplan,
-    Dimensions* __attribute__ ((unused)) dimensions,
-    yyscan_t   yyscanner,
-    char const *msg
+    Dimensions *__attribute__ ((unused)) dimensions,
+    yyscan_t    yyscanner,
+    String_t    msg
 )
 {
     fprintf (stderr, "%s:%d: %s\n",

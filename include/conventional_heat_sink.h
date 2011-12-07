@@ -126,7 +126,7 @@ extern "C"
 
     void print_formatted_conventional_heat_sink
 
-        (FILE *stream, char *prefix, ConventionalHeatSink *conventional_heat_sink) ;
+        (FILE *stream, String_t prefix, ConventionalHeatSink *conventional_heat_sink) ;
 
 
 
@@ -139,7 +139,7 @@ extern "C"
 
     void print_detailed_conventional_heat_sink
 
-        (FILE *stream, char *prefix, ConventionalHeatSink *conventional_heat_sink) ;
+        (FILE *stream, String_t prefix, ConventionalHeatSink *conventional_heat_sink) ;
 
 
 

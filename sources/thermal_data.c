@@ -553,8 +553,8 @@ Error_t print_thermal_map
 (
     ThermalData      *tdata,
     StackDescription *stkd,
-    char             *stack_element_id,
-    char             *file_name
+    String_t          stack_element_id,
+    String_t          file_name
 )
 {
     StackElement *stack_element = find_stack_element_in_list

@@ -83,7 +83,7 @@ void free_materials_list (Material *list)
 
 /******************************************************************************/
 
-Material *find_material_in_list (Material *list, char *id)
+Material *find_material_in_list (Material *list, String_t id)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
     {
@@ -98,7 +98,7 @@ Material *find_material_in_list (Material *list, char *id)
 void print_formatted_material
 (
     FILE     *stream,
-    char     *prefix,
+    String_t  prefix,
     Material *material
 )
 {
@@ -120,7 +120,7 @@ void print_formatted_material
 void print_formatted_materials_list
 (
     FILE     *stream,
-    char     *prefix,
+    String_t  prefix,
     Material *list
 )
 {
@@ -143,7 +143,7 @@ void print_formatted_materials_list
 void print_detailed_material
 (
     FILE     *stream,
-    char     *prefix,
+    String_t  prefix,
     Material *material
 )
 {
@@ -177,7 +177,7 @@ void print_detailed_material
 void print_detailed_materials_list
 (
     FILE     *stream,
-    char     *prefix,
+    String_t  prefix,
     Material *list
 )
 {

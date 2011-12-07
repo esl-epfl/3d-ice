@@ -252,7 +252,7 @@ extern "C"
 
     void print_formatted_dimensions
 
-        (FILE *stream, char *prefix, Dimensions *dimensions) ;
+        (FILE *stream, String_t prefix, Dimensions *dimensions) ;
 
 
 
@@ -265,7 +265,7 @@ extern "C"
 
    void print_detailed_dimensions
 
-        (FILE *stream, char *prefix, Dimensions *dimensions) ;
+        (FILE *stream, String_t prefix, Dimensions *dimensions) ;
 
 
 

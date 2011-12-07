@@ -76,7 +76,7 @@ void free_powers_queue (PowersQueue *powers_queue)
 void print_detailed_powers_queue
 (
     FILE        *stream,
-    char        *prefix,
+    String_t     prefix,
     PowersQueue *powers_queue
 )
 {

@@ -146,7 +146,7 @@ extern "C"
 
     void print_formatted_layer
 
-        (FILE *stream, char *prefix, Layer *layer) ;
+        (FILE *stream, String_t prefix, Layer *layer) ;
 
 
 
@@ -159,7 +159,7 @@ extern "C"
 
     void print_formatted_layers_list
 
-        (FILE *stream, char *prefix, Layer *list) ;
+        (FILE *stream, String_t prefix, Layer *list) ;
 
 
 
@@ -172,7 +172,7 @@ extern "C"
 
     void print_detailed_layer
 
-        (FILE *stream, char *prefix, Layer *layer) ;
+        (FILE *stream, String_t prefix, Layer *layer) ;
 
 
 
@@ -185,7 +185,7 @@ extern "C"
 
     void print_detailed_layers_list
 
-        (FILE *stream, char *prefix, Layer *list) ;
+        (FILE *stream, String_t prefix, Layer *list) ;
 
 
 

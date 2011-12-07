@@ -65,7 +65,7 @@ extern "C"
          * The identifier used to refer to the material in the stack file
          */
 
-        char *Id ;
+        String_t Id ;
 
         /*!
          * To know, after the parsing of a stack file, if a
@@ -160,7 +160,7 @@ extern "C"
      * \return \c NULL if the search fails
      */
 
-    Material *find_material_in_list (Material *list, char *id) ;
+    Material *find_material_in_list (Material *list, String_t id) ;
 
 
 
@@ -173,7 +173,7 @@ extern "C"
 
     void print_formatted_material
 
-         (FILE *stream, char *prefix, Material *material) ;
+         (FILE *stream, String_t prefix, Material *material) ;
 
 
 
@@ -186,7 +186,7 @@ extern "C"
 
     void print_formatted_materials_list
 
-         (FILE *stream, char *prefix, Material *list) ;
+         (FILE *stream, String_t prefix, Material *list) ;
 
 
 
@@ -199,7 +199,7 @@ extern "C"
 
     void print_detailed_material
 
-         (FILE *stream, char *prefix, Material *material) ;
+         (FILE *stream, String_t prefix, Material *material) ;
 
 
 
@@ -212,7 +212,7 @@ extern "C"
 
     void print_detailed_materials_list
 
-         (FILE *stream, char *prefix, Material *list) ;
+         (FILE *stream, String_t prefix, Material *list) ;
 
 /******************************************************************************/
 

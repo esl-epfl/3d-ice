@@ -167,7 +167,7 @@ extern "C"
 
     void print_formatted_channel
 
-        (FILE *stream, char *prefix, Channel *channel, Dimensions *dimensions) ;
+        (FILE *stream, String_t prefix, Channel *channel, Dimensions *dimensions) ;
 
 
 
@@ -180,7 +180,7 @@ extern "C"
 
     void print_detailed_channel
 
-        (FILE *stream, char *prefix, Channel *channel) ;
+        (FILE *stream, String_t prefix, Channel *channel) ;
 
     /*! Fills the thermal cells corresponding to a channel
      *

@@ -64,7 +64,7 @@ extern "C"
     {
         /*! The name of the file scanned to fill the floorplan */
 
-        char *FileName ;
+        String_t FileName ;
 
         /*! The number of floorplan elements in the floorplan  */
 
@@ -123,7 +123,7 @@ extern "C"
      * \param floorplan the floorplan    to print
      */
 
-    void print_detailed_floorplan (FILE *stream, char *prefix, Floorplan *floorplan) ;
+    void print_detailed_floorplan (FILE *stream, String_t prefix, Floorplan *floorplan) ;
 
 
 
@@ -140,7 +140,7 @@ extern "C"
 
     Error_t fill_floorplan
 
-        (Floorplan *floorplan, Dimensions *dimensions, char *file_name) ;
+        (Floorplan *floorplan, Dimensions *dimensions, String_t file_name) ;
 
 
 
@@ -190,7 +190,7 @@ extern "C"
 
     FloorplanElement *get_floorplan_element_floorplan
 
-        (Floorplan *floorplan, char *floorplan_element_id) ;
+        (Floorplan *floorplan, String_t floorplan_element_id) ;
 
 
 

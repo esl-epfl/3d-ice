@@ -70,7 +70,7 @@ int fill_stack_description
 (
   StackDescription *stkd,
   Analysis         *analysis,
-  char             *filename
+  String_t          filename
 )
 {
     FILE*    input ;
@@ -124,7 +124,7 @@ void free_stack_description (StackDescription* stkd)
 void print_formatted_stack_description
 (
   FILE             *stream,
-  char             *prefix,
+  String_t          prefix,
   StackDescription *stkd
 )
 {
@@ -168,11 +168,13 @@ void print_formatted_stack_description
 void print_detailed_stack_description
 (
   FILE             *stream,
-  char             *prefix,
+  String_t          prefix,
   StackDescription *stkd
 )
 {
-    char * new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+    String_t new_prefix =
+
+        (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -286,7 +288,7 @@ void print_detailed_stack_description
 void print_floorplans
 (
     FILE             *stream,
-    char             *prefix,
+    String_t          prefix,
     StackDescription *stkd
 )
 {
@@ -413,7 +415,7 @@ void fill_system_matrix_stack_description
 uint32_t get_number_of_floorplan_elements
 (
   StackDescription *stkd,
-  char             *stack_element_id
+  String_t          stack_element_id
 )
 {
     StackElement *stack_element = find_stack_element_in_list
@@ -447,8 +449,8 @@ uint32_t get_total_number_of_floorplan_elements (StackDescription *stkd)
 FloorplanElement *get_floorplan_element
 (
     StackDescription *stkd,
-    char             *stack_element_id,
-    char             *floorplan_element_id
+    String_t          stack_element_id,
+    String_t          floorplan_element_id
 )
 {
     StackElement *stack_element = find_stack_element_in_list

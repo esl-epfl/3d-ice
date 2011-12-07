@@ -72,7 +72,7 @@ extern "C"
     {
         /*! The name of the file used to fill the stack description */
 
-        char *FileName ;
+        String_t FileName ;
 
         /*! The list of materials componing the layers and channel walls */
 
@@ -136,7 +136,7 @@ extern "C"
 
     int fill_stack_description
 
-        (StackDescription* stkd, Analysis *analysis, char* filename) ;
+        (StackDescription* stkd, Analysis *analysis, String_t filename) ;
 
 
 
@@ -160,7 +160,7 @@ extern "C"
 
     void print_formatted_stack_description
 
-        (FILE *stream, char *prefix, StackDescription *stkd) ;
+        (FILE *stream, String_t prefix, StackDescription *stkd) ;
 
 
 
@@ -173,7 +173,7 @@ extern "C"
 
     void print_detailed_stack_description
 
-        (FILE *stream, char *prefix, StackDescription* stkd) ;
+        (FILE *stream, String_t prefix, StackDescription* stkd) ;
 
 
 
@@ -186,7 +186,7 @@ extern "C"
 
     void print_floorplans
 
-        (FILE *stream, char *prefix, StackDescription *stkd) ;
+        (FILE *stream, String_t prefix, StackDescription *stkd) ;
 
 
 
@@ -273,7 +273,7 @@ extern "C"
 
     uint32_t get_number_of_floorplan_elements
 
-        (StackDescription* stkd, char* stack_element_id) ;
+        (StackDescription* stkd, String_t stack_element_id) ;
 
 
 
@@ -306,7 +306,7 @@ extern "C"
     FloorplanElement *get_floorplan_element
 
         (StackDescription *stkd,
-         char *stack_element_id, char *floorplan_element_id) ;
+         String_t stack_element_id, String_t floorplan_element_id) ;
 
 
 

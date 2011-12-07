@@ -141,7 +141,7 @@ extern "C"
 
     void print_detailed_powers_queue
 
-        (FILE *stream, char *prefix, PowersQueue *powers_queue) ;
+        (FILE *stream, String_t prefix, PowersQueue *powers_queue) ;
 
 
 

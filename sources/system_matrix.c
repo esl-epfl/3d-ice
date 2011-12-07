@@ -98,7 +98,7 @@ void free_system_matrix (SystemMatrix* system_matrix)
 
 /******************************************************************************/
 
-void print_system_matrix (char *file_name, SystemMatrix system_matrix)
+void print_system_matrix (String_t file_name, SystemMatrix system_matrix)
 {
     FILE* file = fopen (file_name, "w") ;
 
