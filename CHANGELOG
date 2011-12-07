@@ -27,6 +27,8 @@
  #                                                                            #
  # For any comment, suggestion or request  about 3D-ICE, please  register and #
  # write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) #
+ # Any usage  of 3D-ICE  for research,  commercial or other  purposes must be #
+ # properly acknowledged in the resulting products or publications.           #
  #                                                                            #
  # EPFL-STI-IEL-ESL                                                           #
  # Batiment ELG, ELG 130                Mail : 3d-ice@listes.epfl.ch          #
@@ -34,6 +36,19 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
+ ##############################################################################
+ 2011-12-07 3D-ICE 2.0
+   * Code enhancement
+   * Doxygen documentation
+   * 2 resistors thermal model for micro-channels and pin-fins
+   * Support for steady state simulation
+   * Inspection points (new stack section)
+   * TextInput-based thermal simulator (bin folder)
+   * Test routines (for system matrix and output temperatures)
+ ##############################################################################
+ 2011-07-11 3D-ICE 1.0.3
+   * Bug fix: memory allocation for system matrix
+   * Bug fix: stack description path tokens
  ##############################################################################
  2011-06-03 3D-ICE 1.0.2
    * Bug fix: Improved filling source vector functions
