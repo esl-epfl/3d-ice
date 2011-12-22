@@ -448,7 +448,8 @@ extern "C"
         TDICE_OUTPUT_TYPE_TCELL,      //!< Single thermal cell
         TDICE_OUTPUT_TYPE_TFLP,       //!< All the element in a floorplan
         TDICE_OUTPUT_TYPE_TFLPEL,     //!< A single floorplan element
-        TDICE_OUTPUT_TYPE_TMAP        //!< The thermal map of a stack element
+        TDICE_OUTPUT_TYPE_TMAP,       //!< The thermal map of a stack element
+        TDICE_OUTPUT_TYPE_TCOOLANT    //!< The coolant leaving the cavity
     } ;
 
 

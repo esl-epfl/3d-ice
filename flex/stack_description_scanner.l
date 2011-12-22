@@ -178,6 +178,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "step"                       return STEP ;
 "T"                          return TCELL ;
 "temperature"                return TEMPERATURE ;
+"Tcoolant"                   return TCOOLANT ;
 "Tflp"                       return TFLP ;
 "Tflpel"                     return TFLPEL ;
 "thermal"                    return THERMAL ;

@@ -55,6 +55,7 @@ extern "C"
 #include "dimensions.h"
 #include "floorplan_element.h"
 #include "stack_element.h"
+#include "channel.h"
 
 /******************************************************************************/
 
@@ -195,7 +196,7 @@ extern "C"
     /*! Allocates a Tflp in memory and sets its fields to their default
      *  value with #init_tflp
      *
-     * \return the pointer to a new TFlp
+     * \return the pointer to a new Tflp
      * \return \c NULL if the memory allocation fails
      */
 
@@ -264,7 +265,7 @@ extern "C"
     /*! Allocates a Tflpel in memory and sets its fields to their default
      *  value with #init_tflpel
      *
-     * \return the pointer to a new TFlp
+     * \return the pointer to a new Tflpel
      * \return \c NULL if the memory allocation fails
      */
 
@@ -299,6 +300,75 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
+    /*! \struct Tcoolant
+     *
+     *  \brief Temperature of the coolant when leaving a cavity
+     */
+
+    struct Tcoolant
+    {
+        /*! The kind of quantity to be measured */
+
+        OutputQuantity_t Quantity ;
+
+        /*! The channel used in the stack */
+
+        Channel *Channel ;
+    } ;
+
+    /*! Definition of the type Tcoolant */
+
+    typedef struct Tcoolant Tcoolant ;
+
+
+
+    /*! Sets all the fields of \a tcoolant to a default value (zero or \c NULL ).
+     *
+     * \param tcoolant the address of the tcoolant to initialize
+     */
+
+    void init_tcoolant (Tcoolant *tcoolant) ;
+
+
+
+    /*! Allocates a Tcoolant in memory and sets its fields to their default
+     *  value with #init_tcoolant
+     *
+     * \return the pointer to a new Tcoolant
+     * \return \c NULL if the memory allocation fails
+     */
+
+    Tcoolant *alloc_and_init_tcoolant (void) ;
+
+
+
+    /*! Frees the memory related to \a tcoolant
+     *
+     * The parametrer \a tcoolant must be a pointer previously obtained with
+     * #alloc_and_init_tcoolant
+     *
+     * \param tcoolant the address of the Tcoolant structure to free
+     */
+
+    void free_tcoolant (Tcoolant *tcoolant) ;
+
+
+
+    /*! Prints a list of detailed information about all the fields of \a tcoolant
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param tcoolant the address of the Tcoolant structure to print
+     */
+
+    void print_detailed_tcoolant
+
+        (FILE *stream, String_t prefix, Tcoolant *tcoolant) ;
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
     /*! \union InspectionPoint_p
      *
      *  \brief A union of pointers to types that can be an instance of InspectionPoint
@@ -306,9 +376,10 @@ extern "C"
 
     union InspectionPoint_p
     {
-        Tcell  *Tcell ;   /*!< Pointer to a Tcell */
-        Tflp   *Tflp ;    /*!< Pointer to a Tflp */
-        Tflpel *Tflpel ;  /*!< Pointer to a Tflpel */
+        Tcell    *Tcell ;     /*!< Pointer to a Tcell */
+        Tflp     *Tflp ;      /*!< Pointer to a Tflp */
+        Tflpel   *Tflpel ;    /*!< Pointer to a Tflpel */
+        Tcoolant *Tcoolant ;  /*!< Pointer to a Tcoolant */
     } ;
 
     /*! Definition of the type InspectionPoint_p */

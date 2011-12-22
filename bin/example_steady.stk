@@ -49,8 +49,10 @@ solver:
    initial temperature 300.0 ;
 
 output:
-   T      ( MEMORY_DIE, 5000, 3000, "output1.txt",             step ) ;
-   Tmap   (   CORE_DIE,             "output2.txt",             slot ) ;
-   Tflp   ( MEMORY_DIE,             "output3.txt", minimum,    step ) ;
-   Tflpel (   CORE_DIE.Core1,       "output4.txt", average,    final) ;
+   T        (  MEMORY_DIE, 5000, 3000, "output1.txt",             final ) ;
+   Tmap     (    CORE_DIE,             "output2.txt",             final ) ;
+   Tflp     (  MEMORY_DIE,             "output3.txt", minimum,    final ) ;
+   Tflpel   (   CORE_DIE.Core1,        "output4.txt", average,    final ) ;
+   Tcoolant ( TOP_CHANNEL,             "output5.txt", maximum,    final ) ;
+
 

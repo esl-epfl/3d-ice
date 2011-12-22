@@ -232,6 +232,54 @@ extern "C"
         SystemMatrix  system_matrix
     ) ;
 
+
+
+    /*! Returns the maximum temperature at the outlet of the channel
+     *
+     *  \param channel       pointer to the channel
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param temperatures  pointer to the temperature of the first thermal
+     *                       cell in the layer where \a channel is placed
+     *
+     *  \return The maximum temperature at the outlet of the channel
+     */
+
+    Temperature_t get_max_temperature_channel_outlet
+
+        (Channel *channel, Dimensions *dimensions, Temperature_t *temperatures) ;
+
+
+
+    /*! Returns the minimum temperature at the outlet of the channel
+     *
+     *  \param channel       pointer to the channel
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param temperatures  pointer to the temperature of the first thermal
+     *                       cell in the layer where \a channel is placed
+     *
+     *  \return The minimum temperature at the outlet of the channel
+     */
+
+    Temperature_t get_min_temperature_channel_outlet
+
+        (Channel *channel, Dimensions *dimensions, Temperature_t *temperatures) ;
+
+
+
+    /*! Returns the average temperature at the outlet of the channel
+     *
+     *  \param channel       pointer to the channel
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param temperatures  pointer to the temperature of the first thermal
+     *                       cell in the layer where \a channel is placed
+     *
+     *  \return The average temperature at the outlet of the channel
+     */
+
+    Temperature_t get_avg_temperature_channel_outlet
+
+        (Channel *channel, Dimensions *dimensions, Temperature_t *temperatures) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

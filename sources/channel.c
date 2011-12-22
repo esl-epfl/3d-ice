@@ -806,4 +806,85 @@ SystemMatrix fill_system_matrix_channel
     return system_matrix ;
 }
 
-  /******************************************************************************/
+/******************************************************************************/
+
+Temperature_t get_max_temperature_channel_outlet
+(
+    Channel       *channel,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures
+)
+{
+    temperatures += get_cell_offset_in_layer
+
+        (dimensions, LAST_ROW_INDEX(dimensions), 0) ;
+
+    Temperature_t max = *temperatures ;
+
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
+
+            max = MAX (max, *temperatures) ;
+
+        temperatures++ ;
+    }
+
+    return max ;
+}
+
+/******************************************************************************/
+
+Temperature_t get_min_temperature_channel_outlet
+(
+    Channel       *channel,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures
+)
+{
+    temperatures += get_cell_offset_in_layer
+
+        (dimensions, LAST_ROW_INDEX(dimensions), 0) ;
+
+    Temperature_t min = *temperatures ;
+
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
+
+            min = MIN (min, *temperatures) ;
+
+        temperatures++ ;
+    }
+
+    return min ;
+}
+
+/******************************************************************************/
+
+Temperature_t get_avg_temperature_channel_outlet
+(
+    Channel       *channel,
+    Dimensions    *dimensions,
+    Temperature_t *temperatures
+)
+{
+    temperatures += get_cell_offset_in_layer
+
+        (dimensions, LAST_ROW_INDEX(dimensions), 0) ;
+
+    Temperature_t avg = *temperatures ;
+
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
+
+            avg += *temperatures ;
+
+        temperatures++ ;
+    }
+
+    return avg / (Temperature_t) channel->NChannels ;
+}
+
+/******************************************************************************/
