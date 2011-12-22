@@ -1515,7 +1515,6 @@ inspection_point
         }
 
         tcoolant->Quantity = $7 ;
-        tcoolant->Channel  = stkd->Channel ;
 
         inspection_point->Type             = TDICE_OUTPUT_TYPE_TCOOLANT ;
         inspection_point->Instant          = $8 ;

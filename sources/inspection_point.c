@@ -243,7 +243,6 @@ void print_detailed_tflpel (FILE  *stream, String_t prefix, Tflpel *tflpel)
 void init_tcoolant (Tcoolant *tcoolant)
 {
     tcoolant->Quantity = TDICE_OUTPUT_QUANTITY_NONE ;
-    tcoolant->Channel  = NULL ;
 }
 
 /******************************************************************************/
@@ -277,10 +276,6 @@ void print_detailed_tcoolant (FILE *stream, String_t prefix, Tcoolant *tcoolant)
     fprintf (stream,
         "%s  Quantity              = %d\n",
         prefix, tcoolant->Quantity) ;
-
-    fprintf (stream,
-        "%s  Channel               = %p\n",
-        prefix, tcoolant->Channel) ;
 }
 
 /******************************************************************************/
@@ -913,19 +908,19 @@ Error_t generate_inspection_point_output
 
                  temperature = get_max_temperature_channel_outlet
 
-                     (inspection_point->Pointer.Tcoolant->Channel, dimensions, temperatures) ;
+                     (inspection_point->StackElement->Pointer.Channel, dimensions, temperatures) ;
 
             else if (inspection_point->Pointer.Tcoolant->Quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
 
                  temperature = get_min_temperature_channel_outlet
 
-                     (inspection_point->Pointer.Tcoolant->Channel, dimensions, temperatures) ;
+                     (inspection_point->StackElement->Pointer.Channel, dimensions, temperatures) ;
 
             else
 
                  temperature = get_avg_temperature_channel_outlet
 
-                     (inspection_point->Pointer.Tcoolant->Channel, dimensions, temperatures) ;
+                     (inspection_point->StackElement->Pointer.Channel, dimensions, temperatures) ;
 
             fprintf (output_stream,
                 "%5.3f \t %7.3f\n", current_time, temperature) ;

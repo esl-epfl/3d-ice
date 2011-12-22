@@ -55,7 +55,6 @@ extern "C"
 #include "dimensions.h"
 #include "floorplan_element.h"
 #include "stack_element.h"
-#include "channel.h"
 
 /******************************************************************************/
 
@@ -311,9 +310,6 @@ extern "C"
 
         OutputQuantity_t Quantity ;
 
-        /*! The channel used in the stack */
-
-        Channel *Channel ;
     } ;
 
     /*! Definition of the type Tcoolant */
