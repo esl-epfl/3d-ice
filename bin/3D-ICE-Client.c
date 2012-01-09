@@ -50,5 +50,19 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
+    UnixSocket_t local_socket ;
+
+    Error_t result = init_client_network_socket (&local_socket, "127.0.0.1", 10024) ;
+
+    if (result == TDICE_FAILURE)
+
+        return EXIT_FAILURE ;
+
+    result = close_client_network_socket (&local_socket) ;
+
+    if (result == TDICE_FAILURE)
+
+        return EXIT_FAILURE ;
+
     return EXIT_SUCCESS ;
 }

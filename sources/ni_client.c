@@ -36,38 +36,149 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <stdio.h>
+#include <errno.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <netdb.h>
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
 #include "ni_client.h"
 
 /******************************************************************************/
 
-int init_client_unix_domain
+Error_t init_client_unix_socket
 (
-    String_t __attribute__ ((unused)) socket_name
+    UnixSocket_t *socket_id,
+    String_t      socket_name
 )
 {
-    return 0 ;
+    *socket_id = socket (AF_UNIX, SOCK_STREAM, 0) ;
+
+    if (*socket_id < 0)
+    {
+        perror ("ERROR :: Creating client unix socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    struct sockaddr_un server_address ;
+
+    memset (&server_address, '\0', sizeof(struct sockaddr_un)) ;
+
+    server_address.sun_family = AF_UNIX ;
+
+    strcpy (server_address.sun_path, socket_name) ;
+
+    socklen_t servlen = (socklen_t)
+
+        (strlen (server_address.sun_path) + sizeof (server_address.sun_family)) ;
+
+    if (connect (*socket_id, (struct sockaddr *) &server_address, servlen) < 0)
+    {
+        perror ("ERROR :: Connecting client unix socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    // fprintf(stdout, "Connection established.\n") ;
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-int init_client_internet_domain
+Error_t init_client_network_socket
 (
-    int      __attribute__ ((unused)) *socket_id,
-    String_t __attribute__ ((unused))  host_name,
-    int      __attribute__ ((unused))  port_number
+    NetworkSocket_t *socket_id,
+    String_t        host_name,
+    int             port_number
 )
 {
-    return 0 ;
+    *socket_id = socket (AF_INET, SOCK_STREAM, 0) ;
+
+    if (*socket_id < 0)
+    {
+        perror ("ERROR :: Creating client network socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    struct hostent *server = gethostbyname (host_name) ;  // FIXME this is obsolete
+
+    if (server == NULL)
+    {
+        fprintf (stderr, "ERROR :: host %s not found\n", host_name) ;
+
+        close_client_network_socket (socket_id) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    struct sockaddr_in server_address ;
+
+    memset (&server_address, '\0', sizeof(struct sockaddr_in)) ;
+
+    server_address.sin_family = AF_INET ;
+    server_address.sin_port   = htons (port_number) ;
+
+    memcpy
+
+        (&server_address.sin_addr.s_addr, server->h_addr, server->h_length) ;
+
+    int tmp = connect (                    *socket_id,
+                       (struct sockaddr *) &server_address,
+                                            sizeof(struct sockaddr_in)) ;
+
+    if (tmp < 0)
+    {
+        perror ("ERROR :: Connecting client network socket") ;
+
+        close_client_network_socket (socket_id) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    // fprintf(stdout, "Connection established.\n");
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-void close_client
+Error_t close_client_unix_socket
 (
-    int __attribute__ ((unused)) socket_id
+    UnixSocket_t *socket_id
 )
 {
-    ;
+    if (close (*socket_id) != 0)
+    {
+        perror ("ERROR :: Closing socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t close_client_network_socket
+(
+    NetworkSocket_t *socket_id
+)
+{
+    if (close (*socket_id) != 0)
+    {
+        perror ("ERROR :: Closing socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

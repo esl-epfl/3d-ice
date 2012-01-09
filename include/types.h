@@ -482,6 +482,18 @@ extern "C"
 
 /******************************************************************************/
 
+    /*! Definition of the type UnixSocket_t */
+
+    typedef int UnixSocket_t ;
+
+
+
+    /*! Definition of the type NetworkSocket_t */
+
+    typedef int NetworkSocket_t ;
+
+/******************************************************************************/
+
 #ifdef __cplusplus
 }
 #endif

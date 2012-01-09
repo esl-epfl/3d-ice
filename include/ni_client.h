@@ -39,6 +39,8 @@
 #ifndef _3DICE_CLIENT_H_
 #define _3DICE_CLIENT_H_
 
+/*! \file ni_client.h */
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -50,13 +52,62 @@ extern "C"
 
 /******************************************************************************/
 
-    int init_client_unix_domain (String_t socket_name) ;
+    /*! Initializes a socket in the unix domain
+     *
+     * \param socket_id   the address of the socket to initialize
+     * \param socket_name the name of the socket to inizialize
+     *
+     * \return \c TDICE_SUCCESS if the initialization succeeded
+     * \return \c TDICE_FAILURE if the initialization fails. A message will be
+     *                          printed on standard error
+     */
 
-    int init_client_internet_domain
+    Error_t init_client_unix_socket
 
-        (int *socket_id, String_t host_name, int port_number) ;
+        (UnixSocket_t *socket_id, String_t socket_name) ;
 
-    void close_client (int socket_id) ;
+
+
+    /*! Initializes a socket in the network domain
+     *
+     * \param socket_id the address of the socket to initialize
+     * \param host_name the ip address of the server
+     * \param port_number the port number of the server
+     *
+     * \return \c TDICE_SUCCESS if the initialization succeeded
+     * \return \c TDICE_FAILURE if the initialization fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t init_client_network_socket
+
+        (NetworkSocket_t *socket_id, String_t host_name, int port_number) ;
+
+
+
+    /*! Closes a socket in the unix domain
+     *
+     * \param socket_id the address of the socket to close
+     *
+     * \return \c TDICE_SUCCESS if the closure succeeded
+     * \return \c TDICE_FAILURE if the closure fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t close_client_unix_socket (UnixSocket_t *socket_id) ;
+
+
+
+    /*! Closes a socket in the network domain
+     *
+     * \param socket_id the address of the socket to close
+     *
+     * \return \c TDICE_SUCCESS if the closure succeeded
+     * \return \c TDICE_FAILURE if the closure fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t close_client_network_socket (NetworkSocket_t *socket_id) ;
 
 #ifdef __cplusplus
 }
