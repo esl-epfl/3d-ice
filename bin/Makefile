@@ -40,7 +40,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-all: 3D-ICE-Emulator
+all: 3D-ICE-Emulator 3D-ICE-Client 3D-ICE-Server
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
@@ -50,8 +50,24 @@ CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 3D-ICE-Emulator: 3D-ICE-Emulator.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
+-include 3D-ICE-Client.d
+
+3D-ICE-Client: 3D-ICE-Client.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
+-include 3D-ICE-Server.d
+
+3D-ICE-Server: 3D-ICE-Server.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
 clean:
 	@$(RM) $(RMFLAGS) 3D-ICE-Emulator
 	@$(RM) $(RMFLAGS) 3D-ICE-Emulator.o
 	@$(RM) $(RMFLAGS) 3D-ICE-Emulator.d
+	@$(RM) $(RMFLAGS) 3D-ICE-Client
+	@$(RM) $(RMFLAGS) 3D-ICE-Client.o
+	@$(RM) $(RMFLAGS) 3D-ICE-Client.d
+	@$(RM) $(RMFLAGS) 3D-ICE-Server
+	@$(RM) $(RMFLAGS) 3D-ICE-Server.o
+	@$(RM) $(RMFLAGS) 3D-ICE-Server.d
 
