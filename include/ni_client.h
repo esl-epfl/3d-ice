@@ -52,7 +52,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Initializes a socket in the unix domain
+    /*! Initializes a client socket in the unix domain
      *
      * \param socket_id   the address of the socket to initialize
      * \param socket_name the name of the socket to inizialize
@@ -68,7 +68,7 @@ extern "C"
 
 
 
-    /*! Initializes a socket in the network domain
+    /*! Initializes a client socket in the network domain
      *
      * \param socket_id the address of the socket to initialize
      * \param host_name the ip address of the server
@@ -85,7 +85,7 @@ extern "C"
 
 
 
-    /*! Closes a socket in the unix domain
+    /*! Closes a client socket in the unix domain
      *
      * \param socket_id the address of the socket to close
      *
@@ -98,7 +98,7 @@ extern "C"
 
 
 
-    /*! Closes a socket in the network domain
+    /*! Closes a clilent socket in the network domain
      *
      * \param socket_id the address of the socket to close
      *

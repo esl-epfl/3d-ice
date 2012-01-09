@@ -36,38 +36,155 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <string.h>
+#include <stdio.h>
+#include <errno.h>
+#include <unistd.h>
+
+#include <sys/un.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+
 #include "ni_server.h"
 
 /******************************************************************************/
 
-int init_server_unix_domain
+Error_t init_server_unix_socket
 (
-    int      __attribute__ ((unused)) *server_socket_id,
-    String_t __attribute__ ((unused))  socket_name
+    UnixSocket_t *socket_id,
+    String_t      socket_name
 )
 {
-    return 0 ;
+    struct sockaddr_un server_address ;
+
+    memset (&server_address, '\0', sizeof(struct sockaddr_un)) ;
+
+    server_address.sun_family = AF_UNIX ;
+
+    strcpy (server_address.sun_path, socket_name) ;
+
+    socklen_t servlen = (socklen_t)
+
+        strlen (server_address.sun_path) + sizeof(server_address.sun_family) ;
+
+    *socket_id = socket (AF_UNIX, SOCK_STREAM, 0) ;
+
+    if (*socket_id < 0)
+    {
+        perror ("ERROR :: Connecting server unix socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    int tmp = bind (*socket_id, (struct sockaddr *) &server_address, servlen) ;
+
+    if (tmp < 0)
+    {
+        perror ("ERROR :: binding unix socket") ;
+
+        close_server_unix_socket (socket_id) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    tmp = listen (*socket_id, 1);
+
+    if (tmp < 0)
+    {
+        perror ("ERROR :: Listening unix socket") ;
+
+        close_server_unix_socket (socket_id) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-int init_server_internet_domain
+Error_t init_server_network_socket
 (
-    int __attribute__ ((unused)) *server_socket_id,
-    int __attribute__ ((unused))  port_number
+    NetworkSocket_t *socket_id,
+    int              port_number
 )
 {
-    return 0 ;
+    struct sockaddr_in server_address ;
+
+    memset (&server_address, '\0', sizeof(struct sockaddr_in) ) ;
+
+    server_address.sin_family      = AF_INET ;
+    server_address.sin_port        = htons (port_number) ;
+    server_address.sin_addr.s_addr = INADDR_ANY ;
+
+    *socket_id = socket (AF_INET, SOCK_STREAM, 0) ;
+
+    if (*socket_id < 0)
+    {
+        perror ("ERROR :: Creating server network socket\n") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    int tmp = bind
+
+        (*socket_id, (struct sockaddr *) &server_address, sizeof(server_address)) ;
+
+    if (tmp < 0)
+    {
+        perror ("ERROR :: Binding server network socket\n") ;
+
+        close_server_network_socket (socket_id) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    tmp = listen (*socket_id, 1) ;
+
+    if (tmp < 0)
+    {
+        perror ("ERROR :: Listening network socket\n") ;
+
+        close_server_network_socket (socket_id) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-void close_server
+Error_t close_server_unix_socket
 (
-    int __attribute__ ((unused)) socket_id
+    UnixSocket_t *socket_id
 )
 {
-    ;
+    if (close (*socket_id) != 0)
+    {
+        perror ("ERROR :: Closing server unix socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t close_server_network_socket
+(
+    NetworkSocket_t *socket_id
+)
+{
+    if (close (*socket_id) != 0)
+    {
+        perror ("ERROR :: Closing server network socket") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

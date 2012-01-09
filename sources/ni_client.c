@@ -156,7 +156,7 @@ Error_t close_client_unix_socket
 {
     if (close (*socket_id) != 0)
     {
-        perror ("ERROR :: Closing socket") ;
+        perror ("ERROR :: Closing client unix socket") ;
 
         return TDICE_FAILURE ;
     }
@@ -173,7 +173,7 @@ Error_t close_client_network_socket
 {
     if (close (*socket_id) != 0)
     {
-        perror ("ERROR :: Closing socket") ;
+        perror ("ERROR :: Closing client network socket") ;
 
         return TDICE_FAILURE ;
     }

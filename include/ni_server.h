@@ -50,11 +50,61 @@ extern "C"
 
 /******************************************************************************/
 
-    int init_server_unix_domain (int *socket_id, String_t socket_name) ;
+    /*! Initializes a server socket in the unix domain
+     *
+     * \param socket_id   the address of the socket to initialize
+     * \param socket_name the name of the socket to inizialize
+     *
+     * \return \c TDICE_SUCCESS if the initialization succeeded
+     * \return \c TDICE_FAILURE if the initialization fails. A message will be
+     *                          printed on standard error
+     */
 
-    int init_server_internet_domain (int *server_socket_id, int port_number) ;
+    Error_t init_server_unix_socket
 
-    void close_socket (int socket_id) ;
+        (UnixSocket_t *socket_id, String_t socket_name) ;
+
+
+
+    /*! Initializes a server socket in the network domain
+     *
+     * \param socket_id the address of the socket to initialize
+     * \param port_number the port number of the server
+     *
+     * \return \c TDICE_SUCCESS if the initialization succeeded
+     * \return \c TDICE_FAILURE if the initialization fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t init_server_network_socket
+
+        (NetworkSocket_t *socket_id, int port_number) ;
+
+
+
+    /*! Closes a server socket in the unix domain
+     *
+     * \param socket_id the address of the socket to close
+     *
+     * \return \c TDICE_SUCCESS if the closure succeeded
+     * \return \c TDICE_FAILURE if the closure fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t close_server_unix_socket (UnixSocket_t *socket_id) ;
+
+
+
+    /*! Closes a server socket in the network domain
+     *
+     * \param socket_id the address of the socket to close
+     *
+     * \return \c TDICE_SUCCESS if the closure succeeded
+     * \return \c TDICE_FAILURE if the closure fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t close_server_network_socket (NetworkSocket_t *socket_id) ;
 
 #ifdef __cplusplus
 }
