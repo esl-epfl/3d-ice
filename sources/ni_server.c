@@ -36,13 +36,12 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <string.h>
 #include <stdio.h>
-#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 
-#include <sys/un.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 
 #include "ni_server.h"
@@ -51,47 +50,67 @@
 
 Error_t init_server_socket
 (
-    NetworkSocket_t *socket_id,
-    int              port_number
+    ServerSocket *server_socket,
+    int           port_number
 )
 {
-    struct sockaddr_in server_address ;
+    server_socket->SocketId = socket (AF_INET, SOCK_STREAM, 0) ;
 
-    memset (&server_address, '\0', sizeof(struct sockaddr_in) ) ;
-
-    server_address.sin_family      = AF_INET ;
-    server_address.sin_port        = htons (port_number) ;
-    server_address.sin_addr.s_addr = INADDR_ANY ;
-
-    *socket_id = socket (AF_INET, SOCK_STREAM, 0) ;
-
-    if (*socket_id < 0)
+    if (server_socket->SocketId < 0)
     {
-        perror ("ERROR :: Creating server network socket\n") ;
+        perror ("ERROR :: server socket creation") ;
 
         return TDICE_FAILURE ;
     }
 
-    int tmp = bind
+    memset ((void *) &(server_socket->ServerAddress), 0, sizeof (struct sockaddr_in)) ;
 
-        (*socket_id, (struct sockaddr *) &server_address, sizeof(server_address)) ;
+    server_socket->ServerAddress.sin_family      = AF_INET ;
+    server_socket->ServerAddress.sin_port        = htons (port_number) ;
+    server_socket->ServerAddress.sin_addr.s_addr = htonl (INADDR_ANY) ;
 
-    if (tmp < 0)
+    if (bind (server_socket->SocketId,
+              (struct sockaddr *) &server_socket->ServerAddress,
+              sizeof (struct sockaddr_in)) < 0)
     {
-        perror ("ERROR :: Binding server network socket\n") ;
+        perror ("ERROR :: server bind") ;
 
-        close_server_socket (socket_id) ;
+        close_server_socket (server_socket) ;
 
         return TDICE_FAILURE ;
     }
 
-    tmp = listen (*socket_id, 1) ;
-
-    if (tmp < 0)
+    if (listen (server_socket->SocketId, 1) < 0)
     {
-        perror ("ERROR :: Listening network socket\n") ;
+        perror ("ERROR :: server listen") ;
 
-        close_server_socket (socket_id) ;
+        close_server_socket (server_socket) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t wait_for_client
+(
+    ServerSocket *server_socket,
+    ClientSocket *client_socket
+)
+{
+    socklen_t length = sizeof (struct sockaddr_in) ;
+
+    client_socket->SocketId = accept (server_socket->SocketId,
+                                      (struct sockaddr *) &(client_socket->ServerAddress),
+                                      &length) ;
+
+    if (client_socket->SocketId < 0)
+    {
+        perror ("ERROR :: server accept") ;
+
+        close_server_socket (server_socket) ;
 
         return TDICE_FAILURE ;
     }
@@ -103,10 +122,10 @@ Error_t init_server_socket
 
 Error_t close_server_socket
 (
-    NetworkSocket_t *socket_id
+    ServerSocket *server_socket
 )
 {
-    if (close (*socket_id) != 0)
+    if (close (server_socket->SocketId) != 0)
     {
         perror ("ERROR :: Closing server network socket") ;
 

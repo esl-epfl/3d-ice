@@ -42,6 +42,8 @@ include $(3DICE_MAIN)/makefile.def
 
 all: 3D-ICE-Emulator 3D-ICE-Client 3D-ICE-Server
 
+CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
+
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
 CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 

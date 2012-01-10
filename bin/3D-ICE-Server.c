@@ -38,14 +38,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-
 #include "types.h"
+#include "ni_client.h"
+#include "ni_server.h"
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
@@ -56,15 +53,8 @@ int main (int argc, char** argv)
     Analysis         analysis ;
     ThermalData      tdata ;
 
-    NetworkSocket_t server_socket ;
-    NetworkSocket_t client_socket ;
-
-    struct sockaddr_in server_address ;
-    struct sockaddr_in client_address ;
-
-    socklen_t client_length ;
-
-    char client_id [24] ;
+    ServerSocket server_socket ;
+    ClientSocket client_socket ;
 
     char message [125] ;
 
@@ -117,78 +107,23 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
-    server_socket = socket (AF_INET, SOCK_STREAM, 0) ;
-
-    if (server_socket < 0)
-    {
-        perror ("ERROR :: server socket creation") ;
+    if (init_server_socket (&server_socket, 10024) != TDICE_SUCCESS)
 
         goto socket_error ;
-    }
 
     fprintf (stdout, "done !\n") ;
 
-    /* Fills server address ***************************************************/
-
-    memset ((void *) &server_address, 0, sizeof (struct sockaddr_in)) ;
-
-    server_address.sin_family      = AF_INET ;
-    server_address.sin_port        = htons (10024) ;
-    server_address.sin_addr.s_addr = htonl (INADDR_ANY) ;
-
-    /* Binds server address to the scket **************************************/
-
-    fprintf (stdout, "Binding socket to address ... ") ; fflush (stdout) ;
-
-    if (bind (server_socket,
-              (struct sockaddr *) &server_address,
-              sizeof (struct sockaddr_in)) < 0)
-    {
-        perror ("ERROR :: server bind") ;
-
-        goto bind_error ;
-    }
-
-    fprintf (stdout, "done !\n") ;
-
-    /* Listens for connections on the socket **********************************/
-
-    fprintf (stdout, "Listening ... ") ; fflush (stdout) ;
-
-    if (listen (server_socket, 1) < 0)
-    {
-        perror ("ERROR :: server listen") ;
-
-        goto listen_error ;
-    }
-
-    fprintf (stdout, "done !\n") ;
-
-    /**************************************************************************/
+    /* Waits for a client to connect ******************************************/
 
     fprintf (stdout, "Waiting for client ... ") ; fflush (stdout) ;
 
-    client_length = sizeof (struct sockaddr_in) ;
+    if (wait_for_client (&server_socket, &client_socket) != TDICE_SUCCESS)
 
-    client_socket = accept (server_socket,
-                            ( struct sockaddr *) &client_address,
-                            &client_length) ;
+        goto wait_error ;
 
-    if (client_socket < 0)
-    {
-        perror ("ERROR :: server accept") ;
+    fprintf (stdout, "done !\n") ;
 
-        goto accept_error ;
-    }
-
-    if (inet_ntop (AF_INET, &client_address.sin_addr, client_id, sizeof (client_id)) == NULL)
-    {
-        perror ("ERROR :: client identification") ;
-
-        goto client_id_error ;
-    }
-
-    fprintf (stdout, "done (%s:%d)!\n", client_id, ntohs (client_address.sin_port)) ;
+//    fprintf (stdout, "done (%s:%d)!\n", client_id, ntohs (client_address.sin_port)) ;
 
     /**************************************************************************/
 
@@ -200,7 +135,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Sending >%s< (%Zu bytes) to client ... ", message, to_send) ; fflush (stdout) ;
 
-    sent = write (client_socket, message, to_send) ;
+    sent = write (client_socket.SocketId, message, to_send) ;
 
     if (sent == -1)
     {
@@ -220,8 +155,8 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    close                  (client_socket) ;
-    close                  (server_socket) ;
+    close_client_socket    (&client_socket) ;
+    close_server_socket    (&server_socket) ;
     free_thermal_data      (&tdata) ;
     free_analysis          (&analysis) ;
     free_stack_description (&stkd) ;
@@ -229,12 +164,9 @@ int main (int argc, char** argv)
     return EXIT_SUCCESS ;
 
 write_error :
-                            close                  (client_socket) ;
-client_id_error :
-accept_error :
-listen_error :
-bind_error :
-                            close                  (server_socket) ;
+                            close_client_socket    (&client_socket) ;
+wait_error :
+                            close_server_socket    (&server_socket) ;
 socket_error :
                             free_thermal_data      (&tdata) ;
 ftd_error :
