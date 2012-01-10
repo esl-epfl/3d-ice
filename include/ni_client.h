@@ -52,23 +52,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Initializes a client socket in the unix domain
-     *
-     * \param socket_id   the address of the socket to initialize
-     * \param socket_name the name of the socket to inizialize
-     *
-     * \return \c TDICE_SUCCESS if the initialization succeeded
-     * \return \c TDICE_FAILURE if the initialization fails. A message will be
-     *                          printed on standard error
-     */
-
-    Error_t init_client_unix_socket
-
-        (UnixSocket_t *socket_id, String_t socket_name) ;
-
-
-
-    /*! Initializes a client socket in the network domain
+    /*! Initializes a client socket
      *
      * \param socket_id the address of the socket to initialize
      * \param host_name the ip address of the server
@@ -79,13 +63,13 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t init_client_network_socket
+    Error_t init_client_socket
 
         (NetworkSocket_t *socket_id, String_t host_name, int port_number) ;
 
 
 
-    /*! Closes a client socket in the unix domain
+    /*! Closes a client socket
      *
      * \param socket_id the address of the socket to close
      *
@@ -94,20 +78,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t close_client_unix_socket (UnixSocket_t *socket_id) ;
-
-
-
-    /*! Closes a clilent socket in the network domain
-     *
-     * \param socket_id the address of the socket to close
-     *
-     * \return \c TDICE_SUCCESS if the closure succeeded
-     * \return \c TDICE_FAILURE if the closure fails. A message will be
-     *                          printed on standard error
-     */
-
-    Error_t close_client_network_socket (NetworkSocket_t *socket_id) ;
+    Error_t close_client_socket (NetworkSocket_t *socket_id) ;
 
 #ifdef __cplusplus
 }

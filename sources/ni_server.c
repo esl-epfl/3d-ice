@@ -49,61 +49,7 @@
 
 /******************************************************************************/
 
-Error_t init_server_unix_socket
-(
-    UnixSocket_t *socket_id,
-    String_t      socket_name
-)
-{
-    struct sockaddr_un server_address ;
-
-    memset (&server_address, '\0', sizeof(struct sockaddr_un)) ;
-
-    server_address.sun_family = AF_UNIX ;
-
-    strcpy (server_address.sun_path, socket_name) ;
-
-    socklen_t servlen = (socklen_t)
-
-        strlen (server_address.sun_path) + sizeof(server_address.sun_family) ;
-
-    *socket_id = socket (AF_UNIX, SOCK_STREAM, 0) ;
-
-    if (*socket_id < 0)
-    {
-        perror ("ERROR :: Connecting server unix socket") ;
-
-        return TDICE_FAILURE ;
-    }
-
-    int tmp = bind (*socket_id, (struct sockaddr *) &server_address, servlen) ;
-
-    if (tmp < 0)
-    {
-        perror ("ERROR :: binding unix socket") ;
-
-        close_server_unix_socket (socket_id) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    tmp = listen (*socket_id, 1);
-
-    if (tmp < 0)
-    {
-        perror ("ERROR :: Listening unix socket") ;
-
-        close_server_unix_socket (socket_id) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-Error_t init_server_network_socket
+Error_t init_server_socket
 (
     NetworkSocket_t *socket_id,
     int              port_number
@@ -134,7 +80,7 @@ Error_t init_server_network_socket
     {
         perror ("ERROR :: Binding server network socket\n") ;
 
-        close_server_network_socket (socket_id) ;
+        close_server_socket (socket_id) ;
 
         return TDICE_FAILURE ;
     }
@@ -145,7 +91,7 @@ Error_t init_server_network_socket
     {
         perror ("ERROR :: Listening network socket\n") ;
 
-        close_server_network_socket (socket_id) ;
+        close_server_socket (socket_id) ;
 
         return TDICE_FAILURE ;
     }
@@ -155,24 +101,7 @@ Error_t init_server_network_socket
 
 /******************************************************************************/
 
-Error_t close_server_unix_socket
-(
-    UnixSocket_t *socket_id
-)
-{
-    if (close (*socket_id) != 0)
-    {
-        perror ("ERROR :: Closing server unix socket") ;
-
-        return TDICE_FAILURE ;
-    }
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-Error_t close_server_network_socket
+Error_t close_server_socket
 (
     NetworkSocket_t *socket_id
 )

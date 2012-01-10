@@ -50,48 +50,7 @@
 
 /******************************************************************************/
 
-Error_t init_client_unix_socket
-(
-    UnixSocket_t *socket_id,
-    String_t      socket_name
-)
-{
-    *socket_id = socket (AF_UNIX, SOCK_STREAM, 0) ;
-
-    if (*socket_id < 0)
-    {
-        perror ("ERROR :: Creating client unix socket") ;
-
-        return TDICE_FAILURE ;
-    }
-
-    struct sockaddr_un server_address ;
-
-    memset (&server_address, '\0', sizeof(struct sockaddr_un)) ;
-
-    server_address.sun_family = AF_UNIX ;
-
-    strcpy (server_address.sun_path, socket_name) ;
-
-    socklen_t servlen = (socklen_t)
-
-        (strlen (server_address.sun_path) + sizeof (server_address.sun_family)) ;
-
-    if (connect (*socket_id, (struct sockaddr *) &server_address, servlen) < 0)
-    {
-        perror ("ERROR :: Connecting client unix socket") ;
-
-        return TDICE_FAILURE ;
-    }
-
-    // fprintf(stdout, "Connection established.\n") ;
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-Error_t init_client_network_socket
+Error_t init_client_socket
 (
     NetworkSocket_t *socket_id,
     String_t        host_name,
@@ -113,7 +72,7 @@ Error_t init_client_network_socket
     {
         fprintf (stderr, "ERROR :: host %s not found\n", host_name) ;
 
-        close_client_network_socket (socket_id) ;
+        close_client_socket (socket_id) ;
 
         return TDICE_FAILURE ;
     }
@@ -137,7 +96,7 @@ Error_t init_client_network_socket
     {
         perror ("ERROR :: Connecting client network socket") ;
 
-        close_client_network_socket (socket_id) ;
+        close_client_socket (socket_id) ;
 
         return TDICE_FAILURE ;
     }
@@ -149,24 +108,7 @@ Error_t init_client_network_socket
 
 /******************************************************************************/
 
-Error_t close_client_unix_socket
-(
-    UnixSocket_t *socket_id
-)
-{
-    if (close (*socket_id) != 0)
-    {
-        perror ("ERROR :: Closing client unix socket") ;
-
-        return TDICE_FAILURE ;
-    }
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-Error_t close_client_network_socket
+Error_t close_client_socket
 (
     NetworkSocket_t *socket_id
 )
