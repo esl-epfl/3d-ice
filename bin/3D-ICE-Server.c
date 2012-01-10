@@ -44,9 +44,28 @@
 #include <sys/socket.h>
 
 #include "types.h"
+#include "stack_description.h"
+#include "thermal_data.h"
+#include "analysis.h"
 
 int main (int argc, char** argv)
 {
+    StackDescription stkd ;
+    Analysis         analysis ;
+    ThermalData      tdata ;
+
+    NetworkSocket_t server_socket ;
+    NetworkSocket_t client_socket ;
+
+    struct sockaddr_in server_address ;
+    struct sockaddr_in client_address ;
+
+    socklen_t client_length ;
+
+    char client_id [24] ;
+
+    /* Checks if all arguments are there **************************************/
+
     if (argc != 2)
     {
         fprintf (stderr, "Usage: \"%s file.stk\n", argv[0]) ;
@@ -54,20 +73,54 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    /**************************************************************************/
+    /* Parses stack file (fills stack descrition and analysis) ****************/
 
-    NetworkSocket_t server_socket = socket (AF_INET, SOCK_STREAM, 0) ;
+    fprintf (stdout, "Preparing stk data ... ") ; fflush (stdout) ;
+
+    init_stack_description (&stkd) ;
+    init_analysis          (&analysis) ;
+
+    if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
+
+        return EXIT_FAILURE ;
+
+    if (analysis.AnalysisType != TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        fprintf (stderr, "only transient analysis!\n") ;
+
+        goto wrong_analysis_error ;
+    }
+
+    fprintf (stdout, "done !\n") ;
+
+    /* Prepares thermal data **************************************************/
+
+    fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
+
+    init_thermal_data (&tdata) ;
+
+    if (fill_thermal_data (&tdata, &stkd, &analysis) == TDICE_FAILURE)
+
+        goto ftd_error ;
+
+    fprintf (stdout, "done !\n") ;
+
+    /* Creates socket *********************************************************/
+
+    fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
+
+    server_socket = socket (AF_INET, SOCK_STREAM, 0) ;
 
     if (server_socket < 0)
     {
         perror ("ERROR :: server socket creation") ;
 
-        return TDICE_FAILURE ;
+        goto socket_error ;
     }
 
-    /**************************************************************************/
+    fprintf (stdout, "done !\n") ;
 
-    struct sockaddr_in server_address ;
+    /* Fills server address ***************************************************/
 
     memset ((void *) &server_address, 0, sizeof (struct sockaddr_in)) ;
 
@@ -75,46 +128,59 @@ int main (int argc, char** argv)
     server_address.sin_port        = htons (10024) ;
     server_address.sin_addr.s_addr = htonl (INADDR_ANY) ;
 
-    /**************************************************************************/
+    /* Binds server address to the scket **************************************/
 
-    int result = bind (server_socket,
-                       (struct sockaddr *) &server_address,
-                       sizeof (struct sockaddr_in)) ;
+    fprintf (stdout, "Binding socket to address ... ") ; fflush (stdout) ;
 
-    if (result < 0)
+    if (bind (server_socket,
+              (struct sockaddr *) &server_address,
+              sizeof (struct sockaddr_in)) < 0)
     {
         perror ("ERROR :: server bind") ;
 
-        close (server_socket) ;
-
-        return EXIT_FAILURE ;
+        goto bind_error ;
     }
 
-    /**************************************************************************/
+    fprintf (stdout, "done !\n") ;
 
-    result = listen (server_socket, 1) ;
+    /* Listens for connections on the socket **********************************/
 
-    if (result < 0)
+    fprintf (stdout, "Listening ... ") ; fflush (stdout) ;
+
+    if (listen (server_socket, 1) < 0)
     {
         perror ("ERROR :: server listen") ;
 
-        close (server_socket) ;
-
-        return EXIT_FAILURE ;
+        goto listen_error ;
     }
+
+    fprintf (stdout, "done !\n") ;
 
     /**************************************************************************/
 
-    NetworkSocket_t client_socket = accept (server_socket, ( struct sockaddr *) NULL , NULL ) ;
+    fprintf (stdout, "Waiting for client ... ") ; fflush (stdout) ;
+
+    client_length = sizeof (struct sockaddr_in) ;
+
+    client_socket = accept (server_socket,
+                            ( struct sockaddr *) &client_address,
+                            &client_length) ;
 
     if (client_socket < 0)
     {
         perror ("ERROR :: server accept") ;
 
-        close (server_socket) ;
-
-        return EXIT_FAILURE ;
+        goto accept_error ;
     }
+
+    if (inet_ntop (AF_INET, &client_address.sin_addr, client_id, sizeof (client_id)) == NULL)
+    {
+        perror ("ERROR :: client identification") ;
+
+        goto client_id_error ;
+    }
+
+    fprintf (stdout, "done (%s:%d)!\n", client_id, ntohs (client_address.sin_port)) ;
 
     /**************************************************************************/
 
@@ -122,8 +188,25 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    close (client_socket) ;
-    close (server_socket) ;
+    close                  (client_socket) ;
+    close                  (server_socket) ;
+    free_thermal_data      (&tdata) ;
+    free_analysis          (&analysis) ;
+    free_stack_description (&stkd) ;
 
     return EXIT_SUCCESS ;
+
+client_id_error :
+accept_error :
+listen_error :
+bind_error :
+                          close                  (server_socket) ;
+socket_error :
+                          free_thermal_data      (&tdata) ;
+ftd_error :
+wrong_analysis_error :
+                          free_analysis          (&analysis) ;
+                          free_stack_description (&stkd) ;
+
+                          return EXIT_FAILURE ;
 }

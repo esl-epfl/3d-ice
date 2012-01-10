@@ -47,6 +47,12 @@
 
 int main (int argc, char** argv)
 {
+    NetworkSocket_t client_socket ;
+
+    struct sockaddr_in server_address ;
+
+    /* Checks if all arguments are there **************************************/
+
     if (argc != 1)
     {
         fprintf (stderr, "Usage: \"%s \n", argv[0]) ;
@@ -54,9 +60,11 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    /**************************************************************************/
+    /* Creates socket *********************************************************/
 
-    NetworkSocket_t client_socket = socket (AF_INET, SOCK_STREAM, 0) ;
+    fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
+
+    client_socket = socket (AF_INET, SOCK_STREAM, 0) ;
 
     if (client_socket < 0)
     {
@@ -65,48 +73,51 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    /**************************************************************************/
+    fprintf (stdout, "done !\n") ;
 
-    struct sockaddr_in server_address ;
+    /* Fills server address ***************************************************/
 
     memset ((void *) &server_address, 0, sizeof (struct sockaddr_in)) ;
 
     server_address.sin_family = AF_INET ;
     server_address.sin_port   = htons (10024) ;
 
-    int result = inet_pton (AF_INET, "127.0.0.1", &server_address.sin_addr) ;
-
-    if (result <= 0)
+    if (inet_pton (AF_INET, "127.0.0.1", &server_address.sin_addr) <= 0)
     {
         perror ("ERROR :: server address creation") ;
 
-        close (client_socket) ;
-
-        return EXIT_FAILURE ;
+        goto server_id_error ;
     }
 
     /**************************************************************************/
 
-    result = connect (client_socket,
-                      (struct sockaddr *) &server_address,
-                      sizeof (struct sockaddr_in)) ;
+    fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
-    if (result < 0)
+    if (connect (client_socket,
+                 (struct sockaddr *) &server_address,
+                  sizeof (struct sockaddr_in)) < 0)
     {
-        perror ("ERROR :: client socket connection") ;
+        perror ("ERROR :: client to server connection") ;
 
-        close (client_socket) ;
-
-        return EXIT_FAILURE ;
+        goto connect_error ;
     }
+
+    fprintf (stdout, "done !\n") ;
 
     /**************************************************************************/
 
-    /* send and reeive ... */
+    /* send and receive ... */
 
     /**************************************************************************/
 
     close (client_socket) ;
 
     return EXIT_SUCCESS ;
+
+connect_error :
+server_id_error :
+                             close (client_socket) ;
+
+                             return EXIT_FAILURE ;
+
 }
