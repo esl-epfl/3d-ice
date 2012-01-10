@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -50,6 +51,10 @@ int main (int argc, char** argv)
     NetworkSocket_t client_socket ;
 
     struct sockaddr_in server_address ;
+
+    char message [125] ;
+
+    ssize_t received ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -89,7 +94,7 @@ int main (int argc, char** argv)
         goto server_id_error ;
     }
 
-    /**************************************************************************/
+    /* Connect to the server **************************************************/
 
     fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
@@ -106,7 +111,11 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    /* send and receive ... */
+    received = read (client_socket, message, 125) ;
+
+    message [received] = '\0' ;
+
+    fprintf (stdout, "Received >%s< (%Zu bytes) from server\n", message, received) ;
 
     /**************************************************************************/
 

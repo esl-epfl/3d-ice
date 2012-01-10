@@ -39,8 +39,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 
 #include "types.h"
@@ -63,6 +65,12 @@ int main (int argc, char** argv)
     socklen_t client_length ;
 
     char client_id [24] ;
+
+    char message [125] ;
+
+    Quantity_t n_flp_el ;
+
+    ssize_t to_send, sent ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -184,7 +192,31 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    /* receive and send ... */
+    n_flp_el = get_total_number_of_floorplan_elements (&stkd) ;
+
+    sprintf (message, "%d", n_flp_el) ;
+
+    to_send = strlen (message) ;
+
+    fprintf (stdout, "Sending >%s< (%Zu bytes) to client ... ", message, to_send) ; fflush (stdout) ;
+
+    sent = write (client_socket, message, to_send) ;
+
+    if (sent == -1)
+    {
+        perror ("ERROR :: write failed") ;
+
+        goto write_error ;
+    }
+
+    if (sent == 0 || sent != to_send)
+    {
+        perror ("ERROR :: wrong write") ;
+
+        goto write_error ;
+    }
+
+    fprintf (stdout, "done !\n") ;
 
     /**************************************************************************/
 
@@ -196,17 +228,19 @@ int main (int argc, char** argv)
 
     return EXIT_SUCCESS ;
 
+write_error :
+                            close                  (client_socket) ;
 client_id_error :
 accept_error :
 listen_error :
 bind_error :
-                          close                  (server_socket) ;
+                            close                  (server_socket) ;
 socket_error :
-                          free_thermal_data      (&tdata) ;
+                            free_thermal_data      (&tdata) ;
 ftd_error :
 wrong_analysis_error :
-                          free_analysis          (&analysis) ;
-                          free_stack_description (&stkd) ;
+                            free_analysis          (&analysis) ;
+                            free_stack_description (&stkd) ;
 
-                          return EXIT_FAILURE ;
+                            return EXIT_FAILURE ;
 }
