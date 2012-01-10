@@ -38,8 +38,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "ni_server.h"
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+#include "types.h"
 
 int main (int argc, char** argv)
 {
@@ -50,19 +54,76 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    NetworkSocket_t local_socket ;
+    /**************************************************************************/
 
-    Error_t result = init_server_network_socket (&local_socket, 10024) ;
+    NetworkSocket_t server_socket = socket (AF_INET, SOCK_STREAM, 0) ;
 
-    if (result == TDICE_FAILURE)
+    if (server_socket < 0)
+    {
+        perror ("ERROR :: server socket creation") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    /**************************************************************************/
+
+    struct sockaddr_in server_address ;
+
+    memset ((void *) &server_address, 0, sizeof (struct sockaddr_in)) ;
+
+    server_address.sin_family      = AF_INET ;
+    server_address.sin_port        = htons (10024) ;
+    server_address.sin_addr.s_addr = htonl (INADDR_ANY) ;
+
+    /**************************************************************************/
+
+    int result = bind (server_socket,
+                       (struct sockaddr *) &server_address,
+                       sizeof (struct sockaddr_in)) ;
+
+    if (result < 0)
+    {
+        perror ("ERROR :: server bind") ;
+
+        close (server_socket) ;
 
         return EXIT_FAILURE ;
+    }
 
-    result = close_server_network_socket (&local_socket) ;
+    /**************************************************************************/
 
-    if (result == TDICE_FAILURE)
+    result = listen (server_socket, 1) ;
+
+    if (result < 0)
+    {
+        perror ("ERROR :: server listen") ;
+
+        close (server_socket) ;
 
         return EXIT_FAILURE ;
+    }
+
+    /**************************************************************************/
+
+    NetworkSocket_t client_socket = accept (server_socket, ( struct sockaddr *) NULL , NULL ) ;
+
+    if (client_socket < 0)
+    {
+        perror ("ERROR :: server accept") ;
+
+        close (server_socket) ;
+
+        return EXIT_FAILURE ;
+    }
+
+    /**************************************************************************/
+
+    /* receive and send ... */
+
+    /**************************************************************************/
+
+    close (client_socket) ;
+    close (server_socket) ;
 
     return EXIT_SUCCESS ;
 }

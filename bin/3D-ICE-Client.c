@@ -38,8 +38,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include "ni_client.h"
+#include <netinet/in.h>
+#include <sys/socket.h>
+
+#include "types.h"
 
 int main (int argc, char** argv)
 {
@@ -50,19 +54,59 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    NetworkSocket_t local_socket ;
+    /**************************************************************************/
 
-    Error_t result = init_client_network_socket (&local_socket, "127.0.0.1", 10024) ;
+    NetworkSocket_t client_socket = socket (AF_INET, SOCK_STREAM, 0) ;
 
-    if (result == TDICE_FAILURE)
-
-        return EXIT_FAILURE ;
-
-    result = close_client_network_socket (&local_socket) ;
-
-    if (result == TDICE_FAILURE)
+    if (client_socket < 0)
+    {
+        perror ("ERROR :: client socket creation") ;
 
         return EXIT_FAILURE ;
+    }
+
+    /**************************************************************************/
+
+    struct sockaddr_in server_address ;
+
+    memset ((void *) &server_address, 0, sizeof (struct sockaddr_in)) ;
+
+    server_address.sin_family = AF_INET ;
+    server_address.sin_port   = htons (10024) ;
+
+    int result = inet_pton (AF_INET, "127.0.0.1", &server_address.sin_addr) ;
+
+    if (result <= 0)
+    {
+        perror ("ERROR :: server address creation") ;
+
+        close (client_socket) ;
+
+        return EXIT_FAILURE ;
+    }
+
+    /**************************************************************************/
+
+    result = connect (client_socket,
+                      (struct sockaddr *) &server_address,
+                      sizeof (struct sockaddr_in)) ;
+
+    if (result < 0)
+    {
+        perror ("ERROR :: client socket connection") ;
+
+        close (client_socket) ;
+
+        return EXIT_FAILURE ;
+    }
+
+    /**************************************************************************/
+
+    /* send and reeive ... */
+
+    /**************************************************************************/
+
+    close (client_socket) ;
 
     return EXIT_SUCCESS ;
 }
