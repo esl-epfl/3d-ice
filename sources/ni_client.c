@@ -37,71 +37,63 @@
  ******************************************************************************/
 
 #include <stdio.h>
-#include <errno.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <netdb.h>
-#include <sys/un.h>
-#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 
 #include "ni_client.h"
 
 /******************************************************************************/
 
-Error_t init_client_socket
+Error_t init_client_socket (ClientSocket *client_socket)
+{
+    client_socket->SocketId = socket (AF_INET, SOCK_STREAM, 0) ;
+
+    if (client_socket->SocketId < 0)
+    {
+        perror ("ERROR :: client socket creation") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t connect_to_server
 (
-    NetworkSocket_t *socket_id,
-    String_t        host_name,
-    int             port_number
+    ClientSocket *client_socket,
+    String_t      host_name,
+    int           port_number
 )
 {
-    *socket_id = socket (AF_INET, SOCK_STREAM, 0) ;
+    memset ((void *) &(client_socket->ServerAddress), 0, sizeof (struct sockaddr_in)) ;
 
-    if (*socket_id < 0)
+    client_socket->ServerAddress.sin_family = AF_INET ;
+    client_socket->ServerAddress.sin_port   = htons (port_number) ;
+
+    if (inet_pton (AF_INET, host_name, &(client_socket->ServerAddress).sin_addr) <= 0)
     {
-        perror ("ERROR :: Creating client network socket") ;
+        perror ("ERROR :: server address creation") ;
+
+        close_client_socket (client_socket) ;
 
         return TDICE_FAILURE ;
     }
 
-    struct hostent *server = gethostbyname (host_name) ;  // FIXME this is obsolete
-
-    if (server == NULL)
+    if (connect (client_socket->SocketId,
+                 (struct sockaddr *) &client_socket->ServerAddress,
+                  sizeof (struct sockaddr_in)) < 0)
     {
-        fprintf (stderr, "ERROR :: host %s not found\n", host_name) ;
+        perror ("ERROR :: client to server connection") ;
 
-        close_client_socket (socket_id) ;
+        close_client_socket (client_socket) ;
 
         return TDICE_FAILURE ;
     }
-
-    struct sockaddr_in server_address ;
-
-    memset (&server_address, '\0', sizeof(struct sockaddr_in)) ;
-
-    server_address.sin_family = AF_INET ;
-    server_address.sin_port   = htons (port_number) ;
-
-    memcpy
-
-        (&server_address.sin_addr.s_addr, server->h_addr, server->h_length) ;
-
-    int tmp = connect (                    *socket_id,
-                       (struct sockaddr *) &server_address,
-                                            sizeof(struct sockaddr_in)) ;
-
-    if (tmp < 0)
-    {
-        perror ("ERROR :: Connecting client network socket") ;
-
-        close_client_socket (socket_id) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    // fprintf(stdout, "Connection established.\n");
 
     return TDICE_SUCCESS ;
 }
@@ -110,10 +102,10 @@ Error_t init_client_socket
 
 Error_t close_client_socket
 (
-    NetworkSocket_t *socket_id
+    ClientSocket *client_socket
 )
 {
-    if (close (*socket_id) != 0)
+    if (close (client_socket->SocketId) != 0)
     {
         perror ("ERROR :: Closing client network socket") ;
 

@@ -48,37 +48,78 @@ extern "C"
 
 /******************************************************************************/
 
+#include <netinet/in.h>
+
 #include "types.h"
 
 /******************************************************************************/
 
+    /*! \struct ClientSocket
+     *
+     *  \brief Structure used to set up network connections in the client side
+     *
+     */
+
+    struct ClientSocket
+    {
+        /*! The descriptor of the socket (like a unique id) */
+
+        NetworkSocket_t    SocketId ;
+
+        /*! The address of the server with which the client will communicate */
+
+        struct sockaddr_in ServerAddress ;
+    } ;
+
+    /*! Definition of the type ClientSocket */
+
+    typedef struct ClientSocket ClientSocket ;
+
+
     /*! Initializes a client socket
      *
-     * \param socket_id the address of the socket to initialize
-     * \param host_name the ip address of the server
-     * \param port_number the port number of the server
+     * \param client_socket the address of the ClientSocket to initialize
      *
      * \return \c TDICE_SUCCESS if the initialization succeeded
      * \return \c TDICE_FAILURE if the initialization fails. A message will be
      *                          printed on standard error
      */
 
-    Error_t init_client_socket
+    Error_t init_client_socket (ClientSocket *client_socket) ;
 
-        (NetworkSocket_t *socket_id, String_t host_name, int port_number) ;
+
+
+    /*! Connects the client to a server
+     *
+     * Prepares the address of the server and establish the connection.
+     * The server side must be waiting for a connection. On error, the
+     * socket is closed.
+     *
+     * \param client_socket the address of the ClientSocket to initialize
+     * \param host_name the ip address of the server
+     * \param port_number the port number of the server
+     *
+     * \return \c TDICE_SUCCESS if the connection succeeded
+     * \return \c TDICE_FAILURE if the connections fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t connect_to_server
+
+        (ClientSocket *client_socket, String_t host_name, int port_number) ;
 
 
 
     /*! Closes a client socket
      *
-     * \param socket_id the address of the socket to close
+     * \param client_socket the address of the ClientSocket to close
      *
      * \return \c TDICE_SUCCESS if the closure succeeded
      * \return \c TDICE_FAILURE if the closure fails. A message will be
      *                          printed on standard error
      */
 
-    Error_t close_client_socket (NetworkSocket_t *socket_id) ;
+    Error_t close_client_socket (ClientSocket *client_socket) ;
 
 #ifdef __cplusplus
 }
