@@ -251,8 +251,6 @@ Error_t receive_from_socket
     // message might contain garbage values, i.e. the value '\0' might
     // be in any location.
 
-    StringLength_t total = 0 ;
-
     while (length > 0)
     {
         ssize_t bread = read (socket->Id ,message, length) ;
@@ -283,10 +281,9 @@ Error_t receive_from_socket
 
         length  -= bread ;
         message += bread ;
-        total   += bread ;
     }
 
-    message [ total ] = '\0' ;
+    *message = '\0' ;
 
     return TDICE_SUCCESS ;
 }

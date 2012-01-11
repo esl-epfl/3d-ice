@@ -41,13 +41,13 @@
 
 #include "network_interface.h"
 
-#define MAXL 100
+#define MESSAGE_LENGTH 32
 
 int main (int argc, char** argv)
 {
     Socket client_socket ;
 
-    char message [MAXL] ;
+    char message [MESSAGE_LENGTH] ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -82,14 +82,26 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    if (receive_from_socket (&client_socket, message, (StringLength_t) MAXL) != TDICE_SUCCESS)
-    {
-        close_socket (&client_socket) ;
+    fprintf (stdout, "Receiving from server ...") ; fflush (stdout) ;
 
-        return EXIT_FAILURE ;
+    if (receive_from_socket (&client_socket, message, (StringLength_t) MESSAGE_LENGTH) != TDICE_SUCCESS)
+
+        goto failure ;
+
+    fprintf (stdout, " ->%s<- ", message) ;
+
+    Quantity_t n_flp_el, n_slots;
+
+    int read = sscanf (message, "%d %d", &n_flp_el, &n_slots) ;
+
+    if (read != 2 || read == EOF)
+    {
+        fprintf (stderr, "Bad message formatting\n") ;
+
+        goto failure ;
     }
 
-    fprintf (stdout, "Received >%s< from server\n", message) ;
+    fprintf (stdout, "done! %d - %d\n", n_flp_el, n_slots) ;
 
     /**************************************************************************/
 
@@ -98,4 +110,9 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
 
     return EXIT_SUCCESS ;
+
+failure :
+                    close_socket (&client_socket) ;
+
+                    return EXIT_FAILURE ;
 }

@@ -45,6 +45,9 @@
 #include "thermal_data.h"
 #include "analysis.h"
 
+#define NSLOTS 10
+#define MESSAGE_LENGTH 32
+
 int main (int argc, char** argv)
 {
     StackDescription stkd ;
@@ -53,7 +56,7 @@ int main (int argc, char** argv)
 
     Socket server_socket, client_socket ;
 
-    char message [125] ;
+    char message [MESSAGE_LENGTH] ;
 
     Quantity_t n_flp_el ;
 
@@ -120,9 +123,7 @@ int main (int argc, char** argv)
 
         goto wait_error ;
 
-    fprintf (stdout,
-        "(%s:%d) done !\n",
-        client_socket.HostName, client_socket.PortNumber) ;
+    fprintf (stdout, "done !\n") ;
 
     /**************************************************************************/
 
@@ -130,7 +131,9 @@ int main (int argc, char** argv)
 
     n_flp_el = get_total_number_of_floorplan_elements (&stkd) ;
 
-    sprintf (message, "%d 10", n_flp_el) ;
+    sprintf (message, "%d %d", n_flp_el, NSLOTS) ;
+
+    fprintf (stdout, " ->%s<- ", message) ;
 
     // here sizeof(message) is the dimension of the vector (i.e. the value
     // used in the declaration while strlen(message) is the number of
