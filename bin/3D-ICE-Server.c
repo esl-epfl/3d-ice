@@ -44,6 +44,7 @@
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
+#include "powers_queue.h"
 
 #define NSLOTS 10
 #define MESSAGE_LENGTH 32
@@ -89,6 +90,15 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
+    /* Generates output headres ***********************************************/
+
+    if (generate_analysis_headers (&analysis, stkd.Dimensions, "% ") != TDICE_SUCCESS)
+    {
+        fprintf (stderr, "error in initializing output files \n ");
+
+        goto header_error ;
+    }
+
     /* Prepares thermal data **************************************************/
 
     fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
@@ -125,7 +135,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
-    /**************************************************************************/
+    /* Sends data to client ***************************************************/
 
     fprintf (stdout, "Sending nflpel to client ... ") ; fflush (stdout) ;
 
@@ -145,7 +155,77 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
-    /**************************************************************************/
+    /* Receives all the power values from the client **************************/
+
+    Quantity_t power_c, slot_c ;
+
+    PowersQueue queue ;
+
+    init_powers_queue (&queue) ;
+
+    for (slot_c = 0 ; slot_c < NSLOTS ; slot_c++)
+    {
+        for (power_c = 0 ; power_c < n_flp_el ; power_c++)
+        {
+            if (receive_message_from_socket (&client_socket, message, (StringLength_t) MESSAGE_LENGTH) != TDICE_SUCCESS)
+
+                goto receive_error ;
+
+            Power_t tmp ;
+
+            if (sscanf (message, "%lf", &tmp) != 1)
+            {
+                fprintf (stderr, "Bad message formatting\n") ;
+
+                goto receive_error ;
+            }
+
+            put_into_powers_queue (&queue, tmp) ;
+        }
+
+        if (   insert_power_values   (&stkd, &queue) != TDICE_SUCCESS
+            || is_empty_powers_queue (&queue)        == false)
+        {
+            fprintf (stderr, "Received wrong number of power values at slot %d\n", slot_c) ;
+
+            goto receive_error ;
+        }
+    }
+
+    /* Runs the simlation and generates output ********************************/
+
+    SimResult_t result ;
+
+    do
+    {
+        result = emulate_step (&tdata, &stkd, &analysis) ;
+
+        if (result == TDICE_STEP_DONE || result == TDICE_SLOT_DONE)
+        {
+            fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
+
+            fflush (stdout) ;
+
+            generate_analysis_output
+
+                (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_STEP) ;
+        }
+
+        if (result == TDICE_SLOT_DONE)
+        {
+            fprintf (stdout, "\n") ;
+
+            generate_analysis_output
+
+                (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_SLOT) ;
+        }
+
+    } while (result != TDICE_END_OF_SIMULATION) ;
+
+    generate_analysis_output
+
+        (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_FINAL) ;
+
 
     close_socket           (&client_socket) ;
     close_socket           (&server_socket) ;
@@ -155,12 +235,14 @@ int main (int argc, char** argv)
 
     return EXIT_SUCCESS ;
 
+receive_error :
 send_error :
                             close_socket           (&client_socket) ;
 wait_error :
                             close_socket           (&server_socket) ;
 socket_error :
                             free_thermal_data      (&tdata) ;
+header_error :
 ftd_error :
 wrong_analysis_error :
                             free_analysis          (&analysis) ;

@@ -38,16 +38,43 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "network_interface.h"
 
 #define MESSAGE_LENGTH 32
+
+void seed_random ()
+{
+    FILE *fp = fopen ("/dev/urandom", "r");
+    unsigned int foo;
+    struct timeval t;
+
+    if (!fp)
+    {
+        gettimeofday (&t, NULL);
+        foo = t.tv_usec;
+    }
+    else
+    {
+        size_t res = fread (&foo, sizeof (foo), 1, fp);
+        if (res == 0 ) printf ("fread failed\n");
+        fclose (fp);
+    }
+    srand (foo);
+}
+
+#define random_value(min_value, max_value) \
+    (   ((double)(min_value))              \
+      + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
 
 int main (int argc, char** argv)
 {
     Socket client_socket ;
 
     char message [MESSAGE_LENGTH] ;
+
+    seed_random () ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -86,22 +113,40 @@ int main (int argc, char** argv)
 
     if (receive_message_from_socket (&client_socket, message, (StringLength_t) MESSAGE_LENGTH) != TDICE_SUCCESS)
 
-        goto failure ;
+        goto receive_error ;
 
     fprintf (stdout, " ->%s<- ", message) ;
 
     Quantity_t n_flp_el, n_slots;
 
-    int read = sscanf (message, "%d %d", &n_flp_el, &n_slots) ;
-
-    if (read != 2 || read == EOF)
+    if (sscanf (message, "%d %d", &n_flp_el, &n_slots) != 2)
     {
         fprintf (stderr, "Bad message formatting\n") ;
 
-        goto failure ;
+        goto receive_error ;
     }
 
     fprintf (stdout, "done! %d - %d\n", n_flp_el, n_slots) ;
+
+    /**************************************************************************/
+
+    fprintf (stdout, "Sending power values to server ...") ; fflush (stdout) ;
+
+    Quantity_t power_c, slot_c ;
+
+    for (slot_c = 0 ; slot_c < n_slots ; slot_c++)
+    {
+        for (power_c = 0 ; power_c < n_flp_el ; power_c++)
+        {
+            sprintf (message, "%.3lf", random_value (0.0, 0.1)) ;
+
+            if (send_message_to_socket (&client_socket, message) != TDICE_SUCCESS)
+
+                goto send_error ;
+        }
+    }
+
+    fprintf (stdout, "done!\n") ;
 
     /**************************************************************************/
 
@@ -111,7 +156,8 @@ int main (int argc, char** argv)
 
     return EXIT_SUCCESS ;
 
-failure :
+send_error :
+receive_error :
                     close_socket (&client_socket) ;
 
                     return EXIT_FAILURE ;

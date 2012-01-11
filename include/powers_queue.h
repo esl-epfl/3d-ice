@@ -105,7 +105,7 @@ extern "C"
 
     /*! Sets all the fields of \a powers_queue to a default value (zero or \c NULL ).
      *
-     * \param powers_queue the address of the material to initialize
+     * \param powers_queue the address of the power queue to initialize
      */
 
     void init_powers_queue (PowersQueue *powers_queue) ;

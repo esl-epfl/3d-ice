@@ -32,7 +32,7 @@ die BOTTOM_IC :
 
 dimensions :
    chip length 10000, width 10000 ;
-   cell length   1000, width   1000 ;
+   cell length   100, width   100 ;
 
 stack:
    die     MEMORY_DIE     TOP_IC    floorplan "./mem.flp" ;
