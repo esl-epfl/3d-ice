@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -187,6 +188,105 @@ Error_t wait_for_client (Socket *server, Socket *client)
 
         return TDICE_FAILURE ;
     }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t send_to_socket
+(
+    Socket   *socket,
+    String_t  message
+)
+{
+    // here sizeof(message) is the dimension in bytes of a poiter to char
+    // while strlen(message) is the length of the message, i.e. the number
+    // of bytes before '\0' to be sent.
+
+    StringLength_t length = strlen (message) ;
+
+    while (length > 0)
+    {
+        // writes up to "length" bytes taken from "message" to the socket
+        // returns the number of bytes sent, or -1
+
+        ssize_t bwritten = write (socket->Id, message, length) ;
+
+        if (bwritten < 0)
+        {
+            if (errno == EINTR)
+
+                continue ;
+
+            else
+            {
+                perror ("ERROR :: write failure") ;
+
+                return TDICE_FAILURE ;
+            }
+        }
+
+        // updates missing bytes to send and move the pointer forward
+
+        length  -= bwritten ;
+        message += bwritten ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t receive_from_socket
+(
+    Socket         *socket,
+    String_t        message,
+    StringLength_t  length
+)
+{
+    // here sizeof(message) is the dimension in bytes of a poiter to char
+    // while strlen(message) is the length of the message, i.e. the number
+    // of bytes before '\0' to be sent. The latter cannot be used since
+    // message might contain garbage values, i.e. the value '\0' might
+    // be in any location.
+
+    StringLength_t total = 0 ;
+
+    while (length > 0)
+    {
+        ssize_t bread = read (socket->Id ,message, length) ;
+
+        if (bread < 0)
+        {
+            if (errno == EINTR)
+
+                continue ;
+
+            else
+            {
+                perror ("ERROR :: read failure") ;
+
+                return TDICE_FAILURE ;
+            }
+        }
+        else if (bread == 0)
+
+            break ;
+
+        if (bread > (ssize_t) length)
+        {
+            fprintf (stderr, "ERROR :: risk of data losses!!\n") ;
+
+            return EXIT_FAILURE ;
+        }
+
+        length  -= bread ;
+        message += bread ;
+        total   += bread ;
+    }
+
+    message [ total ] = '\0' ;
 
     return TDICE_SUCCESS ;
 }

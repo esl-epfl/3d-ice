@@ -46,14 +46,21 @@ extern "C"
 {
 #endif
 
-#include "stdint.h"
-#include "stdbool.h"
+#include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /******************************************************************************/
 
     /*! Definition of the primitive type String_t */
 
     typedef char* String_t ;
+
+
+
+    /*! Definition of the type StringLength_t */
+
+    typedef size_t StringLength_t ;
 
 
 

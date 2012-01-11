@@ -38,7 +38,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "types.h"
 #include "network_interface.h"
@@ -57,8 +56,6 @@ int main (int argc, char** argv)
     char message [125] ;
 
     Quantity_t n_flp_el ;
-
-    ssize_t to_send, sent ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -129,29 +126,19 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
+    fprintf (stdout, "Sending nflpel to client ... ") ; fflush (stdout) ;
+
     n_flp_el = get_total_number_of_floorplan_elements (&stkd) ;
 
-    sprintf (message, "%d", n_flp_el) ;
+    sprintf (message, "%d 10", n_flp_el) ;
 
-    to_send = strlen (message) ;
+    // here sizeof(message) is the dimension of the vector (i.e. the value
+    // used in the declaration while strlen(message) is the number of
+    // characters (bytes) before the '\0'.
 
-    fprintf (stdout, "Sending >%s< (%Zu bytes) to client ... ", message, to_send) ; fflush (stdout) ;
+    if (send_to_socket (&client_socket, message) != TDICE_SUCCESS)
 
-    sent = write (client_socket.Id, message, to_send) ;
-
-    if (sent == -1)
-    {
-        perror ("ERROR :: write failed") ;
-
-        goto write_error ;
-    }
-
-    if (sent == 0 || sent != to_send)
-    {
-        perror ("ERROR :: wrong write") ;
-
-        goto write_error ;
-    }
+        goto send_error ;
 
     fprintf (stdout, "done !\n") ;
 
@@ -165,7 +152,7 @@ int main (int argc, char** argv)
 
     return EXIT_SUCCESS ;
 
-write_error :
+send_error :
                             close_socket           (&client_socket) ;
 wait_error :
                             close_socket           (&server_socket) ;

@@ -38,17 +38,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "network_interface.h"
+
+#define MAXL 100
 
 int main (int argc, char** argv)
 {
     Socket client_socket ;
 
-    char message [125] ;
-
-    ssize_t received ;
+    char message [MAXL] ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -83,11 +82,14 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    received = read (client_socket.Id, message, 125) ;
+    if (receive_from_socket (&client_socket, message, (StringLength_t) MAXL) != TDICE_SUCCESS)
+    {
+        close_socket (&client_socket) ;
 
-    message [received] = '\0' ;
+        return EXIT_FAILURE ;
+    }
 
-    fprintf (stdout, "Received >%s< (%Zu bytes) from server\n", message, received) ;
+    fprintf (stdout, "Received >%s< from server\n", message) ;
 
     /**************************************************************************/
 

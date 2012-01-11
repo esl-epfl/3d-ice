@@ -170,6 +170,45 @@ extern "C"
 
 
 
+    /*! Sends a message to a socket
+     *
+     * \param socket  the socket where the message will be sent
+     * \param message the (text) message to send (must end with character '\\0')
+     *
+     * \return \c TDICE_SUCCESS if the operation succeeded
+     * \return \c TDICE_FAILURE if the operation fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t send_to_socket
+    (
+        Socket   *socket,
+        String_t  message
+    ) ;
+
+
+
+    /*! Receive a message from a socket
+     *
+     * \param socket  the socket from where the message will be received
+     * \param message the string where the received message will be written
+     * \param length  the length of \a message, i.e. the maximum number of
+     *                bytes that can be received
+     *
+     * \return \c TDICE_SUCCESS if the operation succeeded
+     * \return \c TDICE_FAILURE if the operation fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t receive_from_socket
+    (
+        Socket         *socket,
+        String_t        message,
+        StringLength_t  length
+    ) ;
+
+
+
     /*! Closes a socket
      *
      * \param socket the address of the Socket to close
