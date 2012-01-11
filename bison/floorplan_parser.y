@@ -71,6 +71,7 @@
 
 %type <p_floorplan_element> floorplan_element ;
 %type <p_floorplan_element> floorplan_element_list ;
+%type <p_powers_queue>      optional_power_values_list ;
 %type <p_powers_queue>      power_values_list ;
 
 %destructor { FREE_POINTER (free, $$) ; } <identifier>
@@ -200,7 +201,7 @@ floorplan_element
   : IDENTIFIER ':'                             // $1
       POSITION  DVALUE ',' DVALUE ';'          // $4 $6
       DIMENSION DVALUE ',' DVALUE ';'          // $9 $11
-      POWER VALUES power_values_list ';'       // $15
+      optional_power_values_list               // $13
     {
         FloorplanElement *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
 
@@ -218,8 +219,7 @@ floorplan_element
         floorplan_element->SW_Y        = $6 ;
         floorplan_element->Length      = $9 ;
         floorplan_element->Width       = $11 ;
-        floorplan_element->PowerValues = $15 ;
-
+        floorplan_element->PowerValues = $13 ;
     }
   ;
 
@@ -227,10 +227,32 @@ floorplan_element
 /************************* List of power values *******************************/
 /******************************************************************************/
 
+optional_power_values_list
+
+  : // Declaring the entire subsection of power values is not mandatory
+
+    {
+        PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
+
+        if (powers_list == NULL)
+        {
+            floorplan_error (floorplan, dimensions, scanner, "Malloc power list failed") ;
+
+            YYABORT ;
+        }
+    }
+
+  | POWER VALUES power_values_list ';' // $3
+
+    {
+        $$ = $3 ;
+    }
+  ;
+
 power_values_list
 
   : DVALUE              // $1
-                        // There must be at least one power value
+                        // Here at least one power value is mandatory
     {
         PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
 
