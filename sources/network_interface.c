@@ -48,58 +48,107 @@
 
 /******************************************************************************/
 
-Error_t init_client_socket (ClientSocket *client_socket)
+void init_socket (Socket *socket)
 {
-    client_socket->SocketId = socket (AF_INET, SOCK_STREAM, 0) ;
+    socket->Id = 0 ;
 
-    if (client_socket->SocketId < 0)
+    memset ((void *) &(socket->Address), 0, sizeof (struct sockaddr_in)) ;
+
+    memset ((void *) &(socket->HostName), '\0', sizeof (socket->HostName)) ;
+
+    socket->PortNumber = 0u ;
+}
+
+/******************************************************************************/
+
+Error_t open_client_socket (Socket *client)
+{
+    client->Id = socket (AF_INET, SOCK_STREAM, 0) ;
+
+    if (client->Id < 0)
     {
         perror ("ERROR :: client socket creation") ;
 
         return TDICE_FAILURE ;
     }
 
-    memset ((void *) &(client_socket->ServerAddress), 0, sizeof (struct sockaddr_in)) ;
+    return TDICE_SUCCESS ;
+}
 
-    memset ((void *) &(client_socket->HostName), '\0', sizeof (client_socket->HostName)) ;
+/******************************************************************************/
 
-    client_socket->PortNumber = 0u ;
+Error_t open_server_socket
+(
+    Socket       *server,
+    PortNumber_t  port_number
+)
+{
+    server->Id = socket (AF_INET, SOCK_STREAM, 0) ;
+
+    if (server->Id < 0)
+    {
+        perror ("ERROR :: server socket creation") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    server->Address.sin_family      = AF_INET ;
+    server->Address.sin_port        = htons (port_number) ;
+    server->Address.sin_addr.s_addr = htonl (INADDR_ANY) ;
+
+    if (bind (server->Id, (struct sockaddr *) &server->Address,
+              sizeof (struct sockaddr_in)) < 0)
+    {
+        perror ("ERROR :: server bind") ;
+
+        close_socket (server) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    if (listen (server->Id, 1) < 0)
+    {
+        perror ("ERROR :: server listen") ;
+
+        close_socket (server) ;
+
+        return TDICE_FAILURE ;
+    }
 
     return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-Error_t connect_to_server
+Error_t connect_client_to_server
 (
-    ClientSocket *client_socket,
+    Socket       *client,
     String_t      host_name,
     PortNumber_t  port_number
 )
 {
-    strcpy (client_socket->HostName, host_name) ;
+    strcpy (client->HostName, host_name) ;
 
-    client_socket->PortNumber = port_number ;
+    client->PortNumber = port_number ;
 
-    client_socket->ServerAddress.sin_family = AF_INET ;
-    client_socket->ServerAddress.sin_port   = htons (port_number) ;
+    client->Address.sin_family = AF_INET ;
+    client->Address.sin_port   = htons (port_number) ;
 
-    if (inet_pton (AF_INET, host_name, &(client_socket->ServerAddress).sin_addr) <= 0)
+    if (inet_pton (AF_INET, host_name, &(client->Address).sin_addr) <= 0)
     {
         perror ("ERROR :: server address creation") ;
 
-        close_client_socket (client_socket) ;
+        close_socket (client) ;
 
         return TDICE_FAILURE ;
     }
 
-    if (connect (client_socket->SocketId,
-                 (struct sockaddr *) &client_socket->ServerAddress,
-                  sizeof (struct sockaddr_in)) < 0)
+    if (connect (client->Id, (struct sockaddr *) &client->Address,
+                 sizeof (struct sockaddr_in)) < 0)
     {
         perror ("ERROR :: client to server connection") ;
 
-        close_client_socket (client_socket) ;
+        close_socket (client) ;
 
         return TDICE_FAILURE ;
     }
@@ -109,14 +158,46 @@ Error_t connect_to_server
 
 /******************************************************************************/
 
-Error_t close_client_socket
-(
-    ClientSocket *client_socket
-)
+Error_t wait_for_client (Socket *server, Socket *client)
 {
-    if (close (client_socket->SocketId) != 0)
+    socklen_t length = sizeof (struct sockaddr_in) ;
+
+    client->Id = accept
+
+        (server->Id, (struct sockaddr *) &(client->Address), &length) ;
+
+    if (client->Id < 0)
     {
-        perror ("ERROR :: Closing client network socket") ;
+        perror ("ERROR :: server accept") ;
+
+        close_socket (server) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    client->PortNumber = ntohs (client->Address.sin_port) ;
+
+    if (inet_ntop (AF_INET, &client->Address.sin_addr,
+                   client->HostName, sizeof (client->HostName)) == NULL)
+    {
+        perror ("ERROR :: client name translation") ;
+
+        close_socket (client) ;
+        close_socket (server) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t close_socket (Socket *socket)
+{
+    if (close (socket->Id) != 0)
+    {
+        perror ("ERROR :: Closing network socket") ;
 
         return TDICE_FAILURE ;
     }

@@ -44,7 +44,7 @@
 
 int main (int argc, char** argv)
 {
-    ClientSocket client_socket ;
+    Socket client_socket ;
 
     char message [125] ;
 
@@ -63,7 +63,9 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
-    if (init_client_socket (&client_socket) != TDICE_SUCCESS)
+    init_socket (&client_socket) ;
+
+    if (open_client_socket (&client_socket) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
 
@@ -73,7 +75,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
-    if (connect_to_server (&client_socket, "127.0.0.1", 10024) != TDICE_SUCCESS)
+    if (connect_client_to_server (&client_socket, "127.0.0.1", 10024) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
 
@@ -81,7 +83,7 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    received = read (client_socket.SocketId, message, 125) ;
+    received = read (client_socket.Id, message, 125) ;
 
     message [received] = '\0' ;
 
@@ -89,7 +91,7 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    if (close_client_socket (&client_socket) != TDICE_SUCCESS)
+    if (close_socket (&client_socket) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
 

@@ -54,46 +54,81 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct ClientSocket
+    /*! \struct Socket
      *
-     *  \brief Structure used to set up network connections in the client side
+     *  \brief Structure used to set up and use network connections
      *
      */
 
-    struct ClientSocket
+    struct Socket
     {
-        /*! The descriptor of the socket (like a unique id) */
+        /*! The descriptor of the socket (like a unique id - file descriptor) */
 
-        NetworkSocket_t    SocketId ;
+        NetworkSocket_t Id ;
 
-        /*! The address of the server with which the client will communicate */
+        /*! The IP address related to the socket */
 
-        struct sockaddr_in ServerAddress ;
+        struct sockaddr_in Address ;
 
-        /*! The IP address of the client, as a string */
+        /*! The IP address, as a string */
 
         char HostName [32] ;
 
-        /*! The port number in host horder */
+        /*! The port number (host horder) */
 
         PortNumber_t PortNumber ;
     } ;
 
-    /*! Definition of the type ClientSocket */
+    /*! Definition of the type Socket */
 
-    typedef struct ClientSocket ClientSocket ;
+    typedef struct Socket Socket ;
 
 
-    /*! Initializes a client socket
+    /*! Initializes a socket
      *
-     * \param client_socket the address of the ClientSocket to initialize
+     * \param socket the address of the Socket to initialize
      *
      * \return \c TDICE_SUCCESS if the initialization succeeded
      * \return \c TDICE_FAILURE if the initialization fails. A message will be
      *                          printed on standard error
      */
 
-    Error_t init_client_socket (ClientSocket *client_socket) ;
+    void init_socket (Socket *socket) ;
+
+
+
+    /*! Open a socket for the client side
+     *
+     * \param client the address of the Socket to open
+     *
+     * \return \c TDICE_SUCCESS if the opening succeeded
+     * \return \c TDICE_FAILURE if the opening fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t open_client_socket (Socket *client) ;
+
+
+
+    /*! Open a socket for the server side
+     *
+     * The function creates the socket. Then it binds the socket to the
+     * \a port_numebr over any kind of address. It finally enables the
+     * listening.
+     *
+     * \param server      the address of the Socket to open
+     * \param port_number the port number of the server
+     *
+     * \return \c TDICE_SUCCESS if the opening succeeded
+     * \return \c TDICE_FAILURE if the opening fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t open_server_socket
+    (
+        Socket       *server,
+        PortNumber_t  port_number
+    ) ;
 
 
 
@@ -103,8 +138,8 @@ extern "C"
      * The server side must be waiting for a connection. On error, the
      * socket is closed.
      *
-     * \param client_socket the address of the ClientSocket to initialize
-     * \param host_name the ip address of the server (as dotted string)
+     * \param client      the address of the ClientSocket to initialize
+     * \param host_name   the ip address of the server (as dotted string)
      * \param port_number the port number of the server
      *
      * \return \c TDICE_SUCCESS if the connection succeeded
@@ -112,22 +147,39 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t connect_to_server
+    Error_t connect_client_to_server
+    (
+        Socket       *client,
+        String_t      host_name,
+        PortNumber_t  port_number
+    ) ;
 
-        (ClientSocket *client_socket, String_t host_name, PortNumber_t port_number) ;
 
 
-
-    /*! Closes a client socket
+    /*! Waits unitl a client sends a connect to the server
      *
-     * \param client_socket the address of the ClientSocket to close
+     * \param server the address of the ServerSocket that will wait
+     * \param client the address of the ClientSocket that will connect_to_server
+     *
+     * \return \c TDICE_SUCCESS if the connection with the client succeeded
+     * \return \c TDICE_FAILURE if the connection fails. A message will be
+     *                          printed on standard error
+     */
+
+    Error_t wait_for_client (Socket *server, Socket *client) ;
+
+
+
+    /*! Closes a socket
+     *
+     * \param socket the address of the Socket to close
      *
      * \return \c TDICE_SUCCESS if the closure succeeded
      * \return \c TDICE_FAILURE if the closure fails. A message will be
      *                          printed on standard error
      */
 
-    Error_t close_client_socket (ClientSocket *client_socket) ;
+    Error_t close_socket (Socket *socket) ;
 
 #ifdef __cplusplus
 }

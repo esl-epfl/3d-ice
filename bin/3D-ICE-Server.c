@@ -42,7 +42,6 @@
 
 #include "types.h"
 #include "network_interface.h"
-#include "ni_server.h"
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
@@ -53,8 +52,7 @@ int main (int argc, char** argv)
     Analysis         analysis ;
     ThermalData      tdata ;
 
-    ServerSocket server_socket ;
-    ClientSocket client_socket ;
+    Socket server_socket, client_socket ;
 
     char message [125] ;
 
@@ -107,7 +105,9 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
-    if (init_server_socket (&server_socket, 10024) != TDICE_SUCCESS)
+    init_socket (&server_socket) ;
+
+    if (open_server_socket (&server_socket, 10024) != TDICE_SUCCESS)
 
         goto socket_error ;
 
@@ -117,6 +117,8 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Waiting for client ... ") ; fflush (stdout) ;
 
+    init_socket (&client_socket) ;
+
     if (wait_for_client (&server_socket, &client_socket) != TDICE_SUCCESS)
 
         goto wait_error ;
@@ -124,8 +126,6 @@ int main (int argc, char** argv)
     fprintf (stdout,
         "(%s:%d) done !\n",
         client_socket.HostName, client_socket.PortNumber) ;
-
-//    fprintf (stdout, "done (%s:%d)!\n", client_id, ntohs (client_address.sin_port)) ;
 
     /**************************************************************************/
 
@@ -137,7 +137,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Sending >%s< (%Zu bytes) to client ... ", message, to_send) ; fflush (stdout) ;
 
-    sent = write (client_socket.SocketId, message, to_send) ;
+    sent = write (client_socket.Id, message, to_send) ;
 
     if (sent == -1)
     {
@@ -157,8 +157,8 @@ int main (int argc, char** argv)
 
     /**************************************************************************/
 
-    close_client_socket    (&client_socket) ;
-    close_server_socket    (&server_socket) ;
+    close_socket           (&client_socket) ;
+    close_socket           (&server_socket) ;
     free_thermal_data      (&tdata) ;
     free_analysis          (&analysis) ;
     free_stack_description (&stkd) ;
@@ -166,9 +166,9 @@ int main (int argc, char** argv)
     return EXIT_SUCCESS ;
 
 write_error :
-                            close_client_socket    (&client_socket) ;
+                            close_socket           (&client_socket) ;
 wait_error :
-                            close_server_socket    (&server_socket) ;
+                            close_socket           (&server_socket) ;
 socket_error :
                             free_thermal_data      (&tdata) ;
 ftd_error :
