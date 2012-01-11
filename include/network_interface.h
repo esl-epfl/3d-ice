@@ -170,7 +170,7 @@ extern "C"
 
 
 
-    /*! Sends a message to a socket
+    /*! Sends a text message to a socket
      *
      * \param socket  the socket where the message will be sent
      * \param message the (text) message to send (must end with character '\\0')
@@ -180,7 +180,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t send_to_socket
+    Error_t send_message_to_socket
     (
         Socket   *socket,
         String_t  message
@@ -188,7 +188,7 @@ extern "C"
 
 
 
-    /*! Receive a message from a socket
+    /*! Receive a text message from a socket
      *
      * \param socket  the socket from where the message will be received
      * \param message the string where the received message will be written
@@ -200,7 +200,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t receive_from_socket
+    Error_t receive_message_from_socket
     (
         Socket         *socket,
         String_t        message,

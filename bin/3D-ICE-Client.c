@@ -84,7 +84,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Receiving from server ...") ; fflush (stdout) ;
 
-    if (receive_from_socket (&client_socket, message, (StringLength_t) MESSAGE_LENGTH) != TDICE_SUCCESS)
+    if (receive_message_from_socket (&client_socket, message, (StringLength_t) MESSAGE_LENGTH) != TDICE_SUCCESS)
 
         goto failure ;
 

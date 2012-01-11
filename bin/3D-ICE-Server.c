@@ -139,7 +139,7 @@ int main (int argc, char** argv)
     // used in the declaration while strlen(message) is the number of
     // characters (bytes) before the '\0'.
 
-    if (send_to_socket (&client_socket, message) != TDICE_SUCCESS)
+    if (send_message_to_socket (&client_socket, message) != TDICE_SUCCESS)
 
         goto send_error ;
 

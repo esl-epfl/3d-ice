@@ -194,24 +194,46 @@ Error_t wait_for_client (Socket *server, Socket *client)
 
 /******************************************************************************/
 
-Error_t send_to_socket
+Error_t send_message_to_socket
 (
     Socket   *socket,
     String_t  message
 )
 {
+    ssize_t bwritten ;
+
     // here sizeof(message) is the dimension in bytes of a poiter to char
     // while strlen(message) is the length of the message, i.e. the number
     // of bytes before '\0' to be sent.
 
     StringLength_t length = strlen (message) ;
 
+    // Sends the dimension of the message as first information
+
+    bwritten = write (socket->Id, &length, sizeof(StringLength_t)) ;
+
+    if (bwritten < 0)
+    {
+        perror ("ERROR :: write message length failure") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    if (bwritten != sizeof(StringLength_t))
+    {
+        fprintf (stderr, "ERROR :: write message length failure") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    // then it sends the real message ...
+
     while (length > 0)
     {
         // writes up to "length" bytes taken from "message" to the socket
         // returns the number of bytes sent, or -1
 
-        ssize_t bwritten = write (socket->Id, message, length) ;
+        bwritten = write (socket->Id, message, length) ;
 
         if (bwritten < 0)
         {
@@ -221,7 +243,7 @@ Error_t send_to_socket
 
             else
             {
-                perror ("ERROR :: write failure") ;
+                perror ("ERROR :: write message failure") ;
 
                 return TDICE_FAILURE ;
             }
@@ -238,22 +260,49 @@ Error_t send_to_socket
 
 /******************************************************************************/
 
-Error_t receive_from_socket
+Error_t receive_message_from_socket
 (
     Socket         *socket,
     String_t        message,
     StringLength_t  length
 )
 {
+    ssize_t bread ;
+
     // here sizeof(message) is the dimension in bytes of a poiter to char
     // while strlen(message) is the length of the message, i.e. the number
     // of bytes before '\0' to be sent. The latter cannot be used since
     // message might contain garbage values, i.e. the value '\0' might
     // be in any location.
 
-    while (length > 0)
+    StringLength_t message_length ;
+
+    bread = read (socket->Id, &message_length, sizeof(StringLength_t)) ;
+
+    if (bread < 0)
     {
-        ssize_t bread = read (socket->Id ,message, length) ;
+        perror ("ERROR :: read message length failure") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    if (bread != sizeof(StringLength_t))
+    {
+        fprintf (stderr, "ERROR :: read message length failure") ;
+
+        return TDICE_FAILURE ;
+    }
+
+    if (message_length > length)
+    {
+        fprintf (stderr, "ERROR :: not enough space to receive\n") ;
+
+        return EXIT_FAILURE ;
+    }
+
+    while (message_length > 0)
+    {
+        bread = read (socket->Id, message, message_length) ;
 
         if (bread < 0)
         {
@@ -272,15 +321,8 @@ Error_t receive_from_socket
 
             break ;
 
-        if (bread > (ssize_t) length)
-        {
-            fprintf (stderr, "ERROR :: risk of data losses!!\n") ;
-
-            return EXIT_FAILURE ;
-        }
-
-        length  -= bread ;
-        message += bread ;
+        message_length -= bread ;
+        message        += bread ;
     }
 
     *message = '\0' ;
