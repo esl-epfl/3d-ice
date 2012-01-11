@@ -482,15 +482,15 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Definition of the type UnixSocket_t */
-
-    typedef int UnixSocket_t ;
-
-
-
     /*! Definition of the type NetworkSocket_t */
 
     typedef int NetworkSocket_t ;
+
+
+
+    /*! Definition of the type PortNumber_t */
+
+    typedef uint16_t PortNumber_t ;
 
 /******************************************************************************/
 

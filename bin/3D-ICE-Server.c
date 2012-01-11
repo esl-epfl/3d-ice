@@ -121,7 +121,9 @@ int main (int argc, char** argv)
 
         goto wait_error ;
 
-    fprintf (stdout, "done !\n") ;
+    fprintf (stdout,
+        "(%s:%d) done !\n",
+        client_socket.HostName, client_socket.PortNumber) ;
 
 //    fprintf (stdout, "done (%s:%d)!\n", client_id, ntohs (client_address.sin_port)) ;
 

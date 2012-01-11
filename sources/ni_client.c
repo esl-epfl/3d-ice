@@ -43,6 +43,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 
+#include "macros.h"
 #include "ni_client.h"
 
 /******************************************************************************/
@@ -58,6 +59,12 @@ Error_t init_client_socket (ClientSocket *client_socket)
         return TDICE_FAILURE ;
     }
 
+    memset ((void *) &(client_socket->ServerAddress), 0, sizeof (struct sockaddr_in)) ;
+
+    memset ((void *) &(client_socket->HostName), '\0', sizeof (client_socket->HostName)) ;
+
+    client_socket->PortNumber = 0u ;
+
     return TDICE_SUCCESS ;
 }
 
@@ -67,10 +74,12 @@ Error_t connect_to_server
 (
     ClientSocket *client_socket,
     String_t      host_name,
-    int           port_number
+    PortNumber_t  port_number
 )
 {
-    memset ((void *) &(client_socket->ServerAddress), 0, sizeof (struct sockaddr_in)) ;
+    strcpy (client_socket->HostName, host_name) ;
+
+    client_socket->PortNumber = port_number ;
 
     client_socket->ServerAddress.sin_family = AF_INET ;
     client_socket->ServerAddress.sin_port   = htons (port_number) ;

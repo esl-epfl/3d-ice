@@ -115,6 +115,19 @@ Error_t wait_for_client
         return TDICE_FAILURE ;
     }
 
+    client_socket->PortNumber = ntohs (client_socket->ServerAddress.sin_port) ;
+
+    if (inet_ntop (AF_INET, &client_socket->ServerAddress.sin_addr,
+                   client_socket->HostName, sizeof (client_soc	ket->HostName)) == NULL)
+    {
+        perror ("ERROR :: client name translation") ;
+
+        close_client_socket (client_socket) ;
+        close_server_socket (server_socket) ;
+
+        return TDICE_FAILURE ;
+    }
+
     return TDICE_SUCCESS ;
 }
 

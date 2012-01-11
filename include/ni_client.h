@@ -69,6 +69,14 @@ extern "C"
         /*! The address of the server with which the client will communicate */
 
         struct sockaddr_in ServerAddress ;
+
+        /*! The IP address of the client, as a string */
+
+        char HostName [32] ;
+
+        /*! The port number in host horder */
+
+        PortNumber_t PortNumber ;
     } ;
 
     /*! Definition of the type ClientSocket */
@@ -96,7 +104,7 @@ extern "C"
      * socket is closed.
      *
      * \param client_socket the address of the ClientSocket to initialize
-     * \param host_name the ip address of the server
+     * \param host_name the ip address of the server (as dotted string)
      * \param port_number the port number of the server
      *
      * \return \c TDICE_SUCCESS if the connection succeeded
@@ -106,7 +114,7 @@ extern "C"
 
     Error_t connect_to_server
 
-        (ClientSocket *client_socket, String_t host_name, int port_number) ;
+        (ClientSocket *client_socket, String_t host_name, PortNumber_t port_number) ;
 
 
 
