@@ -51,7 +51,7 @@ extern "C"
 #include <netinet/in.h>
 
 #include "types.h"
-#include "ni_client.h"
+#include "network_interface.h"
 
 /******************************************************************************/
 

@@ -118,7 +118,7 @@ Error_t wait_for_client
     client_socket->PortNumber = ntohs (client_socket->ServerAddress.sin_port) ;
 
     if (inet_ntop (AF_INET, &client_socket->ServerAddress.sin_addr,
-                   client_socket->HostName, sizeof (client_soc	ket->HostName)) == NULL)
+                   client_socket->HostName, sizeof (client_socket->HostName)) == NULL)
     {
         perror ("ERROR :: client name translation") ;
 

@@ -77,7 +77,7 @@
                   $(3DICE_SOURCES)/inspection_point.c         \
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/material.c                 \
-                  $(3DICE_SOURCES)/ni_client.c                \
+                  $(3DICE_SOURCES)/network_interface.c        \
                   $(3DICE_SOURCES)/ni_server.c                \
                   $(3DICE_SOURCES)/powers_queue.c             \
                   $(3DICE_SOURCES)/stack_description.c        \

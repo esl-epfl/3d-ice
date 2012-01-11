@@ -36,10 +36,10 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_CLIENT_H_
-#define _3DICE_CLIENT_H_
+#ifndef _3DICE_NETWORK_INTERFACE_H_
+#define _3DICE_NETWORK_INTERFACE_H_
 
-/*! \file ni_client.h */
+/*! \file network_interface.h */
 
 #ifdef __cplusplus
 extern "C"
@@ -133,4 +133,4 @@ extern "C"
 }
 #endif
 
-#endif /* _3DICE_CLIENT_H_ */
+#endif /* _3DICE_NETWORK_INTERFACE_H_ */

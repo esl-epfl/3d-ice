@@ -44,7 +44,7 @@
 #include <sys/socket.h>
 
 #include "macros.h"
-#include "ni_client.h"
+#include "network_interface.h"
 
 /******************************************************************************/
 

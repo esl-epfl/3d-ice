@@ -41,7 +41,7 @@
 #include <unistd.h>
 
 #include "types.h"
-#include "ni_client.h"
+#include "network_interface.h"
 #include "ni_server.h"
 #include "stack_description.h"
 #include "thermal_data.h"

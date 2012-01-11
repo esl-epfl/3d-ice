@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "ni_client.h"
+#include "network_interface.h"
 
 int main (int argc, char** argv)
 {
