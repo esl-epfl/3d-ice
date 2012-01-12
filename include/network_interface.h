@@ -233,13 +233,11 @@ extern "C"
     /*! Extracts the type of a message
      *
      * \param message the string that contains the message
-     * \param type the type of the request
      *
-     * \return \c TDICE_SUCCESS if the operation succeeded
-     * \return \c TDICE_FAILURE if the operation fails.
+     * \return the type of the message
      */
 
-    Error_t get_message_type (String_t message, MessageType_t *type) ;
+     MessageType_t get_message_type (String_t message) ;
 
 
 

@@ -132,16 +132,13 @@ int main (int argc, char** argv)
 
     do
     {
-
         error = receive_message_from_socket
 
             (&client_socket, message, MESSAGE_LENGTH) ;
 
         if (error != TDICE_SUCCESS)    goto transmission_error ;
 
-        error = get_message_type (message, &type) ;
-
-        if  (error != TDICE_SUCCESS)   goto transmission_error ;
+        type = get_message_type (message) ;
 
         switch (type)
         {

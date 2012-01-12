@@ -123,7 +123,9 @@ int main (int argc, char** argv)
 
     if (error != TDICE_SUCCESS)    goto socket_error ;
 
-    fprintf (stdout, "There are %s floorplan elements in the stack\n", message) ;
+    // FIXME this is just to check if it works ...
+
+    fprintf (stdout, "There are %d floorplan elements in the stack\n", (int) message[4]) ;
 
     build_message_request (TDICE_EXIT_SIMULATION, message) ;
 
