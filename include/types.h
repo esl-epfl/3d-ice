@@ -509,9 +509,13 @@ extern "C"
 
     enum MessageType_t
     {
-        /*! Forces the server to terminate */
+        /*! Forces the server to terminate. */
 
         TDICE_EXIT_SIMULATION = 0,
+
+        /*! Reset thermal state to initial temperature */
+
+        TDICE_RESET_THERMAL_STATE,
 
         /*! Request for the total number of florplan elements in the stack */
 

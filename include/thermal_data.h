@@ -187,6 +187,16 @@ extern "C"
 
 
 
+    /*! Reset the thermal state to the initial temperature
+     *
+     * \param tdata    the address of the ThermalData structure to reset
+     * \param analysis the address of the Analysis structure related to \a tdata
+     */
+
+    void reset_thermal_state (ThermalData *tdata, Analysis *analysis) ;
+
+
+
     /*! Simulates a time step
      *
      * \param tdata     address of the ThermalData structure

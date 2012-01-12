@@ -283,6 +283,13 @@ void free_thermal_data (ThermalData* tdata)
 
 /******************************************************************************/
 
+void reset_thermal_state (ThermalData *tdata, Analysis *analysis)
+{
+    init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
+}
+
+/******************************************************************************/
+
 static void fill_system_vector
 (
     Dimensions    *dimensions,

@@ -149,6 +149,10 @@ int main (int argc, char** argv)
 
                 goto quit ;
 
+            case TDICE_RESET_THERMAL_STATE :
+
+                reset_thermal_state (&tdata, &analysis) ;
+
             case TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS :
 
                 build_message_reply
@@ -157,16 +161,16 @@ int main (int argc, char** argv)
                     message,
                     get_total_number_of_floorplan_elements (&stkd)) ;
 
+                error = send_message_to_socket (&client_socket, message) ;
+
+                if (error != TDICE_SUCCESS)    goto transmission_error ;
+
                 break ;
 
             default :
 
                 fprintf (stderr, "ERROR :: received unknown message type") ;
         }
-
-        error = send_message_to_socket (&client_socket, message) ;
-
-        if (error != TDICE_SUCCESS)    goto transmission_error ;
 
     } while (1) ;
 
