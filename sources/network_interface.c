@@ -332,6 +332,40 @@ Error_t receive_message_from_socket
 
 /******************************************************************************/
 
+void build_message_request (MessageType_t type, String_t message)
+{
+    sprintf (message, "%d", type) ;
+}
+
+/******************************************************************************/
+
+void build_message_reply
+(
+    MessageType_t __attribute__ ((unused)) type,
+    String_t      message,
+    Quantity_t    foo
+)
+{
+    sprintf (message, "%d", foo) ;
+}
+
+/******************************************************************************/
+
+Error_t get_message_type (String_t message, MessageType_t *type)
+{
+    int tmp ;
+
+    if (sscanf (message, "%d", &tmp) != 1)
+
+        return TDICE_FAILURE ;
+
+    *type = (MessageType_t) tmp ;
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
 Error_t close_socket (Socket *socket)
 {
     if (close (socket->Id) != 0)

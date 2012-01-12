@@ -50,6 +50,8 @@ int main(int argc, char** argv)
 
     SimResult_t (*emulate) (ThermalData*, StackDescription*, Analysis*) ;
 
+    Error_t error ;
+
     // Checks if there are the all the arguments
     ////////////////////////////////////////////////////////////////////////////
 
@@ -67,9 +69,9 @@ int main(int argc, char** argv)
     init_stack_description (&stkd) ;
     init_analysis          (&analysis) ;
 
-    if (fill_stack_description (&stkd, &analysis, argv[1]) != 0)
+    error = fill_stack_description (&stkd, &analysis, argv[1]) ;
 
-        return EXIT_FAILURE ;
+    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
     if (analysis.AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
 
@@ -95,7 +97,9 @@ int main(int argc, char** argv)
 
     // We use "% " as prefix for matlab compatibility (header will be a comment)
 
-    if (generate_analysis_headers (&analysis, stkd.Dimensions, "% ") != TDICE_SUCCESS)
+    error = generate_analysis_headers (&analysis, stkd.Dimensions, "% ") ;
+
+    if (error != TDICE_SUCCESS)
     {
         fprintf (stderr, "error in initializing output files \n ");
 
@@ -111,7 +115,9 @@ int main(int argc, char** argv)
 
     init_thermal_data (&tdata) ;
 
-    if (fill_thermal_data (&tdata, &stkd, &analysis) == TDICE_FAILURE)
+    error = fill_thermal_data (&tdata, &stkd, &analysis) ;
+
+    if (error != TDICE_SUCCESS)
     {
         free_analysis          (&analysis) ;
         free_stack_description (&stkd) ;
@@ -126,13 +132,13 @@ int main(int argc, char** argv)
 
     clock_t Time = clock() ;
 
-    SimResult_t result ;
+    SimResult_t sim_result ;
 
     do
     {
-        result = emulate (&tdata, &stkd, &analysis) ;
+        sim_result = emulate (&tdata, &stkd, &analysis) ;
 
-        if (result == TDICE_STEP_DONE || result == TDICE_SLOT_DONE)
+        if (sim_result == TDICE_STEP_DONE || sim_result == TDICE_SLOT_DONE)
         {
             fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
 
@@ -143,7 +149,7 @@ int main(int argc, char** argv)
                 (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_STEP) ;
         }
 
-        if (result == TDICE_SLOT_DONE)
+        if (sim_result == TDICE_SLOT_DONE)
         {
             fprintf (stdout, "\n") ;
 
@@ -152,7 +158,7 @@ int main(int argc, char** argv)
                 (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_SLOT) ;
         }
 
-    } while (result != TDICE_END_OF_SIMULATION) ;
+    } while (sim_result != TDICE_END_OF_SIMULATION) ;
 
     generate_analysis_output
 

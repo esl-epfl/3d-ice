@@ -209,6 +209,40 @@ extern "C"
 
 
 
+    /*! Builds a text message to be sent as a request to the server
+     *
+     * \param type    the type of the request
+     * \param message the string that will contain the message
+     */
+
+    void build_message_request (MessageType_t type, String_t message) ;
+
+
+
+    /*! Builds a text message to be sent as a reply to the client
+     *
+     * \param type    the type of the request
+     * \param message the string that will contain the message
+     * \param foo     the value to be sent as reply
+     */
+
+    void build_message_reply (MessageType_t type, String_t message, Quantity_t foo) ;
+
+
+
+    /*! Extracts the type of a message
+     *
+     * \param message the string that contains the message
+     * \param type the type of the request
+     *
+     * \return \c TDICE_SUCCESS if the operation succeeded
+     * \return \c TDICE_FAILURE if the operation fails.
+     */
+
+    Error_t get_message_type (String_t message, MessageType_t *type) ;
+
+
+
     /*! Closes a socket
      *
      * \param socket the address of the Socket to close

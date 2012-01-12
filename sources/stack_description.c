@@ -69,7 +69,7 @@ void init_stack_description (StackDescription* stkd)
 
 /******************************************************************************/
 
-int fill_stack_description
+Error_t fill_stack_description
 (
   StackDescription *stkd,
   Analysis         *analysis,

@@ -44,37 +44,39 @@
 
 #define MESSAGE_LENGTH 32
 
-void seed_random ()
-{
-    FILE *fp = fopen ("/dev/urandom", "r");
-    unsigned int foo;
-    struct timeval t;
-
-    if (!fp)
-    {
-        gettimeofday (&t, NULL);
-        foo = t.tv_usec;
-    }
-    else
-    {
-        size_t res = fread (&foo, sizeof (foo), 1, fp);
-        if (res == 0 ) printf ("fread failed\n");
-        fclose (fp);
-    }
-    srand (foo);
-}
-
-#define random_value(min_value, max_value) \
-    (   ((double)(min_value))              \
-      + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
+// void seed_random ()
+// {
+//     FILE *fp = fopen ("/dev/urandom", "r");
+//     unsigned int foo;
+//     struct timeval t;
+// 
+//     if (!fp)
+//     {
+//         gettimeofday (&t, NULL);
+//         foo = t.tv_usec;
+//     }
+//     else
+//     {
+//         size_t res = fread (&foo, sizeof (foo), 1, fp);
+//         if (res == 0 ) printf ("fread failed\n");
+//         fclose (fp);
+//     }
+//     srand (foo);
+// }
+// 
+// #define random_value(min_value, max_value)
+//     (   ((double)(min_value))             
+//       + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
 
 int main (int argc, char** argv)
 {
     Socket client_socket ;
 
-    char message [MESSAGE_LENGTH] ;
+    Error_t error ;
 
-    seed_random () ;
+    char message [MESSAGE_LENGTH] ;
+// 
+//     seed_random () ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -91,9 +93,9 @@ int main (int argc, char** argv)
 
     init_socket (&client_socket) ;
 
-    if (open_client_socket (&client_socket) != TDICE_SUCCESS)
+    error = open_client_socket (&client_socket) ;
 
-        return EXIT_FAILURE ;
+    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
     fprintf (stdout, "done !\n") ;
 
@@ -101,64 +103,45 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
-    if (connect_client_to_server (&client_socket, "127.0.0.1", 10024) != TDICE_SUCCESS)
+    error = connect_client_to_server (&client_socket, "127.0.0.1", 10024) ;
 
-        return EXIT_FAILURE ;
+    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
     fprintf (stdout, "done !\n") ;
 
     /**************************************************************************/
 
-    fprintf (stdout, "Receiving from server ...") ; fflush (stdout) ;
+    build_message_request (TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS, message) ;
 
-    if (receive_message_from_socket (&client_socket, message, (StringLength_t) MESSAGE_LENGTH) != TDICE_SUCCESS)
+    error = send_message_to_socket (&client_socket, message) ;
 
-        goto receive_error ;
+    if (error != TDICE_SUCCESS)    goto socket_error ;
 
-    fprintf (stdout, " ->%s<- ", message) ;
+    error =
 
-    Quantity_t n_flp_el, n_slots;
+        receive_message_from_socket (&client_socket, message, MESSAGE_LENGTH) ;
 
-    if (sscanf (message, "%d %d", &n_flp_el, &n_slots) != 2)
-    {
-        fprintf (stderr, "Bad message formatting\n") ;
+    if (error != TDICE_SUCCESS)    goto socket_error ;
 
-        goto receive_error ;
-    }
+    fprintf (stdout, "There are %s floorplan elements in the stack\n", message) ;
 
-    fprintf (stdout, "done! %d - %d\n", n_flp_el, n_slots) ;
+    build_message_request (TDICE_EXIT_SIMULATION, message) ;
 
-    /**************************************************************************/
+    error = send_message_to_socket (&client_socket, message) ;
 
-    fprintf (stdout, "Sending power values to server ...") ; fflush (stdout) ;
-
-    Quantity_t power_c, slot_c ;
-
-    for (slot_c = 0 ; slot_c < n_slots ; slot_c++)
-    {
-        for (power_c = 0 ; power_c < n_flp_el ; power_c++)
-        {
-            sprintf (message, "%.3lf", random_value (0.0, 0.1)) ;
-
-            if (send_message_to_socket (&client_socket, message) != TDICE_SUCCESS)
-
-                goto send_error ;
-        }
-    }
-
-    fprintf (stdout, "done!\n") ;
+    if (error != TDICE_SUCCESS)    goto socket_error ;
 
     /**************************************************************************/
 
-    if (close_socket (&client_socket) != TDICE_SUCCESS)
+    error = close_socket (&client_socket) ;
 
-        return EXIT_FAILURE ;
+    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
     return EXIT_SUCCESS ;
 
-send_error :
-receive_error :
-                    close_socket (&client_socket) ;
+socket_error :
 
-                    return EXIT_FAILURE ;
+    close_socket (&client_socket) ;
+
+    return EXIT_FAILURE ;
 }

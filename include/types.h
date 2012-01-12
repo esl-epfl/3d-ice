@@ -499,6 +499,31 @@ extern "C"
 
     typedef uint16_t PortNumber_t ;
 
+
+
+    /*! \enum MessageType_t
+     *
+     * Enumeration to collect all the types of messages that the client
+     * can send as a request to the server
+     */
+
+    enum MessageType_t
+    {
+        /*! Forces the server to terminate */
+
+        TDICE_EXIT_SIMULATION = 0,
+
+        /*! Request for the total number of florplan elements in the stack */
+
+        TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS
+    } ;
+
+
+
+    /*! Definition of the type MessageType_t */
+
+    typedef enum MessageType_t MessageType_t ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus
