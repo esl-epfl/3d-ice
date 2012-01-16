@@ -78,6 +78,7 @@
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/material.c                 \
                   $(3DICE_SOURCES)/network_interface.c        \
+                  $(3DICE_SOURCES)/network_message.c          \
                   $(3DICE_SOURCES)/powers_queue.c             \
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \

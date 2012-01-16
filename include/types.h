@@ -528,6 +528,12 @@ extern "C"
 
     typedef enum MessageType_t MessageType_t ;
 
+
+
+    /*! Definition of the type MessageWord_t */
+
+    typedef uint32_t MessageWord_t ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

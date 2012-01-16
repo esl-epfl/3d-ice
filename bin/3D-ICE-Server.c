@@ -41,13 +41,13 @@
 
 #include "types.h"
 #include "network_interface.h"
+#include "network_message.h"
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
 #include "powers_queue.h"
 
 #define NSLOTS 10
-#define MESSAGE_LENGTH 32
 
 int main (int argc, char** argv)
 {
@@ -59,7 +59,7 @@ int main (int argc, char** argv)
 
     Socket server_socket, client_socket ;
 
-    char message [MESSAGE_LENGTH] ;
+    NetworkMessage message ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -128,19 +128,15 @@ int main (int argc, char** argv)
 
     /* Runs the simlation *****************************************************/
 
-    MessageType_t type ;
+    init_network_message (&message) ;
 
     do
     {
-        error = receive_message_from_socket
-
-            (&client_socket, message, MESSAGE_LENGTH) ;
+        error = receive_message_from_socket (&client_socket, &message) ;
 
         if (error != TDICE_SUCCESS)    goto transmission_error ;
 
-        type = get_message_type (message) ;
-
-        switch (type)
+        switch (*message.Type)
         {
             case TDICE_EXIT_SIMULATION :
 
@@ -150,15 +146,21 @@ int main (int argc, char** argv)
 
                 reset_thermal_state (&tdata, &analysis) ;
 
+                break ;
+
             case TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS :
 
-                build_message_reply
+                build_message_head
 
-                    (TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS,
-                    message,
-                    get_total_number_of_floorplan_elements (&stkd)) ;
+                    (&message, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
 
-                error = send_message_to_socket (&client_socket, message) ;
+                Quantity_t nflpel = get_total_number_of_floorplan_elements (&stkd) ;
+
+                error = insert_message_word (&message, &nflpel) ;
+
+                if (error != TDICE_SUCCESS)    goto transmission_error ;
+
+                error = send_message_to_socket (&client_socket, &message) ;
 
                 if (error != TDICE_SUCCESS)    goto transmission_error ;
 

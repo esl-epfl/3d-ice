@@ -36,119 +36,72 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
+#include <string.h>
 
-#include "network_interface.h"
+#include "macros.h"
 #include "network_message.h"
 
-// void seed_random ()
-// {
-//     FILE *fp = fopen ("/dev/urandom", "r");
-//     unsigned int foo;
-//     struct timeval t;
-// 
-//     if (!fp)
-//     {
-//         gettimeofday (&t, NULL);
-//         foo = t.tv_usec;
-//     }
-//     else
-//     {
-//         size_t res = fread (&foo, sizeof (foo), 1, fp);
-//         if (res == 0 ) printf ("fread failed\n");
-//         fclose (fp);
-//     }
-//     srand (foo);
-// }
-// 
-// #define random_value(min_value, max_value)
-//     (   ((double)(min_value))             
-//       + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
+/******************************************************************************/
 
-int main (int argc, char** argv)
+void init_network_message (NetworkMessage *message)
 {
-    Socket client_socket ;
+    memset (message->Memory, 0u, MAX_LENGTH * sizeof(MessageWord_t)) ;
 
-    Error_t error ;
+    message->MaxLength = MAX_LENGTH ;
 
-    NetworkMessage message ;
+    message->Length    = message->Memory ;
 
-//     seed_random () ;
+    message->Type      = message->Length + 1u ;
 
-    /* Checks if all arguments are there **************************************/
+    message->Content   = message->Type   + 1u ;
+}
 
-    if (argc != 1)
-    {
-        fprintf (stderr, "Usage: \"%s \n", argv[0]) ;
+/******************************************************************************/
 
-        return EXIT_FAILURE ;
-    }
+void build_message_head (NetworkMessage *message, MessageType_t type)
+{
+    *message->Length = (MessageWord_t) 2u ;
 
-    /* Creates socket *********************************************************/
+    *message->Type   = (MessageWord_t) type ;
+}
 
-    fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
+/******************************************************************************/
 
-    init_socket (&client_socket) ;
+#include <stdio.h>
 
-    error = open_client_socket (&client_socket) ;
+Error_t insert_message_word
+(
+    NetworkMessage *message,
+    void           *word
+)
+{
+    if (*message->Length == message->MaxLength)
 
-    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
+        return TDICE_FAILURE ;
 
-    fprintf (stdout, "done !\n") ;
+    MessageWord_t *toinsert = message->Memory + *message->Length ;
 
-    /* Connect to the server **************************************************/
+    memcpy (toinsert, word, sizeof (MessageWord_t)) ;
 
-    fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
+    (*message->Length)++ ;
 
-    error = connect_client_to_server (&client_socket, "127.0.0.1", 10024) ;
+    return TDICE_SUCCESS ;
+}
 
-    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
+/******************************************************************************/
 
-    fprintf (stdout, "done !\n") ;
+Error_t extract_message_word
+(
+    NetworkMessage *message,
+    void           *word,
+    Quantity_t      index
+)
+{
+    if (index >= message->MaxLength - 2)
 
-    /**************************************************************************/
+        return TDICE_FAILURE ;
 
-    init_network_message (&message) ;
+    memcpy (word, message->Content + index, sizeof (MessageWord_t)) ;
 
-    build_message_head (&message, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
-
-    error = send_message_to_socket (&client_socket, &message) ;
-
-    if (error != TDICE_SUCCESS)    goto socket_error ;
-
-    error =
-
-        receive_message_from_socket (&client_socket, &message) ;
-
-    if (error != TDICE_SUCCESS)    goto socket_error ;
-
-    Quantity_t nflpel ;
-
-    error = extract_message_word (&message, &nflpel, 0) ;
-
-    if (error != TDICE_SUCCESS)    goto socket_error ;
-
-    fprintf (stdout, "There are %d floorplan elements in the stack\n", nflpel) ;
-
-    build_message_head (&message, TDICE_EXIT_SIMULATION) ;
-
-    error = send_message_to_socket (&client_socket, &message) ;
-
-    if (error != TDICE_SUCCESS)    goto socket_error ;
-
-    /**************************************************************************/
-
-    error = close_socket (&client_socket) ;
-
-    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
-
-    return EXIT_SUCCESS ;
-
-socket_error :
-
-    close_socket (&client_socket) ;
-
-    return EXIT_FAILURE ;
+    return TDICE_SUCCESS ;
 }

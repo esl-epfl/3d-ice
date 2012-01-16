@@ -51,6 +51,7 @@ extern "C"
 #include <netinet/in.h>
 
 #include "types.h"
+#include "network_message.h"
 
 /******************************************************************************/
 
@@ -87,10 +88,6 @@ extern "C"
     /*! Initializes a socket
      *
      * \param socket the address of the Socket to initialize
-     *
-     * \return \c TDICE_SUCCESS if the initialization succeeded
-     * \return \c TDICE_FAILURE if the initialization fails. A message will be
-     *                          printed on standard error
      */
 
     void init_socket (Socket *socket) ;
@@ -170,10 +167,10 @@ extern "C"
 
 
 
-    /*! Sends a text message to a socket
+    /*! Sends a message to a socket
      *
      * \param socket  the socket where the message will be sent
-     * \param message the (text) message to send (must end with character '\\0')
+     * \param message the address of message to send
      *
      * \return \c TDICE_SUCCESS if the operation succeeded
      * \return \c TDICE_FAILURE if the operation fails. A message will be
@@ -182,18 +179,16 @@ extern "C"
 
     Error_t send_message_to_socket
     (
-        Socket   *socket,
-        String_t  message
+        Socket         *socket,
+        NetworkMessage *message
     ) ;
 
 
 
     /*! Receive a text message from a socket
      *
-     * \param socket  the socket from where the message will be received
-     * \param message the string where the received message will be written
-     * \param length  the length of \a message, i.e. the maximum number of
-     *                bytes that can be received
+     * \param socket  the socket where the message will be received
+     * \param message the address of message to receive
      *
      * \return \c TDICE_SUCCESS if the operation succeeded
      * \return \c TDICE_FAILURE if the operation fails. A message will be
@@ -203,41 +198,8 @@ extern "C"
     Error_t receive_message_from_socket
     (
         Socket         *socket,
-        String_t        message,
-        StringLength_t  length
+        NetworkMessage *message
     ) ;
-
-
-
-    /*! Builds a text message to be sent as a request to the server
-     *
-     * \param type    the type of the request
-     * \param message the string that will contain the message
-     */
-
-    void build_message_request (MessageType_t type, String_t message) ;
-
-
-
-    /*! Builds a text message to be sent as a reply to the client
-     *
-     * \param type    the type of the request
-     * \param message the string that will contain the message
-     * \param foo     the value to be sent as reply
-     */
-
-    void build_message_reply (MessageType_t type, String_t message, Quantity_t foo) ;
-
-
-
-    /*! Extracts the type of a message
-     *
-     * \param message the string that contains the message
-     *
-     * \return the type of the message
-     */
-
-     MessageType_t get_message_type (String_t message) ;
 
 
 

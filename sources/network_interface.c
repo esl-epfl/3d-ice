@@ -196,17 +196,27 @@ Error_t wait_for_client (Socket *server, Socket *client)
 
 Error_t send_message_to_socket
 (
-    Socket   *socket,
-    String_t  message
+    Socket         *socket,
+    NetworkMessage *message
 )
 {
-    uint32_t *begin = (uint32_t *) message ;
+    // length stores the total number of bytes to send
+    // --> The length of the message times the size of a word
 
-    uint32_t length = *begin ;
+    size_t        length = (size_t) *message->Length * sizeof (MessageWord_t) ;
+
+    // Begin points to th beginning of the message ...
+
+    MessageWord_t *begin = (MessageWord_t *) message->Memory ;
 
     while (length > 0)
     {
-        ssize_t bwritten = write (socket->Id, message, length) ;
+
+        // sends "length" bytes ...
+
+        ssize_t bwritten = write (socket->Id, begin, length) ;
+
+        // and check how many bytes are actually sent
 
         if (bwritten < 0)
         {
@@ -222,10 +232,13 @@ Error_t send_message_to_socket
             }
         }
 
-        // updates missing bytes to send and move the pointer forward
+        // decreases by the #bytes sent
 
-        length  -= (uint32_t) bwritten ;
-        message += (uint32_t) bwritten ;
+        length -= (size_t) bwritten ;
+
+        // moves the pointer forward (# of words sent)
+
+        begin += (MessageWord_t) (bwritten / sizeof (MessageWord_t)) ;
     }
 
     return TDICE_SUCCESS ;
@@ -236,33 +249,42 @@ Error_t send_message_to_socket
 Error_t receive_message_from_socket
 (
     Socket         *socket,
-    String_t        message,
-    StringLength_t  length
+    NetworkMessage *message
 )
 {
-    uint32_t message_length ;
+    MessageWord_t message_length ;
 
-    ssize_t bread = read (socket->Id, &message_length, sizeof(uint32_t)) ;
+    // reads the first word : the number of words to receive
 
-    if (bread < 0 || bread != sizeof(uint32_t))
+    ssize_t bread = read (socket->Id, &message_length, sizeof(message_length)) ;
+
+    if (bread < 0 || bread != sizeof(message_length))
     {
         perror ("ERROR :: read message length failure") ;
 
         return TDICE_FAILURE ;
     }
 
-    if (message_length > (uint32_t) length)
+    if (message_length > message->MaxLength)
     {
         fprintf (stderr, "ERROR :: not enough space to receive\n") ;
 
         return EXIT_FAILURE ;
     }
 
-    uint32_t *begin = (uint32_t *) message ;
+    // stores the length of the message
 
-    *begin++ = (uint32_t) message_length ;
+    *message->Length = (MessageWord_t) message_length ;
 
-    message_length -= sizeof (uint32_t) ;
+    // now one whord has already been read !
+
+    message_length-- ;
+
+    // scale the remaining number of words to read to the number of bytes
+
+    message_length *= sizeof (MessageWord_t) ;
+
+    MessageWord_t *begin = message->Type ;
 
     while (message_length > 0)
     {
@@ -281,57 +303,17 @@ Error_t receive_message_from_socket
                 return TDICE_FAILURE ;
             }
         }
-        else if (bread == 0)
 
-            break ;
+        // decreases by the #bytes read
 
-        message_length -= (uint32_t) bread ;
-        begin          += (uint32_t) bread ;
+        message_length -= (size_t) bread ;
+
+        // moves the pointer forward (# of words received)
+
+        begin += (MessageWord_t) (bread / sizeof(MessageWord_t)) ;
     }
 
     return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-void build_message_request (MessageType_t type, String_t message)
-{
-    uint32_t *begin = (uint32_t *) message ;
-
-    // The first 32 bits stores the total length of the message
-
-    *begin++ = (uint32_t)(2u) * (uint32_t)(sizeof (uint32_t)) ;
-
-    // The following 32 bits stores the type of the message
-
-    *begin = (uint32_t) type ;
-}
-
-/******************************************************************************/
-
-void build_message_reply
-(
-    MessageType_t __attribute__ ((unused)) type,
-    String_t      message,
-    Quantity_t    foo
-)
-{
-    uint32_t *begin = (uint32_t *) message ;
-
-    *begin++ = (uint32_t) 2u * sizeof (uint32_t) ;
-
-    *begin   = (uint32_t) foo ;
-}
-
-/******************************************************************************/
-
-MessageType_t get_message_type (String_t message)
-{
-    uint32_t *begin = (uint32_t *) message ;
-
-    begin++ ;
-
-    return (MessageType_t) *begin ;
 }
 
 /******************************************************************************/
