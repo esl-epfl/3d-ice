@@ -443,11 +443,11 @@ void print_formatted_inspection_point_list
                 break ;
         }
 
-        if (inspection_point->Instant == TDICE_OUTPUT_SLOT)
+        if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_SLOT)
 
             fprintf(stream, "slot );\n");
 
-        else if (inspection_point->Instant == TDICE_OUTPUT_STEP)
+        else if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_STEP)
 
             fprintf(stream, "step );\n");
 
@@ -943,6 +943,67 @@ output_error :
     fclose (output_stream) ;
 
     return TDICE_FAILURE ;
+}
+
+/******************************************************************************/
+
+Error_t fill_message_inspection_point
+(
+    InspectionPoint *inspection_point,
+    Dimensions      *dimensions,
+    Temperature_t   *temperatures,
+    NetworkMessage  *message
+)
+{
+    Error_t error = TDICE_FAILURE ;
+
+    switch (inspection_point->Type)
+    {
+        case TDICE_OUTPUT_TYPE_TCELL :
+        {
+            Quantity_t index = get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(inspection_point->StackElement),
+                 inspection_point->Pointer.Tcell->RowIndex,
+                 inspection_point->Pointer.Tcell->ColumnIndex) ;
+
+            float temperature = *(temperatures + index) ;
+
+            error = insert_message_word (message, &temperature) ;
+
+            break ;
+        }
+        case TDICE_OUTPUT_TYPE_TFLP :
+
+            fprintf (stderr, "TFLP output in message not supperted\n") ;
+
+            break ;
+
+        case TDICE_OUTPUT_TYPE_TFLPEL :
+
+            fprintf (stderr, "TFLPEL output in message not supperted\n") ;
+
+            break ;
+
+        case TDICE_OUTPUT_TYPE_TMAP :
+
+            fprintf (stderr, "TMAP output in message not supperted\n") ;
+
+            break ;
+
+        case TDICE_OUTPUT_TYPE_TCOOLANT :
+
+            fprintf (stderr, "TCOOLANT output in message not supperted\n") ;
+
+            break ;
+
+        default :
+
+            fprintf (stderr, "Error reading inspection point instruction\n") ;
+   }
+
+    return error ;
 }
 
 /******************************************************************************/

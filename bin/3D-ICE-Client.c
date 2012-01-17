@@ -114,25 +114,25 @@ int main (int argc, char** argv)
 
     error = send_message_to_socket (&client_socket, &message) ;
 
-    if (error != TDICE_SUCCESS)    goto socket_error ;
+    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
 
     error =
 
         receive_message_from_socket (&client_socket, &message) ;
 
-    if (error != TDICE_SUCCESS)    goto socket_error ;
+    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
 
     Quantity_t nflpel ;
 
     error = extract_message_word (&message, &nflpel, 0) ;
 
-    if (error != TDICE_SUCCESS)    goto socket_error ;
+    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
 
     /* Sends power values *****************************************************/
 
     Quantity_t index ;
 
-    float power_value ;
+    float power_value, time, temperature ;
 
     seed_random () ;
 
@@ -142,7 +142,7 @@ int main (int argc, char** argv)
 
         error = insert_message_word (&message, &nflpel) ;
 
-        if (error != TDICE_SUCCESS)    goto socket_error ;
+        if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
 
         for (index = 0 ; index != nflpel ; index++)
         {
@@ -150,12 +150,62 @@ int main (int argc, char** argv)
 
             error = insert_message_word (&message, &power_value) ;
 
-            if (error != TDICE_SUCCESS)    goto socket_error ;
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
         }
 
         error = send_message_to_socket (&client_socket, &message) ;
 
-        if (error != TDICE_SUCCESS)    goto socket_error ;
+        if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+        if (nslots % 2 == 0)
+        {
+            build_message_head (&message, TDICE_THERMAL_RESULTS) ;
+
+            OutputInstant_t instant = TDICE_OUTPUT_INSTANT_SLOT ;
+
+            error = insert_message_word (&message, &instant) ;
+
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+            OutputType_t type = TDICE_OUTPUT_TYPE_TCELL ;
+
+            error = insert_message_word (&message, &type) ;
+
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+            error = send_message_to_socket (&client_socket, &message) ;
+
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+            error =
+
+                receive_message_from_socket (&client_socket, &message) ;
+
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+            Quantity_t nsensors ;
+
+            error = extract_message_word (&message, &nsensors, 0) ;
+
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+            error = extract_message_word (&message, &time, 1) ;
+
+            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+            fprintf (stdout, "%5.2f sec : \t", time) ;
+
+            for (index = 2, nsensors += 2 ; index != nsensors ; index++)
+            {
+                error = extract_message_word (&message, &temperature, index) ;
+
+                if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+
+                fprintf (stdout, "%5.2f K \t", temperature) ;
+            }
+
+            fprintf (stdout, "\n") ;
+        }
     }
 
     /* Closes the simulation on the server ************************************/
@@ -164,7 +214,7 @@ int main (int argc, char** argv)
 
     error = send_message_to_socket (&client_socket, &message) ;
 
-    if (error != TDICE_SUCCESS)    goto socket_error ;
+    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
 
     /**************************************************************************/
 
@@ -174,7 +224,7 @@ int main (int argc, char** argv)
 
     return EXIT_SUCCESS ;
 
-socket_error :
+close_socket_and_exit :
 
     close_socket (&client_socket) ;
 

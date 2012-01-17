@@ -88,17 +88,6 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
-    /* Generates output headers ***********************************************/
-
-    error = generate_analysis_headers (&analysis, stkd.Dimensions, "% ") ;
-
-    if (error != TDICE_SUCCESS)
-    {
-        fprintf (stderr, "error in initializing output files \n") ;
-
-        goto gah_error ;
-    }
-
     /* Prepares thermal data **************************************************/
 
     fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
@@ -241,9 +230,78 @@ int main (int argc, char** argv)
                     goto sim_error ;
                 }
 
-                generate_analysis_output
+                break ;
+            }
+            case TDICE_THERMAL_RESULTS :
+            {
+                OutputInstant_t instant ;
 
-                    (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_SLOT) ;
+                error = extract_message_word (&message, &instant, 0) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: extract message word 0\n") ;
+
+                    goto message_error ;
+                }
+
+                OutputType_t type ;
+
+                error = extract_message_word (&message, &type, 1) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: extract message word 1\n") ;
+
+                    goto message_error ;
+                }
+
+                build_message_head (&message, TDICE_THERMAL_RESULTS) ;
+
+                Quantity_t nsensors =
+
+                    get_number_of_inspection_points (&analysis, instant, type) ;
+
+                error = insert_message_word (&message, &nsensors) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: insert message word\n") ;
+
+                    goto message_error ;
+                }
+
+                float time = get_simulated_time (&analysis) ;
+
+                error = insert_message_word (&message, &time) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: insert message word\n") ;
+
+                    goto message_error ;
+                }
+
+                error = fill_analysis_message
+
+                    (&analysis, stkd.Dimensions, tdata.Temperatures,
+                     instant, type, &message) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: generate message content\n") ;
+
+                    goto message_error ;
+                }
+
+                error = send_message_to_socket (&client_socket, &message) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: send message to socket\n") ;
+
+                    goto message_error ;
+                }
 
                 break ;
             }
@@ -275,7 +333,6 @@ wait_error :
 socket_error :
                             free_thermal_data      (&tdata) ;
 ftd_error :
-gah_error :
 wrong_analysis_error :
                             free_analysis          (&analysis) ;
                             free_stack_description (&stkd) ;

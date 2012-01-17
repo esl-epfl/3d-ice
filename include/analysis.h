@@ -54,6 +54,7 @@ extern "C"
 
 #include "dimensions.h"
 #include "inspection_point.h"
+#include "network_message.h"
 
 /******************************************************************************/
 
@@ -154,6 +155,22 @@ extern "C"
 
 
 
+    /*! Returns the number of a specific type of insection point
+     *
+     *  \param analysis the address of the analysis structure to query
+     *  \param instant  the instant of the output (slot, step, final)
+     *  \param type     the type of the inspection point (tcell, tmap, ...)
+     *
+     *  \return the number of inspection points recorded in \a analysis
+     *  \return \c 0 if either \a instant or \a type are not known
+     */
+
+    Quantity_t get_number_of_inspection_points
+
+        (Analysis *analysis, OutputInstant_t instant, OutputType_t type) ;
+
+
+
     /*! Returns the state of the slot simulation
      *
      * \param analysis the address of the analysis structure
@@ -242,6 +259,31 @@ extern "C"
         Dimensions      *dimensions,
         Temperature_t   *temperatures,
         OutputInstant_t  output_instant
+    ) ;
+
+
+
+    /*! Fills a network message with thermal outputs for a specific set of inspection points
+     *
+     * \param analysis pointer to the analysis structure
+     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param temperatures pointer to the first element of the temparature array
+     * \param output_instant the instant of the output (slot, step, final)
+     * \param type the type of the ispection point to generate
+     * \param message the message to fill
+     *
+     * \return \c TDICE_SUCCESS if the operation terminates with success
+     * \return \c TDICE_FAILURE if one of the output cannot be generated
+     */
+
+    Error_t fill_analysis_message
+    (
+        Analysis        *analysis,
+        Dimensions      *dimensions,
+        Temperature_t   *temperatures,
+        OutputInstant_t  output_instant,
+        OutputType_t     type,
+        NetworkMessage  *message
     ) ;
 
 /******************************************************************************/

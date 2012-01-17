@@ -476,9 +476,9 @@ extern "C"
     enum OutputInstant_t
     {
         TDICE_OUTPUT_INSTANT_NONE = 0,  //!< Undefined instant
-        TDICE_OUTPUT_FINAL,             //!< At the end of the simulation
-        TDICE_OUTPUT_SLOT,              //!< At the end of each time slot
-        TDICE_OUTPUT_STEP               //!< At every internal time step
+        TDICE_OUTPUT_INSTANT_FINAL,     //!< At the end of the simulation
+        TDICE_OUTPUT_INSTANT_SLOT,      //!< At the end of each time slot
+        TDICE_OUTPUT_INSTANT_STEP       //!< At every internal time step
     } ;
 
 
@@ -516,6 +516,10 @@ extern "C"
         /*! Reset thermal state to initial temperature */
 
         TDICE_RESET_THERMAL_STATE,
+
+        /*! Request thermal results at a specific instant */
+
+        TDICE_THERMAL_RESULTS,
 
         /*! Request for the total number of florplan elements in the stack */
 

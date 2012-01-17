@@ -55,6 +55,7 @@ extern "C"
 #include "dimensions.h"
 #include "floorplan_element.h"
 #include "stack_element.h"
+#include "network_message.h"
 
 /******************************************************************************/
 
@@ -527,6 +528,26 @@ extern "C"
         Dimensions      *dimensions,
         Temperature_t   *temperatures,
         Time_t           current_time
+    ) ;
+
+
+
+    /*! Fills a message with the output implemented by the inspection point
+     *
+     * \param inspection_point the address of the InspectionPoint structure
+     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param temperatures pointer to the first element of the temparature array
+     * \param message the message to fill
+     *
+     * \return FIXME
+     */
+
+    Error_t fill_message_inspection_point
+    (
+        InspectionPoint *inspection_point,
+        Dimensions      *dimensions,
+        Temperature_t   *temperatures,
+        NetworkMessage  *message
     ) ;
 
 /******************************************************************************/

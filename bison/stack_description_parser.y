@@ -1537,10 +1537,10 @@ maxminavg
 when
 
   :  // Declaring the instance option is not mandatory (final is assumed)
-                { $$ =  TDICE_OUTPUT_FINAL ; }
-  |  ',' STEP   { $$ =  TDICE_OUTPUT_STEP ;  }
-  |  ',' SLOT   { $$ =  TDICE_OUTPUT_SLOT ;  }
-  |  ',' FINAL  { $$ =  TDICE_OUTPUT_FINAL ; }
+                { $$ =  TDICE_OUTPUT_INSTANT_FINAL ; }
+  |  ',' STEP   { $$ =  TDICE_OUTPUT_INSTANT_STEP ;  }
+  |  ',' SLOT   { $$ =  TDICE_OUTPUT_INSTANT_SLOT ;  }
+  |  ',' FINAL  { $$ =  TDICE_OUTPUT_INSTANT_FINAL ; }
   ;
 
 %%

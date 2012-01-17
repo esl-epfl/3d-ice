@@ -136,7 +136,9 @@ extern "C"
 
     /*! Extracts the index-th word from the content of a message
      *
-     * The function will not change the status/content of the message
+     * The function will not change the status/content of the message. If
+     * \a index indicates a position out of the message payload the result is
+     * undetermined.
      *
      * \param message the address of the message to build
      * \param word    (out) the address of the word to extrcact
