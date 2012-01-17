@@ -97,7 +97,7 @@ Error_t extract_message_word
     Quantity_t      index
 )
 {
-    if (index >= message->MaxLength - 2)
+    if (index >= (message->MaxLength - 2))
 
         return TDICE_FAILURE ;
 

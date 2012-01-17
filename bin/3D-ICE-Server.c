@@ -47,8 +47,6 @@
 #include "analysis.h"
 #include "powers_queue.h"
 
-#define NSLOTS 10
-
 int main (int argc, char** argv)
 {
     StackDescription stkd ;
@@ -89,6 +87,17 @@ int main (int argc, char** argv)
     }
 
     fprintf (stdout, "done !\n") ;
+
+    /* Generates output headers ***********************************************/
+
+    error = generate_analysis_headers (&analysis, stkd.Dimensions, "% ") ;
+
+    if (error != TDICE_SUCCESS)
+    {
+        fprintf (stderr, "error in initializing output files \n") ;
+
+        goto gah_error ;
+    }
 
     /* Prepares thermal data **************************************************/
 
@@ -134,22 +143,27 @@ int main (int argc, char** argv)
     {
         error = receive_message_from_socket (&client_socket, &message) ;
 
-        if (error != TDICE_SUCCESS)    goto transmission_error ;
+        if (error != TDICE_SUCCESS)
+        {
+            fprintf (stderr, "error: receive message from socket\n") ;
+
+            goto transmission_error ;
+        }
 
         switch (*message.Type)
         {
             case TDICE_EXIT_SIMULATION :
-
+            {
                 goto quit ;
-
+            }
             case TDICE_RESET_THERMAL_STATE :
-
+            {
                 reset_thermal_state (&tdata, &analysis) ;
 
                 break ;
-
+            }
             case TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS :
-
+            {
                 build_message_head
 
                     (&message, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
@@ -158,14 +172,81 @@ int main (int argc, char** argv)
 
                 error = insert_message_word (&message, &nflpel) ;
 
-                if (error != TDICE_SUCCESS)    goto transmission_error ;
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: insert message word\n") ;
+
+                    goto message_error ;
+                }
 
                 error = send_message_to_socket (&client_socket, &message) ;
 
-                if (error != TDICE_SUCCESS)    goto transmission_error ;
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: send message to socket\n") ;
+
+                    goto message_error ;
+                }
 
                 break ;
+            }
+            case TDICE_INSERT_POWERS_AND_SIMULATE_SLOT :
+            {
+                Quantity_t nflpel, index ;
 
+                PowersQueue queue ;
+
+                init_powers_queue (&queue) ;
+
+                error = extract_message_word (&message, &nflpel, 0) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: extract message word 0\n") ;
+
+                    goto message_error ;
+                }
+
+                for (index = 1, nflpel++ ; index != nflpel ; index++)
+                {
+                    float power_value ;
+
+                    error = extract_message_word (&message, &power_value, index) ;
+
+                    if (error != TDICE_SUCCESS)
+                    {
+                        fprintf (stderr, "error: extract message word %d\n", index) ;
+
+                        goto message_error ;
+                    }
+
+                    put_into_powers_queue (&queue, power_value) ;
+                }
+
+                error = insert_power_values (&stkd, &queue) ;
+
+                if (error != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: insert power values\n") ;
+
+                    goto message_error ;
+                }
+
+                SimResult_t result = emulate_slot (&tdata, &stkd, &analysis) ;
+
+                if (result != TDICE_SLOT_DONE)
+                {
+                    fprintf (stderr, "error %d: emulate slot\n", result) ;
+
+                    goto sim_error ;
+                }
+
+                generate_analysis_output
+
+                    (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_SLOT) ;
+
+                break ;
+            }
             default :
 
                 fprintf (stderr, "ERROR :: received unknown message type") ;
@@ -185,6 +266,8 @@ quit :
 
     return EXIT_SUCCESS ;
 
+sim_error :
+message_error:
 transmission_error :
                             close_socket           (&client_socket) ;
 wait_error :
@@ -192,6 +275,7 @@ wait_error :
 socket_error :
                             free_thermal_data      (&tdata) ;
 ftd_error :
+gah_error :
 wrong_analysis_error :
                             free_analysis          (&analysis) ;
                             free_stack_description (&stkd) ;

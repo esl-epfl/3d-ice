@@ -519,7 +519,11 @@ extern "C"
 
         /*! Request for the total number of florplan elements in the stack */
 
-        TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS
+        TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS,
+
+        /*! Insert a slot of power values into the queues and simulate the slot */
+
+        TDICE_INSERT_POWERS_AND_SIMULATE_SLOT
     } ;
 
 

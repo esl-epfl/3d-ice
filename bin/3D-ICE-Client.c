@@ -43,56 +43,52 @@
 #include "network_interface.h"
 #include "network_message.h"
 
-// void seed_random ()
-// {
-//     FILE *fp = fopen ("/dev/urandom", "r");
-//     unsigned int foo;
-//     struct timeval t;
-// 
-//     if (!fp)
-//     {
-//         gettimeofday (&t, NULL);
-//         foo = t.tv_usec;
-//     }
-//     else
-//     {
-//         size_t res = fread (&foo, sizeof (foo), 1, fp);
-//         if (res == 0 ) printf ("fread failed\n");
-//         fclose (fp);
-//     }
-//     srand (foo);
-// }
-// 
-// #define random_value(min_value, max_value)
-//     (   ((double)(min_value))             
-//       + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
+void seed_random ()
+{
+    FILE *fp = fopen ("/dev/urandom", "r");
+    unsigned int foo;
+    struct timeval t;
+
+    if (!fp)
+    {
+        gettimeofday (&t, NULL);
+        foo = t.tv_usec;
+    }
+    else
+    {
+        size_t res = fread (&foo, sizeof (foo), 1, fp);
+        if (res == 0 ) printf ("fread failed\n");
+        fclose (fp);
+    }
+    srand (foo);
+}
+
+#define random_value(min_value, max_value) \
+    (   ((double)(min_value))              \
+      + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
 
 int main (int argc, char** argv)
 {
-    Socket client_socket ;
-
-    Error_t error ;
-
-    NetworkMessage message ;
-
-//     seed_random () ;
-
     /* Checks if all arguments are there **************************************/
 
-    if (argc != 1)
+    if (argc != 2)
     {
-        fprintf (stderr, "Usage: \"%s \n", argv[0]) ;
+        fprintf (stderr, "Usage: \"%s nslots\n", argv[0]) ;
 
         return EXIT_FAILURE ;
     }
+
+    Quantity_t nslots = atoi (argv[1]) ;
 
     /* Creates socket *********************************************************/
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
+    Socket client_socket ;
+
     init_socket (&client_socket) ;
 
-    error = open_client_socket (&client_socket) ;
+    Error_t error = open_client_socket (&client_socket) ;
 
     if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
@@ -108,7 +104,9 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
-    /**************************************************************************/
+    /* Gets the number of floorplan elements from the server ******************/
+
+    NetworkMessage message ;
 
     init_network_message (&message) ;
 
@@ -130,7 +128,37 @@ int main (int argc, char** argv)
 
     if (error != TDICE_SUCCESS)    goto socket_error ;
 
-    fprintf (stdout, "There are %d floorplan elements in the stack\n", nflpel) ;
+    /* Sends power values *****************************************************/
+
+    Quantity_t index ;
+
+    float power_value ;
+
+    seed_random () ;
+
+    for ( ; nslots != 0 ; nslots--)
+    {
+        build_message_head (&message, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
+
+        error = insert_message_word (&message, &nflpel) ;
+
+        if (error != TDICE_SUCCESS)    goto socket_error ;
+
+        for (index = 0 ; index != nflpel ; index++)
+        {
+            power_value = random_value (0.0, 1.0) ;
+
+            error = insert_message_word (&message, &power_value) ;
+
+            if (error != TDICE_SUCCESS)    goto socket_error ;
+        }
+
+        error = send_message_to_socket (&client_socket, &message) ;
+
+        if (error != TDICE_SUCCESS)    goto socket_error ;
+    }
+
+    /* Closes the simulation on the server ************************************/
 
     build_message_head (&message, TDICE_EXIT_SIMULATION) ;
 
