@@ -40,7 +40,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-all: 3D-ICE-Emulator 3D-ICE-Client 3D-ICE-Server
+all: 3D-ICE-Emulator 3D-ICE-Client 3D-ICE-Server stk2svg
 
 CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
 
@@ -62,6 +62,11 @@ CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 3D-ICE-Server: 3D-ICE-Server.o $(3DICE_LIB_A)
 	$(CC) $< $(CLIBS) -o $@
 
+-include stk2svg.d
+
+stk2svg: stk2svg.o $(3DICE_LIB_A)
+	$(CC) $< $(CLIBS) -o $@
+
 clean:
 	@$(RM) $(RMFLAGS) 3D-ICE-Emulator
 	@$(RM) $(RMFLAGS) 3D-ICE-Emulator.o
@@ -72,4 +77,6 @@ clean:
 	@$(RM) $(RMFLAGS) 3D-ICE-Server
 	@$(RM) $(RMFLAGS) 3D-ICE-Server.o
 	@$(RM) $(RMFLAGS) 3D-ICE-Server.d
-
+	@$(RM) $(RMFLAGS) stk2svg
+	@$(RM) $(RMFLAGS) stk2svg.o
+	@$(RM) $(RMFLAGS) stk2svg.d
