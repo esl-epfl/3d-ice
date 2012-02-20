@@ -365,72 +365,72 @@ extern "C"
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \def FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el)
+    /*! \def FIRST_IC_ELEMENT_ROW_INDEX(ic_el)
      *
-     * Returns the index of the first row of thermal cells in a floorplan
-     * element.
+     * Returns the index of the first row of thermal cells in an
+     * ic element.
      */
 
-#   define FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el) (flp_el->SW_Row)
+#   define FIRST_IC_ELEMENT_ROW_INDEX(ic_el) (ic_el->SW_Row)
 
 
 
-    /*! \def LAST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el)
+    /*! \def LAST_IC_ELEMENT_ROW_INDEX(ic_el)
      *
-     * Returns the index of the last row of thermal cells in a floorplan
-     * element.
+     * Returns the index of the last row of thermal cells in an
+     * ic element.
      */
 
-#   define LAST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el)  (flp_el->NE_Row)
+#   define LAST_IC_ELEMENT_ROW_INDEX(ic_el)  (ic_el->NE_Row)
 
 
 
-    /*! \def FOR_EVERY_FLOORPLAN_ELEMENT_ROW(index,flp_el)
+    /*! \def FOR_EVERY_IC_ELEMENT_ROW(index,ic_el)
      *
      * Declares an \a index to access in sequence all the rows
-     * of thermal cells in a floorplan element.
+     * of thermal cells in an ic element.
      */
 
-#   define FOR_EVERY_FLOORPLAN_ELEMENT_ROW(index, flp_el)        \
-                                                                 \
-        uint32_t index ;                                         \
-        for (index = FIRST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el) ; \
-             index <= LAST_FLOORPLAN_ELEMENT_ROW_INDEX(flp_el) ; \
+#   define FOR_EVERY_IC_ELEMENT_ROW(index, ic_el)        \
+                                                         \
+        uint32_t index ;                                 \
+        for (index = FIRST_IC_ELEMENT_ROW_INDEX(ic_el) ; \
+             index <= LAST_IC_ELEMENT_ROW_INDEX(ic_el) ; \
              index++)
 
 
 
-    /*! \def FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el)
+    /*! \def FIRST_IC_ELEMENT_COLUMN_INDEX(ic_el)
      *
-     * Returns the index of the first column of thermal cells in a floorplan
-     * element.
+     * Returns the index of the first column of thermal cells in an
+     * ic element.
      */
 
-#   define FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) (flp_el->SW_Column)
+#   define FIRST_IC_ELEMENT_COLUMN_INDEX(ic_el) (ic_el->SW_Column)
 
 
 
-    /*! \def LAST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el)
+    /*! \def LAST_IC_ELEMENT_COLUMN_INDEX(ic_el)
      *
-     * Returns the index of the last columns of thermal cells in a floorplan
-     * element.
+     * Returns the index of the last columns of thermal cells in an
+     * ic element.
      */
 
-#   define LAST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el)  (flp_el->NE_Column)
+#   define LAST_IC_ELEMENT_COLUMN_INDEX(ic_el)  (ic_el->NE_Column)
 
 
 
-    /*! \def FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN(index,flp_el)
+    /*! \def FOR_EVERY_IC_ELEMENT_COLUMN(index,ic_el)
      *
      * Declares an \a index to access in sequence all the columns
-     * of thermal cells in a floorplan element.
+     * of thermal cells in an ic element.
      */
 
-#   define FOR_EVERY_FLOORPLAN_ELEMENT_COLUMN(index, flp_el)        \
-                                                                    \
-        uint32_t index ;                                            \
-        for (index = FIRST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) ; \
-             index <= LAST_FLOORPLAN_ELEMENT_COLUMN_INDEX(flp_el) ; \
+#   define FOR_EVERY_IC_ELEMENT_COLUMN(index, ic_el)        \
+                                                            \
+        uint32_t index ;                                    \
+        for (index = FIRST_IC_ELEMENT_COLUMN_INDEX(ic_el) ; \
+             index <= LAST_IC_ELEMENT_COLUMN_INDEX(ic_el) ; \
              index++)
 
 /******************************************************************************/

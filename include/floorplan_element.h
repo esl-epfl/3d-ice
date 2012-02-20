@@ -53,6 +53,7 @@ extern "C"
 #include "types.h"
 
 #include "dimensions.h"
+#include "ic_element.h"
 #include "powers_queue.h"
 
 /******************************************************************************/
@@ -69,59 +70,9 @@ extern "C"
 
         String_t Id ;
 
-        /*! The south-west X coordinate in the floorplan, in \f$ \mu m \f$ */
+        /*! The main IC element that compose the surface of the floorplan element */
 
-        ChipDimension_t SW_X ;
-
-        /*! The south-west Y coordinate in the floorplan, in \f$ \mu m \f$ */
-
-        ChipDimension_t SW_Y ;
-
-        /*! The length (west <-> east) of the floorplan element, in \f$ \mu m \f$ */
-
-        ChipDimension_t Length ;
-
-        /*! The width (south <-> north) of the floorplan element, in \f$ \mu m \f$ */
-
-        ChipDimension_t Width ;
-
-        /*! The length of the floorplan element, in \f$ \mu m \f$,
-         *  as the sum of all the lengths of the cells in the source layer that
-         *  receive power from the floorplan element */
-
-        ChipDimension_t EffectiveLength ;
-
-        /*! The width of the floorplan element, in \f$ \mu m \f$,
-         *  as the sum of all the lengths of the cells in the source layer that
-         *  receive power from the floorplan element */
-
-        ChipDimension_t EffectiveWidth ;
-
-        /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
-         *  computed as FloorplanElement::EffectiveLength times
-         *  FloorplanElement::EffectiveWidth */
-
-        ChipDimension_t EffectiveSurface ;
-
-        /*! The index of the row of the thermal cell where the south-west
-         *  corner of the floroplan element is placed */
-
-        CellIndex_t SW_Row ;
-
-        /*! The index of the column of the thermal cell where the south-west
-         *  corner of the floroplan element is placed */
-
-        CellIndex_t SW_Column ;
-
-        /*! The index of the row of the thermal cell where the north-east
-         *  corner of the floroplan element is placed */
-
-        CellIndex_t NE_Row ;
-
-        /*! The index of the column of the thermal cell where the north-east
-         *  corner of the floroplan element is placed */
-
-        CellIndex_t NE_Column ;
+        ICElement *MainElement ;
 
         /*! The list of power values representing the power consumption of
          *  the floorplan element during the thermal simulation */
@@ -256,24 +207,6 @@ extern "C"
 
 
 
-    /*! Checks if two floorplan elements overlap
-     *
-     *  The control is based on the real coordinates of the floorplan, i.e. the
-     *  coordinates read from the floorplan file.
-     *
-     *  \param floorplan_element_a the first floorplan element to test
-     *  \param floorplan_element_b the second floorplan element to test
-     *
-     *  \return \c true if the two surfaces oevrlap
-     *  \return \c false otherwise
-     */
-
-    bool check_intersection
-
-        (FloorplanElement *floorplan_element_a, FloorplanElement *floorplan_element_b) ;
-
-
-
     /*! Searches for an overlap between a floorplan element and other floorplan
      *  elements in a list
      *
@@ -292,41 +225,6 @@ extern "C"
     FloorplanElement *find_intersection_in_list
 
         (FloorplanElement *list, FloorplanElement *floorplan_element) ;
-
-
-
-    /*! Checks if the floorplan element is inside the IC
-     *
-     *  The control is based on the real coordinates of the floorplan, i.e. the
-     *  coordinates read from the floorplan file.
-     *
-     *  \param dimensions the structure storing the dimensions of the IC
-     *  \param floorplan_element the floorplan element to test
-     *
-     *  \return \c true if \a floorplan_element is outside of the IC
-     *  \return \c false otherwise
-     */
-
-    bool check_location
-
-        (Dimensions *dimensions, FloorplanElement* floorplan_element) ;
-
-
-
-    /*! Aligns the floorplan element to the mesh of the IC
-     *
-     *  The function translates the coordinates of the floorplan element as
-     *  they are in the floorplan file to coordinates in terms of rows and
-     *  columns to place the floorplan element on the surface of the active
-     *  layer. It also computes the effective dimensions.
-     *
-     *  \param dimensions the structure storing the dimensions of the IC
-     *  \param floorplan_element the floorplan element to align on the source layer
-     */
-
-    void align_to_grid
-
-        (Dimensions *dimensions, FloorplanElement* floorplan_element) ;
 
 
 

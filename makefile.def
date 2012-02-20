@@ -74,6 +74,7 @@
                   $(3DICE_SOURCES)/dimensions.c               \
                   $(3DICE_SOURCES)/floorplan_element.c        \
                   $(3DICE_SOURCES)/floorplan.c                \
+                  $(3DICE_SOURCES)/ic_element.c               \
                   $(3DICE_SOURCES)/inspection_point.c         \
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/material.c                 \
@@ -98,7 +99,7 @@
  ##############################################################################
 
 SLU_VERSION = 4.3
-SLU_MAIN    = $(HOME)/SuperLU_$(SLU_VERSION)
+SLU_MAIN    = /prj/ast_p2012/users/haugoug/install/RH5_64/pkg/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 #SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
@@ -115,10 +116,10 @@ CC        = gcc
 CFLAGS    = -MD -O3
 CINCLUDES = -I$(3DICE_INCLUDE)
 
-YACC      = bison
+YACC      = /prj/ast_p2012/users/haugoug/install/RH5_64/bin/bison
 YFLAGS    = -d
 
-LEX       = flex
+LEX       = /prj/ast_p2012/users/haugoug/install/RH5_64/bin/flex
 LFLAGS    =
 
 RM        = rm

@@ -138,12 +138,12 @@ int main (int argc, char** argv)
                 " width=\"%d\" height=\"%d\""    \
                 " fill=\"none\" stroke=\"red\" stroke-witd=\"%d\"/>\n",
 
-            (uint32_t) (get_cell_location_x(stack.Dimensions, floorplan_element->SW_Column) / SCALE),
+            (uint32_t) (get_cell_location_x(stack.Dimensions, floorplan_element->MainElement->SW_Column) / SCALE),
             (uint32_t) (ChipWidth
-                         - (get_cell_location_y(stack.Dimensions, floorplan_element->SW_Row) / SCALE)
-                         - (floorplan_element->EffectiveWidth / SCALE)),
-            (uint32_t) (floorplan_element->EffectiveLength / SCALE),
-            (uint32_t) (floorplan_element->EffectiveWidth  / SCALE),
+                         - (get_cell_location_y(stack.Dimensions, floorplan_element->MainElement->SW_Row) / SCALE)
+                         - (floorplan_element->MainElement->EffectiveWidth / SCALE)),
+            (uint32_t) (floorplan_element->MainElement->EffectiveLength / SCALE),
+            (uint32_t) (floorplan_element->MainElement->EffectiveWidth  / SCALE),
             FLPEL_EFF_BORDER) ;
     }
 }
@@ -160,12 +160,12 @@ int main (int argc, char** argv)
                 " width=\"%d\" height=\"%d\""    \
                 " fill=\"none\" stroke=\"black\" stroke-witd=\"%d\"/>\n",
 
-            (uint32_t) (floorplan_element->SW_X / SCALE),
+            (uint32_t) (floorplan_element->MainElement->SW_X / SCALE),
             (uint32_t) (ChipWidth
-                         - (floorplan_element->SW_Y / SCALE)
-                         - (floorplan_element->Width / SCALE)),
-            (uint32_t) (floorplan_element->Length / SCALE),
-            (uint32_t) (floorplan_element->Width  / SCALE),
+                         - (floorplan_element->MainElement->SW_Y / SCALE)
+                         - (floorplan_element->MainElement->Width / SCALE)),
+            (uint32_t) (floorplan_element->MainElement->Length / SCALE),
+            (uint32_t) (floorplan_element->MainElement->Width  / SCALE),
             FLPEL_REAL_BORDER) ;
     }
 }

@@ -40,6 +40,7 @@
 {
     #include "types.h"
     #include "floorplan_element.h"
+    #include "ic_element.h"
     #include "powers_queue.h"
 }
 
@@ -47,6 +48,7 @@
 {
     Power_t           power_value ;
     String_t          identifier ;
+    ICElement        *p_icelement ;
     FloorplanElement *p_floorplan_element ;
     PowersQueue      *p_powers_queue ;
 }
@@ -73,12 +75,14 @@
 %type <p_floorplan_element> floorplan_element_list ;
 %type <p_powers_queue>      optional_power_values_list ;
 %type <p_powers_queue>      power_values_list ;
+%type <p_icelement>         ic_element ;
 
 %destructor { FREE_POINTER (free, $$) ; } <identifier>
 
-%token POSITION   "keyword position"
 %token DIMENSION  "keyword dimension"
+%token POSITION   "keyword position"
 %token POWER      "keyword power"
+%token RECTANGLE  "keywork rectangle"
 %token VALUES     "keyword values"
 
 %token <power_value> DVALUE     "double value"
@@ -127,7 +131,7 @@ floorplan_element_list
 
   : floorplan_element             // $1 : pointer to the first floorplan element found
     {
-        if (check_location (dimensions, $1) == true)
+        if (check_location (dimensions, $1->MainElement) == true)
         {
             sprintf (error_message, "Floorplan element %s is outside of the IC", $1->Id) ;
 
@@ -136,7 +140,7 @@ floorplan_element_list
             local_abort = true ;
         }
 
-        align_to_grid  (dimensions, $1) ;
+        align_to_grid  (dimensions, $1->MainElement) ;
 
         floorplan->ElementsList = $1 ;
         floorplan->NElements    = 1 ;
@@ -155,7 +159,7 @@ floorplan_element_list
             local_abort = true ;
         }
 
-        if (check_location (dimensions, $2) == true)
+        if (check_location (dimensions, $2->MainElement) == true)
         {
             sprintf (error_message, "Floorplan element %s is outside of the IC", $2->Id) ;
 
@@ -183,7 +187,7 @@ floorplan_element_list
 
         }   while (flp_el != NULL) ;
 
-        align_to_grid (dimensions, $2) ;
+        align_to_grid (dimensions, $2->MainElement) ;
 
         floorplan->NElements++ ;
 
@@ -198,10 +202,9 @@ floorplan_element_list
 
 floorplan_element
 
-  : IDENTIFIER ':'                             // $1
-      POSITION  DVALUE ',' DVALUE ';'          // $4 $6
-      DIMENSION DVALUE ',' DVALUE ';'          // $9 $11
-      optional_power_values_list               // $13
+  : IDENTIFIER ':'                        // $1
+      ic_element                          // $3
+      optional_power_values_list          // $4
     {
         FloorplanElement *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
 
@@ -215,11 +218,45 @@ floorplan_element
         }
 
         floorplan_element->Id          = $1 ;
-        floorplan_element->SW_X        = $4 ;
-        floorplan_element->SW_Y        = $6 ;
-        floorplan_element->Length      = $9 ;
-        floorplan_element->Width       = $11 ;
-        floorplan_element->PowerValues = $13 ;
+        floorplan_element->MainElement = $3 ;
+        floorplan_element->PowerValues = $4 ;
+    }
+  ;
+
+ic_element
+
+  : POSITION  DVALUE ',' DVALUE ';'  // $2 $4
+    DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
+    {
+        ICElement *icelement = $$ = alloc_and_init_ic_element () ;
+
+        if (icelement == NULL)
+        {
+            floorplan_error (floorplan, dimensions, scanner, "Malloc ic element failed") ;
+
+            YYABORT ;
+        }
+
+        icelement->SW_X   = $2 ;
+        icelement->SW_Y   = $4 ;
+        icelement->Length = $7 ;
+        icelement->Width  = $9 ;
+    }
+  | RECTANGLE '(' DVALUE ',' DVALUE ',' DVALUE ',' DVALUE ')' ';'  // $3 $5 $7 $9
+    {
+        ICElement *icelement = $$ = alloc_and_init_ic_element () ;
+
+        if (icelement == NULL)
+        {
+            floorplan_error (floorplan, dimensions, scanner, "Malloc ic element failed") ;
+
+            YYABORT ;
+        }
+
+        icelement->SW_X   = $3 ;
+        icelement->SW_Y   = $5 ;
+        icelement->Length = $7 ;
+        icelement->Width  = $9 ;
     }
   ;
 

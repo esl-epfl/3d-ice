@@ -121,6 +121,8 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
 "//"                  BEGIN(ONE_LINE_COMMENT) ;
 "/*"                  BEGIN(MULTIPLE_LINE_COMMENT) ;
 
+"("                   return yytext[0] ;
+")"                   return yytext[0] ;
 ":"                   return yytext[0] ;
 ","                   return yytext[0] ;
 ";"                   return yytext[0] ;
@@ -128,6 +130,7 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
 "dimension"           return DIMENSION ;
 "position"            return POSITION ;
 "power"               return POWER ;
+"rectangle"           return RECTANGLE ;
 "values"              return VALUES ;
 
 {identifier}          {
