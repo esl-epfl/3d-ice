@@ -349,7 +349,7 @@ static void fill_system_vector_steady
 
 #ifdef PRINT_SYSTEM_VECTOR
                 fprintf (stderr,
-                    " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
+                    " l %2d r %4d c %4d [%7d] | %e [b] = %e [s]\n",
                     layer, row, column,
                     get_cell_offset_in_stack (dimensions, layer, row, column),
                     *(vector-1), *(sources-1)) ;

@@ -274,11 +274,11 @@ void fill_sources_ic_element
 #ifdef PRINT_SOURCES
             fprintf (stderr,
                 "solid  cell  | r %4d c %4d | l %6.1f w %6.1f " \
-                            " | %.5e [source] += ( %.4e [W] * l * w) / %4.1f | %s\n",
+                            " | %.5e [source] += ( %.4e [W] * l * w) / %4.1f\n",
                 row_index, column_index,
                 get_cell_length (dimensions, column_index), get_cell_width (dimensions, row_index),
                 sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
-                power, surface, floorplan_element->Id) ;
+                power, surface) ;
 #endif
 
         } // FOR_EVERY_IC_ELEMENT_COLUMN
