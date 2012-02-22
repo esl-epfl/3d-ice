@@ -129,13 +129,13 @@ void print_formatted_materials_list
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
     {
+        if (material->Next == NULL)
+
+            break ;
+
         print_formatted_material (stream, prefix, material) ;
 
         fprintf (stream, "%s\n", prefix) ;
-
-        if (material->Next != NULL && material->Next->Next == NULL)
-
-            break ;
     }
 
     print_formatted_material (stream, prefix, material) ;
@@ -186,13 +186,13 @@ void print_detailed_materials_list
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
     {
+        if (material->Next == NULL)
+
+            break ;
+
         print_detailed_material (stream, prefix, material) ;
 
         fprintf (stream, "%s\n", prefix) ;
-
-        if (material->Next != NULL && material->Next->Next == NULL)
-
-            break ;
     }
 
     print_detailed_material (stream, prefix, material) ;

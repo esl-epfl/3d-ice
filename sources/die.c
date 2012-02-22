@@ -143,13 +143,13 @@ void print_formatted_dies_list (FILE  *stream, String_t prefix, Die *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
+        if (die->Next == NULL)
+
+            break ;
+
         print_formatted_die (stream, prefix, die) ;
 
         fprintf (stream, "%s\n", prefix) ;
-
-        if (die->Next != NULL && die->Next->Next == NULL)
-
-            break ;
     }
 
     print_formatted_die (stream, prefix, die) ;
@@ -218,13 +218,13 @@ void print_detailed_dies_list (FILE  *stream, String_t prefix, Die *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
     {
+        if (die->Next == NULL)
+
+            break ;
+
         print_detailed_die (stream, prefix, die) ;
 
         fprintf (stream, "%s\n", prefix) ;
-
-        if (die->Next != NULL && die->Next->Next == NULL)
-
-            break ;
     }
 
     print_detailed_die (stream, prefix, die) ;
