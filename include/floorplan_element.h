@@ -70,9 +70,18 @@ extern "C"
 
         String_t Id ;
 
-        /*! The main IC element that compose the surface of the floorplan element */
+        /*! The number of IC elements that defines the surface of the floorplan element */
 
-        ICElement *MainElement ;
+        Quantity_t NICElements ;
+
+        /*! The list of IC elements that defines the surface of the floorplan element */
+
+        ICElement *ICElementsList ;
+
+        /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
+         *  computed as the sum of the effective area of each ic element */
+
+        ChipDimension_t EffectiveSurface ;
 
         /*! The list of power values representing the power consumption of
          *  the floorplan element during the thermal simulation */
@@ -204,27 +213,6 @@ extern "C"
     void print_detailed_floorplan_elements_list
 
         (FILE *stream, String_t prefix, FloorplanElement *list) ;
-
-
-
-    /*! Searches for an overlap between a floorplan element and other floorplan
-     *  elements in a list
-     *
-     *  The control is based on the real coordinates of the floorplan, i.e. the
-     *  coordinates read from the floorplan file.
-     *
-     *  \param list the list of floorplan elements
-     *  \param floorplan_element the floorplan element to test
-     *
-     *  \return the address of the first floorplan element in the \a list that
-     *          is found to overlap with \a floorplan_element
-     *  \return \c NULL if floorplan_element does not overlap with all the
-     *          floorplan elements in the \a list
-     */
-
-    FloorplanElement *find_intersection_in_list
-
-        (FloorplanElement *list, FloorplanElement *floorplan_element) ;
 
 
 

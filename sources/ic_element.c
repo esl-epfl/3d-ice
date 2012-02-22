@@ -43,20 +43,20 @@
 
 void init_ic_element (ICElement *icelement)
 {
-    icelement->SW_X            = 0.0 ;
-    icelement->SW_Y            = 0.0 ;
-
-    icelement->Length          = 0.0 ;
-    icelement->Width           = 0.0 ;
+    icelement->SW_X   = 0.0 ;
+    icelement->SW_Y   = 0.0 ;
+    icelement->Length = 0.0 ;
+    icelement->Width  = 0.0 ;
 
     icelement->EffectiveLength  = 0.0 ;
     icelement->EffectiveWidth   = 0.0 ;
-    icelement->EffectiveSurface = 0.0 ;
 
-    icelement->SW_Row          = 0u ;
-    icelement->SW_Column       = 0u ;
-    icelement->NE_Row          = 0u ;
-    icelement->NE_Column       = 0u ;
+    icelement->SW_Row    = 0u ;
+    icelement->SW_Column = 0u ;
+    icelement->NE_Row    = 0u ;
+    icelement->NE_Column = 0u ;
+
+    icelement->Next = NULL ;
 }
 
 /******************************************************************************/
@@ -81,6 +81,13 @@ void free_ic_element (ICElement *icelement)
 
 /******************************************************************************/
 
+void free_ic_elements_list (ICElement *list)
+{
+    FREE_LIST (ICElement, list, free_ic_element) ;
+}
+
+/******************************************************************************/
+
 void print_detailed_ic_element
 (
     FILE      *stream,
@@ -89,16 +96,70 @@ void print_detailed_ic_element
 )
 {
     fprintf (stream,
-        "%s   ( %.1f , %.1f ) %.1f x %.1f \n",
-        prefix,
-        icelement->SW_X,   icelement->SW_Y,
-        icelement->Length, icelement->Width) ;
+             "%sic element                  = %p\n",
+             prefix, icelement) ;
 
     fprintf (stream,
-        "%s    Rows (%d - %d) Columns (%d - %d)",
-        prefix,
-        icelement->SW_Row,    icelement->NE_Row,
-        icelement->SW_Column, icelement->NE_Column) ;
+             "%s    SW_X                    = %.3f\n",
+             prefix, icelement->SW_X) ;
+
+    fprintf (stream,
+             "%s    SW_Y                    = %.3f\n",
+             prefix, icelement->SW_Y) ;
+
+    fprintf (stream,
+             "%s    Length                  = %.3f\n",
+             prefix, icelement->Length) ;
+
+    fprintf (stream,
+             "%s    Width                   = %.3f\n",
+             prefix, icelement->Width) ;
+
+    fprintf (stream,
+             "%s    EffectiveLength         = %.3f\n",
+             prefix, icelement->EffectiveLength) ;
+
+    fprintf (stream,
+             "%s    EffectiveWidth          = %.3f\n",
+             prefix, icelement->EffectiveWidth) ;
+
+    fprintf (stream,
+             "%s    SW_Row                  = %d\n",
+             prefix, icelement->SW_Row) ;
+
+    fprintf (stream,
+             "%s    SW_Column               = %d\n",
+             prefix, icelement->SW_Column) ;
+
+    fprintf (stream,
+             "%s    NE_Row                  = %d\n",
+             prefix, icelement->NE_Row) ;
+
+    fprintf (stream,
+             "%s    NE_Column               = %d\n",
+             prefix, icelement->NE_Column) ;
+
+    fprintf (stream,
+             "%s    Next                    = %p\n",
+             prefix, icelement->Next) ;
+}
+
+/******************************************************************************/
+
+void print_detailed_ic_elements_list (FILE *stream, String_t prefix, ICElement *list)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, icelement, list)
+    {
+        if (icelement->Next == NULL)
+
+            break ;
+
+        print_detailed_ic_element (stream, prefix, icelement) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    print_detailed_ic_element (stream, prefix, icelement) ;
 }
 
 /******************************************************************************/
@@ -111,12 +172,27 @@ void print_formatted_ic_element
 )
 {
     fprintf (stream,
-        "%s\tposition %.1f, %.1f ;\n",
-        prefix, icelement->SW_X, icelement->SW_Y) ;
+        "%s\trectangle (%.1f, %.1f, %.1f, %.1f ) ;\n",
+        prefix, icelement->SW_X, icelement->SW_Y,
+                icelement->Length, icelement->Width) ;
+}
 
-    fprintf (stream,
-        "%s\tdimension %.1f, %.1f ;\n",
-        prefix, icelement->Length, icelement->Width) ;
+/******************************************************************************/
+
+void print_formatted_ic_elements_list (FILE *stream, String_t prefix, ICElement *list)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, icelement, list)
+    {
+        if (icelement->Next == NULL)
+
+            break ;
+
+        print_formatted_ic_element (stream, prefix, icelement) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    print_formatted_ic_element (stream, prefix, icelement) ;
 }
 
 /******************************************************************************/
@@ -127,6 +203,10 @@ bool check_intersection
     ICElement *icelement_b
 )
 {
+    if (icelement_a == icelement_b)
+
+        return false ;
+
     if (   (icelement_a->SW_X + icelement_a->Length)
            <= icelement_b->SW_X
         || icelement_a->SW_X
@@ -231,10 +311,6 @@ void align_to_grid (Dimensions *dimensions, ICElement *icelement)
             get_cell_width (dimensions, tmp_row_index) ;  // CHECKME
     }
 
-    icelement->EffectiveSurface =
-
-        icelement->EffectiveLength * icelement->EffectiveWidth ;
-
 //    if (icelement->NE_Row - icelement->SW_Row == 0
 //        && icelement->NE_Column - icelement->SW_Column == 0)
 //    {
@@ -248,14 +324,13 @@ void align_to_grid (Dimensions *dimensions, ICElement *icelement)
 
 void fill_sources_ic_element
 (
-    Source_t   *sources,
-    Dimensions *dimensions,
-    Power_t     power,
-    ICElement  *icelement
+    Source_t        *sources,
+    Dimensions      *dimensions,
+    Power_t          power,
+    ChipDimension_t  surface,
+    ICElement       *icelement
 )
 {
-    ChipDimension_t surface = icelement->EffectiveSurface ;
-
     // Here we ADD the power value to the source vector. It works as long as
     // the source vector is set to zero every time. This way the vale is added
     // in case this is the top most layer and the heatsink is used

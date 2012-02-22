@@ -45,11 +45,12 @@
 #include "analysis.h"
 #include "stack_element.h"
 #include "floorplan.h"
+#include "ic_element.h"
 #include "floorplan_element.h"
 
-#define CHIP_BORDER       4
-#define FLPEL_REAL_BORDER 8
-#define FLPEL_EFF_BORDER  12
+#define CHIP_BORDER       2
+#define FLPEL_REAL_BORDER 2
+#define FLPEL_EFF_BORDER  2
 #define CELL_CENTER       3
 #define SCALE             10.0
 
@@ -102,7 +103,7 @@ int main (int argc, char** argv)
     fprintf (svg_file,
         "\t<rect x=\"0\" y=\"0\""            \
                " width=\"%d\" height=\"%d\"" \
-               " fill=\"white\" stroke=\"black\" stroke-witd=\"%d\"/>\n",
+               " fill=\"white\" stroke=\"black\" stroke-width=\"%d\"/>\n",
         ChipLength, ChipWidth, CHIP_BORDER) ;
 
     /* Looks for the floorplan to draw ****************************************/
@@ -130,21 +131,28 @@ int main (int argc, char** argv)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-        (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    (FloorplanElement, floorplan_element, floorplan->ElementsList)
     {
-        fprintf (svg_file,
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-            "\t<rect x=\"%d\" y=\"%d\""          \
-                " width=\"%d\" height=\"%d\""    \
-                " fill=\"none\" stroke=\"red\" stroke-witd=\"%d\"/>\n",
+        (ICElement, ice_element, floorplan_element->ICElementsList)
+        {
+            fprintf (svg_file,
 
-            (uint32_t) (get_cell_location_x(stack.Dimensions, floorplan_element->MainElement->SW_Column) / SCALE),
-            (uint32_t) (ChipWidth
-                         - (get_cell_location_y(stack.Dimensions, floorplan_element->MainElement->SW_Row) / SCALE)
-                         - (floorplan_element->MainElement->EffectiveWidth / SCALE)),
-            (uint32_t) (floorplan_element->MainElement->EffectiveLength / SCALE),
-            (uint32_t) (floorplan_element->MainElement->EffectiveWidth  / SCALE),
-            FLPEL_EFF_BORDER) ;
+                "\t<rect x=\"%d\" y=\"%d\""          \
+                    " width=\"%d\" height=\"%d\""    \
+                    " fill=\"none\" stroke=\"red\" stroke-width=\"%d\"/>\n",
+
+                (uint32_t) (get_cell_location_x(stack.Dimensions, ice_element->SW_Column) / SCALE)
+                           + FLPEL_EFF_BORDER,
+                (uint32_t) (ChipWidth
+                            - (get_cell_location_y(stack.Dimensions, ice_element->SW_Row) / SCALE)
+                            - (ice_element->EffectiveWidth / SCALE))
+                           + FLPEL_EFF_BORDER,
+                (uint32_t) (ice_element->EffectiveLength / SCALE) - FLPEL_EFF_BORDER,
+                (uint32_t) (ice_element->EffectiveWidth  / SCALE) - FLPEL_EFF_BORDER,
+                FLPEL_EFF_BORDER) ;
+        }
     }
 }
     /* Draws every flooprlan element in the floorplan      ********************/
@@ -152,21 +160,26 @@ int main (int argc, char** argv)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-        (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    (FloorplanElement, floorplan_element, floorplan->ElementsList)
     {
-        fprintf (svg_file,
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-            "\t<rect x=\"%d\" y=\"%d\""          \
-                " width=\"%d\" height=\"%d\""    \
-                " fill=\"none\" stroke=\"black\" stroke-witd=\"%d\"/>\n",
+        (ICElement, ice_element, floorplan_element->ICElementsList)
+        {
+            fprintf (svg_file,
 
-            (uint32_t) (floorplan_element->MainElement->SW_X / SCALE),
-            (uint32_t) (ChipWidth
-                         - (floorplan_element->MainElement->SW_Y / SCALE)
-                         - (floorplan_element->MainElement->Width / SCALE)),
-            (uint32_t) (floorplan_element->MainElement->Length / SCALE),
-            (uint32_t) (floorplan_element->MainElement->Width  / SCALE),
-            FLPEL_REAL_BORDER) ;
+                "\t<rect x=\"%d\" y=\"%d\""          \
+                    " width=\"%d\" height=\"%d\""    \
+                    " fill=\"none\" stroke=\"black\" stroke-width=\"%d\"/>\n",
+
+                (uint32_t) (ice_element->SW_X / SCALE) + FLPEL_EFF_BORDER,
+                (uint32_t) (ChipWidth
+                            - (ice_element->SW_Y / SCALE)
+                            - (ice_element->Width / SCALE)) + FLPEL_EFF_BORDER,
+                (uint32_t) (ice_element->Length / SCALE) - FLPEL_EFF_BORDER,
+                (uint32_t) (ice_element->Width  / SCALE) - FLPEL_EFF_BORDER,
+                FLPEL_REAL_BORDER) ;
+        }
     }
 }
     /* Draws the center of every thermal cell *********************************/

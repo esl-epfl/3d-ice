@@ -86,11 +86,6 @@ extern "C"
 
         ChipDimension_t EffectiveWidth ;
 
-        /*! The area of the ic element, in \f$ \mu m^2 \f$,
-         *  computed as ICElement::EffectiveLength times ICElement::EffectiveWidth */
-
-        ChipDimension_t EffectiveSurface ;
-
         /*! The index of the row of the thermal cell where the south-west
          *  corner of the ic element is placed */
 
@@ -110,6 +105,10 @@ extern "C"
          *  corner of the ic element is placed */
 
         CellIndex_t NE_Column ;
+
+        /*! pointer to collect IC elements in a linked list */
+
+        struct ICElement *Next ;
 
     } ;
 
@@ -151,6 +150,19 @@ extern "C"
 
 
 
+    /*! Frees a list of ic elements
+     *
+     * If frees, calling \c free_ic_element, the ic element pointed by the
+     * parameter \a list and all the ic elements it finds following the
+     * linked list throught the field ICElement::Next .
+     *
+     * \param list the pointer to the first elment in the list to be freed
+     */
+
+    void free_ic_elements_list (ICElement *list) ;
+
+
+
     /*! Prints detailed information about all the fields of an ic element
      *
      * \param stream    the output stream (must be already open)
@@ -164,6 +176,19 @@ extern "C"
 
 
 
+    /*! Prints a list of detailed information about all the fields of the icelements
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first ic element in the list
+     */
+
+    void print_detailed_ic_elements_list
+
+        (FILE *stream, String_t prefix, ICElement *list) ;
+
+
+
     /*! Prints the ic element as it looks in the stack file
      *
      * \param stream    the output stream (must be already open)
@@ -174,6 +199,19 @@ extern "C"
     void print_formatted_ic_element
 
         (FILE *stream, String_t prefix, ICElement *icelement) ;
+
+
+
+    /*! Prints a list of ic elements as they look in the stack file
+     *
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param list   the pointer to the first ic element in the list
+     */
+
+    void print_formatted_ic_elements_list
+
+        (FILE *stream, String_t prefix, ICElement *list) ;
 
 
 
@@ -229,16 +267,18 @@ extern "C"
      *                    that corresponds to the South-West thermal cell
      *                    of the layer where the floorplan is placed
      *  \param dimensions pointer to the structure storing the dimensions
-     *  \param power      the power value consumed by the ic element
+     *  \param power      the power value consumed by the floorplan element
+     *  \param surface    the surface of the floorplan element
      *  \param icelement  pointer to the ic element
      */
 
     void fill_sources_ic_element
     (
-        Source_t   *sources,
-        Dimensions *dimensions,
-        Power_t     power,
-        ICElement  *icelement
+        Source_t        *sources,
+        Dimensions      *dimensions,
+        Power_t          power,
+        ChipDimension_t  surface,
+        ICElement       *icelement
     ) ;
 
 

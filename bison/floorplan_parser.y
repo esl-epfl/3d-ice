@@ -66,7 +66,9 @@
         (Floorplan *floorplan, Dimensions *dimensions,
          yyscan_t yyscanner, String_t msg) ;
 
-    static char error_message [100] ;
+    static char error_message [250] ;
+
+    static Quantity_t nicelements ;
 
     static bool local_abort ;
 }
@@ -75,9 +77,13 @@
 %type <p_floorplan_element> floorplan_element_list ;
 %type <p_powers_queue>      optional_power_values_list ;
 %type <p_powers_queue>      power_values_list ;
+%type <p_icelement>         ic_elements_list ;
+%type <p_icelement>         ic_elements ;
 %type <p_icelement>         ic_element ;
 
-%destructor { FREE_POINTER (free, $$) ; } <identifier>
+%destructor { FREE_POINTER (free,                  $$) ; } <identifier>
+%destructor { FREE_POINTER (free_ic_elements_list, $$) ; } <p_icelement>
+%destructor { FREE_POINTER (free_powers_queue,     $$) ; } <p_powers_queue>
 
 %token DIMENSION  "keyword dimension"
 %token POSITION   "keyword position"
@@ -103,7 +109,8 @@
 
 %initial-action
 {
-    local_abort = false ;
+    nicelements    = 0u ;
+    local_abort    = false ;
 } ;
 
 %start floorplan_file
@@ -131,17 +138,6 @@ floorplan_element_list
 
   : floorplan_element             // $1 : pointer to the first floorplan element found
     {
-        if (check_location (dimensions, $1->MainElement) == true)
-        {
-            sprintf (error_message, "Floorplan element %s is outside of the IC", $1->Id) ;
-
-            floorplan_error (floorplan, dimensions, scanner, error_message) ;
-
-            local_abort = true ;
-        }
-
-        align_to_grid  (dimensions, $1->MainElement) ;
-
         floorplan->ElementsList = $1 ;
         floorplan->NElements    = 1 ;
 
@@ -152,42 +148,12 @@ floorplan_element_list
     {
         if (find_floorplan_element_in_list(floorplan->ElementsList, $2->Id) != NULL)
         {
-            sprintf (error_message, "Floorplan element %s already declared", $2->Id) ;
+            sprintf (error_message, "Floorplan element id %s already declared", $2->Id) ;
 
             floorplan_error (floorplan, dimensions, scanner, error_message) ;
 
             local_abort = true ;
         }
-
-        if (check_location (dimensions, $2->MainElement) == true)
-        {
-            sprintf (error_message, "Floorplan element %s is outside of the IC", $2->Id) ;
-
-            floorplan_error (floorplan, dimensions, scanner, error_message) ;
-
-            local_abort = true ;
-        }
-
-        FloorplanElement *flp_el = floorplan->ElementsList ;
-
-        do
-        {
-            flp_el = find_intersection_in_list (flp_el, $2) ;
-
-            if (flp_el != NULL)
-            {
-                sprintf (error_message, "Found intersection between %s and %s", $2->Id, flp_el->Id) ;
-
-                floorplan_error (floorplan, dimensions, scanner, error_message) ;
-
-                flp_el = flp_el->Next ;
-
-                local_abort = true ;
-            }
-
-        }   while (flp_el != NULL) ;
-
-        align_to_grid (dimensions, $2->MainElement) ;
 
         floorplan->NElements++ ;
 
@@ -203,7 +169,7 @@ floorplan_element_list
 floorplan_element
 
   : IDENTIFIER ':'                        // $1
-      ic_element                          // $3
+      ic_elements                         // $3
       optional_power_values_list          // $4
     {
         FloorplanElement *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
@@ -217,18 +183,67 @@ floorplan_element
             YYABORT ;
         }
 
-        floorplan_element->Id          = $1 ;
-        floorplan_element->MainElement = $3 ;
-        floorplan_element->PowerValues = $4 ;
+        floorplan_element->Id             = $1 ;
+        floorplan_element->NICElements    = nicelements ;
+        floorplan_element->ICElementsList = $3 ;
+        floorplan_element->PowerValues    = $4 ;
+
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, ic_el_1, $3)
+        {
+            floorplan_element->EffectiveSurface
+
+                += ic_el_1->EffectiveLength * ic_el_1->EffectiveWidth ;
+
+            FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, ic_el_2, $3)
+            {
+                if (check_intersection (ic_el_1, ic_el_2) == true)
+                {
+                    sprintf (error_message,
+                        "Intersection between %s (%.1f, %.1f, %.1f, %.1f)" \
+                                        " and %s (%.1f, %.1f, %.1f, %.1f)\n",
+                        $1,
+                        ic_el_1->SW_X, ic_el_1->SW_Y, ic_el_1->Length, ic_el_1->Width,
+                        $1,
+                        ic_el_2->SW_X, ic_el_2->SW_Y, ic_el_2->Length, ic_el_2->Width) ;
+
+                    floorplan_error (floorplan, dimensions, scanner, error_message) ;
+
+                    local_abort = true ;
+                }
+            }
+
+            FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, floorplan->ElementsList)
+            {
+                FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, ic_el_3, flp_el->ICElementsList)
+                {
+                    if (check_intersection (ic_el_1, ic_el_3) == true)
+                    {
+                        sprintf (error_message,
+                            "Intersection between %s (%.1f, %.1f, %.1f, %.1f)" \
+                                            " and %s (%.1f, %.1f, %.1f, %.1f)\n",
+                            $1,
+                            ic_el_1->SW_X, ic_el_1->SW_Y, ic_el_1->Length, ic_el_1->Width,
+                            flp_el->Id,
+                            ic_el_3->SW_X, ic_el_3->SW_Y, ic_el_3->Length, ic_el_3->Width) ;
+
+                        floorplan_error (floorplan, dimensions, scanner, error_message) ;
+
+                        local_abort = true ;
+                    }
+                }
+            }
+        }
+
+        nicelements = 0u ;
     }
   ;
 
-ic_element
+ic_elements
 
   : POSITION  DVALUE ',' DVALUE ';'  // $2 $4
     DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
     {
-        ICElement *icelement = $$ = alloc_and_init_ic_element () ;
+        ICElement *icelement = alloc_and_init_ic_element () ;
 
         if (icelement == NULL)
         {
@@ -241,8 +256,53 @@ ic_element
         icelement->SW_Y   = $4 ;
         icelement->Length = $7 ;
         icelement->Width  = $9 ;
+
+        align_to_grid (dimensions, icelement) ;
+
+        if (check_location (dimensions, icelement) == true)
+        {
+            sprintf (error_message, "Floorplan element is outside of the IC") ;
+
+            floorplan_error (floorplan, dimensions, scanner, error_message) ;
+
+            local_abort = true ;
+        }
+
+        nicelements    = 1u ;
+        $$             = icelement ;
     }
-  | RECTANGLE '(' DVALUE ',' DVALUE ',' DVALUE ',' DVALUE ')' ';'  // $3 $5 $7 $9
+
+  | ic_elements_list
+    {
+        $$ = $1 ;
+    }
+  ;
+
+ic_elements_list
+
+  :  ic_element
+     {
+        nicelements = 1u ;
+
+        $$ = $1 ;
+     }
+  |  ic_elements_list ic_element
+     {
+        nicelements++ ;
+
+        ICElement *ic_el = $1 ;
+
+        while (ic_el->Next != NULL) ic_el = ic_el->Next ;
+
+        ic_el->Next = $2 ;
+
+        $$ = $1 ;
+     }
+  ;
+
+ic_element
+
+  : RECTANGLE '(' DVALUE ',' DVALUE ',' DVALUE ',' DVALUE ')' ';'  // $3 $5 $7 $9
     {
         ICElement *icelement = $$ = alloc_and_init_ic_element () ;
 
@@ -257,6 +317,17 @@ ic_element
         icelement->SW_Y   = $5 ;
         icelement->Length = $7 ;
         icelement->Width  = $9 ;
+
+        align_to_grid (dimensions, icelement) ;
+
+        if (check_location (dimensions, icelement) == true)
+        {
+            sprintf (error_message, "Floorplan element is outside of the IC") ;
+
+            floorplan_error (floorplan, dimensions, scanner, error_message) ;
+
+            local_abort = true ;
+        }
     }
   ;
 
@@ -323,5 +394,5 @@ void floorplan_error
 )
 {
     fprintf (stderr, "%s:%d: %s\n",
-             floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
+        floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
 }
