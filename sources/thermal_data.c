@@ -120,7 +120,9 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the grid of thermal cells */
 
-    tdata->ThermalCells = malloc (sizeof(ThermalCell) * tdata->Size) ;
+    tdata->ThermalCells = malloc (  sizeof(ThermalCell)
+                                  * get_number_of_layers (stkd->Dimensions)
+                                  * get_number_of_columns (stkd->Dimensions)) ;
 
     if (tdata->ThermalCells == NULL)
 
@@ -295,7 +297,7 @@ static void fill_system_vector
     Dimensions    *dimensions,
     double        *vector,
     Source_t      *sources,
-    ThermalCell   *thermalcells,
+    ThermalCell   *thermal_cells,
     Temperature_t *temperatures
 )
 {
@@ -303,10 +305,14 @@ static void fill_system_vector
     Temperature_t old ;
 #endif
 
+    CellIndex_t ncolumns = get_number_of_columns (dimensions) ;
+
     FOR_EVERY_LAYER (layer, dimensions)
     {
         FOR_EVERY_ROW (row, dimensions)
         {
+            ThermalCell *tmp = thermal_cells ;
+
             FOR_EVERY_COLUMN (column, dimensions)
             {
 
@@ -314,7 +320,7 @@ static void fill_system_vector
                 old = *temperatures ;
 #endif
 
-                *vector++ = *sources++ + thermalcells++->Capacity
+                *vector++ = *sources++ + tmp++->Capacity
                                          * *temperatures++ ;
 
 #ifdef PRINT_SYSTEM_VECTOR
@@ -322,11 +328,14 @@ static void fill_system_vector
                     " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
                     layer, row, column,
                     get_cell_offset_in_stack (dimensions, layer, row, column),
-                    *(vector-1), *(sources-1), (thermalcells-1)->Capacity, old) ;
+                    *(vector-1), *(sources-1), (tmp-1)->Capacity, old) ;
 #endif
 
             } // FOR_EVERY_COLUMN
         } // FOR_EVERY_ROW
+
+        thermal_cells += ncolumns ;
+
     } // FOR_EVERY_LAYER
 }
 

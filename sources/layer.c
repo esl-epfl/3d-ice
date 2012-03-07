@@ -168,31 +168,32 @@ void fill_thermal_cell_layer
 
         fill_cell = fill_solid_cell_central ;
 
+#ifdef PRINT_THERMAL_CELLS
     CellIndex_t cell_index
 
         = get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-    thermal_cells += cell_index ;
-
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-        FOR_EVERY_COLUMN (column_index, dimensions)
-        {
-#ifdef PRINT_THERMAL_CELLS
-            fprintf (stderr,
-                "  l %2d r %4d c %4d [%7d] ",
-                layer_index, row_index, column_index, cell_index++) ;
 #endif
 
-            fill_cell (thermal_cells, delta_time,
-                       get_cell_length(dimensions, column_index),
-                       get_cell_width(dimensions, row_index),
-                       layer->Height,
-                       layer->Material->ThermalConductivity,
-                       layer->Material->VolumetricHeatCapacity) ;
+    thermal_cells += layer_index * get_number_of_columns (dimensions) ;
 
-            thermal_cells ++ ;
-        }
+    FOR_EVERY_COLUMN (column_index, dimensions)
+    {
+#ifdef PRINT_THERMAL_CELLS
+        fprintf (stderr,
+            "  l %2d c %4d [%7d] ",
+            layer_index, column_index, cell_index++) ;
+#endif
+
+        fill_cell (thermal_cells, delta_time,
+
+                   get_cell_length(dimensions, column_index),
+                   get_cell_width(dimensions, 0),
+                   layer->Height,
+
+                   layer->Material->ThermalConductivity,
+                   layer->Material->VolumetricHeatCapacity) ;
+
+        thermal_cells ++ ;
     }
 }
 

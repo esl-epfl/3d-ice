@@ -98,7 +98,7 @@
  # SuperLU variables
  ##############################################################################
 
-SLU_VERSION = 4.0
+SLU_VERSION = 4.3
 SLU_MAIN    = $(HOME)/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib

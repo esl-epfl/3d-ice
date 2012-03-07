@@ -329,7 +329,12 @@ void fill_thermal_cell_stack_description
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
-        reset_capacities (thermal_cells, get_number_of_cells(stkd->Dimensions)) ;
+        reset_capacities
+        (
+            thermal_cells,
+              get_number_of_layers(stkd->Dimensions)
+            * get_number_of_columns(stkd->Dimensions)
+        ) ;
 }
 
 /******************************************************************************/
