@@ -82,7 +82,7 @@ void init_thermal_data (ThermalData *tdata)
     tdata->SLU_Options.SymmetricMode   = YES ;
     tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
     tdata->SLU_Options.RowPerm         = NOROWPERM ;
-    tdata->SLU_Options.DiagPivotThresh = 0.01 ;
+    tdata->SLU_Options.DiagPivotThresh = 0.001 ;
 }
 
 /******************************************************************************/
