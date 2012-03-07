@@ -98,8 +98,8 @@
  # SuperLU variables
  ##############################################################################
 
-SLU_VERSION = 4.3
-SLU_MAIN    = /prj/ast_p2012/users/haugoug/install/RH5_64/pkg/SuperLU_$(SLU_VERSION)
+SLU_VERSION = 4.0
+SLU_MAIN    = $(HOME)/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 #SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
@@ -116,10 +116,10 @@ CC        = gcc
 CFLAGS    = -MD -O3
 CINCLUDES = -I$(3DICE_INCLUDE)
 
-YACC      = /prj/ast_p2012/users/haugoug/install/RH5_64/bin/bison
+YACC      = bison
 YFLAGS    = -d
 
-LEX       = /prj/ast_p2012/users/haugoug/install/RH5_64/bin/flex
+LEX       = flex
 LFLAGS    =
 
 RM        = rm
