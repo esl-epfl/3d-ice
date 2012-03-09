@@ -947,7 +947,7 @@ output_error :
 
 /******************************************************************************/
 
-Error_t fill_message_inspection_point
+void fill_message_inspection_point
 (
     InspectionPoint *inspection_point,
     Dimensions      *dimensions,
@@ -955,8 +955,6 @@ Error_t fill_message_inspection_point
     NetworkMessage  *message
 )
 {
-    Error_t error = TDICE_FAILURE ;
-
     switch (inspection_point->Type)
     {
         case TDICE_OUTPUT_TYPE_TCELL :
@@ -970,7 +968,7 @@ Error_t fill_message_inspection_point
 
             float temperature = *(temperatures + index) ;
 
-            error = insert_message_word (message, &temperature) ;
+            insert_message_word (message, &temperature) ;
 
             break ;
         }
@@ -1002,8 +1000,6 @@ Error_t fill_message_inspection_point
 
             fprintf (stderr, "Error reading inspection point instruction\n") ;
    }
-
-    return error ;
 }
 
 /******************************************************************************/

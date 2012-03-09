@@ -45,15 +45,28 @@
 
 void init_network_message (NetworkMessage *message)
 {
-    memset (message->Memory, 0u, MAX_LENGTH * sizeof(MessageWord_t)) ;
+    message->Memory    = calloc (MESSAGE_LENGTH, sizeof (MessageWord_t)) ;
 
-    message->MaxLength = MAX_LENGTH ;
+    message->MaxLength = MESSAGE_LENGTH ;
 
     message->Length    = message->Memory ;
 
     message->Type      = message->Length + 1u ;
 
     message->Content   = message->Type   + 1u ;
+}
+
+/******************************************************************************/
+
+void free_network_message (NetworkMessage *message)
+{
+    FREE_POINTER (free, message->Memory) ;
+
+    message->Memory    = NULL ;
+    message->MaxLength = 0 ;
+    message->Length    = NULL ;
+    message->Type      = NULL ;
+    message->Content   = NULL ;
 }
 
 /******************************************************************************/
@@ -69,23 +82,32 @@ void build_message_head (NetworkMessage *message, MessageType_t type)
 
 #include <stdio.h>
 
-Error_t insert_message_word
+void insert_message_word
 (
     NetworkMessage *message,
     void           *word
 )
 {
     if (*message->Length == message->MaxLength)
+    {
+        MessageWord_t *tmp = calloc (message->MaxLength * 2, sizeof(MessageWord_t)) ;
 
-        return TDICE_FAILURE ;
+        memcpy (tmp, message->Memory, message->MaxLength * sizeof(MessageWord_t)) ;
+
+        free (message->Memory) ;
+
+        message->Memory    = tmp ;
+        message->MaxLength = message->MaxLength * 2 ;
+        message->Length    = message->Memory ;
+        message->Type      = message->Length + 1u ;
+        message->Content   = message->Type   + 1u ;
+    }
 
     MessageWord_t *toinsert = message->Memory + *message->Length ;
 
     memcpy (toinsert, word, sizeof (MessageWord_t)) ;
 
     (*message->Length)++ ;
-
-    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
@@ -105,3 +127,5 @@ Error_t extract_message_word
 
     return TDICE_SUCCESS ;
 }
+
+/******************************************************************************/

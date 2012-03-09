@@ -538,11 +538,10 @@ extern "C"
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param message the message to fill
-     *
-     * \return FIXME
+
      */
 
-    Error_t fill_message_inspection_point
+    void fill_message_inspection_point
     (
         InspectionPoint *inspection_point,
         Dimensions      *dimensions,

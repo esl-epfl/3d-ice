@@ -50,12 +50,12 @@ extern "C"
 
 #include "types.h"
 
-    /*! \def MAX_LENGTH
+    /*! \def MESSAGE_LENGTH
      *
-     *  The maximum number of words that a message can store (header included)
+     *  The initial number of words that a message can store (header included)
      */
 
-#   define MAX_LENGTH 256
+#   define MESSAGE_LENGTH 256
 
 /******************************************************************************/
 
@@ -67,11 +67,11 @@ extern "C"
      *  Length field in te message is mesured in number of words.
      */
 
-    struct NetworkMessage   
+    struct NetworkMessage
     {
         /*! The memory used to store the message */
 
-        MessageWord_t Memory [MAX_LENGTH] ;
+        MessageWord_t *Memory ;
 
         /*! The maximum length of the message */
 
@@ -98,10 +98,19 @@ extern "C"
 
     /*! Initializes a NetworkMessage
      *
-     * \param message   the address of the NetworkMessage to initialize
+     * \param message the address of the NetworkMessage to initialize
      */
 
     void init_network_message (NetworkMessage *message) ;
+
+
+
+    /*! Frees a message
+     *
+     * \param message the address of the NetworkMessage to free
+     */
+
+    void free_network_message (NetworkMessage *message) ;
 
 
 
@@ -125,12 +134,9 @@ extern "C"
      *
      * \param message the address of the message to build
      * \param word    (in) the address of the word to add
-     *
-     * \return \c TDICE_SUCCESS if the operation succeeded
-     * \return \c TDICE_FAILURE if there is not enough memory left in the message
      */
 
-    Error_t insert_message_word (NetworkMessage *message, void *word) ;
+    void insert_message_word (NetworkMessage *message, void *word) ;
 
 
 

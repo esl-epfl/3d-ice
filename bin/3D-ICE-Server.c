@@ -57,7 +57,7 @@ int main (int argc, char** argv)
 
     Socket server_socket, client_socket ;
 
-    NetworkMessage message ;
+    NetworkMessage request, reply ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -126,23 +126,18 @@ int main (int argc, char** argv)
 
     /* Runs the simlation *****************************************************/
 
-    init_network_message (&message) ;
-
     do
     {
-        error = receive_message_from_socket (&client_socket, &message) ;
+        init_network_message (&request) ;
 
-        if (error != TDICE_SUCCESS)
-        {
-            fprintf (stderr, "error: receive message from socket\n") ;
+        receive_message_from_socket (&client_socket, &request) ;
 
-            goto transmission_error ;
-        }
-
-        switch (*message.Type)
+        switch (*request.Type)
         {
             case TDICE_EXIT_SIMULATION :
             {
+                free_network_message (&request) ;
+
                 goto quit ;
             }
             case TDICE_RESET_THERMAL_STATE :
@@ -153,29 +148,17 @@ int main (int argc, char** argv)
             }
             case TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS :
             {
-                build_message_head
+                init_network_message (&reply) ;
 
-                    (&message, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
+                build_message_head   (&reply, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
 
                 Quantity_t nflpel = get_total_number_of_floorplan_elements (&stkd) ;
 
-                error = insert_message_word (&message, &nflpel) ;
+                insert_message_word (&reply, &nflpel) ;
 
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: insert message word\n") ;
+                send_message_to_socket (&client_socket, &reply) ;
 
-                    goto message_error ;
-                }
-
-                error = send_message_to_socket (&client_socket, &message) ;
-
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: send message to socket\n") ;
-
-                    goto message_error ;
-                }
+                free_network_message (&reply) ;
 
                 break ;
             }
@@ -187,27 +170,13 @@ int main (int argc, char** argv)
 
                 init_powers_queue (&queue) ;
 
-                error = extract_message_word (&message, &nflpel, 0) ;
-
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: extract message word 0\n") ;
-
-                    goto message_error ;
-                }
+                extract_message_word (&request, &nflpel, 0) ;
 
                 for (index = 1, nflpel++ ; index != nflpel ; index++)
                 {
                     float power_value ;
 
-                    error = extract_message_word (&message, &power_value, index) ;
-
-                    if (error != TDICE_SUCCESS)
-                    {
-                        fprintf (stderr, "error: extract message word %d\n", index) ;
-
-                        goto message_error ;
-                    }
+                    extract_message_word (&request, &power_value, index) ;
 
                     put_into_powers_queue (&queue, power_value) ;
                 }
@@ -218,7 +187,9 @@ int main (int argc, char** argv)
                 {
                     fprintf (stderr, "error: insert power values\n") ;
 
-                    goto message_error ;
+                    free_network_message (&request) ;
+
+                    goto sim_error ;
                 }
 
                 SimResult_t result = emulate_slot (&tdata, &stkd, &analysis) ;
@@ -236,79 +207,53 @@ int main (int argc, char** argv)
             {
                 OutputInstant_t instant ;
 
-                error = extract_message_word (&message, &instant, 0) ;
-
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: extract message word 0\n") ;
-
-                    goto message_error ;
-                }
+                extract_message_word (&request, &instant, 0) ;
 
                 OutputType_t type ;
 
-                error = extract_message_word (&message, &type, 1) ;
+                extract_message_word (&request, &type, 1) ;
 
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: extract message word 1\n") ;
-
-                    goto message_error ;
-                }
-
-                build_message_head (&message, TDICE_THERMAL_RESULTS) ;
+                init_network_message (&reply) ;
+                build_message_head   (&reply, TDICE_THERMAL_RESULTS) ;
 
                 Quantity_t nsensors =
 
                     get_number_of_inspection_points (&analysis, instant, type) ;
 
-                error = insert_message_word (&message, &nsensors) ;
-
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: insert message word\n") ;
-
-                    goto message_error ;
-                }
+                insert_message_word (&reply, &nsensors) ;
 
                 float time = get_simulated_time (&analysis) ;
 
-                error = insert_message_word (&message, &time) ;
-
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: insert message word\n") ;
-
-                    goto message_error ;
-                }
+                insert_message_word (&reply, &time) ;
 
                 error = fill_analysis_message
 
                     (&analysis, stkd.Dimensions, tdata.Temperatures,
-                     instant, type, &message) ;
+                     instant, type, &reply) ;
 
                 if (error != TDICE_SUCCESS)
                 {
                     fprintf (stderr, "error: generate message content\n") ;
 
-                    goto message_error ;
+                    free_network_message (&reply) ;
+                    free_network_message (&request) ;
+
+                    goto sim_error ;
                 }
 
-                error = send_message_to_socket (&client_socket, &message) ;
+                send_message_to_socket (&client_socket, &reply) ;
 
-                if (error != TDICE_SUCCESS)
-                {
-                    fprintf (stderr, "error: send message to socket\n") ;
-
-                    goto message_error ;
-                }
+                free_network_message (&reply) ;
 
                 break ;
             }
+
             default :
 
                 fprintf (stderr, "ERROR :: received unknown message type") ;
         }
+
+        free_network_message (&request) ;
 
     } while (1) ;
 
@@ -325,8 +270,6 @@ quit :
     return EXIT_SUCCESS ;
 
 sim_error :
-message_error:
-transmission_error :
                             close_socket           (&client_socket) ;
 wait_error :
                             close_socket           (&server_socket) ;

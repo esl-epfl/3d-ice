@@ -67,8 +67,23 @@ void seed_random ()
     (   ((double)(min_value))              \
       + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
 
+
 int main (int argc, char** argv)
 {
+    Socket client_socket ;
+
+    NetworkMessage client_nflp, client_powers, client_temperatures ;
+    NetworkMessage client_close_sim, server_reply ;
+
+    Quantity_t nflpel, index, nslots, nsensors ;
+
+    OutputInstant_t instant = TDICE_OUTPUT_INSTANT_SLOT ;
+    OutputType_t    type    = TDICE_OUTPUT_TYPE_TCELL ;
+
+    float power, time, temperature ;
+
+    seed_random () ;
+
     /* Checks if all arguments are there **************************************/
 
     if (argc != 2)
@@ -78,19 +93,17 @@ int main (int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    Quantity_t nslots = atoi (argv[1]) ;
+    nslots = atoi (argv[1]) ;
 
     /* Creates socket *********************************************************/
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
-    Socket client_socket ;
-
     init_socket (&client_socket) ;
 
-    Error_t error = open_client_socket (&client_socket) ;
+    if (open_client_socket (&client_socket) != TDICE_SUCCESS)
 
-    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
+        return EXIT_FAILURE ;
 
     fprintf (stdout, "done !\n") ;
 
@@ -98,135 +111,92 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
-    error = connect_client_to_server (&client_socket, "127.0.0.1", 10024) ;
+    if (connect_client_to_server (&client_socket, "127.0.0.1", 10024) != TDICE_SUCCESS)
 
-    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
+        return EXIT_FAILURE ;
 
     fprintf (stdout, "done !\n") ;
 
-    /* Gets the number of floorplan elements from the server ******************/
+    /* Client-Server Communication ********************************************/
+    /**************************************************************************/
 
-    NetworkMessage message ;
+    init_network_message (&client_nflp) ;
+    build_message_head   (&client_nflp, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
 
-    init_network_message (&message) ;
+    send_message_to_socket      (&client_socket, &client_nflp) ;
+    receive_message_from_socket (&client_socket, &client_nflp) ;
 
-    build_message_head (&message, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
+    extract_message_word (&client_nflp, &nflpel, 0) ;
 
-    error = send_message_to_socket (&client_socket, &message) ;
-
-    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-    error =
-
-        receive_message_from_socket (&client_socket, &message) ;
-
-    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-    Quantity_t nflpel ;
-
-    error = extract_message_word (&message, &nflpel, 0) ;
-
-    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-    /* Sends power values *****************************************************/
-
-    Quantity_t index ;
-
-    float power_value, time, temperature ;
-
-    seed_random () ;
+    free_network_message (&client_nflp) ;
 
     for ( ; nslots != 0 ; nslots--)
     {
-        build_message_head (&message, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
+        /* client sends power values ******************************************/
 
-        error = insert_message_word (&message, &nflpel) ;
-
-        if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+        init_network_message (&client_powers) ;
+        build_message_head   (&client_powers, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
+        insert_message_word  (&client_powers, &nflpel) ;
 
         for (index = 0 ; index != nflpel ; index++)
         {
-            power_value = random_value (0.0, 1.0) ;
+            power = random_value (0.0, 1.0) ;
 
-            error = insert_message_word (&message, &power_value) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+            insert_message_word (&client_powers, &power) ;
         }
 
-        error = send_message_to_socket (&client_socket, &message) ;
+        send_message_to_socket (&client_socket, &client_powers) ;
 
-        if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+        free_network_message (&client_powers) ;
 
-        if (nslots % 2 == 0)
+        /* Client sends temperatures request **********************************/
+
+        init_network_message (&client_temperatures) ;
+        build_message_head   (&client_temperatures, TDICE_THERMAL_RESULTS) ;
+        insert_message_word  (&client_temperatures, &instant) ;
+        insert_message_word  (&client_temperatures, &type) ;
+
+        send_message_to_socket (&client_socket, &client_temperatures) ;
+
+        free_network_message (&client_temperatures) ;
+
+        /* Client receives temperatures ***************************************/
+
+        init_network_message (&server_reply) ;
+
+        receive_message_from_socket (&client_socket, &server_reply) ;
+
+        extract_message_word (&server_reply, &nsensors, 0) ;
+        extract_message_word (&server_reply, &time, 1) ;
+
+        fprintf (stdout, "%5.2f sec : \t", time) ;
+
+        for (index = 2, nsensors += 2 ; index != nsensors ; index++)
         {
-            build_message_head (&message, TDICE_THERMAL_RESULTS) ;
+            extract_message_word (&server_reply, &temperature, index) ;
 
-            OutputInstant_t instant = TDICE_OUTPUT_INSTANT_SLOT ;
-
-            error = insert_message_word (&message, &instant) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-            OutputType_t type = TDICE_OUTPUT_TYPE_TCELL ;
-
-            error = insert_message_word (&message, &type) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-            error = send_message_to_socket (&client_socket, &message) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-            error =
-
-                receive_message_from_socket (&client_socket, &message) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-            Quantity_t nsensors ;
-
-            error = extract_message_word (&message, &nsensors, 0) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-            error = extract_message_word (&message, &time, 1) ;
-
-            if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-            fprintf (stdout, "%5.2f sec : \t", time) ;
-
-            for (index = 2, nsensors += 2 ; index != nsensors ; index++)
-            {
-                error = extract_message_word (&message, &temperature, index) ;
-
-                if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
-
-                fprintf (stdout, "%5.2f K \t", temperature) ;
-            }
-
-            fprintf (stdout, "\n") ;
+            fprintf (stdout, "%5.2f K \t", temperature) ;
         }
+
+        fprintf (stdout, "\n") ;
+
+        free_network_message (&server_reply) ;
     }
 
     /* Closes the simulation on the server ************************************/
 
-    build_message_head (&message, TDICE_EXIT_SIMULATION) ;
+    init_network_message (&client_close_sim) ;
+    build_message_head   (&client_close_sim, TDICE_EXIT_SIMULATION) ;
 
-    error = send_message_to_socket (&client_socket, &message) ;
+    send_message_to_socket (&client_socket, &client_close_sim) ;
 
-    if (error != TDICE_SUCCESS)    goto close_socket_and_exit ;
+    free_network_message (&client_close_sim) ;
 
-    /**************************************************************************/
+    /* Closes client sockek ***************************************************/
 
-    error = close_socket (&client_socket) ;
+    if (close_socket (&client_socket) != TDICE_SUCCESS)
 
-    if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
+        return EXIT_FAILURE ;
 
     return EXIT_SUCCESS ;
-
-close_socket_and_exit :
-
-    close_socket (&client_socket) ;
-
-    return EXIT_FAILURE ;
 }

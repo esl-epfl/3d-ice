@@ -102,7 +102,7 @@ SLU_VERSION = 4.3
 SLU_MAIN    = $(HOME)/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
-#SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
+#SLU_LIBS   = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
 SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib -lblas
 
  #

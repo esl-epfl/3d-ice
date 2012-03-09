@@ -49,10 +49,10 @@
 #include "floorplan_element.h"
 
 #define CHIP_BORDER       2
-#define FLPEL_REAL_BORDER 2
-#define FLPEL_EFF_BORDER  2
-#define CELL_CENTER       3
-#define SCALE             10.0
+#define FLPEL_REAL_BORDER 1
+#define FLPEL_EFF_BORDER  1
+#define CELL_CENTER       1
+#define SCALE             5
 
 int main (int argc, char** argv)
 {
@@ -93,12 +93,21 @@ int main (int argc, char** argv)
 
     /* Opens svg tag **********************************************************/
 
-    fprintf (svg_file, "<svg xmlns=\"http://www.w3.org/2000/svg\">\n") ;
-
-    /* Draws the IC border ****************************************************/
-
     uint32_t ChipWidth  = get_chip_width  (stack.Dimensions) / SCALE ;
     uint32_t ChipLength = get_chip_length (stack.Dimensions) / SCALE ;
+
+    fprintf (svg_file,
+
+        "<?xml version=\"1.0\" standalone=\"no\"?>\n"              \
+        "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""         \
+        " \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n" \
+        "<svg length=\"%d\" width=\"%d\" version=\"1.1\""          \
+        " xmlns=\"http://www.w3.org/2000/svg\">\n",
+
+        ChipLength, ChipWidth) ;
+
+
+    /* Draws the IC border ****************************************************/
 
     fprintf (svg_file,
         "\t<rect x=\"0\" y=\"0\""            \

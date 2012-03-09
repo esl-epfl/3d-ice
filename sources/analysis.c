@@ -405,11 +405,11 @@ Error_t fill_analysis_message
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
 
-        if (   type == ipoint->Type
-            && fill_message_inspection_point (ipoint, dimensions, temperatures, message)
-               != TDICE_SUCCESS)
+        if (type == ipoint->Type)
 
-            return TDICE_FAILURE ;
+            fill_message_inspection_point
+
+                (ipoint, dimensions, temperatures, message) ;
 
    return TDICE_SUCCESS ;
 }
