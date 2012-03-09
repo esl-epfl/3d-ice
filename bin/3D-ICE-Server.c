@@ -206,25 +206,19 @@ int main (int argc, char** argv)
             case TDICE_THERMAL_RESULTS :
             {
                 OutputInstant_t instant ;
+                OutputType_t    type ;
 
                 extract_message_word (&request, &instant, 0) ;
-
-                OutputType_t type ;
-
-                extract_message_word (&request, &type, 1) ;
+                extract_message_word (&request, &type,    1) ;
 
                 init_network_message (&reply) ;
                 build_message_head   (&reply, TDICE_THERMAL_RESULTS) ;
 
-                Quantity_t nsensors =
-
-                    get_number_of_inspection_points (&analysis, instant, type) ;
-
-                insert_message_word (&reply, &nsensors) ;
-
-                float time = get_simulated_time (&analysis) ;
+                float   time = get_simulated_time (&analysis) ;
+                Quantity_t n = get_number_of_inspection_points (&analysis, instant, type) ;
 
                 insert_message_word (&reply, &time) ;
+                insert_message_word (&reply, &n) ;
 
                 error = fill_analysis_message
 

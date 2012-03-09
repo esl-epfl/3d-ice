@@ -266,11 +266,8 @@ Error_t receive_message_from_socket
     }
 
     if (message_length > message->MaxLength)
-    {
-        fprintf (stderr, "ERROR :: not enough space to receive\n") ;
 
-        return EXIT_FAILURE ;
-    }
+        increase_message_memory (message, message_length) ;
 
     // stores the length of the message
 

@@ -73,14 +73,19 @@ int main (int argc, char** argv)
     Socket client_socket ;
 
     NetworkMessage client_nflp, client_powers, client_temperatures ;
-    NetworkMessage client_close_sim, server_reply ;
+    NetworkMessage client_tmap, client_close_sim, server_reply ;
 
-    Quantity_t nflpel, index, nslots, nsensors ;
+    Quantity_t nflpel, index, index2, nslots, nsensors ;
 
-    OutputInstant_t instant = TDICE_OUTPUT_INSTANT_SLOT ;
-    OutputType_t    type    = TDICE_OUTPUT_TYPE_TCELL ;
+    OutputInstant_t instant ;
+    OutputType_t    type ;
+
+    CellIndex_t row, column ;
+    CellIndex_t nrows, ncolumns ;
 
     float power, time, temperature ;
+
+    FILE *tmap ;
 
     seed_random () ;
 
@@ -117,6 +122,14 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
+    /* Creates file for themal maps *******************************************/
+
+    tmap = fopen ("thermal_map.txt", "w") ;
+
+    if (tmap == NULL)
+
+        return EXIT_FAILURE ;
+
     /* Client-Server Communication ********************************************/
     /**************************************************************************/
 
@@ -151,6 +164,9 @@ int main (int argc, char** argv)
 
         /* Client sends temperatures request **********************************/
 
+        instant = TDICE_OUTPUT_INSTANT_SLOT ;
+        type    = TDICE_OUTPUT_TYPE_TCELL ;
+
         init_network_message (&client_temperatures) ;
         build_message_head   (&client_temperatures, TDICE_THERMAL_RESULTS) ;
         insert_message_word  (&client_temperatures, &instant) ;
@@ -166,8 +182,8 @@ int main (int argc, char** argv)
 
         receive_message_from_socket (&client_socket, &server_reply) ;
 
-        extract_message_word (&server_reply, &nsensors, 0) ;
-        extract_message_word (&server_reply, &time, 1) ;
+        extract_message_word (&server_reply, &time,     0) ;
+        extract_message_word (&server_reply, &nsensors, 1) ;
 
         fprintf (stdout, "%5.2f sec : \t", time) ;
 
@@ -181,7 +197,53 @@ int main (int argc, char** argv)
         fprintf (stdout, "\n") ;
 
         free_network_message (&server_reply) ;
+
+        /* Client sends thermal maps request **********************************/
+
+        instant = TDICE_OUTPUT_INSTANT_SLOT ;
+        type    = TDICE_OUTPUT_TYPE_TMAP ;
+
+        init_network_message (&client_tmap) ;
+        build_message_head   (&client_tmap, TDICE_THERMAL_RESULTS) ;
+        insert_message_word  (&client_tmap, &instant) ;
+        insert_message_word  (&client_tmap, &type) ;
+
+        send_message_to_socket (&client_socket, &client_tmap) ;
+
+        free_network_message (&client_tmap) ;
+
+        /* Client receives thermal maps ***************************************/
+
+        init_network_message (&server_reply) ;
+
+        receive_message_from_socket (&client_socket, &server_reply) ;
+
+        extract_message_word (&server_reply, &time,     0) ;
+        extract_message_word (&server_reply, &nsensors, 1) ;
+        extract_message_word (&server_reply, &nrows,    2) ;
+        extract_message_word (&server_reply, &ncolumns, 3) ;
+
+        fprintf (stdout, "%.1f %d %d %d\n", time, nsensors, nrows, ncolumns) ;
+
+        for (index = 4, index2 = 0 ; index2 != nsensors ; index2++)
+        {
+            for (row = 0 ; row != nrows ; row++)
+            {
+                for (column = 0 ; column != ncolumns ; column++, index++)
+                {
+                    extract_message_word (&server_reply, &temperature, index) ;
+
+                    fprintf (tmap, "%5.2f ", temperature) ;
+                }
+                fprintf (tmap, "\n") ;
+            }
+            fprintf (tmap, "\n") ;
+        }
+
+        free_network_message (&server_reply) ;
     }
+
+    fclose (tmap) ;
 
     /* Closes the simulation on the server ************************************/
 

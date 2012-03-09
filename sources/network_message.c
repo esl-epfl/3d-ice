@@ -71,6 +71,23 @@ void free_network_message (NetworkMessage *message)
 
 /******************************************************************************/
 
+void increase_message_memory (NetworkMessage *message, Quantity_t new_size)
+{
+    MessageWord_t *tmp = calloc (new_size, sizeof(MessageWord_t)) ;
+
+    memcpy (tmp, message->Memory, message->MaxLength * sizeof(MessageWord_t)) ;
+
+    free (message->Memory) ;
+
+    message->Memory    = tmp ;
+    message->MaxLength = new_size ;
+    message->Length    = message->Memory ;
+    message->Type      = message->Length + 1u ;
+    message->Content   = message->Type   + 1u ;
+}
+
+/******************************************************************************/
+
 void build_message_head (NetworkMessage *message, MessageType_t type)
 {
     *message->Length = (MessageWord_t) 2u ;
@@ -80,8 +97,6 @@ void build_message_head (NetworkMessage *message, MessageType_t type)
 
 /******************************************************************************/
 
-#include <stdio.h>
-
 void insert_message_word
 (
     NetworkMessage *message,
@@ -89,19 +104,8 @@ void insert_message_word
 )
 {
     if (*message->Length == message->MaxLength)
-    {
-        MessageWord_t *tmp = calloc (message->MaxLength * 2, sizeof(MessageWord_t)) ;
 
-        memcpy (tmp, message->Memory, message->MaxLength * sizeof(MessageWord_t)) ;
-
-        free (message->Memory) ;
-
-        message->Memory    = tmp ;
-        message->MaxLength = message->MaxLength * 2 ;
-        message->Length    = message->Memory ;
-        message->Type      = message->Length + 1u ;
-        message->Content   = message->Type   + 1u ;
-    }
+        increase_message_memory (message, 2 * message->MaxLength) ;
 
     MessageWord_t *toinsert = message->Memory + *message->Length ;
 

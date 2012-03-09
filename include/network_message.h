@@ -114,6 +114,17 @@ extern "C"
 
 
 
+    /*! Changes the amount of memory available to store the message
+     *
+     * \param message  the address of the message
+     * \param new_size the new size (number of words)
+     *
+     */
+
+    void increase_message_memory (NetworkMessage *message, Quantity_t new_size) ;
+
+
+
     /*! Builds the head of a message (sets its type)
      *
      *  The function sets the content of the first two words of the message

@@ -985,11 +985,35 @@ void fill_message_inspection_point
             break ;
 
         case TDICE_OUTPUT_TYPE_TMAP :
+        {
+            CellIndex_t n ;
 
-            fprintf (stderr, "TMAP output in message not supperted\n") ;
+            n = get_number_of_rows (dimensions) ;
+
+            insert_message_word (message, &n) ;
+
+            n = get_number_of_columns (dimensions) ;
+
+            insert_message_word (message, &n) ;
+
+            Quantity_t index = get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(inspection_point->StackElement),
+                 0, 0) ;
+
+            FOR_EVERY_ROW (row_index, dimensions)
+            {
+                FOR_EVERY_COLUMN (column_index, dimensions)
+                {
+                    float temperature = *(temperatures + index++) ;
+
+                    insert_message_word (message, &temperature) ;
+                }
+            }
 
             break ;
-
+        }
         case TDICE_OUTPUT_TYPE_TCOOLANT :
 
             fprintf (stderr, "TCOOLANT output in message not supperted\n") ;
