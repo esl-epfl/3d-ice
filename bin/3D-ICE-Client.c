@@ -223,7 +223,7 @@ int main (int argc, char** argv)
         extract_message_word (&server_reply, &nrows,    2) ;
         extract_message_word (&server_reply, &ncolumns, 3) ;
 
-        fprintf (stdout, "%.1f %d %d %d\n", time, nsensors, nrows, ncolumns) ;
+//        fprintf (stdout, "%.1f %d %d %d\n", time, nsensors, nrows, ncolumns) ;
 
         for (index = 4, index2 = 0 ; index2 != nsensors ; index2++)
         {
