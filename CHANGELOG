@@ -37,6 +37,13 @@
  ##############################################################################
 
  ##############################################################################
+ 2012-03-xx 3D-ICE 2.1
+   * Reduction of memory requirement to store thermal cells
+   * New Inspection Point TCoolant for max/min/avg outlet temperature
+   * Support for irregular floorplan elements as sets of rectangles 
+   * Basic support/functionalities for remote simulations (client/server)
+   * 3D-ICE-Server and 3D-ICE-Client binaries as example of remote simulation.
+ ##############################################################################
  2011-12-07 3D-ICE 2.0
    * Code enhancement
    * Doxygen documentation

@@ -58,12 +58,6 @@ extern "C"
 
 
 
-    /*! Definition of the type StringLength_t */
-
-    typedef size_t StringLength_t ;
-
-
-
     /*! Definition of the type Quantity_t
      *
      *  For small quantities as \#channels or \#floorplan elements */
