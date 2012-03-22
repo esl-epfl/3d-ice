@@ -40,7 +40,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#include "network_interface.h"
+#include "network_socket.h"
 #include "network_message.h"
 
 void seed_random ()

@@ -40,7 +40,7 @@
 #include <stdlib.h>
 
 #include "types.h"
-#include "network_interface.h"
+#include "network_socket.h"
 #include "network_message.h"
 #include "stack_description.h"
 #include "thermal_data.h"
