@@ -77,6 +77,8 @@ int main (int argc, char** argv)
 
     Quantity_t nflpel, index, index2, nslots, nsensors ;
 
+    SimResult_t sim_result ;
+
     OutputInstant_t instant ;
     OutputType_t    type ;
 
@@ -161,6 +163,25 @@ int main (int argc, char** argv)
         send_message_to_socket (&client_socket, &client_powers) ;
 
         free_network_message (&client_powers) ;
+
+        /* Client waits for simulation result *********************************/
+
+        init_network_message (&server_reply) ;
+
+        receive_message_from_socket (&client_socket, &server_reply) ;
+
+        extract_message_word (&server_reply, &sim_result, 0) ;
+
+        if (sim_result != TDICE_SLOT_DONE)
+        {
+            free_network_message (&server_reply) ;
+
+            close_socket (&client_socket) ;
+
+            return EXIT_FAILURE ;
+        }
+
+        free_network_message (&server_reply) ;
 
         /* Client sends temperatures request **********************************/
 

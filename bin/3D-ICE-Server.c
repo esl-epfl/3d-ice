@@ -192,7 +192,16 @@ int main (int argc, char** argv)
                     goto sim_error ;
                 }
 
+                init_network_message (&reply) ;
+                build_message_head   (&reply, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
+
                 SimResult_t result = emulate_slot (&tdata, &stkd, &analysis) ;
+
+                insert_message_word (&reply, &result) ;
+
+                send_message_to_socket (&client_socket, &reply) ;
+
+                free_network_message (&reply) ;
 
                 if (result != TDICE_SLOT_DONE)
                 {
