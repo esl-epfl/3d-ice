@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 2.0 .                                 #
+ # This file is part of 3D-ICE, version 2.1 .                                 #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -37,7 +37,7 @@
  ##############################################################################
 
  ##############################################################################
- 2012-03-xx 3D-ICE 2.1
+ 2012-03-23 3D-ICE 2.1
    * Reduction of memory requirement to store thermal cells
    * New Inspection Point TCoolant for max/min/avg outlet temperature
    * Support for irregular floorplan elements as sets of rectangles 
