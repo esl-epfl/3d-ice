@@ -78,8 +78,8 @@
                   $(3DICE_SOURCES)/inspection_point.c         \
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/material.c                 \
-                  $(3DICE_SOURCES)/network_interface.c        \
                   $(3DICE_SOURCES)/network_message.c          \
+                  $(3DICE_SOURCES)/network_socket.c           \
                   $(3DICE_SOURCES)/powers_queue.c             \
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \
@@ -102,8 +102,8 @@ SLU_VERSION = 4.3
 SLU_MAIN    = $(HOME)/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
-#SLU_LIBS   = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
-SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib -lblas
+SLU_LIBS   = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
+#SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib -lblas
 
  #
  # Commands and flags
