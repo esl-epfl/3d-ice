@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
+void init_conventional_heat_sink (ConventionalHeatSink_t *conventional_heat_sink)
 {
     conventional_heat_sink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
     conventional_heat_sink->AmbientTemperature = 0.0 ;
@@ -52,11 +52,11 @@ void init_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
 
 /******************************************************************************/
 
-ConventionalHeatSink *alloc_and_init_conventional_heat_sink (void)
+ConventionalHeatSink_t *alloc_and_init_conventional_heat_sink (void)
 {
-    ConventionalHeatSink *conventional_heat_sink = (ConventionalHeatSink *)
+    ConventionalHeatSink_t *conventional_heat_sink = (ConventionalHeatSink_t *)
 
-        malloc (sizeof(ConventionalHeatSink)) ;
+        malloc (sizeof(ConventionalHeatSink_t)) ;
 
     if (conventional_heat_sink != NULL)
 
@@ -67,7 +67,7 @@ ConventionalHeatSink *alloc_and_init_conventional_heat_sink (void)
 
 /******************************************************************************/
 
-void free_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
+void free_conventional_heat_sink (ConventionalHeatSink_t *conventional_heat_sink)
 {
     FREE_POINTER (free, conventional_heat_sink) ;
 }
@@ -76,9 +76,9 @@ void free_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink)
 
 void print_formatted_conventional_heat_sink
 (
-  FILE                 *stream,
-  String_t              prefix,
-  ConventionalHeatSink *conventional_heat_sink
+  FILE                   *stream,
+  String_t                prefix,
+  ConventionalHeatSink_t *conventional_heat_sink
 )
 {
     fprintf (stream,
@@ -98,9 +98,9 @@ void print_formatted_conventional_heat_sink
 
 void print_detailed_conventional_heat_sink
 (
-  FILE                 *stream,
-  String_t              prefix,
-  ConventionalHeatSink *conventional_heat_sink
+  FILE                   *stream,
+  String_t                prefix,
+  ConventionalHeatSink_t *conventional_heat_sink
 )
 {
     fprintf (stream,
@@ -124,9 +124,9 @@ void print_detailed_conventional_heat_sink
 
 void fill_thermal_cell_conventional_heat_sink
 (
-    ThermalCell          *thermal_cells,
-    Dimensions           *dimensions,
-    ConventionalHeatSink *conventional_heat_sink
+    ThermalCell_t          *thermal_cells,
+    Dimensions_t           *dimensions,
+    ConventionalHeatSink_t *conventional_heat_sink
 )
 {
     CellIndex_t layer_index = LAST_LAYER_INDEX (dimensions) ;
@@ -169,10 +169,10 @@ void fill_thermal_cell_conventional_heat_sink
 
 void fill_sources_conventional_heat_sink
 (
-    Source_t             *sources,
-    ThermalCell          *thermal_cells,
-    Dimensions           *dimensions,
-    ConventionalHeatSink *conventional_heat_sink
+    Source_t               *sources,
+    ThermalCell_t          *thermal_cells,
+    Dimensions_t           *dimensions,
+    ConventionalHeatSink_t *conventional_heat_sink
 )
 {
     CellIndex_t layer_index = LAST_LAYER_INDEX (dimensions) ;
@@ -193,7 +193,7 @@ void fill_sources_conventional_heat_sink
 
     FOR_EVERY_ROW (row_index, dimensions)
     {
-        ThermalCell *tmp = thermal_cells ;
+        ThermalCell_t *tmp = thermal_cells ;
 
         FOR_EVERY_COLUMN (column_index, dimensions)
         {
@@ -219,9 +219,9 @@ void fill_sources_conventional_heat_sink
 
 void fill_system_matrix_conventional_heat_sink
 (
-    SystemMatrix  system_matrix,
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells
+    SystemMatrix_t  system_matrix,
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells
 )
 {
     CellIndex_t cell_index = get_cell_offset_in_stack
@@ -230,7 +230,7 @@ void fill_system_matrix_conventional_heat_sink
 
     thermal_cells += LAST_LAYER_INDEX(dimensions) * get_number_of_columns (dimensions) ;
 
-    ThermalCell *tmp ;
+    ThermalCell_t *tmp ;
 
     FOR_EVERY_ROW (row, dimensions)
     {

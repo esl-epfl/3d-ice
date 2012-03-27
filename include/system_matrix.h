@@ -57,7 +57,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct SystemMatrix
+    /*! \struct SystemMatrix_t
      *
      *  \brief Structure representing the squared matrix storing the coefficients of the
      *         linear system that is solved tu run the thermal simulation
@@ -66,7 +66,7 @@ extern "C"
      * sequences of columns.
      */
 
-    struct SystemMatrix
+    struct SystemMatrix_t
     {
 
         /*! Pointer to the array storing the column pointers.
@@ -94,9 +94,9 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type SystemMAtrix */
+    /*! Definition of the type SystemMatrix_t */
 
-    typedef struct SystemMatrix SystemMatrix ;
+    typedef struct SystemMatrix_t SystemMatrix_t ;
 
 /******************************************************************************/
 
@@ -106,7 +106,7 @@ extern "C"
      * \param system_matrix the address of the system matrix to initialize
      */
 
-    void init_system_matrix (SystemMatrix *system_matrix) ;
+    void init_system_matrix (SystemMatrix_t *system_matrix) ;
 
 
 
@@ -122,7 +122,7 @@ extern "C"
 
     Error_t alloc_system_matrix
 
-        (SystemMatrix *system_matrix, CellIndex_t size, CellIndex_t nnz) ;
+        (SystemMatrix_t *system_matrix, CellIndex_t size, CellIndex_t nnz) ;
 
 
 
@@ -131,7 +131,7 @@ extern "C"
      * \param system_matrix the address of the system matrix structure
      */
 
-    void free_system_matrix (SystemMatrix *system_matrix) ;
+    void free_system_matrix (SystemMatrix_t *system_matrix) ;
 
 
 
@@ -145,7 +145,7 @@ extern "C"
      * \param system_matrix the system matrix structure
      */
 
-    void print_system_matrix (String_t file_name, SystemMatrix system_matrix) ;
+    void print_system_matrix (String_t file_name, SystemMatrix_t system_matrix) ;
 
 
 
@@ -163,16 +163,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_solid_column
+    SystemMatrix_t add_solid_column
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
 
-        CellIndex_t   layer_index,
-        CellIndex_t   row_index,
-        CellIndex_t   column_index,
+        CellIndex_t     layer_index,
+        CellIndex_t     row_index,
+        CellIndex_t     column_index,
 
-        SystemMatrix  system_matrix
+        SystemMatrix_t  system_matrix
     ) ;
 
 
@@ -191,16 +191,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_liquid_column_4rm
+    SystemMatrix_t add_liquid_column_4rm
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
 
-        CellIndex_t   layer_index,
-        CellIndex_t   row_index,
-        CellIndex_t   column_index,
+        CellIndex_t     layer_index,
+        CellIndex_t     row_index,
+        CellIndex_t     column_index,
 
-        SystemMatrix  system_matrix
+        SystemMatrix_t  system_matrix
     ) ;
 
 
@@ -220,16 +220,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_liquid_column_2rm
+    SystemMatrix_t add_liquid_column_2rm
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
 
-        CellIndex_t   layer_index,
-        CellIndex_t   row_index,
-        CellIndex_t   column_index,
+        CellIndex_t     layer_index,
+        CellIndex_t     row_index,
+        CellIndex_t     column_index,
 
-        SystemMatrix  system_matrix
+        SystemMatrix_t  system_matrix
     ) ;
 
 
@@ -249,16 +249,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_bottom_wall_column_2rm
+    SystemMatrix_t add_bottom_wall_column_2rm
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
 
-        CellIndex_t   layer_index,
-        CellIndex_t   row_index,
-        CellIndex_t   column_index,
+        CellIndex_t     layer_index,
+        CellIndex_t     row_index,
+        CellIndex_t     column_index,
 
-        SystemMatrix  system_matrix
+        SystemMatrix_t  system_matrix
     ) ;
 
 
@@ -278,16 +278,16 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_top_wall_column_2rm
+    SystemMatrix_t add_top_wall_column_2rm
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
 
-        CellIndex_t   layer_index,
-        CellIndex_t   row_index,
-        CellIndex_t   column_index,
+        CellIndex_t     layer_index,
+        CellIndex_t     row_index,
+        CellIndex_t     column_index,
 
-        SystemMatrix  system_matrix
+        SystemMatrix_t  system_matrix
     ) ;
 
 
@@ -307,18 +307,18 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix add_virtual_wall_column_2rm
+    SystemMatrix_t add_virtual_wall_column_2rm
     (
-        Dimensions    *dimensions,
-        ThermalCell   *thermal_cells,
+        Dimensions_t    *dimensions,
+        ThermalCell_t   *thermal_cells,
 
-        ChannelModel_t channel_model,
+        ChannelModel_t   channel_model,
 
-        CellIndex_t    layer_index,
-        CellIndex_t    row_index,
-        CellIndex_t    column_index,
+        CellIndex_t      layer_index,
+        CellIndex_t      row_index,
+        CellIndex_t      column_index,
 
-        SystemMatrix   system_matrix
+        SystemMatrix_t   system_matrix
     ) ;
 
 /******************************************************************************/

@@ -66,12 +66,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct StackDescription
+    /*! \struct StackDescription_t
      *
      * \brief Structure containing all the informations related to the 3d stack
      */
 
-    struct StackDescription
+    struct StackDescription_t
     {
         /*! The name of the file used to fill the stack description */
 
@@ -79,38 +79,38 @@ extern "C"
 
         /*! The list of materials componing the layers and channel walls */
 
-        Material *MaterialsList ;
+        Material_t *MaterialsList ;
 
         /*! Information about the heat dissipation throught the top surface */
 
-        ConventionalHeatSink *ConventionalHeatSink ;
+        ConventionalHeatSink_t *ConventionalHeatSink ;
 
         /*! Information about the (unique) type of channel used in the 3d stack */
 
-        Channel *Channel ;
+        Channel_t *Channel ;
 
         /*! The list of dies available to compose the 3d stack */
 
-        Die *DiesList ;
+        Die_t *DiesList ;
 
         /*! Pointer to the top-most stack elements componing the 3Dstack */
 
-        StackElement *TopStackElement ;
+        StackElement_t *TopStackElement ;
 
         /*! Pointer to the bottom-most stack elements componing the 3Dstack */
 
-        StackElement *BottomStackElement ;
+        StackElement_t *BottomStackElement ;
 
         /*! Collection of all the dimensions (chip, grid of cells, cell) */
 
-        Dimensions *Dimensions ;
+        Dimensions_t *Dimensions ;
     } ;
 
 
 
-    /*! Definition of the type StackDescription */
+    /*! Definition of the type StackDescription_t */
 
-    typedef struct StackDescription StackDescription ;
+    typedef struct StackDescription_t StackDescription_t ;
 
 /******************************************************************************/
 
@@ -121,7 +121,7 @@ extern "C"
      * \param stkd the address of the StackDescription to initialize
      */
 
-    void init_stack_description (StackDescription* stkd) ;
+    void init_stack_description (StackDescription_t* stkd) ;
 
 
 
@@ -139,7 +139,7 @@ extern "C"
 
     Error_t fill_stack_description
 
-        (StackDescription* stkd, Analysis *analysis, String_t filename) ;
+        (StackDescription_t* stkd, Analysis_t *analysis, String_t filename) ;
 
 
 
@@ -150,7 +150,7 @@ extern "C"
      * \param stkd the address of the StackDescription structure to free
      */
 
-    void free_stack_description (StackDescription* stkd) ;
+    void free_stack_description (StackDescription_t *stkd) ;
 
 
 
@@ -163,7 +163,7 @@ extern "C"
 
     void print_formatted_stack_description
 
-        (FILE *stream, String_t prefix, StackDescription *stkd) ;
+        (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
 
 
 
@@ -176,7 +176,7 @@ extern "C"
 
     void print_detailed_stack_description
 
-        (FILE *stream, String_t prefix, StackDescription* stkd) ;
+        (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
 
 
 
@@ -189,7 +189,7 @@ extern "C"
 
     void print_floorplans
 
-        (FILE *stream, String_t prefix, StackDescription *stkd) ;
+        (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
 
 
 
@@ -208,9 +208,9 @@ extern "C"
 
     void fill_thermal_cell_stack_description
     (
-        ThermalCell      *thermal_cells,
-        Analysis         *analysis,
-        StackDescription *stkd
+        ThermalCell_t      *thermal_cells,
+        Analysis_t         *analysis,
+        StackDescription_t *stkd
     ) ;
 
 
@@ -234,9 +234,9 @@ extern "C"
 
     Error_t fill_sources_stack_description
     (
-        Source_t         *sources,
-        ThermalCell      *thermal_cells,
-        StackDescription *stkd
+        Source_t           *sources,
+        ThermalCell_t      *thermal_cells,
+        StackDescription_t *stkd
     ) ;
 
 
@@ -254,9 +254,9 @@ extern "C"
 
     void fill_system_matrix_stack_description
     (
-        SystemMatrix      system_matrix,
-        ThermalCell      *thermal_cells,
-        StackDescription *stkd
+        SystemMatrix_t      system_matrix,
+        ThermalCell_t      *thermal_cells,
+        StackDescription_t *stkd
     ) ;
 
 
@@ -276,7 +276,7 @@ extern "C"
 
     Quantity_t get_number_of_floorplan_elements
 
-        (StackDescription* stkd, String_t stack_element_id) ;
+        (StackDescription_t *stkd, String_t stack_element_id) ;
 
 
 
@@ -287,7 +287,7 @@ extern "C"
      * \return the total nyumber of floorplan elements in the 3d stack
      */
 
-    Quantity_t get_total_number_of_floorplan_elements (StackDescription *stkd) ;
+    Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd) ;
 
 
 
@@ -306,9 +306,9 @@ extern "C"
      *         \a stack_element_id
      */
 
-    FloorplanElement *get_floorplan_element
+    FloorplanElement_t *get_floorplan_element
 
-        (StackDescription *stkd,
+        (StackDescription_t *stkd,
          String_t stack_element_id, String_t floorplan_element_id) ;
 
 
@@ -334,7 +334,7 @@ extern "C"
      *  \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t insert_power_values (StackDescription *stkd, PowersQueue *pvalues) ;
+    Error_t insert_power_values (StackDescription_t *stkd, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

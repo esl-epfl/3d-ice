@@ -52,7 +52,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct ThermalCell
+    /*! \struct ThermalCell_t
      *
      *  \brief Structure used to store data about a single thermal cell
      *
@@ -69,7 +69,7 @@ extern "C"
      *
      */
 
-    struct ThermalCell
+    struct ThermalCell_t
     {
         /*! The conductance of the resistor in the \a Top direction */
 
@@ -101,9 +101,9 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type ThermalCell */
+    /*! Definition of the type ThermalCell_t */
 
-    typedef struct ThermalCell ThermalCell ;
+    typedef struct ThermalCell_t ThermalCell_t ;
 
 /******************************************************************************/
 
@@ -112,7 +112,7 @@ extern "C"
      * \param thermal_cell the address of the thermal cell to initialize
      */
 
-    void init_thermal_cell (ThermalCell *thermal_cell) ;
+    void init_thermal_cell (ThermalCell_t *thermal_cell) ;
 
     /*! Set to zero the capacity in a vector of thermal cells
      *
@@ -120,7 +120,7 @@ extern "C"
      * \param ncells number of thermal cells in the vector
      */
 
-    void reset_capacities (ThermalCell *thermal_cell, CellIndex_t ncells) ;
+    void reset_capacities (ThermalCell_t *thermal_cell, CellIndex_t ncells) ;
 
 
     /*! Fill a solid thermal cell that belongs to the bottom-most layer of a stack
@@ -136,7 +136,7 @@ extern "C"
 
     void fill_solid_cell_bottom
     (
-        ThermalCell     *thermal_cell,
+        ThermalCell_t   *thermal_cell,
 
         Time_t           delta_time,
 
@@ -163,7 +163,7 @@ extern "C"
 
     void fill_solid_cell_central
     (
-        ThermalCell     *thermal_cell,
+        ThermalCell_t   *thermal_cell,
 
         Time_t           delta_time,
 
@@ -190,7 +190,7 @@ extern "C"
 
     void fill_solid_cell_top
     (
-        ThermalCell     *thermal_cell,
+        ThermalCell_t   *thermal_cell,
 
         Time_t           delta_time,
 
@@ -216,7 +216,7 @@ extern "C"
 
     void fill_solid_cell_conventional_heat_sink
     (
-        ThermalCell     *thermal_cell,
+        ThermalCell_t   *thermal_cell,
 
         CellDimension_t  cell_length,
         CellDimension_t  cell_width,
@@ -241,7 +241,7 @@ extern "C"
 
     void fill_liquid_cell_mc_4rm
     (
-        ThermalCell      *thermal_cell,
+        ThermalCell_t    *thermal_cell,
 
         Time_t           delta_time,
 
@@ -270,7 +270,7 @@ extern "C"
 
     void fill_liquid_cell_mc_2rm
     (
-        ThermalCell        *thermal_cell,
+        ThermalCell_t      *thermal_cell,
 
         Time_t              delta_time,
 
@@ -300,7 +300,7 @@ extern "C"
 
     void fill_liquid_cell_pf
     (
-        ThermalCell       *thermal_cell,
+        ThermalCell_t     *thermal_cell,
 
         Time_t             delta_time,
 
@@ -329,7 +329,7 @@ extern "C"
 
     void fill_virtual_wall_cell_mc_2rm
     (
-        ThermalCell       *thermal_cell,
+        ThermalCell_t     *thermal_cell,
 
         Time_t             delta_time,
 
@@ -358,7 +358,7 @@ extern "C"
 
     void fill_virtual_wall_cell_pf
     (
-        ThermalCell       *thermal_cell,
+        ThermalCell_t     *thermal_cell,
 
         Time_t             delta_time,
 

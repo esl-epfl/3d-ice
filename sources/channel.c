@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_channel (Channel *channel)
+void init_channel (Channel_t *channel)
 {
     channel->ChannelModel          = TDICE_CHANNEL_MODEL_NONE ;
     channel->Height                = 0.0 ;
@@ -65,9 +65,9 @@ void init_channel (Channel *channel)
 
 /******************************************************************************/
 
-Channel *alloc_and_init_channel (void)
+Channel_t *alloc_and_init_channel (void)
 {
-    Channel *channel = (Channel *) malloc (sizeof(Channel)) ;
+    Channel_t *channel = (Channel_t *) malloc (sizeof(Channel_t)) ;
 
     if (channel != NULL)
 
@@ -78,7 +78,7 @@ Channel *alloc_and_init_channel (void)
 
 /******************************************************************************/
 
-void free_channel (Channel *channel)
+void free_channel (Channel_t *channel)
 {
     FREE_POINTER (free, channel) ;
 }
@@ -87,10 +87,10 @@ void free_channel (Channel *channel)
 
 void print_formatted_channel
 (
-    FILE       *stream,
-    String_t    prefix,
-    Channel    *channel,
-    Dimensions *dimensions
+    FILE         *stream,
+    String_t      prefix,
+    Channel_t    *channel,
+    Dimensions_t *dimensions
 )
 {
     if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM)
@@ -180,9 +180,9 @@ void print_formatted_channel
 
 void print_detailed_channel
 (
-  FILE    *stream,
-  String_t prefix,
-  Channel *channel
+  FILE      *stream,
+  String_t   prefix,
+  Channel_t *channel
 )
 {
     fprintf (stream,
@@ -259,11 +259,11 @@ void print_detailed_channel
 static
 void fill_thermal_cell_channel_4rm
 (
-    ThermalCell *thermalcells,
-    Time_t       delta_time,
-    Dimensions  *dimensions,
-    CellIndex_t  layer_index,
-    Channel     *channel
+    ThermalCell_t  *thermalcells,
+    Time_t          delta_time,
+    Dimensions_t   *dimensions,
+    CellIndex_t     layer_index,
+    Channel_t      *channel
 )
 {
 #ifdef PRINT_THERMAL_CELLS
@@ -315,11 +315,11 @@ void fill_thermal_cell_channel_4rm
 
 static void fill_thermal_cell_channel_2rm
 (
-    ThermalCell *thermalcells,
-    Time_t       delta_time,
-    Dimensions  *dimensions,
-    CellIndex_t  layer_index,
-    Channel     *channel
+    ThermalCell_t  *thermalcells,
+    Time_t          delta_time,
+    Dimensions_t   *dimensions,
+    CellIndex_t     layer_index,
+    Channel_t      *channel
 )
 {
 #ifdef PRINT_THERMAL_CELLS
@@ -418,11 +418,11 @@ static void fill_thermal_cell_channel_2rm
 
 static void fill_thermal_cell_channel_pf
 (
-    ThermalCell *thermalcells,
-    Time_t       delta_time,
-    Dimensions  *dimensions,
-    CellIndex_t  layer_index,
-    Channel     *channel
+    ThermalCell_t   *thermalcells,
+    Time_t           delta_time,
+    Dimensions_t    *dimensions,
+    CellIndex_t      layer_index,
+    Channel_t       *channel
 )
 {
 #ifdef PRINT_THERMAL_CELLS
@@ -521,11 +521,11 @@ static void fill_thermal_cell_channel_pf
 
 void fill_thermal_cell_channel
 (
-    ThermalCell *thermalcells,
-    Time_t       delta_time,
-    Dimensions  *dimensions,
-    CellIndex_t  layer_index,
-    Channel     *channel
+    ThermalCell_t *thermalcells,
+    Time_t         delta_time,
+    Dimensions_t  *dimensions,
+    CellIndex_t    layer_index,
+    Channel_t     *channel
 )
 {
     switch (channel->ChannelModel)
@@ -567,10 +567,10 @@ void fill_thermal_cell_channel
 
 void fill_sources_channel
 (
-    Source_t   *sources,
-    Dimensions *dimensions,
-    CellIndex_t layer_index,
-    Channel    *channel
+    Source_t      *sources,
+    Dimensions_t  *dimensions,
+    CellIndex_t    layer_index,
+    Channel_t     *channel
 )
 {
     // In 2RM, the channel offset is the layer index of the bottom wall,
@@ -649,13 +649,13 @@ void fill_sources_channel
 
 /******************************************************************************/
 
-SystemMatrix fill_system_matrix_channel
+SystemMatrix_t fill_system_matrix_channel
 (
-    Channel      *channel,
-    Dimensions   *dimensions,
-    ThermalCell  *thermalcells,
-    CellIndex_t   layer_index,
-    SystemMatrix  system_matrix
+    Channel_t      *channel,
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermalcells,
+    CellIndex_t     layer_index,
+    SystemMatrix_t  system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX
@@ -765,8 +765,8 @@ SystemMatrix fill_system_matrix_channel
 
 Temperature_t get_max_temperature_channel_outlet
 (
-    Channel       *channel,
-    Dimensions    *dimensions,
+    Channel_t     *channel,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
@@ -792,8 +792,8 @@ Temperature_t get_max_temperature_channel_outlet
 
 Temperature_t get_min_temperature_channel_outlet
 (
-    Channel       *channel,
-    Dimensions    *dimensions,
+    Channel_t     *channel,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
@@ -819,8 +819,8 @@ Temperature_t get_min_temperature_channel_outlet
 
 Temperature_t get_avg_temperature_channel_outlet
 (
-    Channel       *channel,
-    Dimensions    *dimensions,
+    Channel_t     *channel,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {

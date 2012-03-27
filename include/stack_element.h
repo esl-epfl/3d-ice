@@ -71,9 +71,9 @@ extern "C"
 
     union StackElement_p
     {
-        Layer   *Layer ;     /*!< Pointer to a Layer   */
-        Die     *Die ;       /*!< Pointer to a Die     */
-        Channel *Channel ;   /*!< Pointer to a Channel */
+        Layer_t   *Layer ;     /*!< Pointer to a Layer   */
+        Die_t     *Die ;       /*!< Pointer to a Die     */
+        Channel_t *Channel ;   /*!< Pointer to a Channel */
     } ;
 
     /*! Definition of the type StackElement_p */
@@ -82,7 +82,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct StackElement
+    /*! \struct StackElement_t
      *
      *  \brief Structure used to store data about the stack element that compose the 2D/3D stack.
      *
@@ -90,7 +90,7 @@ extern "C"
      *  a die or a channel.
      */
 
-    struct StackElement
+    struct StackElement_t
     {
         /*! The id (string) of the stack element */
 
@@ -98,7 +98,7 @@ extern "C"
 
         /*! The type of the stack element (Layer, Die or Channel) */
 
-        StackElement_t Type ;
+        StackElementType_t Type ;
 
         /*! Pointer to a data structure representing the type of a StackElement.
          *  This pointer must be casted depending on the value stored in
@@ -113,7 +113,7 @@ extern "C"
         /*! A pointer to a Floorplan. This field is
          *  used only if StaclElement::Type is \c TDICE_STACK_ELEMENT_DIE */
 
-        Floorplan *Floorplan ;
+        Floorplan_t *Floorplan ;
 
         /*! The offset (\# layers) of the first layer of the
          *  stack element, counting from the first layer in the stack */
@@ -123,18 +123,18 @@ extern "C"
         /*! Pointer to the 'next' stack element (towards the top of the stack),
          *  to collect stack elements in a double linked list */
 
-        struct StackElement *Next ;
+        struct StackElement_t *Next ;
 
         /*! Pointer to the 'previous' stack element (towards the bottom of the stack),
          *  to collect stack elements in a double linked list */
 
-        struct StackElement *Prev ;
+        struct StackElement_t *Prev ;
 
     } ;
 
-    /*! Definition of the type StackElement */
+    /*! Definition of the type StackElement_t */
 
-    typedef struct StackElement StackElement ;
+    typedef struct StackElement_t StackElement_t ;
 
 /******************************************************************************/
 
@@ -143,7 +143,7 @@ extern "C"
      * \param stack_element the address of the stack element to initialize
      */
 
-    void init_stack_element (StackElement *stack_element) ;
+    void init_stack_element (StackElement_t *stack_element) ;
 
 
 
@@ -154,7 +154,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    StackElement *alloc_and_init_stack_element (void) ;
+    StackElement_t *alloc_and_init_stack_element (void) ;
 
 
 
@@ -166,7 +166,7 @@ extern "C"
      * \param stack_element the address of the stack_element structure to free
      */
 
-    void free_stack_element (StackElement *stack_element) ;
+    void free_stack_element (StackElement_t *stack_element) ;
 
 
 
@@ -179,7 +179,7 @@ extern "C"
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_stack_elements_list (StackElement *list) ;
+    void free_stack_elements_list (StackElement_t *list) ;
 
 
 
@@ -194,7 +194,7 @@ extern "C"
      * \return \c NULL if the search fails
      */
 
-    StackElement *find_stack_element_in_list (StackElement *list, String_t id) ;
+    StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id) ;
 
 
     // FIXME : what about print_formatted_stack_element ??
@@ -209,7 +209,7 @@ extern "C"
 
     void print_formatted_stack_elements_list
 
-        (FILE *stream, String_t prefix, StackElement *list) ;
+        (FILE *stream, String_t prefix, StackElement_t *list) ;
 
 
 
@@ -222,7 +222,7 @@ extern "C"
 
     void print_detailed_stack_elements_list
 
-        (FILE *stream, String_t prefix, StackElement *list) ;
+        (FILE *stream, String_t prefix, StackElement_t *list) ;
 
 
 
@@ -233,7 +233,7 @@ extern "C"
      *  \return the offset (\# layers) of the source layer within the stack
      */
 
-    CellIndex_t get_source_layer_offset (StackElement *stack_element) ;
+    CellIndex_t get_source_layer_offset (StackElement_t *stack_element) ;
 
     /*! Fill the thermal cells corresponding to a stack element
      *
@@ -245,10 +245,10 @@ extern "C"
 
     void fill_thermal_cell_stack_element
     (
-        ThermalCell  *thermal_cells,
-        Time_t        delta_time,
-        Dimensions   *dimensions,
-        StackElement *stack_element
+        ThermalCell_t  *thermal_cells,
+        Time_t          delta_time,
+        Dimensions_t   *dimensions,
+        StackElement_t *stack_element
     ) ;
 
 
@@ -267,9 +267,9 @@ extern "C"
 
     Error_t fill_sources_stack_element
     (
-        Source_t     *sources,
-        Dimensions   *dimensions,
-        StackElement *stack_element
+        Source_t       *sources,
+        Dimensions_t   *dimensions,
+        StackElement_t *stack_element
     ) ;
 
 
@@ -284,12 +284,12 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix fill_system_matrix_stack_element
+    SystemMatrix_t fill_system_matrix_stack_element
     (
-        SystemMatrix  system_matrix,
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
-        StackElement *stack_element
+        SystemMatrix_t    system_matrix,
+        Dimensions_t     *dimensions,
+        ThermalCell_t    *thermal_cells,
+        StackElement_t   *stack_element
     ) ;
 
 
@@ -304,10 +304,10 @@ extern "C"
 
     void print_thermal_map_stack_element
     (
-        StackElement  *stack_element,
-        Dimensions    *dimensions,
-        Temperature_t *temperatures,
-        FILE          *stream
+        StackElement_t  *stack_element,
+        Dimensions_t    *dimensions,
+        Temperature_t   *temperatures,
+        FILE            *stream
     ) ;
 
 
@@ -321,7 +321,7 @@ extern "C"
 
     Quantity_t get_number_of_floorplan_elements_stack_element
 
-        (StackElement *stack_element) ;
+        (StackElement_t *stack_element) ;
 
 
 
@@ -338,9 +338,9 @@ extern "C"
      *         \a stack_element
      */
 
-    FloorplanElement *get_floorplan_element_stack_element
+    FloorplanElement_t *get_floorplan_element_stack_element
 
-        (StackElement *stack_element, String_t floorplan_element_id) ;
+        (StackElement_t *stack_element, String_t floorplan_element_id) ;
 
 
 
@@ -362,7 +362,7 @@ extern "C"
 
     Error_t insert_power_values_stack_element
 
-        (StackElement *stack_element, PowersQueue *pvalues) ;
+        (StackElement_t *stack_element, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

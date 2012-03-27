@@ -70,10 +70,10 @@ void seed_random ()
 
 int main (int argc, char** argv)
 {
-    Socket client_socket ;
+    Socket_t client_socket ;
 
-    NetworkMessage client_nflp, client_powers, client_temperatures ;
-    NetworkMessage client_tmap, client_close_sim, server_reply ;
+    NetworkMessage_t client_nflp, client_powers, client_temperatures ;
+    NetworkMessage_t client_tmap, client_close_sim, server_reply ;
 
     Quantity_t nflpel, index, index2, nslots, nsensors ;
 

@@ -47,7 +47,7 @@
 
 /******************************************************************************/
 
-void init_thermal_cell (ThermalCell *thermal_cell)
+void init_thermal_cell (ThermalCell_t *thermal_cell)
 {
     thermal_cell->Top      = (Conductance_t) 0.0 ;
     thermal_cell->Bottom   = (Conductance_t) 0.0 ;
@@ -60,7 +60,7 @@ void init_thermal_cell (ThermalCell *thermal_cell)
 
 /******************************************************************************/
 
-void reset_capacities (ThermalCell *thermal_cell, CellIndex_t ncells)
+void reset_capacities (ThermalCell_t *thermal_cell, CellIndex_t ncells)
 {
     CellIndex_t index = 0u ;
 
@@ -71,7 +71,7 @@ void reset_capacities (ThermalCell *thermal_cell, CellIndex_t ncells)
 
 void fill_solid_cell_bottom
 (
-    ThermalCell     *thermal_cell,
+    ThermalCell_t   *thermal_cell,
     Time_t           delta_time,
     CellDimension_t  cell_length,
     CellDimension_t  cell_width,
@@ -110,7 +110,7 @@ void fill_solid_cell_bottom
 
 void fill_solid_cell_central
 (
-    ThermalCell     *thermal_cell,
+    ThermalCell_t   *thermal_cell,
     Time_t           delta_time,
     CellDimension_t  cell_length,
     CellDimension_t  cell_width,
@@ -149,7 +149,7 @@ void fill_solid_cell_central
 
 void fill_solid_cell_top
 (
-    ThermalCell     *thermal_cell,
+    ThermalCell_t   *thermal_cell,
     Time_t           delta_time,
     CellDimension_t  cell_length,
     CellDimension_t  cell_width,
@@ -188,7 +188,7 @@ void fill_solid_cell_top
 
 void fill_solid_cell_conventional_heat_sink
 (
-    ThermalCell     *thermal_cell,
+    ThermalCell_t   *thermal_cell,
     CellDimension_t  cell_length,
     CellDimension_t  cell_width,
     CellDimension_t  cell_height,
@@ -223,7 +223,7 @@ void fill_solid_cell_conventional_heat_sink
 
 void fill_liquid_cell_mc_4rm
 (
-    ThermalCell     *thermal_cell,
+    ThermalCell_t   *thermal_cell,
     Time_t           delta_time,
     CellDimension_t  cell_length,
     CellDimension_t  cell_width,
@@ -262,7 +262,7 @@ void fill_liquid_cell_mc_4rm
 
 void fill_liquid_cell_mc_2rm
 (
-    ThermalCell        *thermal_cell,
+    ThermalCell_t      *thermal_cell,
     Time_t              delta_time,
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,
@@ -306,7 +306,7 @@ void fill_liquid_cell_mc_2rm
 
 void fill_liquid_cell_pf
 (
-    ThermalCell        *thermal_cell,
+    ThermalCell_t      *thermal_cell,
     Time_t              delta_time,
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,
@@ -354,7 +354,7 @@ void fill_liquid_cell_pf
 
 void fill_virtual_wall_cell_mc_2rm
 (
-    ThermalCell        *thermal_cell,
+    ThermalCell_t      *thermal_cell,
     Time_t              delta_time,
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,
@@ -395,7 +395,7 @@ void fill_virtual_wall_cell_mc_2rm
 
 void fill_virtual_wall_cell_pf
 (
-    ThermalCell        *thermal_cell,
+    ThermalCell_t      *thermal_cell,
     Time_t              delta_time,
     CellDimension_t     cell_length,
     CellDimension_t     cell_width,

@@ -49,15 +49,15 @@
 
 int main (int argc, char** argv)
 {
-    StackDescription stkd ;
-    Analysis         analysis ;
-    ThermalData      tdata ;
+    StackDescription_t stkd ;
+    Analysis_t         analysis ;
+    ThermalData_t      tdata ;
 
     Error_t error ;
 
-    Socket server_socket, client_socket ;
+    Socket_t server_socket, client_socket ;
 
-    NetworkMessage request, reply ;
+    NetworkMessage_t request, reply ;
 
     /* Checks if all arguments are there **************************************/
 
@@ -166,7 +166,7 @@ int main (int argc, char** argv)
             {
                 Quantity_t nflpel, index ;
 
-                PowersQueue queue ;
+                PowersQueue_t queue ;
 
                 init_powers_queue (&queue) ;
 

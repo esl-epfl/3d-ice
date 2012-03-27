@@ -50,7 +50,7 @@ static void init_data (double* data, uint32_t size, double init_value)
 
 /******************************************************************************/
 
-void init_thermal_data (ThermalData *tdata)
+void init_thermal_data (ThermalData_t *tdata)
 {
     tdata->Size = 0u ;
 
@@ -89,9 +89,9 @@ void init_thermal_data (ThermalData *tdata)
 
 Error_t fill_thermal_data
 (
-    ThermalData      *tdata,
-    StackDescription *stkd,
-    Analysis         *analysis
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis
 )
 {
     int result ;
@@ -120,7 +120,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the grid of thermal cells */
 
-    tdata->ThermalCells = malloc (  sizeof(ThermalCell)
+    tdata->ThermalCells = malloc (  sizeof(ThermalCell_t)
                                   * get_number_of_layers (stkd->Dimensions)
                                   * get_number_of_columns (stkd->Dimensions)) ;
 
@@ -258,7 +258,7 @@ temperatures_fail :
 
 /******************************************************************************/
 
-void free_thermal_data (ThermalData* tdata)
+void free_thermal_data (ThermalData_t *tdata)
 {
     FREE_POINTER (free, tdata->Temperatures) ;
     FREE_POINTER (free, tdata->Sources) ;
@@ -285,7 +285,7 @@ void free_thermal_data (ThermalData* tdata)
 
 /******************************************************************************/
 
-void reset_thermal_state (ThermalData *tdata, Analysis *analysis)
+void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis)
 {
     init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
 }
@@ -294,10 +294,10 @@ void reset_thermal_state (ThermalData *tdata, Analysis *analysis)
 
 static void fill_system_vector
 (
-    Dimensions    *dimensions,
+    Dimensions_t  *dimensions,
     double        *vector,
     Source_t      *sources,
-    ThermalCell   *thermal_cells,
+    ThermalCell_t *thermal_cells,
     Temperature_t *temperatures
 )
 {
@@ -311,7 +311,7 @@ static void fill_system_vector
     {
         FOR_EVERY_ROW (row, dimensions)
         {
-            ThermalCell *tmp = thermal_cells ;
+            ThermalCell_t *tmp = thermal_cells ;
 
             FOR_EVERY_COLUMN (column, dimensions)
             {
@@ -343,9 +343,9 @@ static void fill_system_vector
 
 static void fill_system_vector_steady
 (
-    Dimensions *dimensions,
-    double     *vector,
-    Source_t   *sources
+    Dimensions_t *dimensions,
+    double       *vector,
+    Source_t     *sources
 )
 {
     FOR_EVERY_LAYER (layer, dimensions)
@@ -373,9 +373,9 @@ static void fill_system_vector_steady
 
 SimResult_t emulate_step
 (
-    ThermalData      *tdata,
-    StackDescription *stkd,
-    Analysis         *analysis
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis
 )
 {
     if (analysis->AnalysisType != TDICE_ANALYSIS_TYPE_TRANSIENT)
@@ -427,9 +427,9 @@ SimResult_t emulate_step
 
 SimResult_t emulate_slot
 (
-    ThermalData      *tdata,
-    StackDescription *stkd,
-    Analysis         *analysis
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis
 )
 {
     SimResult_t result ;
@@ -448,9 +448,9 @@ SimResult_t emulate_slot
 
 SimResult_t emulate_steady
 (
-    ThermalData      *tdata,
-    StackDescription *stkd,
-    Analysis         *analysis
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis
 )
 {
     if (analysis->AnalysisType != TDICE_ANALYSIS_TYPE_STEADY)
@@ -496,9 +496,9 @@ SimResult_t emulate_steady
 
 Error_t update_coolant_flow_rate
 (
-  ThermalData      *tdata,
-  StackDescription *stkd,
-  CoolantFR_t       new_flow_rate
+  ThermalData_t      *tdata,
+  StackDescription_t *stkd,
+  CoolantFR_t         new_flow_rate
 )
 {
     stkd->Channel->Coolant.FlowRate = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
@@ -525,7 +525,7 @@ Error_t update_coolant_flow_rate
 
         FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-            (StackElement, stack_element, stkd->BottomStackElement)
+            (StackElement_t, stack_element, stkd->BottomStackElement)
 
             if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
 
@@ -548,11 +548,11 @@ Error_t update_coolant_flow_rate
 
 Temperature_t get_cell_temperature
 (
-    ThermalData      *tdata,
-    StackDescription *stkd,
-    CellIndex_t       layer_index,
-    CellIndex_t       row_index,
-    CellIndex_t       column_index
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd,
+    CellIndex_t         layer_index,
+    CellIndex_t         row_index,
+    CellIndex_t         column_index
 )
 {
     CellIndex_t id = get_cell_offset_in_stack
@@ -572,13 +572,13 @@ Temperature_t get_cell_temperature
 
 Error_t print_thermal_map
 (
-    ThermalData      *tdata,
-    StackDescription *stkd,
-    String_t          stack_element_id,
-    String_t          file_name
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd,
+    String_t            stack_element_id,
+    String_t            file_name
 )
 {
-    StackElement *stack_element = find_stack_element_in_list
+    StackElement_t *stack_element = find_stack_element_in_list
 
          (stkd->BottomStackElement, stack_element_id) ;
 

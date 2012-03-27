@@ -58,12 +58,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Analysis
+    /*! \struct Analysis_t
      *
      *  \brief Informations about the type of thermal simulation to be run and its initial settings
      */
 
-    struct Analysis
+    struct Analysis_t
     {
         /*! The analysis type */
 
@@ -92,23 +92,23 @@ extern "C"
         /*! Pointer to the list of inspection points to print
          *  at the end of the simulation */
 
-        InspectionPoint *InspectionPointListFinal ;
+        InspectionPoint_t *InspectionPointListFinal ;
 
         /*! Pointer to the list of inspection points to print
          *  at the end of the time slot */
 
-        InspectionPoint *InspectionPointListSlot ;
+        InspectionPoint_t *InspectionPointListSlot ;
 
         /*! Pointer to the list of inspection points to print
          *  at every time step */
 
-        InspectionPoint *InspectionPointListStep ;
+        InspectionPoint_t *InspectionPointListStep ;
 
     } ;
 
-    /*! Definition of the type Analysis */
+    /*! Definition of the type Analysis_t */
 
-    typedef struct Analysis Analysis ;
+    typedef struct Analysis_t Analysis_t;
 
 /******************************************************************************/
 
@@ -119,7 +119,7 @@ extern "C"
      * \param analysis the address of the structure to initialize
      */
 
-    void init_analysis (Analysis *analysis) ;
+    void init_analysis (Analysis_t *analysis) ;
 
 
 
@@ -130,7 +130,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Analysis *alloc_and_init_analysis (void) ;
+    Analysis_t *alloc_and_init_analysis (void) ;
 
 
 
@@ -141,7 +141,7 @@ extern "C"
      * \param analysis the address of the structure to free
      */
 
-    void free_analysis (Analysis *analysis) ;
+    void free_analysis (Analysis_t *analysis) ;
 
 
 
@@ -151,7 +151,7 @@ extern "C"
      * \return the simulated amount of time in seconds
      */
 
-    Time_t get_simulated_time (Analysis *analysis) ;
+    Time_t get_simulated_time (Analysis_t *analysis) ;
 
 
 
@@ -167,7 +167,7 @@ extern "C"
 
     Quantity_t get_number_of_inspection_points
 
-        (Analysis *analysis, OutputInstant_t instant, OutputType_t type) ;
+        (Analysis_t *analysis, OutputInstant_t instant, OutputType_t type) ;
 
 
 
@@ -181,7 +181,7 @@ extern "C"
      * \return \c FALSE otherwise
      */
 
-    bool slot_completed (Analysis *analysis) ;
+    bool slot_completed (Analysis_t *analysis) ;
 
 
 
@@ -194,7 +194,7 @@ extern "C"
 
     void print_formatted_analysis
 
-        (FILE *stream, String_t prefix, Analysis *analysis) ;
+        (FILE *stream, String_t prefix, Analysis_t *analysis) ;
 
 
 
@@ -207,7 +207,7 @@ extern "C"
 
     void print_detailed_analysis
 
-        (FILE *stream, String_t prefix, Analysis *analysis) ;
+        (FILE *stream, String_t prefix, Analysis_t *analysis) ;
 
 
 
@@ -219,7 +219,7 @@ extern "C"
 
     void add_inspection_point_to_analysis
 
-        (Analysis *analysis, InspectionPoint *inspection_point) ;
+        (Analysis_t *analysis, InspectionPoint_t *inspection_point) ;
 
 
 
@@ -238,7 +238,7 @@ extern "C"
 
     Error_t generate_analysis_headers
 
-        (Analysis* analysis, Dimensions *dimensions, String_t prefix) ;
+        (Analysis_t *analysis, Dimensions_t *dimensions, String_t prefix) ;
 
 
 
@@ -255,8 +255,8 @@ extern "C"
 
     Error_t generate_analysis_output
     (
-        Analysis        *analysis,
-        Dimensions      *dimensions,
+        Analysis_t      *analysis,
+        Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
         OutputInstant_t  output_instant
     ) ;
@@ -278,12 +278,12 @@ extern "C"
 
     Error_t fill_analysis_message
     (
-        Analysis        *analysis,
-        Dimensions      *dimensions,
-        Temperature_t   *temperatures,
-        OutputInstant_t  output_instant,
-        OutputType_t     type,
-        NetworkMessage  *message
+        Analysis_t       *analysis,
+        Dimensions_t     *dimensions,
+        Temperature_t    *temperatures,
+        OutputInstant_t   output_instant,
+        OutputType_t      type,
+        NetworkMessage_t *message
     ) ;
 
 /******************************************************************************/

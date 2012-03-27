@@ -54,15 +54,15 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Material
+    /*! \struct Material_t
      *
      *  \brief Structure used to store data about the materials that compose the 2D/3D stack.
      *
-     *  Materials are used when declaring layers composing a die or the
+     *  Material_ts are used when declaring layers composing a die or the
      *  stack or when declaring the properties of the walls in a channel.
      */
 
-    struct Material
+    struct Material_t
     {
         /*!
          * The identifier used to refer to the material in the stack file
@@ -95,13 +95,13 @@ extern "C"
          * Pointer to collect materials in a linked list
          */
 
-        struct Material *Next ;
+        struct Material_t *Next ;
     } ;
 
-    /*! Definition of the type Material
+    /*! Definition of the type Material_t
      */
 
-    typedef struct Material Material ;
+    typedef struct Material_t Material_t ;
 
 /******************************************************************************/
 
@@ -112,18 +112,18 @@ extern "C"
      * \param material the address of the material to initialize
      */
 
-    void init_material (Material *material) ;
+    void init_material (Material_t *material) ;
 
 
 
-    /*! Allocates a Material in memory and sets its fields to their default
+    /*! Allocates a Material_t in memory and sets its fields to their default
      *  value with \c init_material
      *
-     * \return the pointer to a new Material
+     * \return the pointer to a new Material_t
      * \return \c NULL if the memory allocation fails
      */
 
-    Material *alloc_and_init_material (void) ;
+    Material_t *alloc_and_init_material (void) ;
 
 
 
@@ -135,7 +135,7 @@ extern "C"
      * \param material the address of the material structure to free
      */
 
-    void free_material (Material *material) ;
+    void free_material (Material_t *material) ;
 
 
 
@@ -143,27 +143,27 @@ extern "C"
      *
      * If frees, calling \c free_material, the material pointed by the
      * parameter \a list and all the materials it finds following the
-     * linked list throught the field Material::Next.
+     * linked list throught the field Material_t::Next.
      *
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_materials_list (Material *list) ;
+    void free_materials_list (Material_t *list) ;
 
 
 
-    /*! Searches for a Material in a linked list of materials.
+    /*! Searches for a Material_t in a linked list of materials.
      *
-     * Id based search of a Material structure in a list.
+     * Id based search of a Material_t structure in a list.
      *
      * \param list the pointer to the list
      * \param id   the identifier of the material to be found
      *
-     * \return the address of a Material, if founded
+     * \return the address of a Material_t, if founded
      * \return \c NULL if the search fails
      */
 
-    Material *find_material_in_list (Material *list, String_t id) ;
+    Material_t *find_material_in_list (Material_t *list, String_t id) ;
 
 
 
@@ -176,7 +176,7 @@ extern "C"
 
     void print_formatted_material
 
-         (FILE *stream, String_t prefix, Material *material) ;
+         (FILE *stream, String_t prefix, Material_t *material) ;
 
 
 
@@ -189,7 +189,7 @@ extern "C"
 
     void print_formatted_materials_list
 
-         (FILE *stream, String_t prefix, Material *list) ;
+         (FILE *stream, String_t prefix, Material_t *list) ;
 
 
 
@@ -202,7 +202,7 @@ extern "C"
 
     void print_detailed_material
 
-         (FILE *stream, String_t prefix, Material *material) ;
+         (FILE *stream, String_t prefix, Material_t *material) ;
 
 
 
@@ -215,7 +215,7 @@ extern "C"
 
     void print_detailed_materials_list
 
-         (FILE *stream, String_t prefix, Material *list) ;
+         (FILE *stream, String_t prefix, Material_t *list) ;
 
 /******************************************************************************/
 

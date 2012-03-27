@@ -55,13 +55,13 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Socket
+    /*! \struct Socket_t
      *
      *  \brief Structure used to set up and use network connections
      *
      */
 
-    struct Socket
+    struct Socket_t
     {
         /*! The descriptor of the socket (like a unique id - file descriptor) */
 
@@ -80,9 +80,9 @@ extern "C"
         PortNumber_t PortNumber ;
     } ;
 
-    /*! Definition of the type Socket */
+    /*! Definition of the type Socket_t */
 
-    typedef struct Socket Socket ;
+    typedef struct Socket_t Socket_t ;
 
 
     /*! Initializes a socket
@@ -90,7 +90,7 @@ extern "C"
      * \param socket the address of the Socket to initialize
      */
 
-    void init_socket (Socket *socket) ;
+    void init_socket (Socket_t *socket) ;
 
 
 
@@ -103,7 +103,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t open_client_socket (Socket *client) ;
+    Error_t open_client_socket (Socket_t *client) ;
 
 
 
@@ -123,7 +123,7 @@ extern "C"
 
     Error_t open_server_socket
     (
-        Socket       *server,
+        Socket_t     *server,
         PortNumber_t  port_number
     ) ;
 
@@ -146,7 +146,7 @@ extern "C"
 
     Error_t connect_client_to_server
     (
-        Socket       *client,
+        Socket_t     *client,
         String_t      host_name,
         PortNumber_t  port_number
     ) ;
@@ -163,7 +163,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t wait_for_client (Socket *server, Socket *client) ;
+    Error_t wait_for_client (Socket_t *server, Socket_t *client) ;
 
 
 
@@ -179,8 +179,8 @@ extern "C"
 
     Error_t send_message_to_socket
     (
-        Socket         *socket,
-        NetworkMessage *message
+        Socket_t         *socket,
+        NetworkMessage_t *message
     ) ;
 
 
@@ -197,8 +197,8 @@ extern "C"
 
     Error_t receive_message_from_socket
     (
-        Socket         *socket,
-        NetworkMessage *message
+        Socket_t         *socket,
+        NetworkMessage_t *message
     ) ;
 
 
@@ -212,7 +212,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t close_socket (Socket *socket) ;
+    Error_t close_socket (Socket_t *socket) ;
 
 #ifdef __cplusplus
 }

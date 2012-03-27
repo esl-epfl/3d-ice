@@ -45,7 +45,7 @@
 /******************************************************************************/
 
 void
-init_stack_element (StackElement *stack_element)
+init_stack_element (StackElement_t *stack_element)
 {
     stack_element->Type            = TDICE_STACK_ELEMENT_NONE ;
     stack_element->Pointer.Layer   = NULL ;
@@ -61,9 +61,9 @@ init_stack_element (StackElement *stack_element)
 
 /******************************************************************************/
 
-StackElement *alloc_and_init_stack_element (void)
+StackElement_t *alloc_and_init_stack_element (void)
 {
-    StackElement *stack_element = (StackElement *) malloc (sizeof(StackElement)) ;
+    StackElement_t *stack_element = (StackElement_t *) malloc (sizeof(StackElement_t)) ;
 
     if (stack_element != NULL)
 
@@ -74,7 +74,7 @@ StackElement *alloc_and_init_stack_element (void)
 
 /******************************************************************************/
 
-void free_stack_element (StackElement *stack_element)
+void free_stack_element (StackElement_t *stack_element)
 {
     if (   stack_element->Type == TDICE_STACK_ELEMENT_DIE
         && stack_element->Floorplan != NULL)
@@ -92,16 +92,16 @@ void free_stack_element (StackElement *stack_element)
 
 /******************************************************************************/
 
-void free_stack_elements_list (StackElement *list)
+void free_stack_elements_list (StackElement_t *list)
 {
-    FREE_LIST (StackElement, list, free_stack_element) ;
+    FREE_LIST (StackElement_t, list, free_stack_element) ;
 }
 
 /******************************************************************************/
 
-StackElement *find_stack_element_in_list (StackElement *list, String_t id)
+StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement, stk_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stk_el, list)
     {
         if (strcmp(stk_el->Id, id) == 0)  break ;
     }
@@ -112,15 +112,15 @@ StackElement *find_stack_element_in_list (StackElement *list, String_t id)
 
 void print_formatted_stack_elements_list
 (
-    FILE         *stream,
-    String_t      prefix,
-    StackElement *list
+    FILE           *stream,
+    String_t        prefix,
+    StackElement_t *list
 )
 {
     Quantity_t max_stk_el_id_length = 0 ;
     Quantity_t max_die_id_length = 0 ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stk_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stk_el, list)
     {
         max_stk_el_id_length =
 
@@ -135,7 +135,7 @@ void print_formatted_stack_elements_list
 
     fprintf (stream, "%sstack : \n", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stack_element, list)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stack_element, list)
     {
         switch (stack_element->Type)
         {
@@ -182,9 +182,9 @@ void print_formatted_stack_elements_list
 
 void print_detailed_stack_elements_list
 (
-    FILE         *stream,
-    String_t      prefix,
-    StackElement *list
+    FILE           *stream,
+    String_t        prefix,
+    StackElement_t *list
 )
 {
     String_t new_prefix =
@@ -195,7 +195,7 @@ void print_detailed_stack_elements_list
 
     sprintf (new_prefix, "%s    ", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement, stk_el, list)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stk_el, list)
     {
         fprintf (stream,
             "%sstk_el                      = %p\n",
@@ -263,7 +263,7 @@ void print_detailed_stack_elements_list
 
 /******************************************************************************/
 
-CellIndex_t get_source_layer_offset (StackElement *stack_element)
+CellIndex_t get_source_layer_offset (StackElement_t *stack_element)
 {
     CellIndex_t layer_offset = stack_element->Offset ;
 
@@ -282,10 +282,10 @@ CellIndex_t get_source_layer_offset (StackElement *stack_element)
 
 void fill_thermal_cell_stack_element
 (
-    ThermalCell  *thermal_cells,
-    Time_t        delta_time,
-    Dimensions   *dimensions,
-    StackElement *stack_element
+    ThermalCell_t  *thermal_cells,
+    Time_t          delta_time,
+    Dimensions_t   *dimensions,
+    StackElement_t *stack_element
 )
 {
     switch (stack_element->Type)
@@ -333,9 +333,9 @@ void fill_thermal_cell_stack_element
 
 Error_t fill_sources_stack_element
 (
-    Source_t     *sources,
-    Dimensions   *dimensions,
-    StackElement *stack_element
+    Source_t       *sources,
+    Dimensions_t   *dimensions,
+    StackElement_t *stack_element
 )
 {
     Error_t toreturn = TDICE_SUCCESS ;
@@ -380,12 +380,12 @@ Error_t fill_sources_stack_element
 
 /******************************************************************************/
 
-SystemMatrix fill_system_matrix_stack_element
+SystemMatrix_t fill_system_matrix_stack_element
 (
-    SystemMatrix  system_matrix,
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    StackElement *stack_element
+    SystemMatrix_t    system_matrix,
+    Dimensions_t     *dimensions,
+    ThermalCell_t    *thermal_cells,
+    StackElement_t   *stack_element
 )
 {
     switch (stack_element->Type)
@@ -434,10 +434,10 @@ SystemMatrix fill_system_matrix_stack_element
 
 void print_thermal_map_stack_element
 (
-    StackElement  *stack_element,
-    Dimensions    *dimensions,
-    Temperature_t *temperatures,
-    FILE          *stream
+    StackElement_t  *stack_element,
+    Dimensions_t    *dimensions,
+    Temperature_t   *temperatures,
+    FILE            *stream
 )
 {
     temperatures += get_cell_offset_in_stack
@@ -459,7 +459,7 @@ void print_thermal_map_stack_element
 
 Quantity_t get_number_of_floorplan_elements_stack_element
 (
-    StackElement *stack_element
+    StackElement_t *stack_element
 )
 {
     if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
@@ -475,10 +475,10 @@ Quantity_t get_number_of_floorplan_elements_stack_element
 
 /******************************************************************************/
 
-FloorplanElement *get_floorplan_element_stack_element
+FloorplanElement_t *get_floorplan_element_stack_element
 (
-    StackElement *stack_element,
-    String_t      floorplan_element_id
+    StackElement_t *stack_element,
+    String_t        floorplan_element_id
 )
 {
     if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)
@@ -494,8 +494,8 @@ FloorplanElement *get_floorplan_element_stack_element
 
 Error_t insert_power_values_stack_element
 (
-    StackElement *stack_element,
-    PowersQueue  *pvalues
+    StackElement_t *stack_element,
+    PowersQueue_t  *pvalues
 )
 {
     if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)

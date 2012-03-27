@@ -58,13 +58,13 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct FloorplanElement
+    /*! \struct FloorplanElement_t
      *  \brief  Structure containing information about a floorplan element
      *
      *  Floorplan elements represent ...
      */
 
-    struct FloorplanElement
+    struct FloorplanElement_t
     {
         /*! The id (string) to identifiy the floorplan element */
 
@@ -76,7 +76,7 @@ extern "C"
 
         /*! The list of IC elements that defines the surface of the floorplan element */
 
-        ICElement *ICElementsList ;
+        ICElement_t *ICElementsList ;
 
         /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
          *  computed as the sum of the effective area of each ic element */
@@ -86,17 +86,17 @@ extern "C"
         /*! The list of power values representing the power consumption of
          *  the floorplan element during the thermal simulation */
 
-        PowersQueue *PowerValues ;
+        PowersQueue_t *PowerValues ;
 
         /*! Pointer to collect floorplan elements in a linked list */
 
-        struct FloorplanElement *Next ;
+        struct FloorplanElement_t *Next ;
 
     } ;
 
-    /*! Definition of the type FloorplanElement */
+    /*! Definition of the type FloorplanElement_t */
 
-    typedef struct FloorplanElement FloorplanElement ;
+    typedef struct FloorplanElement_t FloorplanElement_t ;
 
 /******************************************************************************/
 
@@ -107,7 +107,7 @@ extern "C"
      * \param floorplan_element the address of the flooprlan element to initialize
      */
 
-    void init_floorplan_element (FloorplanElement *floorplan_element) ;
+    void init_floorplan_element (FloorplanElement_t *floorplan_element) ;
 
 
 
@@ -118,7 +118,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    FloorplanElement *alloc_and_init_floorplan_element (void) ;
+    FloorplanElement_t *alloc_and_init_floorplan_element (void) ;
 
 
 
@@ -130,7 +130,7 @@ extern "C"
      * \param floorplan_element the address of the floorplan element structure to free
      */
 
-    void free_floorplan_element (FloorplanElement *floorplan_element) ;
+    void free_floorplan_element (FloorplanElement_t *floorplan_element) ;
 
 
 
@@ -143,7 +143,7 @@ extern "C"
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_floorplan_elements_list (FloorplanElement *list) ;
+    void free_floorplan_elements_list (FloorplanElement_t *list) ;
 
 
 
@@ -158,9 +158,9 @@ extern "C"
      * \return \c NULL if the search fails
      */
 
-    FloorplanElement *find_floorplan_element_in_list
+    FloorplanElement_t *find_floorplan_element_in_list
 
-        (FloorplanElement *list, String_t id) ;
+        (FloorplanElement_t *list, String_t id) ;
 
 
 
@@ -173,7 +173,7 @@ extern "C"
 
     void print_formatted_floorplan_element
 
-        (FILE *stream, String_t prefix, FloorplanElement *floorplan_element) ;
+        (FILE *stream, String_t prefix, FloorplanElement_t *floorplan_element) ;
 
 
 
@@ -186,7 +186,7 @@ extern "C"
 
     void print_formatted_floorplan_elements_list
 
-        (FILE *stream, String_t prefix, FloorplanElement *list) ;
+        (FILE *stream, String_t prefix, FloorplanElement_t *list) ;
 
 
 
@@ -199,7 +199,7 @@ extern "C"
 
     void print_detailed_floorplan_element
 
-        (FILE *stream, String_t prefix, FloorplanElement *floorplan_element) ;
+        (FILE *stream, String_t prefix, FloorplanElement_t *floorplan_element) ;
 
 
 
@@ -212,7 +212,7 @@ extern "C"
 
     void print_detailed_floorplan_elements_list
 
-        (FILE *stream, String_t prefix, FloorplanElement *list) ;
+        (FILE *stream, String_t prefix, FloorplanElement_t *list) ;
 
 
 
@@ -232,9 +232,9 @@ extern "C"
 
     Error_t fill_sources_floorplan_element
     (
-        Source_t         *sources,
-        Dimensions       *dimensions,
-        FloorplanElement *floorplan_element
+        Source_t           *sources,
+        Dimensions_t       *dimensions,
+        FloorplanElement_t *floorplan_element
     ) ;
 
 
@@ -253,9 +253,9 @@ extern "C"
 
     Temperature_t get_max_temperature_floorplan_element
     (
-        FloorplanElement *floorplan_element,
-        Dimensions       *dimensions,
-        Temperature_t    *temperatures
+        FloorplanElement_t *floorplan_element,
+        Dimensions_t       *dimensions,
+        Temperature_t      *temperatures
     ) ;
 
 
@@ -274,9 +274,9 @@ extern "C"
 
     Temperature_t get_min_temperature_floorplan_element
     (
-        FloorplanElement *floorplan_element,
-        Dimensions       *dimensions,
-        Temperature_t    *temperatures
+        FloorplanElement_t *floorplan_element,
+        Dimensions_t       *dimensions,
+        Temperature_t      *temperatures
     ) ;
 
 
@@ -295,9 +295,9 @@ extern "C"
 
     Temperature_t get_avg_temperature_floorplan_element
     (
-        FloorplanElement *floorplan_element,
-        Dimensions       *dimensions,
-        Temperature_t    *temperatures
+        FloorplanElement_t *floorplan_element,
+        Dimensions_t       *dimensions,
+        Temperature_t      *temperatures
     ) ;
 
 
@@ -315,7 +315,7 @@ extern "C"
 
     Error_t insert_power_values_floorplan_element
 
-        (FloorplanElement *floorplan_element, PowersQueue *pvalues) ;
+        (FloorplanElement_t *floorplan_element, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

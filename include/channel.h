@@ -59,14 +59,14 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Channel
+    /*! \struct Channel_t
      *
      *  \brief Structure used to store data about the channel that compose the 2D/3D stack.
      *
      *  Channel is one of the elements that can be used to build a 3d stack
      */
 
-    struct Channel
+    struct Channel_t
     {
         /*! The channel model (4rm - 2rm) */
 
@@ -106,13 +106,13 @@ extern "C"
 
         /*! The material composing the wall */
 
-        Material *WallMaterial ;
+        Material_t *WallMaterial ;
 
     } ;
 
-    /*! Definition of the type Channel */
+    /*! Definition of the type Channel_t */
 
-    typedef struct Channel Channel ;
+    typedef struct Channel_t Channel_t ;
 
 /******************************************************************************/
 
@@ -123,7 +123,7 @@ extern "C"
      * \param channel the address of the channel to initialize
      */
 
-    void init_channel (Channel *channel) ;
+    void init_channel (Channel_t *channel) ;
 
 
 
@@ -134,7 +134,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Channel *alloc_and_init_channel (void) ;
+    Channel_t *alloc_and_init_channel (void) ;
 
 
     /*! Frees the memory related to \a channel
@@ -145,7 +145,7 @@ extern "C"
      * \param channel the address of the channel structure to free
      */
 
-    void free_channel (Channel *channel) ;
+    void free_channel (Channel_t *channel) ;
 
 
 
@@ -159,7 +159,7 @@ extern "C"
 
     void print_formatted_channel
 
-        (FILE *stream, String_t prefix, Channel *channel, Dimensions *dimensions) ;
+        (FILE *stream, String_t prefix, Channel_t *channel, Dimensions_t *dimensions) ;
 
 
 
@@ -172,7 +172,7 @@ extern "C"
 
     void print_detailed_channel
 
-        (FILE *stream, String_t prefix, Channel *channel) ;
+        (FILE *stream, String_t prefix, Channel_t *channel) ;
 
     /*! Fills the thermal cells corresponding to a channel
      *
@@ -185,11 +185,11 @@ extern "C"
 
     void fill_thermal_cell_channel
     (
-        ThermalCell     *thermal_cells,
+        ThermalCell_t   *thermal_cells,
         Time_t           delta_time,
-        Dimensions      *dimensions,
+        Dimensions_t    *dimensions,
         CellIndex_t      layer_index,
-        Channel         *channel
+        Channel_t       *channel
     ) ;
 
 
@@ -204,10 +204,10 @@ extern "C"
 
     void fill_sources_channel
     (
-        Source_t    *sources,
-        Dimensions  *dimensions,
-        CellIndex_t  layer_index,
-        Channel     *channel
+        Source_t     *sources,
+        Dimensions_t *dimensions,
+        CellIndex_t   layer_index,
+        Channel_t    *channel
     ) ;
 
 
@@ -223,13 +223,13 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix fill_system_matrix_channel
+    SystemMatrix_t fill_system_matrix_channel
     (
-        Channel      *channel,
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
-        CellIndex_t   layer_index,
-        SystemMatrix  system_matrix
+        Channel_t      *channel,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
+        CellIndex_t     layer_index,
+        SystemMatrix_t  system_matrix
     ) ;
 
 
@@ -246,7 +246,7 @@ extern "C"
 
     Temperature_t get_max_temperature_channel_outlet
 
-        (Channel *channel, Dimensions *dimensions, Temperature_t *temperatures) ;
+        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
 
 
 
@@ -262,7 +262,7 @@ extern "C"
 
     Temperature_t get_min_temperature_channel_outlet
 
-        (Channel *channel, Dimensions *dimensions, Temperature_t *temperatures) ;
+        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
 
 
 
@@ -278,7 +278,7 @@ extern "C"
 
     Temperature_t get_avg_temperature_channel_outlet
 
-        (Channel *channel, Dimensions *dimensions, Temperature_t *temperatures) ;
+        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
 
 /******************************************************************************/
 

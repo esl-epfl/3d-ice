@@ -44,7 +44,7 @@
 
 /******************************************************************************/
 
-void init_material (Material *material)
+void init_material (Material_t *material)
 {
     material->Id                     = NULL ;
     material->Used                   = 0u ;
@@ -55,9 +55,9 @@ void init_material (Material *material)
 
 /******************************************************************************/
 
-Material *alloc_and_init_material (void)
+Material_t *alloc_and_init_material (void)
 {
-    Material *material = (Material *) malloc (sizeof(Material)) ;
+    Material_t *material = (Material_t *) malloc (sizeof(Material_t)) ;
 
     if (material != NULL)
 
@@ -68,7 +68,7 @@ Material *alloc_and_init_material (void)
 
 /******************************************************************************/
 
-void free_material (Material *material)
+void free_material (Material_t *material)
 {
     if (material->Id != NULL)
 
@@ -79,16 +79,16 @@ void free_material (Material *material)
 
 /******************************************************************************/
 
-void free_materials_list (Material *list)
+void free_materials_list (Material_t *list)
 {
-    FREE_LIST (Material, list, free_material) ;
+    FREE_LIST (Material_t, list, free_material) ;
 }
 
 /******************************************************************************/
 
-Material *find_material_in_list (Material *list, String_t id)
+Material_t *find_material_in_list (Material_t *list, String_t id)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
     {
         if (strcmp(material->Id, id) == 0)
             break ;
@@ -100,9 +100,9 @@ Material *find_material_in_list (Material *list, String_t id)
 
 void print_formatted_material
 (
-    FILE     *stream,
-    String_t  prefix,
-    Material *material
+    FILE       *stream,
+    String_t    prefix,
+    Material_t *material
 )
 {
     fprintf (stream,
@@ -122,12 +122,12 @@ void print_formatted_material
 
 void print_formatted_materials_list
 (
-    FILE     *stream,
-    String_t  prefix,
-    Material *list
+    FILE       *stream,
+    String_t    prefix,
+    Material_t *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
     {
         if (material->Next == NULL)
 
@@ -145,9 +145,9 @@ void print_formatted_materials_list
 
 void print_detailed_material
 (
-    FILE     *stream,
-    String_t  prefix,
-    Material *material
+    FILE       *stream,
+    String_t    prefix,
+    Material_t *material
 )
 {
     fprintf (stream,
@@ -179,12 +179,12 @@ void print_detailed_material
 
 void print_detailed_materials_list
 (
-    FILE     *stream,
-    String_t  prefix,
-    Material *list
+    FILE       *stream,
+    String_t    prefix,
+    Material_t *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
     {
         if (material->Next == NULL)
 

@@ -45,7 +45,7 @@
 
 /******************************************************************************/
 
-void init_tcell (Tcell *tcell)
+void init_tcell (Tcell_t *tcell)
 {
     tcell->Xval        = 0.0 ;
     tcell->ActualXval  = 0.0 ;
@@ -57,9 +57,9 @@ void init_tcell (Tcell *tcell)
 
 /******************************************************************************/
 
-Tcell *alloc_and_init_tcell (void)
+Tcell_t *alloc_and_init_tcell (void)
 {
-    Tcell *tcell = (Tcell *) malloc (sizeof(Tcell)) ;
+    Tcell_t *tcell = (Tcell_t *) malloc (sizeof(Tcell_t)) ;
 
     if (tcell != NULL)
 
@@ -70,14 +70,14 @@ Tcell *alloc_and_init_tcell (void)
 
 /******************************************************************************/
 
-void free_tcell (Tcell *tcell)
+void free_tcell (Tcell_t *tcell)
 {
     FREE_POINTER(free, tcell) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_tcell (FILE  *stream, String_t prefix, Tcell *tcell)
+void print_detailed_tcell (FILE *stream, String_t prefix, Tcell_t *tcell)
 {
     fprintf (stream,
         "%sTcell                   = %p\n",
@@ -112,10 +112,10 @@ void print_detailed_tcell (FILE  *stream, String_t prefix, Tcell *tcell)
 
 void align_tcell
 (
-    Tcell           *tcell,
+    Tcell_t         *tcell,
     ChipDimension_t  xval,
     ChipDimension_t  yval,
-    Dimensions      *dimensions
+    Dimensions_t    *dimensions
 )
 {
     FOR_EVERY_ROW (row_index, dimensions)
@@ -151,16 +151,16 @@ void align_tcell
 /******************************************************************************/
 /******************************************************************************/
 
-void init_tflp (Tflp *tflp)
+void init_tflp (Tflp_t *tflp)
 {
     tflp->Quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 }
 
 /******************************************************************************/
 
-Tflp *alloc_and_init_tflp (void)
+Tflp_t *alloc_and_init_tflp (void)
 {
-    Tflp *tflp = (Tflp *) malloc (sizeof(Tflp)) ;
+    Tflp_t *tflp = (Tflp_t *) malloc (sizeof(Tflp_t)) ;
 
     if (tflp != NULL)
 
@@ -171,14 +171,14 @@ Tflp *alloc_and_init_tflp (void)
 
 /******************************************************************************/
 
-void free_tflp (Tflp *tflp)
+void free_tflp (Tflp_t *tflp)
 {
     FREE_POINTER(free, tflp) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_tflp (FILE  *stream, String_t prefix, Tflp *tflp)
+void print_detailed_tflp (FILE *stream, String_t prefix, Tflp_t *tflp)
 {
     fprintf (stream,
         "%sTflp                    = %p\n",
@@ -193,7 +193,7 @@ void print_detailed_tflp (FILE  *stream, String_t prefix, Tflp *tflp)
 /******************************************************************************/
 /******************************************************************************/
 
-void init_tflpel (Tflpel *tflpel)
+void init_tflpel (Tflpel_t *tflpel)
 {
     tflpel->FloorplanElement = NULL ;
     tflpel->Quantity         = TDICE_OUTPUT_QUANTITY_NONE ;
@@ -201,9 +201,9 @@ void init_tflpel (Tflpel *tflpel)
 
 /******************************************************************************/
 
-Tflpel *alloc_and_init_tflpel (void)
+Tflpel_t *alloc_and_init_tflpel (void)
 {
-    Tflpel *tflpel = (Tflpel *) malloc (sizeof(Tflpel)) ;
+    Tflpel_t *tflpel = (Tflpel_t *) malloc (sizeof(Tflpel_t)) ;
 
     if (tflpel != NULL)
 
@@ -214,14 +214,14 @@ Tflpel *alloc_and_init_tflpel (void)
 
 /******************************************************************************/
 
-void free_tflpel (Tflpel *tflpel)
+void free_tflpel (Tflpel_t *tflpel)
 {
     FREE_POINTER(free, tflpel) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_tflpel (FILE  *stream, String_t prefix, Tflpel *tflpel)
+void print_detailed_tflpel (FILE *stream, String_t prefix, Tflpel_t *tflpel)
 {
     fprintf (stream,
         "%sTflpel                  = %p\n",
@@ -240,16 +240,16 @@ void print_detailed_tflpel (FILE  *stream, String_t prefix, Tflpel *tflpel)
 /******************************************************************************/
 /******************************************************************************/
 
-void init_tcoolant (Tcoolant *tcoolant)
+void init_tcoolant (Tcoolant_t *tcoolant)
 {
     tcoolant->Quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 }
 
 /******************************************************************************/
 
-Tcoolant *alloc_and_init_tcoolant (void)
+Tcoolant_t *alloc_and_init_tcoolant (void)
 {
-    Tcoolant *tcoolant = (Tcoolant *) malloc (sizeof(Tcoolant)) ;
+    Tcoolant_t *tcoolant = (Tcoolant_t *) malloc (sizeof(Tcoolant_t)) ;
 
     if (tcoolant != NULL)
 
@@ -260,14 +260,14 @@ Tcoolant *alloc_and_init_tcoolant (void)
 
 /******************************************************************************/
 
-void free_tcoolant (Tcoolant *tcoolant)
+void free_tcoolant (Tcoolant_t *tcoolant)
 {
     FREE_POINTER (free, tcoolant) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_tcoolant (FILE *stream, String_t prefix, Tcoolant *tcoolant)
+void print_detailed_tcoolant (FILE *stream, String_t prefix, Tcoolant_t *tcoolant)
 {
     fprintf (stream,
         "%sTcoolant                = %p\n",
@@ -282,7 +282,7 @@ void print_detailed_tcoolant (FILE *stream, String_t prefix, Tcoolant *tcoolant)
 /******************************************************************************/
 /******************************************************************************/
 
-void init_inspection_point (InspectionPoint *inspection_point)
+void init_inspection_point (InspectionPoint_t *inspection_point)
 {
     inspection_point->Type             = TDICE_OUTPUT_TYPE_NONE ;
     inspection_point->Instant          = TDICE_OUTPUT_INSTANT_NONE ;
@@ -297,9 +297,9 @@ void init_inspection_point (InspectionPoint *inspection_point)
 
 /******************************************************************************/
 
-InspectionPoint *alloc_and_init_inspection_point (void)
+InspectionPoint_t *alloc_and_init_inspection_point (void)
 {
-    InspectionPoint *inspection_point = (InspectionPoint *) malloc (sizeof(InspectionPoint)) ;
+    InspectionPoint_t *inspection_point = (InspectionPoint_t *) malloc (sizeof(InspectionPoint_t)) ;
 
     if (inspection_point != NULL)
 
@@ -310,7 +310,7 @@ InspectionPoint *alloc_and_init_inspection_point (void)
 
 /******************************************************************************/
 
-void free_inspection_point (InspectionPoint *inspection_point)
+void free_inspection_point (InspectionPoint_t *inspection_point)
 {
     if (   inspection_point->Type == TDICE_OUTPUT_TYPE_TCELL
         && inspection_point->Pointer.Tcell != NULL)
@@ -340,21 +340,21 @@ void free_inspection_point (InspectionPoint *inspection_point)
 
 /******************************************************************************/
 
-void free_inspection_point_list (InspectionPoint *list)
+void free_inspection_point_list (InspectionPoint_t *list)
 {
-    FREE_LIST (InspectionPoint, list, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, list, free_inspection_point) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_inspection_point_list
 (
-    FILE            *stream,
-    String_t         prefix,
-    InspectionPoint *list
+    FILE              *stream,
+    String_t           prefix,
+    InspectionPoint_t *list
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, inspection_point, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, inspection_point, list)
     {
         switch (inspection_point->Type)
         {
@@ -462,9 +462,9 @@ void print_formatted_inspection_point_list
 
 void print_detailed_inspection_point_list
 (
-    FILE            *stream,
-    String_t         prefix,
-    InspectionPoint *list
+    FILE              *stream,
+    String_t           prefix,
+    InspectionPoint_t *list
 )
 {
     String_t new_prefix =
@@ -475,7 +475,7 @@ void print_detailed_inspection_point_list
 
     sprintf (new_prefix, "%s    ", prefix) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
     {
         fprintf (stream,
             "%sinspection_point                = %p\n",
@@ -585,9 +585,9 @@ void print_detailed_inspection_point_list
 
 Error_t generate_inspection_point_header
 (
-    InspectionPoint *inspection_point,
-    Dimensions      *dimensions,
-    String_t         prefix
+    InspectionPoint_t *inspection_point,
+    Dimensions_t      *dimensions,
+    String_t           prefix
 )
 {
     FILE *output_stream = fopen (inspection_point->FileName, "w") ;
@@ -666,7 +666,7 @@ Error_t generate_inspection_point_header
 
             FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-            (FloorplanElement, flp_el, inspection_point->StackElement->Floorplan->ElementsList)
+            (FloorplanElement_t, flp_el, inspection_point->StackElement->Floorplan->ElementsList)
 
                 fprintf (output_stream, "%s(K) \t ", flp_el->Id);
 
@@ -775,10 +775,10 @@ header_error :
 
 Error_t generate_inspection_point_output
 (
-    InspectionPoint *inspection_point,
-    Dimensions      *dimensions,
-    Temperature_t   *temperatures,
-    Time_t           current_time
+    InspectionPoint_t *inspection_point,
+    Dimensions_t      *dimensions,
+    Temperature_t     *temperatures,
+    Time_t             current_time
 )
 {
     Quantity_t index, n_flp_el ;
@@ -949,10 +949,10 @@ output_error :
 
 void fill_message_inspection_point
 (
-    InspectionPoint *inspection_point,
-    Dimensions      *dimensions,
-    Temperature_t   *temperatures,
-    NetworkMessage  *message
+    InspectionPoint_t *inspection_point,
+    Dimensions_t      *dimensions,
+    Temperature_t     *temperatures,
+    NetworkMessage_t  *message
 )
 {
     switch (inspection_point->Type)

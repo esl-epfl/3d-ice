@@ -49,7 +49,7 @@
 
 /******************************************************************************/
 
-void init_socket (Socket *socket)
+void init_socket (Socket_t *socket)
 {
     socket->Id = 0 ;
 
@@ -62,7 +62,7 @@ void init_socket (Socket *socket)
 
 /******************************************************************************/
 
-Error_t open_client_socket (Socket *client)
+Error_t open_client_socket (Socket_t *client)
 {
     client->Id = socket (AF_INET, SOCK_STREAM, 0) ;
 
@@ -80,7 +80,7 @@ Error_t open_client_socket (Socket *client)
 
 Error_t open_server_socket
 (
-    Socket       *server,
+    Socket_t     *server,
     PortNumber_t  port_number
 )
 {
@@ -123,7 +123,7 @@ Error_t open_server_socket
 
 Error_t connect_client_to_server
 (
-    Socket       *client,
+    Socket_t     *client,
     String_t      host_name,
     PortNumber_t  port_number
 )
@@ -159,7 +159,7 @@ Error_t connect_client_to_server
 
 /******************************************************************************/
 
-Error_t wait_for_client (Socket *server, Socket *client)
+Error_t wait_for_client (Socket_t *server, Socket_t *client)
 {
     socklen_t length = sizeof (struct sockaddr_in) ;
 
@@ -196,8 +196,8 @@ Error_t wait_for_client (Socket *server, Socket *client)
 
 Error_t send_message_to_socket
 (
-    Socket         *socket,
-    NetworkMessage *message
+    Socket_t         *socket,
+    NetworkMessage_t *message
 )
 {
     // length stores the total number of bytes to send
@@ -248,8 +248,8 @@ Error_t send_message_to_socket
 
 Error_t receive_message_from_socket
 (
-    Socket         *socket,
-    NetworkMessage *message
+    Socket_t         *socket,
+    NetworkMessage_t *message
 )
 {
     MessageWord_t message_length ;
@@ -315,7 +315,7 @@ Error_t receive_message_from_socket
 
 /******************************************************************************/
 
-Error_t close_socket (Socket *socket)
+Error_t close_socket (Socket_t *socket)
 {
     if (close (socket->Id) != 0)
     {

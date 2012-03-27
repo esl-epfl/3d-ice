@@ -60,14 +60,14 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Die
+    /*! \struct Die_t
      *
      *  \brief Structure used to store data about the dies that compose the 2D/3D stack.
      *
      *  Dies are one of the elements that can be used to build a 3d stack
      */
 
-    struct Die
+    struct Die_t
     {
         /*! The id (string) of the die */
 
@@ -88,25 +88,25 @@ extern "C"
 
         /*! Pointer to the top-most layer */
 
-        Layer *TopLayer ;
+        Layer_t *TopLayer ;
 
         /*! Pointer to the source layer */
 
-        Layer *SourceLayer ;
+        Layer_t *SourceLayer ;
 
         /*! Pointer to the bottom-most layer */
 
-        Layer *BottomLayer ;
+        Layer_t *BottomLayer ;
 
         /*! To collect dies in a linked list */
 
-        struct Die *Next ;
+        struct Die_t *Next ;
 
     } ;
 
-    /*! Definition of the type Die */
+    /*! Definition of the type Die_t */
 
-    typedef struct Die Die ;
+    typedef struct Die_t Die_t ;
 
 /******************************************************************************/
 
@@ -117,7 +117,7 @@ extern "C"
      * \param die the address of the die to initialize
      */
 
-    void init_die (Die *die) ;
+    void init_die (Die_t *die) ;
 
 
 
@@ -128,7 +128,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Die *alloc_and_init_die (void) ;
+    Die_t *alloc_and_init_die (void) ;
 
 
 
@@ -140,7 +140,7 @@ extern "C"
      * \param die the address of the die structure to free
      */
 
-    void free_die (Die *die) ;
+    void free_die (Die_t *die) ;
 
 
 
@@ -153,7 +153,7 @@ extern "C"
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_dies_list (Die *list) ;
+    void free_dies_list (Die_t *list) ;
 
 
 
@@ -168,7 +168,7 @@ extern "C"
      * \return \c NULL if the search fails
      */
 
-    Die *find_die_in_list (Die *list, String_t id) ;
+    Die_t *find_die_in_list (Die_t *list, String_t id) ;
 
 
 
@@ -179,7 +179,7 @@ extern "C"
      * \param die    the die to print
      */
 
-    void print_formatted_die (FILE *stream, String_t prefix, Die *die) ;
+    void print_formatted_die (FILE *stream, String_t prefix, Die_t *die) ;
 
 
 
@@ -190,7 +190,7 @@ extern "C"
      * \param list   the pointer to the first die in the list
      */
 
-    void print_formatted_dies_list (FILE *stream, String_t prefix, Die *list) ;
+    void print_formatted_dies_list (FILE *stream, String_t prefix, Die_t *list) ;
 
 
 
@@ -201,7 +201,7 @@ extern "C"
      * \param die    the die to print
      */
 
-    void print_detailed_die (FILE *stream, String_t prefix, Die *die) ;
+    void print_detailed_die (FILE *stream, String_t prefix, Die_t *die) ;
 
 
 
@@ -212,7 +212,7 @@ extern "C"
      * \param list   the pointer to the first die in the list
      */
 
-    void print_detailed_dies_list (FILE *stream, String_t prefix, Die *list) ;
+    void print_detailed_dies_list (FILE *stream, String_t prefix, Die_t *list) ;
 
 
 
@@ -227,11 +227,11 @@ extern "C"
 
     void fill_thermal_cell_die
     (
-        ThermalCell *thermal_cells,
-        Time_t       delta_time,
-        Dimensions  *dimensions,
-        CellIndex_t  layer_index,
-        Die         *die
+        ThermalCell_t *thermal_cells,
+        Time_t         delta_time,
+        Dimensions_t  *dimensions,
+        CellIndex_t    layer_index,
+        Die_t         *die
     ) ;
 
 
@@ -252,11 +252,11 @@ extern "C"
 
     Error_t fill_sources_die
     (
-        Source_t   *sources,
-        Dimensions *dimensions,
-        CellIndex_t layer_index,
-        Floorplan  *floorplan,
-        Die        *die
+        Source_t     *sources,
+        Dimensions_t *dimensions,
+        CellIndex_t   layer_index,
+        Floorplan_t  *floorplan,
+        Die_t        *die
     ) ;
 
 
@@ -272,13 +272,13 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix fill_system_matrix_die
+    SystemMatrix_t fill_system_matrix_die
     (
-        Die          *die,
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
-        CellIndex_t   layer_index,
-        SystemMatrix  system_matrix
+        Die_t          *die,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
+        CellIndex_t     layer_index,
+        SystemMatrix_t  system_matrix
     ) ;
 
 /******************************************************************************/

@@ -51,12 +51,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct ICElement
+    /*! \struct ICElement_t
      *
      *  A rectangle that represent the surface occupied by a flooprlan element
      */
 
-    struct ICElement
+    struct ICElement_t
     {
         /*! The south-west X coordinate, in \f$ \mu m \f$ */
 
@@ -108,13 +108,13 @@ extern "C"
 
         /*! pointer to collect IC elements in a linked list */
 
-        struct ICElement *Next ;
+        struct ICElement_t *Next ;
 
     } ;
 
-    /*! Definition of the type ICElement */
+    /*! Definition of the type ICElement_t */
 
-    typedef struct ICElement ICElement ;
+    typedef struct ICElement_t ICElement_t ;
 
 /******************************************************************************/
 
@@ -123,7 +123,7 @@ extern "C"
      * \param icelement the address of the ic element to initialize
      */
 
-    void init_ic_element (ICElement *icelement) ;
+    void init_ic_element (ICElement_t *icelement) ;
 
 
 
@@ -134,7 +134,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    ICElement *alloc_and_init_ic_element (void) ;
+    ICElement_t *alloc_and_init_ic_element (void) ;
 
 
 
@@ -146,7 +146,7 @@ extern "C"
      * \param icelement the address of the ic element structure to free
      */
 
-    void free_ic_element (ICElement *icelement) ;
+    void free_ic_element (ICElement_t *icelement) ;
 
 
 
@@ -159,7 +159,7 @@ extern "C"
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_ic_elements_list (ICElement *list) ;
+    void free_ic_elements_list (ICElement_t *list) ;
 
 
 
@@ -172,7 +172,7 @@ extern "C"
 
     void print_detailed_ic_element
 
-        (FILE *stream, String_t prefix, ICElement *icelement) ;
+        (FILE *stream, String_t prefix, ICElement_t *icelement) ;
 
 
 
@@ -185,7 +185,7 @@ extern "C"
 
     void print_detailed_ic_elements_list
 
-        (FILE *stream, String_t prefix, ICElement *list) ;
+        (FILE *stream, String_t prefix, ICElement_t *list) ;
 
 
 
@@ -198,7 +198,7 @@ extern "C"
 
     void print_formatted_ic_element
 
-        (FILE *stream, String_t prefix, ICElement *icelement) ;
+        (FILE *stream, String_t prefix, ICElement_t *icelement) ;
 
 
 
@@ -211,7 +211,7 @@ extern "C"
 
     void print_formatted_ic_elements_list
 
-        (FILE *stream, String_t prefix, ICElement *list) ;
+        (FILE *stream, String_t prefix, ICElement_t *list) ;
 
 
 
@@ -227,7 +227,7 @@ extern "C"
      *  \return \c false otherwise
      */
 
-    bool check_intersection (ICElement *icelement_a, ICElement *icelement_b) ;
+    bool check_intersection (ICElement_t *icelement_a, ICElement_t *icelement_b) ;
 
 
 
@@ -243,7 +243,7 @@ extern "C"
      *  \return \c false otherwise
      */
 
-    bool check_location (Dimensions *dimensions, ICElement* icelement) ;
+    bool check_location (Dimensions_t *dimensions, ICElement_t* icelement) ;
 
 
 
@@ -258,7 +258,7 @@ extern "C"
      *  \param icelement the ic element to align on the source layer
      */
 
-    void align_to_grid (Dimensions *dimensions, ICElement* icelement) ;
+    void align_to_grid (Dimensions_t *dimensions, ICElement_t* icelement) ;
 
 
     /*! Fills the source vector corresponding to an ic element
@@ -275,10 +275,10 @@ extern "C"
     void fill_sources_ic_element
     (
         Source_t        *sources,
-        Dimensions      *dimensions,
+        Dimensions_t    *dimensions,
         Power_t          power,
         ChipDimension_t  surface,
-        ICElement       *icelement
+        ICElement_t     *icelement
     ) ;
 
 
@@ -297,8 +297,8 @@ extern "C"
 
     Temperature_t get_max_temperature_ic_element
     (
-        ICElement     *icelement,
-        Dimensions    *dimensions,
+        ICElement_t   *icelement,
+        Dimensions_t  *dimensions,
         Temperature_t *temperatures
     ) ;
 
@@ -318,8 +318,8 @@ extern "C"
 
     Temperature_t get_min_temperature_ic_element
     (
-        ICElement     *icelement,
-        Dimensions    *dimensions,
+        ICElement_t   *icelement,
+        Dimensions_t  *dimensions,
         Temperature_t *temperatures
     ) ;
 
@@ -339,8 +339,8 @@ extern "C"
 
     Temperature_t get_avg_temperature_ic_element
     (
-        ICElement     *icelement,
-        Dimensions    *dimensions,
+        ICElement_t   *icelement,
+        Dimensions_t  *dimensions,
         Temperature_t *temperatures
     ) ;
 

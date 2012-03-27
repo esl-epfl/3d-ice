@@ -59,13 +59,13 @@ extern "C"
 
 /******************************************************************************/
 
-     /*! \struct ConventionalHeatSink
+     /*! \struct ConventionalHeatSink_t
      *
      *  \brief Structure used to store data about the conventional heat sink on
      *         top of the 2D/3D stack.
      */
 
-    struct ConventionalHeatSink
+    struct ConventionalHeatSink_t
     {
         /*! The heat transfert coefficient (from 3d stack to the environment) */
 
@@ -77,12 +77,12 @@ extern "C"
 
         /*! Pointer to the top-most layer in the 3D stack */
 
-        Layer *TopLayer ;
+        Layer_t *TopLayer ;
     } ;
 
-    /*! Definition of the type ConventionalHeatSink */
+    /*! Definition of the type ConventionalHeatSink_t */
 
-    typedef struct ConventionalHeatSink ConventionalHeatSink ;
+    typedef struct ConventionalHeatSink_t ConventionalHeatSink_t ;
 
 /******************************************************************************/
 
@@ -93,7 +93,7 @@ extern "C"
      * \param conventional_heat_sink the address of the conventional heat sink element to initialize
      */
 
-    void init_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink) ;
+    void init_conventional_heat_sink (ConventionalHeatSink_t *conventional_heat_sink) ;
 
 
 
@@ -104,7 +104,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    ConventionalHeatSink *alloc_and_init_conventional_heat_sink (void) ;
+    ConventionalHeatSink_t *alloc_and_init_conventional_heat_sink (void) ;
 
 
 
@@ -116,7 +116,7 @@ extern "C"
      * \param conventional_heat_sink the address of the conventional_heat_sink structure to free
      */
 
-    void free_conventional_heat_sink (ConventionalHeatSink *conventional_heat_sink) ;
+    void free_conventional_heat_sink (ConventionalHeatSink_t *conventional_heat_sink) ;
 
 
 
@@ -129,7 +129,7 @@ extern "C"
 
     void print_formatted_conventional_heat_sink
 
-        (FILE *stream, String_t prefix, ConventionalHeatSink *conventional_heat_sink) ;
+        (FILE *stream, String_t prefix, ConventionalHeatSink_t *conventional_heat_sink) ;
 
 
 
@@ -142,7 +142,7 @@ extern "C"
 
     void print_detailed_conventional_heat_sink
 
-        (FILE *stream, String_t prefix, ConventionalHeatSink *conventional_heat_sink) ;
+        (FILE *stream, String_t prefix, ConventionalHeatSink_t *conventional_heat_sink) ;
 
 
 
@@ -158,9 +158,9 @@ extern "C"
 
     void fill_thermal_cell_conventional_heat_sink
     (
-       ThermalCell          *thermal_cells,
-       Dimensions           *dimensions,
-       ConventionalHeatSink *conventional_heat_sink
+       ThermalCell_t          *thermal_cells,
+       Dimensions_t           *dimensions,
+       ConventionalHeatSink_t *conventional_heat_sink
     ) ;
 
 
@@ -175,10 +175,10 @@ extern "C"
 
     void fill_sources_conventional_heat_sink
     (
-        Source_t             *sources,
-        ThermalCell          *thermal_cells,
-        Dimensions           *dimensions,
-        ConventionalHeatSink *conventional_heat_sink
+        Source_t               *sources,
+        ThermalCell_t          *thermal_cells,
+        Dimensions_t           *dimensions,
+        ConventionalHeatSink_t *conventional_heat_sink
     ) ;
 
 
@@ -196,9 +196,9 @@ extern "C"
 
     void fill_system_matrix_conventional_heat_sink
     (
-        SystemMatrix  system_matrix,
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells
+        SystemMatrix_t  system_matrix,
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells
     ) ;
 
 /******************************************************************************/

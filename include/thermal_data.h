@@ -61,13 +61,13 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct ThermalData
+    /*! \struct ThermalData_t
      *
      * \brief Structure to collect data to run thermal simulations
      *
      */
 
-    struct ThermalData
+    struct ThermalData_t
     {
         /*! Array containing the temperature of each thermal cell */
 
@@ -79,7 +79,7 @@ extern "C"
 
         /*! Array of Thermal cells */
 
-        ThermalCell *ThermalCells ;
+        ThermalCell_t *ThermalCells ;
 
         /*! The number of cells in the 3D grid */
 
@@ -92,7 +92,7 @@ extern "C"
          * the computed result (temperatures).
          */
 
-        SystemMatrix SM_A ;
+        SystemMatrix_t SM_A ;
 
         /*! SuperLU matrix A (wrapper arount our SystemMatrix SM_A )*/
 
@@ -141,9 +141,9 @@ extern "C"
     } ;
 
 
-    /*! Definition of the type ThermalData */
+    /*! Definition of the type ThermalData_t */
 
-    typedef struct ThermalData ThermalData ;
+    typedef struct ThermalData_t ThermalData_t ;
 
 /******************************************************************************/
 
@@ -153,7 +153,7 @@ extern "C"
      * \param tdata the address of the thermal data to initialize
      */
 
-    void init_thermal_data (ThermalData *tdata) ;
+    void init_thermal_data (ThermalData_t *tdata) ;
 
 
 
@@ -172,7 +172,7 @@ extern "C"
 
     Error_t fill_thermal_data
 
-        (ThermalData* tdata, StackDescription* stkd, Analysis *analysis) ;
+        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
@@ -183,7 +183,7 @@ extern "C"
      * \param tdata the address of the ThermalData structure to free
      */
 
-    void free_thermal_data  (ThermalData* tdata) ;
+    void free_thermal_data  (ThermalData_t *tdata) ;
 
 
 
@@ -193,7 +193,7 @@ extern "C"
      * \param analysis the address of the Analysis structure related to \a tdata
      */
 
-    void reset_thermal_state (ThermalData *tdata, Analysis *analysis) ;
+    void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis) ;
 
 
 
@@ -217,7 +217,7 @@ extern "C"
 
     SimResult_t emulate_step
 
-        (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
+        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
@@ -238,7 +238,7 @@ extern "C"
 
     SimResult_t emulate_slot
 
-        (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
+        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
@@ -259,7 +259,7 @@ extern "C"
 
     SimResult_t emulate_steady
 
-        (ThermalData *tdata, StackDescription *stkd, Analysis *analysis) ;
+        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
@@ -280,7 +280,7 @@ extern "C"
 
     Error_t update_coolant_flow_rate
 
-        (ThermalData *tdata, StackDescription *stkd, CoolantFR_t new_flow_rate) ;
+        (ThermalData_t *tdata, StackDescription_t *stkd, CoolantFR_t new_flow_rate) ;
 
 
 
@@ -300,11 +300,11 @@ extern "C"
 
     Temperature_t get_cell_temperature
     (
-        ThermalData      *tdata,
-        StackDescription *stkd,
-        CellIndex_t       layer_index,
-        CellIndex_t       row_index,
-        CellIndex_t       column_index
+        ThermalData_t      *tdata,
+        StackDescription_t *stkd,
+        CellIndex_t         layer_index,
+        CellIndex_t         row_index,
+        CellIndex_t         column_index
     ) ;
 
 
@@ -324,10 +324,10 @@ extern "C"
 
     Error_t print_thermal_map
     (
-        ThermalData      *tdata,
-        StackDescription *stkd,
-        String_t          stack_element_id,
-        String_t          file_name
+        ThermalData_t      *tdata,
+        StackDescription_t *stkd,
+        String_t            stack_element_id,
+        String_t            file_name
     ) ;
 
 /******************************************************************************/

@@ -264,12 +264,12 @@ extern "C"
 
 
 
-    /*! \enum StackElement_t
+    /*! \enum StackElementType_t
      *
      * Enumeration to collect the types of a stack element
      */
 
-    enum StackElement_t
+    enum StackElementType_t
     {
         TDICE_STACK_ELEMENT_NONE = 0, //!< Undefined type
         TDICE_STACK_ELEMENT_LAYER   , //!< Layer
@@ -277,9 +277,9 @@ extern "C"
         TDICE_STACK_ELEMENT_DIE       //!< Die
     } ;
 
-    /*! The definition of the type StackElement_t */
+    /*! The definition of the type StackElementType_t */
 
-    typedef enum StackElement_t StackElement_t ;
+    typedef enum StackElementType_t StackElementType_t ;
 
 /******************************************************************************/
 

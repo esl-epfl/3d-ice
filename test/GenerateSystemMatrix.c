@@ -44,9 +44,9 @@
 
 int main(int argc, char** argv)
 {
-    StackDescription stkd ;
-    Analysis         analysis ;
-    ThermalData      tdata ;
+    StackDescription_t stkd ;
+    Analysis_t         analysis ;
+    ThermalData_t      tdata ;
 
     // Checks if there are the all the arguments
     ////////////////////////////////////////////////////////////////////////////

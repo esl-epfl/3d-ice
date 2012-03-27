@@ -46,11 +46,11 @@
 
 %union
 {
-    Power_t           power_value ;
-    String_t          identifier ;
-    ICElement        *p_icelement ;
-    FloorplanElement *p_floorplan_element ;
-    PowersQueue      *p_powers_queue ;
+    Power_t             power_value ;
+    String_t            identifier ;
+    ICElement_t        *p_icelement ;
+    FloorplanElement_t *p_floorplan_element ;
+    PowersQueue_t      *p_powers_queue ;
 }
 
 %code
@@ -63,7 +63,7 @@
 
     void floorplan_error
 
-        (Floorplan *floorplan, Dimensions *dimensions,
+        (Floorplan_t *floorplan, Dimensions_t *dimensions,
          yyscan_t yyscanner, String_t msg) ;
 
     static char error_message [250] ;
@@ -101,9 +101,9 @@
 
 %error-verbose
 
-%parse-param { Floorplan*  floorplan  }
-%parse-param { Dimensions* dimensions }
-%parse-param { yyscan_t    scanner    }
+%parse-param { Floorplan_t  *floorplan  }
+%parse-param { Dimensions_t *dimensions }
+%parse-param { yyscan_t      scanner    }
 
 %lex-param   { yyscan_t scanner       }
 
@@ -172,7 +172,7 @@ floorplan_element
       ic_elements                         // $3
       optional_power_values_list          // $4
     {
-        FloorplanElement *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
+        FloorplanElement_t *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
 
         if (floorplan_element == NULL)
         {
@@ -188,13 +188,13 @@ floorplan_element
         floorplan_element->ICElementsList = $3 ;
         floorplan_element->PowerValues    = $4 ;
 
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, ic_el_1, $3)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el_1, $3)
         {
             floorplan_element->EffectiveSurface
 
                 += ic_el_1->EffectiveLength * ic_el_1->EffectiveWidth ;
 
-            FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, ic_el_2, $3)
+            FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el_2, $3)
             {
                 if (check_intersection (ic_el_1, ic_el_2) == true)
                 {
@@ -212,9 +212,9 @@ floorplan_element
                 }
             }
 
-            FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, flp_el, floorplan->ElementsList)
+            FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, floorplan->ElementsList)
             {
-                FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, ic_el_3, flp_el->ICElementsList)
+                FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el_3, flp_el->ICElementsList)
                 {
                     if (check_intersection (ic_el_1, ic_el_3) == true)
                     {
@@ -243,7 +243,7 @@ ic_elements
   : POSITION  DVALUE ',' DVALUE ';'  // $2 $4
     DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
     {
-        ICElement *icelement = alloc_and_init_ic_element () ;
+        ICElement_t *icelement = alloc_and_init_ic_element () ;
 
         if (icelement == NULL)
         {
@@ -290,7 +290,7 @@ ic_elements_list
      {
         nicelements++ ;
 
-        ICElement *ic_el = $1 ;
+        ICElement_t *ic_el = $1 ;
 
         while (ic_el->Next != NULL) ic_el = ic_el->Next ;
 
@@ -304,7 +304,7 @@ ic_element
 
   : RECTANGLE '(' DVALUE ',' DVALUE ',' DVALUE ',' DVALUE ')' ';'  // $3 $5 $7 $9
     {
-        ICElement *icelement = $$ = alloc_and_init_ic_element () ;
+        ICElement_t *icelement = $$ = alloc_and_init_ic_element () ;
 
         if (icelement == NULL)
         {
@@ -340,7 +340,7 @@ optional_power_values_list
   : // Declaring the entire subsection of power values is not mandatory
 
     {
-        PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
+        PowersQueue_t* powers_list = $$ = alloc_and_init_powers_queue() ;
 
         if (powers_list == NULL)
         {
@@ -362,7 +362,7 @@ power_values_list
   : DVALUE              // $1
                         // Here at least one power value is mandatory
     {
-        PowersQueue* powers_list = $$ = alloc_and_init_powers_queue() ;
+        PowersQueue_t* powers_list = $$ = alloc_and_init_powers_queue() ;
 
         if (powers_list == NULL)
         {
@@ -387,10 +387,10 @@ power_values_list
 
 void floorplan_error
 (
-    Floorplan  *floorplan,
-    Dimensions *__attribute__ ((unused)) dimensions,
-    yyscan_t    yyscanner,
-    String_t    msg
+    Floorplan_t  *floorplan,
+    Dimensions_t *__attribute__ ((unused)) dimensions,
+    yyscan_t      yyscanner,
+    String_t      msg
 )
 {
     fprintf (stderr, "%s:%d: %s\n",

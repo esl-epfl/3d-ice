@@ -54,11 +54,11 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct PowerNode
+    /*! \struct PowerNode_t
      *  \brief A node of a linked list to store a power value
      */
 
-    struct PowerNode
+    struct PowerNode_t
     {
         /*! The power value */
 
@@ -66,28 +66,28 @@ extern "C"
 
         /*! Pointer to the following power node */
 
-        struct PowerNode *Next ;
+        struct PowerNode_t *Next ;
     } ;
 
-    /*! Definition of the type PowerNode */
+    /*! Definition of the type PowerNode_t */
 
-    typedef struct PowerNode PowerNode ;
+    typedef struct PowerNode_t PowerNode_t ;
 
 /******************************************************************************/
 
-    /*! \struct PowersQueue
+    /*! \struct PowersQueue_t
      *  \brief A First In - First Out list to store power values
      */
 
-    struct PowersQueue
+    struct PowersQueue_t
     {
         /*! Pointer to the first power value in the list */
 
-        PowerNode *Head ;
+        PowerNode_t *Head ;
 
         /*! Pointer to the last power value in the list */
 
-        PowerNode *Tail ;
+        PowerNode_t *Tail ;
 
         /*! The number of power values in the list */
 
@@ -95,9 +95,9 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type PowersQueue */
+    /*! Definition of the type PowersQueue_t */
 
-    typedef struct PowersQueue PowersQueue ;
+    typedef struct PowersQueue_t PowersQueue_t ;
 
 /******************************************************************************/
 
@@ -108,7 +108,7 @@ extern "C"
      * \param powers_queue the address of the power queue to initialize
      */
 
-    void init_powers_queue (PowersQueue *powers_queue) ;
+    void init_powers_queue (PowersQueue_t *powers_queue) ;
 
 
 
@@ -119,7 +119,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    PowersQueue *alloc_and_init_powers_queue (void) ;
+    PowersQueue_t *alloc_and_init_powers_queue (void) ;
 
 
 
@@ -131,7 +131,7 @@ extern "C"
      * \param powers_queue the address of the powers queue structure to free
      */
 
-    void free_powers_queue (PowersQueue *powers_queue) ;
+    void free_powers_queue (PowersQueue_t *powers_queue) ;
 
 
 
@@ -144,7 +144,7 @@ extern "C"
 
     void print_detailed_powers_queue
 
-        (FILE *stream, String_t prefix, PowersQueue *powers_queue) ;
+        (FILE *stream, String_t prefix, PowersQueue_t *powers_queue) ;
 
 
 
@@ -156,7 +156,7 @@ extern "C"
 
     void print_formatted_powers_queue
 
-        (FILE *stream, PowersQueue *powers_queue) ;
+        (FILE *stream, PowersQueue_t *powers_queue) ;
 
 
 
@@ -168,7 +168,7 @@ extern "C"
      * \return \c FALSE otherwise
      */
 
-    bool is_empty_powers_queue (PowersQueue *powers_queue) ;
+    bool is_empty_powers_queue (PowersQueue_t *powers_queue) ;
 
 
 
@@ -178,7 +178,7 @@ extern "C"
      * \param power the power value to insert
      */
 
-    void put_into_powers_queue (PowersQueue *powers_queue, Power_t power) ;
+    void put_into_powers_queue (PowersQueue_t *powers_queue, Power_t power) ;
 
 
 
@@ -189,7 +189,7 @@ extern "C"
      * \return the first power value in the list \a powers_queue
      */
 
-    Power_t get_from_powers_queue (PowersQueue *powers_queue) ;
+    Power_t get_from_powers_queue (PowersQueue_t *powers_queue) ;
 
 
 
@@ -198,7 +198,7 @@ extern "C"
      * \param powers_queue the powers queue
      */
 
-    void pop_from_powers_queue (PowersQueue *powers_queue) ;
+    void pop_from_powers_queue (PowersQueue_t *powers_queue) ;
 
 /******************************************************************************/
 

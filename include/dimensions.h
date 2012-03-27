@@ -54,7 +54,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct CellDimensions
+    /*! \struct CellDimensions_t
      *
      *  \brief Structure that collects the dimensions of a thermal cell
      *
@@ -70,7 +70,7 @@ extern "C"
      *  the same value.
      */
 
-    struct CellDimensions
+    struct CellDimensions_t
     {
         /*! The length of the first wall of a channel in \f$ \mu m \f$
          *  (west side of the 3D-IC). It corresponds to the length of all the
@@ -101,18 +101,18 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type CellDimensions */
+    /*! Definition of the type CellDimension_t */
 
-    typedef struct CellDimensions CellDimensions ;
+    typedef struct CellDimensions_t CellDimensions_t ;
 
 /******************************************************************************/
 
-    /*! \struct GridDimensions
+    /*! \struct GridDimensions_t
      *
      *  \brief Structure that collects the dimensions of a 3d thermal grid of cells
      */
 
-    struct GridDimensions
+    struct GridDimensions_t
     {
         /*! The number of layers along the bottom-top direction.
          *
@@ -158,18 +158,18 @@ extern "C"
         CellIndex_t NConnections ;
     } ;
 
-    /*! The definition of the type GridDimensions */
+    /*! The definition of the type GridDimensions_t */
 
-    typedef struct GridDimensions GridDimensions ;
+    typedef struct GridDimensions_t GridDimensions_t ;
 
 /******************************************************************************/
 
-    /*! \struct ChipDimensions
+    /*! \struct ChipDimensions_t
      *
      *  \brief Structure that collects the main dimensions of the IC
      */
 
-    struct ChipDimensions
+    struct ChipDimensions_t
     {
         /*! The length of the IC (west-east) in \f$ \mu m \f$ */
 
@@ -182,33 +182,33 @@ extern "C"
 
     /*! Definition of the type ChipDimension */
 
-    typedef struct ChipDimensions ChipDimensions ;
+    typedef struct ChipDimensions_t ChipDimensions_t ;
 
 /******************************************************************************/
 
-    /*! \struct Dimensions
+    /*! \struct Dimensions_t
      *  \brief Collections of all the structures that are needed for the thermal simulation
      */
 
-    struct Dimensions
+    struct Dimensions_t
     {
         /*! The dimensions of the thermal cells */
 
-        CellDimensions Cell ;
+        CellDimensions_t Cell ;
 
         /*! The dimensions of the grid of thermal cells */
 
-        GridDimensions Grid ;
+        GridDimensions_t Grid ;
 
         /*! The dimensions of the IC */
 
-        ChipDimensions Chip ;
+        ChipDimensions_t Chip ;
 
     } ;
 
-    /*! Definition of the type Dimensions */
+    /*! Definition of the type Dimensions_t */
 
-    typedef struct Dimensions Dimensions ;
+    typedef struct Dimensions_t Dimensions_t ;
 
 /******************************************************************************/
 
@@ -219,7 +219,7 @@ extern "C"
      * \param dimensions the address of the dimensions structure to initialize
      */
 
-    void init_dimensions (Dimensions *dimensions) ;
+    void init_dimensions (Dimensions_t *dimensions) ;
 
 
 
@@ -230,7 +230,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Dimensions *alloc_and_init_dimensions (void) ;
+    Dimensions_t *alloc_and_init_dimensions (void) ;
 
 
 
@@ -242,7 +242,7 @@ extern "C"
      * \param dimensions the address of the dimensions structure to free
      */
 
-    void free_dimensions (Dimensions *dimensions) ;
+    void free_dimensions (Dimensions_t *dimensions) ;
 
 
 
@@ -255,7 +255,7 @@ extern "C"
 
     void print_formatted_dimensions
 
-        (FILE *stream, String_t prefix, Dimensions *dimensions) ;
+        (FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
 
 
 
@@ -268,7 +268,7 @@ extern "C"
 
    void print_detailed_dimensions
 
-        (FILE *stream, String_t prefix, Dimensions *dimensions) ;
+        (FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
 
 
 
@@ -277,7 +277,7 @@ extern "C"
      *  \param dimensions the address of the dimensions structure
      */
 
-    void print_axes (Dimensions *dimensions) ;
+    void print_axes (Dimensions_t *dimensions) ;
 
 
 
@@ -292,7 +292,7 @@ extern "C"
 
     void compute_number_of_connections
 
-        (Dimensions *dimensions, Quantity_t num_channels, ChannelModel_t channel_model) ;
+        (Dimensions_t *dimensions, Quantity_t num_channels, ChannelModel_t channel_model) ;
 
     /*! Returns the length of a thermal cell
      *
@@ -302,7 +302,7 @@ extern "C"
      * \return the length of the thermal cell in position \a coluimn_index
      */
 
-    CellDimension_t get_cell_length (Dimensions *dimensions, CellIndex_t column_index) ;
+    CellDimension_t get_cell_length (Dimensions_t *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -314,7 +314,7 @@ extern "C"
      * \return the width of the thermal cell in position \a row_index
      */
 
-    CellDimension_t get_cell_width (Dimensions *dimensions, CellIndex_t row_index) ;
+    CellDimension_t get_cell_width (Dimensions_t *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -326,7 +326,7 @@ extern "C"
      * \return the X coordinate of the center of thermal cell in position \a column_index
      */
 
-    ChipDimension_t get_cell_center_x (Dimensions *dimensions, CellIndex_t column_index) ;
+    ChipDimension_t get_cell_center_x (Dimensions_t *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -338,7 +338,7 @@ extern "C"
      * \return the Y coordinate of the center of thermal cell in position \a row_index
      */
 
-    ChipDimension_t get_cell_center_y (Dimensions *dimensions, CellIndex_t row_index) ;
+    ChipDimension_t get_cell_center_y (Dimensions_t *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -350,7 +350,7 @@ extern "C"
      * \return the X coordinate of the south-west corner of thermal cell in position \a column_index
      */
 
-    ChipDimension_t get_cell_location_x (Dimensions *dimensions, CellIndex_t column_index) ;
+    ChipDimension_t get_cell_location_x (Dimensions_t *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -362,7 +362,7 @@ extern "C"
      * \return the X coordinate of the south-west corner of thermal cell in position \a row_index
      */
 
-    ChipDimension_t get_cell_location_y (Dimensions *dimensions, CellIndex_t row_index) ;
+    ChipDimension_t get_cell_location_y (Dimensions_t *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -373,7 +373,7 @@ extern "C"
      * \return the number of layers
      */
 
-    CellIndex_t get_number_of_layers (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_layers (Dimensions_t *dimensions) ;
 
 
 
@@ -384,7 +384,7 @@ extern "C"
      * \return the number of rows
      */
 
-    CellIndex_t get_number_of_rows (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_rows (Dimensions_t *dimensions) ;
 
 
 
@@ -395,7 +395,7 @@ extern "C"
      * \return the number of columns
      */
 
-    CellIndex_t get_number_of_columns (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_columns (Dimensions_t *dimensions) ;
 
 
 
@@ -406,7 +406,7 @@ extern "C"
      * \return the number of thermal cells
      */
 
-    CellIndex_t get_number_of_cells (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_cells (Dimensions_t *dimensions) ;
 
 
 
@@ -417,7 +417,7 @@ extern "C"
      * \return the number of connections
      */
 
-    CellIndex_t get_number_of_connections (Dimensions *dimensions) ;
+    CellIndex_t get_number_of_connections (Dimensions_t *dimensions) ;
 
 
 
@@ -428,7 +428,7 @@ extern "C"
      * \return the number of thermal cells in a layer
      */
 
-    CellIndex_t get_layer_area (Dimensions *dimensions) ;
+    CellIndex_t get_layer_area (Dimensions_t *dimensions) ;
 
 
 
@@ -446,7 +446,7 @@ extern "C"
 
     CellIndex_t get_cell_offset_in_layer
 
-        (Dimensions *dimensions, CellIndex_t row_index, CellIndex_t column_index) ;
+        (Dimensions_t *dimensions, CellIndex_t row_index, CellIndex_t column_index) ;
 
 
 
@@ -466,7 +466,7 @@ extern "C"
 
     CellIndex_t get_cell_offset_in_stack
 
-        (Dimensions *dimensions,
+        (Dimensions_t *dimensions,
          CellIndex_t layer_index, CellIndex_t row_index, CellIndex_t column_index) ;
 
 
@@ -478,7 +478,7 @@ extern "C"
      * \return the length of the IC
      */
 
-    ChipDimension_t get_chip_length (Dimensions *dimensions) ;
+    ChipDimension_t get_chip_length (Dimensions_t *dimensions) ;
 
 
 
@@ -489,7 +489,7 @@ extern "C"
      * \return the width of the IC
      */
 
-    ChipDimension_t get_chip_width (Dimensions *dimensions) ;
+    ChipDimension_t get_chip_width (Dimensions_t *dimensions) ;
 
 /******************************************************************************/
 

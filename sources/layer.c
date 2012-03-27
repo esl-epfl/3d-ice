@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_layer (Layer *layer)
+void init_layer (Layer_t *layer)
 {
     layer->Height   = 0.0 ;
     layer->Material = NULL ;
@@ -53,9 +53,9 @@ void init_layer (Layer *layer)
 
 /******************************************************************************/
 
-Layer *alloc_and_init_layer (void)
+Layer_t *alloc_and_init_layer (void)
 {
-    Layer *layer = (Layer *) malloc (sizeof(Layer));
+    Layer_t *layer = (Layer_t *) malloc (sizeof(Layer_t));
 
     if (layer != NULL)
 
@@ -66,21 +66,21 @@ Layer *alloc_and_init_layer (void)
 
 /******************************************************************************/
 
-void free_layer (Layer *layer)
+void free_layer (Layer_t *layer)
 {
     FREE_POINTER (free, layer) ;
 }
 
 /******************************************************************************/
 
-void free_layers_list (Layer *list)
+void free_layers_list (Layer_t *list)
 {
-    FREE_LIST (Layer, list, free_layer) ;
+    FREE_LIST (Layer_t, list, free_layer) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_layer (FILE *stream, String_t prefix, Layer *layer)
+void print_formatted_layer (FILE *stream, String_t prefix, Layer_t *layer)
 {
     fprintf (stream,
         "%s %7.1f  %s ;\n",
@@ -89,7 +89,7 @@ void print_formatted_layer (FILE *stream, String_t prefix, Layer *layer)
 
 /******************************************************************************/
 
-void print_detailed_layer (FILE *stream, String_t prefix, Layer *layer)
+void print_detailed_layer (FILE *stream, String_t prefix, Layer_t *layer)
 {
     fprintf (stream,
         "%slayer                   = %p\n",
@@ -114,18 +114,18 @@ void print_detailed_layer (FILE *stream, String_t prefix, Layer *layer)
 
 /******************************************************************************/
 
-void print_formatted_layers_list (FILE *stream, String_t prefix, Layer *list)
+void print_formatted_layers_list (FILE *stream, String_t prefix, Layer_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
 
         print_formatted_layer (stream, prefix, layer) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_layers_list (FILE *stream, String_t prefix, Layer *list)
+void print_detailed_layers_list (FILE *stream, String_t prefix, Layer_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
     {
         if (layer->Next == NULL)
 
@@ -143,16 +143,16 @@ void print_detailed_layers_list (FILE *stream, String_t prefix, Layer *list)
 
 void fill_thermal_cell_layer
 (
-    ThermalCell *thermal_cells,
-    Time_t       delta_time,
-    Dimensions  *dimensions,
-    CellIndex_t  layer_index,
-    Layer       *layer
+    ThermalCell_t  *thermal_cells,
+    Time_t          delta_time,
+    Dimensions_t   *dimensions,
+    CellIndex_t     layer_index,
+    Layer_t        *layer
 )
 {
     void (*fill_cell)
 
-        (ThermalCell *, Time_t,
+        (ThermalCell_t*, Time_t,
          CellDimension_t, CellDimension_t, CellDimension_t,
          SolidTC_t, SolidVHC_t) ;
 
@@ -199,12 +199,12 @@ void fill_thermal_cell_layer
 
 /******************************************************************************/
 
-SystemMatrix fill_system_matrix_layer
+SystemMatrix_t fill_system_matrix_layer
 (
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    SystemMatrix  system_matrix
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells,
+    CellIndex_t     layer_index,
+    SystemMatrix_t  system_matrix
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX

@@ -51,11 +51,11 @@
 
 extern int stack_description_parse
 
-    (StackDescription *stkd, Analysis *analysis, yyscan_t scanner) ;
+    (StackDescription_t *stkd, Analysis_t *analysis, yyscan_t scanner) ;
 
 /******************************************************************************/
 
-void init_stack_description (StackDescription* stkd)
+void init_stack_description (StackDescription_t *stkd)
 {
   stkd->FileName             = NULL ;
   stkd->MaterialsList        = NULL ;
@@ -71,9 +71,9 @@ void init_stack_description (StackDescription* stkd)
 
 Error_t fill_stack_description
 (
-  StackDescription *stkd,
-  Analysis         *analysis,
-  String_t          filename
+  StackDescription_t *stkd,
+  Analysis_t         *analysis,
+  String_t            filename
 )
 {
     FILE*    input ;
@@ -109,7 +109,7 @@ Error_t fill_stack_description
 
 /******************************************************************************/
 
-void free_stack_description (StackDescription* stkd)
+void free_stack_description (StackDescription_t *stkd)
 {
     FREE_POINTER (free_materials_list,         stkd->MaterialsList) ;
     FREE_POINTER (free_channel,                stkd->Channel) ;
@@ -126,9 +126,9 @@ void free_stack_description (StackDescription* stkd)
 
 void print_formatted_stack_description
 (
-  FILE             *stream,
-  String_t          prefix,
-  StackDescription *stkd
+  FILE               *stream,
+  String_t            prefix,
+  StackDescription_t *stkd
 )
 {
     print_formatted_materials_list (stream, prefix, stkd->MaterialsList) ;
@@ -170,9 +170,9 @@ void print_formatted_stack_description
 
 void print_detailed_stack_description
 (
-  FILE             *stream,
-  String_t          prefix,
-  StackDescription *stkd
+  FILE               *stream,
+  String_t            prefix,
+  StackDescription_t *stkd
 )
 {
     String_t new_prefix =
@@ -290,14 +290,14 @@ void print_detailed_stack_description
 
 void print_floorplans
 (
-    FILE             *stream,
-    String_t          prefix,
-    StackDescription *stkd
+    FILE               *stream,
+    String_t            prefix,
+    StackDescription_t *stkd
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (StackElement, stk_el, stkd->BottomStackElement)
+    (StackElement_t, stk_el, stkd->BottomStackElement)
 
         if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -308,14 +308,14 @@ void print_floorplans
 
 void fill_thermal_cell_stack_description
 (
-    ThermalCell      *thermal_cells,
-    Analysis         *analysis,
-    StackDescription *stkd
+    ThermalCell_t      *thermal_cells,
+    Analysis_t         *analysis,
+    StackDescription_t *stkd
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (StackElement, stack_element, stkd->BottomStackElement)
+    (StackElement_t, stack_element, stkd->BottomStackElement)
 
         fill_thermal_cell_stack_element
 
@@ -341,9 +341,9 @@ void fill_thermal_cell_stack_description
 
 Error_t fill_sources_stack_description
 (
-    Source_t         *sources,
-    ThermalCell      *thermal_cells,
-    StackDescription *stkd
+    Source_t           *sources,
+    ThermalCell_t      *thermal_cells,
+    StackDescription_t *stkd
 )
 {
 #ifdef PRINT_SOURCES
@@ -373,7 +373,7 @@ Error_t fill_sources_stack_description
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (StackElement, stack_element, stkd->BottomStackElement)
+    (StackElement_t, stack_element, stkd->BottomStackElement)
 
         if (fill_sources_stack_element (sources, stkd->Dimensions, stack_element) == TDICE_FAILURE)
 
@@ -386,9 +386,9 @@ Error_t fill_sources_stack_description
 
 void fill_system_matrix_stack_description
 (
-    SystemMatrix      system_matrix,
-    ThermalCell*      thermal_cells,
-    StackDescription *stkd
+    SystemMatrix_t      system_matrix,
+    ThermalCell_t      *thermal_cells,
+    StackDescription_t *stkd
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
@@ -399,13 +399,13 @@ void fill_system_matrix_stack_description
         get_number_of_columns (stkd->Dimensions)) ;
 #endif
 
-    SystemMatrix tmp_system_matrix = system_matrix ;
+    SystemMatrix_t tmp_system_matrix = system_matrix ;
 
     *system_matrix.ColumnPointers++ = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (StackElement, stack_element, stkd->BottomStackElement)
+    (StackElement_t, stack_element, stkd->BottomStackElement)
 
         system_matrix = fill_system_matrix_stack_element
 
@@ -422,11 +422,11 @@ void fill_system_matrix_stack_description
 
 Quantity_t get_number_of_floorplan_elements
 (
-  StackDescription *stkd,
-  String_t          stack_element_id
+  StackDescription_t *stkd,
+  String_t            stack_element_id
 )
 {
-    StackElement *stack_element = find_stack_element_in_list
+    StackElement_t *stack_element = find_stack_element_in_list
 
         (stkd->BottomStackElement, stack_element_id) ;
 
@@ -439,13 +439,13 @@ Quantity_t get_number_of_floorplan_elements
 
 /******************************************************************************/
 
-Quantity_t get_total_number_of_floorplan_elements (StackDescription *stkd)
+Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd)
 {
     Quantity_t tmp = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-        (StackElement, stack_element, stkd->BottomStackElement)
+        (StackElement_t, stack_element, stkd->BottomStackElement)
 
         tmp += get_number_of_floorplan_elements_stack_element (stack_element) ;
 
@@ -454,14 +454,14 @@ Quantity_t get_total_number_of_floorplan_elements (StackDescription *stkd)
 
 /******************************************************************************/
 
-FloorplanElement *get_floorplan_element
+FloorplanElement_t *get_floorplan_element
 (
-    StackDescription *stkd,
-    String_t          stack_element_id,
-    String_t          floorplan_element_id
+    StackDescription_t *stkd,
+    String_t            stack_element_id,
+    String_t            floorplan_element_id
 )
 {
-    StackElement *stack_element = find_stack_element_in_list
+    StackElement_t *stack_element = find_stack_element_in_list
 
         (stkd->BottomStackElement, stack_element_id) ;
 
@@ -478,15 +478,15 @@ FloorplanElement *get_floorplan_element
 
 Error_t insert_power_values
 (
-    StackDescription *stkd,
-    PowersQueue      *pvalues
+    StackDescription_t *stkd,
+    PowersQueue_t      *pvalues
 )
 {
     Error_t result ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (StackElement, stack_element, stkd->BottomStackElement)
+    (StackElement_t, stack_element, stkd->BottomStackElement)
     {
         result = insert_power_values_stack_element (stack_element, pvalues) ;
 

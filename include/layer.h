@@ -59,14 +59,14 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Layer
+    /*! \struct Layer_t
      *
      *  \brief Structure used to store data about the layers that compose the 2D/3D stack.
      *
      *  Layers are used to build dies os as stack elements
      */
 
-    struct Layer
+    struct Layer_t
     {
         /*! The heigh of the layer in \f$ \mu m \f$ (1 cell) */
 
@@ -74,22 +74,22 @@ extern "C"
 
         /*! The material composing the layer */
 
-        Material *Material ;
+        Material_t *Material ;
 
         /*! Pointer to the 'next' layer (towards the top of the die),
          *  to collect layers in a double linked list */
 
-        struct Layer *Next ;
+        struct Layer_t *Next ;
 
         /*! Pointer to the 'previous' layer (towards the bottom of the die),
          *  to collect layers in a double linked list */
 
-        struct Layer *Prev ;
+        struct Layer_t *Prev ;
     } ;
 
-    /*! Definition of the type Layer */
+    /*! Definition of the type Layer_t */
 
-    typedef struct Layer Layer ;
+    typedef struct Layer_t Layer_t ;
 
 /******************************************************************************/
 
@@ -100,7 +100,7 @@ extern "C"
      * \param layer the address of the layer to initialize
      */
 
-    void init_layer (Layer *layer) ;
+    void init_layer (Layer_t *layer) ;
 
 
 
@@ -111,7 +111,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Layer *alloc_and_init_layer (void) ;
+    Layer_t *alloc_and_init_layer (void) ;
 
 
 
@@ -123,7 +123,7 @@ extern "C"
      * \param layer the address of the layer structure to free
      */
 
-    void free_layer (Layer *layer) ;
+    void free_layer (Layer_t *layer) ;
 
 
 
@@ -136,7 +136,7 @@ extern "C"
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_layers_list (Layer *list) ;
+    void free_layers_list (Layer_t *list) ;
 
 
 
@@ -149,7 +149,7 @@ extern "C"
 
     void print_formatted_layer
 
-        (FILE *stream, String_t prefix, Layer *layer) ;
+        (FILE *stream, String_t prefix, Layer_t *layer) ;
 
 
 
@@ -162,7 +162,7 @@ extern "C"
 
     void print_formatted_layers_list
 
-        (FILE *stream, String_t prefix, Layer *list) ;
+        (FILE *stream, String_t prefix, Layer_t *list) ;
 
 
 
@@ -175,7 +175,7 @@ extern "C"
 
     void print_detailed_layer
 
-        (FILE *stream, String_t prefix, Layer *layer) ;
+        (FILE *stream, String_t prefix, Layer_t *layer) ;
 
 
 
@@ -188,7 +188,7 @@ extern "C"
 
     void print_detailed_layers_list
 
-        (FILE *stream, String_t prefix, Layer *list) ;
+        (FILE *stream, String_t prefix, Layer_t *list) ;
 
 
 
@@ -203,11 +203,11 @@ extern "C"
 
     void fill_thermal_cell_layer
     (
-        ThermalCell *thermal_cells,
-        Time_t       delta_time,
-        Dimensions  *dimensions,
-        CellIndex_t  layer_index,
-        Layer       *layer
+        ThermalCell_t  *thermal_cells,
+        Time_t          delta_time,
+        Dimensions_t   *dimensions,
+        CellIndex_t     layer_index,
+        Layer_t        *layer
     ) ;
 
 
@@ -222,12 +222,12 @@ extern "C"
      *  \return A matrix partially filled (FIXME)
      */
 
-    SystemMatrix fill_system_matrix_layer
+    SystemMatrix_t fill_system_matrix_layer
     (
-        Dimensions   *dimensions,
-        ThermalCell  *thermal_cells,
-        CellIndex_t   layer_index,
-        SystemMatrix  system_matrix
+        Dimensions_t   *dimensions,
+        ThermalCell_t  *thermal_cells,
+        CellIndex_t     layer_index,
+        SystemMatrix_t  system_matrix
     ) ;
 
 /******************************************************************************/

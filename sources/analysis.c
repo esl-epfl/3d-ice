@@ -44,7 +44,7 @@
 
 /******************************************************************************/
 
-void init_analysis (Analysis *analysis)
+void init_analysis (Analysis_t *analysis)
 {
     analysis->AnalysisType         = TDICE_ANALYSIS_TYPE_NONE ;
     analysis->StepTime             = (Time_t) 0.0 ;
@@ -59,9 +59,9 @@ void init_analysis (Analysis *analysis)
 
 /******************************************************************************/
 
-Analysis *alloc_and_init_analysis (void)
+Analysis_t *alloc_and_init_analysis (void)
 {
-    Analysis *analysis = (Analysis *) malloc (sizeof(Analysis)) ;
+    Analysis_t *analysis = (Analysis_t *) malloc (sizeof(Analysis_t)) ;
 
     if (analysis != NULL)
 
@@ -72,16 +72,16 @@ Analysis *alloc_and_init_analysis (void)
 
 /******************************************************************************/
 
-void free_analysis (Analysis *analysis)
+void free_analysis (Analysis_t *analysis)
 {
-    FREE_LIST (InspectionPoint, analysis->InspectionPointListFinal, free_inspection_point) ;
-    FREE_LIST (InspectionPoint, analysis->InspectionPointListSlot, free_inspection_point) ;
-    FREE_LIST (InspectionPoint, analysis->InspectionPointListStep, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, analysis->InspectionPointListFinal, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, analysis->InspectionPointListSlot, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, analysis->InspectionPointListStep, free_inspection_point) ;
 }
 
 /******************************************************************************/
 
-Time_t get_simulated_time (Analysis *analysis)
+Time_t get_simulated_time (Analysis_t *analysis)
 {
   return analysis->CurrentTime * analysis->StepTime ;
 }
@@ -90,14 +90,14 @@ Time_t get_simulated_time (Analysis *analysis)
 
 Quantity_t get_number_of_inspection_points
 (
-    Analysis        *analysis,
+    Analysis_t      *analysis,
     OutputInstant_t  instant,
     OutputType_t     type
 )
 {
     Quantity_t number = 0u ;
 
-    InspectionPoint *list ;
+    InspectionPoint_t *list ;
 
     if (instant == TDICE_OUTPUT_INSTANT_FINAL)
 
@@ -115,7 +115,7 @@ Quantity_t get_number_of_inspection_points
 
         return number ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 
         if (ipoint->Type == type)   number++ ;
 
@@ -124,7 +124,7 @@ Quantity_t get_number_of_inspection_points
 
 /******************************************************************************/
 
-bool slot_completed (Analysis *analysis)
+bool slot_completed (Analysis_t *analysis)
 {
     if (analysis->CurrentTime % analysis->SlotLength == 0u)
 
@@ -137,9 +137,9 @@ bool slot_completed (Analysis *analysis)
 
 void print_formatted_analysis
 (
-    FILE     *stream,
-    String_t  prefix,
-    Analysis *analysis
+    FILE       *stream,
+    String_t    prefix,
+    Analysis_t *analysis
 )
 {
     fprintf (stream, "%ssolver : ", prefix) ;
@@ -187,9 +187,9 @@ void print_formatted_analysis
 
 void print_detailed_analysis
 (
-  FILE     *stream,
-  String_t  prefix,
-  Analysis *analysis
+  FILE       *stream,
+  String_t    prefix,
+  Analysis_t *analysis
 )
 {
     String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
@@ -278,11 +278,11 @@ void print_detailed_analysis
 
 void add_inspection_point_to_analysis
 (
-    Analysis        *analysis,
-    InspectionPoint *inspection_point
+    Analysis_t        *analysis,
+    InspectionPoint_t *inspection_point
 )
 {
-    InspectionPoint **list = NULL ;
+    InspectionPoint_t **list = NULL ;
 
     if (   analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY
         || inspection_point->Instant == TDICE_OUTPUT_INSTANT_FINAL)
@@ -308,24 +308,24 @@ void add_inspection_point_to_analysis
 
 Error_t generate_analysis_headers
 (
-    Analysis   *analysis,
-    Dimensions *dimensions,
-    String_t    prefix
+    Analysis_t   *analysis,
+    Dimensions_t *dimensions,
+    String_t      prefix
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, final, analysis->InspectionPointListFinal)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, final, analysis->InspectionPointListFinal)
 
         if (generate_inspection_point_header (final, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, slot, analysis->InspectionPointListSlot)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, slot, analysis->InspectionPointListSlot)
 
         if (generate_inspection_point_header (slot, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, step, analysis->InspectionPointListStep)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, step, analysis->InspectionPointListStep)
 
         if (generate_inspection_point_header (step, dimensions, prefix) != TDICE_SUCCESS)
 
@@ -338,15 +338,15 @@ Error_t generate_analysis_headers
 
 Error_t generate_analysis_output
 (
-    Analysis        *analysis,
-    Dimensions      *dimensions,
+    Analysis_t      *analysis,
+    Dimensions_t    *dimensions,
     Temperature_t   *temperatures,
     OutputInstant_t  output_instant
 )
 {
     Time_t current_time = get_simulated_time (analysis) ;
 
-    InspectionPoint *list ;
+    InspectionPoint_t *list ;
 
     if (output_instant == TDICE_OUTPUT_INSTANT_FINAL)
 
@@ -364,7 +364,7 @@ Error_t generate_analysis_output
 
         return EXIT_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 
         if (generate_inspection_point_output (ipoint, dimensions, temperatures, current_time) != TDICE_SUCCESS)
 
@@ -377,15 +377,15 @@ Error_t generate_analysis_output
 
 Error_t fill_analysis_message
 (
-    Analysis        *analysis,
-    Dimensions      *dimensions,
-    Temperature_t   *temperatures,
-    OutputInstant_t  output_instant,
-    OutputType_t     type,
-    NetworkMessage  *message
+    Analysis_t       *analysis,
+    Dimensions_t     *dimensions,
+    Temperature_t    *temperatures,
+    OutputInstant_t   output_instant,
+    OutputType_t      type,
+    NetworkMessage_t *message
 )
 {
-    InspectionPoint *list ;
+    InspectionPoint_t *list ;
 
     if (output_instant == TDICE_OUTPUT_INSTANT_FINAL)
 
@@ -403,7 +403,7 @@ Error_t fill_analysis_message
 
         return EXIT_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint, ipoint, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 
         if (type == ipoint->Type)
 

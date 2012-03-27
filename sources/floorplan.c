@@ -51,11 +51,11 @@
 
 extern int floorplan_parse
 
-    (Floorplan  *floorplan, Dimensions *dimensions, yyscan_t scanner) ;
+    (Floorplan_t *floorplan, Dimensions_t *dimensions, yyscan_t scanner) ;
 
 /******************************************************************************/
 
-void init_floorplan (Floorplan *floorplan)
+void init_floorplan (Floorplan_t *floorplan)
 {
     floorplan->FileName     = NULL ;
     floorplan->NElements    = 0u ;
@@ -64,9 +64,9 @@ void init_floorplan (Floorplan *floorplan)
 
 /******************************************************************************/
 
-Floorplan *alloc_and_init_floorplan (void)
+Floorplan_t *alloc_and_init_floorplan (void)
 {
-    Floorplan *floorplan = (Floorplan *) malloc (sizeof(Floorplan));
+    Floorplan_t *floorplan = (Floorplan_t *) malloc (sizeof(Floorplan_t));
 
     if (floorplan != NULL)
 
@@ -77,7 +77,7 @@ Floorplan *alloc_and_init_floorplan (void)
 
 /******************************************************************************/
 
-void free_floorplan (Floorplan *floorplan)
+void free_floorplan (Floorplan_t *floorplan)
 {
     FREE_POINTER (free_floorplan_elements_list, floorplan->ElementsList) ;
     FREE_POINTER (free,                         floorplan->FileName) ;
@@ -88,9 +88,9 @@ void free_floorplan (Floorplan *floorplan)
 
 void print_detailed_floorplan
 (
-    FILE      *stream,
-    String_t   prefix,
-    Floorplan *floorplan
+    FILE        *stream,
+    String_t     prefix,
+    Floorplan_t *floorplan
 )
 {
     fprintf(stream,
@@ -105,9 +105,9 @@ void print_detailed_floorplan
 
 Error_t fill_floorplan
 (
-    Floorplan  *floorplan,
-    Dimensions *dimensions,
-    String_t    file_name
+    Floorplan_t  *floorplan,
+    Dimensions_t *dimensions,
+    String_t      file_name
 )
 {
     FILE *input ;
@@ -147,7 +147,7 @@ Error_t fill_floorplan
 
 Quantity_t get_number_of_floorplan_elements_floorplan
 (
-    Floorplan *floorplan
+    Floorplan_t *floorplan
 )
 {
     return floorplan->NElements ;
@@ -155,10 +155,10 @@ Quantity_t get_number_of_floorplan_elements_floorplan
 
 /******************************************************************************/
 
-FloorplanElement *get_floorplan_element_floorplan
+FloorplanElement_t *get_floorplan_element_floorplan
 (
-    Floorplan *floorplan,
-    String_t   floorplan_element_id
+    Floorplan_t *floorplan,
+    String_t     floorplan_element_id
 )
 {
     return find_floorplan_element_in_list
@@ -170,12 +170,12 @@ FloorplanElement *get_floorplan_element_floorplan
 
 Error_t fill_sources_floorplan
 (
-    Source_t   *sources,
-    Dimensions *dimensions,
-    Floorplan  *floorplan
+    Source_t     *sources,
+    Dimensions_t *dimensions,
+    Floorplan_t  *floorplan
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, floorplan_element, floorplan->ElementsList)
 
         if (fill_sources_floorplan_element (sources, dimensions, floorplan_element) == TDICE_FAILURE)
 
@@ -188,15 +188,15 @@ Error_t fill_sources_floorplan
 
 Error_t insert_power_values_floorplan
 (
-    Floorplan   *floorplan,
-    PowersQueue *pvalues
+    Floorplan_t   *floorplan,
+    PowersQueue_t *pvalues
 )
 {
     Error_t result ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (FloorplanElement, floorplan_element, floorplan->ElementsList)
+    (FloorplanElement_t, floorplan_element, floorplan->ElementsList)
     {
         result = insert_power_values_floorplan_element
 
@@ -214,8 +214,8 @@ Error_t insert_power_values_floorplan
 
 Temperature_t *get_all_max_temperatures_floorplan
 (
-    Floorplan     *floorplan,
-    Dimensions    *dimensions,
+    Floorplan_t   *floorplan,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures,
     Quantity_t    *n_floorplan_elements,
     Temperature_t *max_temperatures
@@ -236,7 +236,7 @@ Temperature_t *get_all_max_temperatures_floorplan
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (FloorplanElement, flp_el, floorplan->ElementsList)
+    (FloorplanElement_t, flp_el, floorplan->ElementsList)
 
         *tmp++ = get_max_temperature_floorplan_element
 
@@ -249,8 +249,8 @@ Temperature_t *get_all_max_temperatures_floorplan
 
 Temperature_t *get_all_min_temperatures_floorplan
 (
-    Floorplan     *floorplan,
-    Dimensions    *dimensions,
+    Floorplan_t   *floorplan,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures,
     Quantity_t    *n_floorplan_elements,
     Temperature_t *min_temperatures
@@ -271,7 +271,7 @@ Temperature_t *get_all_min_temperatures_floorplan
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (FloorplanElement, flp_el, floorplan->ElementsList)
+    (FloorplanElement_t, flp_el, floorplan->ElementsList)
 
         *tmp++ = get_min_temperature_floorplan_element
 
@@ -284,8 +284,8 @@ Temperature_t *get_all_min_temperatures_floorplan
 
 Temperature_t *get_all_avg_temperatures_floorplan
 (
-    Floorplan     *floorplan,
-    Dimensions    *dimensions,
+    Floorplan_t   *floorplan,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures,
     Quantity_t    *n_floorplan_elements,
     Temperature_t *avg_temperatures
@@ -306,7 +306,7 @@ Temperature_t *get_all_avg_temperatures_floorplan
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (FloorplanElement, flp_el, floorplan->ElementsList)
+    (FloorplanElement_t, flp_el, floorplan->ElementsList)
 
         *tmp++ = get_avg_temperature_floorplan_element
 

@@ -58,12 +58,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Floorplan
+    /*! \struct Floorplan_t
      *
      *  \brief The floorplan representing the IC as a set of floorplan elements
      */
 
-    struct Floorplan
+    struct Floorplan_t
     {
         /*! The name of the file scanned to fill the floorplan */
 
@@ -75,13 +75,13 @@ extern "C"
 
         /*! Pointer to the list of floorplan elements */
 
-        FloorplanElement *ElementsList ;
+        FloorplanElement_t *ElementsList ;
 
     } ;
 
-    /*! Definition of the type Floorplan */
+    /*! Definition of the type Floorplan_t */
 
-    typedef struct Floorplan Floorplan ;
+    typedef struct Floorplan_t Floorplan_t ;
 
 /******************************************************************************/
 
@@ -92,7 +92,7 @@ extern "C"
      * \param floorplan the address of the flooprlan to initialize
      */
 
-    void init_floorplan (Floorplan *floorplan) ;
+    void init_floorplan (Floorplan_t *floorplan) ;
 
 
 
@@ -103,7 +103,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Floorplan *alloc_and_init_floorplan (void) ;
+    Floorplan_t *alloc_and_init_floorplan (void) ;
 
 
 
@@ -115,7 +115,7 @@ extern "C"
      * \param floorplan the address of the floorplan structure to free
      */
 
-    void free_floorplan (Floorplan *floorplan) ;
+    void free_floorplan (Floorplan_t *floorplan) ;
 
 
 
@@ -126,7 +126,7 @@ extern "C"
      * \param floorplan the floorplan    to print
      */
 
-    void print_detailed_floorplan (FILE *stream, String_t prefix, Floorplan *floorplan) ;
+    void print_detailed_floorplan (FILE *stream, String_t prefix, Floorplan_t *floorplan) ;
 
 
 
@@ -143,7 +143,7 @@ extern "C"
 
     Error_t fill_floorplan
 
-        (Floorplan *floorplan, Dimensions *dimensions, String_t file_name) ;
+        (Floorplan_t *floorplan, Dimensions_t *dimensions, String_t file_name) ;
 
 
 
@@ -163,9 +163,9 @@ extern "C"
 
     Error_t fill_sources_floorplan
     (
-        Source_t   *sources,
-        Dimensions *dimensions,
-        Floorplan  *floorplan
+        Source_t     *sources,
+        Dimensions_t *dimensions,
+        Floorplan_t  *floorplan
     ) ;
 
 
@@ -177,7 +177,7 @@ extern "C"
      * \return the total nyumber of floorplan elements in \a floorplan
      */
 
-    Quantity_t get_number_of_floorplan_elements_floorplan (Floorplan *floorplan) ;
+    Quantity_t get_number_of_floorplan_elements_floorplan (Floorplan_t *floorplan) ;
 
 
 
@@ -191,9 +191,9 @@ extern "C"
      * \return the pointer to the floorplan element \a floorplan_element_id
      */
 
-    FloorplanElement *get_floorplan_element_floorplan
+    FloorplanElement_t *get_floorplan_element_floorplan
 
-        (Floorplan *floorplan, String_t floorplan_element_id) ;
+        (Floorplan_t *floorplan, String_t floorplan_element_id) ;
 
 
 
@@ -215,7 +215,7 @@ extern "C"
 
     Error_t insert_power_values_floorplan
 
-        (Floorplan *floorplan, PowersQueue *pvalues) ;
+        (Floorplan_t *floorplan, PowersQueue_t *pvalues) ;
 
 
 
@@ -238,8 +238,8 @@ extern "C"
 
     Temperature_t *get_all_max_temperatures_floorplan
     (
-        Floorplan     *floorplan,
-        Dimensions    *dimensions,
+        Floorplan_t   *floorplan,
+        Dimensions_t  *dimensions,
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,
         Temperature_t *max_temperatures
@@ -266,8 +266,8 @@ extern "C"
 
     Temperature_t *get_all_min_temperatures_floorplan
     (
-        Floorplan     *floorplan,
-        Dimensions    *dimensions,
+        Floorplan_t   *floorplan,
+        Dimensions_t  *dimensions,
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,
         Temperature_t *min_temperatures
@@ -294,8 +294,8 @@ extern "C"
 
     Temperature_t *get_all_avg_temperatures_floorplan
     (
-        Floorplan     *floorplan,
-        Dimensions    *dimensions,
+        Floorplan_t   *floorplan,
+        Dimensions_t  *dimensions,
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,
         Temperature_t *avg_temperatures

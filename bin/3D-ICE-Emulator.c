@@ -44,11 +44,11 @@
 
 int main(int argc, char** argv)
 {
-    StackDescription stkd ;
-    Analysis         analysis ;
-    ThermalData      tdata ;
+    StackDescription_t stkd ;
+    Analysis_t         analysis ;
+    ThermalData_t      tdata ;
 
-    SimResult_t (*emulate) (ThermalData*, StackDescription*, Analysis*) ;
+    SimResult_t (*emulate) (ThermalData_t*, StackDescription_t*, Analysis_t*) ;
 
     Error_t error ;
 

@@ -52,13 +52,13 @@
 {
     double                double_v ;
     String_t              string ;
-    Material             *material_p ;
+    Material_t           *material_p ;
     Coolant_t             coolant_v ;
     ChannelModel_t        channel_model_v ;
-    Die                  *die_p ;
-    Layer                *layer_p ;
-    StackElement         *stack_element_p ;
-    InspectionPoint      *inspection_point_p ;
+    Die_t                *die_p ;
+    Layer_t              *layer_p ;
+    StackElement_t       *stack_element_p ;
+    InspectionPoint_t    *inspection_point_p ;
     OutputInstant_t       output_instant_v ;
     OutputQuantity_t      output_quantity_v ;
 }
@@ -79,7 +79,7 @@
 
     void stack_description_error
 
-        (StackDescription *stack, Analysis *analysis,
+        (StackDescription_t *stack, Analysis_t *analysis,
          yyscan_t scanner, String_t message) ;
 
     static char error_message [100] ;
@@ -188,9 +188,9 @@
 %pure-parser
 %error-verbose
 
-%parse-param { StackDescription *stkd     }
-%parse-param { Analysis         *analysis }
-%parse-param { yyscan_t          scanner }
+%parse-param { StackDescription_t *stkd     }
+%parse-param { Analysis_t         *analysis }
+%parse-param { yyscan_t            scanner }
 
 %lex-param   { yyscan_t scanner }
 
@@ -263,7 +263,7 @@ material
         THERMAL CONDUCTIVITY     DVALUE ';'     // $6
         VOLUMETRIC HEAT CAPACITY DVALUE ';'     // $11
     {
-        Material *material = $$ = alloc_and_init_material () ;
+        Material_t *material = $$ = alloc_and_init_material () ;
 
         if (material == NULL)
         {
@@ -552,7 +552,7 @@ layer_content :
     DVALUE IDENTIFIER ';' // $1 and $2
 
     {
-        Layer *layer = $$ = alloc_and_init_layer () ;
+        Layer_t *layer = $$ = alloc_and_init_layer () ;
 
         if (layer == NULL)
         {
@@ -622,7 +622,7 @@ die
         source_layer           // $5 source layer
         layers_list            // $6 list of layers (bottom -> below source)
     {
-        Die *die = $$ = alloc_and_init_die () ;
+        Die_t *die = $$ = alloc_and_init_die () ;
 
         if (die == NULL)
         {
@@ -818,14 +818,14 @@ stack
             fprintf (stderr, "Warning: neither heat sink nor channel has been declared\n") ;
 
 
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material, material, stkd->MaterialsList)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, stkd->MaterialsList)
 
             if (material->Used == 0)
 
                 fprintf (stderr, "Warning: material %s declared but not used\n", material->Id) ;
 
 
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, stkd->DiesList)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, stkd->DiesList)
 
             if (die->Used == 0)
 
@@ -849,7 +849,7 @@ stack
 
         CellIndex_t layer_index = 0u ;
 
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement, stk_el, stkd->BottomStackElement)
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stk_el, stkd->BottomStackElement)
         {
             stk_el->Offset = layer_index ;
             layer_index   += stk_el->NLayers ;
@@ -938,7 +938,7 @@ stack_element
                                               // $3 Height of the layer
                                               // $4 Identifier of the material
     {
-        StackElement *stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -950,7 +950,7 @@ stack_element
             YYABORT ;
         }
 
-        Layer *layer = alloc_and_init_layer () ;
+        Layer_t *layer = alloc_and_init_layer () ;
 
         if (layer == NULL)
         {
@@ -1001,7 +1001,7 @@ stack_element
             YYABORT ;
         }
 
-        StackElement *stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1024,7 +1024,7 @@ stack_element
     {
         num_dies++ ;
 
-        StackElement *stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1188,7 +1188,7 @@ inspection_point
      // $10      when to generate output for this observation
 
      {
-        StackElement *stack_element =
+        StackElement_t *stack_element =
 
             find_stack_element_in_list (stkd->BottomStackElement, $3) ;
 
@@ -1204,7 +1204,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tcell *tcell = alloc_and_init_tcell () ;
+        Tcell_t *tcell = alloc_and_init_tcell () ;
 
         if (tcell == NULL)
         {
@@ -1218,7 +1218,7 @@ inspection_point
 
         align_tcell (tcell, $5, $7, stkd->Dimensions) ;
 
-        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1249,7 +1249,7 @@ inspection_point
      // $8 when to generate output for this observation
 
      {
-        StackElement *stack_element =
+        StackElement_t *stack_element =
 
             find_stack_element_in_list (stkd->BottomStackElement, $3) ;
 
@@ -1277,7 +1277,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tflp *tflp = alloc_and_init_tflp () ;
+        Tflp_t *tflp = alloc_and_init_tflp () ;
 
         if (tflp == NULL)
         {
@@ -1291,7 +1291,7 @@ inspection_point
 
         tflp->Quantity = $7 ;
 
-        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1323,7 +1323,7 @@ inspection_point
      // $10 when to generate output for this observation
 
      {
-        StackElement *stack_element =
+        StackElement_t *stack_element =
 
             find_stack_element_in_list (stkd->BottomStackElement, $3) ;
 
@@ -1353,7 +1353,7 @@ inspection_point
             YYABORT ;
         }
 
-        FloorplanElement *floorplan_element = find_floorplan_element_in_list
+        FloorplanElement_t *floorplan_element = find_floorplan_element_in_list
 
             (stack_element->Floorplan->ElementsList, $5) ;
 
@@ -1370,7 +1370,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tflpel *tflpel = alloc_and_init_tflpel () ;
+        Tflpel_t *tflpel = alloc_and_init_tflpel () ;
 
         if (tflpel == NULL)
         {
@@ -1386,7 +1386,7 @@ inspection_point
         tflpel->FloorplanElement = floorplan_element ;
         tflpel->Quantity         = $9 ;
 
-        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1418,7 +1418,7 @@ inspection_point
      // $6 when to generate output for this observation
 
      {
-        StackElement *stack_element =
+        StackElement_t *stack_element =
 
             find_stack_element_in_list (stkd->BottomStackElement, $3) ;
 
@@ -1434,7 +1434,7 @@ inspection_point
             YYABORT ;
         }
 
-        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1462,7 +1462,7 @@ inspection_point
      // $8 when to generate output for this observation
 
      {
-        StackElement *stack_element =
+        StackElement_t *stack_element =
 
             find_stack_element_in_list (stkd->BottomStackElement, $3) ;
 
@@ -1490,7 +1490,7 @@ inspection_point
             YYABORT ;
         }
 
-        InspectionPoint *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1502,7 +1502,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tcoolant *tcoolant = alloc_and_init_tcoolant () ;
+        Tcoolant_t *tcoolant = alloc_and_init_tcoolant () ;
 
         if (tcoolant == NULL)
         {
@@ -1547,10 +1547,10 @@ when
 
 void stack_description_error
 (
-    StackDescription *stkd,
-    Analysis          __attribute__ ((unused)) *analysis,
-    yyscan_t          scanner,
-    String_t          message
+    StackDescription_t *stkd,
+    Analysis_t          __attribute__ ((unused)) *analysis,
+    yyscan_t            scanner,
+    String_t            message
 )
 {
     fprintf (stack_description_get_out (scanner),

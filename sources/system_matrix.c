@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_system_matrix (SystemMatrix* system_matrix)
+void init_system_matrix (SystemMatrix_t* system_matrix)
 {
     system_matrix->ColumnPointers = NULL ;
     system_matrix->RowIndices     = NULL;
@@ -56,9 +56,9 @@ void init_system_matrix (SystemMatrix* system_matrix)
 
 Error_t alloc_system_matrix
 (
-    SystemMatrix *system_matrix,
-    CellIndex_t   size,
-    CellIndex_t   nnz
+    SystemMatrix_t *system_matrix,
+    CellIndex_t     size,
+    CellIndex_t     nnz
 )
 {
     system_matrix->Size = size ;
@@ -92,7 +92,7 @@ Error_t alloc_system_matrix
 
 /******************************************************************************/
 
-void free_system_matrix (SystemMatrix* system_matrix)
+void free_system_matrix (SystemMatrix_t* system_matrix)
 {
     FREE_POINTER (free, system_matrix->ColumnPointers) ;
     FREE_POINTER (free, system_matrix->RowIndices) ;
@@ -101,7 +101,7 @@ void free_system_matrix (SystemMatrix* system_matrix)
 
 /******************************************************************************/
 
-void print_system_matrix (String_t file_name, SystemMatrix system_matrix)
+void print_system_matrix (String_t file_name, SystemMatrix_t system_matrix)
 {
     FILE* file = fopen (file_name, "w") ;
 
@@ -128,14 +128,14 @@ void print_system_matrix (String_t file_name, SystemMatrix system_matrix)
 
 /******************************************************************************/
 
-SystemMatrix add_solid_column
+SystemMatrix_t add_solid_column
 (
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    CellIndex_t   row_index,
-    CellIndex_t   column_index,
-    SystemMatrix  system_matrix
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells,
+    CellIndex_t     layer_index,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index,
+    SystemMatrix_t  system_matrix
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -149,7 +149,7 @@ SystemMatrix add_solid_column
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    ThermalCell *cell =
+    ThermalCell_t *cell =
 
         thermal_cells + layer_index * ncolumns + column_index ;
 
@@ -332,14 +332,14 @@ SystemMatrix add_solid_column
 
 /******************************************************************************/
 
-SystemMatrix add_liquid_column_4rm
+SystemMatrix_t add_liquid_column_4rm
 (
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    CellIndex_t   row_index,
-    CellIndex_t   column_index,
-    SystemMatrix  system_matrix
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells,
+    CellIndex_t     layer_index,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index,
+    SystemMatrix_t  system_matrix
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -353,7 +353,7 @@ SystemMatrix add_liquid_column_4rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    ThermalCell *cell =
+    ThermalCell_t *cell =
 
         thermal_cells + layer_index * ncolumns + column_index ;
 
@@ -520,14 +520,14 @@ SystemMatrix add_liquid_column_4rm
 
 /******************************************************************************/
 
-SystemMatrix add_liquid_column_2rm
+SystemMatrix_t add_liquid_column_2rm
 (
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    CellIndex_t   row_index,
-    CellIndex_t   column_index,
-    SystemMatrix  system_matrix
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells,
+    CellIndex_t     layer_index,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index,
+    SystemMatrix_t  system_matrix
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -541,7 +541,7 @@ SystemMatrix add_liquid_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    ThermalCell *cell =
+    ThermalCell_t *cell =
 
         thermal_cells + layer_index * ncolumns + column_index ;
 
@@ -664,14 +664,14 @@ SystemMatrix add_liquid_column_2rm
 
 /******************************************************************************/
 
-SystemMatrix add_bottom_wall_column_2rm
+SystemMatrix_t add_bottom_wall_column_2rm
 (
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    CellIndex_t   row_index,
-    CellIndex_t   column_index,
-    SystemMatrix  system_matrix
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells,
+    CellIndex_t     layer_index,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index,
+    SystemMatrix_t  system_matrix
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -685,7 +685,7 @@ SystemMatrix add_bottom_wall_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    ThermalCell *cell =
+    ThermalCell_t *cell =
 
         thermal_cells + layer_index * ncolumns + column_index ;
 
@@ -792,14 +792,14 @@ SystemMatrix add_bottom_wall_column_2rm
 
 /******************************************************************************/
 
-SystemMatrix add_top_wall_column_2rm
+SystemMatrix_t add_top_wall_column_2rm
 (
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    CellIndex_t   row_index,
-    CellIndex_t   column_index,
-    SystemMatrix  system_matrix
+    Dimensions_t   *dimensions,
+    ThermalCell_t  *thermal_cells,
+    CellIndex_t     layer_index,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index,
+    SystemMatrix_t  system_matrix
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -813,7 +813,7 @@ SystemMatrix add_top_wall_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    ThermalCell *cell =
+    ThermalCell_t *cell =
 
         thermal_cells + layer_index * ncolumns + column_index ;
 
@@ -921,15 +921,15 @@ SystemMatrix add_top_wall_column_2rm
 
 /******************************************************************************/
 
-SystemMatrix add_virtual_wall_column_2rm
+SystemMatrix_t add_virtual_wall_column_2rm
 (
-    Dimensions    *dimensions,
-    ThermalCell   *thermal_cells,
-    ChannelModel_t channel_model,
-    CellIndex_t    layer_index,
-    CellIndex_t    row_index,
-    CellIndex_t    column_index,
-    SystemMatrix   system_matrix
+    Dimensions_t    *dimensions,
+    ThermalCell_t   *thermal_cells,
+    ChannelModel_t   channel_model,
+    CellIndex_t      layer_index,
+    CellIndex_t      row_index,
+    CellIndex_t      column_index,
+    SystemMatrix_t   system_matrix
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -943,7 +943,7 @@ SystemMatrix add_virtual_wall_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    ThermalCell *cell =
+    ThermalCell_t *cell =
 
         thermal_cells + layer_index * ncolumns + column_index ;
 

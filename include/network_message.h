@@ -59,7 +59,7 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct NetworkMessage
+    /*! \struct NetworkMessage_t
      *
      *  \brief Structure used to store messages to be sent over network
      *
@@ -67,7 +67,7 @@ extern "C"
      *  Length field in te message is mesured in number of words.
      */
 
-    struct NetworkMessage
+    struct NetworkMessage_t
     {
         /*! The memory used to store the message */
 
@@ -91,9 +91,9 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type NetworkMessage */
+    /*! Definition of the type NetworkMessage_t */
 
-    typedef struct NetworkMessage NetworkMessage ;
+    typedef struct NetworkMessage_t NetworkMessage_t ;
 
 
     /*! Initializes a NetworkMessage
@@ -101,7 +101,7 @@ extern "C"
      * \param message the address of the NetworkMessage to initialize
      */
 
-    void init_network_message (NetworkMessage *message) ;
+    void init_network_message (NetworkMessage_t *message) ;
 
 
 
@@ -110,7 +110,7 @@ extern "C"
      * \param message the address of the NetworkMessage to free
      */
 
-    void free_network_message (NetworkMessage *message) ;
+    void free_network_message (NetworkMessage_t *message) ;
 
 
 
@@ -121,7 +121,7 @@ extern "C"
      *
      */
 
-    void increase_message_memory (NetworkMessage *message, Quantity_t new_size) ;
+    void increase_message_memory (NetworkMessage_t *message, Quantity_t new_size) ;
 
 
 
@@ -134,7 +134,7 @@ extern "C"
      * \param type    the type of the request
      */
 
-    void build_message_head (NetworkMessage *message, MessageType_t type) ;
+    void build_message_head (NetworkMessage_t *message, MessageType_t type) ;
 
 
 
@@ -147,7 +147,7 @@ extern "C"
      * \param word    (in) the address of the word to add
      */
 
-    void insert_message_word (NetworkMessage *message, void *word) ;
+    void insert_message_word (NetworkMessage_t *message, void *word) ;
 
 
 
@@ -167,7 +167,7 @@ extern "C"
 
     Error_t extract_message_word
 
-        (NetworkMessage *message, void *word, Quantity_t index) ;
+        (NetworkMessage_t *message, void *word, Quantity_t index) ;
 
 #ifdef __cplusplus
 }

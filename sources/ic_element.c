@@ -41,7 +41,7 @@
 
 /******************************************************************************/
 
-void init_ic_element (ICElement *icelement)
+void init_ic_element (ICElement_t *icelement)
 {
     icelement->SW_X   = 0.0 ;
     icelement->SW_Y   = 0.0 ;
@@ -61,9 +61,9 @@ void init_ic_element (ICElement *icelement)
 
 /******************************************************************************/
 
-ICElement *alloc_and_init_ic_element (void)
+ICElement_t *alloc_and_init_ic_element (void)
 {
-    ICElement *ic_element = (ICElement *) malloc (sizeof(ICElement));
+    ICElement_t *ic_element = (ICElement_t *) malloc (sizeof(ICElement_t));
 
     if (ic_element != NULL)
 
@@ -74,25 +74,25 @@ ICElement *alloc_and_init_ic_element (void)
 
 /*****************************************************************************/
 
-void free_ic_element (ICElement *icelement)
+void free_ic_element (ICElement_t *icelement)
 {
     FREE_POINTER (free, icelement) ;
 }
 
 /******************************************************************************/
 
-void free_ic_elements_list (ICElement *list)
+void free_ic_elements_list (ICElement_t *list)
 {
-    FREE_LIST (ICElement, list, free_ic_element) ;
+    FREE_LIST (ICElement_t, list, free_ic_element) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_ic_element
 (
-    FILE      *stream,
-    String_t   prefix,
-    ICElement *icelement
+    FILE        *stream,
+    String_t     prefix,
+    ICElement_t *icelement
 )
 {
     fprintf (stream,
@@ -146,9 +146,9 @@ void print_detailed_ic_element
 
 /******************************************************************************/
 
-void print_detailed_ic_elements_list (FILE *stream, String_t prefix, ICElement *list)
+void print_detailed_ic_elements_list (FILE *stream, String_t prefix, ICElement_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, icelement, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
     {
         if (icelement->Next == NULL)
 
@@ -166,9 +166,9 @@ void print_detailed_ic_elements_list (FILE *stream, String_t prefix, ICElement *
 
 void print_formatted_ic_element
 (
-    FILE      *stream,
-    String_t   prefix,
-    ICElement *icelement
+    FILE        *stream,
+    String_t     prefix,
+    ICElement_t *icelement
 )
 {
     fprintf (stream,
@@ -179,9 +179,9 @@ void print_formatted_ic_element
 
 /******************************************************************************/
 
-void print_formatted_ic_elements_list (FILE *stream, String_t prefix, ICElement *list)
+void print_formatted_ic_elements_list (FILE *stream, String_t prefix, ICElement_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement, icelement, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
     {
         if (icelement->Next == NULL)
 
@@ -199,8 +199,8 @@ void print_formatted_ic_elements_list (FILE *stream, String_t prefix, ICElement 
 
 bool check_intersection
 (
-    ICElement *icelement_a,
-    ICElement *icelement_b
+    ICElement_t *icelement_a,
+    ICElement_t *icelement_b
 )
 {
     if (icelement_a == icelement_b)
@@ -226,7 +226,7 @@ bool check_intersection
 
 /******************************************************************************/
 
-bool check_location (Dimensions *dimensions, ICElement *icelement)
+bool check_location (Dimensions_t *dimensions, ICElement_t *icelement)
 {
     return (   (icelement->SW_X <  0)
 
@@ -239,7 +239,7 @@ bool check_location (Dimensions *dimensions, ICElement *icelement)
 
 /******************************************************************************/
 
-void align_to_grid (Dimensions *dimensions, ICElement *icelement)
+void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 {
     ChipDimension_t cx = 0.0 ;
     ChipDimension_t cy = 0.0 ;
@@ -325,10 +325,10 @@ void align_to_grid (Dimensions *dimensions, ICElement *icelement)
 void fill_sources_ic_element
 (
     Source_t        *sources,
-    Dimensions      *dimensions,
+    Dimensions_t    *dimensions,
     Power_t          power,
     ChipDimension_t  surface,
-    ICElement       *icelement
+    ICElement_t     *icelement
 )
 {
     // Here we ADD the power value to the source vector. It works as long as
@@ -366,8 +366,8 @@ void fill_sources_ic_element
 
 Temperature_t get_max_temperature_ic_element
 (
-    ICElement     *icelement,
-    Dimensions    *dimensions,
+    ICElement_t   *icelement,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
@@ -399,8 +399,8 @@ Temperature_t get_max_temperature_ic_element
 
 Temperature_t get_min_temperature_ic_element
 (
-    ICElement     *icelement,
-    Dimensions    *dimensions,
+    ICElement_t   *icelement,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
@@ -432,8 +432,8 @@ Temperature_t get_min_temperature_ic_element
 
 Temperature_t get_avg_temperature_ic_element
 (
-    ICElement     *icelement,
-    Dimensions    *dimensions,
+    ICElement_t   *icelement,
+    Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {

@@ -44,7 +44,7 @@
 
 /******************************************************************************/
 
-void init_die (Die *die)
+void init_die (Die_t *die)
 {
     die->Id                = NULL ;
     die->Used              = 0u ;
@@ -58,9 +58,9 @@ void init_die (Die *die)
 
 /******************************************************************************/
 
-Die *alloc_and_init_die (void)
+Die_t *alloc_and_init_die (void)
 {
-    Die *die = (Die *) malloc (sizeof(Die)) ;
+    Die_t *die = (Die_t *) malloc (sizeof(Die_t)) ;
 
     if (die != NULL)
 
@@ -71,7 +71,7 @@ Die *alloc_and_init_die (void)
 
 /******************************************************************************/
 
-void free_die (Die *die)
+void free_die (Die_t *die)
 {
     if (die->Id != NULL)
 
@@ -85,16 +85,16 @@ void free_die (Die *die)
 
 /******************************************************************************/
 
-void free_dies_list (Die *list)
+void free_dies_list (Die_t *list)
 {
-    FREE_LIST (Die, list, free_die) ;
+    FREE_LIST (Die_t, list, free_die) ;
 }
 
 /******************************************************************************/
 
-Die *find_die_in_list (Die *list, String_t id)
+Die_t *find_die_in_list (Die_t *list, String_t id)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, list)
     {
         if (strcmp(die->Id, id) == 0) break ;
     }
@@ -103,7 +103,7 @@ Die *find_die_in_list (Die *list, String_t id)
 
 /******************************************************************************/
 
-void print_formatted_die (FILE  *stream, String_t prefix, Die *die)
+void print_formatted_die (FILE  *stream, String_t prefix, Die_t *die)
 {
     String_t new_prefix_layer = (String_t)
 
@@ -122,7 +122,7 @@ void print_formatted_die (FILE  *stream, String_t prefix, Die *die)
 
     fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer, layer, die->TopLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer_t, layer, die->TopLayer)
     {
         if (layer == die->SourceLayer)
 
@@ -139,9 +139,9 @@ void print_formatted_die (FILE  *stream, String_t prefix, Die *die)
 
 /******************************************************************************/
 
-void print_formatted_dies_list (FILE  *stream, String_t prefix, Die *list)
+void print_formatted_dies_list (FILE  *stream, String_t prefix, Die_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, list)
     {
         if (die->Next == NULL)
 
@@ -157,7 +157,7 @@ void print_formatted_dies_list (FILE  *stream, String_t prefix, Die *list)
 
 /******************************************************************************/
 
-void print_detailed_die (FILE  *stream, String_t prefix, Die *die)
+void print_detailed_die (FILE  *stream, String_t prefix, Die_t *die)
 {
     String_t new_prefix = (String_t)
 
@@ -214,9 +214,9 @@ void print_detailed_die (FILE  *stream, String_t prefix, Die *die)
 
 /******************************************************************************/
 
-void print_detailed_dies_list (FILE  *stream, String_t prefix, Die *list)
+void print_detailed_dies_list (FILE  *stream, String_t prefix, Die_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die, die, list)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, list)
     {
         if (die->Next == NULL)
 
@@ -234,14 +234,14 @@ void print_detailed_dies_list (FILE  *stream, String_t prefix, Die *list)
 
 void fill_thermal_cell_die
 (
-    ThermalCell *thermal_cells,
-    Time_t       delta_time,
-    Dimensions  *dimensions,
-    CellIndex_t  layer_index,
-    Die         *die
+    ThermalCell_t *thermal_cells,
+    Time_t         delta_time,
+    Dimensions_t  *dimensions,
+    CellIndex_t    layer_index,
+    Die_t         *die
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, die->BottomLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, die->BottomLayer)
 
         fill_thermal_cell_layer
 
@@ -252,11 +252,11 @@ void fill_thermal_cell_die
 
 Error_t fill_sources_die
 (
-    Source_t   *sources,
-    Dimensions *dimensions,
-    CellIndex_t layer_index,
-    Floorplan  *floorplan,
-    Die        *die
+    Source_t     *sources,
+    Dimensions_t *dimensions,
+    CellIndex_t   layer_index,
+    Floorplan_t  *floorplan,
+    Die_t        *die
 )
 {
 #ifdef PRINT_SOURCES
@@ -274,20 +274,20 @@ Error_t fill_sources_die
 
 /******************************************************************************/
 
-SystemMatrix fill_system_matrix_die
+SystemMatrix_t fill_system_matrix_die
 (
-    Die          *die,
-    Dimensions   *dimensions,
-    ThermalCell  *thermal_cells,
-    CellIndex_t   layer_index,
-    SystemMatrix  system_matrix
+    Die_t            *die,
+    Dimensions_t     *dimensions,
+    ThermalCell_t    *thermal_cells,
+    CellIndex_t       layer_index,
+    SystemMatrix_t    system_matrix
 )
 {
 # ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
 # endif
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer, layer, die->BottomLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, die->BottomLayer)
 
         system_matrix = fill_system_matrix_layer
 

@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_powers_queue (PowersQueue *powers_queue)
+void init_powers_queue (PowersQueue_t *powers_queue)
 {
     powers_queue->Head   = NULL ;
     powers_queue->Tail   = NULL ;
@@ -52,9 +52,9 @@ void init_powers_queue (PowersQueue *powers_queue)
 
 /******************************************************************************/
 
-PowersQueue *alloc_and_init_powers_queue (void)
+PowersQueue_t *alloc_and_init_powers_queue (void)
 {
-    PowersQueue *powers_queue = (PowersQueue *) malloc (sizeof(PowersQueue)) ;
+    PowersQueue_t *powers_queue = (PowersQueue_t *) malloc (sizeof(PowersQueue_t)) ;
 
     if (powers_queue != NULL)
 
@@ -65,7 +65,7 @@ PowersQueue *alloc_and_init_powers_queue (void)
 
 /******************************************************************************/
 
-void free_powers_queue (PowersQueue *powers_queue)
+void free_powers_queue (PowersQueue_t *powers_queue)
 {
     while (! is_empty_powers_queue(powers_queue))
 
@@ -78,14 +78,14 @@ void free_powers_queue (PowersQueue *powers_queue)
 
 void print_detailed_powers_queue
 (
-    FILE        *stream,
-    String_t     prefix,
-    PowersQueue *powers_queue
+    FILE          *stream,
+    String_t       prefix,
+    PowersQueue_t *powers_queue
 )
 {
     fprintf(stream, "%s [%d] ", prefix, powers_queue->Length) ;
 
-    PowerNode *tmp = NULL ;
+    PowerNode_t *tmp = NULL ;
     for (tmp = powers_queue->Head ; tmp != NULL ; tmp = tmp->Next)
 
         fprintf(stream, "%6.4f ", tmp->Value) ;
@@ -95,9 +95,9 @@ void print_detailed_powers_queue
 
 /******************************************************************************/
 
-void print_formatted_powers_queue (FILE *stream, PowersQueue *powers_queue)
+void print_formatted_powers_queue (FILE *stream, PowersQueue_t *powers_queue)
 {
-    PowerNode *tmp = NULL ;
+    PowerNode_t *tmp = NULL ;
     for (tmp = powers_queue->Head ; tmp != NULL ; tmp = tmp->Next)
 
         fprintf(stream, "%6.4f ", tmp->Value) ;
@@ -105,18 +105,18 @@ void print_formatted_powers_queue (FILE *stream, PowersQueue *powers_queue)
 
 /******************************************************************************/
 
-bool is_empty_powers_queue (PowersQueue *powers_queue)
+bool is_empty_powers_queue (PowersQueue_t *powers_queue)
 {
     return (powers_queue->Length == 0) ;
 }
 
 /******************************************************************************/
 
-void put_into_powers_queue (PowersQueue *powers_queue, Power_t power)
+void put_into_powers_queue (PowersQueue_t *powers_queue, Power_t power)
 {
-    PowerNode *tmp = powers_queue->Tail ;
+    PowerNode_t *tmp = powers_queue->Tail ;
 
-    powers_queue->Tail = malloc (sizeof(PowerNode)) ;
+    powers_queue->Tail = malloc (sizeof(PowerNode_t)) ;
 
     if ( powers_queue->Tail == NULL )
     {
@@ -140,16 +140,16 @@ void put_into_powers_queue (PowersQueue *powers_queue, Power_t power)
 
 /******************************************************************************/
 
-Power_t get_from_powers_queue (PowersQueue *powers_queue)
+Power_t get_from_powers_queue (PowersQueue_t *powers_queue)
 {
     return powers_queue->Head->Value ;
 }
 
 /******************************************************************************/
 
-void pop_from_powers_queue (PowersQueue *powers_queue)
+void pop_from_powers_queue (PowersQueue_t *powers_queue)
 {
-    PowerNode *tmp = powers_queue->Head->Next ;
+    PowerNode_t *tmp = powers_queue->Head->Next ;
 
     FREE_POINTER (free, powers_queue->Head) ;
 

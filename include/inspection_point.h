@@ -59,12 +59,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct Tcell
+    /*! \struct Tcell_t
      *
      *  \brief Temperature of an individual thermal cell
      */
 
-    struct Tcell
+    struct Tcell_t
     {
         /*! X coordinate of the thermal cell as specified in the stack file */
 
@@ -91,9 +91,9 @@ extern "C"
         CellIndex_t ColumnIndex ;
     } ;
 
-    /*! Definition of the type Tcell */
+    /*! Definition of the type Tcell_t */
 
-    typedef struct Tcell Tcell ;
+    typedef struct Tcell_t Tcell_t ;
 
 
 
@@ -102,7 +102,7 @@ extern "C"
      * \param tcell the address of the tcell to initialize
      */
 
-    void init_tcell (Tcell *tcell) ;
+    void init_tcell (Tcell_t *tcell) ;
 
 
 
@@ -113,7 +113,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Tcell *alloc_and_init_tcell (void) ;
+    Tcell_t *alloc_and_init_tcell (void) ;
 
 
 
@@ -125,7 +125,7 @@ extern "C"
      * \param tcell the address of the Tcell structure to free
      */
 
-    void free_tcell (Tcell *tcell) ;
+    void free_tcell (Tcell_t *tcell) ;
 
 
 
@@ -138,7 +138,7 @@ extern "C"
 
     void print_detailed_tcell
 
-        (FILE *stream, String_t prefix, Tcell *tcell) ;
+        (FILE *stream, String_t prefix, Tcell_t *tcell) ;
 
 
 
@@ -156,31 +156,31 @@ extern "C"
 
     void align_tcell
     (
-        Tcell           *tcell,
+        Tcell_t         *tcell,
         ChipDimension_t  xval,
         ChipDimension_t  yval,
-        Dimensions      *dimensions
+        Dimensions_t    *dimensions
     ) ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \struct Tflp
+    /*! \struct Tflp_t
      *
      *  \brief Temperature of all elements in a floorplan
      */
 
-    struct Tflp
+    struct Tflp_t
     {
         /*! The kind of quantity to be measured */
 
         OutputQuantity_t Quantity ;
     } ;
 
-    /*! Definition of the type Tflp */
+    /*! Definition of the type Tflp_t */
 
-    typedef struct Tflp Tflp ;
+    typedef struct Tflp_t Tflp_t ;
 
 
 
@@ -189,7 +189,7 @@ extern "C"
      * \param tflp the address of the tflp to initialize
      */
 
-    void init_tflp (Tflp *tflp) ;
+    void init_tflp (Tflp_t *tflp) ;
 
 
 
@@ -200,7 +200,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Tflp *alloc_and_init_tflp (void) ;
+    Tflp_t *alloc_and_init_tflp (void) ;
 
 
 
@@ -212,7 +212,7 @@ extern "C"
      * \param tflp the address of the Tflp structure to free
      */
 
-    void free_tflp (Tflp *tflp) ;
+    void free_tflp (Tflp_t *tflp) ;
 
 
 
@@ -225,31 +225,31 @@ extern "C"
 
     void print_detailed_tflp
 
-        (FILE *stream, String_t prefix, Tflp *tflp) ;
+        (FILE *stream, String_t prefix, Tflp_t *tflp) ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \struct Tflpel
+    /*! \struct Tflpel_t
      *
      * \brief Temperature of a single floorplan element
      */
 
-    struct Tflpel
+    struct Tflpel_t
     {
         /*! Pointer to the Floorplan Element */
 
-        FloorplanElement *FloorplanElement ;
+        FloorplanElement_t *FloorplanElement ;
 
         /*! The kind of quantity to be measured */
 
         OutputQuantity_t Quantity ;
     } ;
 
-    /*! Definition of the type Tflpel */
+    /*! Definition of the type Tflpel_t */
 
-    typedef struct Tflpel Tflpel ;
+    typedef struct Tflpel_t Tflpel_t ;
 
 
 
@@ -258,7 +258,7 @@ extern "C"
      * \param tflpel the address of the tflpel to initialize
      */
 
-    void init_tflpel (Tflpel *tflpel) ;
+    void init_tflpel (Tflpel_t *tflpel) ;
 
 
 
@@ -269,7 +269,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Tflpel *alloc_and_init_tflpel (void) ;
+    Tflpel_t *alloc_and_init_tflpel (void) ;
 
 
 
@@ -281,7 +281,7 @@ extern "C"
      * \param tflpel the address of the Tflpel structure to free
      */
 
-    void free_tflpel (Tflpel *tflpel) ;
+    void free_tflpel (Tflpel_t *tflpel) ;
 
 
 
@@ -294,18 +294,18 @@ extern "C"
 
     void print_detailed_tflpel
 
-        (FILE *stream, String_t prefix, Tflpel *tflpel) ;
+        (FILE *stream, String_t prefix, Tflpel_t *tflpel) ;
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 
-    /*! \struct Tcoolant
+    /*! \struct Tcoolant_t
      *
      *  \brief Temperature of the coolant when leaving a cavity
      */
 
-    struct Tcoolant
+    struct Tcoolant_t
     {
         /*! The kind of quantity to be measured */
 
@@ -313,9 +313,9 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type Tcoolant */
+    /*! Definition of the type Tcoolant_t */
 
-    typedef struct Tcoolant Tcoolant ;
+    typedef struct Tcoolant_t Tcoolant_t ;
 
 
 
@@ -324,7 +324,7 @@ extern "C"
      * \param tcoolant the address of the tcoolant to initialize
      */
 
-    void init_tcoolant (Tcoolant *tcoolant) ;
+    void init_tcoolant (Tcoolant_t *tcoolant) ;
 
 
 
@@ -335,7 +335,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    Tcoolant *alloc_and_init_tcoolant (void) ;
+    Tcoolant_t *alloc_and_init_tcoolant (void) ;
 
 
 
@@ -347,7 +347,7 @@ extern "C"
      * \param tcoolant the address of the Tcoolant structure to free
      */
 
-    void free_tcoolant (Tcoolant *tcoolant) ;
+    void free_tcoolant (Tcoolant_t *tcoolant) ;
 
 
 
@@ -360,7 +360,7 @@ extern "C"
 
     void print_detailed_tcoolant
 
-        (FILE *stream, String_t prefix, Tcoolant *tcoolant) ;
+        (FILE *stream, String_t prefix, Tcoolant_t *tcoolant) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -373,10 +373,10 @@ extern "C"
 
     union InspectionPoint_p
     {
-        Tcell    *Tcell ;     /*!< Pointer to a Tcell */
-        Tflp     *Tflp ;      /*!< Pointer to a Tflp */
-        Tflpel   *Tflpel ;    /*!< Pointer to a Tflpel */
-        Tcoolant *Tcoolant ;  /*!< Pointer to a Tcoolant */
+        Tcell_t    *Tcell ;     /*!< Pointer to a Tcell */
+        Tflp_t     *Tflp ;      /*!< Pointer to a Tflp */
+        Tflpel_t   *Tflpel ;    /*!< Pointer to a Tflpel */
+        Tcoolant_t *Tcoolant ;  /*!< Pointer to a Tcoolant */
     } ;
 
     /*! Definition of the type InspectionPoint_p */
@@ -385,12 +385,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! \struct InspectionPoint
+    /*! \struct InspectionPoint_t
      *
      *  \brief Structure containing info about the output to be ptrinted while simulating
      */
 
-    struct InspectionPoint
+    struct InspectionPoint_t
     {
         /*! The path of the file used to store the output */
 
@@ -413,17 +413,17 @@ extern "C"
         /*! Pointer to the StackElement that will be used to print the outputs.
          *  The inspection point will be applied to this stack element */
 
-        StackElement *StackElement ;
+        StackElement_t *StackElement ;
 
         /*! To collect inspection points in a linked list */
 
-        struct InspectionPoint *Next ;
+        struct InspectionPoint_t *Next ;
 
     } ;
 
-    /*! definition of the type InspectionPoint */
+    /*! definition of the type InspectionPoint_t */
 
-    typedef struct InspectionPoint InspectionPoint ;
+    typedef struct InspectionPoint_t InspectionPoint_t ;
 
 
 
@@ -432,7 +432,7 @@ extern "C"
      * \param inspection_point the address of the inspection point to initialize
      */
 
-    void init_inspection_point (InspectionPoint *inspection_point) ;
+    void init_inspection_point (InspectionPoint_t *inspection_point) ;
 
 
 
@@ -443,7 +443,7 @@ extern "C"
      * \return \c NULL if the memory allocation fails
      */
 
-    InspectionPoint *alloc_and_init_inspection_point (void) ;
+    InspectionPoint_t *alloc_and_init_inspection_point (void) ;
 
 
 
@@ -455,7 +455,7 @@ extern "C"
      * \param inspection_point the address of the InspectionPoint structure to free
      */
 
-    void free_inspection_point (InspectionPoint *inspection_point) ;
+    void free_inspection_point (InspectionPoint_t *inspection_point) ;
 
 
 
@@ -468,7 +468,7 @@ extern "C"
      * \param list the pointer to the first elment in the list to be freed
      */
 
-    void free_inspection_point_list (InspectionPoint *list) ;
+    void free_inspection_point_list (InspectionPoint_t *list) ;
 
 
 
@@ -481,7 +481,7 @@ extern "C"
 
     void print_formatted_inspection_point_list
 
-        (FILE *stream, String_t prefix, InspectionPoint *list) ;
+        (FILE *stream, String_t prefix, InspectionPoint_t *list) ;
 
 
 
@@ -494,7 +494,7 @@ extern "C"
 
     void print_detailed_inspection_point_list
 
-        (FILE *stream, String_t prefix, InspectionPoint *list) ;
+        (FILE *stream, String_t prefix, InspectionPoint_t *list) ;
 
 
     /*! Generates the file in which a particular inspection point will be printed
@@ -508,7 +508,7 @@ extern "C"
 
     Error_t generate_inspection_point_header
 
-        (InspectionPoint *inspection_point, Dimensions *dimensions, String_t prefix) ;
+        (InspectionPoint_t *inspection_point, Dimensions_t *dimensions, String_t prefix) ;
 
 
 
@@ -524,10 +524,10 @@ extern "C"
 
     Error_t generate_inspection_point_output
     (
-        InspectionPoint *inspection_point,
-        Dimensions      *dimensions,
-        Temperature_t   *temperatures,
-        Time_t           current_time
+        InspectionPoint_t *inspection_point,
+        Dimensions_t      *dimensions,
+        Temperature_t     *temperatures,
+        Time_t             current_time
     ) ;
 
 
@@ -543,10 +543,10 @@ extern "C"
 
     void fill_message_inspection_point
     (
-        InspectionPoint *inspection_point,
-        Dimensions      *dimensions,
-        Temperature_t   *temperatures,
-        NetworkMessage  *message
+        InspectionPoint_t *inspection_point,
+        Dimensions_t      *dimensions,
+        Temperature_t     *temperatures,
+        NetworkMessage_t  *message
     ) ;
 
 /******************************************************************************/
