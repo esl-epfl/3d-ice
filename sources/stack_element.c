@@ -162,7 +162,7 @@ void print_formatted_stack_elements_list
                     "%s   layer    %-*s ",
                     prefix, max_stk_el_id_length, stack_element->Id) ;
 
-                print_formatted_layer (stream, "", stack_element->Pointer.Layer) ;
+                print_formatted_layer (stream, (String_t) "", stack_element->Pointer.Layer) ;
 
                 break ;
 

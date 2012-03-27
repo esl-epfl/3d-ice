@@ -102,7 +102,7 @@ Error_t fill_thermal_data
 
     tdata->Temperatures =
 
-        (Temperature_t*) malloc (sizeof(*tdata->Temperatures) * tdata->Size) ;
+        (Temperature_t*) malloc (sizeof(Temperature_t) * tdata->Size) ;
 
     if (tdata->Temperatures == NULL)
 
@@ -120,9 +120,11 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the grid of thermal cells */
 
-    tdata->ThermalCells = malloc (  sizeof(ThermalCell_t)
-                                  * get_number_of_layers (stkd->Dimensions)
-                                  * get_number_of_columns (stkd->Dimensions)) ;
+    tdata->ThermalCells = (ThermalCell_t *)
+
+        malloc (  sizeof(ThermalCell_t)
+                * get_number_of_layers (stkd->Dimensions)
+                * get_number_of_columns (stkd->Dimensions)) ;
 
     if (tdata->ThermalCells == NULL)
 
@@ -134,7 +136,7 @@ Error_t fill_thermal_data
 
     /* Alloc and set sources to zero */
 
-    tdata->Sources = malloc (sizeof(*tdata->Sources) * tdata->Size) ;
+    tdata->Sources = (Source_t *) malloc (sizeof(Source_t) * tdata->Size) ;
 
     if (tdata->Sources == NULL)
 
@@ -166,19 +168,19 @@ Error_t fill_thermal_data
 
     /* Alloc SLU permutation matrices and elimination tree */
 
-    tdata->SLU_PermutationMatrixR = malloc (sizeof(int) * tdata->Size) ;
+    tdata->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * tdata->Size) ;
 
     if (tdata->SLU_PermutationMatrixR == NULL )
 
         goto slu_perm_r_fail ;
 
-    tdata->SLU_PermutationMatrixC = malloc(sizeof(int) * tdata->Size) ;
+    tdata->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * tdata->Size) ;
 
     if (tdata->SLU_PermutationMatrixC == NULL )
 
         goto slu_perm_c_fail ;
 
-    tdata->SLU_Etree = malloc (sizeof(int) * tdata->Size) ;
+    tdata->SLU_Etree = (int *) malloc (sizeof(int) * tdata->Size) ;
 
     if (tdata->SLU_Etree == NULL)
 

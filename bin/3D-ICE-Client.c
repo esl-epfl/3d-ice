@@ -118,7 +118,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
-    if (connect_client_to_server (&client_socket, "127.0.0.1", 10024) != TDICE_SUCCESS)
+    if (connect_client_to_server (&client_socket, (String_t)"127.0.0.1", 10024) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
 

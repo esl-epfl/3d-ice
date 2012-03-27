@@ -45,7 +45,7 @@
 
 void init_network_message (NetworkMessage_t *message)
 {
-    message->Memory    = calloc (MESSAGE_LENGTH, sizeof (MessageWord_t)) ;
+    message->Memory    = (MessageWord_t *) calloc (MESSAGE_LENGTH, sizeof (MessageWord_t)) ;
 
     message->MaxLength = MESSAGE_LENGTH ;
 
@@ -73,7 +73,7 @@ void free_network_message (NetworkMessage_t *message)
 
 void increase_message_memory (NetworkMessage_t *message, Quantity_t new_size)
 {
-    MessageWord_t *tmp = calloc (new_size, sizeof(MessageWord_t)) ;
+    MessageWord_t *tmp = (MessageWord_t *) calloc (new_size, sizeof(MessageWord_t)) ;
 
     memcpy (tmp, message->Memory, message->MaxLength * sizeof(MessageWord_t)) ;
 

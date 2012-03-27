@@ -120,7 +120,7 @@ Error_t fill_floorplan
     {
         fprintf (stderr, "Unable to open floorplan file %s\n", file_name) ;
 
-        return EXIT_FAILURE ;
+        return TDICE_FAILURE ;
     }
 
     floorplan->FileName = strdup (file_name) ;  // FIXME memory leak

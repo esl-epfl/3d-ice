@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
     // We use "% " as prefix for matlab compatibility (header will be a comment)
 
-    error = generate_analysis_headers (&analysis, stkd.Dimensions, "% ") ;
+    error = generate_analysis_headers (&analysis, stkd.Dimensions, (String_t)"% ") ;
 
     if (error != TDICE_SUCCESS)
     {

@@ -192,7 +192,7 @@ void print_detailed_analysis
   Analysis_t *analysis
 )
 {
-    String_t new_prefix = malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
+    String_t new_prefix = (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;
 
@@ -362,7 +362,7 @@ Error_t generate_analysis_output
 
     else
 
-        return EXIT_FAILURE ;
+        return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 
@@ -401,7 +401,7 @@ Error_t fill_analysis_message
 
     else
 
-        return EXIT_FAILURE ;
+        return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 

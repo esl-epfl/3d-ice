@@ -85,7 +85,7 @@ Error_t fill_stack_description
     {
         fprintf (stderr, "Unable to open stack file %s\n", filename) ;
 
-        return EXIT_FAILURE ;
+        return TDICE_FAILURE ;
     }
 
     stkd->FileName = strdup (filename) ;  // FIXME memory leak

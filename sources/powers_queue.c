@@ -116,7 +116,7 @@ void put_into_powers_queue (PowersQueue_t *powers_queue, Power_t power)
 {
     PowerNode_t *tmp = powers_queue->Tail ;
 
-    powers_queue->Tail = malloc (sizeof(PowerNode_t)) ;
+    powers_queue->Tail = (PowerNode_t *) malloc (sizeof(PowerNode_t)) ;
 
     if ( powers_queue->Tail == NULL )
     {

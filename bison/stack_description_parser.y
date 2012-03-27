@@ -80,7 +80,7 @@
     void stack_description_error
 
         (StackDescription_t *stack, Analysis_t *analysis,
-         yyscan_t scanner, String_t message) ;
+         yyscan_t scanner, const char *message) ;
 
     static char error_message [100] ;
 
@@ -1550,7 +1550,7 @@ void stack_description_error
     StackDescription_t *stkd,
     Analysis_t          __attribute__ ((unused)) *analysis,
     yyscan_t            scanner,
-    String_t            message
+    const char         *message
 )
 {
     fprintf (stack_description_get_out (scanner),

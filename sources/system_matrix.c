@@ -64,13 +64,13 @@ Error_t alloc_system_matrix
     system_matrix->Size = size ;
     system_matrix->NNz  = nnz ;
 
-    system_matrix->RowIndices = malloc (sizeof(CellIndex_t) * nnz) ;
+    system_matrix->RowIndices = (CellIndex_t *) malloc (sizeof(CellIndex_t) * nnz) ;
 
     if (system_matrix->RowIndices == NULL)
 
         return TDICE_FAILURE ;
 
-    system_matrix->ColumnPointers = malloc (sizeof(CellIndex_t) * (size + 1)) ;
+    system_matrix->ColumnPointers = (CellIndex_t *) malloc (sizeof(CellIndex_t) * (size + 1)) ;
 
     if (system_matrix->ColumnPointers == NULL)
     {
@@ -78,7 +78,7 @@ Error_t alloc_system_matrix
         return TDICE_FAILURE ;
     }
 
-    system_matrix->Values = malloc (sizeof(SystemMatrixCoeff_t) * nnz) ;
+    system_matrix->Values = (SystemMatrixCoeff_t *) malloc (sizeof(SystemMatrixCoeff_t) * nnz) ;
 
     if (system_matrix->Values == NULL)
     {

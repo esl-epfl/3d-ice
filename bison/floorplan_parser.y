@@ -64,7 +64,7 @@
     void floorplan_error
 
         (Floorplan_t *floorplan, Dimensions_t *dimensions,
-         yyscan_t yyscanner, String_t msg) ;
+         yyscan_t yyscanner, const char *msg) ;
 
     static char error_message [250] ;
 
@@ -390,7 +390,7 @@ void floorplan_error
     Floorplan_t  *floorplan,
     Dimensions_t *__attribute__ ((unused)) dimensions,
     yyscan_t      yyscanner,
-    String_t      msg
+    const char   *msg
 )
 {
     fprintf (stderr, "%s:%d: %s\n",
