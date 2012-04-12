@@ -269,7 +269,13 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
         column_index++ ;
     }
 
-    icelement->NE_Column = column_index - 1 ;
+    if (column_index > 0)
+
+        icelement->NE_Column = column_index - 1 ;
+
+    else
+
+        icelement->NE_Column = column_index ;
 
     /* Effective length */
 
@@ -300,7 +306,13 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
         row_index++ ;
     }
 
-    icelement->NE_Row = row_index - 1 ;
+    if (row_index > 0) 
+
+        icelement->NE_Row = row_index - 1 ;
+
+    else
+
+        icelement->NE_Row = row_index ;
 
     /* Effective width */
 
