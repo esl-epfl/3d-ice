@@ -72,15 +72,16 @@ int main (int argc, char** argv)
 {
     Socket_t client_socket ;
 
-    NetworkMessage_t client_nflp, client_powers, client_temperatures ;
+    NetworkMessage_t client_nflp, client_powers, client_temperatures, client_cores ;
     NetworkMessage_t client_tmap, client_close_sim, server_reply ;
 
-    Quantity_t nflpel, index, index2, nslots, nsensors ;
+    Quantity_t nflpel, index, index2, nslots, nresults ;
 
     SimResult_t sim_result ;
 
-    OutputInstant_t instant ;
-    OutputType_t    type ;
+    OutputInstant_t  instant ;
+    OutputType_t     type ;
+    OutputQuantity_t quantity ;
 
     CellIndex_t row, column ;
     CellIndex_t nrows, ncolumns ;
@@ -183,15 +184,17 @@ int main (int argc, char** argv)
 
         free_network_message (&server_reply) ;
 
-        /* Client sends temperatures request **********************************/
+        /* Client sends temperatures request for thermal sensors **************/
 
-        instant = TDICE_OUTPUT_INSTANT_SLOT ;
-        type    = TDICE_OUTPUT_TYPE_TCELL ;
+        instant  = TDICE_OUTPUT_INSTANT_SLOT ;
+        type     = TDICE_OUTPUT_TYPE_TCELL ;
+        quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 
         init_network_message (&client_temperatures) ;
         build_message_head   (&client_temperatures, TDICE_THERMAL_RESULTS) ;
         insert_message_word  (&client_temperatures, &instant) ;
         insert_message_word  (&client_temperatures, &type) ;
+        insert_message_word  (&client_temperatures, &quantity) ;
 
         send_message_to_socket (&client_socket, &client_temperatures) ;
 
@@ -204,30 +207,30 @@ int main (int argc, char** argv)
         receive_message_from_socket (&client_socket, &server_reply) ;
 
         extract_message_word (&server_reply, &time,     0) ;
-        extract_message_word (&server_reply, &nsensors, 1) ;
+        extract_message_word (&server_reply, &nresults, 1) ;
 
         fprintf (stdout, "%5.2f sec : \t", time) ;
 
-        for (index = 2, nsensors += 2 ; index != nsensors ; index++)
+        for (index = 2, nresults += 2 ; index != nresults ; index++)
         {
             extract_message_word (&server_reply, &temperature, index) ;
 
             fprintf (stdout, "%5.2f K \t", temperature) ;
         }
 
-        fprintf (stdout, "\n") ;
-
         free_network_message (&server_reply) ;
 
         /* Client sends thermal maps request **********************************/
 
-        instant = TDICE_OUTPUT_INSTANT_SLOT ;
-        type    = TDICE_OUTPUT_TYPE_TMAP ;
+        instant  = TDICE_OUTPUT_INSTANT_SLOT ;
+        type     = TDICE_OUTPUT_TYPE_TMAP ;
+        quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 
         init_network_message (&client_tmap) ;
         build_message_head   (&client_tmap, TDICE_THERMAL_RESULTS) ;
         insert_message_word  (&client_tmap, &instant) ;
         insert_message_word  (&client_tmap, &type) ;
+        insert_message_word  (&client_tmap, &quantity) ;
 
         send_message_to_socket (&client_socket, &client_tmap) ;
 
@@ -240,13 +243,11 @@ int main (int argc, char** argv)
         receive_message_from_socket (&client_socket, &server_reply) ;
 
         extract_message_word (&server_reply, &time,     0) ;
-        extract_message_word (&server_reply, &nsensors, 1) ;
+        extract_message_word (&server_reply, &nresults, 1) ;
         extract_message_word (&server_reply, &nrows,    2) ;
         extract_message_word (&server_reply, &ncolumns, 3) ;
 
-//        fprintf (stdout, "%.1f %d %d %d\n", time, nsensors, nrows, ncolumns) ;
-
-        for (index = 4, index2 = 0 ; index2 != nsensors ; index2++)
+        for (index = 4, index2 = 0 ; index2 != nresults ; index2++)
         {
             for (row = 0 ; row != nrows ; row++)
             {
@@ -260,6 +261,42 @@ int main (int argc, char** argv)
             }
             fprintf (tmap, "\n") ;
         }
+
+        free_network_message (&server_reply) ;
+
+        /* Client sends temperatures request for cores ************************/
+
+        instant  = TDICE_OUTPUT_INSTANT_SLOT ;
+        type     = TDICE_OUTPUT_TYPE_TFLPEL ;
+        quantity = TDICE_OUTPUT_QUANTITY_AVERAGE ;
+
+        init_network_message (&client_cores) ;
+        build_message_head   (&client_cores, TDICE_THERMAL_RESULTS) ;
+        insert_message_word  (&client_cores, &instant) ;
+        insert_message_word  (&client_cores, &type) ;
+        insert_message_word  (&client_cores, &quantity) ;
+
+        send_message_to_socket (&client_socket, &client_cores) ;
+
+        free_network_message (&client_cores) ;
+
+        /* Client receives cores temperatures  ********************************/
+
+        init_network_message (&server_reply) ;
+
+        receive_message_from_socket (&client_socket, &server_reply) ;
+
+        extract_message_word (&server_reply, &time,     0) ;
+        extract_message_word (&server_reply, &nresults, 1) ;
+
+        for (index = 2, nresults += 2 ; index != nresults ; index++)
+        {
+            extract_message_word (&server_reply, &temperature, index) ;
+
+            fprintf (stdout, "%5.2f K \t", temperature) ;
+        }
+
+        fprintf (stdout, "\n") ;
 
         free_network_message (&server_reply) ;
     }

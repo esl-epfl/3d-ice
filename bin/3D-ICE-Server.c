@@ -214,34 +214,39 @@ int main (int argc, char** argv)
             }
             case TDICE_THERMAL_RESULTS :
             {
-                OutputInstant_t instant ;
-                OutputType_t    type ;
+                OutputInstant_t  instant ;
+                OutputType_t     type ;
+                OutputQuantity_t quantity ;
 
-                extract_message_word (&request, &instant, 0) ;
-                extract_message_word (&request, &type,    1) ;
+                extract_message_word (&request, &instant,  0) ;
+                extract_message_word (&request, &type,     1) ;
+                extract_message_word (&request, &quantity, 2) ;
 
                 init_network_message (&reply) ;
                 build_message_head   (&reply, TDICE_THERMAL_RESULTS) ;
 
                 float   time = get_simulated_time (&analysis) ;
-                Quantity_t n = get_number_of_inspection_points (&analysis, instant, type) ;
+                Quantity_t n = get_number_of_inspection_points (&analysis, instant, type, quantity) ;
 
                 insert_message_word (&reply, &time) ;
                 insert_message_word (&reply, &n) ;
 
-                error = fill_analysis_message
-
-                    (&analysis, stkd.Dimensions, tdata.Temperatures,
-                     instant, type, &reply) ;
-
-                if (error != TDICE_SUCCESS)
+                if (n > 0)
                 {
-                    fprintf (stderr, "error: generate message content\n") ;
+                    error = fill_analysis_message
 
-                    free_network_message (&reply) ;
-                    free_network_message (&request) ;
+                        (&analysis, stkd.Dimensions, tdata.Temperatures,
+                        instant, type, quantity, &reply) ;
 
-                    goto sim_error ;
+                    if (error != TDICE_SUCCESS)
+                    {
+                        fprintf (stderr, "error: generate message content\n") ;
+
+                        free_network_message (&reply) ;
+                        free_network_message (&request) ;
+
+                        goto sim_error ;
+                    }
                 }
 
                 send_message_to_socket (&client_socket, &reply) ;

@@ -387,7 +387,7 @@ extern "C"
 
     /*! \struct InspectionPoint_t
      *
-     *  \brief Structure containing info about the output to be ptrinted while simulating
+     *  \brief Structure containing info about the output to be printed while simulating
      */
 
     struct InspectionPoint_t
@@ -497,6 +497,23 @@ extern "C"
         (FILE *stream, String_t prefix, InspectionPoint_t *list) ;
 
 
+    /*! Checks if the inspection point has a specific set up
+     *
+     * \param inspection_point the address of the InspectionPoint structure
+     * \param type     the type of the inspection point (tcell, tmap, ...)
+     * \param quantity the quantity to be measured (max, min, avg)
+     *
+     * \return \c true if \a inspection_point has type \a type and quantity
+     *         \a quantity, \c false otherwise
+     */
+
+    bool is_inspection_point
+    (
+        InspectionPoint_t *inspection_point,
+        OutputType_t       type,
+        OutputQuantity_t   quantity
+    ) ;
+
     /*! Generates the file in which a particular inspection point will be printed
      *
      * \param inspection_point the address of the InspectionPoint structure
@@ -535,6 +552,7 @@ extern "C"
     /*! Fills a message with the output implemented by the inspection point
      *
      * \param inspection_point the address of the InspectionPoint structure
+     * \param output_quantity the quantity to report (max, min, avg)
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param message the message to fill
@@ -544,6 +562,7 @@ extern "C"
     void fill_message_inspection_point
     (
         InspectionPoint_t *inspection_point,
+        OutputQuantity_t   output_quantity,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,
         NetworkMessage_t  *message

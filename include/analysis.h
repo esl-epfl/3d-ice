@@ -160,14 +160,19 @@ extern "C"
      *  \param analysis the address of the analysis structure to query
      *  \param instant  the instant of the output (slot, step, final)
      *  \param type     the type of the inspection point (tcell, tmap, ...)
+     *  \param quantity the quantity to be measured (max, min, avg)
      *
      *  \return the number of inspection points recorded in \a analysis
      *  \return \c 0 if either \a instant or \a type are not known
      */
 
     Quantity_t get_number_of_inspection_points
-
-        (Analysis_t *analysis, OutputInstant_t instant, OutputType_t type) ;
+    (
+        Analysis_t       *analysis,
+        OutputInstant_t   instant,
+        OutputType_t      type,
+        OutputQuantity_t  quantity
+    ) ;
 
 
 
@@ -269,7 +274,8 @@ extern "C"
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param output_instant the instant of the output (slot, step, final)
-     * \param type the type of the ispection point to generate
+     * \param output_type the type of the ispection point to generate
+     * \param output_quantity the quantity to report (max, min, avg)
      * \param message the message to fill
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
@@ -282,7 +288,8 @@ extern "C"
         Dimensions_t     *dimensions,
         Temperature_t    *temperatures,
         OutputInstant_t   output_instant,
-        OutputType_t      type,
+        OutputType_t      output_type,
+        OutputQuantity_t  output_quantity,
         NetworkMessage_t *message
     ) ;
 

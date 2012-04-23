@@ -583,6 +583,53 @@ void print_detailed_inspection_point_list
 
 /******************************************************************************/
 
+bool is_inspection_point
+(
+    InspectionPoint_t *inspection_point,
+    OutputType_t       type,
+    OutputQuantity_t   quantity
+)
+{
+    if (inspection_point->Type != type)
+
+        return false ;
+
+    switch (type)
+    {
+        case TDICE_OUTPUT_TYPE_NONE :
+
+            return false ;
+
+        case TDICE_OUTPUT_TYPE_TCELL :
+
+            return true ;
+
+        case TDICE_OUTPUT_TYPE_TMAP :
+
+            return true ;
+
+        case TDICE_OUTPUT_TYPE_TFLP :
+
+            return inspection_point->Pointer.Tflp->Quantity == quantity ;
+
+        case TDICE_OUTPUT_TYPE_TFLPEL :
+
+            return inspection_point->Pointer.Tflpel->Quantity == quantity ;
+
+        case TDICE_OUTPUT_TYPE_TCOOLANT :
+
+            return inspection_point->Pointer.Tcoolant->Quantity == quantity ;
+
+        default :
+
+            fprintf (stderr, "Error: output type %d not supported\n", type) ;
+
+            return false ;
+    }
+}
+
+/******************************************************************************/
+
 Error_t generate_inspection_point_header
 (
     InspectionPoint_t *inspection_point,
@@ -950,6 +997,7 @@ output_error :
 void fill_message_inspection_point
 (
     InspectionPoint_t *inspection_point,
+    OutputQuantity_t   output_quantity,
     Dimensions_t      *dimensions,
     Temperature_t     *temperatures,
     NetworkMessage_t  *message
@@ -979,11 +1027,39 @@ void fill_message_inspection_point
             break ;
 
         case TDICE_OUTPUT_TYPE_TFLPEL :
+        {
+            temperatures += get_cell_offset_in_stack
 
-            fprintf (stderr, "TFLPEL output in message not supperted\n") ;
+                (dimensions,
+                 get_source_layer_offset(inspection_point->StackElement), 0, 0) ;
+
+            float temperature ;
+
+            if (output_quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
+
+                temperature = get_max_temperature_floorplan_element
+
+                    (inspection_point->Pointer.Tflpel->FloorplanElement,
+                     dimensions, temperatures) ;
+
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
+
+                temperature = get_min_temperature_floorplan_element
+
+                    (inspection_point->Pointer.Tflpel->FloorplanElement,
+                     dimensions, temperatures) ;
+
+            else
+
+                temperature = get_avg_temperature_floorplan_element
+
+                    (inspection_point->Pointer.Tflpel->FloorplanElement,
+                     dimensions, temperatures) ;
+
+            insert_message_word (message, &temperature) ;
 
             break ;
-
+        }
         case TDICE_OUTPUT_TYPE_TMAP :
         {
             CellIndex_t n ;

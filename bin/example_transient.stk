@@ -49,6 +49,6 @@ output:
    T        (  MEMORY_DIE, 5000, 3000, "output1.txt",             slot ) ;
    Tmap     (    CORE_DIE,             "output2.txt",             slot ) ;
    Tflp     (  MEMORY_DIE,             "output3.txt", minimum,    slot ) ;
-   Tflpel   (    CORE_DIE.Core1,       "output4.txt", average,    final) ;
+   Tflpel   (    CORE_DIE.Core1,       "output4.txt", average,    slot ) ;
    Tcoolant ( TOP_CHANNEL,             "output5.txt", maximum,    slot ) ; 
 

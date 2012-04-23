@@ -90,9 +90,10 @@ Time_t get_simulated_time (Analysis_t *analysis)
 
 Quantity_t get_number_of_inspection_points
 (
-    Analysis_t      *analysis,
-    OutputInstant_t  instant,
-    OutputType_t     type
+    Analysis_t       *analysis,
+    OutputInstant_t   instant,
+    OutputType_t      type,
+    OutputQuantity_t  quantity
 )
 {
     Quantity_t number = 0u ;
@@ -117,7 +118,9 @@ Quantity_t get_number_of_inspection_points
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 
-        if (ipoint->Type == type)   number++ ;
+        if (is_inspection_point (ipoint, type, quantity) == true)
+
+            number++ ;
 
     return number ;
 }
@@ -381,7 +384,8 @@ Error_t fill_analysis_message
     Dimensions_t     *dimensions,
     Temperature_t    *temperatures,
     OutputInstant_t   output_instant,
-    OutputType_t      type,
+    OutputType_t      output_type,
+    OutputQuantity_t  output_quantity,
     NetworkMessage_t *message
 )
 {
@@ -405,11 +409,11 @@ Error_t fill_analysis_message
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
 
-        if (type == ipoint->Type)
+        if (output_type == ipoint->Type)
 
             fill_message_inspection_point
 
-                (ipoint, dimensions, temperatures, message) ;
+                (ipoint, output_quantity, dimensions, temperatures, message) ;
 
    return TDICE_SUCCESS ;
 }
