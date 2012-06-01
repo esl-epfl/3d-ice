@@ -38,6 +38,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 
 #include "network_socket.h"
@@ -67,6 +68,7 @@ void seed_random ()
     (   ((double)(min_value))              \
       + ( ( (double)(max_value)-((double)(min_value)) )*rand() / (RAND_MAX+1.0f)) )
 
+#define MAX_SERVER_IP 50
 
 int main (int argc, char** argv)
 {
@@ -75,7 +77,9 @@ int main (int argc, char** argv)
     NetworkMessage_t client_nflp, client_powers, client_temperatures, client_cores ;
     NetworkMessage_t client_tmap, client_close_sim, server_reply ;
 
-    Quantity_t nflpel, index, index2, nslots, nresults ;
+    Quantity_t nflpel, index, index2, nslots, nresults, server_port ;
+
+    char server_ip [MAX_SERVER_IP] ;
 
     SimResult_t sim_result ;
 
@@ -94,14 +98,25 @@ int main (int argc, char** argv)
 
     /* Checks if all arguments are there **************************************/
 
-    if (argc != 2)
+    if (argc != 4)
     {
-        fprintf (stderr, "Usage: \"%s nslots\n", argv[0]) ;
+        fprintf (stderr, "Usage: \"%s nslots server_ip server_port\n", argv[0]) ;
 
         return EXIT_FAILURE ;
     }
 
     nslots = atoi (argv[1]) ;
+
+    if (strlen (argv[2]) > MAX_SERVER_IP - 1)
+    {
+        fprintf (stderr, "Server ip %s too long !!!\n", argv[2]) ;
+
+        return EXIT_FAILURE ;
+    }
+
+    strcpy (server_ip, argv[2]) ;
+
+    server_port = atoi (argv[3]) ;
 
     /* Creates socket *********************************************************/
 
@@ -119,7 +134,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Connecting to server ... ") ; fflush (stdout) ;
 
-    if (connect_client_to_server (&client_socket, (String_t)"127.0.0.1", 10024) != TDICE_SUCCESS)
+    if (connect_client_to_server (&client_socket, (String_t)server_ip, server_port) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
 

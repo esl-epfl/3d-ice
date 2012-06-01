@@ -55,18 +55,22 @@ int main (int argc, char** argv)
 
     Error_t error ;
 
+    Quantity_t server_port ;
+
     Socket_t server_socket, client_socket ;
 
     NetworkMessage_t request, reply ;
 
     /* Checks if all arguments are there **************************************/
 
-    if (argc != 2)
+    if (argc != 3)
     {
-        fprintf (stderr, "Usage: \"%s file.stk\n", argv[0]) ;
+        fprintf (stderr, "Usage: \"%s file.stk server_port\n", argv[0]) ;
 
         return EXIT_FAILURE ;
     }
+
+    server_port = atoi (argv[2]) ;
 
     /* Parses stack file (fills stack descrition and analysis) ****************/
 
@@ -106,7 +110,7 @@ int main (int argc, char** argv)
 
     init_socket (&server_socket) ;
 
-    error = open_server_socket (&server_socket, 10024) ;
+    error = open_server_socket (&server_socket, server_port) ;
 
     if (error != TDICE_SUCCESS)    goto socket_error ;
 
