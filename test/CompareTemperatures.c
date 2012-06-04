@@ -192,6 +192,9 @@ int main(int argc, char** argv)
     max_node1 = 0.0 ;
     max_node2 = 0.0 ;
 
+    time_node1 = 0.0 ;
+    time_node2 = 0.0 ;
+
     for (counter = 0 ; counter != counter1 ; counter++)
     {
         if (fscanf (node1, "%lf %lf\n", &time1, &temp1) != 2)
