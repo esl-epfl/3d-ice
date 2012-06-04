@@ -570,7 +570,13 @@ extern "C"
          * | 3 | TDICE_INSERT_POWERS_AND_SIMULATE_SLOT | SimResult_t |
          */
 
-        TDICE_INSERT_POWERS_AND_SIMULATE_SLOT
+        TDICE_INSERT_POWERS_AND_SIMULATE_SLOT,
+        
+        TDICE_SIMULATE_SLOT,
+        /*! \brief Tells the server to run a slot. Used in 3d-ice-gui*/
+        
+				TDICE_SIMULATE_STEP,
+        /*! \brief Tells the server to run a step. Used in 3d-ice-gui */
     } ;
 
 
