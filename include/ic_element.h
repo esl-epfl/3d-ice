@@ -261,6 +261,7 @@ extern "C"
     void align_to_grid (Dimensions_t *dimensions, ICElement_t* icelement) ;
 
 
+
     /*! Fills the source vector corresponding to an ic element
      *
      *  \param sources    pointer to the location of the source vector

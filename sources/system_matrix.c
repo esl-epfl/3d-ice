@@ -1665,7 +1665,7 @@ void fill_system_matrix
 
 /******************************************************************************/
 
-void print_system_matrix (String_t file_name, SystemMatrix_t this)
+void print_system_matrix (SystemMatrix_t this, String_t file_name)
 {
     FILE* file = fopen (file_name, "w") ;
 

@@ -36,10 +36,10 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_SYSTEM_MATRIX_
-#define _3DICE_SYSTEM_MATRIX_
+#ifndef _3DICE_FLOORPLAN_MATRIX_
+#define _3DICE_FLOORPLAN_MATRIX_
 
-/*! \file system_matrix.h */
+/*! \file floorplan_matrix.h */
 
 #ifdef __cplusplus
 extern "C"
@@ -51,26 +51,25 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
-
+#include "floorplan.h"
 #include "dimensions.h"
-#include "thermal_grid.h"
 
 /******************************************************************************/
 
-    /*! \struct SystemMatrix_t
+    /*! \struct FloorplanMatrix_t
      *
-     *  \brief Structure representing the squared matrix storing the coefficients of the
-     *         linear system that is solved tu run the thermal simulation
+     *  \brief Structure representing the matrix storing the coefficients of the
+     *         floorplans tha scales power values to sources
      *
      * Compressed Column Storage (CCS): the matrix stores non zero values as
      * sequences of columns.
      */
 
-    struct SystemMatrix_t
+    struct FloorplanMatrix_t
     {
 
         /*! Pointer to the array storing the column pointers.
-         *  If the matrix is nxn, then n+1 column pointers are needed.
+         *  If the matrix is nxm, then m+1 column pointers are needed.
          */
 
         CellIndex_t *ColumnPointers ;
@@ -82,11 +81,15 @@ extern "C"
 
         /*! Pointer to the array storing the non zeroes coefficient */
 
-        SystemMatrixCoeff_t* Values ;
+        float *Values ;
 
-        /*! The dimension n of the squared matrix nxn */
+        /*! The number of rows (i.e. the number of thermal cells) */
 
-        CellIndex_t Size ;
+        CellIndex_t NRows ;
+
+        /*! The number of columns (i.e. the number of floorplan elements) */
+
+        CellIndex_t NColumns ;
 
         /*! The number of nonzeroes coefficients */
 
@@ -94,62 +97,67 @@ extern "C"
 
     } ;
 
-    /*! Definition of the type SystemMatrix_t */
+    /*! Definition of the type FloorplanMatrix_t */
 
-    typedef struct SystemMatrix_t SystemMatrix_t ;
+    typedef struct FloorplanMatrix_t FloorplanMatrix_t ;
 
 /******************************************************************************/
 
 
     /*! Sets all the fields of \a this to a default value (zero or \c NULL ).
      *
-     * \param this the address of the system matrix to initialize
+     * \param this the address of the floorplan matrix to initialize
      */
 
-    void init_system_matrix (SystemMatrix_t *this) ;
+    void init_floorplan_matrix (FloorplanMatrix_t *this) ;
 
 
 
-    /*! Allocates memory to store indexes and coefficients of a SystemMatrix
+    /*! Allocates memory to store indexes and coefficients of a FloorplanMatrix
      *
-     * \param this the address of the system matrix
-     * \param size the dimension of the matrix
-     * \param nnz  the number of nonzeroes coeffcients
+     * \param this     the address of the floorplan matrix
+     * \param nrows    the number of rows of the matrix
+     * \param ncolumns the number of columns of the matrix
+     * \param nnz      the number of nonzeroes coeffcients
      *
      * \return \c TDICE_SUCCESS if the memory allocation succeded
      * \return \c TDICE_FAILURE if the memory allocation fails
      */
 
-    Error_t alloc_system_matrix
+    Error_t alloc_floorplan_matrix
+    (
+        FloorplanMatrix_t *this,
+        CellIndex_t        nrows,
+        CellIndex_t        ncolumns,
+        CellIndex_t        nnz
+    ) ;
 
-        (SystemMatrix_t *this, CellIndex_t size, CellIndex_t nnz) ;
 
 
-
-    /*! Frees the memory used to store indexes and coefficients of a system matrix
+    /*! Frees the memory used to store indexes and coefficients of a floorplan matrix
      *
-     * \param this the address of the system matrix structure
+     * \param this the address of the floorplan matrix structure
      */
 
-    void free_system_matrix (SystemMatrix_t *this) ;
+    void free_floorplan_matrix (FloorplanMatrix_t *this) ;
 
 
 
-    /*! Fills the system matrix
+    /*! Fills the floorplan matrix
      *
      *  The function fills, layer by layer, all the columns
-     *  of the system matrix.
+     *  of the floorplan matrix.
      *
-     *  \param this         pointer to the system matrix to fill
-     *  \param thermal_grid pointer to the thermal grid structure
+     *  \param this         pointer to the floorplan matrix to fill
+     *  \param floorplan    pointer to the floorplan
      *  \param dimensions   pointer to the structure containing the dimensions of the IC
      */
 
-    void fill_system_matrix
+    void fill_floorplan_matrix
     (
-        SystemMatrix_t *this,
-        ThermalGrid_t  *thermal_grid,
-        Dimensions_t   *dimensions
+        FloorplanMatrix_t *this,
+        Floorplan_t       *floorplan,
+        Dimensions_t      *dimensions
     ) ;
 
 
@@ -160,11 +168,11 @@ extern "C"
      * zero coefficient (COO format). The first row (or column) has index 1
      * (matlab compatibile)
      *
-     * \param this      the system matrix structure
+     * \param this      the floorplan matrix structure
      * \param file_name the name of the file to create
      */
 
-    void print_system_matrix (SystemMatrix_t this, String_t file_name) ;
+    void print_floorplan_matrix (FloorplanMatrix_t this, String_t file_name) ;
 
 /******************************************************************************/
 
@@ -172,4 +180,4 @@ extern "C"
 }
 #endif
 
-#endif /* _3DICE_SYSTEM_MATRIX_ */
+#endif /* _3DICE_FLOORPLAN_MATRIX_ */

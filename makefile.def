@@ -72,6 +72,7 @@
                   $(3DICE_SOURCES)/die.c                      \
                   $(3DICE_SOURCES)/dimensions.c               \
                   $(3DICE_SOURCES)/floorplan_element.c        \
+		  $(3DICE_SOURCES)/floorplan_matrix.c         \
                   $(3DICE_SOURCES)/floorplan.c                \
                   $(3DICE_SOURCES)/heat_sink.c                \
                   $(3DICE_SOURCES)/ic_element.c               \
