@@ -53,6 +53,7 @@ extern "C"
 #include "types.h"
 
 #include "dimensions.h"
+#include "floorplan_matrix.h"
 #include "floorplan_element.h"
 #include "powers_queue.h"
 
@@ -77,6 +78,10 @@ extern "C"
 
         FloorplanElement_t *ElementsList ;
 
+        /*! Matrix that stores the surface coefficients to transform
+            power traces of each floorplan element into a source vector */
+
+        FloorplanMatrix_t SurfaceCoefficients ;
     } ;
 
     /*! Definition of the type Floorplan_t */
@@ -89,10 +94,10 @@ extern "C"
 
     /*! Sets all the fields of \a floorplan to a default value (zero or \c NULL ).
      *
-     * \param floorplan the address of the flooprlan to initialize
+     * \param this the address of the flooprlan to initialize
      */
 
-    void init_floorplan (Floorplan_t *floorplan) ;
+    void init_floorplan (Floorplan_t *this) ;
 
 
 
@@ -109,13 +114,13 @@ extern "C"
 
     /*! Frees the memory related to \a floorplan
      *
-     * The parametrer \a floorplan must be a pointer previously
+     * The parametrer \a this must be a pointer previously
      * obtained with #alloc_and_init_floorplan
      *
-     * \param floorplan the address of the floorplan structure to free
+     * \param this the address of the floorplan structure to free
      */
 
-    void free_floorplan (Floorplan_t *floorplan) ;
+    void free_floorplan (Floorplan_t *this) ;
 
 
 
@@ -123,16 +128,17 @@ extern "C"
      *
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param floorplan the floorplan    to print
+     * \param this   the floorplan to print
      */
 
-    void print_detailed_floorplan (FILE *stream, String_t prefix, Floorplan_t *floorplan) ;
+    void print_detailed_floorplan (FILE *stream, String_t prefix, Floorplan_t *this) ;
 
 
 
-    /*! Parses the file pointed by Floorplan::FileName and fills the \a floorplan structure
+    /*! Parses the file pointed by Floorplan::FileName and fills the floorplan structure
+     *  \a this
      *
-     * \param floorplan  the floorplan structure to fill
+     * \param this       the floorplan structure to fill
      * \param dimensions pointer to the structure storing the dimensions of the stack
      * \param file_name  path to the floorplan file to parse
      *
@@ -143,17 +149,16 @@ extern "C"
 
     Error_t fill_floorplan
 
-        (Floorplan_t *floorplan, Dimensions_t *dimensions, String_t file_name) ;
+        (Floorplan_t *this, Dimensions_t *dimensions, String_t file_name) ;
 
 
 
     /*! Fills the source vector corresponding to a floorplan
      *
-     *  \param sources     pointer to the location of the source vector
-     *                     that corresponds to the South-West thermal cell
-     *                     of the layer where the floorplan is placed
-     *  \param dimensions  pointer to the structure storing the dimensions
-     *  \param floorplan   pointer to the floorplan placed on the source layer
+     *  \param sources pointer to the location of the source vector
+     *                 that corresponds to the South-West thermal cell
+     *                 of the layer where the floorplan is placed
+     *  \param this    pointer to the floorplan placed on the source layer
      *
      *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
      *  \return \c TDICE_FAILURE if it not possible to fill the source vector
@@ -164,26 +169,25 @@ extern "C"
     Error_t fill_sources_floorplan
     (
         Source_t     *sources,
-        Dimensions_t *dimensions,
-        Floorplan_t  *floorplan
+        Floorplan_t  *this
     ) ;
 
 
 
-    /*! Returns the total number of floorplan elements in \a floorplan
+    /*! Returns the total number of floorplan elements in the floorplan \a this
      *
-     * \param floorplan address of the Floorplan structure
+     * \param this address of the Floorplan structure
      *
-     * \return the total nyumber of floorplan elements in \a floorplan
+     * \return the total nyumber of floorplan elements in \a this
      */
 
-    Quantity_t get_number_of_floorplan_elements_floorplan (Floorplan_t *floorplan) ;
+    Quantity_t get_number_of_floorplan_elements_floorplan (Floorplan_t *this) ;
 
 
 
     /*! Returns a pointer to a floorplan element in the floorplan
      *
-     * \param floorplan address of the floorplan
+     * \param this address of the floorplan
      * \param floorplan_element_id id of the floorplan element as in the
      *                             floorplan file
      *
@@ -193,7 +197,7 @@ extern "C"
 
     FloorplanElement_t *get_floorplan_element_floorplan
 
-        (Floorplan_t *floorplan, String_t floorplan_element_id) ;
+        (Floorplan_t *this, String_t floorplan_element_id) ;
 
 
 
@@ -205,7 +209,7 @@ extern "C"
      *  first element popped from \a pvalues (a fifo queue) goes to the first
      *  floorplan element in the flp file, the second to the second, etc ...
      *
-     *  \param floorplan pointer to the floorplan
+     *  \param this pointer to the floorplan
      *  \param pvalues pointer to the list of power values
      *
      *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
@@ -215,17 +219,17 @@ extern "C"
 
     Error_t insert_power_values_floorplan
 
-        (Floorplan_t *floorplan, PowersQueue_t *pvalues) ;
+        (Floorplan_t *this, PowersQueue_t *pvalues) ;
 
 
 
     /*! Returns the maximum temperature of each floorplan element
      *  in the given floorplan
      *
-     *  \param floorplan pointer to the floorplan
+     *  \param this pointer to the floorplan
      *  \param dimensions pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a floorplan is placed
+     *                      cell in the layer where \a this is placed
      *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
      *  \param max_temperatures (\c IN/OUT) addres to the memory where
      *                      temperatures will be written into.
@@ -238,7 +242,7 @@ extern "C"
 
     Temperature_t *get_all_max_temperatures_floorplan
     (
-        Floorplan_t   *floorplan,
+        Floorplan_t   *this,
         Dimensions_t  *dimensions,
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,
@@ -250,10 +254,10 @@ extern "C"
     /*! Returns the minimum temperature of each floorplan element
      *  in the given floorplan
      *
-     *  \param floorplan pointer to the floorplan
+     *  \param this pointer to the floorplan
      *  \param dimensions pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a floorplan is placed
+     *                      cell in the layer where \a this is placed
      *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
      *  \param min_temperatures (\c IN/OUT) addres to the memory where
      *                      temperatures will be written into.
@@ -266,7 +270,7 @@ extern "C"
 
     Temperature_t *get_all_min_temperatures_floorplan
     (
-        Floorplan_t   *floorplan,
+        Floorplan_t   *this,
         Dimensions_t  *dimensions,
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,
@@ -278,10 +282,10 @@ extern "C"
     /*! Returns the average temperature of each floorplan element
      *  in the given floorplan
      *
-     *  \param floorplan pointer to the floorplan
+     *  \param this pointer to the floorplan
      *  \param dimensions pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a floorplan is placed
+     *                      cell in the layer where \a this is placed
      *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
      *  \param avg_temperatures (\c IN/OUT) addres to the memory where
      *                      temperatures will be written into.
@@ -294,7 +298,7 @@ extern "C"
 
     Temperature_t *get_all_avg_temperatures_floorplan
     (
-        Floorplan_t   *floorplan,
+        Floorplan_t   *this,
         Dimensions_t  *dimensions,
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,

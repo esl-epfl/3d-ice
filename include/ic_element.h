@@ -262,28 +262,6 @@ extern "C"
 
 
 
-    /*! Fills the source vector corresponding to an ic element
-     *
-     *  \param sources    pointer to the location of the source vector
-     *                    that corresponds to the South-West thermal cell
-     *                    of the layer where the floorplan is placed
-     *  \param dimensions pointer to the structure storing the dimensions
-     *  \param power      the power value consumed by the floorplan element
-     *  \param surface    the surface of the floorplan element
-     *  \param icelement  pointer to the ic element
-     */
-
-    void fill_sources_ic_element
-    (
-        Source_t        *sources,
-        Dimensions_t    *dimensions,
-        Power_t          power,
-        ChipDimension_t  surface,
-        ICElement_t     *icelement
-    ) ;
-
-
-
     /*! Returns the maximum temperature of the ic element
      *
      *  \param icelement    pointer to the ic element

@@ -334,48 +334,6 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 
 /******************************************************************************/
 
-void fill_sources_ic_element
-(
-    Source_t        *sources,
-    Dimensions_t    *dimensions,
-    Power_t          power,
-    ChipDimension_t  surface,
-    ICElement_t     *icelement
-)
-{
-    // Here we ADD the power value to the source vector. It works as long as
-    // the source vector is set to zero every time. This way the vale is added
-    // in case this is the top most layer and the heatsink is used
-
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icelement)
-    {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icelement)
-        {
-            sources [get_cell_offset_in_layer (dimensions, row_index, column_index)]
-
-            += (power * get_cell_length (dimensions, column_index)
-                      * get_cell_width (dimensions, row_index)
-               )
-               /  surface ;
-
-#ifdef PRINT_SOURCES
-            fprintf (stderr,
-                "solid  cell  | r %4d c %4d | l %6.1f w %6.1f " \
-                            " | %.5e [source] += ( %.4e [W] * l * w) / %4.1f\n",
-                row_index, column_index,
-                get_cell_length (dimensions, column_index), get_cell_width (dimensions, row_index),
-                sources [get_cell_offset_in_layer (dimensions, row_index, column_index)],
-                power, surface) ;
-#endif
-
-        } // FOR_EVERY_IC_ELEMENT_COLUMN
-    } // FOR_EVERY_IC_ELEMENT_ROW
-
-    return ;
-}
-
-/******************************************************************************/
-
 Temperature_t get_max_temperature_ic_element
 (
     ICElement_t   *icelement,

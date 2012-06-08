@@ -81,7 +81,7 @@ Error_t alloc_floorplan_matrix
         return TDICE_FAILURE ;
     }
 
-    this->Values = (float *) malloc (sizeof(float) * nnz) ;
+    this->Values = (Source_t *) malloc (sizeof(Source_t) * nnz) ;
 
     if (this->Values == NULL)
     {
@@ -100,6 +100,59 @@ void free_floorplan_matrix (FloorplanMatrix_t* this)
     FREE_POINTER (free, this->ColumnPointers) ;
     FREE_POINTER (free, this->RowIndices) ;
     FREE_POINTER (free, this->Values) ;
+}
+
+/******************************************************************************/
+
+void fill_floorplan_matrix
+(
+    FloorplanMatrix_t  *this,
+    FloorplanElement_t *list,
+    Dimensions_t       *dimensions
+)
+{
+    FloorplanMatrix_t tmp_matrix ;
+
+    tmp_matrix.NRows    = this->NRows ;
+    tmp_matrix.NColumns = this->NColumns ;
+    tmp_matrix.NNz      = this->NNz ;
+
+    tmp_matrix.ColumnPointers = this->ColumnPointers ;
+    tmp_matrix.RowIndices     = this->RowIndices ;
+    tmp_matrix.Values         = this->Values ;
+
+    *tmp_matrix.ColumnPointers++ = 0u ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, list)
+    {
+        *tmp_matrix.ColumnPointers = *(tmp_matrix.ColumnPointers - 1) ;
+
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT
+
+        (ICElement_t, ic_el, flp_el->ICElementsList)
+        {
+
+            FOR_EVERY_IC_ELEMENT_ROW (row_index, ic_el)
+            {
+                FOR_EVERY_IC_ELEMENT_COLUMN (column_index, ic_el)
+                {
+
+                    *tmp_matrix.RowIndices++ = get_cell_offset_in_layer
+
+                        (dimensions, row_index, column_index) ;
+
+                    *tmp_matrix.Values++ = (   get_cell_length (dimensions, column_index)
+                                            *  get_cell_width (dimensions, row_index)
+                                           )
+                                           /  flp_el->EffectiveSurface ;
+
+                    (*tmp_matrix.ColumnPointers)++ ;
+                }
+            }
+        }
+
+        tmp_matrix.ColumnPointers++ ;
+    }
 }
 
 /******************************************************************************/

@@ -216,29 +216,6 @@ extern "C"
 
 
 
-    /*! Fills the source vector corresponding to a floorplan element
-     *
-     *  \param sources           pointer to the location of the source vector
-     *                           that corresponds to the South-West thermal cell
-     *                           of the layer where the floorplan is placed
-     *  \param dimensions        pointer to the structure storing the dimensions
-     *  \param floorplan_element pointer to the floorplan element
-     *
-     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
-     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
-     *                           (at least one floorplan element with no power
-     *                            values in its queue)
-     */
-
-    Error_t fill_sources_floorplan_element
-    (
-        Source_t           *sources,
-        Dimensions_t       *dimensions,
-        FloorplanElement_t *floorplan_element
-    ) ;
-
-
-
     /*! Returns the maximum temperature of the floorplan element
      *
      *  \param floorplan_element pointer to the floorplan element

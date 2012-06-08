@@ -261,14 +261,6 @@ Error_t update_source_vector
     StackDescription_t *stkd
 )
 {
-#ifdef PRINT_SOURCES
-    fprintf (stderr,
-        "update_source_vector ( l %d r %d c %d )\n",
-        get_number_of_layers  (stkd->Dimensions),
-        get_number_of_rows    (stkd->Dimensions),
-        get_number_of_columns (stkd->Dimensions)) ;
-#endif
-
     // reset all the source vector to 0
 
     CellIndex_t ccounter ;
@@ -302,7 +294,7 @@ Error_t update_source_vector
 
                 Error_t error = fill_sources_floorplan
 
-                    (sources, stkd->Dimensions, stack_element->Floorplan) ;
+                    (sources, stack_element->Floorplan) ;
 
                 if (error == TDICE_FAILURE)
 
@@ -324,22 +316,10 @@ Error_t update_source_vector
                 {
                     FOR_EVERY_COLUMN (column, stkd->Dimensions)
                     {
-                        *sources = stack_element->Pointer.HeatSink->AmbientTemperature
-                                   * get_conductance_top
+                        *sources++ =   stack_element->Pointer.HeatSink->AmbientTemperature
+                                     * get_conductance_top
 
-                                     (&tdata->ThermalGrid, stkd->Dimensions, layer_index, row, column) ;
-
-#ifdef PRINT_SOURCES
-                        fprintf (stderr,
-                            "solid  cell  |  l %2d r %4d c %4d [%7d] | = %f * %.5e = %.5e\n",
-                            layer_index, row, column, cell_index++,
-                            stack_element->Pointer.HeatSink->AmbientTemperature,
-                            get_conductance_top (&tdata->ThermalGrid, stkd->Dimensions,
-                                                 layer_index, row, column),
-                            *sources) ;
-#endif
-
-                        sources++ ;
+                                           (&tdata->ThermalGrid, stkd->Dimensions, layer_index, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 } // FOR_EVERY_ROW
@@ -367,16 +347,6 @@ Error_t update_source_vector
                                      (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)
                                    * stack_element->Pointer.Channel->Coolant.TIn ;
 
-#ifdef PRINT_SOURCES
-                        fprintf (stderr,
-                            "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
-                            " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
-                            column_index,
-                            get_cell_length (stkd->Dimensions, column_index), get_cell_width (stkd->Dimensions, 0),
-                            *sources, stack_element->Pointer.Channel->Coolant.TIn,
-                            get_convective_term
-                            (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)) ;
-#endif
                     }
 
                     sources++ ;
@@ -679,17 +649,6 @@ Error_t update_coolant_flow_rate
                                    * get_convective_term
                                      (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)
                                    * stack_element->Pointer.Channel->Coolant.TIn ;
-
-#ifdef PRINT_SOURCES
-                        fprintf (stderr,
-                            "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
-                            " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
-                            column_index,
-                            get_cell_length (stkd->Dimensions, column_index), get_cell_width (stkd->Dimensions, 0),
-                            *sources, stack_element->Pointer.Channel->Coolant.TIn,
-                            get_convective_term
-                            (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)) ;
-#endif
                     }
 
                     sources++ ;

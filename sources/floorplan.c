@@ -44,6 +44,8 @@
 #include "../bison/floorplan_parser.h"
 #include "../flex/floorplan_scanner.h"
 
+#include "slu_ddefs.h"
+
 // From Bison manual:
 // The value returned by yyparse is 0 if parsing was successful (return is
 // due to end-of-input). The value is 1 if parsing failed (return is due to
@@ -60,6 +62,8 @@ void init_floorplan (Floorplan_t *floorplan)
     floorplan->FileName     = NULL ;
     floorplan->NElements    = 0u ;
     floorplan->ElementsList = NULL ;
+
+    init_floorplan_matrix (&floorplan->SurfaceCoefficients) ;
 }
 
 /******************************************************************************/
@@ -79,6 +83,8 @@ Floorplan_t *alloc_and_init_floorplan (void)
 
 void free_floorplan (Floorplan_t *floorplan)
 {
+    free_floorplan_matrix (&floorplan->SurfaceCoefficients) ;
+
     FREE_POINTER (free_floorplan_elements_list, floorplan->ElementsList) ;
     FREE_POINTER (free,                         floorplan->FileName) ;
     FREE_POINTER (free,                         floorplan) ;
@@ -171,15 +177,48 @@ FloorplanElement_t *get_floorplan_element_floorplan
 Error_t fill_sources_floorplan
 (
     Source_t     *sources,
-    Dimensions_t *dimensions,
     Floorplan_t  *floorplan
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, floorplan_element, floorplan->ElementsList)
+    Quantity_t  index = 0u ;
 
-        if (fill_sources_floorplan_element (sources, dimensions, floorplan_element) == TDICE_FAILURE)
+    Power_t *powers = malloc (sizeof (Power_t) * floorplan->NElements) ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, floorplan->ElementsList)
+    {
+        if (is_empty_powers_queue (flp_el->PowerValues) == true)
+        {
+            FREE_POINTER (free, powers) ;
 
             return TDICE_FAILURE ;
+        }
+
+        powers [ index++ ] = get_from_powers_queue (flp_el->PowerValues) ;
+
+        pop_from_powers_queue (flp_el->PowerValues) ;
+    }
+
+    // Does the mv multiplication to compute the source vector
+
+    SuperMatrix SLUA ;
+
+    dCreate_CompCol_Matrix
+    (
+        &SLUA,
+        floorplan->SurfaceCoefficients.NRows,
+        floorplan->SurfaceCoefficients.NColumns,
+        floorplan->SurfaceCoefficients.NNz,
+        floorplan->SurfaceCoefficients.Values,
+        (int*) floorplan->SurfaceCoefficients.RowIndices,
+        (int*) floorplan->SurfaceCoefficients.ColumnPointers,
+        SLU_NC, SLU_D, SLU_GE
+    ) ;
+
+    sp_dgemv("N", 1.0, &SLUA, powers, 1, 1.0, sources, 1) ;
+
+    Destroy_SuperMatrix_Store (&SLUA) ;
+
+    FREE_POINTER (free, powers) ;
 
     return TDICE_SUCCESS ;
 }

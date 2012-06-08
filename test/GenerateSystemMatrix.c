@@ -83,7 +83,7 @@ int main(int argc, char** argv)
     // Run the simulation and print the output
     ////////////////////////////////////////////////////////////////////////////
 
-    print_system_matrix (argv[2], tdata.SM_A) ;
+    print_system_matrix (tdata.SM_A, argv[2]) ;
 
 
     // free all data

@@ -51,7 +51,7 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
-#include "floorplan.h"
+#include "floorplan_element.h"
 #include "dimensions.h"
 
 /******************************************************************************/
@@ -81,9 +81,9 @@ extern "C"
 
         /*! Pointer to the array storing the non zeroes coefficient */
 
-        float *Values ;
+        Source_t *Values ;
 
-        /*! The number of rows (i.e. the number of thermal cells) */
+        /*! The number of rows (i.e. the number of thermal cells on a layer) */
 
         CellIndex_t NRows ;
 
@@ -145,19 +145,19 @@ extern "C"
 
     /*! Fills the floorplan matrix
      *
-     *  The function fills, layer by layer, all the columns
-     *  of the floorplan matrix.
+     *  The function fills, floorplan element by floorplan element, all
+     *  the columns of the floorplan matrix.
      *
-     *  \param this         pointer to the floorplan matrix to fill
-     *  \param floorplan    pointer to the floorplan
-     *  \param dimensions   pointer to the structure containing the dimensions of the IC
+     *  \param this       pointer to the floorplan matrix to fill
+     *  \param list       pointer to the list of floorplan elements
+     *  \param dimensions pointer to the structure containing the dimensions of the IC
      */
 
     void fill_floorplan_matrix
     (
-        FloorplanMatrix_t *this,
-        Floorplan_t       *floorplan,
-        Dimensions_t      *dimensions
+        FloorplanMatrix_t  *this,
+        FloorplanElement_t *list,
+        Dimensions_t       *dimensions
     ) ;
 
 

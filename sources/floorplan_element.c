@@ -224,33 +224,6 @@ void print_formatted_floorplan_elements_list
 
 /******************************************************************************/
 
-Error_t fill_sources_floorplan_element
-(
-    Source_t           *sources,
-    Dimensions_t       *dimensions,
-    FloorplanElement_t *floorplan_element
-)
-{
-    if (is_empty_powers_queue (floorplan_element->PowerValues) == true)
-
-        return TDICE_FAILURE ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, floorplan_element->ICElementsList)
-
-        fill_sources_ic_element
-
-            (sources, dimensions,
-             get_from_powers_queue (floorplan_element->PowerValues),
-             floorplan_element->EffectiveSurface,
-             icelement) ;
-
-    pop_from_powers_queue (floorplan_element->PowerValues) ;
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
 Error_t insert_power_values_floorplan_element
 (
     FloorplanElement_t *floorplan_element,
