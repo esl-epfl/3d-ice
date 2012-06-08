@@ -53,14 +53,12 @@ extern "C"
 #include "types.h"
 
 #include "channel.h"
+#include "heat_sink.h"
 #include "die.h"
 #include "dimensions.h"
 #include "floorplan.h"
-#include "floorplan_element.h"
 #include "layer.h"
 #include "powers_queue.h"
-#include "system_matrix.h"
-#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -71,9 +69,10 @@ extern "C"
 
     union StackElement_p
     {
-        Layer_t   *Layer ;     /*!< Pointer to a Layer   */
-        Die_t     *Die ;       /*!< Pointer to a Die     */
-        Channel_t *Channel ;   /*!< Pointer to a Channel */
+        Layer_t    *Layer ;     /*!< Pointer to a Layer      */
+        Die_t      *Die ;       /*!< Pointer to a Die        */
+        Channel_t  *Channel ;   /*!< Pointer to the Channel  */
+        HeatSink_t *HeatSink ;  /*!< Pointer to the Heatsink */
     } ;
 
     /*! Definition of the type StackElement_p */
@@ -234,63 +233,6 @@ extern "C"
      */
 
     CellIndex_t get_source_layer_offset (StackElement_t *stack_element) ;
-
-    /*! Fill the thermal cells corresponding to a stack element
-     *
-     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
-     *  \param delta_time    the time resolution of the thermal simulation
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param stack_element pointer to the stack element
-     */
-
-    void fill_thermal_cell_stack_element
-    (
-        ThermalCell_t  *thermal_cells,
-        Time_t          delta_time,
-        Dimensions_t   *dimensions,
-        StackElement_t *stack_element
-    ) ;
-
-
-
-    /*! Fills the source vector corresponding to a stack element
-     *
-     *  \param sources       pointer to the first element in the source vector
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param stack_element pointer to the stack element
-     *
-     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
-     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
-     *                           (at least one floorplan element with no power
-     *                            values in its queue)
-     */
-
-    Error_t fill_sources_stack_element
-    (
-        Source_t       *sources,
-        Dimensions_t   *dimensions,
-        StackElement_t *stack_element
-    ) ;
-
-
-
-    /*! Fills the system matrix
-     *
-     *  \param system_matrix copy of the system matrix structure
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
-     *  \param stack_element pointer to the stack element
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t fill_system_matrix_stack_element
-    (
-        SystemMatrix_t    system_matrix,
-        Dimensions_t     *dimensions,
-        ThermalCell_t    *thermal_cells,
-        StackElement_t   *stack_element
-    ) ;
 
 
 

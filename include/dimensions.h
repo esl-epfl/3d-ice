@@ -99,6 +99,11 @@ extern "C"
 
         CellDimension_t Width ;
 
+        /*! The heights of all the cells in \f$ \mu m \f$. The vector stores
+         *  as many values as layers in the 3D-IC */
+
+        CellDimension_t *Heights ;
+
     } ;
 
     /*! Definition of the type CellDimension_t */
@@ -285,21 +290,32 @@ extern "C"
      *
      *  Sets the content of the field Dimensions::NConnections
      *
-     *  \param dimensions the address of the dimensions structure
-     *  \param num_channels number of channels (as stack element) in the stack
+     *  \param dimensions    the address of the dimensions structure
+     *  \param num_channels  number of channels (as stack element) in the stack
      *  \param channel_model the model of the channel used in the stack
+     *  \param sink_model    the model of the heat sink used in the stack
      */
 
     void compute_number_of_connections
+    (
+        Dimensions_t   *dimensions,
+        Quantity_t      num_channels,
+        ChannelModel_t  channel_model,
+        HeatSinkModel_t sink_model
+    ) ;
 
-        (Dimensions_t *dimensions, Quantity_t num_channels, ChannelModel_t channel_model) ;
+
 
     /*! Returns the length of a thermal cell
+     *
+     *  The function prints a warning on stderr if \a column_index is
+     *  oustside of its correct range of values, i.e. [0, ncolumns].
      *
      * \param dimensions   the address of the structure containing all the dimensions
      * \param column_index the column index of the thermal cell
      *
-     * \return the length of the thermal cell in position \a coluimn_index
+     * \return the length of the thermal cell in position \a column_index
+     * \return \c 0 if \a column_index is out of range
      */
 
     CellDimension_t get_cell_length (Dimensions_t *dimensions, CellIndex_t column_index) ;
@@ -308,13 +324,35 @@ extern "C"
 
     /*! Returns the width of a thermal cell
      *
+     *  The function prints a warning on stderr if \a row_index is
+     *  oustside of its correct range of values, i.e. [0, nrows].
+     *
      * \param dimensions the address of the structure containing all the dimensions
      * \param row_index  the row index of the thermal cell
      *
      * \return the width of the thermal cell in position \a row_index
+     * \return \c 0 if \a row_index is out of range
      */
 
     CellDimension_t get_cell_width (Dimensions_t *dimensions, CellIndex_t row_index) ;
+
+
+
+    /*! Returns the height of a thermal cell
+     *
+     *  The function prints a warning on stderr if \a layer_index is
+     *  oustside of its correct range of values, i.e. [0, nlayers] or if
+     *  the array of heights has not been created.
+     *
+     * \param dimensions   the address of the structure containing all the dimensions
+     * \param layer_index  the layer index of the thermal cell
+     *
+     * \return the height of the thermal cell in position \a layer_index
+     * \return \c 0 if \a layer_index is out of range or if the array of
+     *         heights has not been created.
+     */
+
+    CellDimension_t get_cell_height (Dimensions_t *dimensions, CellIndex_t layer_index) ;
 
 
 
@@ -490,6 +528,17 @@ extern "C"
      */
 
     ChipDimension_t get_chip_width (Dimensions_t *dimensions) ;
+
+
+
+    /*! Returns the area of the IC in \f$ \mu m^2 \f$
+     *
+     * \param dimensions the address of the structure containing all the dimensions
+     *
+     * \return the area of the IC
+     */
+
+    ChipDimension_t get_chip_area (Dimensions_t *dimensions) ;
 
 /******************************************************************************/
 

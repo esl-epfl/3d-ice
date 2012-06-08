@@ -53,7 +53,7 @@ extern "C"
 #include "types.h"
 
 #include "dimensions.h"
-#include "thermal_cell.h"
+#include "thermal_grid.h"
 
 /******************************************************************************/
 
@@ -103,18 +103,18 @@ extern "C"
 
     /*! Sets all the fields of \a system_matrix to a default value (zero or \c NULL ).
      *
-     * \param system_matrix the address of the system matrix to initialize
+     * \param this the address of the system matrix to initialize
      */
 
-    void init_system_matrix (SystemMatrix_t *system_matrix) ;
+    void init_system_matrix (SystemMatrix_t *this) ;
 
 
 
     /*! Allocates memory to store indexes and coefficients of a SystemMatrix
      *
-     * \param system_matrix the address of the system matrix
-     * \param size          the dimension of the matrix
-     * \param nnz           the number of nonzeroes coeffcients
+     * \param this the address of the system matrix
+     * \param size the dimension of the matrix
+     * \param nnz  the number of nonzeroes coeffcients
      *
      * \return \c TDICE_SUCCESS if the memory allocation succeded
      * \return \c TDICE_FAILURE if the memory allocation fails
@@ -122,16 +122,35 @@ extern "C"
 
     Error_t alloc_system_matrix
 
-        (SystemMatrix_t *system_matrix, CellIndex_t size, CellIndex_t nnz) ;
+        (SystemMatrix_t *this, CellIndex_t size, CellIndex_t nnz) ;
 
 
 
     /*! Frees the memory used to store indexes and coefficients of a system matrix
      *
-     * \param system_matrix the address of the system matrix structure
+     * \param this the address of the system matrix structure
      */
 
-    void free_system_matrix (SystemMatrix_t *system_matrix) ;
+    void free_system_matrix (SystemMatrix_t *this) ;
+
+
+
+    /*! Fills the system matrix
+     *
+     *  The function fills, layer by layer, all the columns
+     *  of the system matrix.
+     *
+     *  \param this         pointer to the system matrix to fill
+     *  \param thermal_grid pointer to the thermal grid structure
+     *  \param dimensions   pointer to the structure containing the dimensions of the IC
+     */
+
+    void fill_system_matrix
+    (
+        SystemMatrix_t *this,
+        ThermalGrid_t  *thermal_grid,
+        Dimensions_t   *dimensions
+    ) ;
 
 
 
@@ -141,185 +160,11 @@ extern "C"
      * zero coefficient (COO format). The first row (or column) has index 1
      * (matlab compatibile)
      *
-     * \param file_name     the name of the file to create
-     * \param system_matrix the system matrix structure
+     * \param file_name the name of the file to create
+     * \param this      the system matrix structure
      */
 
-    void print_system_matrix (String_t file_name, SystemMatrix_t system_matrix) ;
-
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a solid layer
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t add_solid_column
-    (
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-
-        CellIndex_t     layer_index,
-        CellIndex_t     row_index,
-        CellIndex_t     column_index,
-
-        SystemMatrix_t  system_matrix
-    ) ;
-
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a channel layer (4rm model)
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t add_liquid_column_4rm
-    (
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-
-        CellIndex_t     layer_index,
-        CellIndex_t     row_index,
-        CellIndex_t     column_index,
-
-        SystemMatrix_t  system_matrix
-    ) ;
-
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a liquid layer
-     *  in the 2rm model (microchannels and pin fins)
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t add_liquid_column_2rm
-    (
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-
-        CellIndex_t     layer_index,
-        CellIndex_t     row_index,
-        CellIndex_t     column_index,
-
-        SystemMatrix_t  system_matrix
-    ) ;
-
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a bottom wall layer
-     *  in the 2rm model (microchannels and pin fins)
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t add_bottom_wall_column_2rm
-    (
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-
-        CellIndex_t     layer_index,
-        CellIndex_t     row_index,
-        CellIndex_t     column_index,
-
-        SystemMatrix_t  system_matrix
-    ) ;
-
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a top wall layer
-     *  in the 2rm model (microchannels and pin fins)
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t add_top_wall_column_2rm
-    (
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-
-        CellIndex_t     layer_index,
-        CellIndex_t     row_index,
-        CellIndex_t     column_index,
-
-        SystemMatrix_t  system_matrix
-    ) ;
-
-
-    /*! Fills a column of the system matrix
-     *
-     *  The column corresponds to a thermal cell in a virtual wall layer (2rm model)
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param channel_model the model of the channel, to distinguish between
-     *                       2rm microchannel or 2rm pinfins
-     *  \param layer_index   layer index of the thermal cell
-     *  \param row_index     row index of the thermal cell
-     *  \param column_index  column index of the thermal cell
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t add_virtual_wall_column_2rm
-    (
-        Dimensions_t    *dimensions,
-        ThermalCell_t   *thermal_cells,
-
-        ChannelModel_t   channel_model,
-
-        CellIndex_t      layer_index,
-        CellIndex_t      row_index,
-        CellIndex_t      column_index,
-
-        SystemMatrix_t   system_matrix
-    ) ;
+    void print_system_matrix (String_t file_name, SystemMatrix_t this) ;
 
 /******************************************************************************/
 

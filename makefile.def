@@ -69,11 +69,11 @@
 
 3DICE_SOURCES_C = $(3DICE_SOURCES)/analysis.c                 \
                   $(3DICE_SOURCES)/channel.c                  \
-                  $(3DICE_SOURCES)/conventional_heat_sink.c   \
                   $(3DICE_SOURCES)/die.c                      \
                   $(3DICE_SOURCES)/dimensions.c               \
                   $(3DICE_SOURCES)/floorplan_element.c        \
                   $(3DICE_SOURCES)/floorplan.c                \
+                  $(3DICE_SOURCES)/heat_sink.c                \
                   $(3DICE_SOURCES)/ic_element.c               \
                   $(3DICE_SOURCES)/inspection_point.c         \
                   $(3DICE_SOURCES)/layer.c                    \
@@ -84,8 +84,8 @@
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \
                   $(3DICE_SOURCES)/system_matrix.c            \
-                  $(3DICE_SOURCES)/thermal_cell.c             \
-                  $(3DICE_SOURCES)/thermal_data.c
+                  $(3DICE_SOURCES)/thermal_data.c             \
+                  $(3DICE_SOURCES)/thermal_grid.c
 
 3DICE_SOURCES_O = $(3DICE_SOURCES_C:.c=.o)
 3DICE_SOURCES_D = $(3DICE_SOURCES_C:.c=.d)

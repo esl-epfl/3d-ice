@@ -54,15 +54,14 @@ extern "C"
 
 #include "analysis.h"
 #include "channel.h"
-#include "conventional_heat_sink.h"
+#include "heat_sink.h"
 #include "die.h"
+#include "layer.h"
 #include "dimensions.h"
 #include "floorplan_element.h"
 #include "material.h"
 #include "powers_queue.h"
 #include "stack_element.h"
-#include "system_matrix.h"
-#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -83,15 +82,23 @@ extern "C"
 
         /*! Information about the heat dissipation throught the top surface */
 
-        ConventionalHeatSink_t *ConventionalHeatSink ;
+        HeatSink_t *HeatSink ;
 
         /*! Information about the (unique) type of channel used in the 3d stack */
 
         Channel_t *Channel ;
 
+        /*! The list of layers available to compose the 3d stack */
+
+        Layer_t *LayersList ;
+
         /*! The list of dies available to compose the 3d stack */
 
         Die_t *DiesList ;
+
+        /*! Collection of all the dimensions (chip, grid of cells, cell) */
+
+        Dimensions_t *Dimensions ;
 
         /*! Pointer to the top-most stack elements componing the 3Dstack */
 
@@ -100,10 +107,6 @@ extern "C"
         /*! Pointer to the bottom-most stack elements componing the 3Dstack */
 
         StackElement_t *BottomStackElement ;
-
-        /*! Collection of all the dimensions (chip, grid of cells, cell) */
-
-        Dimensions_t *Dimensions ;
     } ;
 
 
@@ -190,74 +193,6 @@ extern "C"
     void print_floorplans
 
         (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
-
-
-
-    /*! Fills the 3d grid of thermal cells
-     *
-     *  The function fills all the thermal cells representing the 3d volume
-     *  of the IC stack, starting from the bottom-most stack element. If the
-     *  heat sink is used, it adapts the top-most layer to connect it to
-     *  the enviroment and enable heat dissipation. If the simulation typed
-     *  is steady state it resets the capacitance of each thermal cell.
-     *
-     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
-     *  \param analysis      pointer to the steructure containing info about the type of analysis
-     *  \param stkd          pointer to the stack descritpion structure
-     */
-
-    void fill_thermal_cell_stack_description
-    (
-        ThermalCell_t      *thermal_cells,
-        Analysis_t         *analysis,
-        StackDescription_t *stkd
-    ) ;
-
-
-
-    /*! Fills the source vector
-     *
-     *  The function resets the source vector. If the heat sink is used,
-     *  it inserts power values into the thermal cells in the top-most layer.
-     *  Then, it extracts power traces from each floorplan elements and power
-     *  related to the inlet of the channels.
-     *
-     *  \param sources       pointer to the first element in the source vector
-     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
-     *  \param stkd          pointer to the stack descritpion structure
-     *
-     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
-     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
-     *                           (at least one floorplan element with no power
-     *                            values in its queue)
-     */
-
-    Error_t fill_sources_stack_description
-    (
-        Source_t           *sources,
-        ThermalCell_t      *thermal_cells,
-        StackDescription_t *stkd
-    ) ;
-
-
-
-    /*! Fills the system matrix
-     *
-     *  The function fills, stack element by stack element, all the columns
-     *  of the system matrix. If the heat sink is used, the coefficients
-     *  related to the last layer are updated.
-     *
-     *  \param system_matrix copy of the system matrix structure
-     *  \param thermal_cells pointer to the first thermal cell in the 3d grid
-     *  \param stkd          pointer to the stack descritpion structure
-     */
-
-    void fill_system_matrix_stack_description
-    (
-        SystemMatrix_t      system_matrix,
-        ThermalCell_t      *thermal_cells,
-        StackDescription_t *stkd
-    ) ;
 
 
 

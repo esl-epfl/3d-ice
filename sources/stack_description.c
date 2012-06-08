@@ -57,23 +57,24 @@ extern int stack_description_parse
 
 void init_stack_description (StackDescription_t *stkd)
 {
-  stkd->FileName             = NULL ;
-  stkd->MaterialsList        = NULL ;
-  stkd->ConventionalHeatSink = NULL ;
-  stkd->Channel              = NULL ;
-  stkd->DiesList             = NULL ;
-  stkd->TopStackElement      = NULL ;
-  stkd->BottomStackElement   = NULL ;
-  stkd->Dimensions           = NULL ;
+    stkd->FileName           = NULL ;
+    stkd->MaterialsList      = NULL ;
+    stkd->HeatSink           = NULL ;
+    stkd->Channel            = NULL ;
+    stkd->LayersList         = NULL ;
+    stkd->DiesList           = NULL ;
+    stkd->Dimensions         = NULL ;
+    stkd->TopStackElement    = NULL ;
+    stkd->BottomStackElement = NULL ;
 }
 
 /******************************************************************************/
 
 Error_t fill_stack_description
 (
-  StackDescription_t *stkd,
-  Analysis_t         *analysis,
-  String_t            filename
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    String_t            filename
 )
 {
     FILE*    input ;
@@ -111,13 +112,14 @@ Error_t fill_stack_description
 
 void free_stack_description (StackDescription_t *stkd)
 {
-    FREE_POINTER (free_materials_list,         stkd->MaterialsList) ;
-    FREE_POINTER (free_channel,                stkd->Channel) ;
-    FREE_POINTER (free_dies_list,              stkd->DiesList) ;
-    FREE_POINTER (free_conventional_heat_sink, stkd->ConventionalHeatSink) ;
-    FREE_POINTER (free_stack_elements_list,    stkd->BottomStackElement) ;
-    FREE_POINTER (free_dimensions,             stkd->Dimensions) ;
-    FREE_POINTER (free,                        stkd->FileName) ;
+    FREE_POINTER (free,                     stkd->FileName) ;
+    FREE_POINTER (free_materials_list,      stkd->MaterialsList) ;
+    FREE_POINTER (free_heat_sink,           stkd->HeatSink) ;
+    FREE_POINTER (free_channel,             stkd->Channel) ;
+    FREE_POINTER (free_layers_list,         stkd->LayersList) ;
+    FREE_POINTER (free_dies_list,           stkd->DiesList) ;
+    FREE_POINTER (free_dimensions,          stkd->Dimensions) ;
+    FREE_POINTER (free_stack_elements_list, stkd->BottomStackElement) ;
 
     stkd->TopStackElement = NULL ;
 }
@@ -135,11 +137,9 @@ void print_formatted_stack_description
 
     fprintf (stream, "%s\n", prefix) ;
 
-    if (stkd->ConventionalHeatSink != NULL)
+    if (stkd->HeatSink != NULL)
     {
-        print_formatted_conventional_heat_sink
-
-            (stream, prefix, stkd->ConventionalHeatSink) ;
+        print_formatted_heat_sink (stream, prefix, stkd->HeatSink) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
@@ -152,6 +152,10 @@ void print_formatted_stack_description
 
         fprintf (stream, "%s\n", prefix) ;
     }
+
+    print_formatted_layers_list (stream, prefix, stkd->LayersList) ;
+
+    fprintf (stream, "%s\n", prefix) ;
 
     print_formatted_dies_list (stream, prefix, stkd->DiesList) ;
 
@@ -207,16 +211,14 @@ void print_detailed_stack_description
     }
 
     fprintf (stream,
-             "%s  ConventionalHeatSink          = %p\n",
-             prefix, stkd->ConventionalHeatSink) ;
+             "%s  HeatSink                      = %p\n",
+             prefix, stkd->HeatSink) ;
 
-    if (stkd->ConventionalHeatSink != NULL)
+    if (stkd->HeatSink != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
-        print_detailed_conventional_heat_sink
-
-            (stream, new_prefix, stkd->ConventionalHeatSink) ;
+        print_detailed_heat_sink (stream, new_prefix, stkd->HeatSink) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
@@ -235,6 +237,25 @@ void print_detailed_stack_description
     }
 
     fprintf (stream,
+             "%s  LayersList                    = %p\n",
+             prefix, stkd->LayersList) ;
+
+    if (stkd->LayersList != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+
+        sprintf (new_prefix, "%s        ", prefix) ;
+
+        print_detailed_layers_list
+
+            (stream, new_prefix, stkd->LayersList) ;
+
+        sprintf (new_prefix, "%s    ", prefix) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    fprintf (stream,
              "%s  DiesList                      = %p\n",
              prefix, stkd->DiesList) ;
 
@@ -245,6 +266,21 @@ void print_detailed_stack_description
         print_detailed_dies_list
 
             (stream, new_prefix, stkd->DiesList) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    fprintf (stream,
+             "%s  Dimensions                    = %p\n",
+             prefix, stkd->Dimensions) ;
+
+    if (stkd->Dimensions != NULL)
+    {
+        fprintf (stream, "%s\n", prefix) ;
+
+        print_detailed_dimensions
+
+            (stream, new_prefix, stkd->Dimensions) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
@@ -268,21 +304,6 @@ void print_detailed_stack_description
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    fprintf (stream,
-             "%s  Dimensions                    = %p\n",
-             prefix, stkd->Dimensions) ;
-
-    if (stkd->Dimensions != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_dimensions
-
-            (stream, new_prefix, stkd->Dimensions) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
     FREE_POINTER (free, new_prefix) ;
 }
 
@@ -302,120 +323,6 @@ void print_floorplans
         if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
 
             print_detailed_floorplan (stream, prefix, stk_el->Floorplan) ;
-}
-
-/******************************************************************************/
-
-void fill_thermal_cell_stack_description
-(
-    ThermalCell_t      *thermal_cells,
-    Analysis_t         *analysis,
-    StackDescription_t *stkd
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement_t, stack_element, stkd->BottomStackElement)
-
-        fill_thermal_cell_stack_element
-
-            (thermal_cells, analysis->StepTime, stkd->Dimensions, stack_element) ;
-
-    if (stkd->ConventionalHeatSink)
-
-        fill_thermal_cell_conventional_heat_sink
-
-            (thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
-
-    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
-
-        reset_capacities
-        (
-            thermal_cells,
-              get_number_of_layers(stkd->Dimensions)
-            * get_number_of_columns(stkd->Dimensions)
-        ) ;
-}
-
-/******************************************************************************/
-
-Error_t fill_sources_stack_description
-(
-    Source_t           *sources,
-    ThermalCell_t      *thermal_cells,
-    StackDescription_t *stkd
-)
-{
-#ifdef PRINT_SOURCES
-    fprintf (stderr,
-        "fill_sources_stack_description ( l %d r %d c %d )\n",
-        get_number_of_layers  (stkd->Dimensions),
-        get_number_of_rows    (stkd->Dimensions),
-        get_number_of_columns (stkd->Dimensions)) ;
-#endif
-
-    // reset all the source vector to 0
-
-    CellIndex_t ccounter ;
-    CellIndex_t ncells = get_number_of_cells (stkd->Dimensions) ;
-
-    for (ccounter = 0 ; ccounter != ncells ; ccounter++)
-
-        sources [ ccounter ] = (Source_t) 0.0 ;
-
-    // set the sources due to the heatsink (overwrites all cells in the last layer)
-
-    if (stkd->ConventionalHeatSink != NULL)
-
-        fill_sources_conventional_heat_sink
-
-            (sources, thermal_cells, stkd->Dimensions, stkd->ConventionalHeatSink) ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement_t, stack_element, stkd->BottomStackElement)
-
-        if (fill_sources_stack_element (sources, stkd->Dimensions, stack_element) == TDICE_FAILURE)
-
-            return TDICE_FAILURE ;
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
-void fill_system_matrix_stack_description
-(
-    SystemMatrix_t      system_matrix,
-    ThermalCell_t      *thermal_cells,
-    StackDescription_t *stkd
-)
-{
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr,
-        "fill_system_matrix_stack_description ( l %d r %d c %d )\n",
-        get_number_of_layers  (stkd->Dimensions),
-        get_number_of_rows    (stkd->Dimensions),
-        get_number_of_columns (stkd->Dimensions)) ;
-#endif
-
-    SystemMatrix_t tmp_system_matrix = system_matrix ;
-
-    *system_matrix.ColumnPointers++ = 0u ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement_t, stack_element, stkd->BottomStackElement)
-
-        system_matrix = fill_system_matrix_stack_element
-
-            (system_matrix, stkd->Dimensions, thermal_cells, stack_element) ;
-
-    if (stkd->ConventionalHeatSink != NULL)
-
-        fill_system_matrix_conventional_heat_sink
-
-            (tmp_system_matrix, stkd->Dimensions, thermal_cells) ;
 }
 
 /******************************************************************************/

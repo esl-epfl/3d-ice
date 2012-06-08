@@ -262,7 +262,125 @@ extern "C"
 
 /******************************************************************************/
 
+    /*! \enum HeatSinkModel_t
+     *
+     * Enumeration to collect the supported model of the heat sink
+     */
 
+    enum HeatSinkModel_t
+    {
+        TDICE_HEATSINK_MODEL_NONE = 0,               //!< Undefined type
+        TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT,  //!< Connection to ambient
+        TDICE_HEATSINK_MODEL_TRADITIONAL             //!< Traditional Heat Sink
+    } ;
+
+    /*! The definition of the type HeatSinkModel_t */
+
+    typedef enum HeatSinkModel_t HeatSinkModel_t ;
+
+
+
+    /*! \def NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT
+     *
+     *  The number of layers of thermal cells needed to model the
+     * connection of the top layer to the enviroment
+     */
+
+#   define NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT 0
+
+    /*! \def NUM_LAYERS_HEATSINK_TRADITIONAL
+     *
+     *  The number of layers of thermal cells needed to model the
+     *  heat sink made with spreader and sink
+     */
+
+#   define NUM_LAYERS_HEATSINK_TRADITIONAL 2
+
+    /*! \def SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT
+     *
+     *  The offset (\# layers) within an heat sink of type
+     *  \a TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT to be added
+     *  to the offset of the stack element to locate the source layer
+     */
+
+#   define SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT 0
+
+    /*! \def SOURCE_OFFSET_HEATSINK_TRADITIONAL
+     *
+     *  The offset (\# layers) within an heat sink of type
+     *  \a TDICE_HEATSINK_MODEL_TRADITIONAL to be added to
+     *  the offset of the stack element to locate the source layer
+     */
+
+#   define SOURCE_OFFSET_HEATSINK_TRADITIONAL 1
+
+/******************************************************************************/
+
+    /*! \enum StackLayerType_t
+     *
+     * Enumeration to collect the types of layer
+     */
+
+    enum StackLayerType_t
+    {
+        /*! Undefined type */
+
+        TDICE_LAYER_NONE = 0,
+
+        /*! Solid layer in Layer or Die stack elements */
+
+        TDICE_LAYER_SOLID,
+
+        /*! Solid layer connected to the environment to dissipate heat */
+
+        TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT,
+
+        /*! Spreader layer between the chip and the sink */
+
+        TDICE_LAYER_SPREADER,
+
+        /*! Sink layer between the spreader and the environment */
+
+        TDICE_LAYER_SINK,
+
+        /*! Liquid layer in Channel 4 resistors model */
+
+        TDICE_LAYER_CHANNEL_4RM,
+
+        /*! Liquid layer in Channel 2 resistors model */
+
+        TDICE_LAYER_CHANNEL_2RM,
+
+        /*! Liquid layer in inline PinFins 2 resistors model */
+
+        TDICE_LAYER_PINFINS_INLINE,
+
+        /*! Liquid layer in staggered PinFins 2 resistors model */
+
+        TDICE_LAYER_PINFINS_STAGGERED,
+
+        /*! Virtual wall layer in Channel 2rm */
+
+        TDICE_LAYER_VWALL_CHANNEL,
+
+        /*! Virtual wall layer in inline/staggered PinFins 2 rm */
+
+        TDICE_LAYER_VWALL_PINFINS,
+
+        /*! Top wall layer in Channel/PinFins 2 rm */
+
+        TDICE_LAYER_TOP_WALL,
+
+        /*! Bottom wall layer in Channel/PinFins 2 rm */
+
+        TDICE_LAYER_BOTTOM_WALL,
+    } ;
+
+    /*! The definition of the type StackLayerType_t */
+
+    typedef enum StackLayerType_t StackLayerType_t ;
+
+/******************************************************************************/
 
     /*! \enum StackElementType_t
      *
@@ -271,10 +389,11 @@ extern "C"
 
     enum StackElementType_t
     {
-        TDICE_STACK_ELEMENT_NONE = 0, //!< Undefined type
-        TDICE_STACK_ELEMENT_LAYER   , //!< Layer
-        TDICE_STACK_ELEMENT_CHANNEL , //!< Channel
-        TDICE_STACK_ELEMENT_DIE       //!< Die
+        TDICE_STACK_ELEMENT_NONE = 0,   //!< Undefined type
+        TDICE_STACK_ELEMENT_LAYER   ,   //!< Layer
+        TDICE_STACK_ELEMENT_CHANNEL ,   //!< Channel
+        TDICE_STACK_ELEMENT_DIE     ,   //!< Die
+        TDICE_STACK_ELEMENT_HEATSINK    //!< Heat Sink
     } ;
 
     /*! The definition of the type StackElementType_t */
@@ -572,11 +691,13 @@ extern "C"
 
         TDICE_INSERT_POWERS_AND_SIMULATE_SLOT,
         
+        /*! \brief Tells the server to run a slot. Used in 3d-ice-gui */
+
         TDICE_SIMULATE_SLOT,
-        /*! \brief Tells the server to run a slot. Used in 3d-ice-gui*/
         
-				TDICE_SIMULATE_STEP,
         /*! \brief Tells the server to run a step. Used in 3d-ice-gui */
+
+        TDICE_SIMULATE_STEP,
     } ;
 
 

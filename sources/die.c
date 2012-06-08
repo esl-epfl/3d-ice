@@ -105,36 +105,22 @@ Die_t *find_die_in_list (Die_t *list, String_t id)
 
 void print_formatted_die (FILE  *stream, String_t prefix, Die_t *die)
 {
-    String_t new_prefix_layer = (String_t)
-
-        malloc (sizeof (*new_prefix_layer) * (10 + strlen(prefix))) ;
-
-    String_t new_prefix_source = (String_t)
-
-        malloc (sizeof (*new_prefix_source) * (10 + strlen(prefix))) ;
-
-    if (new_prefix_layer == NULL) return ;
-
-    if (new_prefix_source == NULL) return ;
-
-    sprintf (new_prefix_layer,  "%s    layer", prefix) ;
-    sprintf (new_prefix_source, "%s   source", prefix) ;
-
     fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
     FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer_t, layer, die->TopLayer)
     {
         if (layer == die->SourceLayer)
 
-            print_formatted_layer (stream, new_prefix_source, layer) ;
+            fprintf (stream,
+                "%s   source  %4.1f %s ;\n",
+                prefix, layer->Height, layer->Material->Id) ;
 
         else
 
-            print_formatted_layer (stream, new_prefix_layer, layer) ;
+            fprintf (stream,
+                "%s    layer  %4.1f %s ;\n",
+                prefix, layer->Height, layer->Material->Id) ;
     }
-
-    FREE_POINTER (free, new_prefix_layer) ;
-    FREE_POINTER (free, new_prefix_source) ;
 }
 
 /******************************************************************************/
@@ -228,72 +214,6 @@ void print_detailed_dies_list (FILE  *stream, String_t prefix, Die_t *list)
     }
 
     print_detailed_die (stream, prefix, die) ;
-}
-
-/******************************************************************************/
-
-void fill_thermal_cell_die
-(
-    ThermalCell_t *thermal_cells,
-    Time_t         delta_time,
-    Dimensions_t  *dimensions,
-    CellIndex_t    layer_index,
-    Die_t         *die
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, die->BottomLayer)
-
-        fill_thermal_cell_layer
-
-            (thermal_cells, delta_time, dimensions, layer_index++, layer) ;
-}
-
-/******************************************************************************/
-
-Error_t fill_sources_die
-(
-    Source_t     *sources,
-    Dimensions_t *dimensions,
-    CellIndex_t   layer_index,
-    Floorplan_t  *floorplan,
-    Die_t        *die
-)
-{
-#ifdef PRINT_SOURCES
-    fprintf (stderr,
-        "layer_index = %d\tfill_sources_die %s floorplan %s\n",
-        layer_index, die->Id, floorplan->FileName) ;
-#endif
-
-    layer_index += die->SourceLayerOffset ;
-
-    sources += get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-    return fill_sources_floorplan (sources, dimensions, floorplan) ;
-}
-
-/******************************************************************************/
-
-SystemMatrix_t fill_system_matrix_die
-(
-    Die_t            *die,
-    Dimensions_t     *dimensions,
-    ThermalCell_t    *thermal_cells,
-    CellIndex_t       layer_index,
-    SystemMatrix_t    system_matrix
-)
-{
-# ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "(l %2d) fill_system_matrix_die\n", layer_index) ;
-# endif
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, die->BottomLayer)
-
-        system_matrix = fill_system_matrix_layer
-
-            (dimensions, thermal_cells, layer_index++, system_matrix) ;
-
-    return system_matrix ;
 }
 
 /******************************************************************************/

@@ -81,11 +81,6 @@ void free_stack_element (StackElement_t *stack_element)
 
         FREE_POINTER (free_floorplan, stack_element->Floorplan) ;
 
-    else if (   stack_element->Type == TDICE_STACK_ELEMENT_LAYER
-             && stack_element->Pointer.Layer != NULL)
-
-        FREE_POINTER (free_layer, stack_element->Pointer.Layer) ;
-
     FREE_POINTER (free, stack_element->Id) ;
     FREE_POINTER (free, stack_element) ;
 }
@@ -159,10 +154,14 @@ void print_formatted_stack_elements_list
             case TDICE_STACK_ELEMENT_LAYER :
 
                 fprintf (stream,
-                    "%s   layer    %-*s ",
-                    prefix, max_stk_el_id_length, stack_element->Id) ;
+                    "%s   layer    %-*s %s",
+                    prefix,
+                    max_stk_el_id_length, stack_element->Id,
+                    stack_element->Pointer.Layer->Id) ;
 
-                print_formatted_layer (stream, (String_t) "", stack_element->Pointer.Layer) ;
+                break ;
+
+            case TDICE_STACK_ELEMENT_HEATSINK :
 
                 break ;
 
@@ -187,14 +186,6 @@ void print_detailed_stack_elements_list
     StackElement_t *list
 )
 {
-    String_t new_prefix =
-
-        (String_t ) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
-
-    if (new_prefix == NULL) return ;
-
-    sprintf (new_prefix, "%s    ", prefix) ;
-
     FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stk_el, list)
     {
         fprintf (stream,
@@ -226,12 +217,12 @@ void print_detailed_stack_elements_list
             fprintf (stream,
                 "%s  Pointer.Layer             = %p\n",
                 prefix,   stk_el->Pointer.Layer);
-
-            fprintf (stream, "%s\n", prefix) ;
-
-            print_detailed_layer (stream, new_prefix, stk_el->Pointer.Layer) ;
-
-            fprintf (stream, "%s\n", prefix) ;
+        }
+        else if (stk_el->Type == TDICE_STACK_ELEMENT_HEATSINK)
+        {
+            fprintf (stream,
+                "%s  Pointer.HeatSink          = %p\n",
+                prefix,   stk_el->Pointer.HeatSink);
         }
 
         fprintf (stream,
@@ -257,8 +248,6 @@ void print_detailed_stack_elements_list
         fprintf (stream, "%s\n", prefix) ;
 
     } // FOR_EVERY_ELEMENT_IN_LIST
-
-    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/
@@ -276,158 +265,6 @@ CellIndex_t get_source_layer_offset (StackElement_t *stack_element)
         layer_offset += stack_element->Pointer.Channel->SourceLayerOffset ;
 
     return layer_offset ;
-}
-
-/******************************************************************************/
-
-void fill_thermal_cell_stack_element
-(
-    ThermalCell_t  *thermal_cells,
-    Time_t          delta_time,
-    Dimensions_t   *dimensions,
-    StackElement_t *stack_element
-)
-{
-    switch (stack_element->Type)
-    {
-        case TDICE_STACK_ELEMENT_DIE :
-
-            fill_thermal_cell_die
-
-                (thermal_cells, delta_time, dimensions,
-                 stack_element->Offset, stack_element->Pointer.Die) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_LAYER :
-
-            fill_thermal_cell_layer
-
-                (thermal_cells, delta_time, dimensions,
-                 stack_element->Offset, stack_element->Pointer.Layer) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_CHANNEL :
-
-            fill_thermal_cell_channel
-
-                (thermal_cells, delta_time, dimensions,
-                 stack_element->Offset, stack_element->Pointer.Channel) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_NONE :
-
-            fprintf (stderr, "Error! Found stack element with unset type\n") ;
-            break ;
-
-        default :
-
-            fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
-
-    } /* switch stack_element->Type */
-}
-
-/******************************************************************************/
-
-Error_t fill_sources_stack_element
-(
-    Source_t       *sources,
-    Dimensions_t   *dimensions,
-    StackElement_t *stack_element
-)
-{
-    Error_t toreturn = TDICE_SUCCESS ;
-
-    switch (stack_element->Type)
-    {
-        case TDICE_STACK_ELEMENT_DIE :
-
-            toreturn = fill_sources_die
-
-                (sources, dimensions, stack_element->Offset,
-                 stack_element->Floorplan, stack_element->Pointer.Die) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_LAYER :
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_CHANNEL :
-
-            fill_sources_channel
-
-                (sources, dimensions, stack_element->Offset,
-                 stack_element->Pointer.Channel) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_NONE :
-
-            fprintf (stderr, "Error! Found stack element with unset type\n") ;
-            break ;
-
-        default :
-
-            fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
-
-    } /* switch stack_element->Type */
-
-    return toreturn ;
-}
-
-/******************************************************************************/
-
-SystemMatrix_t fill_system_matrix_stack_element
-(
-    SystemMatrix_t    system_matrix,
-    Dimensions_t     *dimensions,
-    ThermalCell_t    *thermal_cells,
-    StackElement_t   *stack_element
-)
-{
-    switch (stack_element->Type)
-    {
-        case TDICE_STACK_ELEMENT_DIE :
-
-            system_matrix = fill_system_matrix_die
-
-                (stack_element->Pointer.Die, dimensions,
-                 thermal_cells, stack_element->Offset, system_matrix) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_LAYER :
-
-            system_matrix = fill_system_matrix_layer
-
-                (dimensions, thermal_cells, stack_element->Offset, system_matrix) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_CHANNEL :
-
-            system_matrix = fill_system_matrix_channel
-
-                (stack_element->Pointer.Channel, dimensions,
-                 thermal_cells, stack_element->Offset, system_matrix) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_NONE :
-
-            fprintf (stderr, "Error! Found stack element with unset type\n") ;
-            break ;
-
-        default :
-
-            fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
-
-    } /* stk_el->Type */
-
-    return system_matrix ;
 }
 
 /******************************************************************************/

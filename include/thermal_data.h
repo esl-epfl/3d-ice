@@ -55,7 +55,7 @@ extern "C"
 #include "analysis.h"
 #include "stack_description.h"
 #include "system_matrix.h"
-#include "thermal_cell.h"
+#include "thermal_grid.h"
 
 #include "slu_ddefs.h"
 
@@ -77,9 +77,9 @@ extern "C"
 
         Source_t *Sources ;
 
-        /*! Array of Thermal cells */
+        /*! Structure storing the Thermal Grid */
 
-        ThermalCell_t *ThermalCells ;
+        ThermalGrid_t ThermalGrid ;
 
         /*! The number of cells in the 3D grid */
 
@@ -173,6 +173,24 @@ extern "C"
     Error_t fill_thermal_data
 
         (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
+
+
+
+    /*! Updates the source vector
+     *
+     * \param tdata address of the ThermalData structure storing the sources
+     * \param stkd  address of the StackDescription structure used to
+     *              fill the content of \a tdata
+     *
+     *  \return \c TDICE_SUCCESS if the source vector has been updated successfully
+     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
+     *                           (at least one floorplan element with no power
+     *                            values in its queue)
+     */
+
+    Error_t update_source_vector
+
+        (ThermalData_t *tdata, StackDescription_t *stkd) ;
 
 
 

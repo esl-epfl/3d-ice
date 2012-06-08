@@ -56,7 +56,8 @@ void init_thermal_data (ThermalData_t *tdata)
 
     tdata->Temperatures = NULL ;
     tdata->Sources      = NULL ;
-    tdata->ThermalCells = NULL ;
+
+    init_thermal_grid (&tdata->ThermalGrid) ;
 
     init_system_matrix (&tdata->SM_A) ;
 
@@ -94,7 +95,7 @@ Error_t fill_thermal_data
     Analysis_t         *analysis
 )
 {
-    int result ;
+    Error_t result ;
 
     tdata->Size = get_number_of_cells (stkd->Dimensions) ;
 
@@ -118,21 +119,17 @@ Error_t fill_thermal_data
          tdata->Temperatures, tdata->Size,
          SLU_DN, SLU_D, SLU_GE) ;
 
-    /* Alloc and fill the grid of thermal cells */
+    /* Alloc and fill the thermal grid */
 
-    tdata->ThermalCells = (ThermalCell_t *)
+    result = alloc_thermal_grid
 
-        malloc (  sizeof(ThermalCell_t)
-                * get_number_of_layers (stkd->Dimensions)
-                * get_number_of_columns (stkd->Dimensions)) ;
+        (&tdata->ThermalGrid, get_number_of_layers (stkd->Dimensions)) ;
 
-    if (tdata->ThermalCells == NULL)
+    if (result == TDICE_FAILURE)
 
-        goto thermal_cell_data_fail ;
+        goto thermal_grid_fail ;
 
-    fill_thermal_cell_stack_description
-
-        (tdata->ThermalCells, analysis, stkd) ;
+    fill_thermal_grid (&tdata->ThermalGrid, stkd, analysis) ;
 
     /* Alloc and set sources to zero */
 
@@ -154,9 +151,7 @@ Error_t fill_thermal_data
 
         goto system_matrix_fail ;
 
-    fill_system_matrix_stack_description
-
-        (tdata->SM_A, tdata->ThermalCells, stkd) ;
+    fill_system_matrix (&tdata->SM_A, &tdata->ThermalGrid, stkd->Dimensions) ;
 
     dCreate_CompCol_Matrix
 
@@ -244,9 +239,9 @@ system_matrix_fail :
 
 sources_fail :
 
-    FREE_POINTER (free, tdata->ThermalCells) ;
+    free_thermal_grid (&tdata->ThermalGrid) ;
 
-thermal_cell_data_fail :
+thermal_grid_fail:
 
     Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
     FREE_POINTER              (free, tdata->Temperatures) ;
@@ -260,15 +255,163 @@ temperatures_fail :
 
 /******************************************************************************/
 
+Error_t update_source_vector
+(
+    ThermalData_t      *tdata,
+    StackDescription_t *stkd
+)
+{
+#ifdef PRINT_SOURCES
+    fprintf (stderr,
+        "update_source_vector ( l %d r %d c %d )\n",
+        get_number_of_layers  (stkd->Dimensions),
+        get_number_of_rows    (stkd->Dimensions),
+        get_number_of_columns (stkd->Dimensions)) ;
+#endif
+
+    // reset all the source vector to 0
+
+    CellIndex_t ccounter ;
+    CellIndex_t ncells = get_number_of_cells (stkd->Dimensions) ;
+
+    for (ccounter = 0 ; ccounter != ncells ; ccounter++)
+
+        tdata->Sources [ ccounter ] = (Source_t) 0.0 ;
+
+    // if used, sets the sources due to the heatsink (overwrites all cells in
+    // the last layer) as first operation. Then the die will add its sources
+    // only in those cells covered by the floorplan.
+    // Reverse ordering works as long as every stack element knows where it
+    // should access the source vector (offset)
+
+    FOR_EVERY_ELEMENT_IN_LIST_PREV
+
+    (StackElement_t, stack_element, stkd->TopStackElement)
+    {
+        CellIndex_t layer_index = stack_element->Offset ;
+
+        switch (stack_element->Type)
+        {
+            case TDICE_STACK_ELEMENT_DIE :
+            {
+                layer_index += stack_element->Pointer.Die->SourceLayerOffset ;
+
+                Source_t *sources = tdata->Sources +
+
+                    get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
+
+                Error_t error = fill_sources_floorplan
+
+                    (sources, stkd->Dimensions, stack_element->Floorplan) ;
+
+                if (error == TDICE_FAILURE)
+
+                    return TDICE_FAILURE ;
+
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_HEATSINK :
+            {
+                layer_index += stack_element->Pointer.HeatSink->SourceLayerOffset ;
+
+                CellIndex_t cell_index =
+
+                    get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
+
+                Source_t *sources = tdata->Sources + cell_index ;
+
+                FOR_EVERY_ROW (row, stkd->Dimensions)
+                {
+                    FOR_EVERY_COLUMN (column, stkd->Dimensions)
+                    {
+                        *sources = stack_element->Pointer.HeatSink->AmbientTemperature
+                                   * get_conductance_top
+
+                                     (&tdata->ThermalGrid, stkd->Dimensions, layer_index, row, column) ;
+
+#ifdef PRINT_SOURCES
+                        fprintf (stderr,
+                            "solid  cell  |  l %2d r %4d c %4d [%7d] | = %f * %.5e = %.5e\n",
+                            layer_index, row, column, cell_index++,
+                            stack_element->Pointer.HeatSink->AmbientTemperature,
+                            get_conductance_top (&tdata->ThermalGrid, stkd->Dimensions,
+                                                 layer_index, row, column),
+                            *sources) ;
+#endif
+
+                        sources++ ;
+
+                    } // FOR_EVERY_COLUMN
+                } // FOR_EVERY_ROW
+
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_LAYER :
+
+                break ;
+
+            case TDICE_STACK_ELEMENT_CHANNEL :
+            {
+                layer_index += stack_element->Pointer.Channel->SourceLayerOffset ;
+
+                Source_t *sources = tdata->Sources +
+
+                    get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
+
+                FOR_EVERY_COLUMN (column_index, stkd->Dimensions)
+                {
+                    if (IS_CHANNEL_COLUMN (stack_element->Pointer.Channel->ChannelModel, column_index) == true)
+                    {
+                        *sources =   (Source_t) 2.0
+                                   * get_convective_term
+                                     (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)
+                                   * stack_element->Pointer.Channel->Coolant.TIn ;
+
+#ifdef PRINT_SOURCES
+                        fprintf (stderr,
+                            "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
+                            " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
+                            column_index,
+                            get_cell_length (stkd->Dimensions, column_index), get_cell_width (stkd->Dimensions, 0),
+                            *sources, stack_element->Pointer.Channel->Coolant.TIn,
+                            get_convective_term
+                            (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)) ;
+#endif
+                    }
+
+                    sources++ ;
+
+                } // FOR_EVERY_COLUMN
+
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_NONE :
+
+                fprintf (stderr, "Error! Found stack element with unset type\n") ;
+                break ;
+
+            default :
+
+                fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
+
+        } /* switch stack_element->Type */
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
 void free_thermal_data (ThermalData_t *tdata)
 {
     FREE_POINTER (free, tdata->Temperatures) ;
     FREE_POINTER (free, tdata->Sources) ;
-    FREE_POINTER (free, tdata->ThermalCells) ;
 
     FREE_POINTER (free, tdata->SLU_PermutationMatrixR) ;
     FREE_POINTER (free, tdata->SLU_PermutationMatrixC) ;
     FREE_POINTER (free, tdata->SLU_Etree) ;
+
+    free_thermal_grid (&tdata->ThermalGrid) ;
 
     StatFree (&tdata->SLU_Stat) ;
 
@@ -299,7 +442,7 @@ static void fill_system_vector
     Dimensions_t  *dimensions,
     double        *vector,
     Source_t      *sources,
-    ThermalCell_t *thermal_cells,
+    ThermalGrid_t *thermal_grid,
     Temperature_t *temperatures
 )
 {
@@ -307,14 +450,10 @@ static void fill_system_vector
     Temperature_t old ;
 #endif
 
-    CellIndex_t ncolumns = get_number_of_columns (dimensions) ;
-
     FOR_EVERY_LAYER (layer, dimensions)
     {
         FOR_EVERY_ROW (row, dimensions)
         {
-            ThermalCell_t *tmp = thermal_cells ;
-
             FOR_EVERY_COLUMN (column, dimensions)
             {
 
@@ -322,22 +461,21 @@ static void fill_system_vector
                 old = *temperatures ;
 #endif
 
-                *vector++ = *sources++ + tmp++->Capacity
-                                         * *temperatures++ ;
+                *vector++ =   *sources++
+                            + get_capacity (thermal_grid, dimensions, layer, row, column)
+                            * *temperatures++ ;
 
 #ifdef PRINT_SYSTEM_VECTOR
                 fprintf (stderr,
                     " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
                     layer, row, column,
                     get_cell_offset_in_stack (dimensions, layer, row, column),
-                    *(vector-1), *(sources-1), (tmp-1)->Capacity, old) ;
+                    *(vector-1), *(sources-1),
+                    get_capacity (thermal_grid, dimensions, layer, row, column), old) ;
 #endif
 
             } // FOR_EVERY_COLUMN
         } // FOR_EVERY_ROW
-
-        thermal_cells += ncolumns ;
-
     } // FOR_EVERY_LAYER
 }
 
@@ -386,9 +524,7 @@ SimResult_t emulate_step
 
     if (slot_completed (analysis) == true)
     {
-        Error_t result = fill_sources_stack_description
-
-            (tdata->Sources, tdata->ThermalCells, stkd) ;
+        Error_t result = update_source_vector (tdata, stkd) ;
 
         if (result == TDICE_FAILURE)
 
@@ -398,7 +534,7 @@ SimResult_t emulate_step
     fill_system_vector
 
         (stkd->Dimensions, tdata->Temperatures,
-         tdata->Sources, tdata->ThermalCells, tdata->Temperatures) ;
+         tdata->Sources, &tdata->ThermalGrid, tdata->Temperatures) ;
 
     dgstrs
 
@@ -459,9 +595,7 @@ SimResult_t emulate_steady
 
         return TDICE_WRONG_CONFIG ;
 
-    Error_t result = fill_sources_stack_description
-
-        (tdata->Sources, tdata->ThermalCells, stkd) ;
+    Error_t result = update_source_vector (tdata, stkd) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -505,9 +639,9 @@ Error_t update_coolant_flow_rate
 {
     stkd->Channel->Coolant.FlowRate = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
 
-    fill_system_matrix_stack_description
+    // TODO replace with "update"
 
-        (tdata->SM_A, tdata->ThermalCells, stkd) ;  // TODO replace with "update"
+    fill_system_matrix (&tdata->SM_A, &tdata->ThermalGrid, stkd->Dimensions) ;
 
     tdata->SLU_Options.Fact = SamePattern_SameRowPerm ;
 
@@ -530,11 +664,38 @@ Error_t update_coolant_flow_rate
             (StackElement_t, stack_element, stkd->BottomStackElement)
 
             if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
+            {
+                CellIndex_t layer_index = stack_element->Pointer.Channel->SourceLayerOffset ;
 
-                fill_sources_channel
+                Source_t *sources = tdata->Sources +
 
-                    (tdata->Sources, stkd->Dimensions,
-                    stack_element->Offset, stack_element->Pointer.Channel) ;
+                    get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
+
+                FOR_EVERY_COLUMN (column_index, stkd->Dimensions)
+                {
+                    if (IS_CHANNEL_COLUMN (stack_element->Pointer.Channel->ChannelModel, column_index) == true)
+                    {
+                        *sources =   (Source_t) 2.0
+                                   * get_convective_term
+                                     (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)
+                                   * stack_element->Pointer.Channel->Coolant.TIn ;
+
+#ifdef PRINT_SOURCES
+                        fprintf (stderr,
+                            "liquid cell  | r %4d c    0 | l %6.1f w %6.1f "
+                            " | %.5e [source] = 2 * %.2f [Tin] * %.5e [C]\n",
+                            column_index,
+                            get_cell_length (stkd->Dimensions, column_index), get_cell_width (stkd->Dimensions, 0),
+                            *sources, stack_element->Pointer.Channel->Coolant.TIn,
+                            get_convective_term
+                            (stack_element->Pointer.Channel, stkd->Dimensions, layer_index, 0, column_index)) ;
+#endif
+                    }
+
+                    sources++ ;
+
+                } // FOR_EVERY_COLUMN
+            }
 
         return TDICE_SUCCESS ;
     }

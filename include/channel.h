@@ -54,8 +54,6 @@ extern "C"
 
 #include "dimensions.h"
 #include "material.h"
-#include "system_matrix.h"
-#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -118,6 +116,25 @@ extern "C"
 
 
 
+    /*! Sets all the fields of \a coolant to a default value.
+     *
+     * \param coolant the address of the coolant structure to initialize
+     */
+
+    void init_coolant (Coolant_t *coolant) ;
+
+
+
+    /*! Copies all the fields of the coolant structure \a src into \a dest.
+     *
+     * \param dest the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void copy_coolant (Coolant_t *dest, Coolant_t *src) ;
+
+
+
     /*! Sets all the fields of \a channel to a default value (zero or \c NULL ).
      *
      * \param channel the address of the channel to initialize
@@ -174,62 +191,27 @@ extern "C"
 
         (FILE *stream, String_t prefix, Channel_t *channel) ;
 
-    /*! Fills the thermal cells corresponding to a channel
+
+
+    /*! Returns the convective C term, depending on the type of channel and
+     *  the location of the thermal cell
      *
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param delta_time    the time resolution of the thermal simulation
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (\# layers) of the channel within the stack
-     *  \param channel       pointer to the channel
+     *  \param channel      pointer to the channel
+     *  \param dimensions   pointer to the structure storing the dimensions
+     *  \param layer_index  the index of the layer
+     *  \param row_index    the index of the row
+     *  \param column_index the index of the column
+     *
+     *  \return \c C , the convective term
      */
 
-    void fill_thermal_cell_channel
+    Cconv_t get_convective_term
     (
-        ThermalCell_t   *thermal_cells,
-        Time_t           delta_time,
-        Dimensions_t    *dimensions,
-        CellIndex_t      layer_index,
-        Channel_t       *channel
-    ) ;
-
-
-
-    /*! Fills the source vector corresponding to a channel
-     *
-     *  \param sources     pointer to the first element in the source vector
-     *  \param dimensions  pointer to the structure storing the dimensions
-     *  \param layer_index offset (\# layers) of the channel within the stack
-     *  \param channel     pointer to the channel
-     */
-
-    void fill_sources_channel
-    (
-        Source_t     *sources,
+        Channel_t    *channel,
         Dimensions_t *dimensions,
         CellIndex_t   layer_index,
-        Channel_t    *channel
-    ) ;
-
-
-
-    /*! Fills the system matrix
-     *
-     *  \param channel       pointer to the channel
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (\# layers) of the channel within the stack
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t fill_system_matrix_channel
-    (
-        Channel_t      *channel,
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-        CellIndex_t     layer_index,
-        SystemMatrix_t  system_matrix
+        CellIndex_t   row_index,
+        CellIndex_t   column_index
     ) ;
 
 

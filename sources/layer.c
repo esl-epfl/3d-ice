@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "layer.h"
 #include "macros.h"
@@ -47,6 +48,8 @@ void init_layer (Layer_t *layer)
 {
     layer->Height   = 0.0 ;
     layer->Material = NULL ;
+    layer->Id       = NULL ;
+    layer->Used     = 0u ;
     layer->Next     = NULL ;
     layer->Prev     = NULL ;
 }
@@ -68,6 +71,10 @@ Layer_t *alloc_and_init_layer (void)
 
 void free_layer (Layer_t *layer)
 {
+    if (layer->Id != NULL)
+
+        FREE_POINTER (free, layer->Id) ;
+
     FREE_POINTER (free, layer) ;
 }
 
@@ -80,11 +87,31 @@ void free_layers_list (Layer_t *list)
 
 /******************************************************************************/
 
+Layer_t *find_layer_in_list (Layer_t *list, String_t id)
+{
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
+    {
+        if (strcmp(layer->Id, id) == 0)
+            break ;
+    }
+    return layer ;
+}
+
+/******************************************************************************/
+
 void print_formatted_layer (FILE *stream, String_t prefix, Layer_t *layer)
 {
     fprintf (stream,
-        "%s %7.1f  %s ;\n",
-        prefix, layer->Height, layer->Material->Id) ;
+        "%slayer %s :\n",
+        prefix, layer->Id) ;
+
+    fprintf (stream,
+        "%s   height %.1f ;\n",
+        prefix, layer->Height) ;
+
+    fprintf (stream,
+        "%s   material %s ;\n",
+        prefix, layer->Material->Id) ;
 }
 
 /******************************************************************************/
@@ -102,6 +129,14 @@ void print_detailed_layer (FILE *stream, String_t prefix, Layer_t *layer)
     fprintf (stream,
         "%s  Material              = %p\n",
         prefix, layer->Material) ;
+
+    fprintf (stream,
+        "%s  Id                    = %s\n",
+        prefix, layer->Id) ;
+
+    fprintf (stream,
+        "%s  Used                  = %d\n",
+        prefix, layer->Used) ;
 
     fprintf (stream,
         "%s  Next                  = %p\n",
@@ -137,93 +172,6 @@ void print_detailed_layers_list (FILE *stream, String_t prefix, Layer_t *list)
     }
 
     print_detailed_layer (stream, prefix, layer) ;
-}
-
-/******************************************************************************/
-
-void fill_thermal_cell_layer
-(
-    ThermalCell_t  *thermal_cells,
-    Time_t          delta_time,
-    Dimensions_t   *dimensions,
-    CellIndex_t     layer_index,
-    Layer_t        *layer
-)
-{
-    void (*fill_cell)
-
-        (ThermalCell_t*, Time_t,
-         CellDimension_t, CellDimension_t, CellDimension_t,
-         SolidTC_t, SolidVHC_t) ;
-
-    if (IS_FIRST_LAYER (layer_index))
-
-        fill_cell = fill_solid_cell_bottom ;
-
-    else if (IS_LAST_LAYER (layer_index, dimensions))
-
-        fill_cell = fill_solid_cell_top ;
-
-    else
-
-        fill_cell = fill_solid_cell_central ;
-
-#ifdef PRINT_THERMAL_CELLS
-    CellIndex_t cell_index
-
-        = get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-#endif
-
-    thermal_cells += layer_index * get_number_of_columns (dimensions) ;
-
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-#ifdef PRINT_THERMAL_CELLS
-        fprintf (stderr,
-            "  l %2d c %4d [%7d] ",
-            layer_index, column_index, cell_index++) ;
-#endif
-
-        fill_cell (thermal_cells, delta_time,
-
-                   get_cell_length(dimensions, column_index),
-                   get_cell_width(dimensions, 0),
-                   layer->Height,
-
-                   layer->Material->ThermalConductivity,
-                   layer->Material->VolumetricHeatCapacity) ;
-
-        thermal_cells ++ ;
-    }
-}
-
-/******************************************************************************/
-
-SystemMatrix_t fill_system_matrix_layer
-(
-    Dimensions_t   *dimensions,
-    ThermalCell_t  *thermal_cells,
-    CellIndex_t     layer_index,
-    SystemMatrix_t  system_matrix
-)
-{
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "(l %2d) fill_system_matrix_layer \n", layer_index) ;
-#endif
-
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-        FOR_EVERY_COLUMN (column_index, dimensions)
-        {
-            system_matrix = add_solid_column
-
-                (dimensions, thermal_cells,
-                 layer_index, row_index, column_index, system_matrix) ;
-
-        } // FOR_EVERY_COLUMN
-    } // FOR_EVERY_ROW
-
-    return system_matrix ;
 }
 
 /******************************************************************************/

@@ -6,7 +6,7 @@ material BEOL :
    thermal conductivity     2.25e-6 ;
    volumetric heat capacity 2.175e-12 ;
 
-conventional heat sink :
+connection to ambient :
    heat transfer coefficient 1.0e-7 ;
    ambient temperature 300 ;
 
@@ -23,6 +23,10 @@ microchannel 4rm :
                                    bottom 4.7132e-8 ;
    coolant volumetric heat capacity 4.172e-12 ;
    coolant incoming temperature 300.0 ;
+
+layer PCB :
+   height 10 ;
+   material BEOL ;
 
 die TOP_IC :
    source  2 SILICON ;
@@ -42,7 +46,7 @@ stack:
    channel TOP_CHANNEL    ;
    die     CORE_DIE       BOTTOM_IC floorplan "./core.flp" ;
    channel BOTTOM_CHANNEL ;
-   layer   BOTTOM_MOST    10 BEOL ;
+   layer   CONN_TO_PCB    PCB ;
 
 solver:
    steady ;

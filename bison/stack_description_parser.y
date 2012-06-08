@@ -67,7 +67,7 @@
 {
     #include "analysis.h"
     #include "channel.h"
-    #include "conventional_heat_sink.h"
+    #include "heat_sink.h"
     #include "dimensions.h"
     #include "floorplan_element.h"
     #include "floorplan.h"
@@ -81,6 +81,9 @@
 
         (StackDescription_t *stack, Analysis_t *analysis,
          yyscan_t scanner, const char *message) ;
+
+    #define STKERROR(m) stack_description_error (stkd, analysis, scanner, m)
+
 
     static char error_message [100] ;
 
@@ -101,10 +104,12 @@
 %type <material_p>         materials_list
 %type <die_p>              die
 %type <die_p>              dies_list
-%type <layer_p>            layer
 %type <layer_p>            layers_list
-%type <layer_p>            source_layer
-%type <layer_p>            layer_content
+%type <layer_p>            layer
+%type <layer_p>            die_layers_list
+%type <layer_p>            die_layer
+%type <layer_p>            die_source_layer
+%type <layer_p>            die_layer_content
 %type <stack_element_p>    stack_element
 %type <stack_element_p>    stack_elements
 %type <inspection_point_p> inspection_point
@@ -114,6 +119,7 @@
 %token _2RM                  "keyword 2rm"
 %token _4RM                  "keyword 4rm"
 %token AMBIENT               "keyword ambient"
+%token AREA                  "keyword area"
 %token AVERAGE               "keyword average"
 %token BOTTOM                "keyword bottom"
 %token CAPACITY              "keyword capacity"
@@ -122,7 +128,7 @@
 %token CHIP                  "keyword chip"
 %token COEFFICIENT           "keyword coefficient"
 %token CONDUCTIVITY          "keyword conductivity"
-%token CONVENTIONAL          "keyword conventional"
+%token CONNECTION            "keyword connection"
 %token COOLANT               "keyword coolant"
 %token DARCY                 "keyword darcy"
 %token DIAMETER              "keyword diameter"
@@ -155,6 +161,7 @@
 %token SLOT                  "keyword slot"
 %token SOLVER                "keyword solver"
 %token SOURCE                "keyword source"
+%token SPREADER              "keyword spreader"
 %token STACK                 "keyword stack"
 %token STAGGERED             "keyword staggered"
 %token STATE                 "keyword state"
@@ -167,6 +174,7 @@
 %token TFLPEL                "keyword Tflpel"
 %token THERMAL               "keyword thermal"
 %token TMAP                  "keyword Tmap"
+%token TO                    "keyword to"
 %token TOP                   "keyword top"
 %token TRANSFER              "keyword transfer"
 %token TRANSIENT             "keyword transient"
@@ -179,8 +187,8 @@
 %token <string>   IDENTIFIER "identifier"
 %token <string>   PATH       "path to file"
 
-%destructor { FREE_POINTER (free,                     $$) ; } <string>
-%destructor { FREE_POINTER (free_layers_list,         $$) ; } <layer_p>
+%destructor { FREE_POINTER (free,             $$) ; } <string>
+%destructor { FREE_POINTER (free_layers_list, $$) ; } <layer_p>
 
 %name-prefix "stack_description_"
 %output      "stack_description_parser.c"
@@ -215,13 +223,13 @@
 stack_description_file
 
   : materials_list
-    conventional_heat_sink
-    microchannel
+    heat_sink_opt
+    microchannel_opt
+    layers_list_opt
     dies_list
     dimensions
     stack
     solver
-    initial_temperature
     inspection_points
   ;
 
@@ -247,7 +255,7 @@ materials_list
 
             FREE_POINTER (free_material, $2) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -269,7 +277,7 @@ material
         {
             FREE_POINTER (free, $2) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc material failed") ;
+            STKERROR ("Malloc material failed") ;
 
             YYABORT ;
         }
@@ -284,25 +292,109 @@ material
 /******************************* Heatsink *************************************/
 /******************************************************************************/
 
-conventional_heat_sink
+heat_sink_opt
 
   : // Declaring the heat sink section is not mandatory
 
-  | CONVENTIONAL HEAT SINK ':'
-        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
-        AMBIENT TEMPERATURE       DVALUE ';'  // $12
+  | HEAT SINK ':'
+        SINK     HEIGHT   DVALUE     ',' // $6
+                 AREA     DVALUE     ',' // $9
+                 MATERIAL IDENTIFIER ';' // $12
+        SPREADER HEIGHT   DVALUE     ',' // $16
+                 AREA     DVALUE     ',' // $19
+                 MATERIAL IDENTIFIER ';' // $22
+        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $27
+        AMBIENT TEMPERATURE       DVALUE ';'  // $31
     {
-        stkd->ConventionalHeatSink = alloc_and_init_conventional_heat_sink () ;
+        stkd->HeatSink = alloc_and_init_heat_sink () ;
 
-        if (stkd->ConventionalHeatSink == NULL)
+        if (stkd->HeatSink == NULL)
         {
-            stack_description_error (stkd, analysis, scanner, "Malloc conventional heat sink failed") ;
+            STKERROR ("Malloc heat sink failed") ;
 
             YYABORT ;
         }
 
-        stkd->ConventionalHeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
-        stkd->ConventionalHeatSink->AmbientTemperature = $12 ;
+        stkd->HeatSink->SinkModel          = TDICE_HEATSINK_MODEL_TRADITIONAL ;
+        stkd->HeatSink->NLayers            = NUM_LAYERS_HEATSINK_TRADITIONAL ;
+        stkd->HeatSink->SourceLayerOffset  = SOURCE_OFFSET_HEATSINK_TRADITIONAL ;
+        stkd->HeatSink->SinkHeight         = $6 ;
+        stkd->HeatSink->SinkArea           = $9 ;
+        stkd->HeatSink->SpreaderHeight     = $16 ;
+        stkd->HeatSink->SpreaderArea       = $19 ;
+        stkd->HeatSink->AmbientHTC         = (AmbientHTC_t) $27 ;
+        stkd->HeatSink->AmbientTemperature = $31 ;
+
+        if (stkd->HeatSink->SinkArea < stkd->HeatSink->SpreaderArea)
+        {
+            sprintf (error_message,
+                "Error: the area of the spreader must be smaller than the sink") ;
+
+            FREE_POINTER (free, $12) ;
+            FREE_POINTER (free, $22) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        stkd->HeatSink->SinkMaterial =
+
+            find_material_in_list (stkd->MaterialsList, $12) ;
+
+        if (stkd->HeatSink->SinkMaterial == NULL)
+        {
+            sprintf (error_message, "Unknown sink material %s", $12) ;
+
+            FREE_POINTER (free, $12) ;
+            FREE_POINTER (free, $22) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        stkd->HeatSink->SpreaderMaterial =
+
+            find_material_in_list (stkd->MaterialsList, $22) ;
+
+        if (stkd->HeatSink->SpreaderMaterial == NULL)
+        {
+            sprintf (error_message, "Unknown spreader material %s", $22) ;
+
+            FREE_POINTER (free, $12) ;
+            FREE_POINTER (free, $22) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        stkd->HeatSink->SinkMaterial->Used++ ;
+        stkd->HeatSink->SpreaderMaterial->Used++ ;
+
+        FREE_POINTER (free, $12) ;
+        FREE_POINTER (free, $22) ;
+    }
+
+  | CONNECTION TO AMBIENT ':'
+        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
+        AMBIENT TEMPERATURE       DVALUE ';'  // $12
+    {
+        stkd->HeatSink = alloc_and_init_heat_sink () ;
+
+        if (stkd->HeatSink == NULL)
+        {
+            STKERROR ("Malloc heat sink failed") ;
+
+            YYABORT ;
+        }
+
+        stkd->HeatSink->SinkModel          = TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT ;
+        stkd->HeatSink->NLayers            = NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT ;
+        stkd->HeatSink->SourceLayerOffset  = SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT ;
+        stkd->HeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
+        stkd->HeatSink->AmbientTemperature = $12 ;
     }
   ;
 
@@ -310,7 +402,7 @@ conventional_heat_sink
 /******************************* MicroChannel *********************************/
 /******************************************************************************/
 
-microchannel
+microchannel_opt
 
   : // Declaring the channel section is not mandatory
 
@@ -332,7 +424,7 @@ microchannel
         {
             FREE_POINTER (free, $19) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc channel failed") ;
+            STKERROR ("Malloc channel failed") ;
 
             YYABORT ;
         }
@@ -360,7 +452,7 @@ microchannel
 
             FREE_POINTER (free, $19) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -386,7 +478,7 @@ microchannel
         {
             FREE_POINTER (free, $17) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc channel failed") ;
+            STKERROR ("Malloc channel failed") ;
 
             YYABORT ;
         }
@@ -412,7 +504,7 @@ microchannel
 
             FREE_POINTER (free, $17) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -438,7 +530,7 @@ microchannel
         {
             FREE_POINTER (free, $20) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc channel failed") ;
+            STKERROR ("Malloc channel failed") ;
 
             YYABORT ;
         }
@@ -463,7 +555,7 @@ microchannel
 
             FREE_POINTER (free, $20) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -528,14 +620,98 @@ distribution
 /******************************* Layers ***************************************/
 /******************************************************************************/
 
+layers_list_opt
+
+  :                    // Declaring a list of layers is not mandatory
+    {
+        stkd->LayersList = NULL ;
+    }
+  | layers_list
+
+  ;
+
 layers_list
+
+  : layer
+    {
+        stkd->LayersList = $1 ;
+
+        $$ = $1 ;      // $1 will be the new layer in the list
+    }
+  | layers_list layer  // $1 : pointer to the last layer in the list
+                       // $2 : pointer to the layer to add in the list
+    {
+
+        // checks if layer id already exist
+
+        if (find_layer_in_list (stkd->LayersList, $2->Id) != NULL)
+        {
+            sprintf (error_message, "Layer %s already declared", $2->Id) ;
+
+            FREE_POINTER (free_layer, $2) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        JOIN_ELEMENTS($1, $2) ;
+
+        $$ = $2 ;               // $2 will be the new last element in the list
+    }
+  ;
+
+layer
+
+  : LAYER IDENTIFIER ':'       // $2
+       HEIGHT DVALUE ';'       // $5
+       MATERIAL IDENTIFIER ';' // $8
+  {
+        Layer_t *layer = $$ = alloc_and_init_layer () ;
+
+        if (layer == NULL)
+        {
+            FREE_POINTER (free, $2) ;
+            FREE_POINTER (free, $8) ;
+
+            STKERROR ("Malloc layer failed") ;
+
+            YYABORT ;
+        }
+
+        layer->Height   = $5 ;
+        layer->Id       = $2 ;
+        layer->Material = find_material_in_list (stkd->MaterialsList, $8) ;
+
+        if (layer->Material == NULL)
+        {
+            sprintf (error_message, "Unknown material %s", $8) ;
+
+            FREE_POINTER (free,       $8) ;
+            FREE_POINTER (free_layer, layer) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        layer->Material->Used++ ;
+
+        FREE_POINTER (free, $8) ;
+  }
+
+/******************************************************************************/
+/******************************* Dies *****************************************/
+/******************************************************************************/
+
+die_layers_list
 
   :                    // Declaring a "non active" layer in a die is not mandatory
     {
         $$ = NULL ;    // The first layer in the list will be null
     }
-  | layers_list layer  // $1 : pointer to the last layer in the list
-                       // $2 : pointer to the layer to add in the list
+  | die_layers_list die_layer  // $1 : pointer to the last layer in the list
+                               // $2 : pointer to the layer to add in the list
     {
         if ($1 != NULL)
             JOIN_ELEMENTS ($2, $1) ; // this reverse the order !
@@ -543,11 +719,11 @@ layers_list
     }
   ;
 
-layer         : LAYER  layer_content { $$ = $2 ; } ;
+die_layer         : LAYER  die_layer_content { $$ = $2 ; } ;
 
-source_layer  : SOURCE layer_content { $$ = $2 ; } ;
+die_source_layer  : SOURCE die_layer_content { $$ = $2 ; } ;
 
-layer_content :
+die_layer_content :
 
     DVALUE IDENTIFIER ';' // $1 and $2
 
@@ -558,12 +734,13 @@ layer_content :
         {
             FREE_POINTER (free, $2) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc layer failed") ;
+            STKERROR ("Malloc layer failed") ;
 
             YYABORT ;
         }
 
         layer->Height   = $1 ;
+        layer->Id       = NULL ;
         layer->Material = find_material_in_list (stkd->MaterialsList, $2) ;
 
         if (layer->Material == NULL)
@@ -573,7 +750,7 @@ layer_content :
             FREE_POINTER (free,       $2) ;
             FREE_POINTER (free_layer, layer) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -584,28 +761,24 @@ layer_content :
     }
   ;
 
-/******************************************************************************/
-/******************************* Dies *****************************************/
-/******************************************************************************/
-
 dies_list
 
   : die                   // $1 : pointer to the first die found
     {
         stkd->DiesList = $1 ;
+
         $$ = $1 ;         // $1 will be the new die in the list
     }
   | dies_list die         // $1 : pointer to the last die in the list
                           // $2 : pointer to the die to add in the list
     {
-
         if (find_die_in_list (stkd->DiesList, $2->Id) != NULL)
         {
             sprintf (error_message, "Die %s already declared", $2->Id) ;
 
             FREE_POINTER (free_die, $2) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -618,9 +791,9 @@ dies_list
 die
 
   : DIE IDENTIFIER ':'         // $2 Die identifier
-        layers_list            // $4 list of layers (above source -> top)
-        source_layer           // $5 source layer
-        layers_list            // $6 list of layers (bottom -> below source)
+        die_layers_list        // $4 list of layers (above source -> top)
+        die_source_layer       // $5 source layer
+        die_layers_list        // $6 list of layers (bottom -> below source)
     {
         Die_t *die = $$ = alloc_and_init_die () ;
 
@@ -631,7 +804,7 @@ die
             FREE_POINTER (free_layer,       $5) ;
             FREE_POINTER (free_layers_list, $6);
 
-            stack_description_error (stkd, analysis, scanner, "Malloc die failed") ;
+            STKERROR ("Malloc die failed") ;
 
             YYABORT ;
         }
@@ -723,7 +896,8 @@ dimensions
 
         if (stkd->Dimensions == NULL)
         {
-            stack_description_error (stkd, analysis, scanner, "Malloc dimensions failed") ;
+            STKERROR ("Malloc dimensions failed") ;
+
             YYABORT ;
         }
 
@@ -757,7 +931,7 @@ dimensions
 
                 if ( ratio - (int) ratio != 0)
                 {
-                    stack_description_error (stkd, analysis, scanner, "Error: cell dimensions does not fit the chip length correctly") ;
+                    STKERROR ("Error: cell dimensions does not fit the chip length correctly") ;
 
                     YYABORT ;
                 }
@@ -766,7 +940,7 @@ dimensions
 
                 if ((stkd->Dimensions->Grid.NColumns & 1) == 0)
                 {
-                    stack_description_error (stkd, analysis, scanner, "Error: colum number must be odd when channel is declared") ;
+                    STKERROR ("Error: column number must be odd") ;
 
                     YYABORT ;
                 }
@@ -775,7 +949,7 @@ dimensions
 
                 if (stkd->Dimensions->Grid.NColumns < 3)
                 {
-                    stack_description_error (stkd, analysis, scanner, "Error: not enough columns") ;
+                    STKERROR ("Error: not enough columns") ;
 
                     YYABORT ;
                 }
@@ -786,6 +960,20 @@ dimensions
             {
                 stkd->Channel->NChannels = (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
             }
+        }
+
+		// Check if the spreader is larger than the chip
+
+        if (   stkd->HeatSink != NULL
+            && stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_TRADITIONAL
+            && stkd->HeatSink->SpreaderArea < get_chip_area (stkd->Dimensions))
+        {
+            sprintf (error_message,
+                "Error: the area of the spreader must be smaller than the chip") ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
         }
     }
   ;
@@ -801,19 +989,19 @@ stack
     {
         if (num_dies == 0u)
         {
-            stack_description_error (stkd, analysis, scanner, "Error: stack must contain at least one die") ;
+            STKERROR ("Error: stack must contain at least one die") ;
 
             YYABORT ;
         }
 
         if (stkd->BottomStackElement->Type == TDICE_STACK_ELEMENT_CHANNEL)
         {
-            stack_description_error (stkd, analysis, scanner, "Error: cannot declare a channel as bottom-most stack element") ;
+            STKERROR ("Error: cannot declare a channel as bottom-most stack element") ;
 
             YYABORT ;
         }
 
-        if (stkd->ConventionalHeatSink == NULL && stkd->Channel == NULL)
+        if (stkd->HeatSink == NULL && stkd->Channel == NULL)
 
             fprintf (stderr, "Warning: neither heat sink nor channel has been declared\n") ;
 
@@ -824,6 +1012,11 @@ stack
 
                 fprintf (stderr, "Warning: material %s declared but not used\n", material->Id) ;
 
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, stkd->LayersList)
+
+            if (layer->Used == 0)
+
+                fprintf (stderr, "Warning: layer %s declared but not used\n", layer->Id) ;
 
         FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, stkd->DiesList)
 
@@ -831,16 +1024,45 @@ stack
 
                 fprintf (stderr, "Warning: die %s declared but not used\n", die->Id) ;
 
-        if (stkd->ConventionalHeatSink != NULL)
+        if (stkd->HeatSink != NULL)
         {
-            if (stkd->TopStackElement->Type == TDICE_STACK_ELEMENT_LAYER)
+            if (stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
             {
-                stkd->ConventionalHeatSink->TopLayer = stkd->TopStackElement->Pointer.Layer ;
+                if (stkd->TopStackElement->Type == TDICE_STACK_ELEMENT_LAYER)
+                {
+                    stkd->HeatSink->SinkMaterial =
+
+                        stkd->TopStackElement->Pointer.Layer->Material ;
+                }
+                else
+                {
+                    stkd->HeatSink->SinkMaterial =
+
+                        stkd->TopStackElement->Pointer.Die->TopLayer->Material ;
+                }
             }
-            else
+
+            // Creates an extra stack element to be add in the 3d stack
+
+            StackElement_t *stack_element = alloc_and_init_stack_element () ;
+
+            if (stack_element == NULL)
             {
-                stkd->ConventionalHeatSink->TopLayer = stkd->TopStackElement->Pointer.Die->TopLayer ;
+                STKERROR ("Malloc stack element failed") ;
+
+                YYABORT ;
             }
+
+            stack_element->Id               = strdup ("Ambient") ;
+            stack_element->Type             = TDICE_STACK_ELEMENT_HEATSINK ;
+            stack_element->Pointer.HeatSink = stkd->HeatSink ;
+            stack_element->NLayers          = stkd->HeatSink->NLayers ;
+
+            // Add the stack element to the queue
+
+            JOIN_ELEMENTS (stkd->TopStackElement, stack_element) ;
+
+            stkd->TopStackElement = stack_element ;
         }
 
         // Counts the number of layers and fix the layer offset starting from
@@ -855,46 +1077,115 @@ stack
             layer_index   += stk_el->NLayers ;
         }
 
+        if (   stkd->TopStackElement->Type == TDICE_STACK_ELEMENT_HEATSINK
+            && stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
+
+            stkd->TopStackElement->Offset-- ;
+
         stkd->Dimensions->Grid.NLayers = layer_index ;
 
-        // Evaluate the number of cells and nonzero elements
+        // Stores the vertical profile of cell heights
 
-        stkd->Dimensions->Grid.NCells
-            =   get_number_of_layers (stkd->Dimensions)
-                * get_number_of_rows (stkd->Dimensions)
-                * get_number_of_columns (stkd->Dimensions) ;
+        stkd->Dimensions->Cell.Heights = malloc (layer_index * sizeof (CellDimension_t)) ;
 
-        if (stkd->Dimensions->Grid.NCells >  INT32_MAX)
+        if (stkd->Dimensions->Cell.Heights == NULL)
         {
-            sprintf (error_message, "%d are too many cells ... (SuperLU uses 'int')", stkd->Dimensions->Grid.NCells) ;
-
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR ("Malloc heights failed") ;
 
             YYABORT ;
         }
 
-        if (stkd->Channel == NULL)
+        layer_index  = 0u ;
 
-            compute_number_of_connections
+        FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stk_el_, stkd->BottomStackElement)
+        {
+            if (stk_el_->Type == TDICE_STACK_ELEMENT_CHANNEL)
+            {
+                CellIndex_t tmp ;
 
-                (stkd->Dimensions, num_channels, TDICE_CHANNEL_MODEL_NONE) ;
+                for (tmp = 0u ; tmp != stk_el_->Pointer.Channel->NLayers ; tmp++)
 
-        else
+                    stkd->Dimensions->Cell.Heights [ layer_index++ ]
 
-            compute_number_of_connections
+                        = stk_el_->Pointer.Channel->Height ;
+            }
+            else if (stk_el_->Type == TDICE_STACK_ELEMENT_LAYER)
+            {
+                stkd->Dimensions->Cell.Heights [ layer_index++ ]
 
-                (stkd->Dimensions, num_channels, stkd->Channel->ChannelModel) ;
+                    = stk_el_->Pointer.Layer->Height ;
+            }
+            else if (stk_el_->Type == TDICE_STACK_ELEMENT_DIE)
+            {
+                FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, stk_el_->Pointer.Die->BottomLayer)
+                {
+                    stkd->Dimensions->Cell.Heights [ layer_index++ ] = layer->Height ;
+                }
+            }
+            else if (stk_el_->Type == TDICE_STACK_ELEMENT_HEATSINK)
+            {
+                if (stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_TRADITIONAL)
+                {
+                    stkd->Dimensions->Cell.Heights [ layer_index++ ]
 
-    }
+                        = stkd->HeatSink->SpreaderHeight ;
+
+                    stkd->Dimensions->Cell.Heights [ layer_index++ ]
+
+                        = stkd->HeatSink->SinkHeight ;
+                }
+            }
+            else
+            {
+                sprintf (error_message, "Unknown stack type %d", stk_el_->Type) ;
+
+                STKERROR (error_message) ;
+
+                YYABORT ;
+            }
+        }
+
+        // Evaluate the number of cells and nonzero elements
+
+        uint64_t ncells =   (uint64_t) get_number_of_layers (stkd->Dimensions)
+                          * (uint64_t) get_number_of_rows (stkd->Dimensions)
+                          * (uint64_t) get_number_of_columns (stkd->Dimensions) ;
+
+        if (ncells > INT32_MAX)
+        {
+            sprintf (error_message,
+                "%llu are too many cells ... (SuperLU uses 'int')",
+                ncells) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        stkd->Dimensions->Grid.NCells = (CellIndex_t) ncells ;
+
+        ChannelModel_t cm =  stkd->Channel == NULL       ?
+                             TDICE_CHANNEL_MODEL_NONE    :
+                             stkd->Channel->ChannelModel ;
+
+        HeatSinkModel_t hm = stkd->HeatSink == NULL    ?
+                             TDICE_HEATSINK_MODEL_NONE :
+                             stkd->HeatSink->SinkModel ;
+
+        compute_number_of_connections
+
+            (stkd->Dimensions, num_channels, cm, hm) ;
+   }
   ;
 
 stack_elements
 
   : stack_element                 // $1 : pointer to the first stack element found
     {
-        if (   stkd->TopStackElement == NULL && $1->Type == TDICE_STACK_ELEMENT_CHANNEL)
+        if (   stkd->TopStackElement == NULL
+            && $1->Type == TDICE_STACK_ELEMENT_CHANNEL)
         {
-            stack_description_error (stkd, analysis, scanner, "Error: cannot declare a channel as top-most stack element") ;
+            STKERROR ("Error: cannot declare a channel as top-most stack element") ;
 
             YYABORT ;
         }
@@ -912,7 +1203,7 @@ stack_elements
 
             FREE_POINTER (free_stack_element, $2) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -920,7 +1211,7 @@ stack_elements
         if (   $1->Type == TDICE_STACK_ELEMENT_CHANNEL
             && $2->Type == TDICE_STACK_ELEMENT_CHANNEL)
         {
-            stack_description_error (stkd, analysis, scanner, "Error: cannot declare two consecutive channels") ;
+            STKERROR ("Error: cannot declare two consecutive channels") ;
 
             YYABORT ;
         }
@@ -934,60 +1225,44 @@ stack_elements
 
 stack_element
 
-  : LAYER IDENTIFIER DVALUE IDENTIFIER ';'    // $2 Identifier for the stack element
-                                              // $3 Height of the layer
-                                              // $4 Identifier of the material
+  : LAYER IDENTIFIER IDENTIFIER ';'    // $2 Identifier for the stack element
+                                       // $3 Identifier of the layer
     {
         StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
 
         if (stack_element == NULL)
         {
             FREE_POINTER (free, $2) ;
-            FREE_POINTER (free, $4) ;
+            FREE_POINTER (free, $3) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc stack element failed") ;
+            STKERROR ("Malloc stack element failed") ;
 
             YYABORT ;
         }
 
-        Layer_t *layer = alloc_and_init_layer () ;
+        Layer_t *layer = find_layer_in_list (stkd->LayersList, $3) ;
 
         if (layer == NULL)
         {
+            sprintf (error_message, "Unknown layer %s", $3) ;
+
             FREE_POINTER (free,               $2) ;
-            FREE_POINTER (free,               $4) ;
+            FREE_POINTER (free,               $3) ;
             FREE_POINTER (free_stack_element, stack_element) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc layer failed") ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
 
-        layer->Height   = $3 ;
-        layer->Material = find_material_in_list (stkd->MaterialsList, $4) ;
-
-        if (layer->Material == NULL)
-        {
-            sprintf (error_message, "Unknown material %s", $4) ;
-
-            FREE_POINTER (free,               $2) ;
-            FREE_POINTER (free,               $4) ;
-            FREE_POINTER (free_stack_element, stack_element) ;
-            FREE_POINTER (free_layer,         layer) ;
-
-            stack_description_error (stkd, analysis, scanner, error_message) ;
-
-            YYABORT ;
-        }
-
-        layer->Material->Used++ ;
-
-        FREE_POINTER (free, $4) ;
+        layer->Used++ ;
 
         stack_element->Type          = TDICE_STACK_ELEMENT_LAYER ;
         stack_element->Pointer.Layer = layer ;
         stack_element->Id            = $2 ;
         stack_element->NLayers       = 1 ;
+
+        FREE_POINTER (free, $3) ;
     }
 
   | CHANNEL IDENTIFIER ';'  // $2 Identifier for the stack element
@@ -996,7 +1271,7 @@ stack_element
 
         if (stkd->Channel == NULL)
         {
-            stack_description_error (stkd, analysis, scanner, "Error: channel used in stack but not declared") ;
+            STKERROR ("Error: channel used in stack but not declared") ;
 
             YYABORT ;
         }
@@ -1007,7 +1282,7 @@ stack_element
         {
             FREE_POINTER (free, $2) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc stack element failed") ;
+            STKERROR ("Malloc stack element failed") ;
 
             YYABORT ;
         }
@@ -1032,7 +1307,7 @@ stack_element
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc stack element failed") ;
+            STKERROR ("Malloc stack element failed") ;
 
             YYABORT ;
         }
@@ -1049,7 +1324,7 @@ stack_element
             FREE_POINTER (free,               $5) ;
             FREE_POINTER (free_stack_element, stack_element) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -1065,7 +1340,7 @@ stack_element
             FREE_POINTER (free,               $5) ;
             FREE_POINTER (free_stack_element, stack_element) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc floorplan failed") ;
+            STKERROR ("Malloc floorplan failed") ;
 
             YYABORT ;
         }
@@ -1091,7 +1366,10 @@ stack_element
 
 solver
 
-  : SOLVER ':' STEADY ';'
+  : SOLVER ':'
+        STEADY ';'
+        INITIAL_ TEMPERATURE DVALUE ';' // $7
+
     {
         // StepTime is set to 1 to avoid division by zero when computing
         // the capacitance of a thermal cell
@@ -1100,34 +1378,32 @@ solver
         analysis->StepTime     = (Time_t) 1.0 ;
         analysis->SlotTime     = (Time_t) 0.0 ;
         analysis->SlotLength   = 1u ; // CHECKME
+
+        analysis->InitialTemperature = (Temperature_t) $7;
     }
 
-  | SOLVER ':' TRANSIENT STEP DVALUE ',' SLOT DVALUE ';'  // $5 StepTime
-                                                          // $8 SlotTime
+  | SOLVER ':'
+        TRANSIENT STEP DVALUE ',' SLOT DVALUE ';'  // $5 StepTime
+                                                   // $8 SlotTime
+        INITIAL_ TEMPERATURE DVALUE ';'            // $12 Initial temperature
     {
         if ($8 < $5)
         {
-            stack_description_error
-
-                (stkd, analysis, scanner, "Slot time must be higher than StepTime") ;
+            STKERROR ("Slot time must be higher than StepTime") ;
 
             YYABORT ;
         }
 
         if ($5 <= 0.0)
         {
-            stack_description_error
-
-                (stkd, analysis, scanner, "StepTime must be a positive value") ;
+            STKERROR ("StepTime must be a positive value") ;
 
             YYABORT ;
         }
 
         if ($8 <= 0.0)
         {
-            stack_description_error
-
-                (stkd, analysis, scanner, "SlotTime must be a positive value") ;
+            STKERROR ("SlotTime must be a positive value") ;
 
             YYABORT ;
         }
@@ -1136,18 +1412,9 @@ solver
         analysis->StepTime     = (Time_t) $5 ;
         analysis->SlotTime     = (Time_t) $8 ;
         analysis->SlotLength   = (Quantity_t) ( $8 / $5 ) ;
-    }
-  ;
 
-/******************************************************************************/
-/*************************** Initial Temperature ******************************/
-/******************************************************************************/
 
-initial_temperature
-
-  : INITIAL_ TEMPERATURE DVALUE ';'
-    {
-        analysis->InitialTemperature = (Temperature_t) $3;
+        analysis->InitialTemperature = (Temperature_t) $12;
     }
   ;
 
@@ -1196,7 +1463,7 @@ inspection_point
         {
             sprintf (error_message, "Unknown stack element %s", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $9) ;
@@ -1211,7 +1478,7 @@ inspection_point
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $9) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc tcell failed") ;
+            STKERROR ("Malloc tcell failed") ;
 
             YYABORT ;
         }
@@ -1227,7 +1494,7 @@ inspection_point
 
             FREE_POINTER (free_tcell, tcell) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
+            STKERROR ("Malloc inspection point failed") ;
 
             YYABORT ;
         }
@@ -1257,7 +1524,7 @@ inspection_point
         {
             sprintf (error_message, "Unknown stack element %s", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1269,7 +1536,7 @@ inspection_point
         {
             sprintf (error_message, "The stack element %s must be a die", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1284,7 +1551,7 @@ inspection_point
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc tflp failed") ;
+            STKERROR ("Malloc tflp failed") ;
 
             YYABORT ;
         }
@@ -1300,7 +1567,7 @@ inspection_point
 
             FREE_POINTER (free_tflp, tflp) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
+            STKERROR ("Malloc inspection point failed") ;
 
             YYABORT ;
         }
@@ -1331,7 +1598,7 @@ inspection_point
         {
             sprintf (error_message, "Unknown stack element %s", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1344,7 +1611,7 @@ inspection_point
         {
             sprintf (error_message, "The stack element %s must be a die", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1361,7 +1628,7 @@ inspection_point
         {
             sprintf (error_message, "Unknown floorplan element %s", $5) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1378,7 +1645,7 @@ inspection_point
             FREE_POINTER (free, $5) ;
             FREE_POINTER (free, $7) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc Tflpel failed") ;
+            STKERROR ("Malloc Tflpel failed") ;
 
             YYABORT ;
         }
@@ -1396,7 +1663,7 @@ inspection_point
 
             FREE_POINTER (free_tflpel, tflpel) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
+            STKERROR ("Malloc inspection point failed") ;
 
             YYABORT ;
         }
@@ -1426,7 +1693,7 @@ inspection_point
         {
             sprintf (error_message, "Unknown stack element %s", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1441,7 +1708,7 @@ inspection_point
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
+            STKERROR ("Malloc inspection point failed") ;
 
             YYABORT ;
         }
@@ -1470,7 +1737,7 @@ inspection_point
         {
             sprintf (error_message, "Unknown stack element %s", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1482,7 +1749,7 @@ inspection_point
         {
             sprintf (error_message, "The stack element %s must be a channel", $3) ;
 
-            stack_description_error (stkd, analysis, scanner, error_message) ;
+            STKERROR (error_message) ;
 
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
@@ -1497,7 +1764,7 @@ inspection_point
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc inspection point command failed") ;
+            STKERROR ("Malloc inspection point failed") ;
 
             YYABORT ;
         }
@@ -1509,7 +1776,7 @@ inspection_point
             FREE_POINTER (free, $3) ;
             FREE_POINTER (free, $5) ;
 
-            stack_description_error (stkd, analysis, scanner, "Malloc tcoolant failed") ;
+            STKERROR ("Malloc tcoolant failed") ;
 
             YYABORT ;
         }

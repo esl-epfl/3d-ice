@@ -52,10 +52,7 @@ extern "C"
 
 #include "types.h"
 
-#include "dimensions.h"
 #include "material.h"
-#include "system_matrix.h"
-#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -75,6 +72,17 @@ extern "C"
         /*! The material composing the layer */
 
         Material_t *Material ;
+
+        /*! The Id given to the layer if declared for stack element */
+
+        String_t Id ;
+
+        /*!
+         * To know, after the parsing of a stack file, if a
+         * layer has been declared but never used
+         */
+
+        Quantity_t Used ;
 
         /*! Pointer to the 'next' layer (towards the top of the die),
          *  to collect layers in a double linked list */
@@ -140,6 +148,21 @@ extern "C"
 
 
 
+    /*! Searches for a Layer_t in a linked list of layers.
+     *
+     * Id based search of a Layer_t structure in a list.
+     *
+     * \param list the pointer to the list
+     * \param id   the identifier of the layer to be found
+     *
+     * \return the address of a Layer_t, if founded
+     * \return \c NULL if the search fails
+     */
+
+    Layer_t *find_layer_in_list (Layer_t *list, String_t id) ;
+
+
+
     /*! Prints the layer as it looks in the stack file
      *
      * \param stream the output stream (must be already open)
@@ -189,46 +212,6 @@ extern "C"
     void print_detailed_layers_list
 
         (FILE *stream, String_t prefix, Layer_t *list) ;
-
-
-
-    /*! Fills the thermal cells corresponding to a layer in the stack
-     *
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param delta_time    the time resolution of the thermal simulation
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (\# layers) of the layer within the stack
-     *  \param layer         pointer to the layer
-     */
-
-    void fill_thermal_cell_layer
-    (
-        ThermalCell_t  *thermal_cells,
-        Time_t          delta_time,
-        Dimensions_t   *dimensions,
-        CellIndex_t     layer_index,
-        Layer_t        *layer
-    ) ;
-
-
-
-    /*! Fills the system matrix
-     *
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (\# layers) of the die within the stack
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t fill_system_matrix_layer
-    (
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-        CellIndex_t     layer_index,
-        SystemMatrix_t  system_matrix
-    ) ;
 
 /******************************************************************************/
 

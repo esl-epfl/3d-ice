@@ -52,11 +52,7 @@ extern "C"
 
 #include "types.h"
 
-#include "dimensions.h"
-#include "floorplan.h"
 #include "layer.h"
-#include "system_matrix.h"
-#include "thermal_cell.h"
 
 /******************************************************************************/
 
@@ -213,73 +209,6 @@ extern "C"
      */
 
     void print_detailed_dies_list (FILE *stream, String_t prefix, Die_t *list) ;
-
-
-
-    /*! Fills the thermal cells corresponding to a die
-     *
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param delta_time    the time resolution of the thermal simulation
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param layer_index   offset (\# layers) of the die within the stack
-     *  \param die           pointer to the die
-     */
-
-    void fill_thermal_cell_die
-    (
-        ThermalCell_t *thermal_cells,
-        Time_t         delta_time,
-        Dimensions_t  *dimensions,
-        CellIndex_t    layer_index,
-        Die_t         *die
-    ) ;
-
-
-
-    /*! Fills the source vector corresponding to a die
-     *
-     *  \param sources     pointer to the first element in the source vector
-     *  \param dimensions  pointer to the structure storing the dimensions
-     *  \param layer_index offset (\# layers) of the die within the stack
-     *  \param floorplan   pointer to the floorplan placed on the source layer
-     *  \param die         pointer to the die
-     *
-     *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
-     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
-     *                           (at least one floorplan element with no power
-     *                            values in its queue)
-     */
-
-    Error_t fill_sources_die
-    (
-        Source_t     *sources,
-        Dimensions_t *dimensions,
-        CellIndex_t   layer_index,
-        Floorplan_t  *floorplan,
-        Die_t        *die
-    ) ;
-
-
-
-    /*! Fills the system matrix
-     *
-     *  \param die           pointer to the die
-     *  \param dimensions    pointer to the structure storing the dimensions
-     *  \param thermal_cells pointer to the first thermal cell in the 3d stack
-     *  \param layer_index   offset (\# layers) of the die within the stack
-     *  \param system_matrix copy of the system matrix structure
-     *
-     *  \return A matrix partially filled (FIXME)
-     */
-
-    SystemMatrix_t fill_system_matrix_die
-    (
-        Die_t          *die,
-        Dimensions_t   *dimensions,
-        ThermalCell_t  *thermal_cells,
-        CellIndex_t     layer_index,
-        SystemMatrix_t  system_matrix
-    ) ;
 
 /******************************************************************************/
 
