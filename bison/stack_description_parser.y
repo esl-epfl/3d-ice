@@ -1355,35 +1355,6 @@ stack_element
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
-        CellIndex_t nnz = 0u ;
-
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-        (FloorplanElement_t, flp_el, stack_element->Floorplan->ElementsList)
-        {
-
-            FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icel, flp_el->ICElementsList)
-            {
-                nnz +=    (icel->NE_Row    - icel->SW_Row    + 1)
-                        * (icel->NE_Column - icel->SW_Column + 1) ;
-            }
-        }
-
-        alloc_floorplan_matrix
-        (
-            &stack_element->Floorplan->SurfaceCoefficients,
-            get_layer_area (stkd->Dimensions),
-            stack_element->Floorplan->NElements,
-            nnz
-        ) ;
-
-        fill_floorplan_matrix
-        (
-            &stack_element->Floorplan->SurfaceCoefficients,
-            stack_element->Floorplan->ElementsList,
-            stkd->Dimensions
-        ) ;
-
         FREE_POINTER (free, $5) ;  // FIXME check memory leak
         FREE_POINTER (free, $3) ;
     }

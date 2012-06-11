@@ -41,6 +41,8 @@
 
 include $(3DICE_MAIN)/makefile.def
 
+CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
+
 all: $(3DICE_LIB_A)
 
 $(3DICE_LIB_A): $(3DICE_LIB_O)
