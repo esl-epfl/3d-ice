@@ -88,6 +88,13 @@ Time_t get_simulated_time (Analysis_t *this)
 
 /******************************************************************************/
 
+void increase_step_time (Analysis_t *this)
+{
+    this->StepTime++ ;
+}
+
+/******************************************************************************/
+
 Quantity_t get_number_of_inspection_points
 (
     Analysis_t       *this,

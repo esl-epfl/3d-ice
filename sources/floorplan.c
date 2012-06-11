@@ -38,20 +38,9 @@
 
 #include <stdlib.h>
 
-#include "floorplan.h"
 #include "macros.h"
-
-#include "../bison/floorplan_parser.h"
-#include "../flex/floorplan_scanner.h"
-
-// From Bison manual:
-// The value returned by yyparse is 0 if parsing was successful (return is
-// due to end-of-input). The value is 1 if parsing failed (return is due to
-// a syntax error).
-
-extern int floorplan_parse
-
-    (Floorplan_t *this, Dimensions_t *dimensions, yyscan_t scanner) ;
+#include "floorplan.h"
+#include "floorplan_file_parser.h"
 
 /******************************************************************************/
 
@@ -110,34 +99,14 @@ Error_t fill_floorplan
 (
     Floorplan_t  *this,
     Dimensions_t *dimensions,
-    String_t      file_name
+    String_t      filename
 )
 {
-    FILE *input ;
-    int result ;
-    yyscan_t scanner ;
+    Error_t result ;
 
-    input = fopen (file_name, "r") ;
+    result = parse_floorplan_file (filename, this, dimensions) ;
 
-    if (input == NULL)
-    {
-        fprintf (stderr, "Unable to open floorplan file %s\n", file_name) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    this->FileName = strdup (file_name) ;  // FIXME memory leak
-
-    floorplan_lex_init  (&scanner) ;
-    floorplan_set_in    (input, scanner) ;
-    //floorplan_set_debug (1, scanner) ;
-
-    result = floorplan_parse (this, dimensions, scanner) ;
-
-    floorplan_lex_destroy (scanner) ;
-    fclose (input) ;
-
-    if (result != 0)
+    if (result == TDICE_FAILURE)
 
         return TDICE_FAILURE ;
 
@@ -154,12 +123,12 @@ Error_t fill_floorplan
         }
     }
 
-    Error_t error = alloc_floorplan_matrix
+    result = alloc_floorplan_matrix
 
         (&this->SurfaceCoefficients, get_layer_area (dimensions),
          this->NElements, nnz) ;
 
-    if (error == TDICE_FAILURE)
+    if (result == TDICE_FAILURE)
 
         return TDICE_FAILURE ;
 

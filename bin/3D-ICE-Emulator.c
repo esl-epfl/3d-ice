@@ -38,6 +38,7 @@
 
 #include <time.h>
 
+#include "stack_file_parser.h"
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
@@ -69,7 +70,7 @@ int main(int argc, char** argv)
     init_stack_description (&stkd) ;
     init_analysis          (&analysis) ;
 
-    error = fill_stack_description (&stkd, &analysis, argv[1]) ;
+    error = parse_stack_description_file (argv[1], &stkd, &analysis) ;
 
     if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 

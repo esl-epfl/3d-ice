@@ -36,63 +36,44 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <time.h>
+#ifndef _3DICE_STACK_FILE_PARSER_H_
+#define _3DICE_STACK_FILE_PARSER_H_
 
-#include "stack_file_parser.h"
+/*! \file stack_file_parser.h */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "types.h"
 #include "stack_description.h"
-#include "thermal_data.h"
 #include "analysis.h"
 
-int main(int argc, char** argv)
-{
-    StackDescription_t stkd ;
-    Analysis_t         analysis ;
-    ThermalData_t      tdata ;
-
-    // Checks if there are the all the arguments
-    ////////////////////////////////////////////////////////////////////////////
-
-    if (argc != 3)
-    {
-        fprintf(stderr, "Usage: \"%s file.stk smfile.txt\"\n", argv[0]) ;
-        return EXIT_FAILURE ;
-    }
-
-    // Init StackDescription and parse the input file
-    ////////////////////////////////////////////////////////////////////////////
-
-    init_stack_description (&stkd) ;
-    init_analysis          (&analysis) ;
-
-    if (parse_stack_description_file (argv[1], &stkd, &analysis) != 0)
-
-        return EXIT_FAILURE ;
-
-    // Init thermal data and fill it using the StackDescription
-    ////////////////////////////////////////////////////////////////////////////
-
-    init_thermal_data (&tdata) ;
-
-    if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
-    {
-        free_analysis          (&analysis) ;
-        free_stack_description (&stkd) ;
-
-        return EXIT_FAILURE ;
-    }
-
-    // Run the simulation and print the output
-    ////////////////////////////////////////////////////////////////////////////
-
-    print_system_matrix (tdata.SM_A, argv[2]) ;
+/******************************************************************************/
 
 
-    // free all data
-    ////////////////////////////////////////////////////////////////////////////
+    /*! Fills the StackDescription Analysis structures with the content
+     *  taken from a stack description file
+     *
+     * \param filename the path of the stack file
+     * \param stkd     the address of the StackDescription structure to fill
+     * \param analysis the address of the Analysis structure to fill
+     *
+     * \return \c TDICE_FAILURE if the file cannot be opened or if the parsing
+     *                  of the stack description fails
+     * \return \c TDICE_FAILURE otherwise
+     */
 
-    free_thermal_data      (&tdata) ;
-    free_analysis          (&analysis) ;
-    free_stack_description (&stkd) ;
+    Error_t parse_stack_description_file
 
-    return EXIT_SUCCESS ;
+        (String_t filename, StackDescription_t *stkd, Analysis_t *analysis) ;
+
+
+/******************************************************************************/
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* _3DICE_STACK_FILE_PARSER_H_ */

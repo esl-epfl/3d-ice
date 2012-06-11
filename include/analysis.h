@@ -153,6 +153,15 @@ extern "C"
 
 
 
+    /*! Increase the simulation time by a step
+     *
+     * \param this the address of the analysis structure
+     */
+
+    void increase_step_time (Analysis_t *this) ;
+
+
+
     /*! Returns the number of a specific type of insection point
      *
      *  \param this     the address of the analysis structure to query

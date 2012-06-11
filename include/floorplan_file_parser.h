@@ -36,63 +36,43 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <time.h>
+#ifndef _3DICE_FLOORPLAN_FILE_PARSER_H_
+#define _3DICE_FLOORPLAN_FILE_PARSER_H_
 
-#include "stack_file_parser.h"
-#include "stack_description.h"
-#include "thermal_data.h"
-#include "analysis.h"
+/*! \file floorplan_file_parser.h */
 
-int main(int argc, char** argv)
+#ifdef __cplusplus
+extern "C"
 {
-    StackDescription_t stkd ;
-    Analysis_t         analysis ;
-    ThermalData_t      tdata ;
+#endif
 
-    // Checks if there are the all the arguments
-    ////////////////////////////////////////////////////////////////////////////
+#include "types.h"
+#include "floorplan.h"
+#include "dimensions.h"
 
-    if (argc != 3)
-    {
-        fprintf(stderr, "Usage: \"%s file.stk smfile.txt\"\n", argv[0]) ;
-        return EXIT_FAILURE ;
-    }
+/******************************************************************************/
 
-    // Init StackDescription and parse the input file
-    ////////////////////////////////////////////////////////////////////////////
+    /*! Fills the Floorplan structure with the content taken from a
+     *  floorplan file
+     *
+     * \param filename   path to the floorplan file to parse
+     * \param floorplan  address of the Floorplan structure to fill
+     * \param dimensions pointer to the structure storing the dimensions
+     *                   of the stack where the floorplan is used
+     *
+     * \return \c TDICE_FAILURE if the file cannot be opened or if the parsing
+     *                  of the floorplan fails
+     * \return \c TDICE_FAILURE otherwise
+     */
 
-    init_stack_description (&stkd) ;
-    init_analysis          (&analysis) ;
+    Error_t parse_floorplan_file
 
-    if (parse_stack_description_file (argv[1], &stkd, &analysis) != 0)
+        (String_t filename, Floorplan_t *floorplan, Dimensions_t *dimensions) ;
 
-        return EXIT_FAILURE ;
+/******************************************************************************/
 
-    // Init thermal data and fill it using the StackDescription
-    ////////////////////////////////////////////////////////////////////////////
-
-    init_thermal_data (&tdata) ;
-
-    if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
-    {
-        free_analysis          (&analysis) ;
-        free_stack_description (&stkd) ;
-
-        return EXIT_FAILURE ;
-    }
-
-    // Run the simulation and print the output
-    ////////////////////////////////////////////////////////////////////////////
-
-    print_system_matrix (tdata.SM_A, argv[2]) ;
-
-
-    // free all data
-    ////////////////////////////////////////////////////////////////////////////
-
-    free_thermal_data      (&tdata) ;
-    free_analysis          (&analysis) ;
-    free_stack_description (&stkd) ;
-
-    return EXIT_SUCCESS ;
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* _3DICE_FLOORPLAN_FILE_PARSER_H_ */

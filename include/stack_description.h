@@ -52,7 +52,6 @@ extern "C"
 
 #include "types.h"
 
-#include "analysis.h"
 #include "channel.h"
 #include "heat_sink.h"
 #include "die.h"
@@ -125,24 +124,6 @@ extern "C"
      */
 
     void init_stack_description (StackDescription_t* this) ;
-
-
-
-    /*! Fills the StackDescription Analysis structures with the content
-     *  of a stack file
-     *
-     * \param this the address of the StackDescription structure to fill
-     * \param analysis the address of the Analysis structure to fill
-     * \param filename the path of the stack file
-     *
-     * \return \c TDICE_FAILURE if the file cannot be opened or if the parsing
-     *                  of the stack description fails
-     * \return \c TDICE_FAILURE otherwise
-     */
-
-    Error_t fill_stack_description
-
-        (StackDescription_t* this, Analysis_t *analysis, String_t filename) ;
 
 
 

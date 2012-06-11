@@ -41,18 +41,6 @@
 #include "stack_description.h"
 #include "macros.h"
 
-#include "../bison/stack_description_parser.h"
-#include "../flex/stack_description_scanner.h"
-
-// From Bison manual:
-// The value returned by yyparse is 0 if parsing was successful (return is
-// due to end-of-input). The value is 1 if parsing failed (return is due to
-// a syntax error).
-
-extern int stack_description_parse
-
-    (StackDescription_t *this, Analysis_t *analysis, yyscan_t scanner) ;
-
 /******************************************************************************/
 
 void init_stack_description (StackDescription_t *this)
@@ -66,46 +54,6 @@ void init_stack_description (StackDescription_t *this)
     this->Dimensions         = NULL ;
     this->TopStackElement    = NULL ;
     this->BottomStackElement = NULL ;
-}
-
-/******************************************************************************/
-
-Error_t fill_stack_description
-(
-    StackDescription_t *this,
-    Analysis_t         *analysis,
-    String_t            filename
-)
-{
-    FILE*    input ;
-    int      result ;
-    yyscan_t scanner ;
-
-    input = fopen (filename, "r") ;
-    if (input == NULL)
-    {
-        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    this->FileName = strdup (filename) ;  // FIXME memory leak
-
-    stack_description_lex_init (&scanner) ;
-    stack_description_set_in (input, scanner) ;
-
-    result = stack_description_parse (this, analysis, scanner) ;
-
-    stack_description_lex_destroy (scanner) ;
-    fclose (input) ;
-
-    if (result == 0)
-
-        return TDICE_SUCCESS ;
-
-    else
-
-        return TDICE_FAILURE ;
 }
 
 /******************************************************************************/

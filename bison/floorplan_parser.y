@@ -385,6 +385,8 @@ power_values_list
 
 %%
 
+/******************************************************************************/
+
 void floorplan_error
 (
     Floorplan_t  *floorplan,
@@ -396,3 +398,52 @@ void floorplan_error
     fprintf (stderr, "%s:%d: %s\n",
         floorplan->FileName, floorplan_get_lineno(yyscanner), msg) ;
 }
+
+/******************************************************************************/
+
+Error_t parse_floorplan_file
+(
+    String_t      filename,
+    Floorplan_t  *floorplan,
+    Dimensions_t *dimensions
+)
+{
+    FILE *input ;
+    int result ;
+    yyscan_t scanner ;
+
+    input = fopen (filename, "r") ;
+
+    if (input == NULL)
+    {
+        fprintf (stderr, "Unable to open floorplan file %s\n", filename) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    floorplan->FileName = strdup (filename) ;  // FIXME memory leak
+
+    floorplan_lex_init  (&scanner) ;
+    floorplan_set_in    (input, scanner) ;
+    //floorplan_set_debug (1, scanner) ;
+
+    result = floorplan_parse (floorplan, dimensions, scanner) ;
+
+    floorplan_lex_destroy (scanner) ;
+    fclose (input) ;
+
+//  From Bison manual:
+//  The value returned by yyparse is 0 if parsing was successful (return is
+//  due to end-of-input). The value is 1 if parsing failed (return is due to
+//  a syntax error).
+
+    if (result == 0)
+
+        return TDICE_SUCCESS ;
+
+    else
+
+        return TDICE_FAILURE ;
+}
+
+/******************************************************************************/
