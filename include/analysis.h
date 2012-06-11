@@ -158,7 +158,7 @@ extern "C"
      * \param this the address of the analysis structure
      */
 
-    void increase_step_time (Analysis_t *this) ;
+    void increase_by_step_time (Analysis_t *this) ;
 
 
 

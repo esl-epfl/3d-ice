@@ -520,7 +520,7 @@ SimResult_t emulate_step
         return TDICE_SOLVER_ERROR ;
     }
 
-    increase_step_time (analysis) ;
+    increase_by_step_time (analysis) ;
 
     if (slot_completed (analysis) == false)
 

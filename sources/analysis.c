@@ -88,9 +88,9 @@ Time_t get_simulated_time (Analysis_t *this)
 
 /******************************************************************************/
 
-void increase_step_time (Analysis_t *this)
+void increase_by_step_time (Analysis_t *this)
 {
-    this->StepTime++ ;
+    this->CurrentTime++ ;
 }
 
 /******************************************************************************/
