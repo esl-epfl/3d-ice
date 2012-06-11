@@ -111,21 +111,15 @@ void fill_floorplan_matrix
     Dimensions_t       *dimensions
 )
 {
-    FloorplanMatrix_t tmp_matrix ;
+    CellIndex_t *c_pointers = this->ColumnPointers ;
+    CellIndex_t *r_indices  = this->RowIndices ;
+    Source_t    *values     = this->Values ;
 
-    tmp_matrix.NRows    = this->NRows ;
-    tmp_matrix.NColumns = this->NColumns ;
-    tmp_matrix.NNz      = this->NNz ;
-
-    tmp_matrix.ColumnPointers = this->ColumnPointers ;
-    tmp_matrix.RowIndices     = this->RowIndices ;
-    tmp_matrix.Values         = this->Values ;
-
-    *tmp_matrix.ColumnPointers++ = 0u ;
+    *c_pointers++ = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, list)
     {
-        *tmp_matrix.ColumnPointers = *(tmp_matrix.ColumnPointers - 1) ;
+        *c_pointers = *(c_pointers - 1) ;
 
         FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
@@ -137,21 +131,21 @@ void fill_floorplan_matrix
                 FOR_EVERY_IC_ELEMENT_COLUMN (column_index, ic_el)
                 {
 
-                    *tmp_matrix.RowIndices++ = get_cell_offset_in_layer
+                    *r_indices++ = get_cell_offset_in_layer
 
-                        (dimensions, row_index, column_index) ;
+                                   (dimensions, row_index, column_index) ;
 
-                    *tmp_matrix.Values++ = (   get_cell_length (dimensions, column_index)
-                                            *  get_cell_width (dimensions, row_index)
-                                           )
-                                           /  flp_el->EffectiveSurface ;
+                    *values++ = (   get_cell_length (dimensions, column_index)
+                                 *  get_cell_width (dimensions, row_index)
+                                )
+                                /  flp_el->EffectiveSurface ;
 
-                    (*tmp_matrix.ColumnPointers)++ ;
+                    (*c_pointers)++ ;
                 }
             }
         }
 
-        tmp_matrix.ColumnPointers++ ;
+        c_pointers++ ;
     }
 }
 

@@ -115,8 +115,11 @@ static SystemMatrix_t add_solid_column
     SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
     SystemMatrixCoeff_t *diagonal_pointer = NULL ;
 
+    Conductance_t g_bottom, g_top, g_north, g_south, g_east, g_west ;
+
 #ifdef PRINT_SYSTEM_MATRIX
     fpos_t diag_fposition, last_fpos ;
+
     fprintf (stderr,
         "add_solid_column   l %2d r %4d c %4d [%7d]\n",
         layer_index, row_index, column_index,
@@ -125,99 +128,116 @@ static SystemMatrix_t add_solid_column
 
     *this.ColumnPointers = *(this.ColumnPointers - 1) ;
 
-    /* BOTTOM */
+    /********************************* BOTTOM *********************************/
 
-    if ( ! IS_FIRST_LAYER(layer_index) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
+    if (IS_FIRST_LAYER(layer_index))
 
-            (dimensions, layer_index - 1, row_index, column_index) ;
+        goto skip_bottom ;
 
-        Conductance_t c_bottom = get_conductance_bottom
+    *this.RowIndices++ = get_cell_offset_in_stack
 
-            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+        (dimensions, layer_index - 1, row_index, column_index) ;
 
-        Conductance_t c_top = get_conductance_top
+    g_bottom = get_conductance_bottom
 
-            (thermal_grid, dimensions, layer_index - 1, row_index, column_index) ;
+        (thermal_grid, dimensions, layer_index    , row_index, column_index) ;
 
-        conductance = PARALLEL (c_bottom, c_top) ;
+    g_top = get_conductance_top
 
-        if (conductance == 0)
-        {
-            conductance = c_bottom ? c_bottom : c_top ;
-        }
+        (thermal_grid, dimensions, layer_index - 1, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+    if (g_top == 0)
 
-        (*this.ColumnPointers)++ ;
+        conductance = g_bottom ;
 
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            c_bottom, c_top) ;
-#endif
-    }
+    else
 
-    /* SOUTH */
+        conductance = PARALLEL (g_bottom, g_top) ;
 
-    if ( ! IS_FIRST_ROW(row_index) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
+    *this.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
 
-            (dimensions, layer_index, row_index - 1, column_index) ;
-
-        conductance = PARALLEL
-        (
-            get_conductance_south (thermal_grid, dimensions, layer_index, row_index    , column_index),
-            get_conductance_north (thermal_grid, dimensions, layer_index, row_index - 1, column_index)
-        ) ;
-
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
+    (*this.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  south   \t%d\t% .4e = % .4e (S) || % .4e (N)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_south (thermal_grid, dimensions, layer_index, row_index    , column_index),
-            get_conductance_north (thermal_grid, dimensions, layer_index, row_index - 1, column_index)) ;
+    fprintf (stderr,
+        "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
+        *(this.RowIndices-1), *(this.Values-1), c_bottom, c_top) ;
 #endif
-    }
 
-    /* WEST */
+skip_bottom :
 
-    if ( ! IS_FIRST_COLUMN(column_index) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
+    /********************************* SOUTH **********************************/
 
-            (dimensions, layer_index, row_index, column_index - 1) ;
+    if (   IS_FIRST_ROW(row_index)
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
-        conductance = PARALLEL
-        (
-            get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index    ),
-            get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index - 1)
-        ) ;
+        goto skip_south ;
 
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+    *this.RowIndices++ = get_cell_offset_in_stack
 
-        (*this.ColumnPointers)++ ;
+        (dimensions, layer_index, row_index - 1, column_index) ;
+
+    g_south = get_conductance_south
+
+        (thermal_grid, dimensions, layer_index, row_index    , column_index) ;
+
+    g_north = get_conductance_north
+
+        (thermal_grid, dimensions, layer_index, row_index - 1, column_index) ;
+
+    conductance = PARALLEL (g_south, g_north) ;
+
+    *this.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*this.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index    ),
-            get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index - 1)) ;
+    fprintf (stderr,
+        "  south   \t%d\t% .4e = % .4e (S) || % .4e (N)\n",
+        *(this.RowIndices-1), *(this.Values-1), g_south, g_north) ;
 #endif
-    }
 
-    /* DIAGONAL */
+skip_south :
+
+    /********************************* WEST ***********************************/
+
+    if (   IS_FIRST_COLUMN(column_index)
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
+
+        goto skip_west ;
+
+    *this.RowIndices++ = get_cell_offset_in_stack
+
+        (dimensions, layer_index, row_index, column_index - 1) ;
+
+    g_west = get_conductance_west
+
+        (thermal_grid, dimensions, layer_index, row_index, column_index    ) ;
+
+    g_east = get_conductance_east
+
+        (thermal_grid, dimensions, layer_index, row_index, column_index - 1) ;
+
+    conductance = PARALLEL (g_west, g_east) ;
+
+    *this.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*this.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
+        *(this.RowIndices-1), *(this.Values-1), g_west, g_east) ;
+#endif
+
+skip_west :
+
+    /********************************* DIAGONAL *******************************/
 
     *this.RowIndices++ = get_cell_offset_in_stack
 
@@ -226,6 +246,13 @@ static SystemMatrix_t add_solid_column
     *this.Values = get_capacity
 
         (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+    if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT)
+
+        *this.Values += get_conductance_top
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
     diagonal_pointer = this.Values++ ;
 
@@ -237,339 +264,117 @@ static SystemMatrix_t add_solid_column
     fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
 #endif
 
-    /* EAST */
+    /********************************* EAST ***********************************/
 
-    if ( ! IS_LAST_COLUMN(column_index, dimensions) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
+    if (   IS_LAST_COLUMN(column_index, dimensions)
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
-            (dimensions, layer_index, row_index, column_index + 1) ;
+        goto skip_east ;
 
-        conductance = PARALLEL
-        (
-            get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index    ),
-            get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index + 1)
-        ) ;
+    *this.RowIndices++ = get_cell_offset_in_stack
 
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        (dimensions, layer_index, row_index, column_index + 1) ;
 
-        (*this.ColumnPointers)++ ;
+    g_east = get_conductance_east
 
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index    ),
-            get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index + 1)) ;
-#endif
-    }
+        (thermal_grid, dimensions, layer_index, row_index, column_index    ) ;
 
-    /* NORTH */
+    g_west = get_conductance_west
 
-    if ( ! IS_LAST_ROW(row_index, dimensions) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        (thermal_grid, dimensions, layer_index, row_index, column_index + 1) ;
 
-            (dimensions, layer_index, row_index + 1, column_index) ;
+    conductance = PARALLEL (g_east, g_west) ;
 
-        conductance = PARALLEL
-        (
-            get_conductance_north (thermal_grid, dimensions, layer_index, row_index    , column_index),
-            get_conductance_south (thermal_grid, dimensions, layer_index, row_index + 1, column_index)
-        ) ;
+    *this.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
 
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
+    (*this.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  north   \t%d\t% .4e = % .4e (N) || % .4e (S)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_north (thermal_grid, dimensions, layer_index, row_index    , column_index),
-            get_conductance_south (thermal_grid, dimensions, layer_index, row_index + 1, column_index)) ;
+    fprintf (stderr,
+        "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
+        *(this.RowIndices-1), *(this.Values-1), g_east, g_west) ;
 #endif
-    }
 
-    /* TOP */
+skip_east :
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
+    /********************************* NORTH **********************************/
 
-            (dimensions, layer_index + 1, row_index, column_index) ;
+    if (   IS_LAST_ROW(row_index, dimensions)
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
-        Conductance_t c_top = get_conductance_top
+        goto skip_north ;
 
-            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    *this.RowIndices++ = get_cell_offset_in_stack
 
-        Conductance_t c_bottom = get_conductance_bottom
+        (dimensions, layer_index, row_index + 1, column_index) ;
 
-            (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
+    g_north = get_conductance_north
+
+        (thermal_grid, dimensions, layer_index, row_index    , column_index) ;
+
+    g_south = get_conductance_south
+
+        (thermal_grid, dimensions, layer_index, row_index + 1, column_index) ;
+
+    conductance = PARALLEL (g_north, g_south) ;
+
+    *this.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*this.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  north   \t%d\t% .4e = % .4e (N) || % .4e (S)\n",
+        *(this.RowIndices-1), *(this.Values-1), g_north, g_south) ;
+#endif
+
+skip_north :
+
+    /********************************* TOP ************************************/
+
+    if (IS_LAST_LAYER(layer_index, dimensions))
+
+        goto skip_top ;
+
+    *this.RowIndices++ = get_cell_offset_in_stack
+
+        (dimensions, layer_index + 1, row_index, column_index) ;
+
+    Conductance_t c_top = get_conductance_top
+
+        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+    Conductance_t c_bottom = get_conductance_bottom
+
+        (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
+
+    if (c_bottom == 0)
+
+        conductance = c_top ;
+
+    else
 
         conductance = PARALLEL (c_top, c_bottom) ;
 
-        if (conductance == 0)
-        {
-            conductance = c_top ? c_top : c_bottom ;
-        }
-
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            c_top, c_bottom) ;
-#endif
-    }
-
-    /* DIAGONAL ELEMENT */
-
-    *diagonal_pointer += diagonal_value ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fgetpos (stderr, &last_fpos) ;
-    fsetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "% .4e", *diagonal_pointer) ;
-    fsetpos (stderr, &last_fpos) ;
-
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
-#endif
-
-    this.ColumnPointers++ ;
-
-    return this ;
-}
-
-/******************************************************************************/
-
-static SystemMatrix_t add_spread_column
-(
-    SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
-    ThermalGrid_t  *thermal_grid,
-    CellIndex_t     layer_index,
-    CellIndex_t     row_index,
-    CellIndex_t     column_index
-)
-{
-    Conductance_t conductance = 0.0 ;
-    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
-    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fpos_t diag_fposition, last_fpos ;
-    fprintf (stderr,
-        "add_spread_column   l %2d r %4d c %4d [%7d]\n",
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
-#endif
-
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
-
-    /* BOTTOM */
-
-    if ( ! IS_FIRST_LAYER(layer_index) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
-
-            (dimensions, layer_index - 1, row_index, column_index) ;
-
-        conductance = PARALLEL
-        (
-            get_conductance_bottom (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_top    (thermal_grid, dimensions, layer_index - 1, row_index, column_index)
-        ) ;
-
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_bottom (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_top    (thermal_grid, dimensions, layer_index - 1, row_index, column_index)) ;
-#endif
-    }
-
-    /* DIAGONAL */
-
-    *this.RowIndices++ = get_cell_offset_in_stack
-
-        (dimensions, layer_index, row_index, column_index) ;
-
-    *this.Values = get_capacity
-
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
-
-    diagonal_pointer = this.Values++ ;
+    *this.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
 
     (*this.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
-    fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
-#endif
-
-    /* TOP */
-
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
-
-            (dimensions, layer_index + 1, row_index, column_index) ;
-
-        conductance = PARALLEL
-        (
-            get_conductance_top    (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_bottom (thermal_grid, dimensions, layer_index + 1, row_index, column_index)
-        ) ;
-
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_top    (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_bottom (thermal_grid, dimensions, layer_index + 1, row_index, column_index)) ;
-#endif
-    }
-
-    /* DIAGONAL ELEMENT */
-
-    *diagonal_pointer += diagonal_value ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fgetpos (stderr, &last_fpos) ;
-    fsetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "% .4e", *diagonal_pointer) ;
-    fsetpos (stderr, &last_fpos) ;
-
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
-#endif
-
-    this.ColumnPointers++ ;
-
-    return this ;
-}
-
-/******************************************************************************/
-
-static SystemMatrix_t add_sink_column
-(
-    SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
-    ThermalGrid_t  *thermal_grid,
-    CellIndex_t     layer_index,
-    CellIndex_t     row_index,
-    CellIndex_t     column_index
-)
-{
-    Conductance_t conductance = 0.0 ;
-    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
-    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fpos_t diag_fposition, last_fpos ;
     fprintf (stderr,
-        "add_spread_column   l %2d r %4d c %4d [%7d]\n",
-        layer_index, row_index, column_index,
-        get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
+        "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
+        *(this.RowIndices-1), *(this.Values-1),
+        c_top, c_bottom) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+skip_top :
 
-    /* BOTTOM */
-
-    if ( ! IS_FIRST_LAYER(layer_index) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
-
-            (dimensions, layer_index - 1, row_index, column_index) ;
-
-        conductance = PARALLEL
-        (
-            get_conductance_bottom (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_top    (thermal_grid, dimensions, layer_index - 1, row_index, column_index)
-        ) ;
-
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_bottom (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_top    (thermal_grid, dimensions, layer_index - 1, row_index, column_index)) ;
-#endif
-    }
-
-    /* DIAGONAL */
-
-    *this.RowIndices++ = get_cell_offset_in_stack
-
-        (dimensions, layer_index, row_index, column_index) ;
-
-    *this.Values = get_capacity
-
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
-
-    diagonal_pointer = this.Values++ ;
-
-    (*this.ColumnPointers)++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
-    fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
-#endif
-
-    /* TOP */
-
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
-    {
-        *this.RowIndices++ = get_cell_offset_in_stack
-
-            (dimensions, layer_index + 1, row_index, column_index) ;
-
-        conductance = PARALLEL
-        (
-            get_conductance_top    (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_bottom (thermal_grid, dimensions, layer_index + 1, row_index, column_index)
-        ) ;
-
-        *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
-
-        (*this.ColumnPointers)++ ;
-
-#ifdef PRINT_SYSTEM_MATRIX
-        fprintf (stderr,
-            "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
-            *(this.RowIndices-1), *(this.Values-1),
-            get_conductance_top    (thermal_grid, dimensions, layer_index    , row_index, column_index),
-            get_conductance_bottom (thermal_grid, dimensions, layer_index + 1, row_index, column_index)) ;
-#endif
-    }
-
-    /* DIAGONAL ELEMENT */
+    /************************** DIAGONAL ELEMENT ******************************/
 
     *diagonal_pointer += diagonal_value ;
 
@@ -628,7 +433,7 @@ static SystemMatrix_t add_liquid_column_4rm
         ) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -677,7 +482,7 @@ static SystemMatrix_t add_liquid_column_4rm
         ) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -725,7 +530,7 @@ static SystemMatrix_t add_liquid_column_4rm
         ) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -774,7 +579,7 @@ static SystemMatrix_t add_liquid_column_4rm
         ) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -850,7 +655,7 @@ static SystemMatrix_t add_liquid_column_2rm
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -936,7 +741,7 @@ static SystemMatrix_t add_liquid_column_2rm
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1010,7 +815,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
             (thermal_grid, dimensions, layer_index - 1, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1054,7 +859,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
             (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1078,7 +883,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
             (thermal_grid, dimensions, layer_index + 2, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1146,7 +951,7 @@ static SystemMatrix_t add_top_wall_column_2rm
             (thermal_grid, dimensions, layer_index - 2, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1170,7 +975,7 @@ static SystemMatrix_t add_top_wall_column_2rm
             (thermal_grid, dimensions, layer_index - 1, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1214,7 +1019,7 @@ static SystemMatrix_t add_top_wall_column_2rm
             (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1284,7 +1089,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1311,7 +1116,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
         ) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1357,7 +1162,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
         ) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1381,7 +1186,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
         *this.Values++  = -conductance ;
-        diagonal_value          +=  conductance ;
+        diagonal_value +=  conductance ;
 
         (*this.ColumnPointers)++ ;
 
@@ -1447,112 +1252,23 @@ void fill_system_matrix
         switch (thermal_grid->LayersProfile [lindex])
         {
             case TDICE_LAYER_SOLID :
-            {
-
-                FOR_EVERY_ROW (row_index, dimensions)
-                {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
-                    {
-                        tmp_matrix = add_solid_column
-
-                            (tmp_matrix, dimensions, thermal_grid,
-                             lindex, row_index, column_index) ;
-
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
-
-                break ;
-            }
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-            {
-                FOR_EVERY_ROW (_row_, dimensions)
-                {
-                    FOR_EVERY_COLUMN (_column_, dimensions)
-                    {
-                        tmp_matrix = add_solid_column
-
-                            (tmp_matrix, dimensions, thermal_grid,
-                             lindex, _row_, _column_) ;
-
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
-                CellIndex_t cell  = get_cell_offset_in_stack (dimensions, lindex, 0 ,0) ;
-
-                FOR_EVERY_ROW (row, dimensions)
-                {
-                    FOR_EVERY_COLUMN (column, dimensions)
-                    {
-                        CellIndex_t row_index ;
-
-                        for (row_index = this->ColumnPointers [ cell ] ;
-                            row_index < (CellIndex_t) this->ColumnPointers [ cell + 1 ] ;
-                            row_index ++)
-
-                            if ((CellIndex_t) this->RowIndices [ row_index ] == cell)
-
-                                this->Values [ row_index ] += get_conductance_top
-
-                                    (thermal_grid, dimensions, lindex, row, column) ;
-
-                        cell++ ;
-                    }
-                }
-
-                break ;
-            }
             case TDICE_LAYER_SPREADER :
-            {
-                FOR_EVERY_ROW (row_index, dimensions)
-                {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
-                    {
-                        tmp_matrix = add_spread_column
-
-                            (tmp_matrix, dimensions, thermal_grid,
-                             lindex, row_index, column_index) ;
-
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
-                break ;
-            }
             case TDICE_LAYER_SINK :
             {
-                FOR_EVERY_ROW (_row_, dimensions)
+
+                FOR_EVERY_ROW (row_index, dimensions)
                 {
-                    FOR_EVERY_COLUMN (_column_, dimensions)
+                    FOR_EVERY_COLUMN (column_index, dimensions)
                     {
-                        tmp_matrix = add_sink_column
+                        tmp_matrix = add_solid_column
 
                             (tmp_matrix, dimensions, thermal_grid,
-                             lindex, _row_, _column_) ;
+                             lindex, row_index, column_index) ;
 
                     } // FOR_EVERY_COLUMN
                 } // FOR_EVERY_ROW
 
-                CellIndex_t cell  = get_cell_offset_in_stack (dimensions, lindex, 0 ,0) ;
-
-                FOR_EVERY_ROW (row, dimensions)
-                {
-                    FOR_EVERY_COLUMN (column, dimensions)
-                    {
-                        CellIndex_t row_index ;
-
-                        for (row_index = this->ColumnPointers [ cell ] ;
-                            row_index < (CellIndex_t) this->ColumnPointers [ cell + 1 ] ;
-                            row_index ++)
-
-                            if ((CellIndex_t) this->RowIndices [ row_index ] == cell)
-
-                                this->Values [ row_index ] += get_conductance_top
-
-                                    (thermal_grid, dimensions, lindex, row, column) ;
-
-                        cell++ ;
-                    }
-                }
 
                 break ;
             }
