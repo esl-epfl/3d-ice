@@ -45,18 +45,18 @@
 /******************************************************************************/
 
 void
-init_stack_element (StackElement_t *stack_element)
+init_stack_element (StackElement_t *this)
 {
-    stack_element->Type            = TDICE_STACK_ELEMENT_NONE ;
-    stack_element->Pointer.Layer   = NULL ;
-    stack_element->Pointer.Die     = NULL ;
-    stack_element->Pointer.Channel = NULL ;
-    stack_element->Floorplan       = NULL ;
-    stack_element->Id              = NULL ;
-    stack_element->NLayers         = 0u ;
-    stack_element->Offset          = 0u ;
-    stack_element->Next            = NULL ;
-    stack_element->Prev            = NULL ;
+    this->Type            = TDICE_STACK_ELEMENT_NONE ;
+    this->Pointer.Layer   = NULL ;
+    this->Pointer.Die     = NULL ;
+    this->Pointer.Channel = NULL ;
+    this->Floorplan       = NULL ;
+    this->Id              = NULL ;
+    this->NLayers         = 0u ;
+    this->Offset          = 0u ;
+    this->Next            = NULL ;
+    this->Prev            = NULL ;
 }
 
 /******************************************************************************/
@@ -74,15 +74,15 @@ StackElement_t *alloc_and_init_stack_element (void)
 
 /******************************************************************************/
 
-void free_stack_element (StackElement_t *stack_element)
+void free_stack_element (StackElement_t *this)
 {
-    if (   stack_element->Type == TDICE_STACK_ELEMENT_DIE
-        && stack_element->Floorplan != NULL)
+    if (   this->Type == TDICE_STACK_ELEMENT_DIE
+        && this->Floorplan != NULL)
 
-        FREE_POINTER (free_floorplan, stack_element->Floorplan) ;
+        FREE_POINTER (free_floorplan, this->Floorplan) ;
 
-    FREE_POINTER (free, stack_element->Id) ;
-    FREE_POINTER (free, stack_element) ;
+    FREE_POINTER (free, this->Id) ;
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -107,9 +107,9 @@ StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id)
 
 void print_formatted_stack_elements_list
 (
+    StackElement_t *list,
     FILE           *stream,
-    String_t        prefix,
-    StackElement_t *list
+    String_t        prefix
 )
 {
     Quantity_t max_stk_el_id_length = 0 ;
@@ -181,9 +181,9 @@ void print_formatted_stack_elements_list
 
 void print_detailed_stack_elements_list
 (
+    StackElement_t *list,
     FILE           *stream,
-    String_t        prefix,
-    StackElement_t *list
+    String_t        prefix
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stk_el, list)
@@ -252,17 +252,17 @@ void print_detailed_stack_elements_list
 
 /******************************************************************************/
 
-CellIndex_t get_source_layer_offset (StackElement_t *stack_element)
+CellIndex_t get_source_layer_offset (StackElement_t *this)
 {
-    CellIndex_t layer_offset = stack_element->Offset ;
+    CellIndex_t layer_offset = this->Offset ;
 
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+    if (this->Type == TDICE_STACK_ELEMENT_DIE)
 
-        layer_offset += stack_element->Pointer.Die->SourceLayerOffset ;
+        layer_offset += this->Pointer.Die->SourceLayerOffset ;
 
-    else if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
+    else if (this->Type == TDICE_STACK_ELEMENT_CHANNEL)
 
-        layer_offset += stack_element->Pointer.Channel->SourceLayerOffset ;
+        layer_offset += this->Pointer.Channel->SourceLayerOffset ;
 
     return layer_offset ;
 }
@@ -271,7 +271,7 @@ CellIndex_t get_source_layer_offset (StackElement_t *stack_element)
 
 void print_thermal_map_stack_element
 (
-    StackElement_t  *stack_element,
+    StackElement_t  *this,
     Dimensions_t    *dimensions,
     Temperature_t   *temperatures,
     FILE            *stream
@@ -279,7 +279,7 @@ void print_thermal_map_stack_element
 {
     temperatures += get_cell_offset_in_stack
 
-        (dimensions, get_source_layer_offset (stack_element), 0, 0) ;
+        (dimensions, get_source_layer_offset (this), 0, 0) ;
 
     FOR_EVERY_ROW (row_index, dimensions)
     {
@@ -296,14 +296,14 @@ void print_thermal_map_stack_element
 
 Quantity_t get_number_of_floorplan_elements_stack_element
 (
-    StackElement_t *stack_element
+    StackElement_t *this
 )
 {
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+    if (this->Type == TDICE_STACK_ELEMENT_DIE)
 
         return get_number_of_floorplan_elements_floorplan
 
-            (stack_element->Floorplan) ;
+            (this->Floorplan) ;
 
     else
 
@@ -314,32 +314,32 @@ Quantity_t get_number_of_floorplan_elements_stack_element
 
 FloorplanElement_t *get_floorplan_element_stack_element
 (
-    StackElement_t *stack_element,
+    StackElement_t *this,
     String_t        floorplan_element_id
 )
 {
-    if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)
+    if (this->Type != TDICE_STACK_ELEMENT_DIE)
 
         return NULL ;
 
     return get_floorplan_element_floorplan
 
-        (stack_element->Floorplan, floorplan_element_id) ;
+        (this->Floorplan, floorplan_element_id) ;
 }
 
 /******************************************************************************/
 
 Error_t insert_power_values_stack_element
 (
-    StackElement_t *stack_element,
+    StackElement_t *this,
     PowersQueue_t  *pvalues
 )
 {
-    if (stack_element->Type == TDICE_STACK_ELEMENT_DIE)
+    if (this->Type == TDICE_STACK_ELEMENT_DIE)
 
         return insert_power_values_floorplan
 
-            (stack_element->Floorplan, pvalues) ;
+            (this->Floorplan, pvalues) ;
 
     else
 

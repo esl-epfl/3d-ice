@@ -99,7 +99,7 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a floorplan to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
      * \param this the address of the flooprlan to initialize
      */
@@ -119,7 +119,7 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a floorplan
+    /*! Frees the memory related to \a this
      *
      * The parametrer \a this must be a pointer previously
      * obtained with #alloc_and_init_floorplan
@@ -133,12 +133,12 @@ extern "C"
 
     /*! Prints detailed information about all the fields of a floorplan
      *
+     * \param this   the floorplan to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param this   the floorplan to print
      */
 
-    void print_detailed_floorplan (FILE *stream, String_t prefix, Floorplan_t *this) ;
+    void print_detailed_floorplan (Floorplan_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -162,10 +162,10 @@ extern "C"
 
     /*! Fills the source vector corresponding to a floorplan
      *
+     *  \param this    pointer to the floorplan placed on the source layer
      *  \param sources pointer to the location of the source vector
      *                 that corresponds to the South-West thermal cell
      *                 of the layer where the floorplan is placed
-     *  \param this    pointer to the floorplan placed on the source layer
      *
      *  \return \c TDICE_SUCCESS if the source vector has been filled correctly
      *  \return \c TDICE_FAILURE if it not possible to fill the source vector
@@ -173,11 +173,7 @@ extern "C"
      *                            values in its queue)
      */
 
-    Error_t fill_sources_floorplan
-    (
-        Source_t     *sources,
-        Floorplan_t  *this
-    ) ;
+    Error_t fill_sources_floorplan (Floorplan_t *this, Source_t *sources) ;
 
 
 

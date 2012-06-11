@@ -152,27 +152,27 @@ extern "C"
 
     /*! Prints an heat sink as it looks in the stack file
      *
+     * \param this   the pointer to the heat sink to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param this   the pointer to the heat sink to print
      */
 
     void print_formatted_heat_sink
 
-        (FILE *stream, String_t prefix, HeatSink_t *this) ;
+        (HeatSink_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the heat sink
      *
+     * \param this   the pointer to the heat sink
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param this   the pointer to the heat sink
      */
 
     void print_detailed_heat_sink
 
-        (FILE *stream, String_t prefix, HeatSink_t *this) ;
+        (HeatSink_t *this, FILE *stream, String_t prefix) ;
 
 
     /*! Returns the equivalent volumetric heat capacity of the material of the

@@ -44,14 +44,14 @@
 
 /******************************************************************************/
 
-void init_layer (Layer_t *layer)
+void init_layer (Layer_t *this)
 {
-    layer->Height   = 0.0 ;
-    layer->Material = NULL ;
-    layer->Id       = NULL ;
-    layer->Used     = 0u ;
-    layer->Next     = NULL ;
-    layer->Prev     = NULL ;
+    this->Height   = 0.0 ;
+    this->Material = NULL ;
+    this->Id       = NULL ;
+    this->Used     = 0u ;
+    this->Next     = NULL ;
+    this->Prev     = NULL ;
 }
 
 /******************************************************************************/
@@ -69,13 +69,13 @@ Layer_t *alloc_and_init_layer (void)
 
 /******************************************************************************/
 
-void free_layer (Layer_t *layer)
+void free_layer (Layer_t *this)
 {
-    if (layer->Id != NULL)
+    if (this->Id != NULL)
 
-        FREE_POINTER (free, layer->Id) ;
+        FREE_POINTER (free, this->Id) ;
 
-    FREE_POINTER (free, layer) ;
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -99,66 +99,66 @@ Layer_t *find_layer_in_list (Layer_t *list, String_t id)
 
 /******************************************************************************/
 
-void print_formatted_layer (FILE *stream, String_t prefix, Layer_t *layer)
+void print_formatted_layer (Layer_t *this, FILE *stream, String_t prefix)
 {
     fprintf (stream,
         "%slayer %s :\n",
-        prefix, layer->Id) ;
+        prefix, this->Id) ;
 
     fprintf (stream,
         "%s   height %.1f ;\n",
-        prefix, layer->Height) ;
+        prefix, this->Height) ;
 
     fprintf (stream,
         "%s   material %s ;\n",
-        prefix, layer->Material->Id) ;
+        prefix, this->Material->Id) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_layer (FILE *stream, String_t prefix, Layer_t *layer)
+void print_detailed_layer (Layer_t *this, FILE *stream, String_t prefix)
 {
     fprintf (stream,
         "%slayer                   = %p\n",
-        prefix, layer) ;
+        prefix, this) ;
 
     fprintf (stream,
         "%s  Height                = %.1f\n",
-        prefix, layer->Height) ;
+        prefix, this->Height) ;
 
     fprintf (stream,
         "%s  Material              = %p\n",
-        prefix, layer->Material) ;
+        prefix, this->Material) ;
 
     fprintf (stream,
         "%s  Id                    = %s\n",
-        prefix, layer->Id) ;
+        prefix, this->Id) ;
 
     fprintf (stream,
         "%s  Used                  = %d\n",
-        prefix, layer->Used) ;
+        prefix, this->Used) ;
 
     fprintf (stream,
         "%s  Next                  = %p\n",
-        prefix, layer->Next) ;
+        prefix, this->Next) ;
 
     fprintf (stream,
         "%s  Prev                  = %p\n",
-        prefix, layer->Prev) ;
+        prefix, this->Prev) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_layers_list (FILE *stream, String_t prefix, Layer_t *list)
+void print_formatted_layers_list (Layer_t *list, FILE *stream, String_t prefix)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
 
-        print_formatted_layer (stream, prefix, layer) ;
+        print_formatted_layer (layer, stream, prefix) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_layers_list (FILE *stream, String_t prefix, Layer_t *list)
+void print_detailed_layers_list (Layer_t *list, FILE *stream, String_t prefix)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
     {
@@ -166,12 +166,12 @@ void print_detailed_layers_list (FILE *stream, String_t prefix, Layer_t *list)
 
             break ;
 
-        print_detailed_layer (stream, prefix, layer) ;
+        print_detailed_layer (layer, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_detailed_layer (stream, prefix, layer) ;
+    print_detailed_layer (layer, stream, prefix) ;
 }
 
 /******************************************************************************/

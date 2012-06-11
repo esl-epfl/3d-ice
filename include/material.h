@@ -107,12 +107,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a material to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param material the address of the material to initialize
+     * \param this the address of the material to initialize
      */
 
-    void init_material (Material_t *material) ;
+    void init_material (Material_t *this) ;
 
 
 
@@ -127,15 +127,15 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a material
+    /*! Frees the memory related to \a this
      *
      * The parametrer \a material must be a pointer previously obtained with
      * \c alloc_and_init_material
      *
-     * \param material the address of the material structure to free
+     * \param this the address of the material structure to free
      */
 
-    void free_material (Material_t *material) ;
+    void free_material (Material_t *this) ;
 
 
 
@@ -169,53 +169,53 @@ extern "C"
 
     /*! Prints the material as it looks in the stack file
      *
-     * \param stream   the output stream (must be already open)
-     * \param prefix   a string to be printed as prefix at the beginning of each line
-     * \param material the material to print
+     * \param this   the material to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_formatted_material
 
-         (FILE *stream, String_t prefix, Material_t *material) ;
+         (Material_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of materials as they look in the stack file
      *
+     * \param list   the pointer to the first material in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first material in the list
      */
 
     void print_formatted_materials_list
 
-         (FILE *stream, String_t prefix, Material_t *list) ;
+         (Material_t *list, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints detailed information about all the fields of a material
      *
-     * \param stream   the output stream (must be already open)
-     * \param prefix   a string to be printed as prefix at the beginning of each line
-     * \param material the material to print
+     * \param this   the material to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_detailed_material
 
-         (FILE *stream, String_t prefix, Material_t *material) ;
+         (Material_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the materials
      *
+     * \param list the pointer to the first material in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list the pointer to the first material in the list
      */
 
     void print_detailed_materials_list
 
-         (FILE *stream, String_t prefix, Material_t *list) ;
+         (Material_t *list, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

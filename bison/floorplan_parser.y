@@ -257,9 +257,9 @@ ic_elements
         icelement->Length = $7 ;
         icelement->Width  = $9 ;
 
-        align_to_grid (dimensions, icelement) ;
+        align_to_grid (icelement, dimensions) ;
 
-        if (check_location (dimensions, icelement) == true)
+        if (check_location (icelement, dimensions) == true)
         {
             sprintf (error_message, "Floorplan element is outside of the IC") ;
 
@@ -318,9 +318,9 @@ ic_element
         icelement->Length = $7 ;
         icelement->Width  = $9 ;
 
-        align_to_grid (dimensions, icelement) ;
+        align_to_grid (icelement, dimensions) ;
 
-        if (check_location (dimensions, icelement) == true)
+        if (check_location (icelement, dimensions) == true)
         {
             sprintf (error_message, "Floorplan element is outside of the IC") ;
 

@@ -44,17 +44,17 @@
 
 /******************************************************************************/
 
-void init_analysis (Analysis_t *analysis)
+void init_analysis (Analysis_t *this)
 {
-    analysis->AnalysisType         = TDICE_ANALYSIS_TYPE_NONE ;
-    analysis->StepTime             = (Time_t) 0.0 ;
-    analysis->SlotTime             = (Time_t) 0.0 ;
-    analysis->SlotLength           = 0u ;
-    analysis->CurrentTime          = 0u ;
-    analysis->InitialTemperature   = (Temperature_t) 0.0 ;
-    analysis->InspectionPointListFinal = NULL ;
-    analysis->InspectionPointListSlot  = NULL ;
-    analysis->InspectionPointListStep  = NULL ;
+    this->AnalysisType         = TDICE_ANALYSIS_TYPE_NONE ;
+    this->StepTime             = (Time_t) 0.0 ;
+    this->SlotTime             = (Time_t) 0.0 ;
+    this->SlotLength           = 0u ;
+    this->CurrentTime          = 0u ;
+    this->InitialTemperature   = (Temperature_t) 0.0 ;
+    this->InspectionPointListFinal = NULL ;
+    this->InspectionPointListSlot  = NULL ;
+    this->InspectionPointListStep  = NULL ;
 }
 
 /******************************************************************************/
@@ -72,25 +72,25 @@ Analysis_t *alloc_and_init_analysis (void)
 
 /******************************************************************************/
 
-void free_analysis (Analysis_t *analysis)
+void free_analysis (Analysis_t *this)
 {
-    FREE_LIST (InspectionPoint_t, analysis->InspectionPointListFinal, free_inspection_point) ;
-    FREE_LIST (InspectionPoint_t, analysis->InspectionPointListSlot, free_inspection_point) ;
-    FREE_LIST (InspectionPoint_t, analysis->InspectionPointListStep, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, this->InspectionPointListFinal, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, this->InspectionPointListSlot, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, this->InspectionPointListStep, free_inspection_point) ;
 }
 
 /******************************************************************************/
 
-Time_t get_simulated_time (Analysis_t *analysis)
+Time_t get_simulated_time (Analysis_t *this)
 {
-  return analysis->CurrentTime * analysis->StepTime ;
+  return this->CurrentTime * this->StepTime ;
 }
 
 /******************************************************************************/
 
 Quantity_t get_number_of_inspection_points
 (
-    Analysis_t       *analysis,
+    Analysis_t       *this,
     OutputInstant_t   instant,
     OutputType_t      type,
     OutputQuantity_t  quantity
@@ -102,15 +102,15 @@ Quantity_t get_number_of_inspection_points
 
     if (instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = analysis->InspectionPointListFinal ;
+        list = this->InspectionPointListFinal ;
 
     else if (instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = analysis->InspectionPointListStep ;
+        list = this->InspectionPointListStep ;
 
     else if (instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = analysis->InspectionPointListSlot ;
+        list = this->InspectionPointListSlot ;
 
     else
 
@@ -127,9 +127,9 @@ Quantity_t get_number_of_inspection_points
 
 /******************************************************************************/
 
-bool slot_completed (Analysis_t *analysis)
+bool slot_completed (Analysis_t *this)
 {
-    if (analysis->CurrentTime % analysis->SlotLength == 0u)
+    if (this->CurrentTime % this->SlotLength == 0u)
 
         return true ;
 
@@ -140,26 +140,26 @@ bool slot_completed (Analysis_t *analysis)
 
 void print_formatted_analysis
 (
+    Analysis_t *this,
     FILE       *stream,
-    String_t    prefix,
-    Analysis_t *analysis
+    String_t    prefix
 )
 {
     fprintf (stream, "%ssolver : ", prefix) ;
 
-    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+    if (this->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
         fprintf (stream, "steady ;\n") ;
 
     else
 
         fprintf (stream, "transient step %.2f, slot %.2f ;\n",
-            analysis->StepTime, analysis->SlotTime) ;
+            this->StepTime, this->SlotTime) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
     fprintf (stream, "%sinitial temperature  %.2f ;\n",
-        prefix, analysis->InitialTemperature) ;
+        prefix, this->InitialTemperature) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
@@ -169,19 +169,19 @@ void print_formatted_analysis
 
     print_formatted_inspection_point_list
 
-        (stream, prefix, analysis->InspectionPointListFinal) ;
+        (this->InspectionPointListFinal, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
     print_formatted_inspection_point_list
 
-        (stream, prefix, analysis->InspectionPointListSlot) ;
+        (this->InspectionPointListSlot, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
     print_formatted_inspection_point_list
 
-        (stream, prefix, analysis->InspectionPointListStep) ;
+        (this->InspectionPointListStep, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 }
@@ -190,9 +190,9 @@ void print_formatted_analysis
 
 void print_detailed_analysis
 (
+  Analysis_t *this,
   FILE       *stream,
-  String_t    prefix,
-  Analysis_t *analysis
+  String_t    prefix
 )
 {
     String_t new_prefix = (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
@@ -203,73 +203,73 @@ void print_detailed_analysis
 
     fprintf (stream,
         "%sAnalysis                        = %p\n",
-        prefix, analysis) ;
+        prefix, this) ;
 
     fprintf (stream,
         "%s  AnalysisType                  = %d\n",
-        prefix, analysis->AnalysisType) ;
+        prefix, this->AnalysisType) ;
 
     fprintf (stream,
         "%s  StepTime                      = %.2f\n",
-        prefix, analysis->StepTime) ;
+        prefix, this->StepTime) ;
 
     fprintf (stream,
         "%s  SlotTime                      = %.2f\n",
-        prefix, analysis->SlotTime) ;
+        prefix, this->SlotTime) ;
 
     fprintf (stream,
         "%s  SlotLength                    = %d\n",
-        prefix, analysis->SlotLength) ;
+        prefix, this->SlotLength) ;
 
     fprintf (stream,
         "%s  CurrentTime                   = %d\n",
-        prefix, analysis->CurrentTime) ;
+        prefix, this->CurrentTime) ;
 
     fprintf (stream,
         "%s  InitialTemperature            = %.2f\n",
-        prefix, analysis->InitialTemperature) ;
+        prefix, this->InitialTemperature) ;
 
     fprintf (stream,
         "%s  InspectionPointListFinal          = %p\n",
-        prefix, analysis->InspectionPointListFinal) ;
+        prefix, this->InspectionPointListFinal) ;
 
-    if (analysis->InspectionPointListFinal != NULL)
+    if (this->InspectionPointListFinal != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
         print_detailed_inspection_point_list
 
-            (stream, new_prefix, analysis->InspectionPointListFinal) ;
+            (this->InspectionPointListFinal, stream, new_prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     fprintf (stream,
         "%s  InspectionPointListSlot           = %p\n",
-        prefix, analysis->InspectionPointListSlot) ;
+        prefix, this->InspectionPointListSlot) ;
 
-    if (analysis->InspectionPointListSlot != NULL)
+    if (this->InspectionPointListSlot != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
         print_detailed_inspection_point_list
 
-            (stream, new_prefix, analysis->InspectionPointListSlot) ;
+            (this->InspectionPointListSlot, stream, new_prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     fprintf (stream,
         "%s  InspectionPointListStep           = %p\n",
-        prefix, analysis->InspectionPointListStep) ;
+        prefix, this->InspectionPointListStep) ;
 
-    if (analysis->InspectionPointListStep != NULL)
+    if (this->InspectionPointListStep != NULL)
     {
         fprintf (stream, "%s\n", prefix) ;
 
         print_detailed_inspection_point_list
 
-            (stream, new_prefix, analysis->InspectionPointListStep) ;
+            (this->InspectionPointListStep, stream, new_prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
@@ -281,24 +281,24 @@ void print_detailed_analysis
 
 void add_inspection_point_to_analysis
 (
-    Analysis_t        *analysis,
+    Analysis_t        *this,
     InspectionPoint_t *inspection_point
 )
 {
     InspectionPoint_t **list = NULL ;
 
-    if (   analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY
+    if (   this->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY
         || inspection_point->Instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = &analysis->InspectionPointListFinal ;
+        list = &this->InspectionPointListFinal ;
 
     else if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = &analysis->InspectionPointListSlot ;
+        list = &this->InspectionPointListSlot ;
 
     else if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = &analysis->InspectionPointListStep ;
+        list = &this->InspectionPointListStep ;
 
     while (*list != NULL) list = &( (*list)->Next ) ;
 
@@ -311,24 +311,24 @@ void add_inspection_point_to_analysis
 
 Error_t generate_analysis_headers
 (
-    Analysis_t   *analysis,
+    Analysis_t   *this,
     Dimensions_t *dimensions,
     String_t      prefix
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, final, analysis->InspectionPointListFinal)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, final, this->InspectionPointListFinal)
 
         if (generate_inspection_point_header (final, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, slot, analysis->InspectionPointListSlot)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, slot, this->InspectionPointListSlot)
 
         if (generate_inspection_point_header (slot, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, step, analysis->InspectionPointListStep)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, step, this->InspectionPointListStep)
 
         if (generate_inspection_point_header (step, dimensions, prefix) != TDICE_SUCCESS)
 
@@ -341,27 +341,27 @@ Error_t generate_analysis_headers
 
 Error_t generate_analysis_output
 (
-    Analysis_t      *analysis,
+    Analysis_t      *this,
     Dimensions_t    *dimensions,
     Temperature_t   *temperatures,
     OutputInstant_t  output_instant
 )
 {
-    Time_t current_time = get_simulated_time (analysis) ;
+    Time_t current_time = get_simulated_time (this) ;
 
     InspectionPoint_t *list ;
 
     if (output_instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = analysis->InspectionPointListFinal ;
+        list = this->InspectionPointListFinal ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = analysis->InspectionPointListStep ;
+        list = this->InspectionPointListStep ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = analysis->InspectionPointListSlot ;
+        list = this->InspectionPointListSlot ;
 
     else
 
@@ -380,7 +380,7 @@ Error_t generate_analysis_output
 
 Error_t fill_analysis_message
 (
-    Analysis_t       *analysis,
+    Analysis_t       *this,
     Dimensions_t     *dimensions,
     Temperature_t    *temperatures,
     OutputInstant_t   output_instant,
@@ -393,15 +393,15 @@ Error_t fill_analysis_message
 
     if (output_instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = analysis->InspectionPointListFinal ;
+        list = this->InspectionPointListFinal ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = analysis->InspectionPointListStep ;
+        list = this->InspectionPointListStep ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = analysis->InspectionPointListSlot ;
+        list = this->InspectionPointListSlot ;
 
     else
 

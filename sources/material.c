@@ -44,13 +44,13 @@
 
 /******************************************************************************/
 
-void init_material (Material_t *material)
+void init_material (Material_t *this)
 {
-    material->Id                     = NULL ;
-    material->Used                   = 0u ;
-    material->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
-    material->ThermalConductivity    = (SolidTC_t) 0.0 ;
-    material->Next                   = NULL ;
+    this->Id                     = NULL ;
+    this->Used                   = 0u ;
+    this->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
+    this->ThermalConductivity    = (SolidTC_t) 0.0 ;
+    this->Next                   = NULL ;
 }
 
 /******************************************************************************/
@@ -68,13 +68,13 @@ Material_t *alloc_and_init_material (void)
 
 /******************************************************************************/
 
-void free_material (Material_t *material)
+void free_material (Material_t *this)
 {
-    if (material->Id != NULL)
+    if (this->Id != NULL)
 
-        FREE_POINTER (free, material->Id) ;
+        FREE_POINTER (free, this->Id) ;
 
-    FREE_POINTER (free, material) ;
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -100,31 +100,31 @@ Material_t *find_material_in_list (Material_t *list, String_t id)
 
 void print_formatted_material
 (
+    Material_t *this,
     FILE       *stream,
-    String_t    prefix,
-    Material_t *material
+    String_t    prefix
 )
 {
     fprintf (stream,
              "%smaterial %s :\n",
-             prefix, material->Id) ;
+             prefix, this->Id) ;
 
     fprintf (stream,
              "%s   thermal conductivity     %.4e  ;\n",
-             prefix, material->ThermalConductivity) ;
+             prefix, this->ThermalConductivity) ;
 
     fprintf (stream,
              "%s   volumetric heat capacity %.4e  ;\n",
-             prefix, material->VolumetricHeatCapacity) ;
+             prefix, this->VolumetricHeatCapacity) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_materials_list
 (
+    Material_t *list,
     FILE       *stream,
-    String_t    prefix,
-    Material_t *list
+    String_t    prefix
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
@@ -133,55 +133,55 @@ void print_formatted_materials_list
 
             break ;
 
-        print_formatted_material (stream, prefix, material) ;
+        print_formatted_material (material, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_formatted_material (stream, prefix, material) ;
+    print_formatted_material (material, stream, prefix) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_material
 (
+    Material_t *this,
     FILE       *stream,
-    String_t    prefix,
-    Material_t *material
+    String_t    prefix
 )
 {
     fprintf (stream,
              "%smaterial                    = %p\n",
-             prefix, material) ;
+             prefix, this) ;
 
     fprintf (stream,
              "%s  Id                        = %s\n",
-             prefix, material->Id) ;
+             prefix, this->Id) ;
 
     fprintf (stream,
              "%s  Used                      = %d\n",
-             prefix, material->Used) ;
+             prefix, this->Used) ;
 
     fprintf (stream,
              "%s  VolumetricHeatCapacity    = %.4e\n",
-             prefix, material->VolumetricHeatCapacity) ;
+             prefix, this->VolumetricHeatCapacity) ;
 
     fprintf (stream,
              "%s  ThermalConductivity       = %.4e\n",
-             prefix, material->ThermalConductivity) ;
+             prefix, this->ThermalConductivity) ;
 
     fprintf (stream,
              "%s  Next                      = %p\n",
-             prefix, material->Next) ;
+             prefix, this->Next) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_materials_list
 (
+    Material_t *list,
     FILE       *stream,
-    String_t    prefix,
-    Material_t *list
+    String_t    prefix
 )
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
@@ -190,12 +190,12 @@ void print_detailed_materials_list
 
             break ;
 
-        print_detailed_material (stream, prefix, material) ;
+        print_detailed_material (material, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_detailed_material (stream, prefix, material) ;
+    print_detailed_material (material, stream, prefix) ;
 }
 
 /******************************************************************************/

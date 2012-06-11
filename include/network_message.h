@@ -98,30 +98,30 @@ extern "C"
 
     /*! Initializes a NetworkMessage
      *
-     * \param message the address of the NetworkMessage to initialize
+     * \param this the address of the NetworkMessage to initialize
      */
 
-    void init_network_message (NetworkMessage_t *message) ;
+    void init_network_message (NetworkMessage_t *this) ;
 
 
 
     /*! Frees a message
      *
-     * \param message the address of the NetworkMessage to free
+     * \param this the address of the NetworkMessage to free
      */
 
-    void free_network_message (NetworkMessage_t *message) ;
+    void free_network_message (NetworkMessage_t *this) ;
 
 
 
     /*! Changes the amount of memory available to store the message
      *
-     * \param message  the address of the message
+     * \param this     the address of the message
      * \param new_size the new size (number of words)
      *
      */
 
-    void increase_message_memory (NetworkMessage_t *message, Quantity_t new_size) ;
+    void increase_message_memory (NetworkMessage_t *this, Quantity_t new_size) ;
 
 
 
@@ -130,11 +130,11 @@ extern "C"
      *  The function sets the content of the first two words of the message
      *  (i.e. the length snd the type)
      *
-     * \param message the address of the message to build
-     * \param type    the type of the request
+     * \param this the address of the message to build
+     * \param type the type of the request
      */
 
-    void build_message_head (NetworkMessage_t *message, MessageType_t type) ;
+    void build_message_head (NetworkMessage_t *this, MessageType_t type) ;
 
 
 
@@ -143,11 +143,11 @@ extern "C"
      * The value pointed by word will be insert at the end of the message
      * (as a suffix) and the length of the message is incresed conseguently
      *
-     * \param message the address of the message to build
-     * \param word    (in) the address of the word to add
+     * \param this the address of the message to build
+     * \param word (in) the address of the word to add
      */
 
-    void insert_message_word (NetworkMessage_t *message, void *word) ;
+    void insert_message_word (NetworkMessage_t *this, void *word) ;
 
 
 
@@ -157,9 +157,9 @@ extern "C"
      * \a index indicates a position out of the message payload the result is
      * undetermined.
      *
-     * \param message the address of the message to build
-     * \param word    (out) the address of the word to extrcact
-     * \param index   the index of the word (starting from the beginning of the content)
+     * \param this  the address of the message to access
+     * \param word  (out) the address of the word to extrcact
+     * \param index the index of the word (starting from the beginning of the content)
      *
      * \return \c TDICE_SUCCESS if the operation succeeded
      * \return \c TDICE_FAILURE if there index specifies a word out of the message
@@ -167,7 +167,7 @@ extern "C"
 
     Error_t extract_message_word
 
-        (NetworkMessage_t *message, void *word, Quantity_t index) ;
+        (NetworkMessage_t *this, void *word, Quantity_t index) ;
 
 #ifdef __cplusplus
 }

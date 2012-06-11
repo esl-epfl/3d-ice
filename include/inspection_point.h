@@ -97,12 +97,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a tcell to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param tcell the address of the tcell to initialize
+     * \param this the address of the tcell to initialize
      */
 
-    void init_tcell (Tcell_t *tcell) ;
+    void init_tcell (Tcell_t *this) ;
 
 
 
@@ -117,28 +117,28 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a tcell
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a tcell must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_tcell
      *
-     * \param tcell the address of the Tcell structure to free
+     * \param this the address of the Tcell structure to free
      */
 
-    void free_tcell (Tcell_t *tcell) ;
+    void free_tcell (Tcell_t *this) ;
 
 
 
-    /*! Prints a list of detailed information about all the fields of \a tcell
+    /*! Prints a list of detailed information about all the fields of a Tcell
      *
+     * \param this   the address of the Tcell structure to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param tcell  the address of the Tcell structure to print
      */
 
     void print_detailed_tcell
 
-        (FILE *stream, String_t prefix, Tcell_t *tcell) ;
+        (Tcell_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -148,7 +148,7 @@ extern "C"
      *  Tcell:RowIndex and Tcell:ColumnIndex while Tcell:XVal and Tcell:YVal
      *  are set as \a xval and \a yval
      *
-     *  \param tcell the pointer to the Tcell to align
+     *  \param this  the pointer to the Tcell to align
      *  \param xval  the requested X coordinate of the cell
      *  \param yval  the requested Y coordinate of the cell
      *  \param dimensions pointer to the structure containing the dimensions of the IC
@@ -156,7 +156,7 @@ extern "C"
 
     void align_tcell
     (
-        Tcell_t         *tcell,
+        Tcell_t         *this,
         ChipDimension_t  xval,
         ChipDimension_t  yval,
         Dimensions_t    *dimensions
@@ -184,12 +184,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a tflp to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param tflp the address of the tflp to initialize
+     * \param this the address of the tflp to initialize
      */
 
-    void init_tflp (Tflp_t *tflp) ;
+    void init_tflp (Tflp_t *this) ;
 
 
 
@@ -204,28 +204,28 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a tflp
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a tflp must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_tflp
      *
-     * \param tflp the address of the Tflp structure to free
+     * \param this the address of the Tflp structure to free
      */
 
-    void free_tflp (Tflp_t *tflp) ;
+    void free_tflp (Tflp_t *this) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of \a tflp
      *
+     * \param this   the address of the Tflp structure to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param tflp   the address of the Tflp structure to print
      */
 
     void print_detailed_tflp
 
-        (FILE *stream, String_t prefix, Tflp_t *tflp) ;
+        (Tflp_t *this, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -253,12 +253,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a tflpel to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param tflpel the address of the tflpel to initialize
+     * \param this the address of the tflpel to initialize
      */
 
-    void init_tflpel (Tflpel_t *tflpel) ;
+    void init_tflpel (Tflpel_t *this) ;
 
 
 
@@ -273,28 +273,28 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a tflpel
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a tflpel must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_tflpel
      *
-     * \param tflpel the address of the Tflpel structure to free
+     * \param this the address of the Tflpel structure to free
      */
 
-    void free_tflpel (Tflpel_t *tflpel) ;
+    void free_tflpel (Tflpel_t *this) ;
 
 
 
-    /*! Prints a list of detailed information about all the fields of \a tflpel
+    /*! Prints a list of detailed information about all the fields of a Tflpel
      *
+     * \param this the address of the Tflpel structure to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param tflpel the address of the Tflpel structure to print
      */
 
     void print_detailed_tflpel
 
-        (FILE *stream, String_t prefix, Tflpel_t *tflpel) ;
+        (Tflpel_t *this, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -319,12 +319,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a tcoolant to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param tcoolant the address of the tcoolant to initialize
+     * \param this the address of the tcoolant to initialize
      */
 
-    void init_tcoolant (Tcoolant_t *tcoolant) ;
+    void init_tcoolant (Tcoolant_t *this) ;
 
 
 
@@ -339,28 +339,28 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a tcoolant
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a tcoolant must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_tcoolant
      *
-     * \param tcoolant the address of the Tcoolant structure to free
+     * \param this the address of the Tcoolant structure to free
      */
 
-    void free_tcoolant (Tcoolant_t *tcoolant) ;
+    void free_tcoolant (Tcoolant_t *this) ;
 
 
 
-    /*! Prints a list of detailed information about all the fields of \a tcoolant
+    /*! Prints a list of detailed information about all the fields of a Tcoolant
      *
+     * \param this the address of the Tcoolant structure to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param tcoolant the address of the Tcoolant structure to print
      */
 
     void print_detailed_tcoolant
 
-        (FILE *stream, String_t prefix, Tcoolant_t *tcoolant) ;
+        (Tcoolant_t *this, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -427,12 +427,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a inspection_point to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param inspection_point the address of the inspection point to initialize
+     * \param this the address of the inspection point to initialize
      */
 
-    void init_inspection_point (InspectionPoint_t *inspection_point) ;
+    void init_inspection_point (InspectionPoint_t *this) ;
 
 
 
@@ -447,15 +447,15 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a inspection_point
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a inspection_point must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_inspection_point
      *
-     * \param inspection_point the address of the InspectionPoint structure to free
+     * \param this the address of the InspectionPoint structure to free
      */
 
-    void free_inspection_point (InspectionPoint_t *inspection_point) ;
+    void free_inspection_point (InspectionPoint_t *this) ;
 
 
 
@@ -474,49 +474,49 @@ extern "C"
 
     /*! Prints a list of inspection points as they look in the stack file
      *
+     * \param list   the pointer to the first inspection point in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first inspection point in the list
      */
 
     void print_formatted_inspection_point_list
 
-        (FILE *stream, String_t prefix, InspectionPoint_t *list) ;
+        (InspectionPoint_t *list, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the inspection points
      *
+     * \param list   the pointer to the first inspection point in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first inspection point in the list
      */
 
     void print_detailed_inspection_point_list
 
-        (FILE *stream, String_t prefix, InspectionPoint_t *list) ;
+        (InspectionPoint_t *list, FILE *stream, String_t prefix) ;
 
 
     /*! Checks if the inspection point has a specific set up
      *
-     * \param inspection_point the address of the InspectionPoint structure
+     * \param this     the address of the InspectionPoint structure
      * \param type     the type of the inspection point (tcell, tmap, ...)
      * \param quantity the quantity to be measured (max, min, avg)
      *
-     * \return \c true if \a inspection_point has type \a type and quantity
+     * \return \c true if \a this has type \a type and quantity
      *         \a quantity, \c false otherwise
      */
 
     bool is_inspection_point
     (
-        InspectionPoint_t *inspection_point,
+        InspectionPoint_t *this,
         OutputType_t       type,
         OutputQuantity_t   quantity
     ) ;
 
     /*! Generates the file in which a particular inspection point will be printed
      *
-     * \param inspection_point the address of the InspectionPoint structure
+     * \param this       the address of the InspectionPoint structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param prefix string to be printed as suffix for every line in the header
      *
@@ -525,13 +525,13 @@ extern "C"
 
     Error_t generate_inspection_point_header
 
-        (InspectionPoint_t *inspection_point, Dimensions_t *dimensions, String_t prefix) ;
+        (InspectionPoint_t *this, Dimensions_t *dimensions, String_t prefix) ;
 
 
 
     /*! Generates the output implemented by the inspection point
      *
-     * \param inspection_point the address of the InspectionPoint structure
+     * \param this the address of the InspectionPoint structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param current_time time instant of the measurement
@@ -541,7 +541,7 @@ extern "C"
 
     Error_t generate_inspection_point_output
     (
-        InspectionPoint_t *inspection_point,
+        InspectionPoint_t *this,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,
         Time_t             current_time
@@ -551,7 +551,7 @@ extern "C"
 
     /*! Fills a message with the output implemented by the inspection point
      *
-     * \param inspection_point the address of the InspectionPoint structure
+     * \param this the address of the InspectionPoint structure
      * \param output_quantity the quantity to report (max, min, avg)
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
@@ -561,7 +561,7 @@ extern "C"
 
     void fill_message_inspection_point
     (
-        InspectionPoint_t *inspection_point,
+        InspectionPoint_t *this,
         OutputQuantity_t   output_quantity,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,

@@ -83,9 +83,9 @@ void free_heat_sink (HeatSink_t *this)
 
 void print_formatted_heat_sink
 (
+  HeatSink_t *this,
   FILE       *stream,
-  String_t    prefix,
-  HeatSink_t *this
+  String_t    prefix
 )
 {
     if (this->SinkModel == TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
@@ -124,9 +124,9 @@ void print_formatted_heat_sink
 
 void print_detailed_heat_sink
 (
+  HeatSink_t *this,
   FILE       *stream,
-  String_t    prefix,
-  HeatSink_t *this
+  String_t    prefix
 )
 {
     fprintf (stream,

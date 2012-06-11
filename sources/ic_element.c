@@ -41,22 +41,22 @@
 
 /******************************************************************************/
 
-void init_ic_element (ICElement_t *icelement)
+void init_ic_element (ICElement_t *this)
 {
-    icelement->SW_X   = 0.0 ;
-    icelement->SW_Y   = 0.0 ;
-    icelement->Length = 0.0 ;
-    icelement->Width  = 0.0 ;
+    this->SW_X   = 0.0 ;
+    this->SW_Y   = 0.0 ;
+    this->Length = 0.0 ;
+    this->Width  = 0.0 ;
 
-    icelement->EffectiveLength  = 0.0 ;
-    icelement->EffectiveWidth   = 0.0 ;
+    this->EffectiveLength  = 0.0 ;
+    this->EffectiveWidth   = 0.0 ;
 
-    icelement->SW_Row    = 0u ;
-    icelement->SW_Column = 0u ;
-    icelement->NE_Row    = 0u ;
-    icelement->NE_Column = 0u ;
+    this->SW_Row    = 0u ;
+    this->SW_Column = 0u ;
+    this->NE_Row    = 0u ;
+    this->NE_Column = 0u ;
 
-    icelement->Next = NULL ;
+    this->Next = NULL ;
 }
 
 /******************************************************************************/
@@ -74,9 +74,9 @@ ICElement_t *alloc_and_init_ic_element (void)
 
 /*****************************************************************************/
 
-void free_ic_element (ICElement_t *icelement)
+void free_ic_element (ICElement_t *this)
 {
-    FREE_POINTER (free, icelement) ;
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -90,63 +90,63 @@ void free_ic_elements_list (ICElement_t *list)
 
 void print_detailed_ic_element
 (
+    ICElement_t *this,
     FILE        *stream,
-    String_t     prefix,
-    ICElement_t *icelement
+    String_t     prefix
 )
 {
     fprintf (stream,
              "%sic element                  = %p\n",
-             prefix, icelement) ;
+             prefix, this) ;
 
     fprintf (stream,
              "%s    SW_X                    = %.3f\n",
-             prefix, icelement->SW_X) ;
+             prefix, this->SW_X) ;
 
     fprintf (stream,
              "%s    SW_Y                    = %.3f\n",
-             prefix, icelement->SW_Y) ;
+             prefix, this->SW_Y) ;
 
     fprintf (stream,
              "%s    Length                  = %.3f\n",
-             prefix, icelement->Length) ;
+             prefix, this->Length) ;
 
     fprintf (stream,
              "%s    Width                   = %.3f\n",
-             prefix, icelement->Width) ;
+             prefix, this->Width) ;
 
     fprintf (stream,
              "%s    EffectiveLength         = %.3f\n",
-             prefix, icelement->EffectiveLength) ;
+             prefix, this->EffectiveLength) ;
 
     fprintf (stream,
              "%s    EffectiveWidth          = %.3f\n",
-             prefix, icelement->EffectiveWidth) ;
+             prefix, this->EffectiveWidth) ;
 
     fprintf (stream,
              "%s    SW_Row                  = %d\n",
-             prefix, icelement->SW_Row) ;
+             prefix, this->SW_Row) ;
 
     fprintf (stream,
              "%s    SW_Column               = %d\n",
-             prefix, icelement->SW_Column) ;
+             prefix, this->SW_Column) ;
 
     fprintf (stream,
              "%s    NE_Row                  = %d\n",
-             prefix, icelement->NE_Row) ;
+             prefix, this->NE_Row) ;
 
     fprintf (stream,
              "%s    NE_Column               = %d\n",
-             prefix, icelement->NE_Column) ;
+             prefix, this->NE_Column) ;
 
     fprintf (stream,
              "%s    Next                    = %p\n",
-             prefix, icelement->Next) ;
+             prefix, this->Next) ;
 }
 
 /******************************************************************************/
 
-void print_detailed_ic_elements_list (FILE *stream, String_t prefix, ICElement_t *list)
+void print_detailed_ic_elements_list (ICElement_t *list, FILE *stream, String_t prefix)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
     {
@@ -154,32 +154,32 @@ void print_detailed_ic_elements_list (FILE *stream, String_t prefix, ICElement_t
 
             break ;
 
-        print_detailed_ic_element (stream, prefix, icelement) ;
+        print_detailed_ic_element (icelement, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_detailed_ic_element (stream, prefix, icelement) ;
+    print_detailed_ic_element (icelement, stream, prefix) ;
 }
 
 /******************************************************************************/
 
 void print_formatted_ic_element
 (
+    ICElement_t *this,
     FILE        *stream,
-    String_t     prefix,
-    ICElement_t *icelement
+    String_t     prefix
 )
 {
     fprintf (stream,
         "%s\trectangle (%.1f, %.1f, %.1f, %.1f ) ;\n",
-        prefix, icelement->SW_X, icelement->SW_Y,
-                icelement->Length, icelement->Width) ;
+        prefix, this->SW_X, this->SW_Y,
+                this->Length, this->Width) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_ic_elements_list (FILE *stream, String_t prefix, ICElement_t *list)
+void print_formatted_ic_elements_list (ICElement_t *list, FILE *stream, String_t prefix)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
     {
@@ -187,12 +187,12 @@ void print_formatted_ic_elements_list (FILE *stream, String_t prefix, ICElement_
 
             break ;
 
-        print_formatted_ic_element (stream, prefix, icelement) ;
+        print_formatted_ic_element (icelement, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_formatted_ic_element (stream, prefix, icelement) ;
+    print_formatted_ic_element (icelement, stream, prefix) ;
 }
 
 /******************************************************************************/
@@ -226,20 +226,20 @@ bool check_intersection
 
 /******************************************************************************/
 
-bool check_location (Dimensions_t *dimensions, ICElement_t *icelement)
+bool check_location (ICElement_t *this, Dimensions_t *dimensions)
 {
-    return (   (icelement->SW_X <  0)
+    return (   (this->SW_X <  0)
 
-               || (icelement->SW_X + icelement->Length > get_chip_length (dimensions))
+               || (this->SW_X + this->Length > get_chip_length (dimensions))
 
-            || (icelement->SW_Y <  0)
+            || (this->SW_Y <  0)
 
-               || (icelement->SW_Y + icelement->Width > get_chip_width (dimensions)) ) ;
+               || (this->SW_Y + this->Width > get_chip_width (dimensions)) ) ;
 }
 
 /******************************************************************************/
 
-void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
+void align_to_grid (ICElement_t *this, Dimensions_t *dimensions)
 {
     ChipDimension_t cx = 0.0 ;
     ChipDimension_t cy = 0.0 ;
@@ -251,18 +251,18 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 
     cx = get_cell_length (dimensions, 0) / 2.0 ;
 
-    while (cx < icelement->SW_X)
+    while (cx < this->SW_X)
     {
         cx += get_cell_length (dimensions, column_index    ) / 2.0 ;
         cx += get_cell_length (dimensions, column_index + 1) / 2.0 ;
         column_index++ ;
     }
 
-    icelement->SW_Column = column_index ;
+    this->SW_Column = column_index ;
 
     /* East side */
 
-    while (cx < icelement->SW_X + icelement->Length)
+    while (cx < this->SW_X + this->Length)
     {
         cx += get_cell_length (dimensions, column_index    ) / 2.0 ;
         cx += get_cell_length (dimensions, column_index + 1) / 2.0 ;
@@ -271,17 +271,17 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 
     if (column_index > 0)
 
-        icelement->NE_Column = column_index - 1 ;
+        this->NE_Column = column_index - 1 ;
 
     else
 
-        icelement->NE_Column = column_index ;
+        this->NE_Column = column_index ;
 
     /* Effective length */
 
-    FOR_EVERY_IC_ELEMENT_COLUMN (tmp_column_index, icelement)
+    FOR_EVERY_IC_ELEMENT_COLUMN (tmp_column_index, this)
     {
-        icelement->EffectiveLength +=
+        this->EffectiveLength +=
 
             get_cell_length (dimensions, tmp_column_index) ;
     }
@@ -290,17 +290,17 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 
     cy  = (get_cell_width (dimensions, 0) / 2.0) ;
 
-    while (cy < icelement->SW_Y)
+    while (cy < this->SW_Y)
     {
         cy += get_cell_width (dimensions, row_index) ;  // CHECKME
         row_index++ ;
     }
 
-    icelement->SW_Row = row_index ;
+    this->SW_Row = row_index ;
 
     /* North side */
 
-    while (cy < icelement->SW_Y + icelement->Width)
+    while (cy < this->SW_Y + this->Width)
     {
         cy += get_cell_width (dimensions, row_index) ;  // CHECKME
         row_index++ ;
@@ -308,17 +308,17 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 
     if (row_index > 0) 
 
-        icelement->NE_Row = row_index - 1 ;
+        this->NE_Row = row_index - 1 ;
 
     else
 
-        icelement->NE_Row = row_index ;
+        this->NE_Row = row_index ;
 
     /* Effective width */
 
-    FOR_EVERY_IC_ELEMENT_ROW (tmp_row_index, icelement)
+    FOR_EVERY_IC_ELEMENT_ROW (tmp_row_index, this)
     {
-        icelement->EffectiveWidth +=
+        this->EffectiveWidth +=
 
             get_cell_width (dimensions, tmp_row_index) ;  // CHECKME
     }
@@ -336,21 +336,21 @@ void align_to_grid (Dimensions_t *dimensions, ICElement_t *icelement)
 
 Temperature_t get_max_temperature_ic_element
 (
-    ICElement_t   *icelement,
+    ICElement_t   *this,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
-    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(icelement) ;
-    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(icelement) ;
+    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(this) ;
+    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(this) ;
 
     Temperature_t max_temperature =
 
         *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icelement)
+    FOR_EVERY_IC_ELEMENT_ROW (row_index, this)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icelement)
+        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, this)
         {
 
             max_temperature = MAX
@@ -369,21 +369,21 @@ Temperature_t get_max_temperature_ic_element
 
 Temperature_t get_min_temperature_ic_element
 (
-    ICElement_t   *icelement,
+    ICElement_t   *this,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
-    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(icelement) ;
-    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(icelement) ;
+    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(this) ;
+    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(this) ;
 
     Temperature_t min_temperature =
 
         *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icelement)
+    FOR_EVERY_IC_ELEMENT_ROW (row_index, this)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icelement)
+        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, this)
         {
 
             min_temperature = MIN
@@ -402,7 +402,7 @@ Temperature_t get_min_temperature_ic_element
 
 Temperature_t get_avg_temperature_ic_element
 (
-    ICElement_t   *icelement,
+    ICElement_t   *this,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
@@ -411,9 +411,9 @@ Temperature_t get_avg_temperature_ic_element
 
     Temperature_t avg_temperature = 0.0 ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icelement)
+    FOR_EVERY_IC_ELEMENT_ROW (row_index, this)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icelement)
+        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, this)
         {
 
             avg_temperature +=

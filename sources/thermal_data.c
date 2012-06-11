@@ -50,134 +50,134 @@ static void init_data (double* data, uint32_t size, double init_value)
 
 /******************************************************************************/
 
-void init_thermal_data (ThermalData_t *tdata)
+void init_thermal_data (ThermalData_t *this)
 {
-    tdata->Size = 0u ;
+    this->Size = 0u ;
 
-    tdata->Temperatures = NULL ;
-    tdata->Sources      = NULL ;
+    this->Temperatures = NULL ;
+    this->Sources      = NULL ;
 
-    init_thermal_grid (&tdata->ThermalGrid) ;
+    init_thermal_grid (&this->ThermalGrid) ;
 
-    init_system_matrix (&tdata->SM_A) ;
+    init_system_matrix (&this->SM_A) ;
 
-    tdata->SLU_PermutationMatrixR = NULL ;
-    tdata->SLU_PermutationMatrixC = NULL ;
-    tdata->SLU_Etree              = NULL ;
+    this->SLU_PermutationMatrixR = NULL ;
+    this->SLU_PermutationMatrixC = NULL ;
+    this->SLU_Etree              = NULL ;
 
-    tdata->SLUMatrix_A.Store          = NULL ;
-    tdata->SLUMatrix_A_Permuted.Store = NULL ;
-    tdata->SLUMatrix_B.Store          = NULL ;
-    tdata->SLUMatrix_L.Store          = NULL ;
-    tdata->SLUMatrix_U.Store          = NULL ;
+    this->SLUMatrix_A.Store          = NULL ;
+    this->SLUMatrix_A_Permuted.Store = NULL ;
+    this->SLUMatrix_B.Store          = NULL ;
+    this->SLUMatrix_L.Store          = NULL ;
+    this->SLUMatrix_U.Store          = NULL ;
 
-    tdata->SLU_Info = 0 ;
+    this->SLU_Info = 0 ;
 
-    StatInit (&tdata->SLU_Stat) ;
+    StatInit (&this->SLU_Stat) ;
 
-    set_default_options (&tdata->SLU_Options) ;
+    set_default_options (&this->SLU_Options) ;
 
-    tdata->SLU_Options.Fact            = DOFACT ;
-    tdata->SLU_Options.PrintStat       = NO ;
-    tdata->SLU_Options.Equil           = NO ;
-    tdata->SLU_Options.SymmetricMode   = YES ;
-    tdata->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
-    tdata->SLU_Options.RowPerm         = NOROWPERM ;
-    tdata->SLU_Options.DiagPivotThresh = 0.001 ;
+    this->SLU_Options.Fact            = DOFACT ;
+    this->SLU_Options.PrintStat       = NO ;
+    this->SLU_Options.Equil           = NO ;
+    this->SLU_Options.SymmetricMode   = YES ;
+    this->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
+    this->SLU_Options.RowPerm         = NOROWPERM ;
+    this->SLU_Options.DiagPivotThresh = 0.001 ;
 }
 
 /******************************************************************************/
 
 Error_t fill_thermal_data
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd,
     Analysis_t         *analysis
 )
 {
     Error_t result ;
 
-    tdata->Size = get_number_of_cells (stkd->Dimensions) ;
+    this->Size = get_number_of_cells (stkd->Dimensions) ;
 
     /* Alloc and set temperatures */
 
-    tdata->Temperatures =
+    this->Temperatures =
 
-        (Temperature_t*) malloc (sizeof(Temperature_t) * tdata->Size) ;
+        (Temperature_t*) malloc (sizeof(Temperature_t) * this->Size) ;
 
-    if (tdata->Temperatures == NULL)
+    if (this->Temperatures == NULL)
 
         goto temperatures_fail ;
 
     /* Set Temperatures to the initial thermal state and builds SLU vector B */
 
-    init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
+    init_data (this->Temperatures, this->Size, analysis->InitialTemperature) ;
 
     dCreate_Dense_Matrix  /* Vector B */
 
-        (&tdata->SLUMatrix_B, tdata->Size, 1,
-         tdata->Temperatures, tdata->Size,
+        (&this->SLUMatrix_B, this->Size, 1,
+         this->Temperatures, this->Size,
          SLU_DN, SLU_D, SLU_GE) ;
 
     /* Alloc and fill the thermal grid */
 
     result = alloc_thermal_grid
 
-        (&tdata->ThermalGrid, get_number_of_layers (stkd->Dimensions)) ;
+        (&this->ThermalGrid, get_number_of_layers (stkd->Dimensions)) ;
 
     if (result == TDICE_FAILURE)
 
         goto thermal_grid_fail ;
 
-    fill_thermal_grid (&tdata->ThermalGrid, stkd, analysis) ;
+    fill_thermal_grid (&this->ThermalGrid, stkd, analysis) ;
 
     /* Alloc and set sources to zero */
 
-    tdata->Sources = (Source_t *) malloc (sizeof(Source_t) * tdata->Size) ;
+    this->Sources = (Source_t *) malloc (sizeof(Source_t) * this->Size) ;
 
-    if (tdata->Sources == NULL)
+    if (this->Sources == NULL)
 
         goto sources_fail ;
 
-    init_data (tdata->Sources, tdata->Size, 0.0) ;
+    init_data (this->Sources, this->Size, 0.0) ;
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
 
     result = alloc_system_matrix
 
-        (&tdata->SM_A, tdata->Size, get_number_of_connections (stkd->Dimensions)) ;
+        (&this->SM_A, this->Size, get_number_of_connections (stkd->Dimensions)) ;
 
     if (result == TDICE_FAILURE)
 
         goto system_matrix_fail ;
 
-    fill_system_matrix (&tdata->SM_A, &tdata->ThermalGrid, stkd->Dimensions) ;
+    fill_system_matrix (&this->SM_A, &this->ThermalGrid, stkd->Dimensions) ;
 
     dCreate_CompCol_Matrix
 
-        (&tdata->SLUMatrix_A, tdata->Size, tdata->Size, tdata->SM_A.NNz,
-                tdata->SM_A.Values,
-         (int*) tdata->SM_A.RowIndices,
-         (int*) tdata->SM_A.ColumnPointers,
+        (&this->SLUMatrix_A, this->Size, this->Size, this->SM_A.NNz,
+                this->SM_A.Values,
+         (int*) this->SM_A.RowIndices,
+         (int*) this->SM_A.ColumnPointers,
          SLU_NC, SLU_D, SLU_GE) ;
 
     /* Alloc SLU permutation matrices and elimination tree */
 
-    tdata->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * tdata->Size) ;
+    this->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * this->Size) ;
 
-    if (tdata->SLU_PermutationMatrixR == NULL )
+    if (this->SLU_PermutationMatrixR == NULL )
 
         goto slu_perm_r_fail ;
 
-    tdata->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * tdata->Size) ;
+    this->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * this->Size) ;
 
-    if (tdata->SLU_PermutationMatrixC == NULL )
+    if (this->SLU_PermutationMatrixC == NULL )
 
         goto slu_perm_c_fail ;
 
-    tdata->SLU_Etree = (int *) malloc (sizeof(int) * tdata->Size) ;
+    this->SLU_Etree = (int *) malloc (sizeof(int) * this->Size) ;
 
-    if (tdata->SLU_Etree == NULL)
+    if (this->SLU_Etree == NULL)
 
         goto slu_etree_fail ;
 
@@ -186,34 +186,34 @@ Error_t fill_thermal_data
 
     get_perm_c
 
-        (tdata->SLU_Options.ColPerm, &tdata->SLUMatrix_A,
-         tdata->SLU_PermutationMatrixC) ;
+        (this->SLU_Options.ColPerm, &this->SLUMatrix_A,
+         this->SLU_PermutationMatrixC) ;
 
     sp_preorder
 
-        (&tdata->SLU_Options, &tdata->SLUMatrix_A,
-         tdata->SLU_PermutationMatrixC, tdata->SLU_Etree,
-         &tdata->SLUMatrix_A_Permuted) ;
+        (&this->SLU_Options, &this->SLUMatrix_A,
+         this->SLU_PermutationMatrixC, this->SLU_Etree,
+         &this->SLUMatrix_A_Permuted) ;
 
     dgstrf
 
-        (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+        (&this->SLU_Options, &this->SLUMatrix_A_Permuted,
          sp_ienv(2), sp_ienv(1), /* relax and panel size */
-         tdata->SLU_Etree,
+         this->SLU_Etree,
          NULL, 0,                /* work and lwork */
-         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-         &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-         &tdata->SLU_Stat, &tdata->SLU_Info) ;
+         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
+         &this->SLUMatrix_L, &this->SLUMatrix_U,
+         &this->SLU_Stat, &this->SLU_Info) ;
 
-    if (tdata->SLU_Info == 0)
+    if (this->SLU_Info == 0)
     {
-        tdata->SLU_Options.Fact = FACTORED ;
+        this->SLU_Options.Fact = FACTORED ;
 
         return TDICE_SUCCESS ;
     }
     else
     {
-        fprintf (stderr, "SuperLu factorization error %d\n", tdata->SLU_Info) ;
+        fprintf (stderr, "SuperLu factorization error %d\n", this->SLU_Info) ;
 
         return TDICE_FAILURE ;
     }
@@ -222,29 +222,29 @@ Error_t fill_thermal_data
 
 slu_etree_fail :
 
-    FREE_POINTER (free, tdata->SLU_PermutationMatrixC) ;
+    FREE_POINTER (free, this->SLU_PermutationMatrixC) ;
 
 slu_perm_c_fail :
 
-    FREE_POINTER (free, tdata->SLU_PermutationMatrixR) ;
+    FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
 
 slu_perm_r_fail :
 
-    Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
-    free_system_matrix        (&tdata->SM_A) ;
+    Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+    free_system_matrix        (&this->SM_A) ;
 
 system_matrix_fail :
 
-    FREE_POINTER (free, tdata->Sources) ;
+    FREE_POINTER (free, this->Sources) ;
 
 sources_fail :
 
-    free_thermal_grid (&tdata->ThermalGrid) ;
+    free_thermal_grid (&this->ThermalGrid) ;
 
 thermal_grid_fail:
 
-    Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
-    FREE_POINTER              (free, tdata->Temperatures) ;
+    Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
+    FREE_POINTER              (free, this->Temperatures) ;
 
 temperatures_fail :
 
@@ -257,7 +257,7 @@ temperatures_fail :
 
 Error_t update_source_vector
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd
 )
 {
@@ -268,7 +268,7 @@ Error_t update_source_vector
 
     for (ccounter = 0 ; ccounter != ncells ; ccounter++)
 
-        tdata->Sources [ ccounter ] = (Source_t) 0.0 ;
+        this->Sources [ ccounter ] = (Source_t) 0.0 ;
 
     // if used, sets the sources due to the heatsink (overwrites all cells in
     // the last layer) as first operation. Then the die will add its sources
@@ -288,13 +288,13 @@ Error_t update_source_vector
             {
                 layer_index += stack_element->Pointer.Die->SourceLayerOffset ;
 
-                Source_t *sources = tdata->Sources +
+                Source_t *sources = this->Sources +
 
                     get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
 
                 Error_t error = fill_sources_floorplan
 
-                    (sources, stack_element->Floorplan) ;
+                    (stack_element->Floorplan, sources) ;
 
                 if (error == TDICE_FAILURE)
 
@@ -310,7 +310,7 @@ Error_t update_source_vector
 
                     get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
 
-                Source_t *sources = tdata->Sources + cell_index ;
+                Source_t *sources = this->Sources + cell_index ;
 
                 FOR_EVERY_ROW (row, stkd->Dimensions)
                 {
@@ -319,7 +319,7 @@ Error_t update_source_vector
                         *sources++ =   stack_element->Pointer.HeatSink->AmbientTemperature
                                      * get_conductance_top
 
-                                           (&tdata->ThermalGrid, stkd->Dimensions, layer_index, row, column) ;
+                                           (&this->ThermalGrid, stkd->Dimensions, layer_index, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 } // FOR_EVERY_ROW
@@ -334,7 +334,7 @@ Error_t update_source_vector
             {
                 layer_index += stack_element->Pointer.Channel->SourceLayerOffset ;
 
-                Source_t *sources = tdata->Sources +
+                Source_t *sources = this->Sources +
 
                     get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
 
@@ -372,37 +372,37 @@ Error_t update_source_vector
 
 /******************************************************************************/
 
-void free_thermal_data (ThermalData_t *tdata)
+void free_thermal_data (ThermalData_t *this)
 {
-    FREE_POINTER (free, tdata->Temperatures) ;
-    FREE_POINTER (free, tdata->Sources) ;
+    FREE_POINTER (free, this->Temperatures) ;
+    FREE_POINTER (free, this->Sources) ;
 
-    FREE_POINTER (free, tdata->SLU_PermutationMatrixR) ;
-    FREE_POINTER (free, tdata->SLU_PermutationMatrixC) ;
-    FREE_POINTER (free, tdata->SLU_Etree) ;
+    FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
+    FREE_POINTER (free, this->SLU_PermutationMatrixC) ;
+    FREE_POINTER (free, this->SLU_Etree) ;
 
-    free_thermal_grid (&tdata->ThermalGrid) ;
+    free_thermal_grid (&this->ThermalGrid) ;
 
-    StatFree (&tdata->SLU_Stat) ;
+    StatFree (&this->SLU_Stat) ;
 
-    Destroy_SuperMatrix_Store (&tdata->SLUMatrix_A) ;
-    free_system_matrix        (&tdata->SM_A) ;
+    Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+    free_system_matrix        (&this->SM_A) ;
 
-    Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
+    Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
 
-    if (tdata->SLU_Options.Fact != DOFACT )
+    if (this->SLU_Options.Fact != DOFACT )
     {
-        Destroy_CompCol_Permuted (&tdata->SLUMatrix_A_Permuted) ;
-        Destroy_SuperNode_Matrix (&tdata->SLUMatrix_L) ;
-        Destroy_CompCol_Matrix   (&tdata->SLUMatrix_U) ;
+        Destroy_CompCol_Permuted (&this->SLUMatrix_A_Permuted) ;
+        Destroy_SuperNode_Matrix (&this->SLUMatrix_L) ;
+        Destroy_CompCol_Matrix   (&this->SLUMatrix_U) ;
     }
 }
 
 /******************************************************************************/
 
-void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis)
+void reset_thermal_state (ThermalData_t *this, Analysis_t *analysis)
 {
-    init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
+    init_data (this->Temperatures, this->Size, analysis->InitialTemperature) ;
 }
 
 /******************************************************************************/
@@ -483,7 +483,7 @@ static void fill_system_vector_steady
 
 SimResult_t emulate_step
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd,
     Analysis_t         *analysis
 )
@@ -494,7 +494,7 @@ SimResult_t emulate_step
 
     if (slot_completed (analysis) == true)
     {
-        Error_t result = update_source_vector (tdata, stkd) ;
+        Error_t result = update_source_vector (this, stkd) ;
 
         if (result == TDICE_FAILURE)
 
@@ -503,19 +503,19 @@ SimResult_t emulate_step
 
     fill_system_vector
 
-        (stkd->Dimensions, tdata->Temperatures,
-         tdata->Sources, &tdata->ThermalGrid, tdata->Temperatures) ;
+        (stkd->Dimensions, this->Temperatures,
+         this->Sources, &this->ThermalGrid, this->Temperatures) ;
 
     dgstrs
 
-        (NOTRANS, &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-         &tdata->SLUMatrix_B, &tdata->SLU_Stat, &tdata->SLU_Info) ;
+        (NOTRANS, &this->SLUMatrix_L, &this->SLUMatrix_U,
+         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
+         &this->SLUMatrix_B, &this->SLU_Stat, &this->SLU_Info) ;
 
-    if (tdata->SLU_Info < 0)
+    if (this->SLU_Info < 0)
     {
         fprintf (stderr,
-            "Error (%d) while solving linear system\n", tdata->SLU_Info) ;
+            "Error (%d) while solving linear system\n", this->SLU_Info) ;
 
         return TDICE_SOLVER_ERROR ;
     }
@@ -535,7 +535,7 @@ SimResult_t emulate_step
 
 SimResult_t emulate_slot
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd,
     Analysis_t         *analysis
 )
@@ -545,7 +545,7 @@ SimResult_t emulate_slot
     do
     {
 
-        result = emulate_step (tdata, stkd, analysis) ;
+        result = emulate_step (this, stkd, analysis) ;
 
     }   while (result == TDICE_STEP_DONE) ;
 
@@ -556,7 +556,7 @@ SimResult_t emulate_slot
 
 SimResult_t emulate_steady
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd,
     Analysis_t         *analysis
 )
@@ -565,7 +565,7 @@ SimResult_t emulate_steady
 
         return TDICE_WRONG_CONFIG ;
 
-    Error_t result = update_source_vector (tdata, stkd) ;
+    Error_t result = update_source_vector (this, stkd) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -578,19 +578,19 @@ SimResult_t emulate_steady
 
     fill_system_vector_steady
 
-        (stkd->Dimensions, tdata->Temperatures, tdata->Sources) ;
+        (stkd->Dimensions, this->Temperatures, this->Sources) ;
 
     dgstrs
 
-        (NOTRANS, &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-         &tdata->SLUMatrix_B, &tdata->SLU_Stat, &tdata->SLU_Info) ;
+        (NOTRANS, &this->SLUMatrix_L, &this->SLUMatrix_U,
+         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
+         &this->SLUMatrix_B, &this->SLU_Stat, &this->SLU_Info) ;
 
-    if (tdata->SLU_Info < 0)
+    if (this->SLU_Info < 0)
     {
         fprintf (stderr,
 
-            "Error (%d) while solving linear system\n", tdata->SLU_Info) ;
+            "Error (%d) while solving linear system\n", this->SLU_Info) ;
 
         return TDICE_SOLVER_ERROR ;
     }
@@ -602,7 +602,7 @@ SimResult_t emulate_steady
 
 Error_t update_coolant_flow_rate
 (
-  ThermalData_t      *tdata,
+  ThermalData_t      *this,
   StackDescription_t *stkd,
   CoolantFR_t         new_flow_rate
 )
@@ -611,23 +611,23 @@ Error_t update_coolant_flow_rate
 
     // TODO replace with "update"
 
-    fill_system_matrix (&tdata->SM_A, &tdata->ThermalGrid, stkd->Dimensions) ;
+    fill_system_matrix (&this->SM_A, &this->ThermalGrid, stkd->Dimensions) ;
 
-    tdata->SLU_Options.Fact = SamePattern_SameRowPerm ;
+    this->SLU_Options.Fact = SamePattern_SameRowPerm ;
 
     dgstrf
 
-        (&tdata->SLU_Options, &tdata->SLUMatrix_A_Permuted,
+        (&this->SLU_Options, &this->SLUMatrix_A_Permuted,
          sp_ienv(2), sp_ienv(1), /* relax and panel size */
-         tdata->SLU_Etree,
+         this->SLU_Etree,
          NULL, 0,                /* work and lwork */
-         tdata->SLU_PermutationMatrixC, tdata->SLU_PermutationMatrixR,
-         &tdata->SLUMatrix_L, &tdata->SLUMatrix_U,
-         &tdata->SLU_Stat, &tdata->SLU_Info) ;
+         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
+         &this->SLUMatrix_L, &this->SLUMatrix_U,
+         &this->SLU_Stat, &this->SLU_Info) ;
 
-    if (tdata->SLU_Info == 0)
+    if (this->SLU_Info == 0)
     {
-        tdata->SLU_Options.Fact = FACTORED ;
+        this->SLU_Options.Fact = FACTORED ;
 
         FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
@@ -637,7 +637,7 @@ Error_t update_coolant_flow_rate
             {
                 CellIndex_t layer_index = stack_element->Pointer.Channel->SourceLayerOffset ;
 
-                Source_t *sources = tdata->Sources +
+                Source_t *sources = this->Sources +
 
                     get_cell_offset_in_stack (stkd->Dimensions, layer_index, 0, 0) ;
 
@@ -660,7 +660,7 @@ Error_t update_coolant_flow_rate
     }
     else
     {
-        fprintf (stderr, "SuperLu factorization error %d\n", tdata->SLU_Info) ;
+        fprintf (stderr, "SuperLu factorization error %d\n", this->SLU_Info) ;
 
         return TDICE_FAILURE ;
     }
@@ -670,7 +670,7 @@ Error_t update_coolant_flow_rate
 
 Temperature_t get_cell_temperature
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd,
     CellIndex_t         layer_index,
     CellIndex_t         row_index,
@@ -687,14 +687,14 @@ Temperature_t get_cell_temperature
 
     else
 
-        return *(tdata->Temperatures + id) ;
+        return *(this->Temperatures + id) ;
 }
 
 /******************************************************************************/
 
 Error_t print_thermal_map
 (
-    ThermalData_t      *tdata,
+    ThermalData_t      *this,
     StackDescription_t *stkd,
     String_t            stack_element_id,
     String_t            file_name
@@ -719,7 +719,7 @@ Error_t print_thermal_map
 
     print_thermal_map_stack_element
 
-        (stack_element, stkd->Dimensions, tdata->Temperatures, output_file) ;
+        (stack_element, stkd->Dimensions, this->Temperatures, output_file) ;
 
     fclose (output_file) ;
 

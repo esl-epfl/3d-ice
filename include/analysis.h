@@ -114,12 +114,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a analysis to a default value (zero or \c NULL ).
+    /*! Sets all the fields of \a this to a default value (zero or \c NULL ).
      *
-     * \param analysis the address of the structure to initialize
+     * \param this the address of the structure to initialize
      */
 
-    void init_analysis (Analysis_t *analysis) ;
+    void init_analysis (Analysis_t *this) ;
 
 
 
@@ -134,30 +134,28 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a analysis
+    /*! Frees the memory related to \a this
      *
-     *  \a analysis must be the address of an automatic variable
-     *
-     * \param analysis the address of the structure to free
+     * \param this the address of the structure to free
      */
 
-    void free_analysis (Analysis_t *analysis) ;
+    void free_analysis (Analysis_t *this) ;
 
 
 
     /*! Returns the time, in seconds, sum of the time steps emulated so far
      *
-     * \param analysis the address of the analysis structure
+     * \param this the address of the analysis structure
      * \return the simulated amount of time in seconds
      */
 
-    Time_t get_simulated_time (Analysis_t *analysis) ;
+    Time_t get_simulated_time (Analysis_t *this) ;
 
 
 
     /*! Returns the number of a specific type of insection point
      *
-     *  \param analysis the address of the analysis structure to query
+     *  \param this     the address of the analysis structure to query
      *  \param instant  the instant of the output (slot, step, final)
      *  \param type     the type of the inspection point (tcell, tmap, ...)
      *  \param quantity the quantity to be measured (max, min, avg)
@@ -168,7 +166,7 @@ extern "C"
 
     Quantity_t get_number_of_inspection_points
     (
-        Analysis_t       *analysis,
+        Analysis_t       *this,
         OutputInstant_t   instant,
         OutputType_t      type,
         OutputQuantity_t  quantity
@@ -178,7 +176,7 @@ extern "C"
 
     /*! Returns the state of the slot simulation
      *
-     * \param analysis the address of the analysis structure
+     * \param this the address of the analysis structure
      *
      * \return \c TRUE  if the number of simulation steps done so far matches a
      *                  multiple of the slot length, i.e. it is time to update
@@ -186,45 +184,45 @@ extern "C"
      * \return \c FALSE otherwise
      */
 
-    bool slot_completed (Analysis_t *analysis) ;
+    bool slot_completed (Analysis_t *this) ;
 
 
 
     /*! Prints the analysis informations as they look in the stack file
      *
-     * \param stream   the output stream (must be already open)
-     * \param prefix   a string to be printed as prefix at the beginning of each line
-     * \param analysis the analysis information to print
+     * \param this   the analysis information to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_formatted_analysis
 
-        (FILE *stream, String_t prefix, Analysis_t *analysis) ;
+        (Analysis_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints detailed information about all the fields of analysis
      *
-     * \param stream   the output stream (must be already open)
-     * \param prefix   a string to be printed as prefix at the beginning of each line
-     * \param analysis the analysis information to print
+     * \param stream  the output stream (must be already open)
+     * \param prefix  a string to be printed as prefix at the beginning of each line
+     * \param this    the analysis information to print
      */
 
     void print_detailed_analysis
 
-        (FILE *stream, String_t prefix, Analysis_t *analysis) ;
+        (Analysis_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Inserts an inspection point into the corresponding queue
      *
-     * \param analysis     pointer to the analysis structure
+     * \param this             pointer to the analysis structure
      * \param inspection_point pointer to the inspection point to add
      */
 
     void add_inspection_point_to_analysis
 
-        (Analysis_t *analysis, InspectionPoint_t *inspection_point) ;
+        (Analysis_t *this, InspectionPoint_t *inspection_point) ;
 
 
 
@@ -233,7 +231,7 @@ extern "C"
      * Generates, for every inspection point, the output file and print the header
      * If the target output file is already there, it will be overwritten.
      *
-     * \param analysis pointer to the analysis structure
+     * \param this       pointer to the analysis structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param prefix string to be printed as suffix for every line in the header
      *
@@ -243,13 +241,13 @@ extern "C"
 
     Error_t generate_analysis_headers
 
-        (Analysis_t *analysis, Dimensions_t *dimensions, String_t prefix) ;
+        (Analysis_t *this, Dimensions_t *dimensions, String_t prefix) ;
 
 
 
     /*! Generates thermal outputs for each inspection point
      *
-     * \param analysis pointer to the analysis structure
+     * \param this       pointer to the analysis structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param output_instant the instant of the output (slot, step, final)
@@ -260,7 +258,7 @@ extern "C"
 
     Error_t generate_analysis_output
     (
-        Analysis_t      *analysis,
+        Analysis_t      *this,
         Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
         OutputInstant_t  output_instant
@@ -270,7 +268,7 @@ extern "C"
 
     /*! Fills a network message with thermal outputs for a specific set of inspection points
      *
-     * \param analysis pointer to the analysis structure
+     * \param this       pointer to the analysis structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param output_instant the instant of the output (slot, step, final)
@@ -284,7 +282,7 @@ extern "C"
 
     Error_t fill_analysis_message
     (
-        Analysis_t       *analysis,
+        Analysis_t       *this,
         Dimensions_t     *dimensions,
         Temperature_t    *temperatures,
         OutputInstant_t   output_instant,

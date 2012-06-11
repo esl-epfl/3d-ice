@@ -103,12 +103,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a powers_queue to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param powers_queue the address of the power queue to initialize
+     * \param this the address of the power queue to initialize
      */
 
-    void init_powers_queue (PowersQueue_t *powers_queue) ;
+    void init_powers_queue (PowersQueue_t *this) ;
 
 
 
@@ -123,82 +123,80 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a powers_queue
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a powers_queue must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_powers_queue
      *
-     * \param powers_queue the address of the powers queue structure to free
+     * \param this the address of the powers queue structure to free
      */
 
-    void free_powers_queue (PowersQueue_t *powers_queue) ;
+    void free_powers_queue (PowersQueue_t *this) ;
 
 
 
     /*! Prints detailed information about all the fields of a power queue
      *
+     * \param this the powers queue to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param powers_queue the powers queue to print
      */
 
     void print_detailed_powers_queue
 
-        (FILE *stream, String_t prefix, PowersQueue_t *powers_queue) ;
+        (PowersQueue_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints the list of power values as it looks in the stack file
      *
+     * \param this the powers queue to print
      * \param stream the output stream (must be already open)
-     * \param powers_queue the powers queue to print
      */
 
-    void print_formatted_powers_queue
-
-        (FILE *stream, PowersQueue_t *powers_queue) ;
+    void print_formatted_powers_queue (PowersQueue_t *this, FILE *stream) ;
 
 
 
     /*! Returns the state of the powers queue
      *
-     * \param powers_queue the powers queue
+     * \param this the powers queue
      *
      * \return \c TRUE if the queue is empty
      * \return \c FALSE otherwise
      */
 
-    bool is_empty_powers_queue (PowersQueue_t *powers_queue) ;
+    bool is_empty_powers_queue (PowersQueue_t *this) ;
 
 
 
     /*! Inserts a power value at the end of the powers queue
      *
-     * \param powers_queue the powers queue
+     * \param this the powers queue
      * \param power the power value to insert
      */
 
-    void put_into_powers_queue (PowersQueue_t *powers_queue, Power_t power) ;
+    void put_into_powers_queue (PowersQueue_t *this, Power_t power) ;
 
 
 
     /*! Returns the power value at the beginning of a powers queue
      *
-     * \param powers_queue the powers queue
+     * \param this the powers queue
      *
-     * \return the first power value in the list \a powers_queue
+     * \return the first power value in \a this
      */
 
-    Power_t get_from_powers_queue (PowersQueue_t *powers_queue) ;
+    Power_t get_from_powers_queue (PowersQueue_t *this) ;
 
 
 
     /*! Removes the power value at the beginning of a powers queue
      *
-     * \param powers_queue the powers queue
+     * \param this the powers queue
      */
 
-    void pop_from_powers_queue (PowersQueue_t *powers_queue) ;
+    void pop_from_powers_queue (PowersQueue_t *this) ;
 
 /******************************************************************************/
 

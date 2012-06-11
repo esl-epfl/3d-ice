@@ -43,91 +43,91 @@
 
 /******************************************************************************/
 
-void init_network_message (NetworkMessage_t *message)
+void init_network_message (NetworkMessage_t *this)
 {
-    message->Memory    = (MessageWord_t *) calloc (MESSAGE_LENGTH, sizeof (MessageWord_t)) ;
+    this->Memory    = (MessageWord_t *) calloc (MESSAGE_LENGTH, sizeof (MessageWord_t)) ;
 
-    message->MaxLength = MESSAGE_LENGTH ;
+    this->MaxLength = MESSAGE_LENGTH ;
 
-    message->Length    = message->Memory ;
+    this->Length    = this->Memory ;
 
-    message->Type      = message->Length + 1u ;
+    this->Type      = this->Length + 1u ;
 
-    message->Content   = message->Type   + 1u ;
+    this->Content   = this->Type   + 1u ;
 }
 
 /******************************************************************************/
 
-void free_network_message (NetworkMessage_t *message)
+void free_network_message (NetworkMessage_t *this)
 {
-    FREE_POINTER (free, message->Memory) ;
+    FREE_POINTER (free, this->Memory) ;
 
-    message->Memory    = NULL ;
-    message->MaxLength = 0 ;
-    message->Length    = NULL ;
-    message->Type      = NULL ;
-    message->Content   = NULL ;
+    this->Memory    = NULL ;
+    this->MaxLength = 0 ;
+    this->Length    = NULL ;
+    this->Type      = NULL ;
+    this->Content   = NULL ;
 }
 
 /******************************************************************************/
 
-void increase_message_memory (NetworkMessage_t *message, Quantity_t new_size)
+void increase_message_memory (NetworkMessage_t *this, Quantity_t new_size)
 {
     MessageWord_t *tmp = (MessageWord_t *) calloc (new_size, sizeof(MessageWord_t)) ;
 
-    memcpy (tmp, message->Memory, message->MaxLength * sizeof(MessageWord_t)) ;
+    memcpy (tmp, this->Memory, this->MaxLength * sizeof(MessageWord_t)) ;
 
-    free (message->Memory) ;
+    free (this->Memory) ;
 
-    message->Memory    = tmp ;
-    message->MaxLength = new_size ;
-    message->Length    = message->Memory ;
-    message->Type      = message->Length + 1u ;
-    message->Content   = message->Type   + 1u ;
+    this->Memory    = tmp ;
+    this->MaxLength = new_size ;
+    this->Length    = this->Memory ;
+    this->Type      = this->Length + 1u ;
+    this->Content   = this->Type   + 1u ;
 }
 
 /******************************************************************************/
 
-void build_message_head (NetworkMessage_t *message, MessageType_t type)
+void build_message_head (NetworkMessage_t *this, MessageType_t type)
 {
-    *message->Length = (MessageWord_t) 2u ;
+    *this->Length = (MessageWord_t) 2u ;
 
-    *message->Type   = (MessageWord_t) type ;
+    *this->Type   = (MessageWord_t) type ;
 }
 
 /******************************************************************************/
 
 void insert_message_word
 (
-    NetworkMessage_t *message,
+    NetworkMessage_t *this,
     void             *word
 )
 {
-    if (*message->Length == message->MaxLength)
+    if (*this->Length == this->MaxLength)
 
-        increase_message_memory (message, 2 * message->MaxLength) ;
+        increase_message_memory (this, 2 * this->MaxLength) ;
 
-    MessageWord_t *toinsert = message->Memory + *message->Length ;
+    MessageWord_t *toinsert = this->Memory + *this->Length ;
 
     memcpy (toinsert, word, sizeof (MessageWord_t)) ;
 
-    (*message->Length)++ ;
+    (*this->Length)++ ;
 }
 
 /******************************************************************************/
 
 Error_t extract_message_word
 (
-    NetworkMessage_t *message,
+    NetworkMessage_t *this,
     void             *word,
     Quantity_t        index
 )
 {
-    if (index >= (message->MaxLength - 2))
+    if (index >= (this->MaxLength - 2))
 
         return TDICE_FAILURE ;
 
-    memcpy (word, message->Content + index, sizeof (MessageWord_t)) ;
+    memcpy (word, this->Content + index, sizeof (MessageWord_t)) ;
 
     return TDICE_SUCCESS ;
 }

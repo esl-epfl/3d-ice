@@ -103,12 +103,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a layer to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param layer the address of the layer to initialize
+     * \param this the address of the layer to initialize
      */
 
-    void init_layer (Layer_t *layer) ;
+    void init_layer (Layer_t *this) ;
 
 
 
@@ -123,15 +123,15 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a layer
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a layer must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * \c alloc_and_init_layer
      *
-     * \param layer the address of the layer structure to free
+     * \param this the address of the layer structure to free
      */
 
-    void free_layer (Layer_t *layer) ;
+    void free_layer (Layer_t *this) ;
 
 
 
@@ -165,27 +165,27 @@ extern "C"
 
     /*! Prints the layer as it looks in the stack file
      *
+     * \param this  the layer to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param layer  the layer to print
      */
 
     void print_formatted_layer
 
-        (FILE *stream, String_t prefix, Layer_t *layer) ;
+        (Layer_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of layers as they look in the stack file
      *
+     * \param list   the pointer to the first layer in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first layer in the list
      */
 
     void print_formatted_layers_list
 
-        (FILE *stream, String_t prefix, Layer_t *list) ;
+        (Layer_t *list, FILE *stream, String_t prefix) ;
 
 
 
@@ -193,25 +193,25 @@ extern "C"
      *
      * \param stream  the output stream (must be already open)
      * \param prefix  a string to be printed as prefix at the beginning of each line
-     * \param layer   the layer to print
+     * \param this    the layer to print
      */
 
     void print_detailed_layer
 
-        (FILE *stream, String_t prefix, Layer_t *layer) ;
+        (Layer_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the layers
      *
+     * \param list the pointer to the first layer in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list the pointer to the first layer in the list
      */
 
     void print_detailed_layers_list
 
-        (FILE *stream, String_t prefix, Layer_t *list) ;
+        (Layer_t *list, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

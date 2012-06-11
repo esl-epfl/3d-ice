@@ -108,12 +108,12 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a die to a default value (zero or \c NULL ).
+    /*! Sets all the fields of the die to a default value (zero or \c NULL ).
      *
-     * \param die the address of the die to initialize
+     * \param this the address of the die to initialize
      */
 
-    void init_die (Die_t *die) ;
+    void init_die (Die_t *this) ;
 
 
 
@@ -130,13 +130,13 @@ extern "C"
 
     /*! Frees the memory related to \a die
      *
-     * The parametrer \a die must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * \c alloc_and_init_die
      *
-     * \param die the address of the die structure to free
+     * \param this the address of the die structure to free
      */
 
-    void free_die (Die_t *die) ;
+    void free_die (Die_t *this) ;
 
 
 
@@ -170,45 +170,45 @@ extern "C"
 
     /*! Prints the die as it looks in the stack file
      *
+     * \param this   the die to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param die    the die to print
      */
 
-    void print_formatted_die (FILE *stream, String_t prefix, Die_t *die) ;
+    void print_formatted_die (Die_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of dies as they look in the stack file
      *
+     * \param list   the pointer to the first die in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first die in the list
      */
 
-    void print_formatted_dies_list (FILE *stream, String_t prefix, Die_t *list) ;
+    void print_formatted_dies_list (Die_t *list, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints detailed information about all the fields of a die
      *
+     * \param this   the die to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param die    the die to print
      */
 
-    void print_detailed_die (FILE *stream, String_t prefix, Die_t *die) ;
+    void print_detailed_die (Die_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the dies
      *
+     * \param list   the pointer to the first die in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first die in the list
      */
 
-    void print_detailed_dies_list (FILE *stream, String_t prefix, Die_t *list) ;
+    void print_detailed_dies_list (Die_t *list, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

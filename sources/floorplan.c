@@ -93,17 +93,15 @@ void free_floorplan (Floorplan_t *this)
 
 void print_detailed_floorplan
 (
+    Floorplan_t *this,
     FILE        *stream,
-    String_t     prefix,
-    Floorplan_t *this
+    String_t     prefix
 )
 {
     fprintf(stream,
         "%sFloorplan read from file %s\n", prefix, this->FileName) ;
 
-    print_detailed_floorplan_elements_list
-
-        (stream, prefix, this->ElementsList) ;
+    print_detailed_floorplan_elements_list (this->ElementsList, stream, prefix) ;
 }
 
 /******************************************************************************/
@@ -206,11 +204,7 @@ FloorplanElement_t *get_floorplan_element_floorplan
 
 /******************************************************************************/
 
-Error_t fill_sources_floorplan
-(
-    Source_t     *sources,
-    Floorplan_t  *this
-)
+Error_t fill_sources_floorplan (Floorplan_t *this, Source_t *sources)
 {
     Quantity_t  index = 0u ;
 

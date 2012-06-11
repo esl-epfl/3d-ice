@@ -147,21 +147,21 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Sets all the fields of \a tdata to a default value (zero or \c NULL )
+    /*! Sets all the fields to a default value (zero or \c NULL )
      *  and configure the SLU fields to run a factorization
      *
-     * \param tdata the address of the thermal data to initialize
+     * \param this the address of the thermal data to initialize
      */
 
-    void init_thermal_data (ThermalData_t *tdata) ;
+    void init_thermal_data (ThermalData_t *this) ;
 
 
 
     /*! Allocs and initialize memory and prepares the LU factorization
      *
-     * \param tdata the address of the ThermalData to fill
-     * \param stkd  the address of the StackDescription previously filled
-     *              through the parsing of the stack file
+     * \param this the address of the ThermalData to fill
+     * \param stkd the address of the StackDescription previously filled
+     *             through the parsing of the stack file
      * \param analysis the address of the Analysis previously filled trough
      *                  the parsing of the stack file
      *
@@ -172,15 +172,15 @@ extern "C"
 
     Error_t fill_thermal_data
 
-        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
+        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
     /*! Updates the source vector
      *
-     * \param tdata address of the ThermalData structure storing the sources
-     * \param stkd  address of the StackDescription structure used to
-     *              fill the content of \a tdata
+     * \param this address of the ThermalData structure storing the sources
+     * \param stkd address of the StackDescription structure used to
+     *             fill the content of \a this
      *
      *  \return \c TDICE_SUCCESS if the source vector has been updated successfully
      *  \return \c TDICE_FAILURE if it not possible to fill the source vector
@@ -190,36 +190,36 @@ extern "C"
 
     Error_t update_source_vector
 
-        (ThermalData_t *tdata, StackDescription_t *stkd) ;
+        (ThermalData_t *this, StackDescription_t *stkd) ;
 
 
 
-    /*! Frees the memory related to \a tdata
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a tdata must be the address of a static variable
+     * The parametrer \a this must be the address of a static variable
      *
-     * \param tdata the address of the ThermalData structure to free
+     * \param this the address of the ThermalData structure to free
      */
 
-    void free_thermal_data  (ThermalData_t *tdata) ;
+    void free_thermal_data  (ThermalData_t *this) ;
 
 
 
     /*! Reset the thermal state to the initial temperature
      *
-     * \param tdata    the address of the ThermalData structure to reset
-     * \param analysis the address of the Analysis structure related to \a tdata
+     * \param this     the address of the ThermalData structure to reset
+     * \param analysis the address of the Analysis structure related to \a this
      */
 
-    void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis) ;
+    void reset_thermal_state (ThermalData_t *this, Analysis_t *analysis) ;
 
 
 
     /*! Simulates a time step
      *
-     * \param tdata     address of the ThermalData structure
-     * \param stkd      address of the StackDescription structure used to
-     *                  fill the content of \a tdata and \a analysys
+     * \param this address of the ThermalData structure
+     * \param stkd address of the StackDescription structure used to
+     *             fill the content of \a this and \a analysys
      * \param analysis  address of the Analysis structure
      *
      * \return \c TDICE_WRONG_CONFIG if the parameters refers to a steady
@@ -235,15 +235,15 @@ extern "C"
 
     SimResult_t emulate_step
 
-        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
+        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
     /*! Simulates a time slot
      *
-     * \param tdata     address of the ThermalData structure
-     * \param stkd      address of the StackDescription structure used to
-     *                  fill the content of \a tdata and \a analysys
+     * \param this address of the ThermalData structure
+     * \param stkd address of the StackDescription structure used to
+     *             fill the content of \a this and \a analysys
      * \param analysis  address of the Analysis structure
      *
      * \return \c TDICE_WRONG_CONFIG if the parameters refers to a steady
@@ -256,15 +256,15 @@ extern "C"
 
     SimResult_t emulate_slot
 
-        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
+        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
     /*! Execute steady state simulation
      *
-     * \param tdata     address of the ThermalData structure
-     * \param stkd      address of the StackDescription structure used to
-     *                  fill the content of \a tdata and \a analysys
+     * \param this  address of the ThermalData structure
+     * \param stkd  address of the StackDescription structure used to
+     *              fill the content of \a this and \a analysys
      * \param analysis  address of the Analysis structure
      *
      * \return \c TDICE_WRONG_CONFIG if the parameters refers to a transient
@@ -277,7 +277,7 @@ extern "C"
 
     SimResult_t emulate_steady
 
-        (ThermalData_t *tdata, StackDescription_t *stkd, Analysis_t *analysis) ;
+        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
 
 
 
@@ -288,8 +288,8 @@ extern "C"
      * succeeds then the source vector will be upadted with the new inlet
      * source value.
      *
-     * \param tdata address of the ThermalData structure
-     * \param stkd  address of the StackDescription structure
+     * \param this address of the ThermalData structure
+     * \param stkd address of the StackDescription structure
      * \param new_flow_rate the new flow rate (in ml/min)
      *
      * \return \c TDICE_FAILURE if the syatem matrix cannot be split in A=LU.
@@ -298,7 +298,7 @@ extern "C"
 
     Error_t update_coolant_flow_rate
 
-        (ThermalData_t *tdata, StackDescription_t *stkd, CoolantFR_t new_flow_rate) ;
+        (ThermalData_t *this, StackDescription_t *stkd, CoolantFR_t new_flow_rate) ;
 
 
 
@@ -306,8 +306,8 @@ extern "C"
      *
      * Coordinates of the cell must be within the ranges
      *
-     * \param tdata        address of the ThermalData structure
-     * \param stkd         address of the StackDescription structure
+     * \param this address of the ThermalData structure
+     * \param stkd address of the StackDescription structure
      * \param layer_index  the index \c L of the thermal cell
      * \param row_index    the index \c R of the thermal cell
      * \param column_index the index \c C of the thermal cell
@@ -318,7 +318,7 @@ extern "C"
 
     Temperature_t get_cell_temperature
     (
-        ThermalData_t      *tdata,
+        ThermalData_t      *this,
         StackDescription_t *stkd,
         CellIndex_t         layer_index,
         CellIndex_t         row_index,
@@ -329,8 +329,8 @@ extern "C"
 
     /*! Generate a text file with the thermal map of a stack element
      *
-     * \param tdata     address of the ThermalData structure
-     * \param stkd      address of the StackDescription structure
+     * \param this address of the ThermalData structure
+     * \param stkd address of the StackDescription structure
      * \param stack_element_id the id of the stack element as it appears in the
                         stack file
      * \param file_name the path of the file to be generated
@@ -342,7 +342,7 @@ extern "C"
 
     Error_t print_thermal_map
     (
-        ThermalData_t      *tdata,
+        ThermalData_t      *this,
         StackDescription_t *stkd,
         String_t            stack_element_id,
         String_t            file_name

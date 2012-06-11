@@ -137,12 +137,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Sets all the fields of \a stack \a element to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param stack_element the address of the stack element to initialize
+     * \param this the address of the stack element to initialize
      */
 
-    void init_stack_element (StackElement_t *stack_element) ;
+    void init_stack_element (StackElement_t *this) ;
 
 
 
@@ -159,13 +159,13 @@ extern "C"
 
     /*! Frees the memory related to \a stack \a element
      *
-     * The parametrer \a stack_element must be a pointer previously obtained with
+     * The parametrer \a this must be a pointer previously obtained with
      * #alloc_and_init_stack_element
      *
-     * \param stack_element the address of the stack_element structure to free
+     * \param this the address of the stack_element structure to free
      */
 
-    void free_stack_element (StackElement_t *stack_element) ;
+    void free_stack_element (StackElement_t *this) ;
 
 
 
@@ -201,44 +201,44 @@ extern "C"
 
     /*! Prints a list of stack elements as they look in the stack file
      *
+     * \param list   the pointer to the first stack element in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first stack element in the list
      */
 
     void print_formatted_stack_elements_list
 
-        (FILE *stream, String_t prefix, StackElement_t *list) ;
+        (StackElement_t *list, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the stack elements
      *
+     * \param list   the pointer to the first stack element in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first stack element in the list
      */
 
     void print_detailed_stack_elements_list
 
-        (FILE *stream, String_t prefix, StackElement_t *list) ;
+        (StackElement_t *list, FILE *stream, String_t prefix) ;
 
 
 
     /*! Returns the offset of the source layer of the stack element within the stack
      *
-     *  \param stack_element pointer to the stack element
+     *  \param this pointer to the stack element
      *
      *  \return the offset (\# layers) of the source layer within the stack
      */
 
-    CellIndex_t get_source_layer_offset (StackElement_t *stack_element) ;
+    CellIndex_t get_source_layer_offset (StackElement_t *this) ;
 
 
 
     /*! Prints a matrix of temperatures as the thermal map of the stack element
      *
-     * \param stack_element pointer to the stack element to print
+     * \param this          pointer to the stack element to print
      * \param dimensions    pointer to the structure storing the dimensions
      * \param temperatures  pointer to the first element of the temparature array
      * \param stream        the reference to the (already opened) stream
@@ -246,7 +246,7 @@ extern "C"
 
     void print_thermal_map_stack_element
     (
-        StackElement_t  *stack_element,
+        StackElement_t  *this,
         Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
         FILE            *stream
@@ -254,57 +254,57 @@ extern "C"
 
 
 
-    /*! Returns the total number of floorplan elements in \a stack_element
+    /*! Returns the total number of floorplan elements
      *
-     * \param stack_element address of the StackElement structure
+     * \param this address of the StackElement structure
      *
-     * \return the total nyumber of floorplan elements in \a stack_element
+     * \return the total nyumber of floorplan elements in \a this
      */
 
     Quantity_t get_number_of_floorplan_elements_stack_element
 
-        (StackElement_t *stack_element) ;
+        (StackElement_t *this) ;
 
 
 
     /*! Returns a pointer to a floorplan element in the stack element
      *
-     * \param stack_element address of the stack_element
+     * \param this address of the stack_element
      * \param floorplan_element_id id of the floorplan element as in the
      *                             floorplan file
      *
-     * \return \c NULL if \a stack_element is not a die stack element
+     * \return \c NULL if \a this is not a die stack element
      * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
      * \return the pointer to the floorplan element \a floorplan_element_id
      *         that belongs to the floorplan on the die stack element
-     *         \a stack_element
+     *         \a this
      */
 
     FloorplanElement_t *get_floorplan_element_stack_element
 
-        (StackElement_t *stack_element, String_t floorplan_element_id) ;
+        (StackElement_t *this, String_t floorplan_element_id) ;
 
 
 
-    /*! Moves power values from \a pvaluse into a \a stack_element
+    /*! Moves power values from \a pvaluse into a stack element
      *
-     *  The function works only if \a stack_element is a die. Otherwise, the
+     *  The function works only if \a this is a die. Otherwise, the
      *  queue \a pvalues remains unchanged. The queue \a pvalues must contain
      *  at least as many power values as floorplan elements in the floorplan
      *  of the stack element.
      *
-     *  \param stack_element address of the StackElement structure
+     *  \param this address of the StackElement structure
      *  \param pvalues pointer to the list of power values
      *
      *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
      *                           power values
      *  \return \c TDICE_SUCCESS if the power values have been copied or if
-     *                           \a stack_element is not a die
+     *                           \a this is not a die
      */
 
     Error_t insert_power_values_stack_element
 
-        (StackElement_t *stack_element, PowersQueue_t *pvalues) ;
+        (StackElement_t *this, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

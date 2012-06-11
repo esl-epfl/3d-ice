@@ -119,19 +119,19 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a stkd to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param stkd the address of the StackDescription to initialize
+     * \param this the address of the StackDescription to initialize
      */
 
-    void init_stack_description (StackDescription_t* stkd) ;
+    void init_stack_description (StackDescription_t* this) ;
 
 
 
-    /*! Fills the \a stkd and \a analysis structures with the content
+    /*! Fills the StackDescription Analysis structures with the content
      *  of a stack file
      *
-     * \param stkd the address of the StackDescription structure to fill
+     * \param this the address of the StackDescription structure to fill
      * \param analysis the address of the Analysis structure to fill
      * \param filename the path of the stack file
      *
@@ -142,66 +142,66 @@ extern "C"
 
     Error_t fill_stack_description
 
-        (StackDescription_t* stkd, Analysis_t *analysis, String_t filename) ;
+        (StackDescription_t* this, Analysis_t *analysis, String_t filename) ;
 
 
 
-    /*! Frees the memory related to \a stkd
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a stkd must be the address of a static variable
+     * The parametrer \a this must be the address of a static variable
      *
-     * \param stkd the address of the StackDescription structure to free
+     * \param this the address of the StackDescription structure to free
      */
 
-    void free_stack_description (StackDescription_t *stkd) ;
+    void free_stack_description (StackDescription_t *this) ;
 
 
 
     /*! Prints the stack descritpion as it looks in the stack file
      *
+     * \param this   the pointer to the StackDescription to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param stkd   the pointer to the StackDescription to print
      */
 
     void print_formatted_stack_description
 
-        (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
+        (StackDescription_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about the stack descritpion
      *
+     * \param this   the pointer to the StackDescription to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param stkd   the pointer to the StackDescription to print
      */
 
     void print_detailed_stack_description
 
-        (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
+        (StackDescription_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints the floorplans (detilaed info) used in the stack file
      *
+     * \param this   the pointer to the StackDescription
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param stkd   the pointer to the StackDescription
      */
 
     void print_floorplans
 
-        (FILE *stream, String_t prefix, StackDescription_t *stkd) ;
+        (StackDescription_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Returns the number of floorplan elements in a stack element
      *
      * The parameter \a stack_element_id must refer to the ID given to a stack
-     * element (of type die) in the stack file used to to fill \a stkd
+     * element (of type die) in the stack file used to to fill \a this
      *
-     * \param stkd address of the StackDescription structure
+     * \param this address of the StackDescription structure
      * \param stack_element_id the id of the stack element
      *
      * \return \c 0 if stack_element_id does not exist in the stack or if it
@@ -211,24 +211,24 @@ extern "C"
 
     Quantity_t get_number_of_floorplan_elements
 
-        (StackDescription_t *stkd, String_t stack_element_id) ;
+        (StackDescription_t *this, String_t stack_element_id) ;
 
 
 
     /*! Returns the total number of floorplan elements in the whole 3d stack
      *
-     * \param stkd address of the StackDescription structure
+     * \param this address of the StackDescription structure
      *
      * \return the total nyumber of floorplan elements in the 3d stack
      */
 
-    Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd) ;
+    Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *this) ;
 
 
 
     /*! Returns a pointer to a floorplan element in the stack
      *
-     * \param stkd address of the StackDescription structure
+     * \param this address of the StackDescription structure
      * \param stack_element_id id of the stack element as in the stack file
      * \param floorplan_element_id id of the floorplan element as in the
      *                             floorplan file
@@ -243,7 +243,7 @@ extern "C"
 
     FloorplanElement_t *get_floorplan_element
 
-        (StackDescription_t *stkd,
+        (StackDescription_t *this,
          String_t stack_element_id, String_t floorplan_element_id) ;
 
 
@@ -261,7 +261,7 @@ extern "C"
      *  first \c n power values will be given to \c A and the remaining will
      *  be assigned to \c B
      *
-     *  \param stkd address of the StackDescription structure
+     *  \param this address of the StackDescription structure
      *  \param pvalues pointer to the list of power values
      *
      *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
@@ -269,7 +269,7 @@ extern "C"
      *  \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t insert_power_values (StackDescription_t *stkd, PowersQueue_t *pvalues) ;
+    Error_t insert_power_values (StackDescription_t *this, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

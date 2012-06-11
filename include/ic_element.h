@@ -118,12 +118,12 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Sets all the fields of \a icelement to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param icelement the address of the ic element to initialize
+     * \param this the address of the ic element to initialize
      */
 
-    void init_ic_element (ICElement_t *icelement) ;
+    void init_ic_element (ICElement_t *this) ;
 
 
 
@@ -138,15 +138,15 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a icelement
+    /*! Frees the memory related to \a this
      *
-     * The parametrer \a icelement must be a pointer previously
+     * The parametrer \a this must be a pointer previously
      *  obtained with #alloc_and_init_ic_element
      *
-     * \param icelement the address of the ic element structure to free
+     * \param this the address of the ic element structure to free
      */
 
-    void free_ic_element (ICElement_t *icelement) ;
+    void free_ic_element (ICElement_t *this) ;
 
 
 
@@ -165,53 +165,53 @@ extern "C"
 
     /*! Prints detailed information about all the fields of an ic element
      *
-     * \param stream    the output stream (must be already open)
-     * \param prefix    a string to be printed as prefix at the beginning of each line
-     * \param icelement the ic element to print
+     * \param this   the ic element to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_detailed_ic_element
 
-        (FILE *stream, String_t prefix, ICElement_t *icelement) ;
+        (ICElement_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of detailed information about all the fields of the icelements
      *
+     * \param list   the pointer to the first ic element in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first ic element in the list
      */
 
     void print_detailed_ic_elements_list
 
-        (FILE *stream, String_t prefix, ICElement_t *list) ;
+        (ICElement_t *list, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints the ic element as it looks in the stack file
      *
-     * \param stream    the output stream (must be already open)
-     * \param prefix    a string to be printed as prefix at the beginning of each line
-     * \param icelement the ic element to print
+     * \param this   the ic element to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_formatted_ic_element
 
-        (FILE *stream, String_t prefix, ICElement_t *icelement) ;
+        (ICElement_t *this, FILE *stream, String_t prefix) ;
 
 
 
     /*! Prints a list of ic elements as they look in the stack file
      *
+     * \param list   the pointer to the first ic element in the list
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
-     * \param list   the pointer to the first ic element in the list
      */
 
     void print_formatted_ic_elements_list
 
-        (FILE *stream, String_t prefix, ICElement_t *list) ;
+        (ICElement_t *list, FILE *stream, String_t prefix) ;
 
 
 
@@ -236,14 +236,14 @@ extern "C"
      *  The control is based on the real coordinates of the ic element, i.e. the
      *  coordinates read from the floorplan file.
      *
+     *  \param this       the ic element to test
      *  \param dimensions the structure storing the dimensions of the IC
-     *  \param icelement the ic element to test
      *
-     *  \return \c true if \a icelement is outside of the IC
+     *  \return \c true if \a this is outside of the IC
      *  \return \c false otherwise
      */
 
-    bool check_location (Dimensions_t *dimensions, ICElement_t* icelement) ;
+    bool check_location (ICElement_t* this, Dimensions_t *dimensions) ;
 
 
 
@@ -254,29 +254,28 @@ extern "C"
      *  columns to place the ic element on the surface of the active
      *  layer. It also computes the effective dimensions.
      *
+     *  \param this       the ic element to align on the source layer
      *  \param dimensions the structure storing the dimensions of the IC
-     *  \param icelement the ic element to align on the source layer
      */
 
-    void align_to_grid (Dimensions_t *dimensions, ICElement_t* icelement) ;
+    void align_to_grid (ICElement_t* this, Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the maximum temperature of the ic element
      *
-     *  \param icelement    pointer to the ic element
+     *  \param this         pointer to the ic element
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a icelement
-     *                      is placed
+     *                      cell in the layer where the IC element is placed
      *
      *  \return the maximum temperature among the thermal cells on the stack
-     *          layer where \a icelement is placed
+     *          layer where \a this is placed
      */
 
     Temperature_t get_max_temperature_ic_element
     (
-        ICElement_t   *icelement,
+        ICElement_t   *this,
         Dimensions_t  *dimensions,
         Temperature_t *temperatures
     ) ;
@@ -285,19 +284,18 @@ extern "C"
 
     /*! Returns the minimum temperature of the ic element
      *
-     *  \param icelement    pointer to the ic element
+     *  \param this         pointer to the ic element
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a icelement
-     *                      is placed
+     *                      cell in the layer where the IC element is placed
      *
      *  \return the minimum temperature among the thermal cells on the stack
-     *          layer where \a icelement is placed
+     *          layer where \a this is placed
      */
 
     Temperature_t get_min_temperature_ic_element
     (
-        ICElement_t   *icelement,
+        ICElement_t   *this,
         Dimensions_t  *dimensions,
         Temperature_t *temperatures
     ) ;
@@ -306,19 +304,18 @@ extern "C"
 
     /*! Returns the average temperature of the ic element
      *
-     *  \param icelement    pointer to the ic element
+     *  \param this         pointer to the ic element
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a icelement
-     *                      is placed
+     *                      cell in the layer where the IC element is placed
      *
      *  \return the average temperature among the thermal cells on the stack
-     *          layer where \a icelement is placed
+     *          layer where \a this is placed
      */
 
     Temperature_t get_avg_temperature_ic_element
     (
-        ICElement_t   *icelement,
+        ICElement_t   *this,
         Dimensions_t  *dimensions,
         Temperature_t *temperatures
     ) ;

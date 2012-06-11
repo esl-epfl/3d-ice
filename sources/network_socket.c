@@ -49,24 +49,24 @@
 
 /******************************************************************************/
 
-void init_socket (Socket_t *socket)
+void init_socket (Socket_t *this)
 {
-    socket->Id = 0 ;
+    this->Id = 0 ;
 
-    memset ((void *) &(socket->Address), 0, sizeof (struct sockaddr_in)) ;
+    memset ((void *) &(this->Address), 0, sizeof (struct sockaddr_in)) ;
 
-    memset ((void *) &(socket->HostName), '\0', sizeof (socket->HostName)) ;
+    memset ((void *) &(this->HostName), '\0', sizeof (this->HostName)) ;
 
-    socket->PortNumber = 0u ;
+    this->PortNumber = 0u ;
 }
 
 /******************************************************************************/
 
-Error_t open_client_socket (Socket_t *client)
+Error_t open_client_socket (Socket_t *this)
 {
-    client->Id = socket (AF_INET, SOCK_STREAM, 0) ;
+    this->Id = socket (AF_INET, SOCK_STREAM, 0) ;
 
-    if (client->Id < 0)
+    if (this->Id < 0)
     {
         perror ("ERROR :: client socket creation") ;
 
@@ -80,38 +80,38 @@ Error_t open_client_socket (Socket_t *client)
 
 Error_t open_server_socket
 (
-    Socket_t     *server,
+    Socket_t     *this,
     PortNumber_t  port_number
 )
 {
-    server->Id = socket (AF_INET, SOCK_STREAM, 0) ;
+    this->Id = socket (AF_INET, SOCK_STREAM, 0) ;
 
-    if (server->Id < 0)
+    if (this->Id < 0)
     {
         perror ("ERROR :: server socket creation") ;
 
         return TDICE_FAILURE ;
     }
 
-    server->Address.sin_family      = AF_INET ;
-    server->Address.sin_port        = htons (port_number) ;
-    server->Address.sin_addr.s_addr = htonl (INADDR_ANY) ;
+    this->Address.sin_family      = AF_INET ;
+    this->Address.sin_port        = htons (port_number) ;
+    this->Address.sin_addr.s_addr = htonl (INADDR_ANY) ;
 
-    if (bind (server->Id, (struct sockaddr *) &server->Address,
+    if (bind (this->Id, (struct sockaddr *) &this->Address,
               sizeof (struct sockaddr_in)) < 0)
     {
         perror ("ERROR :: server bind") ;
 
-        close_socket (server) ;
+        close_socket (this) ;
 
         return TDICE_FAILURE ;
     }
 
-    if (listen (server->Id, 1) < 0)
+    if (listen (this->Id, 1) < 0)
     {
         perror ("ERROR :: server listen") ;
 
-        close_socket (server) ;
+        close_socket (this) ;
 
         return TDICE_FAILURE ;
     }
@@ -123,33 +123,33 @@ Error_t open_server_socket
 
 Error_t connect_client_to_server
 (
-    Socket_t     *client,
+    Socket_t     *this,
     String_t      host_name,
     PortNumber_t  port_number
 )
 {
-    strcpy (client->HostName, host_name) ;
+    strcpy (this->HostName, host_name) ;
 
-    client->PortNumber = port_number ;
+    this->PortNumber = port_number ;
 
-    client->Address.sin_family = AF_INET ;
-    client->Address.sin_port   = htons (port_number) ;
+    this->Address.sin_family = AF_INET ;
+    this->Address.sin_port   = htons (port_number) ;
 
-    if (inet_pton (AF_INET, host_name, &(client->Address).sin_addr) <= 0)
+    if (inet_pton (AF_INET, host_name, &(this->Address).sin_addr) <= 0)
     {
         perror ("ERROR :: server address creation") ;
 
-        close_socket (client) ;
+        close_socket (this) ;
 
         return TDICE_FAILURE ;
     }
 
-    if (connect (client->Id, (struct sockaddr *) &client->Address,
+    if (connect (this->Id, (struct sockaddr *) &this->Address,
                  sizeof (struct sockaddr_in)) < 0)
     {
         perror ("ERROR :: client to server connection") ;
 
-        close_socket (client) ;
+        close_socket (this) ;
 
         return TDICE_FAILURE ;
     }
@@ -159,19 +159,19 @@ Error_t connect_client_to_server
 
 /******************************************************************************/
 
-Error_t wait_for_client (Socket_t *server, Socket_t *client)
+Error_t wait_for_client (Socket_t *this, Socket_t *client)
 {
     socklen_t length = sizeof (struct sockaddr_in) ;
 
     client->Id = accept
 
-        (server->Id, (struct sockaddr *) &(client->Address), &length) ;
+        (this->Id, (struct sockaddr *) &(client->Address), &length) ;
 
     if (client->Id < 0)
     {
         perror ("ERROR :: server accept") ;
 
-        close_socket (server) ;
+        close_socket (this) ;
 
         return TDICE_FAILURE ;
     }
@@ -184,7 +184,7 @@ Error_t wait_for_client (Socket_t *server, Socket_t *client)
         perror ("ERROR :: client name translation") ;
 
         close_socket (client) ;
-        close_socket (server) ;
+        close_socket (this) ;
 
         return TDICE_FAILURE ;
     }
@@ -196,7 +196,7 @@ Error_t wait_for_client (Socket_t *server, Socket_t *client)
 
 Error_t send_message_to_socket
 (
-    Socket_t         *socket,
+    Socket_t         *this,
     NetworkMessage_t *message
 )
 {
@@ -214,7 +214,7 @@ Error_t send_message_to_socket
 
         // sends "length" bytes ...
 
-        ssize_t bwritten = write (socket->Id, begin, length) ;
+        ssize_t bwritten = write (this->Id, begin, length) ;
 
         // and check how many bytes are actually sent
 
@@ -248,7 +248,7 @@ Error_t send_message_to_socket
 
 Error_t receive_message_from_socket
 (
-    Socket_t         *socket,
+    Socket_t         *this,
     NetworkMessage_t *message
 )
 {
@@ -256,7 +256,7 @@ Error_t receive_message_from_socket
 
     // reads the first word : the number of words to receive
 
-    ssize_t bread = read (socket->Id, &message_length, sizeof(message_length)) ;
+    ssize_t bread = read (this->Id, &message_length, sizeof(message_length)) ;
 
     if (bread < 0 || bread != sizeof(message_length))
     {
@@ -285,7 +285,7 @@ Error_t receive_message_from_socket
 
     while (message_length > 0)
     {
-        bread = read (socket->Id, begin, message_length) ;
+        bread = read (this->Id, begin, message_length) ;
 
         if (bread < 0)
         {
@@ -315,9 +315,9 @@ Error_t receive_message_from_socket
 
 /******************************************************************************/
 
-Error_t close_socket (Socket_t *socket)
+Error_t close_socket (Socket_t *this)
 {
-    if (close (socket->Id) != 0)
+    if (close (this->Id) != 0)
     {
         perror ("ERROR :: Closing network socket") ;
 

@@ -43,24 +43,24 @@
 
 /******************************************************************************/
 
-void init_dimensions (Dimensions_t *dimensions)
+void init_dimensions (Dimensions_t *this)
 {
-    dimensions->Cell.FirstWallLength = 0.0 ;
-    dimensions->Cell.LastWallLength  = 0.0 ;
-    dimensions->Cell.WallLength      = 0.0 ;
-    dimensions->Cell.ChannelLength   = 0.0 ;
+    this->Cell.FirstWallLength = 0.0 ;
+    this->Cell.LastWallLength  = 0.0 ;
+    this->Cell.WallLength      = 0.0 ;
+    this->Cell.ChannelLength   = 0.0 ;
 
-    dimensions->Cell.Width   = 0.0 ;
-    dimensions->Cell.Heights = NULL ;
+    this->Cell.Width   = 0.0 ;
+    this->Cell.Heights = NULL ;
 
-    dimensions->Grid.NLayers      = 0u ;
-    dimensions->Grid.NRows        = 0u ;
-    dimensions->Grid.NColumns     = 0u ;
-    dimensions->Grid.NCells       = 0u ;
-    dimensions->Grid.NConnections = 0u ;
+    this->Grid.NLayers      = 0u ;
+    this->Grid.NRows        = 0u ;
+    this->Grid.NColumns     = 0u ;
+    this->Grid.NCells       = 0u ;
+    this->Grid.NConnections = 0u ;
 
-    dimensions->Chip.Length = 0.0 ;
-    dimensions->Chip.Width  = 0.0 ;
+    this->Chip.Length = 0.0 ;
+    this->Chip.Width  = 0.0 ;
 }
 
 /******************************************************************************/
@@ -78,9 +78,9 @@ Dimensions_t *alloc_and_init_dimensions (void)
 
 void print_formatted_dimensions
 (
+    Dimensions_t *this,
     FILE         *stream,
-    String_t      prefix,
-    Dimensions_t *dimensions
+    String_t      prefix
 )
 {
     fprintf (stream,
@@ -89,102 +89,102 @@ void print_formatted_dimensions
 
     fprintf (stream,
             "%s   chip length %7.1f , width %7.1f ;\n",
-            prefix, dimensions->Chip.Length, dimensions->Chip.Width) ;
+            prefix, this->Chip.Length, this->Chip.Width) ;
 
     fprintf (stream,
             "%s   cell length %7.1f , width %7.1f ;\n",
-            prefix, dimensions->Cell.WallLength, dimensions->Cell.Width) ;
+            prefix, this->Cell.WallLength, this->Cell.Width) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_dimensions
 (
+  Dimensions_t *this,
   FILE         *stream,
-  String_t      prefix,
-  Dimensions_t *dimensions
+  String_t      prefix
 )
 {
     fprintf (stream,
             "%sdimensions                  = %p\n",
-            prefix, dimensions) ;
+            prefix, this) ;
 
     fprintf (stream,
             "%s  Cell.FirstWallLength      = %.1f\n",
-            prefix, dimensions->Cell.FirstWallLength) ;
+            prefix, this->Cell.FirstWallLength) ;
 
     fprintf (stream,
             "%s  Cell.WallLength           = %.1f\n",
-            prefix, dimensions->Cell.WallLength) ;
+            prefix, this->Cell.WallLength) ;
 
     fprintf (stream,
             "%s  Cell.LastWallLength       = %.1f\n",
-            prefix, dimensions->Cell.LastWallLength) ;
+            prefix, this->Cell.LastWallLength) ;
 
     fprintf (stream,
             "%s  Cell.ChannelLength        = %.1f\n",
-            prefix, dimensions->Cell.ChannelLength) ;
+            prefix, this->Cell.ChannelLength) ;
 
     fprintf (stream,
             "%s  Cell.Width                = %.1f\n",
-            prefix, dimensions->Cell.Width) ;
+            prefix, this->Cell.Width) ;
 
     fprintf (stream,
             "%s  Cell.Heigths              = %p\t",
-            prefix, dimensions->Cell.Heights) ;
+            prefix, this->Cell.Heights) ;
 
     CellIndex_t layer ;
 
-    for (layer = 0 ; layer != dimensions->Grid.NLayers ; layer++)
+    for (layer = 0 ; layer != this->Grid.NLayers ; layer++)
 
-    fprintf (stream, "%.1f ", dimensions->Cell.Heights [layer]) ;
+    fprintf (stream, "%.1f ", this->Cell.Heights [layer]) ;
 
     fprintf (stream, "\n") ;
 
 
     fprintf (stream,
             "%s  Grid.NLayers              = %d\n",
-            prefix, dimensions->Grid.NLayers) ;
+            prefix, this->Grid.NLayers) ;
 
     fprintf (stream,
             "%s  Grid.NRows                = %d\n",
-            prefix, dimensions->Grid.NRows) ;
+            prefix, this->Grid.NRows) ;
 
     fprintf (stream,
             "%s  Grid.NColumns             = %d\n",
-            prefix, dimensions->Grid.NColumns) ;
+            prefix, this->Grid.NColumns) ;
 
     fprintf (stream,
             "%s  Grid.NCells               = %d\n",
-            prefix, dimensions->Grid.NCells) ;
+            prefix, this->Grid.NCells) ;
 
     fprintf (stream,
             "%s  Grid.Nconnections         = %d\n",
-            prefix, dimensions->Grid.NConnections) ;
+            prefix, this->Grid.NConnections) ;
 
     fprintf (stream,
             "%s  Chip.Length               = %.1f\n",
-            prefix, dimensions->Chip.Length) ;
+            prefix, this->Chip.Length) ;
 
     fprintf (stream,
             "%s  Chip.Width                = %.1f\n",
-            prefix, dimensions->Chip.Width) ;
+            prefix, this->Chip.Width) ;
 }
 
 /******************************************************************************/
 
-void free_dimensions (Dimensions_t *dimensions)
+void free_dimensions (Dimensions_t *this)
 {
-    if (dimensions->Cell.Heights != NULL)
+    if (this->Cell.Heights != NULL)
 
-        FREE_POINTER (free, dimensions->Cell.Heights) ;
+        FREE_POINTER (free, this->Cell.Heights) ;
 
-    FREE_POINTER (free, dimensions) ;
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
 
-void print_axes (Dimensions_t *dimensions)
+void print_axes (Dimensions_t *this)
 {
     FILE *file = fopen ("xaxis.txt", "w") ;
 
@@ -194,9 +194,9 @@ void print_axes (Dimensions_t *dimensions)
         return ;
     }
 
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    FOR_EVERY_COLUMN (column_index, this)
 
-        fprintf (file, "%5.2f\n", get_cell_center_x (dimensions, column_index)) ;
+        fprintf (file, "%5.2f\n", get_cell_center_x (this, column_index)) ;
 
     fclose (file) ;
 
@@ -208,9 +208,9 @@ void print_axes (Dimensions_t *dimensions)
         return ;
     }
 
-    FOR_EVERY_ROW (row_index, dimensions)
+    FOR_EVERY_ROW (row_index, this)
 
-        fprintf (file, "%5.2f\n", get_cell_center_y (dimensions, row_index)) ;
+        fprintf (file, "%5.2f\n", get_cell_center_y (this, row_index)) ;
 
     fclose (file) ;
 }
@@ -219,15 +219,15 @@ void print_axes (Dimensions_t *dimensions)
 
 void compute_number_of_connections
 (
-    Dimensions_t   *dimensions,
+    Dimensions_t   *this,
     Quantity_t      num_channels,
     ChannelModel_t  channel_model,
     HeatSinkModel_t sink_model
 )
 {
-    CellIndex_t nlayers  = dimensions->Grid.NLayers ;
-    CellIndex_t nrows    = dimensions->Grid.NRows ;
-    CellIndex_t ncolumns = dimensions->Grid.NColumns ;
+    CellIndex_t nlayers  = this->Grid.NLayers ;
+    CellIndex_t nrows    = this->Grid.NRows ;
+    CellIndex_t ncolumns = this->Grid.NColumns ;
 
     CellIndex_t nlayers_for_channel    = num_channels * NUM_LAYERS_CHANNEL_2RM ;
     CellIndex_t nlayers_except_channel = nlayers - nlayers_for_channel ;
@@ -266,7 +266,7 @@ void compute_number_of_connections
         case TDICE_CHANNEL_MODEL_NONE :
         case TDICE_CHANNEL_MODEL_MC_4RM :
         {
-            dimensions->Grid.NConnections =
+            this->Grid.NConnections =
 
                 // All Normal Cells
 
@@ -291,7 +291,7 @@ void compute_number_of_connections
         case TDICE_CHANNEL_MODEL_PF_INLINE :
         case TDICE_CHANNEL_MODEL_PF_STAGGERED :
         {
-            dimensions->Grid.NConnections =
+            this->Grid.NConnections =
 
                 // For Normal Cells
 
@@ -335,13 +335,13 @@ void compute_number_of_connections
 
 CellDimension_t get_cell_length
 (
-  Dimensions_t *dimensions,
+  Dimensions_t *this,
   CellIndex_t   column_index
 )
 {
     // column_index < 0 not tested since CellIndex_t is unsigned
 
-    if (column_index > LAST_COLUMN_INDEX (dimensions))
+    if (column_index > LAST_COLUMN_INDEX (this))
     {
         fprintf (stderr,
             "ERROR: column index %d is out of range\n", column_index) ;
@@ -351,34 +351,34 @@ CellDimension_t get_cell_length
 
     if (IS_FIRST_COLUMN (column_index))
 
-        return dimensions->Cell.FirstWallLength ;
+        return this->Cell.FirstWallLength ;
 
-    else if (IS_LAST_COLUMN (column_index, dimensions))
+    else if (IS_LAST_COLUMN (column_index, this))
 
-        return dimensions->Cell.LastWallLength ;
+        return this->Cell.LastWallLength ;
 
     else
 
         if (column_index & 1)
 
-        return dimensions->Cell.ChannelLength ;
+        return this->Cell.ChannelLength ;
 
         else
 
-        return dimensions->Cell.WallLength ;
+        return this->Cell.WallLength ;
 }
 
 /******************************************************************************/
 
 CellDimension_t get_cell_width
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   row_index
 )
 {
     // column_index < 0 not tested since CellIndex_t is unsigned
 
-    if (row_index > LAST_ROW_INDEX (dimensions))
+    if (row_index > LAST_ROW_INDEX (this))
     {
         fprintf (stderr,
             "ERROR: row index %d is out of range\n", row_index) ;
@@ -386,18 +386,18 @@ CellDimension_t get_cell_width
         return 0.0 ;
     }
 
-    return dimensions->Cell.Width ;
+    return this->Cell.Width ;
 }
 
 /******************************************************************************/
 
 CellDimension_t get_cell_height
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   layer_index
 )
 {
-    if (dimensions->Cell.Heights == NULL)
+    if (this->Cell.Heights == NULL)
     {
         fprintf (stderr, "ERROR: vector of heigths does not exist in memory\n") ;
 
@@ -406,7 +406,7 @@ CellDimension_t get_cell_height
 
     // layer_index < 0 not tested since CellIndex_t is unsigned
 
-    if (layer_index > LAST_LAYER_INDEX (dimensions))
+    if (layer_index > LAST_LAYER_INDEX (this))
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -414,52 +414,52 @@ CellDimension_t get_cell_height
         return 0.0 ;
     }
 
-    return dimensions->Cell.Heights [ layer_index ] ;
+    return this->Cell.Heights [ layer_index ] ;
 }
 
 /******************************************************************************/
 
 ChipDimension_t get_cell_center_x
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   column_index
 )
 {
     if (IS_FIRST_COLUMN (column_index))
 
-        return dimensions->Cell.FirstWallLength / 2.0 ;
+        return this->Cell.FirstWallLength / 2.0 ;
 
-    else if (IS_LAST_COLUMN (column_index, dimensions))
+    else if (IS_LAST_COLUMN (column_index, this))
 
-        return   (dimensions->Cell.FirstWallLength      )
-               + (dimensions->Cell.ChannelLength   / 2.0) * (column_index    )
-               + (dimensions->Cell.WallLength      / 2.0) * (column_index - 2)
-               + (dimensions->Cell.LastWallLength  / 2.0) ;
+        return   (this->Cell.FirstWallLength      )
+               + (this->Cell.ChannelLength   / 2.0) * (column_index    )
+               + (this->Cell.WallLength      / 2.0) * (column_index - 2)
+               + (this->Cell.LastWallLength  / 2.0) ;
 
     else
 
-        return   (dimensions->Cell.FirstWallLength      )
-               + (dimensions->Cell.ChannelLength   / 2.0) * (column_index    )
-               + (dimensions->Cell.WallLength      / 2.0) * (column_index - 1) ;
+        return   (this->Cell.FirstWallLength      )
+               + (this->Cell.ChannelLength   / 2.0) * (column_index    )
+               + (this->Cell.WallLength      / 2.0) * (column_index - 1) ;
 }
 
 /******************************************************************************/
 
 ChipDimension_t get_cell_center_y
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   row_index
 )
 {
-    return    dimensions->Cell.Width / 2.0
-           +  dimensions->Cell.Width * row_index ;
+    return    this->Cell.Width / 2.0
+           +  this->Cell.Width * row_index ;
 }
 
 /******************************************************************************/
 
 ChipDimension_t get_cell_location_x
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   column_index
 )
 {
@@ -469,109 +469,109 @@ ChipDimension_t get_cell_location_x
 
     else
 
-        return   (dimensions->Cell.FirstWallLength)
-               + (dimensions->Cell.ChannelLength  ) * ((column_index    ) / 2u)
-               + (dimensions->Cell.WallLength     ) * ((column_index - 1) / 2u) ;
+        return   (this->Cell.FirstWallLength)
+               + (this->Cell.ChannelLength  ) * ((column_index    ) / 2u)
+               + (this->Cell.WallLength     ) * ((column_index - 1) / 2u) ;
 }
 
 /******************************************************************************/
 
 ChipDimension_t get_cell_location_y
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   row_index
 )
 {
-    return dimensions->Cell.Width * row_index ;
+    return this->Cell.Width * row_index ;
 }
 
 /******************************************************************************/
 
-CellIndex_t get_number_of_layers (Dimensions_t *dimensions)
+CellIndex_t get_number_of_layers (Dimensions_t *this)
 {
-    return dimensions->Grid.NLayers ;
+    return this->Grid.NLayers ;
 }
 
 /******************************************************************************/
 
-CellIndex_t get_number_of_rows (Dimensions_t *dimensions)
+CellIndex_t get_number_of_rows (Dimensions_t *this)
 {
-    return dimensions->Grid.NRows ;
+    return this->Grid.NRows ;
 }
 
 /******************************************************************************/
 
-CellIndex_t get_number_of_columns (Dimensions_t *dimensions)
+CellIndex_t get_number_of_columns (Dimensions_t *this)
 {
-    return dimensions->Grid.NColumns ;
+    return this->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
-CellIndex_t get_number_of_cells (Dimensions_t *dimensions)
+CellIndex_t get_number_of_cells (Dimensions_t *this)
 {
-    return dimensions->Grid.NCells ;
+    return this->Grid.NCells ;
 }
 
 /******************************************************************************/
 
-CellIndex_t get_number_of_connections (Dimensions_t *dimensions)
+CellIndex_t get_number_of_connections (Dimensions_t *this)
 {
-    return dimensions->Grid.NConnections ;
+    return this->Grid.NConnections ;
 }
 
 /******************************************************************************/
 
-CellIndex_t get_layer_area (Dimensions_t *dimensions)
+CellIndex_t get_layer_area (Dimensions_t *this)
 {
-    return dimensions->Grid.NRows * dimensions->Grid.NColumns ;
+    return this->Grid.NRows * this->Grid.NColumns ;
 }
 
 /******************************************************************************/
 
 CellIndex_t get_cell_offset_in_layer
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   row_index,
     CellIndex_t   column_index
 )
 {
-    return row_index * get_number_of_columns (dimensions) + column_index ;
+    return row_index * get_number_of_columns (this) + column_index ;
 }
 
 /******************************************************************************/
 
 CellIndex_t get_cell_offset_in_stack
 (
-    Dimensions_t *dimensions,
+    Dimensions_t *this,
     CellIndex_t   layer_index,
     CellIndex_t   row_index,
     CellIndex_t   column_index
 )
 {
-    return layer_index * get_layer_area (dimensions)
-           + get_cell_offset_in_layer (dimensions, row_index, column_index) ;
+    return layer_index * get_layer_area (this)
+           + get_cell_offset_in_layer (this, row_index, column_index) ;
 }
 
 /******************************************************************************/
 
-ChipDimension_t get_chip_length (Dimensions_t *dimensions)
+ChipDimension_t get_chip_length (Dimensions_t *this)
 {
-    return dimensions->Chip.Length ;
+    return this->Chip.Length ;
 }
 
 /******************************************************************************/
 
-ChipDimension_t get_chip_width (Dimensions_t *dimensions)
+ChipDimension_t get_chip_width (Dimensions_t *this)
 {
-    return dimensions->Chip.Width ;
+    return this->Chip.Width ;
 }
 
 /******************************************************************************/
 
-ChipDimension_t get_chip_area (Dimensions_t *dimensions)
+ChipDimension_t get_chip_area (Dimensions_t *this)
 {
-    return get_chip_length (dimensions) * get_chip_width (dimensions) ;
+    return get_chip_length (this) * get_chip_width (this) ;
 }
 
 /******************************************************************************/

@@ -43,11 +43,11 @@
 
 /******************************************************************************/
 
-void init_powers_queue (PowersQueue_t *powers_queue)
+void init_powers_queue (PowersQueue_t *this)
 {
-    powers_queue->Head   = NULL ;
-    powers_queue->Tail   = NULL ;
-    powers_queue->Length = 0u ;
+    this->Head   = NULL ;
+    this->Tail   = NULL ;
+    this->Length = 0u ;
 }
 
 /******************************************************************************/
@@ -65,28 +65,28 @@ PowersQueue_t *alloc_and_init_powers_queue (void)
 
 /******************************************************************************/
 
-void free_powers_queue (PowersQueue_t *powers_queue)
+void free_powers_queue (PowersQueue_t *this)
 {
-    while (! is_empty_powers_queue(powers_queue))
+    while (! is_empty_powers_queue(this))
 
-        pop_from_powers_queue(powers_queue) ;
+        pop_from_powers_queue(this) ;
 
-    FREE_POINTER (free, powers_queue) ;
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
 
 void print_detailed_powers_queue
 (
+    PowersQueue_t *this,
     FILE          *stream,
-    String_t       prefix,
-    PowersQueue_t *powers_queue
+    String_t       prefix
 )
 {
-    fprintf(stream, "%s [%d] ", prefix, powers_queue->Length) ;
+    fprintf(stream, "%s [%d] ", prefix, this->Length) ;
 
     PowerNode_t *tmp = NULL ;
-    for (tmp = powers_queue->Head ; tmp != NULL ; tmp = tmp->Next)
+    for (tmp = this->Head ; tmp != NULL ; tmp = tmp->Next)
 
         fprintf(stream, "%6.4f ", tmp->Value) ;
 
@@ -95,67 +95,67 @@ void print_detailed_powers_queue
 
 /******************************************************************************/
 
-void print_formatted_powers_queue (FILE *stream, PowersQueue_t *powers_queue)
+void print_formatted_powers_queue (PowersQueue_t *this, FILE *stream)
 {
     PowerNode_t *tmp = NULL ;
-    for (tmp = powers_queue->Head ; tmp != NULL ; tmp = tmp->Next)
+    for (tmp = this->Head ; tmp != NULL ; tmp = tmp->Next)
 
         fprintf(stream, "%6.4f ", tmp->Value) ;
 }
 
 /******************************************************************************/
 
-bool is_empty_powers_queue (PowersQueue_t *powers_queue)
+bool is_empty_powers_queue (PowersQueue_t *this)
 {
-    return (powers_queue->Length == 0) ;
+    return (this->Length == 0) ;
 }
 
 /******************************************************************************/
 
-void put_into_powers_queue (PowersQueue_t *powers_queue, Power_t power)
+void put_into_powers_queue (PowersQueue_t *this, Power_t power)
 {
-    PowerNode_t *tmp = powers_queue->Tail ;
+    PowerNode_t *tmp = this->Tail ;
 
-    powers_queue->Tail = (PowerNode_t *) malloc (sizeof(PowerNode_t)) ;
+    this->Tail = (PowerNode_t *) malloc (sizeof(PowerNode_t)) ;
 
-    if ( powers_queue->Tail == NULL )
+    if ( this->Tail == NULL )
     {
         fprintf (stderr, "malloc power node error !!\n") ;
         return ;
     }
 
-    powers_queue->Tail->Value = power ;
-    powers_queue->Tail->Next  = NULL ;
+    this->Tail->Value = power ;
+    this->Tail->Next  = NULL ;
 
-    if (powers_queue->Head == NULL)
+    if (this->Head == NULL)
 
-        powers_queue->Head = powers_queue->Tail ;
+        this->Head = this->Tail ;
 
     else
 
-        tmp->Next = powers_queue->Tail ;
+        tmp->Next = this->Tail ;
 
-    powers_queue->Length++;
+    this->Length++;
 }
 
 /******************************************************************************/
 
-Power_t get_from_powers_queue (PowersQueue_t *powers_queue)
+Power_t get_from_powers_queue (PowersQueue_t *this)
 {
-    return powers_queue->Head->Value ;
+    return this->Head->Value ;
 }
 
 /******************************************************************************/
 
-void pop_from_powers_queue (PowersQueue_t *powers_queue)
+void pop_from_powers_queue (PowersQueue_t *this)
 {
-    PowerNode_t *tmp = powers_queue->Head->Next ;
+    PowerNode_t *tmp = this->Head->Next ;
 
-    FREE_POINTER (free, powers_queue->Head) ;
+    FREE_POINTER (free, this->Head) ;
 
-    powers_queue->Head = tmp ;
+    this->Head = tmp ;
 
-    powers_queue->Length--;
+    this->Length--;
 }
 
 /******************************************************************************/
