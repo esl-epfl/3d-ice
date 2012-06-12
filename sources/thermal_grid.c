@@ -51,7 +51,6 @@ void init_thermal_grid (ThermalGrid_t *this)
     this->TCProfile        = NULL ;
     this->Channel          = NULL ;
     this->HeatSink         = NULL ;
-    this->Analysis         = NULL ;
 }
 
 /******************************************************************************/
@@ -103,16 +102,12 @@ void free_thermal_grid (ThermalGrid_t *this)
 
 void fill_thermal_grid
 (
-    ThermalGrid_t      *this,
-    StackDescription_t *stkd,
-    Analysis_t         *analysis
+    ThermalGrid_t  *this,
+    StackElement_t *list,
+    Dimensions_t   *dimensions
 )
 {
-    this->Analysis = analysis ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement_t, stack_element, stkd->BottomStackElement)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stack_element, list)
     {
         CellIndex_t index = stack_element->Offset ;
 
@@ -229,21 +224,21 @@ void fill_thermal_grid
 
                         this->VHCProfile [index] = get_spreader_volumetric_heat_capacity
 
-                            (this->HeatSink, get_chip_area(stkd->Dimensions)) ;
+                            (this->HeatSink, get_chip_area(dimensions)) ;
 
                         this->TCProfile  [index] = get_spreader_thermal_conductivity
 
-                            (this->HeatSink, get_chip_area(stkd->Dimensions)) ;
+                            (this->HeatSink, get_chip_area(dimensions)) ;
 
                         this->LayersProfile [index + 1] = TDICE_LAYER_SINK ;
 
                         this->VHCProfile [index + 1] = get_sink_volumetric_heat_capacity
 
-                            (this->HeatSink, get_chip_area(stkd->Dimensions)) ;
+                            (this->HeatSink, get_chip_area(dimensions)) ;
 
                         this->TCProfile [index + 1] = get_sink_thermal_conductivity
 
-                             (this->HeatSink, get_chip_area(stkd->Dimensions)) ;
+                             (this->HeatSink, get_chip_area(dimensions)) ;
 
                         break ;
 
@@ -297,10 +292,6 @@ Capacity_t get_capacity
         return 0.0 ;
     }
 
-    if (this->Analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
-
-        return 0.0 ;
-
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
@@ -312,8 +303,7 @@ Capacity_t get_capacity
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
-                   )
-                    / this->Analysis->StepTime ;
+                   ) ;
 
         case TDICE_LAYER_CHANNEL_4RM :
 
@@ -323,8 +313,7 @@ Capacity_t get_capacity
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
-                       )
-                        / this->Analysis->StepTime ;
+                       ) ;
 
             else
 
@@ -332,8 +321,7 @@ Capacity_t get_capacity
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
-                       )
-                        / this->Analysis->StepTime ;
+                       ) ;
 
         case TDICE_LAYER_CHANNEL_2RM :
         case TDICE_LAYER_PINFINS_INLINE :
@@ -344,8 +332,7 @@ Capacity_t get_capacity
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
-                   )
-                    / this->Analysis->StepTime ;
+                   ) ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
@@ -355,8 +342,7 @@ Capacity_t get_capacity
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
-                   )
-                    / this->Analysis->StepTime ;
+                   ) ;
 
         case TDICE_LAYER_TOP_WALL :
         case TDICE_LAYER_BOTTOM_WALL :

@@ -49,6 +49,7 @@ void init_floorplan (Floorplan_t *this)
     this->FileName     = NULL ;
     this->NElements    = 0u ;
     this->ElementsList = NULL ;
+    this->Bpowers      = NULL ;
 
     init_floorplan_matrix (&this->SurfaceCoefficients) ;
 }
@@ -73,6 +74,7 @@ void free_floorplan (Floorplan_t *this)
     Destroy_SuperMatrix_Store (&this->SLUA) ;
     free_floorplan_matrix     (&this->SurfaceCoefficients) ;
 
+    FREE_POINTER (free                        , this->Bpowers) ;
     FREE_POINTER (free_floorplan_elements_list, this->ElementsList) ;
     FREE_POINTER (free,                         this->FileName) ;
     FREE_POINTER (free,                         this) ;
@@ -109,6 +111,15 @@ Error_t fill_floorplan
     if (result == TDICE_FAILURE)
 
         return TDICE_FAILURE ;
+
+    this->Bpowers = malloc (sizeof (Power_t) * this->NElements) ;
+
+    if (this->Bpowers == NULL)
+    {
+        fprintf (stderr, "Malloc Bpowers failed\n") ;
+
+        return TDICE_FAILURE ;
+    }
 
     CellIndex_t nnz = 0u ;
 
@@ -177,27 +188,20 @@ Error_t fill_sources_floorplan (Floorplan_t *this, Source_t *sources)
 {
     Quantity_t  index = 0u ;
 
-    Power_t *powers = malloc (sizeof (Power_t) * this->NElements) ;
-
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, this->ElementsList)
     {
         if (is_empty_powers_queue (flp_el->PowerValues) == true)
-        {
-            FREE_POINTER (free, powers) ;
 
             return TDICE_FAILURE ;
-        }
 
-        powers [ index++ ] = get_from_powers_queue (flp_el->PowerValues) ;
+        this->Bpowers [ index++ ] = get_from_powers_queue (flp_el->PowerValues) ;
 
         pop_from_powers_queue (flp_el->PowerValues) ;
     }
 
     // Does the mv multiplication to compute the source vector
 
-    sp_dgemv("N", 1.0, &this->SLUA, powers, 1, 1.0, sources, 1) ;
-
-    FREE_POINTER (free, powers) ;
+    sp_dgemv("N", 1.0, &this->SLUA, this->Bpowers, 1, 1.0, sources, 1) ;
 
     return TDICE_SUCCESS ;
 }

@@ -104,8 +104,9 @@ void free_system_matrix (SystemMatrix_t* this)
 static SystemMatrix_t add_solid_column
 (
     SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
     ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
     CellIndex_t     layer_index,
     CellIndex_t     row_index,
     CellIndex_t     column_index
@@ -243,9 +244,16 @@ skip_west :
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = get_capacity
+    *this.Values = 0.0 ;
 
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *this.Values = get_capacity
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+        *this.Values /= analysis->StepTime ;
+    }
 
     if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT)
@@ -397,8 +405,9 @@ skip_top :
 static SystemMatrix_t add_liquid_column_4rm
 (
     SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
     ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
     CellIndex_t     layer_index,
     CellIndex_t     row_index,
     CellIndex_t     column_index
@@ -501,9 +510,16 @@ static SystemMatrix_t add_liquid_column_4rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = get_capacity
+    *this.Values = 0.0 ;
 
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *this.Values = get_capacity
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+        *this.Values /= analysis->StepTime ;
+    }
 
     diagonal_pointer = this.Values++ ;
 
@@ -621,8 +637,9 @@ static SystemMatrix_t add_liquid_column_4rm
 static SystemMatrix_t add_liquid_column_2rm
 (
     SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
     ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
     CellIndex_t     layer_index,
     CellIndex_t     row_index,
     CellIndex_t     column_index
@@ -693,9 +710,16 @@ static SystemMatrix_t add_liquid_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = get_capacity
+    *this.Values = 0.0 ;
 
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *this.Values = get_capacity
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+        *this.Values /= analysis->StepTime ;
+    }
 
     diagonal_pointer = this.Values++ ;
 
@@ -781,8 +805,9 @@ static SystemMatrix_t add_liquid_column_2rm
 static SystemMatrix_t add_bottom_wall_column_2rm
 (
     SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
     ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
     CellIndex_t     layer_index,
     CellIndex_t     row_index,
     CellIndex_t     column_index
@@ -832,9 +857,16 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = get_capacity
+    *this.Values = 0.0 ;
 
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *this.Values = get_capacity
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+        *this.Values /= analysis->StepTime ;
+    }
 
     diagonal_pointer = this.Values++ ;
 
@@ -917,8 +949,9 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 static SystemMatrix_t add_top_wall_column_2rm
 (
     SystemMatrix_t  this,
-    Dimensions_t   *dimensions,
     ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
     CellIndex_t     layer_index,
     CellIndex_t     row_index,
     CellIndex_t     column_index
@@ -992,9 +1025,16 @@ static SystemMatrix_t add_top_wall_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = get_capacity
+    *this.Values = 0.0 ;
 
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *this.Values = get_capacity
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+        *this.Values /= analysis->StepTime ;
+    }
 
     diagonal_pointer = this.Values++ ;
 
@@ -1053,13 +1093,14 @@ static SystemMatrix_t add_top_wall_column_2rm
 
 static SystemMatrix_t add_virtual_wall_column_2rm
 (
-    SystemMatrix_t   this,
-    Dimensions_t    *dimensions,
-    ThermalGrid_t   *thermal_grid,
-    ChannelModel_t   channel_model,
-    CellIndex_t      layer_index,
-    CellIndex_t      row_index,
-    CellIndex_t      column_index
+    SystemMatrix_t  this,
+    ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
+    ChannelModel_t  channel_model,
+    CellIndex_t     layer_index,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index
 )
 {
     Conductance_t conductance = 0.0 ;
@@ -1132,9 +1173,16 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = get_capacity
+    *this.Values = 0.0 ;
 
-        (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *this.Values = get_capacity
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
+        *this.Values /= analysis->StepTime ;
+    }
 
     diagonal_pointer = this.Values++ ;
 
@@ -1219,9 +1267,10 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
 void fill_system_matrix
 (
-    SystemMatrix_t     *this,
-    ThermalGrid_t      *thermal_grid,
-    Dimensions_t       *dimensions
+    SystemMatrix_t *this,
+    ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions
 )
 {
 #ifdef PRINT_SYSTEM_MATRIX
@@ -1263,7 +1312,7 @@ void fill_system_matrix
                     {
                         tmp_matrix = add_solid_column
 
-                            (tmp_matrix, dimensions, thermal_grid,
+                            (tmp_matrix, thermal_grid, analysis, dimensions,
                              lindex, row_index, column_index) ;
 
                     } // FOR_EVERY_COLUMN
@@ -1282,14 +1331,14 @@ void fill_system_matrix
 
                             tmp_matrix = add_liquid_column_4rm
 
-                                (tmp_matrix, dimensions, thermal_grid,
+                                (tmp_matrix, thermal_grid, analysis, dimensions,
                                  lindex, row_index, column_index) ;
 
                         else
 
                             tmp_matrix = add_solid_column
 
-                                (tmp_matrix, dimensions, thermal_grid,
+                                (tmp_matrix, thermal_grid, analysis, dimensions,
                                  lindex, row_index, column_index) ;
 
                     } // FOR_EVERY_COLUMN
@@ -1307,7 +1356,7 @@ void fill_system_matrix
                     {
                         tmp_matrix = add_liquid_column_2rm
 
-                            (tmp_matrix, dimensions, thermal_grid,
+                            (tmp_matrix, thermal_grid, analysis, dimensions,
                              lindex, row_index, column_index) ;
 
                     } // FOR_EVERY_COLUMN
@@ -1324,7 +1373,7 @@ void fill_system_matrix
                     {
                         tmp_matrix = add_virtual_wall_column_2rm
 
-                            (tmp_matrix, dimensions, thermal_grid,
+                            (tmp_matrix, thermal_grid, analysis, dimensions,
                              thermal_grid->Channel->ChannelModel,
                              lindex, row_index, column_index) ;
 
@@ -1341,7 +1390,7 @@ void fill_system_matrix
                     {
                         tmp_matrix = add_top_wall_column_2rm
 
-                            (tmp_matrix, dimensions, thermal_grid,
+                            (tmp_matrix, thermal_grid, analysis, dimensions,
                              lindex, row_index, column_index) ;
 
                     } // FOR_EVERY_COLUMN
@@ -1357,7 +1406,7 @@ void fill_system_matrix
                     {
                         tmp_matrix = add_bottom_wall_column_2rm
 
-                            (tmp_matrix, dimensions, thermal_grid,
+                            (tmp_matrix, thermal_grid, analysis, dimensions,
                              lindex, row_index, column_index) ;
 
                     } // FOR_EVERY_COLUMN

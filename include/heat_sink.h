@@ -51,7 +51,7 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
-#include "layer.h"
+#include "material.h"
 
 /******************************************************************************/
 

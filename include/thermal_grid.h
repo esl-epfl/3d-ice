@@ -52,10 +52,9 @@ extern "C"
 
 #include "channel.h"
 #include "heat_sink.h"
-#include "analysis.h"
 
 #include "dimensions.h"
-#include "stack_description.h"
+#include "stack_element.h"
 
 /******************************************************************************/
 
@@ -92,10 +91,6 @@ extern "C"
         /*! Pointer to the heat sink structure */
 
         HeatSink_t *HeatSink ;
-
-        /*! Pointer to the analysis structure */
-
-        Analysis_t *Analysis ;
     } ;
 
     /*! Definition of the type ThermalGrid_t */
@@ -138,17 +133,16 @@ extern "C"
 
     /*! Fills a thermal grid
      *
-     *  \param this     pointer to the thermal cell in the 3d grid
-     *  \param stkd     pointer to the stack descritpion structure
-     *  \param analysis pointer to the structure containing info
-     *                  about the type of thermal analysis
+     *  \param this pointer to the thermal cell in the 3d grid
+     *  \param list pointer to the list of stack elements
+     * \param  dimensions pointer to the structure storing the dimensions
      */
 
     void fill_thermal_grid
     (
-        ThermalGrid_t      *this,
-        StackDescription_t *stkd,
-        Analysis_t         *analysis
+        ThermalGrid_t  *this,
+        StackElement_t *list,
+        Dimensions_t   *dimensions
     ) ;
 
 

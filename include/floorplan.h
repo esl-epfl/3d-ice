@@ -85,8 +85,13 @@ extern "C"
 
         FloorplanMatrix_t SurfaceCoefficients ;
 
+        /*! Power vector to perform the mv-multiplication
+             to get the source vector */
 
-        /*! SuperLU matrix to perform the mv-multiplication */
+        Power_t *Bpowers ;
+
+        /*! SuperLU matrix to perform the mv-multiplication
+             to get the source vector */
 
         SuperMatrix SLUA ;
     } ;

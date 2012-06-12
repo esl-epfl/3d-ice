@@ -129,7 +129,7 @@ Error_t fill_thermal_data
 
         goto thermal_grid_fail ;
 
-    fill_thermal_grid (&this->ThermalGrid, stkd, analysis) ;
+    fill_thermal_grid (&this->ThermalGrid, stkd->BottomStackElement, stkd->Dimensions) ;
 
     /* Alloc and set sources to zero */
 
@@ -151,7 +151,7 @@ Error_t fill_thermal_data
 
         goto system_matrix_fail ;
 
-    fill_system_matrix (&this->SM_A, &this->ThermalGrid, stkd->Dimensions) ;
+    fill_system_matrix (&this->SM_A, &this->ThermalGrid, analysis, stkd->Dimensions) ;
 
     dCreate_CompCol_Matrix
 
@@ -413,7 +413,8 @@ static void fill_system_vector
     double        *vector,
     Source_t      *sources,
     ThermalGrid_t *thermal_grid,
-    Temperature_t *temperatures
+    Temperature_t *temperatures,
+    Time_t         step_time
 )
 {
 #ifdef PRINT_SYSTEM_VECTOR
@@ -432,7 +433,9 @@ static void fill_system_vector
 #endif
 
                 *vector++ =   *sources++
-                            + get_capacity (thermal_grid, dimensions, layer, row, column)
+                            +
+                              (  get_capacity (thermal_grid, dimensions, layer, row, column)
+                               / step_time)
                             * *temperatures++ ;
 
 #ifdef PRINT_SYSTEM_VECTOR
@@ -504,7 +507,7 @@ SimResult_t emulate_step
     fill_system_vector
 
         (stkd->Dimensions, this->Temperatures,
-         this->Sources, &this->ThermalGrid, this->Temperatures) ;
+         this->Sources, &this->ThermalGrid, this->Temperatures, analysis->StepTime) ;
 
     dgstrs
 
@@ -602,16 +605,17 @@ SimResult_t emulate_steady
 
 Error_t update_coolant_flow_rate
 (
-  ThermalData_t      *this,
-  StackDescription_t *stkd,
-  CoolantFR_t         new_flow_rate
+    ThermalData_t      *this,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    CoolantFR_t         new_flow_rate
 )
 {
     stkd->Channel->Coolant.FlowRate = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
 
     // TODO replace with "update"
 
-    fill_system_matrix (&this->SM_A, &this->ThermalGrid, stkd->Dimensions) ;
+    fill_system_matrix (&this->SM_A, &this->ThermalGrid, analysis, stkd->Dimensions) ;
 
     this->SLU_Options.Fact = SamePattern_SameRowPerm ;
 

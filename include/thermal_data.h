@@ -290,6 +290,7 @@ extern "C"
      *
      * \param this address of the ThermalData structure
      * \param stkd address of the StackDescription structure
+     * \param analysis address of the Analisys structure
      * \param new_flow_rate the new flow rate (in ml/min)
      *
      * \return \c TDICE_FAILURE if the syatem matrix cannot be split in A=LU.
@@ -297,8 +298,12 @@ extern "C"
      */
 
     Error_t update_coolant_flow_rate
-
-        (ThermalData_t *this, StackDescription_t *stkd, CoolantFR_t new_flow_rate) ;
+    (
+        ThermalData_t      *this,
+        StackDescription_t *stkd,
+        Analysis_t         *analysis,
+        CoolantFR_t         new_flow_rate
+    ) ;
 
 
 

@@ -54,6 +54,7 @@ extern "C"
 
 #include "dimensions.h"
 #include "thermal_grid.h"
+#include "analysis.h"
 
 /******************************************************************************/
 
@@ -142,13 +143,17 @@ extern "C"
      *
      *  \param this         pointer to the system matrix to fill
      *  \param thermal_grid pointer to the thermal grid structure
-     *  \param dimensions   pointer to the structure containing the dimensions of the IC
+     *  \param analysis     pointer to the structure containing info
+     *                      about the type of thermal analysis
+     *  \param dimensions   pointer to the structure containing the
+     *                      dimensions of the IC
      */
 
     void fill_system_matrix
     (
         SystemMatrix_t *this,
         ThermalGrid_t  *thermal_grid,
+        Analysis_t     *analysis,
         Dimensions_t   *dimensions
     ) ;
 
