@@ -351,6 +351,7 @@ Error_t generate_analysis_output
     Analysis_t      *this,
     Dimensions_t    *dimensions,
     Temperature_t   *temperatures,
+    Source_t        *sources,
     OutputInstant_t  output_instant
 )
 {
@@ -375,10 +376,15 @@ Error_t generate_analysis_output
         return TDICE_FAILURE ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
+    {
+        Error_t error = generate_inspection_point_output
 
-        if (generate_inspection_point_output (ipoint, dimensions, temperatures, current_time) != TDICE_SUCCESS)
+            (ipoint, dimensions, temperatures, sources, current_time) ;
+
+        if (error != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
+    }
 
    return TDICE_SUCCESS ;
 }

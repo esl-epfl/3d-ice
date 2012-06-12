@@ -147,7 +147,8 @@ int main(int argc, char** argv)
 
             generate_analysis_output
 
-                (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_INSTANT_STEP) ;
+                (&analysis, stkd.Dimensions, tdata.Temperatures, tdata.Sources,
+                 TDICE_OUTPUT_INSTANT_STEP) ;
         }
 
         if (sim_result == TDICE_SLOT_DONE)
@@ -156,14 +157,16 @@ int main(int argc, char** argv)
 
             generate_analysis_output
 
-                (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_INSTANT_SLOT) ;
+                (&analysis, stkd.Dimensions, tdata.Temperatures,  tdata.Sources,
+                 TDICE_OUTPUT_INSTANT_SLOT) ;
         }
 
     } while (sim_result != TDICE_END_OF_SIMULATION) ;
 
     generate_analysis_output
 
-        (&analysis, stkd.Dimensions, tdata.Temperatures, TDICE_OUTPUT_INSTANT_FINAL) ;
+        (&analysis, stkd.Dimensions, tdata.Temperatures, tdata.Sources,
+         TDICE_OUTPUT_INSTANT_FINAL) ;
 
     fprintf (stdout, "emulation took %.3f sec\n",
         ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;

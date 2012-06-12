@@ -400,7 +400,7 @@ extern "C"
 
         OutputInstant_t Instant ;
 
-        /*! Type of Output requested (cell, flp, flpel, map) */
+        /*! Type of Output requested (cell, flp, flpel, tmap, pmap) */
 
         OutputType_t Type ;
 
@@ -534,6 +534,7 @@ extern "C"
      * \param this the address of the InspectionPoint structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
+     * \param sources      pointer to the first element of the source array
      * \param current_time time instant of the measurement
      *
      * \return FIXME
@@ -544,6 +545,7 @@ extern "C"
         InspectionPoint_t *this,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,
+        Source_t          *sources,
         Time_t             current_time
     ) ;
 

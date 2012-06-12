@@ -154,6 +154,7 @@
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
+%token PMAP                  "keyword Pmap"
 %token RATE                  "keyword rate"
 %token SIDE                  "keyword side"
 %token SINK                  "keywork sink"
@@ -1720,6 +1721,61 @@ inspection_point
         FREE_POINTER (free, $3) ;
      }
 
+  |  PMAP '(' IDENTIFIER ',' PATH when ')' ';'
+
+     // $3 Identifier of the stack element (must be a die)
+     // $5 Path of the output file
+     // $6 when to generate output for this observation
+
+    {
+        StackElement_t *stack_element =
+
+            find_stack_element_in_list (stkd->BottomStackElement, $3) ;
+
+        if (stack_element == NULL)
+        {
+            sprintf (error_message, "Unknown stack element %s", $3) ;
+
+            STKERROR (error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            YYABORT ;
+        }
+
+        if (stack_element->Type != TDICE_STACK_ELEMENT_DIE)
+        {
+            sprintf (error_message, "The stack element %s must be a die", $3) ;
+
+            STKERROR (error_message) ;
+
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            YYABORT ;
+        }
+
+        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+
+        if (inspection_point == NULL)
+        {
+            FREE_POINTER (free, $3) ;
+            FREE_POINTER (free, $5) ;
+
+            STKERROR ("Malloc inspection point failed") ;
+
+            YYABORT ;
+        }
+
+        inspection_point->Type         = TDICE_OUTPUT_TYPE_PMAP ;
+        inspection_point->Instant      = $6 ;
+        inspection_point->FileName     = $5 ;
+        inspection_point->StackElement = stack_element ;
+
+        FREE_POINTER (free, $3) ;
+    }
+
   |  TCOOLANT '(' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
 
      // $3 Identifier of the stack element (must be a channel)
@@ -1790,7 +1846,6 @@ inspection_point
 
         FREE_POINTER (free, $3) ;
      }
-
   ;
 
 maxminavg
@@ -1833,6 +1888,7 @@ void stack_description_error
 Error_t parse_stack_description_file
 (
     String_t            filename,
+
     StackDescription_t *stkd,
     Analysis_t         *analysis
 )

@@ -294,6 +294,31 @@ void print_thermal_map_stack_element
 
 /******************************************************************************/
 
+void print_power_map_stack_element
+(
+    StackElement_t  *this,
+    Dimensions_t    *dimensions,
+    Source_t        *sources,
+    FILE            *stream
+)
+{
+    sources += get_cell_offset_in_stack
+
+        (dimensions, get_source_layer_offset (this), 0, 0) ;
+
+    FOR_EVERY_ROW (row_index, dimensions)
+    {
+        FOR_EVERY_COLUMN (column_index, dimensions)
+        {
+            fprintf (stream, "%7.3f  ", *sources++) ;
+        }
+
+        fprintf (stream, "\n") ;
+    }
+}
+
+/******************************************************************************/
+
 Quantity_t get_number_of_floorplan_elements_stack_element
 (
     StackElement_t *this

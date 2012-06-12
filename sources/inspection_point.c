@@ -416,6 +416,14 @@ void print_formatted_inspection_point_list
 
                 break ;
 
+            case TDICE_OUTPUT_TYPE_PMAP :
+
+                fprintf (stream, "%sPmap   (%s, \"%s\", ",
+                    prefix, inspection_point->StackElement->Id,
+                    inspection_point->FileName) ;
+
+                break ;
+
             case TDICE_OUTPUT_TYPE_TCOOLANT :
 
                 fprintf (stream, "%sTcoolant (%s, \"%s\", ",
@@ -600,10 +608,8 @@ bool is_inspection_point
             return false ;
 
         case TDICE_OUTPUT_TYPE_TCELL :
-
-            return true ;
-
         case TDICE_OUTPUT_TYPE_TMAP :
+        case TDICE_OUTPUT_TYPE_PMAP :
 
             return true ;
 
@@ -767,6 +773,16 @@ Error_t generate_inspection_point_header
 
             break ;
 
+        case TDICE_OUTPUT_TYPE_PMAP :
+
+            fprintf (output_stream,
+                "%sPower map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
+                prefix, this->StackElement->Id);
+
+            print_axes (dimensions) ;
+
+            break ;
+
         case TDICE_OUTPUT_TYPE_TCOOLANT :
 
             fprintf (output_stream, "%s", prefix) ;
@@ -824,6 +840,7 @@ Error_t generate_inspection_point_output
     InspectionPoint_t *this,
     Dimensions_t      *dimensions,
     Temperature_t     *temperatures,
+    Source_t          *sources,
     Time_t             current_time
 )
 {
@@ -938,6 +955,17 @@ Error_t generate_inspection_point_output
 
                 (this->StackElement, dimensions,
                  temperatures, output_stream) ;
+
+            fprintf (output_stream, "\n") ;
+
+            break ;
+
+        case TDICE_OUTPUT_TYPE_PMAP :
+
+            print_power_map_stack_element
+
+                (this->StackElement, dimensions,
+                 sources, output_stream) ;
 
             fprintf (output_stream, "\n") ;
 

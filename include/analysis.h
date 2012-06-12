@@ -259,6 +259,7 @@ extern "C"
      * \param this       pointer to the analysis structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
+     * \param sources      pointer to the first element of the source array
      * \param output_instant the instant of the output (slot, step, final)
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
@@ -270,6 +271,7 @@ extern "C"
         Analysis_t      *this,
         Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
+        Source_t        *sources,
         OutputInstant_t  output_instant
     ) ;
 

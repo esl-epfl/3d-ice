@@ -569,6 +569,7 @@ extern "C"
         TDICE_OUTPUT_TYPE_TFLP,       //!< All the element in a floorplan
         TDICE_OUTPUT_TYPE_TFLPEL,     //!< A single floorplan element
         TDICE_OUTPUT_TYPE_TMAP,       //!< The thermal map of a stack element
+        TDICE_OUTPUT_TYPE_PMAP,       //!< The power map of a die (its floorplan)
         TDICE_OUTPUT_TYPE_TCOOLANT    //!< The coolant leaving the cavity
     } ;
 

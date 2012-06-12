@@ -254,6 +254,24 @@ extern "C"
 
 
 
+    /*! Prints a matrix of source values as the power map of the stack element
+     *
+     * \param this          pointer to the stack element to print
+     * \param dimensions    pointer to the structure storing the dimensions
+     * \param sources       pointer to the first element of the source array
+     * \param stream        the reference to the (already opened) stream
+     */
+
+    void print_power_map_stack_element
+    (
+        StackElement_t  *this,
+        Dimensions_t    *dimensions,
+        Source_t        *sources,
+        FILE            *stream
+    ) ;
+
+
+
     /*! Returns the total number of floorplan elements
      *
      * \param this address of the StackElement structure
