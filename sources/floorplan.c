@@ -71,8 +71,7 @@ Floorplan_t *alloc_and_init_floorplan (void)
 
 void free_floorplan (Floorplan_t *this)
 {
-    Destroy_SuperMatrix_Store (&this->SLUA) ;
-    free_floorplan_matrix     (&this->SurfaceCoefficients) ;
+    free_floorplan_matrix (&this->SurfaceCoefficients) ;
 
     FREE_POINTER (free                        , this->Bpowers) ;
     FREE_POINTER (free_floorplan_elements_list, this->ElementsList) ;
@@ -147,18 +146,6 @@ Error_t fill_floorplan
 
         (&this->SurfaceCoefficients, this->ElementsList, dimensions) ;
 
-    dCreate_CompCol_Matrix
-    (
-        &this->SLUA,
-        this->SurfaceCoefficients.NRows,
-        this->SurfaceCoefficients.NColumns,
-        this->SurfaceCoefficients.NNz,
-        this->SurfaceCoefficients.Values,
-        (int*) this->SurfaceCoefficients.RowIndices,
-        (int*) this->SurfaceCoefficients.ColumnPointers,
-        SLU_NC, SLU_D, SLU_GE
-    ) ;
-
     return TDICE_SUCCESS ;
 }
 
@@ -201,7 +188,9 @@ Error_t fill_sources_floorplan (Floorplan_t *this, Source_t *sources)
 
     // Does the mv multiplication to compute the source vector
 
-    sp_dgemv("N", 1.0, &this->SLUA, this->Bpowers, 1, 1.0, sources, 1) ;
+    multiply_floorplan_matrix
+
+        (&this->SurfaceCoefficients, sources, this->Bpowers) ;
 
     return TDICE_SUCCESS ;
 }

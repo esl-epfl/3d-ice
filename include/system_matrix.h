@@ -56,6 +56,8 @@ extern "C"
 #include "thermal_grid.h"
 #include "analysis.h"
 
+#include "slu_ddefs.h"
+
 /******************************************************************************/
 
     /*! \struct SystemMatrix_t
@@ -93,6 +95,45 @@ extern "C"
 
         CellIndex_t NNz ;
 
+        /*! SuperLU matrix A (wrapper arount our SystemMatrix SM_A )*/
+
+        SuperMatrix SLUMatrix_A ;
+
+        /*! SuperLU matrix A after the permutation */
+
+        SuperMatrix SLUMatrix_A_Permuted ;
+
+        /*! SuperLU matrix L after the A=LU factorization */
+
+        SuperMatrix SLUMatrix_L ;
+
+        /*! SuperLU matrix U after the A=LU factorization */
+
+        SuperMatrix SLUMatrix_U ;
+
+        /*! SuperLU structure for statistics */
+
+        SuperLUStat_t SLU_Stat ;
+
+        /*! SuperLU structure for factorization options */
+
+        superlu_options_t SLU_Options ;
+
+        /*! SuperLU integer to code the result of the SLU routines */
+
+        int  SLU_Info ;
+
+        /*! SuperLU matrix R for permutation RAC = LU. */
+
+        int* SLU_PermutationMatrixR ;
+
+        /*! SuperLU matrix C for permutation RAC = LU. */
+
+        int* SLU_PermutationMatrixC ;
+
+        /*! SuperLU elimination tree */
+
+        int* SLU_Etree ;
     } ;
 
     /*! Definition of the type SystemMatrix_t */
@@ -156,6 +197,31 @@ extern "C"
         Analysis_t     *analysis,
         Dimensions_t   *dimensions
     ) ;
+
+
+
+    /*! Perform the A=LU decomposition on the system matrix
+     *
+     * \param this pointer to the (system) matrix \a A to factorize
+     *
+     * \return \c TDICE_SUCCESS if the factorization succeded
+     * \return \c TDICE_FAILURE if some error occured
+     */
+
+    Error_t do_factorization (SystemMatrix_t *this) ;
+
+
+
+    /*! Solve the linear system b = A/b
+     *
+     * \param this pointer to the (system) matrix \a A
+     * \param b    pointer to the input vector \a b
+     *
+     * \return \c TDICE_SUCCESS if the solution b has been found
+     * \return \c TDICE_FAILURE if some error occured
+     */
+
+    Error_t solve_sparse_linear_system (SystemMatrix_t *this, SuperMatrix *b) ;
 
 
 

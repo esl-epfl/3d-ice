@@ -45,12 +45,13 @@
 
 void init_floorplan_matrix (FloorplanMatrix_t* this)
 {
-    this->ColumnPointers = NULL ;
-    this->RowIndices     = NULL ;
-    this->Values         = NULL ;
-    this->NRows          = 0u ;
-    this->NColumns       = 0u ;
-    this->NNz            = 0u ;
+    this->ColumnPointers  = NULL ;
+    this->RowIndices      = NULL ;
+    this->Values          = NULL ;
+    this->NRows           = 0u ;
+    this->NColumns        = 0u ;
+    this->NNz             = 0u ;
+    this->SLUMatrix.Store = NULL ;
 }
 
 /******************************************************************************/
@@ -90,6 +91,12 @@ Error_t alloc_floorplan_matrix
         return TDICE_FAILURE ;
     }
 
+    dCreate_CompCol_Matrix
+
+        (&this->SLUMatrix, this->NRows, this->NColumns, this->NNz,
+         this->Values, (int*) this->RowIndices, (int*) this->ColumnPointers,
+         SLU_NC, SLU_D, SLU_GE) ;
+
     return TDICE_SUCCESS ;
 }
 
@@ -100,6 +107,8 @@ void free_floorplan_matrix (FloorplanMatrix_t* this)
     FREE_POINTER (free, this->ColumnPointers) ;
     FREE_POINTER (free, this->RowIndices) ;
     FREE_POINTER (free, this->Values) ;
+
+    Destroy_SuperMatrix_Store (&this->SLUMatrix) ;
 }
 
 /******************************************************************************/
@@ -169,6 +178,18 @@ void fill_floorplan_matrix
 
         c_pointers++ ;
     }
+}
+
+/******************************************************************************/
+
+void multiply_floorplan_matrix
+(
+    FloorplanMatrix_t *this,
+    Source_t          *x,
+    Source_t          *b
+)
+{
+    sp_dgemv("N", 1.0, &this->SLUMatrix, b, 1, 1.0, x, 1) ;
 }
 
 /******************************************************************************/

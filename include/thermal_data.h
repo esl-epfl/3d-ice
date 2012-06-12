@@ -94,50 +94,9 @@ extern "C"
 
         SystemMatrix_t SM_A ;
 
-        /*! SuperLU matrix A (wrapper arount our SystemMatrix SM_A )*/
-
-        SuperMatrix SLUMatrix_A ;
-
-        /*! SuperLU matrix A after the permutation */
-
-        SuperMatrix SLUMatrix_A_Permuted ;
-
         /*! SuperLU vector B (wrapper around the Temperatures array) */
 
         SuperMatrix SLUMatrix_B ;
-
-        /*! SuperLU matrix L after the A=LU factorization */
-
-        SuperMatrix SLUMatrix_L ;
-
-        /*! SuperLU matrix U after the A=LU factorization */
-
-        SuperMatrix SLUMatrix_U ;
-
-        /*! SuperLU structure for statistics */
-
-        SuperLUStat_t     SLU_Stat ;
-
-        /*! SuperLU structure for factorization options */
-
-        superlu_options_t SLU_Options ;
-
-        /*! SuperLU integer to code the result of the SLU routines */
-
-        int  SLU_Info ;
-
-        /*! SuperLU matrix R for permutation RAC = LU. */
-
-        int* SLU_PermutationMatrixR ;
-
-        /*! SuperLU matrix C for permutation RAC = LU. */
-
-        int* SLU_PermutationMatrixC ;
-
-        /*! SuperLU elimination tree */
-
-        int* SLU_Etree ;
-
     } ;
 
 

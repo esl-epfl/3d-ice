@@ -50,6 +50,29 @@ void init_system_matrix (SystemMatrix_t* this)
     this->Values         = NULL ;
     this->Size           = 0u ;
     this->NNz            = 0u ;
+
+    this->SLU_PermutationMatrixR = NULL ;
+    this->SLU_PermutationMatrixC = NULL ;
+    this->SLU_Etree              = NULL ;
+
+    this->SLUMatrix_A.Store          = NULL ;
+    this->SLUMatrix_A_Permuted.Store = NULL ;
+    this->SLUMatrix_L.Store          = NULL ;
+    this->SLUMatrix_U.Store          = NULL ;
+
+    this->SLU_Info = 0 ;
+
+    StatInit (&this->SLU_Stat) ;
+
+    set_default_options (&this->SLU_Options) ;
+
+    this->SLU_Options.Fact            = DOFACT ;
+    this->SLU_Options.PrintStat       = NO ;
+    this->SLU_Options.Equil           = NO ;
+    this->SLU_Options.SymmetricMode   = YES ;
+    this->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
+    this->SLU_Options.RowPerm         = NOROWPERM ;
+    this->SLU_Options.DiagPivotThresh = 0.001 ;
 }
 
 /******************************************************************************/
@@ -87,16 +110,136 @@ Error_t alloc_system_matrix
         return TDICE_FAILURE ;
     }
 
+    dCreate_CompCol_Matrix
+
+        (&this->SLUMatrix_A, this->Size, this->Size, this->NNz,
+          this->Values, (int*) this->RowIndices, (int*) this->ColumnPointers,
+         SLU_NC, SLU_D, SLU_GE) ;
+
+    /* Alloc SLU permutation matrices and elimination tree */
+
+    this->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * this->Size) ;
+
+    if (this->SLU_PermutationMatrixR == NULL )
+    {
+        FREE_POINTER (free, this->ColumnPointers) ;
+        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, this->Values) ;
+
+        Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    this->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * this->Size) ;
+
+    if (this->SLU_PermutationMatrixC == NULL )
+    {
+        FREE_POINTER (free, this->ColumnPointers) ;
+        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, this->Values) ;
+
+        Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+
+        FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    this->SLU_Etree = (int *) malloc (sizeof(int) * this->Size) ;
+
+    if (this->SLU_Etree == NULL)
+    {
+        FREE_POINTER (free, this->ColumnPointers) ;
+        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, this->Values) ;
+
+        Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+
+        FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
+        FREE_POINTER (free, this->SLU_PermutationMatrixC) ;
+
+        return TDICE_FAILURE ;
+    }
+
     return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/
 
-void free_system_matrix (SystemMatrix_t* this)
+Error_t do_factorization (SystemMatrix_t *this)
+{
+    if (this->SLU_Options.Fact == DOFACT)
+    {
+        get_perm_c
+
+            (this->SLU_Options.ColPerm, &this->SLUMatrix_A,
+            this->SLU_PermutationMatrixC) ;
+
+        sp_preorder
+
+            (&this->SLU_Options, &this->SLUMatrix_A,
+            this->SLU_PermutationMatrixC, this->SLU_Etree,
+            &this->SLUMatrix_A_Permuted) ;
+    }
+    else if (this->SLU_Options.Fact == FACTORED)
+    {
+         this->SLU_Options.Fact = SamePattern_SameRowPerm ;
+    }
+    else
+    {
+        fprintf (stderr, "ERROR: wrong factorization status %d\n",
+            this->SLU_Options.Fact) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    dgstrf
+
+        (&this->SLU_Options, &this->SLUMatrix_A_Permuted,
+         sp_ienv(2), sp_ienv(1), /* relax and panel size */
+         this->SLU_Etree,
+         NULL, 0,                /* work and lwork */
+         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
+         &this->SLUMatrix_L, &this->SLUMatrix_U,
+         &this->SLU_Stat, &this->SLU_Info) ;
+
+    if (this->SLU_Info == 0)
+    {
+        this->SLU_Options.Fact = FACTORED ;
+
+        return TDICE_SUCCESS ;
+    }
+    else
+    {
+        fprintf (stderr, "SuperLu factorization error %d\n", this->SLU_Info) ;
+
+        return TDICE_FAILURE ;
+    }
+}
+
+/******************************************************************************/
+
+void free_system_matrix (SystemMatrix_t *this)
 {
     FREE_POINTER (free, this->ColumnPointers) ;
     FREE_POINTER (free, this->RowIndices) ;
     FREE_POINTER (free, this->Values) ;
+
+    FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
+    FREE_POINTER (free, this->SLU_PermutationMatrixC) ;
+    FREE_POINTER (free, this->SLU_Etree) ;
+
+    StatFree (&this->SLU_Stat) ;
+
+    Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+
+    if (this->SLU_Options.Fact != DOFACT )
+    {
+        Destroy_CompCol_Permuted (&this->SLUMatrix_A_Permuted) ;
+        Destroy_SuperNode_Matrix (&this->SLUMatrix_L) ;
+        Destroy_CompCol_Matrix   (&this->SLUMatrix_U) ;
+    }
 }
 
 /******************************************************************************/
@@ -1426,6 +1569,27 @@ void fill_system_matrix
         }
 
     }
+}
+
+/******************************************************************************/
+
+Error_t solve_sparse_linear_system (SystemMatrix_t *this, SuperMatrix *b)
+{
+    dgstrs
+
+        (NOTRANS, &this->SLUMatrix_L, &this->SLUMatrix_U,
+         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
+         b, &this->SLU_Stat, &this->SLU_Info) ;
+
+    if (this->SLU_Info < 0)
+    {
+        fprintf (stderr,
+            "Error (%d) while solving linear system\n", this->SLU_Info) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

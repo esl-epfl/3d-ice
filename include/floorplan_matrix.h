@@ -54,6 +54,8 @@ extern "C"
 #include "floorplan_element.h"
 #include "dimensions.h"
 
+#include "slu_ddefs.h"
+
 /******************************************************************************/
 
     /*! \struct FloorplanMatrix_t
@@ -94,6 +96,10 @@ extern "C"
         /*! The number of nonzeroes coefficients */
 
         CellIndex_t NNz ;
+
+        /*! SuperLU matrix to perform a mv-multiplication */
+
+        SuperMatrix SLUMatrix ;
 
     } ;
 
@@ -159,6 +165,20 @@ extern "C"
         FloorplanElement_t *list,
         Dimensions_t       *dimensions
     ) ;
+
+
+
+    /*! Performs a Matrix-Vector Multiplication x = Ab
+     *
+     * \param this pointer to the (floorplan) matrix \a A
+     * \param x    pointer to the output vector \a x
+     * \param b    pointer to the input vector \a b
+     *
+     */
+
+    void multiply_floorplan_matrix
+
+        (FloorplanMatrix_t *this, Source_t *x, Source_t *b) ;
 
 
 

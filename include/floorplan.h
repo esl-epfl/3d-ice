@@ -57,8 +57,6 @@ extern "C"
 #include "floorplan_element.h"
 #include "powers_queue.h"
 
-#include "slu_ddefs.h"
-
 /******************************************************************************/
 
     /*! \struct Floorplan_t
@@ -89,11 +87,6 @@ extern "C"
              to get the source vector */
 
         Power_t *Bpowers ;
-
-        /*! SuperLU matrix to perform the mv-multiplication
-             to get the source vector */
-
-        SuperMatrix SLUA ;
     } ;
 
     /*! Definition of the type Floorplan_t */
