@@ -81,7 +81,7 @@ extern "C"
         /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
          *  computed as the sum of the effective area of each ic element */
 
-        ChipDimension_t EffectiveSurface ;
+        ChipDimension_t Area ;
 
         /*! The list of power values representing the power consumption of
          *  the floorplan element during the thermal simulation */

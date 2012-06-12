@@ -46,12 +46,12 @@
 
 void init_floorplan_element (FloorplanElement_t *this)
 {
-    this->Id               = NULL ;
-    this->NICElements      = 0u ;
-    this->ICElementsList   = NULL ;
-    this->EffectiveSurface = 0u ;
-    this->PowerValues      = NULL ;
-    this->Next             = NULL ;
+    this->Id             = NULL ;
+    this->NICElements    = 0u ;
+    this->ICElementsList = NULL ;
+    this->Area           = 0u ;
+    this->PowerValues    = NULL ;
+    this->Next           = NULL ;
 }
 
 /******************************************************************************/
@@ -128,8 +128,8 @@ void print_detailed_floorplan_element
     fprintf (stream, "%s\n", prefix) ;
 
     fprintf (stream,
-        "%s    Id                      = %.3f\n",
-        prefix, this->EffectiveSurface) ;
+        "%s    Area                    = %.3f\n",
+        prefix, this->Area) ;
 
     fprintf (stream,
         "%s    PowerValues             = %p\n",

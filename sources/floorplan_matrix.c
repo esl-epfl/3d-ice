@@ -125,23 +125,45 @@ void fill_floorplan_matrix
 
         (ICElement_t, ic_el, flp_el->ICElementsList)
         {
+            CellDimension_t width = 0u ;
+            CellDimension_t y     = ic_el->SW_Y ;
 
             FOR_EVERY_IC_ELEMENT_ROW (row_index, ic_el)
             {
+                if (row_index < ic_el->NE_Row)
+
+                    width = get_cell_location_y (dimensions, row_index + 1) - y ;
+
+                else
+
+                    width = (ic_el->SW_Y + ic_el->Width) - y ;
+
+
+                CellDimension_t length = 0u ;
+                CellDimension_t x      = ic_el->SW_X ;
+
                 FOR_EVERY_IC_ELEMENT_COLUMN (column_index, ic_el)
                 {
-
                     *r_indices++ = get_cell_offset_in_layer
 
                                    (dimensions, row_index, column_index) ;
 
-                    *values++ = (   get_cell_length (dimensions, column_index)
-                                 *  get_cell_width (dimensions, row_index)
-                                )
-                                /  flp_el->EffectiveSurface ;
+                    if (column_index < ic_el->NE_Column)
+
+                        length = get_cell_location_x (dimensions, column_index + 1) - x ;
+
+                    else
+
+                        length = (ic_el->SW_X + ic_el->Length) - x ;
+
+                    *values++ = (length * width) /  flp_el->Area ;
 
                     (*c_pointers)++ ;
+
+                    x += length ;
                 }
+
+                y += width ;
             }
         }
 

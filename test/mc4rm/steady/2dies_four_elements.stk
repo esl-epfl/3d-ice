@@ -36,9 +36,9 @@ dimensions :
 
 stack:
 
-   die     die2     topdie    floorplan "four_elements.flp" ;
+   die     die2     topdie    floorplan "four_elements_4rm.flp" ;
    channel channel1 ;
-   die     die1     bottomdie floorplan "four_elements.flp" ;
+   die     die1     bottomdie floorplan "four_elements_4rm.flp" ;
 
 solver:
 

@@ -48,9 +48,6 @@ void init_ic_element (ICElement_t *this)
     this->Length = 0.0 ;
     this->Width  = 0.0 ;
 
-    this->EffectiveLength  = 0.0 ;
-    this->EffectiveWidth   = 0.0 ;
-
     this->SW_Row    = 0u ;
     this->SW_Column = 0u ;
     this->NE_Row    = 0u ;
@@ -114,14 +111,6 @@ void print_detailed_ic_element
     fprintf (stream,
              "%s    Width                   = %.3f\n",
              prefix, this->Width) ;
-
-    fprintf (stream,
-             "%s    EffectiveLength         = %.3f\n",
-             prefix, this->EffectiveLength) ;
-
-    fprintf (stream,
-             "%s    EffectiveWidth          = %.3f\n",
-             prefix, this->EffectiveWidth) ;
 
     fprintf (stream,
              "%s    SW_Row                  = %d\n",
@@ -241,95 +230,46 @@ bool check_location (ICElement_t *this, Dimensions_t *dimensions)
 
 void align_to_grid (ICElement_t *this, Dimensions_t *dimensions)
 {
-    ChipDimension_t cx = 0.0 ;
-    ChipDimension_t cy = 0.0 ;
-
-    CellIndex_t column_index = 0u ;
-    CellIndex_t row_index    = 0u ;
+    /* We "search" for these values instead of computing them directly
+       since the lengths of the cells along the length of the ic might not
+       be uniform
+    */
 
     /* West side */
 
-    cx = get_cell_length (dimensions, 0) / 2.0 ;
+    CellIndex_t column_index = 0u ;
 
-    while (cx < this->SW_X)
-    {
-        cx += get_cell_length (dimensions, column_index    ) / 2.0 ;
-        cx += get_cell_length (dimensions, column_index + 1) / 2.0 ;
+    while (get_cell_location_x (dimensions, column_index + 1) <= this->SW_X)
+
         column_index++ ;
-    }
 
-    this->SW_Column = column_index ;
+    this->SW_Column = column_index-- ;
 
     /* East side */
 
-    while (cx < this->SW_X + this->Length)
-    {
-        cx += get_cell_length (dimensions, column_index    ) / 2.0 ;
-        cx += get_cell_length (dimensions, column_index + 1) / 2.0 ;
+    while (get_cell_location_x (dimensions, column_index + 1) < this->SW_X + this->Length)
+
         column_index++ ;
-    }
 
-    if (column_index > 0)
-
-        this->NE_Column = column_index - 1 ;
-
-    else
-
-        this->NE_Column = column_index ;
-
-    /* Effective length */
-
-    FOR_EVERY_IC_ELEMENT_COLUMN (tmp_column_index, this)
-    {
-        this->EffectiveLength +=
-
-            get_cell_length (dimensions, tmp_column_index) ;
-    }
+    this->NE_Column = column_index ;
 
     /* South side */
 
-    cy  = (get_cell_width (dimensions, 0) / 2.0) ;
+    CellIndex_t row_index = 0u ;
 
-    while (cy < this->SW_Y)
-    {
-        cy += get_cell_width (dimensions, row_index) ;  // CHECKME
+    while (get_cell_location_y (dimensions, row_index + 1) <= this->SW_Y)
+
         row_index++ ;
-    }
 
-    this->SW_Row = row_index ;
+    this->SW_Row = row_index-- ;
 
     /* North side */
 
-    while (cy < this->SW_Y + this->Width)
-    {
-        cy += get_cell_width (dimensions, row_index) ;  // CHECKME
+    while (get_cell_location_y (dimensions, row_index + 1) < this->SW_Y + this->Width)
+
         row_index++ ;
-    }
 
-    if (row_index > 0) 
-
-        this->NE_Row = row_index - 1 ;
-
-    else
-
-        this->NE_Row = row_index ;
-
-    /* Effective width */
-
-    FOR_EVERY_IC_ELEMENT_ROW (tmp_row_index, this)
-    {
-        this->EffectiveWidth +=
-
-            get_cell_width (dimensions, tmp_row_index) ;  // CHECKME
-    }
-
-//    if (icelement->NE_Row - icelement->SW_Row == 0
-//        && icelement->NE_Column - icelement->SW_Column == 0)
-//    {
-//        fprintf (stderr,  FIXME
-//        "%s: no cells belong to floorplan element %s.\n",
-//        floorplan->FileName, icelement->Id) ;
-//    }
+    this->NE_Row = row_index ;
 }
 
 /******************************************************************************/

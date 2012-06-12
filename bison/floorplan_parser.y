@@ -190,9 +190,7 @@ floorplan_element
 
         FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el_1, $3)
         {
-            floorplan_element->EffectiveSurface
-
-                += ic_el_1->EffectiveLength * ic_el_1->EffectiveWidth ;
+            floorplan_element->Area += ic_el_1->Length * ic_el_1->Width ;
 
             FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el_2, $3)
             {

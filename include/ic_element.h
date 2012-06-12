@@ -74,18 +74,6 @@ extern "C"
 
         ChipDimension_t Width ;
 
-        /*! The length of the ic element, in \f$ \mu m \f$,
-         *  as the sum of all the lengths of the cells in the source layer
-         *  covered by the ic element */
-
-        ChipDimension_t EffectiveLength ;
-
-        /*! The width of the ic element, in \f$ \mu m \f$,
-         *  as the sum of all the widths of the cells in the source layer
-         *  covered by the ic element */
-
-        ChipDimension_t EffectiveWidth ;
-
         /*! The index of the row of the thermal cell where the south-west
          *  corner of the ic element is placed */
 
