@@ -53,9 +53,12 @@ extern "C"
 #include "types.h"
 
 #include "analysis.h"
-#include "stack_description.h"
+#include "stack_element.h"
 #include "system_matrix.h"
 #include "thermal_grid.h"
+#include "dimensions.h"
+
+#include "channel.h"
 
 #include "slu_ddefs.h"
 
@@ -118,11 +121,10 @@ extern "C"
 
     /*! Allocs and initialize memory and prepares the LU factorization
      *
-     * \param this the address of the ThermalData to fill
-     * \param stkd the address of the StackDescription previously filled
-     *             through the parsing of the stack file
-     * \param analysis the address of the Analysis previously filled trough
-     *                  the parsing of the stack file
+     * \param this           the address of the ThermalData to fill
+     * \param stack_elements_list  the list of stack element (bottom first)
+     * \param dimensions     the dimensions of the IC
+     * \param analysis       the address of the Analysis structure
      *
      * \return \c TDICE_FAILURE if the memory allocation fails or the syatem
      *              matrix cannot be split in A=LU.
@@ -130,16 +132,20 @@ extern "C"
      */
 
     Error_t fill_thermal_data
-
-        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
+    (
+        ThermalData_t  *this,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions,
+        Analysis_t     *analysis
+    ) ;
 
 
 
     /*! Updates the source vector
      *
      * \param this address of the ThermalData structure storing the sources
-     * \param stkd address of the StackDescription structure used to
-     *             fill the content of \a this
+     * \param stack_elements_list  the list of stack element (top first)
+     * \param dimensions the dimensions of the IC
      *
      *  \return \c TDICE_SUCCESS if the source vector has been updated successfully
      *  \return \c TDICE_FAILURE if it not possible to fill the source vector
@@ -148,8 +154,11 @@ extern "C"
      */
 
     Error_t update_source_vector
-
-        (ThermalData_t *this, StackDescription_t *stkd) ;
+    (
+        ThermalData_t  *this,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions
+    ) ;
 
 
 
@@ -176,10 +185,10 @@ extern "C"
 
     /*! Simulates a time step
      *
-     * \param this address of the ThermalData structure
-     * \param stkd address of the StackDescription structure used to
-     *             fill the content of \a this and \a analysys
-     * \param analysis  address of the Analysis structure
+     * \param this           the address of the ThermalData to fill
+     * \param stack_elements_list  the list of stack element (top first)
+     * \param dimensions     the dimensions of the IC
+     * \param analysis       the address of the Analysis structure
      *
      * \return \c TDICE_WRONG_CONFIG if the parameters refers to a steady
      *                               state simulation
@@ -193,17 +202,21 @@ extern "C"
      */
 
     SimResult_t emulate_step
-
-        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
+    (
+        ThermalData_t  *this,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions,
+        Analysis_t     *analysis
+    ) ;
 
 
 
     /*! Simulates a time slot
      *
-     * \param this address of the ThermalData structure
-     * \param stkd address of the StackDescription structure used to
-     *             fill the content of \a this and \a analysys
-     * \param analysis  address of the Analysis structure
+     * \param this           the address of the ThermalData to fill
+     * \param stack_elements_list  the list of stack element (top first)
+     * \param dimensions     the dimensions of the IC
+     * \param analysis       the address of the Analysis structure
      *
      * \return \c TDICE_WRONG_CONFIG if the parameters refers to a steady
      *                               state simulation
@@ -214,17 +227,21 @@ extern "C"
      */
 
     SimResult_t emulate_slot
-
-        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
+    (
+        ThermalData_t  *this,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions,
+        Analysis_t     *analysis
+    ) ;
 
 
 
     /*! Execute steady state simulation
      *
-     * \param this  address of the ThermalData structure
-     * \param stkd  address of the StackDescription structure used to
-     *              fill the content of \a this and \a analysys
-     * \param analysis  address of the Analysis structure
+     * \param this           the address of the ThermalData to fill
+     * \param stack_elements_list  the list of stack element (top first)
+     * \param dimensions     the dimensions of the IC
+     * \param analysis       the address of the Analysis structure
      *
      * \return \c TDICE_WRONG_CONFIG if the parameters refers to a transient
      *                               simulation
@@ -235,8 +252,12 @@ extern "C"
      */
 
     SimResult_t emulate_steady
-
-        (ThermalData_t *this, StackDescription_t *stkd, Analysis_t *analysis) ;
+    (
+        ThermalData_t  *this,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions,
+        Analysis_t     *analysis
+    ) ;
 
 
 
@@ -248,7 +269,9 @@ extern "C"
      * source value.
      *
      * \param this address of the ThermalData structure
-     * \param stkd address of the StackDescription structure
+     * \param channel pointer to the channel structure
+     * \param stack_elements_list  the list of stack element (bottom first)
+     * \param dimensions the dimensions of the IC
      * \param analysis address of the Analisys structure
      * \param new_flow_rate the new flow rate (in ml/min)
      *
@@ -258,10 +281,12 @@ extern "C"
 
     Error_t update_coolant_flow_rate
     (
-        ThermalData_t      *this,
-        StackDescription_t *stkd,
-        Analysis_t         *analysis,
-        CoolantFR_t         new_flow_rate
+        ThermalData_t  *this,
+        Channel_t      *channel,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions,
+        Analysis_t     *analysis,
+        CoolantFR_t     new_flow_rate
     ) ;
 
 
@@ -271,7 +296,7 @@ extern "C"
      * Coordinates of the cell must be within the ranges
      *
      * \param this address of the ThermalData structure
-     * \param stkd address of the StackDescription structure
+     * \param dimensions the dimensions of the IC
      * \param layer_index  the index \c L of the thermal cell
      * \param row_index    the index \c R of the thermal cell
      * \param column_index the index \c C of the thermal cell
@@ -282,11 +307,11 @@ extern "C"
 
     Temperature_t get_cell_temperature
     (
-        ThermalData_t      *this,
-        StackDescription_t *stkd,
-        CellIndex_t         layer_index,
-        CellIndex_t         row_index,
-        CellIndex_t         column_index
+        ThermalData_t *this,
+        Dimensions_t  *dimensions,
+        CellIndex_t    layer_index,
+        CellIndex_t    row_index,
+        CellIndex_t    column_index
     ) ;
 
 
@@ -294,7 +319,8 @@ extern "C"
     /*! Generate a text file with the thermal map of a stack element
      *
      * \param this address of the ThermalData structure
-     * \param stkd address of the StackDescription structure
+     * \param stack_elements_list  the list of stack element (bottom first)
+     * \param dimensions the dimensions of the IC
      * \param stack_element_id the id of the stack element as it appears in the
                         stack file
      * \param file_name the path of the file to be generated
@@ -306,10 +332,11 @@ extern "C"
 
     Error_t print_thermal_map
     (
-        ThermalData_t      *this,
-        StackDescription_t *stkd,
-        String_t            stack_element_id,
-        String_t            file_name
+        ThermalData_t  *this,
+        StackElement_t *stack_elements_list,
+        Dimensions_t   *dimensions,
+        String_t        stack_element_id,
+        String_t        file_name
     ) ;
 
 /******************************************************************************/

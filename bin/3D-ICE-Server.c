@@ -102,7 +102,9 @@ int main (int argc, char** argv)
 
     init_thermal_data (&tdata) ;
 
-    error = fill_thermal_data (&tdata, &stkd, &analysis) ;
+    error = fill_thermal_data
+
+        (&tdata, stkd.BottomStackElement, stkd.Dimensions, &analysis) ;
 
     if (error != TDICE_SUCCESS)    goto ftd_error ;
 
@@ -203,7 +205,9 @@ int main (int argc, char** argv)
                 init_network_message (&reply) ;
                 build_message_head   (&reply, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
 
-                SimResult_t result = emulate_slot (&tdata, &stkd, &analysis) ;
+                SimResult_t result = emulate_slot
+
+                    (&tdata, stkd.TopStackElement, stkd.Dimensions, &analysis) ;
 
                 insert_message_word (&reply, &result) ;
 

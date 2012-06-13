@@ -77,7 +77,11 @@ int main(int argc, char** argv)
 
     init_thermal_data (&tdata) ;
 
-    if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
+    Error_t result = fill_thermal_data
+
+        (&tdata, stkd.BottomStackElement, stkd.Dimensions, &analysis) ;
+
+    if (result != TDICE_SUCCESS)
     {
         free_stack_description (&stkd) ;
         free_output            (&output) ;

@@ -1873,8 +1873,8 @@ when
 void stack_description_error
 (
     StackDescription_t *stkd,
-    Analysis_t          __attribute__ ((unused)) *analysis,
-    Output_t            __attribute__ ((unused)) *output,
+    Analysis_t         *analysis,
+    Output_t           *output,
     yyscan_t            scanner,
     const char         *message
 )
@@ -1883,7 +1883,13 @@ void stack_description_error
              "%s:%d: %s\n",
             stkd->FileName, stack_description_get_lineno (scanner), message) ;
 
-    FREE_POINTER (free_stack_description, stkd) ;
+    free_stack_description (stkd) ;
+    init_stack_description (stkd) ;
+
+    init_analysis (analysis) ;
+
+    free_output (output) ;
+    init_output (output) ;
 }
 
 /******************************************************************************/

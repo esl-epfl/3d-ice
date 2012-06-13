@@ -52,7 +52,8 @@ int main(int argc, char** argv)
     Output_t           output ;
     ThermalData_t      tdata ;
 
-    SimResult_t (*emulate) (ThermalData_t*, StackDescription_t*, Analysis_t*) ;
+    SimResult_t (*emulate) (ThermalData_t*, StackElement_t*,
+                            Dimensions_t*, Analysis_t*) ;
 
     Error_t error ;
 
@@ -122,7 +123,9 @@ int main(int argc, char** argv)
 
     init_thermal_data (&tdata) ;
 
-    error = fill_thermal_data (&tdata, &stkd, &analysis) ;
+    error = fill_thermal_data
+
+        (&tdata, stkd.BottomStackElement, stkd.Dimensions, &analysis) ;
 
     if (error != TDICE_SUCCESS)
     {
@@ -143,7 +146,7 @@ int main(int argc, char** argv)
 
     do
     {
-        sim_result = emulate (&tdata, &stkd, &analysis) ;
+        sim_result = emulate (&tdata, stkd.TopStackElement, stkd.Dimensions, &analysis) ;
 
         if (sim_result == TDICE_STEP_DONE || sim_result == TDICE_SLOT_DONE)
         {
