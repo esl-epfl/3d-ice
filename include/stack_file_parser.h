@@ -49,6 +49,7 @@ extern "C"
 #include "types.h"
 #include "stack_description.h"
 #include "analysis.h"
+#include "output.h"
 
 /******************************************************************************/
 
@@ -56,19 +57,44 @@ extern "C"
     /*! Fills the StackDescription Analysis structures with the content
      *  taken from a stack description file
      *
-     * \param filename the path of the stack file
+     * \param filename the path of the stack file to parse
      * \param stkd     the address of the StackDescription structure to fill
      * \param analysis the address of the Analysis structure to fill
+     * \param output   the address of the Output structure to fill
      *
      * \return \c TDICE_FAILURE if the file cannot be opened or if the parsing
      *                  of the stack description fails
-     * \return \c TDICE_FAILURE otherwise
+     * \return \c TDICE_SUCCESS otherwise
      */
 
     Error_t parse_stack_description_file
+    (
+        String_t            filename,
+        StackDescription_t *stkd,
+        Analysis_t         *analysis,
+        Output_t           *output
+    ) ;
 
-        (String_t filename, StackDescription_t *stkd, Analysis_t *analysis) ;
 
+
+    /*! Generates a stack description file_name
+     *
+     * \param filename the path of the stack file to generate
+     * \param stkd     the address of the StackDescription structure to fill
+     * \param analysis the address of the Analysis structure to fill
+     * \param output   the address of the Output structure to fill
+     *
+     * \return \c TDICE_FAILURE if the file cannot be created
+     * \return \c TDICE_SUCCESS otherwise
+     */
+
+    void generate_stack_description_file
+    (
+        String_t            filename,
+        StackDescription_t *stkd,
+        Analysis_t         *analysis,
+        Output_t           *output
+    ) ;
 
 /******************************************************************************/
 

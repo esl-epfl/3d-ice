@@ -39,14 +39,17 @@
 #include <time.h>
 
 #include "stack_file_parser.h"
+
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
+#include "output.h"
 
 int main(int argc, char** argv)
 {
     StackDescription_t stkd ;
     Analysis_t         analysis ;
+    Output_t           output ;
     ThermalData_t      tdata ;
 
     // Checks if there are the all the arguments
@@ -63,8 +66,9 @@ int main(int argc, char** argv)
 
     init_stack_description (&stkd) ;
     init_analysis          (&analysis) ;
+    init_output            (&output) ;
 
-    if (parse_stack_description_file (argv[1], &stkd, &analysis) != 0)
+    if (parse_stack_description_file (argv[1], &stkd, &analysis, &output) != 0)
 
         return EXIT_FAILURE ;
 
@@ -75,8 +79,8 @@ int main(int argc, char** argv)
 
     if (fill_thermal_data (&tdata, &stkd, &analysis) != 0)
     {
-        free_analysis          (&analysis) ;
         free_stack_description (&stkd) ;
+        free_output            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -91,8 +95,8 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
 
     free_thermal_data      (&tdata) ;
-    free_analysis          (&analysis) ;
     free_stack_description (&stkd) ;
+    free_output            (&output) ;
 
     return EXIT_SUCCESS ;
 }

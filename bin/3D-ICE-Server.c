@@ -46,12 +46,14 @@
 #include "stack_description.h"
 #include "thermal_data.h"
 #include "analysis.h"
+#include "output.h"
 #include "powers_queue.h"
 
 int main (int argc, char** argv)
 {
     StackDescription_t stkd ;
     Analysis_t         analysis ;
+    Output_t           output ;
     ThermalData_t      tdata ;
 
     Error_t error ;
@@ -79,8 +81,9 @@ int main (int argc, char** argv)
 
     init_stack_description (&stkd) ;
     init_analysis          (&analysis) ;
+    init_output            (&output) ;
 
-    error = parse_stack_description_file (argv[1], &stkd, &analysis) ;
+    error = parse_stack_description_file (argv[1], &stkd, &analysis, &output) ;
 
     if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
@@ -231,16 +234,16 @@ int main (int argc, char** argv)
                 build_message_head   (&reply, TDICE_THERMAL_RESULTS) ;
 
                 float   time = get_simulated_time (&analysis) ;
-                Quantity_t n = get_number_of_inspection_points (&analysis, instant, type, quantity) ;
+                Quantity_t n = get_number_of_inspection_points (&output, instant, type, quantity) ;
 
                 insert_message_word (&reply, &time) ;
                 insert_message_word (&reply, &n) ;
 
                 if (n > 0)
                 {
-                    error = fill_analysis_message
+                    error = fill_output_message
 
-                        (&analysis, stkd.Dimensions, tdata.Temperatures,
+                        (&output, stkd.Dimensions, tdata.Temperatures,
                         instant, type, quantity, &reply) ;
 
                     if (error != TDICE_SUCCESS)
@@ -277,8 +280,8 @@ quit :
     close_socket           (&client_socket) ;
     close_socket           (&server_socket) ;
     free_thermal_data      (&tdata) ;
-    free_analysis          (&analysis) ;
     free_stack_description (&stkd) ;
+    free_output            (&output) ;
 
     return EXIT_SUCCESS ;
 
@@ -290,8 +293,8 @@ socket_error :
                             free_thermal_data      (&tdata) ;
 ftd_error :
 wrong_analysis_error :
-                            free_analysis          (&analysis) ;
                             free_stack_description (&stkd) ;
+                            free_output            (&output) ;
 
                             return EXIT_FAILURE ;
 }

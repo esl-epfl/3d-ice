@@ -66,6 +66,7 @@
 %code
 {
     #include "analysis.h"
+    #include "output.h"
     #include "channel.h"
     #include "heat_sink.h"
     #include "dimensions.h"
@@ -79,10 +80,10 @@
 
     void stack_description_error
 
-        (StackDescription_t *stack, Analysis_t *analysis,
+        (StackDescription_t *stack, Analysis_t *analysis, Output_t *output,
          yyscan_t scanner, const char *message) ;
 
-    #define STKERROR(m) stack_description_error (stkd, analysis, scanner, m)
+    #define STKERROR(m) stack_description_error (stkd, analysis, output, scanner, m)
 
     static char error_message [100] ;
 
@@ -198,7 +199,8 @@
 
 %parse-param { StackDescription_t *stkd     }
 %parse-param { Analysis_t         *analysis }
-%parse-param { yyscan_t            scanner }
+%parse-param { Output_t           *output   }
+%parse-param { yyscan_t            scanner  }
 
 %lex-param   { yyscan_t scanner }
 
@@ -1434,14 +1436,14 @@ inspection_points_list
 
   :  inspection_point // $1 : pointer to the first inspection point found
      {
-        add_inspection_point_to_analysis (analysis, $1) ;
+        add_inspection_point (output, $1) ;
      }
 
   |  inspection_points_list inspection_point
                       // $1 : not used
                       // $2 : pointer to the inspection point to add in the list
      {
-        add_inspection_point_to_analysis (analysis, $2) ;
+        add_inspection_point (output, $2) ;
      }
   ;
 
@@ -1872,6 +1874,7 @@ void stack_description_error
 (
     StackDescription_t *stkd,
     Analysis_t          __attribute__ ((unused)) *analysis,
+    Output_t            __attribute__ ((unused)) *output,
     yyscan_t            scanner,
     const char         *message
 )
@@ -1888,9 +1891,9 @@ void stack_description_error
 Error_t parse_stack_description_file
 (
     String_t            filename,
-
     StackDescription_t *stkd,
-    Analysis_t         *analysis
+    Analysis_t         *analysis,
+    Output_t           *output
 )
 {
     FILE*    input ;
@@ -1910,7 +1913,7 @@ Error_t parse_stack_description_file
     stack_description_lex_init (&scanner) ;
     stack_description_set_in (input, scanner) ;
 
-    result = stack_description_parse (stkd, analysis, scanner) ;
+    result = stack_description_parse (stkd, analysis, output, scanner) ;
 
     stack_description_lex_destroy (scanner) ;
     fclose (input) ;
@@ -1930,3 +1933,35 @@ Error_t parse_stack_description_file
 }
 
 /******************************************************************************/
+
+Error_t generate_stack_description_file
+(
+    String_t            filename,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    Output_t           *output
+)
+{
+    FILE *out = fopen (filename, "w") ;
+
+    if (out == NULL)
+    {
+        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    print_formatted_stack_description (stkd, out, "") ;
+
+    fprintf (out, "\n") ;
+
+    print_formatted_analysis (analysis, out, "") ;
+
+    fprintf (out, "\n") ;
+
+    print_formatted_output (output, out, "") ;
+
+    fclose (out) ;
+
+    return TDICE_SUCCESS ;
+}
