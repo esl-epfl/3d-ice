@@ -260,24 +260,6 @@ void print_detailed_stack_description
 
 /******************************************************************************/
 
-void print_floorplans
-(
-    StackDescription_t *this,
-    FILE               *stream,
-    String_t            prefix
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement_t, stk_el, this->BottomStackElement)
-
-        if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
-
-            print_detailed_floorplan (stk_el->Floorplan, stream, prefix) ;
-}
-
-/******************************************************************************/
-
 Quantity_t get_number_of_floorplan_elements
 (
   StackDescription_t *this,
@@ -308,52 +290,6 @@ Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *this)
         tmp += get_number_of_floorplan_elements_stack_element (stack_element) ;
 
     return tmp ;
-}
-
-/******************************************************************************/
-
-FloorplanElement_t *get_floorplan_element
-(
-    StackDescription_t *this,
-    String_t            stack_element_id,
-    String_t            floorplan_element_id
-)
-{
-    StackElement_t *stack_element = find_stack_element_in_list
-
-        (this->BottomStackElement, stack_element_id) ;
-
-    if (stack_element == NULL)
-
-        return NULL ;
-
-    return get_floorplan_element_stack_element
-
-        (stack_element, floorplan_element_id) ;
-}
-
-/******************************************************************************/
-
-Error_t insert_power_values
-(
-    StackDescription_t *this,
-    PowersQueue_t      *pvalues
-)
-{
-    Error_t result ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-    (StackElement_t, stack_element, this->BottomStackElement)
-    {
-        result = insert_power_values_stack_element (stack_element, pvalues) ;
-
-        if (result == TDICE_FAILURE)
-
-            return TDICE_FAILURE ;
-    }
-
-    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

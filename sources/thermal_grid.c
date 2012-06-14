@@ -121,7 +121,14 @@ void fill_thermal_grid
 
                 (Layer_t, layer, stack_element->Pointer.Die->BottomLayer)
                 {
-                    this->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+                    if (layer == stack_element->Pointer.Die->SourceLayer)
+
+                        this->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
+
+                    else
+
+                        this->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+
                     this->VHCProfile    [index + tmp] = layer->Material->VolumetricHeatCapacity ;
                     this->TCProfile     [index + tmp] = layer->Material->ThermalConductivity ;
 
@@ -295,6 +302,7 @@ Capacity_t get_capacity
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
@@ -386,6 +394,7 @@ Conductance_t get_conductance_top
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
 
             if (IS_LAST_LAYER (layer_index, dimensions))
 
@@ -537,6 +546,7 @@ Conductance_t get_conductance_bottom
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
 
             if (IS_FIRST_LAYER (layer_index))
 
@@ -657,6 +667,7 @@ Conductance_t get_conductance_north
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
@@ -743,6 +754,7 @@ Conductance_t get_conductance_south
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
@@ -829,6 +841,7 @@ Conductance_t get_conductance_east
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
@@ -902,6 +915,7 @@ Conductance_t get_conductance_west
     switch (this->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]

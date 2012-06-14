@@ -56,9 +56,8 @@ extern "C"
 #include "stack_element.h"
 #include "system_matrix.h"
 #include "thermal_grid.h"
+#include "power_grid.h"
 #include "dimensions.h"
-
-#include "channel.h"
 
 #include "slu_ddefs.h"
 
@@ -76,13 +75,13 @@ extern "C"
 
         Temperature_t *Temperatures ;
 
-        /*! Array containing the source value of each thermal cell */
-
-        Source_t *Sources ;
-
         /*! Structure storing the Thermal Grid */
 
         ThermalGrid_t ThermalGrid ;
+
+        /*! Structure storing the Power Grid */
+
+        PowerGrid_t PowerGrid ;
 
         /*! The number of cells in the 3D grid */
 
@@ -141,27 +140,6 @@ extern "C"
 
 
 
-    /*! Updates the source vector
-     *
-     * \param this address of the ThermalData structure storing the sources
-     * \param stack_elements_list  the list of stack element (top first)
-     * \param dimensions the dimensions of the IC
-     *
-     *  \return \c TDICE_SUCCESS if the source vector has been updated successfully
-     *  \return \c TDICE_FAILURE if it not possible to fill the source vector
-     *                           (at least one floorplan element with no power
-     *                            values in its queue)
-     */
-
-    Error_t update_source_vector
-    (
-        ThermalData_t  *this,
-        StackElement_t *stack_elements_list,
-        Dimensions_t   *dimensions
-    ) ;
-
-
-
     /*! Frees the memory related to \a this
      *
      * The parametrer \a this must be the address of a static variable
@@ -186,7 +164,6 @@ extern "C"
     /*! Simulates a time step
      *
      * \param this           the address of the ThermalData to fill
-     * \param stack_elements_list  the list of stack element (top first)
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
      *
@@ -204,7 +181,6 @@ extern "C"
     SimResult_t emulate_step
     (
         ThermalData_t  *this,
-        StackElement_t *stack_elements_list,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
     ) ;
@@ -214,7 +190,6 @@ extern "C"
     /*! Simulates a time slot
      *
      * \param this           the address of the ThermalData to fill
-     * \param stack_elements_list  the list of stack element (top first)
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
      *
@@ -229,7 +204,6 @@ extern "C"
     SimResult_t emulate_slot
     (
         ThermalData_t  *this,
-        StackElement_t *stack_elements_list,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
     ) ;
@@ -239,7 +213,6 @@ extern "C"
     /*! Execute steady state simulation
      *
      * \param this           the address of the ThermalData to fill
-     * \param stack_elements_list  the list of stack element (top first)
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
      *
@@ -254,7 +227,6 @@ extern "C"
     SimResult_t emulate_steady
     (
         ThermalData_t  *this,
-        StackElement_t *stack_elements_list,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
     ) ;
@@ -269,8 +241,6 @@ extern "C"
      * source value.
      *
      * \param this address of the ThermalData structure
-     * \param channel pointer to the channel structure
-     * \param stack_elements_list  the list of stack element (bottom first)
      * \param dimensions the dimensions of the IC
      * \param analysis address of the Analisys structure
      * \param new_flow_rate the new flow rate (in ml/min)
@@ -282,8 +252,6 @@ extern "C"
     Error_t update_coolant_flow_rate
     (
         ThermalData_t  *this,
-        Channel_t      *channel,
-        StackElement_t *stack_elements_list,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis,
         CoolantFR_t     new_flow_rate

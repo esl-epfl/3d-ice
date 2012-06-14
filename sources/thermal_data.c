@@ -55,9 +55,9 @@ void init_thermal_data (ThermalData_t *this)
     this->Size = 0u ;
 
     this->Temperatures = NULL ;
-    this->Sources      = NULL ;
 
     init_thermal_grid (&this->ThermalGrid) ;
+    init_power_grid   (&this->PowerGrid) ;
 
     init_system_matrix (&this->SM_A) ;
 
@@ -119,13 +119,15 @@ Error_t fill_thermal_data
 
     fill_thermal_grid (&this->ThermalGrid, stack_elements_list, dimensions) ;
 
-    /* Alloc and set sources to zero */
+    /* Alloc and fill the power grid */
 
-    this->Sources = (Source_t *) malloc (sizeof(Source_t) * this->Size) ;
+    result = alloc_power_grid (&this->PowerGrid,
+                               get_number_of_layers (dimensions),
+                               get_number_of_cells(dimensions)) ;
 
-    if (this->Sources == NULL)
+    if (result == TDICE_FAILURE)
     {
-        fprintf (stderr, "Cannot malloc source vector\n") ;
+        fprintf (stderr, "Cannot malloc power grid\n") ;
 
         Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
         FREE_POINTER (free, this->Temperatures) ;
@@ -135,7 +137,7 @@ Error_t fill_thermal_data
         return TDICE_FAILURE ;
     }
 
-    init_data (this->Sources, this->Size, 0.0) ;
+    fill_power_grid (&this->PowerGrid, stack_elements_list) ;
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
 
@@ -151,8 +153,7 @@ Error_t fill_thermal_data
         FREE_POINTER (free, this->Temperatures) ;
 
         free_thermal_grid (&this->ThermalGrid) ;
-
-        FREE_POINTER (free, this->Sources) ;
+        free_power_grid   (&this->PowerGrid) ;
 
         return TDICE_FAILURE ;
     }
@@ -175,130 +176,12 @@ Error_t fill_thermal_data
 
 /******************************************************************************/
 
-Error_t update_source_vector
-(
-    ThermalData_t  *this,
-    StackElement_t *stack_elements_list,
-    Dimensions_t   *dimensions
-)
-{
-    // reset all the source vector to 0
-
-    CellIndex_t ccounter ;
-    CellIndex_t ncells = get_number_of_cells (dimensions) ;
-
-    for (ccounter = 0 ; ccounter != ncells ; ccounter++)
-
-        this->Sources [ ccounter ] = (Source_t) 0.0 ;
-
-    // if used, sets the sources due to the heatsink (overwrites all cells in
-    // the last layer) as first operation. Then the die will add its sources
-    // only in those cells covered by the floorplan.
-    // Reverse ordering works as long as every stack element knows where it
-    // should access the source vector (offset)
-
-    FOR_EVERY_ELEMENT_IN_LIST_PREV
-
-    (StackElement_t, stack_element, stack_elements_list)
-    {
-        CellIndex_t layer_index = stack_element->Offset ;
-
-        switch (stack_element->Type)
-        {
-            case TDICE_STACK_ELEMENT_DIE :
-            {
-                layer_index += stack_element->Pointer.Die->SourceLayerOffset ;
-
-                Source_t *sources = this->Sources +
-
-                    get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-                Error_t error = fill_sources_floorplan
-
-                    (stack_element->Floorplan, sources) ;
-
-                if (error == TDICE_FAILURE)
-
-                    return TDICE_FAILURE ;
-
-                break ;
-            }
-            case TDICE_STACK_ELEMENT_HEATSINK :
-            {
-                layer_index += stack_element->Pointer.HeatSink->SourceLayerOffset ;
-
-                CellIndex_t cell_index =
-
-                    get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-                Source_t *sources = this->Sources + cell_index ;
-
-                FOR_EVERY_ROW (row, dimensions)
-                {
-                    FOR_EVERY_COLUMN (column, dimensions)
-                    {
-                        *sources++ =   stack_element->Pointer.HeatSink->AmbientTemperature
-                                     * get_conductance_top
-
-                                           (&this->ThermalGrid, dimensions, layer_index, row, column) ;
-
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
-                break ;
-            }
-            case TDICE_STACK_ELEMENT_LAYER :
-
-                break ;
-
-            case TDICE_STACK_ELEMENT_CHANNEL :
-            {
-                layer_index += stack_element->Pointer.Channel->SourceLayerOffset ;
-
-                Source_t *sources = this->Sources +
-
-                    get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-                FOR_EVERY_COLUMN (column_index, dimensions)
-                {
-                    if (IS_CHANNEL_COLUMN (stack_element->Pointer.Channel->ChannelModel, column_index) == true)
-                    {
-                        *sources =   (Source_t) 2.0
-                                   * get_convective_term
-                                     (stack_element->Pointer.Channel, dimensions, layer_index, 0, column_index)
-                                   * stack_element->Pointer.Channel->Coolant.TIn ;
-
-                    }
-
-                    sources++ ;
-
-                } // FOR_EVERY_COLUMN
-
-                break ;
-            }
-            case TDICE_STACK_ELEMENT_NONE :
-
-                fprintf (stderr, "Error! Found stack element with unset type\n") ;
-                break ;
-
-            default :
-
-                fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
-
-        } /* switch stack_element->Type */
-    }
-
-    return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/
-
 void free_thermal_data (ThermalData_t *this)
 {
     FREE_POINTER (free, this->Temperatures) ;
-    FREE_POINTER (free, this->Sources) ;
 
     free_thermal_grid (&this->ThermalGrid) ;
+    free_power_grid   (&this->PowerGrid) ;
 
     free_system_matrix (&this->SM_A) ;
 
@@ -394,7 +277,6 @@ static void fill_system_vector_steady
 SimResult_t emulate_step
 (
     ThermalData_t  *this,
-    StackElement_t *stack_elements_list,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
 )
@@ -405,7 +287,9 @@ SimResult_t emulate_step
 
     if (slot_completed (analysis) == true)
     {
-        Error_t result = update_source_vector (this, stack_elements_list, dimensions) ;
+        Error_t result = update_source_vector
+
+            (&this->PowerGrid, &this->ThermalGrid, dimensions) ;
 
         if (result == TDICE_FAILURE)
 
@@ -414,7 +298,7 @@ SimResult_t emulate_step
 
     fill_system_vector
 
-        (dimensions, this->Temperatures, this->Sources,
+        (dimensions, this->Temperatures, this->PowerGrid.Sources,
          &this->ThermalGrid, this->Temperatures, analysis->StepTime) ;
 
     Error_t res = solve_sparse_linear_system (&this->SM_A, &this->SLUMatrix_B) ;
@@ -439,7 +323,6 @@ SimResult_t emulate_step
 SimResult_t emulate_slot
 (
     ThermalData_t  *this,
-    StackElement_t *stack_elements_list,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
 )
@@ -449,7 +332,7 @@ SimResult_t emulate_slot
     do
     {
 
-        result = emulate_step (this, stack_elements_list, dimensions, analysis) ;
+        result = emulate_step (this, dimensions, analysis) ;
 
     }   while (result == TDICE_STEP_DONE) ;
 
@@ -461,7 +344,6 @@ SimResult_t emulate_slot
 SimResult_t emulate_steady
 (
     ThermalData_t  *this,
-    StackElement_t *stack_elements_list,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
 )
@@ -470,7 +352,9 @@ SimResult_t emulate_steady
 
         return TDICE_WRONG_CONFIG ;
 
-    Error_t result = update_source_vector (this, stack_elements_list, dimensions) ;
+    Error_t result = update_source_vector
+
+        (&this->PowerGrid, &this->ThermalGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -481,7 +365,7 @@ SimResult_t emulate_steady
         return TDICE_END_OF_SIMULATION ;
     }
 
-    fill_system_vector_steady (dimensions, this->Temperatures, this->Sources) ;
+    fill_system_vector_steady (dimensions, this->Temperatures, this->PowerGrid.Sources) ;
 
     Error_t res = solve_sparse_linear_system (&this->SM_A, &this->SLUMatrix_B) ;
 
@@ -497,14 +381,14 @@ SimResult_t emulate_steady
 Error_t update_coolant_flow_rate
 (
     ThermalData_t  *this,
-    Channel_t      *channel,
-    StackElement_t *stack_elements_list,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis,
     CoolantFR_t     new_flow_rate
 )
 {
-    channel->Coolant.FlowRate = FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
+    this->ThermalGrid.Channel->Coolant.FlowRate =
+
+        FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
 
     // TODO replace with "update"
 
@@ -514,33 +398,7 @@ Error_t update_coolant_flow_rate
 
         return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-        (StackElement_t, stack_element, stack_elements_list)
-    {
-        if (stack_element->Type == TDICE_STACK_ELEMENT_CHANNEL)
-        {
-            CellIndex_t layer_index = stack_element->Pointer.Channel->SourceLayerOffset ;
-
-            Source_t *sources = this->Sources +
-
-                get_cell_offset_in_stack (dimensions, layer_index, 0, 0) ;
-
-            FOR_EVERY_COLUMN (column_index, dimensions)
-            {
-                if (IS_CHANNEL_COLUMN (stack_element->Pointer.Channel->ChannelModel, column_index) == true)
-                {
-                    *sources =   (Source_t) 2.0
-                                * get_convective_term
-                                    (stack_element->Pointer.Channel, dimensions, layer_index, 0, column_index)
-                                * stack_element->Pointer.Channel->Coolant.TIn ;
-                }
-
-                sources++ ;
-
-            } // FOR_EVERY_COLUMN
-        }
-    }
+    update_channel_sources (&this->PowerGrid, dimensions) ;
 
     return TDICE_SUCCESS ;
 }

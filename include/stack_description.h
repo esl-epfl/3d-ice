@@ -57,9 +57,7 @@ extern "C"
 #include "die.h"
 #include "layer.h"
 #include "dimensions.h"
-#include "floorplan_element.h"
 #include "material.h"
-#include "powers_queue.h"
 #include "stack_element.h"
 
 /******************************************************************************/
@@ -164,19 +162,6 @@ extern "C"
 
 
 
-    /*! Prints the floorplans (detilaed info) used in the stack file
-     *
-     * \param this   the pointer to the StackDescription
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_floorplans
-
-        (StackDescription_t *this, FILE *stream, String_t prefix) ;
-
-
-
     /*! Returns the number of floorplan elements in a stack element
      *
      * The parameter \a stack_element_id must refer to the ID given to a stack
@@ -204,53 +189,6 @@ extern "C"
      */
 
     Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *this) ;
-
-
-
-    /*! Returns a pointer to a floorplan element in the stack
-     *
-     * \param this address of the StackDescription structure
-     * \param stack_element_id id of the stack element as in the stack file
-     * \param floorplan_element_id id of the floorplan element as in the
-     *                             floorplan file
-     *
-     * \return \c NULL if \a stack_element_id does not exist in the stack
-     * \return \c NULL if \a stack_element_id is not a die stack element
-     * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
-     * \return the pointer to the floorplan element \a floorplan_element_id
-     *         that belongs to the floorplan on the die stack element
-     *         \a stack_element_id
-     */
-
-    FloorplanElement_t *get_floorplan_element
-
-        (StackDescription_t *this,
-         String_t stack_element_id, String_t floorplan_element_id) ;
-
-
-
-    /*! Inserts one power values from \a pvaluse into each floorplan element
-     *  in the stack
-     *
-     *  The queue \a pvalues must contain at least as many power values as
-     *  the number of floorplan elements in the entire stack. \a pvalues is a
-     *  FIFO queue and, whithin the stack, elements are considered from the
-     *  bottom (the last element declared in the stack section of the
-     *  stack description file). If the stack has two dies \c A (bottom) and
-     *  \c B (top) and A has a floorplan with \c n elements while \c B has \c m
-     *  elements, then \a pvalues must contain at least \c nm elements. The
-     *  first \c n power values will be given to \c A and the remaining will
-     *  be assigned to \c B
-     *
-     *  \param this address of the StackDescription structure
-     *  \param pvalues pointer to the list of power values
-     *
-     *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
-     *                           power values
-     *  \return \c TDICE_SUCCESS otherwise
-     */
-
-    Error_t insert_power_values (StackDescription_t *this, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

@@ -82,6 +82,7 @@
                   $(3DICE_SOURCES)/network_message.c          \
                   $(3DICE_SOURCES)/network_socket.c           \
                   $(3DICE_SOURCES)/output.c                   \
+                  $(3DICE_SOURCES)/power_grid.c               \
                   $(3DICE_SOURCES)/powers_queue.c             \
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \

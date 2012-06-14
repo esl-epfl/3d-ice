@@ -129,17 +129,6 @@ extern "C"
 
 
 
-    /*! Prints detailed information about all the fields of a floorplan
-     *
-     * \param this   the floorplan to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_floorplan (Floorplan_t *this, FILE *stream, String_t prefix) ;
-
-
-
     /*! Parses the file pointed by Floorplan::FileName and fills the floorplan structure
      *  \a this
      *
@@ -196,7 +185,7 @@ extern "C"
      * \return the pointer to the floorplan element \a floorplan_element_id
      */
 
-    FloorplanElement_t *get_floorplan_element_floorplan
+    FloorplanElement_t *get_floorplan_element
 
         (Floorplan_t *this, String_t floorplan_element_id) ;
 

@@ -58,7 +58,6 @@ extern "C"
 #include "dimensions.h"
 #include "floorplan.h"
 #include "layer.h"
-#include "powers_queue.h"
 
 /******************************************************************************/
 
@@ -279,50 +278,7 @@ extern "C"
      * \return the total nyumber of floorplan elements in \a this
      */
 
-    Quantity_t get_number_of_floorplan_elements_stack_element
-
-        (StackElement_t *this) ;
-
-
-
-    /*! Returns a pointer to a floorplan element in the stack element
-     *
-     * \param this address of the stack_element
-     * \param floorplan_element_id id of the floorplan element as in the
-     *                             floorplan file
-     *
-     * \return \c NULL if \a this is not a die stack element
-     * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
-     * \return the pointer to the floorplan element \a floorplan_element_id
-     *         that belongs to the floorplan on the die stack element
-     *         \a this
-     */
-
-    FloorplanElement_t *get_floorplan_element_stack_element
-
-        (StackElement_t *this, String_t floorplan_element_id) ;
-
-
-
-    /*! Moves power values from \a pvaluse into a stack element
-     *
-     *  The function works only if \a this is a die. Otherwise, the
-     *  queue \a pvalues remains unchanged. The queue \a pvalues must contain
-     *  at least as many power values as floorplan elements in the floorplan
-     *  of the stack element.
-     *
-     *  \param this address of the StackElement structure
-     *  \param pvalues pointer to the list of power values
-     *
-     *  \return \c TDICE_FAILURE if the queue \a pvalues does not contain enough
-     *                           power values
-     *  \return \c TDICE_SUCCESS if the power values have been copied or if
-     *                           \a this is not a die
-     */
-
-    Error_t insert_power_values_stack_element
-
-        (StackElement_t *this, PowersQueue_t *pvalues) ;
+    Quantity_t get_number_of_floorplan_elements_stack_element (StackElement_t *this) ;
 
 /******************************************************************************/
 

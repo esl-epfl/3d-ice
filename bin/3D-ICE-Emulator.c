@@ -52,8 +52,7 @@ int main(int argc, char** argv)
     Output_t           output ;
     ThermalData_t      tdata ;
 
-    SimResult_t (*emulate) (ThermalData_t*, StackElement_t*,
-                            Dimensions_t*, Analysis_t*) ;
+    SimResult_t (*emulate) (ThermalData_t*, Dimensions_t*, Analysis_t*) ;
 
     Error_t error ;
 
@@ -146,7 +145,7 @@ int main(int argc, char** argv)
 
     do
     {
-        sim_result = emulate (&tdata, stkd.TopStackElement, stkd.Dimensions, &analysis) ;
+        sim_result = emulate (&tdata, stkd.Dimensions, &analysis) ;
 
         if (sim_result == TDICE_STEP_DONE || sim_result == TDICE_SLOT_DONE)
         {
@@ -155,7 +154,7 @@ int main(int argc, char** argv)
             fflush (stdout) ;
 
             generate_output (&output, stkd.Dimensions,
-                             tdata.Temperatures, tdata.Sources,
+                             tdata.Temperatures, tdata.PowerGrid.Sources,
                              get_simulated_time (&analysis),
                              TDICE_OUTPUT_INSTANT_STEP) ;
         }
@@ -165,7 +164,7 @@ int main(int argc, char** argv)
             fprintf (stdout, "\n") ;
 
             generate_output (&output, stkd.Dimensions,
-                             tdata.Temperatures, tdata.Sources,
+                             tdata.Temperatures, tdata.PowerGrid.Sources,
                              get_simulated_time (&analysis),
                              TDICE_OUTPUT_INSTANT_SLOT) ;
         }
@@ -173,7 +172,7 @@ int main(int argc, char** argv)
     } while (sim_result != TDICE_END_OF_SIMULATION) ;
 
     generate_output (&output, stkd.Dimensions,
-                     tdata.Temperatures, tdata.Sources,
+                     tdata.Temperatures, tdata.PowerGrid.Sources,
                      get_simulated_time (&analysis),
                      TDICE_OUTPUT_INSTANT_FINAL) ;
 

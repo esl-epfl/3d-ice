@@ -336,39 +336,3 @@ Quantity_t get_number_of_floorplan_elements_stack_element
 }
 
 /******************************************************************************/
-
-FloorplanElement_t *get_floorplan_element_stack_element
-(
-    StackElement_t *this,
-    String_t        floorplan_element_id
-)
-{
-    if (this->Type != TDICE_STACK_ELEMENT_DIE)
-
-        return NULL ;
-
-    return get_floorplan_element_floorplan
-
-        (this->Floorplan, floorplan_element_id) ;
-}
-
-/******************************************************************************/
-
-Error_t insert_power_values_stack_element
-(
-    StackElement_t *this,
-    PowersQueue_t  *pvalues
-)
-{
-    if (this->Type == TDICE_STACK_ELEMENT_DIE)
-
-        return insert_power_values_floorplan
-
-            (this->Floorplan, pvalues) ;
-
-    else
-
-        return TDICE_SUCCESS ;
-}
-
-/******************************************************************************/

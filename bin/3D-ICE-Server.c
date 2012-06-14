@@ -191,7 +191,7 @@ int main (int argc, char** argv)
                     put_into_powers_queue (&queue, power_value) ;
                 }
 
-                error = insert_power_values (&stkd, &queue) ;
+                error = insert_power_values (&tdata.PowerGrid, &queue) ;
 
                 if (error != TDICE_SUCCESS)
                 {
@@ -207,7 +207,7 @@ int main (int argc, char** argv)
 
                 SimResult_t result = emulate_slot
 
-                    (&tdata, stkd.TopStackElement, stkd.Dimensions, &analysis) ;
+                    (&tdata, stkd.Dimensions, &analysis) ;
 
                 insert_message_word (&reply, &result) ;
 

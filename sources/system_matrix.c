@@ -1444,6 +1444,7 @@ void fill_system_matrix
         switch (thermal_grid->LayersProfile [lindex])
         {
             case TDICE_LAYER_SOLID :
+            case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SPREADER :
             case TDICE_LAYER_SINK :

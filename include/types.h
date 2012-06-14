@@ -327,9 +327,13 @@ extern "C"
 
         TDICE_LAYER_NONE = 0,
 
-        /*! Solid layer in Layer or Die stack elements */
+        /*! Solid layer (passive) */
 
         TDICE_LAYER_SOLID,
+
+        /*! Solid layer (active) */
+
+        TDICE_LAYER_SOURCE,
 
         /*! Solid layer connected to the environment to dissipate heat */
 

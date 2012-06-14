@@ -36,8 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_THERMALGRID_H_
-#define _3DICE_THERMALGRID_H_
+#ifndef _3DICE_THERMAL_GRID_H_
+#define _3DICE_THERMAL_GRID_H_
 
 /*! \file thermal_grid.h */
 
@@ -133,7 +133,7 @@ extern "C"
 
     /*! Fills a thermal grid
      *
-     *  \param this pointer to the thermal cell in the 3d grid
+     *  \param this pointer to the thermal grid
      *  \param list pointer to the list of stack elements
      * \param  dimensions pointer to the structure storing the dimensions
      */
@@ -326,4 +326,4 @@ extern "C"
 }
 #endif
 
-#endif /* _3DICE_THERMALGRID_H_ */
+#endif /* _3DICE_THERMAL_GRID_H_ */
