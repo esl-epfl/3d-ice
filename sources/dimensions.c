@@ -175,6 +175,10 @@ void print_detailed_dimensions
 
 void free_dimensions (Dimensions_t *this)
 {
+    if (this == NULL)
+
+        return ;
+
     if (this->Cell.Heights != NULL)
 
         FREE_POINTER (free, this->Cell.Heights) ;
