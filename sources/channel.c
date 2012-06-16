@@ -43,49 +43,67 @@
 
 void init_coolant (Coolant_t *this)
 {
-    this->HTCSide       = 0.0 ;
-    this->HTCTop        = 0.0 ;
-    this->HTCBottom     = 0.0 ;
-    this->VHC           = 0.0 ;
-    this->FlowRate      = 0.0 ;
-    this->DarcyVelocity = 0.0 ;
-    this->TIn           = 0.0 ;
+    this->HTCSide       = (CoolantHTC_t) 0.0 ;
+    this->HTCTop        = (CoolantHTC_t) 0.0 ;
+    this->HTCBottom     = (CoolantHTC_t) 0.0 ;
+    this->VHC           = (CoolantVHC_t) 0.0 ;
+    this->FlowRate      = (CoolantFR_t) 0.0 ;
+    this->DarcyVelocity = (DarcyVelocity_t) 0.0 ;
+    this->TIn           = (Temperature_t) 0.0 ;
 }
 
 /******************************************************************************/
 
-void copy_coolant (Coolant_t *dest, Coolant_t *src)
+void copy_coolant (Coolant_t *dst, Coolant_t *src)
 {
-    dest->HTCSide       = src->HTCSide ;
-    dest->HTCTop        = src->HTCTop ;
-    dest->HTCBottom     = src->HTCBottom ;
-    dest->VHC           = src->VHC ;
-    dest->FlowRate      = src->FlowRate ;
-    dest->DarcyVelocity = src->DarcyVelocity ;
-    dest->TIn           = src->TIn ;
+    dst->HTCSide       = src->HTCSide ;
+    dst->HTCTop        = src->HTCTop ;
+    dst->HTCBottom     = src->HTCBottom ;
+    dst->VHC           = src->VHC ;
+    dst->FlowRate      = src->FlowRate ;
+    dst->DarcyVelocity = src->DarcyVelocity ;
+    dst->TIn           = src->TIn ;
 }
 
 /******************************************************************************/
 
 void init_channel (Channel_t *this)
 {
-    this->ChannelModel          = TDICE_CHANNEL_MODEL_NONE ;
-    this->Height                = 0.0 ;
-    this->Length                = 0.0 ;
-    this->Pitch                 = 0.0 ;
-    this->Porosity              = 0.0 ;
-    this->NChannels             = 0u ;
-    this->NLayers               = 0u ;
-    this->SourceLayerOffset     = 0u ;
+    this->ChannelModel      = (ChannelModelType_t) TDICE_CHANNEL_MODEL_NONE ;
+    this->Height            = (CellDimension_t) 0.0 ;
+    this->Length            = (ChannelDimension_t) 0.0 ;
+    this->Pitch             = (ChannelDimension_t) 0.0 ;
+    this->Porosity          = (ChannelDimension_t) 0.0 ;
+    this->NChannels         = (Quantity_t) 0u ;
+    this->NLayers           = (CellIndex_t) 0u ;
+    this->SourceLayerOffset = (CellIndex_t) 0u ;
 
     init_coolant ( &this->Coolant ) ;
 
-    this->WallMaterial          = NULL ;
+    this->WallMaterial = NULL ;
 }
 
 /******************************************************************************/
 
-Channel_t *alloc_and_init_channel (void)
+void copy_channel (Channel_t *dst, Channel_t *src)
+{
+    dst->ChannelModel          = src->ChannelModel ;
+    dst->Height                = src->Height ;
+    dst->Length                = src->Length ;
+    dst->Pitch                 = src->Pitch ;
+    dst->Porosity              = src->Porosity ;
+    dst->NChannels             = src->NChannels ;
+    dst->NLayers               = src->NLayers ;
+    dst->SourceLayerOffset     = src->SourceLayerOffset ;
+
+    copy_coolant (&dst->Coolant, &src->Coolant) ;
+
+    dst->WallMaterial = src->WallMaterial ;
+}
+
+/******************************************************************************/
+
+Channel_t *calloc_channel ( void )
 {
     Channel_t *channel = (Channel_t *) malloc (sizeof(Channel_t)) ;
 
@@ -98,9 +116,28 @@ Channel_t *alloc_and_init_channel (void)
 
 /******************************************************************************/
 
+Channel_t *clone_channel (Channel_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    Channel_t *channel = calloc_channel ( ) ;
+
+    if (channel != NULL)
+
+        copy_channel (channel, this) ;
+
+    return channel ;
+}
+
+/******************************************************************************/
+
 void free_channel (Channel_t *this)
 {
-    FREE_POINTER (free, this) ;
+    if (this != NULL)
+
+        FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/

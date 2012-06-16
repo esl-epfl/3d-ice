@@ -241,7 +241,7 @@ ic_elements
   : POSITION  DVALUE ',' DVALUE ';'  // $2 $4
     DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
     {
-        ICElement_t *icelement = alloc_and_init_ic_element () ;
+        ICElement_t *icelement = calloc_ic_element () ;
 
         if (icelement == NULL)
         {
@@ -302,7 +302,7 @@ ic_element
 
   : RECTANGLE '(' DVALUE ',' DVALUE ',' DVALUE ',' DVALUE ')' ';'  // $3 $5 $7 $9
     {
-        ICElement_t *icelement = $$ = alloc_and_init_ic_element () ;
+        ICElement_t *icelement = $$ = calloc_ic_element () ;
 
         if (icelement == NULL)
         {

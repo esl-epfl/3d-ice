@@ -109,33 +109,68 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the material to initialize
+     * \param this the address of the material structure to initialize
      */
 
     void init_material (Material_t *this) ;
 
 
 
-    /*! Allocates a Material_t in memory and sets its fields to their default
-     *  value with \c init_material
+    /*! Copies all the fields of \a src into \a dest.
      *
-     * \return the pointer to a new Material_t
-     * \return \c NULL if the memory allocation fails
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
      */
 
-    Material_t *alloc_and_init_material (void) ;
+    void copy_material (Material_t *dst, Material_t *src) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Allocates and inits memory for a structure of type Analysit_t
      *
-     * The parametrer \a material must be a pointer previously obtained with
-     * \c alloc_and_init_material
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    Material_t *calloc_material ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type Material_t and inits its
+     *  fields with the all the values taken from the parameter \a this
      *
-     * \param this the address of the material structure to free
+     * \param this the address of the material structure to clone
+     *
+     * \return a pointer to a new structure of type Material_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    Material_t *clone_material (Material_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_material or \a clone_material. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
      */
 
     void free_material (Material_t *this) ;
+
+
+
+    /*! Duplicates a list of materials
+     *
+     * \param list the pointer to the first elment in the list to clone
+     *
+     * \return the pointer to the first material in the new list
+     * \return \c NULL in case of error or if the parameter \a list is \c NULL
+     */
+
+    Material_t *clone_materials_list (Material_t *list) ;
 
 
 

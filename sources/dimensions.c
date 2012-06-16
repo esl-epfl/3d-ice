@@ -43,35 +43,149 @@
 
 /******************************************************************************/
 
-void init_dimensions (Dimensions_t *this)
+void init_cell_dimensions (CellDimensions_t *this)
 {
-    this->Cell.FirstWallLength = 0.0 ;
-    this->Cell.LastWallLength  = 0.0 ;
-    this->Cell.WallLength      = 0.0 ;
-    this->Cell.ChannelLength   = 0.0 ;
-
-    this->Cell.Width   = 0.0 ;
-    this->Cell.Heights = NULL ;
-
-    this->Grid.NLayers      = 0u ;
-    this->Grid.NRows        = 0u ;
-    this->Grid.NColumns     = 0u ;
-    this->Grid.NCells       = 0u ;
-    this->Grid.NConnections = 0u ;
-
-    this->Chip.Length = 0.0 ;
-    this->Chip.Width  = 0.0 ;
+    this->FirstWallLength = (CellDimension_t) 0.0 ;
+    this->LastWallLength  = (CellDimension_t) 0.0 ;
+    this->WallLength      = (CellDimension_t) 0.0 ;
+    this->ChannelLength   = (CellDimension_t) 0.0 ;
+    this->Width           = (CellDimension_t) 0.0 ;
+    this->NHeights        = (Quantity_t) 0u ;
+    this->Heights         = NULL ;
 }
 
 /******************************************************************************/
 
-Dimensions_t *alloc_and_init_dimensions (void)
+void copy_cell_dimensions (CellDimensions_t *dst, CellDimensions_t *src)
+{
+    dst->FirstWallLength = src->FirstWallLength ;
+    dst->LastWallLength  = src->LastWallLength ;
+    dst->WallLength      = src->WallLength ;
+    dst->ChannelLength   = src->ChannelLength ;
+    dst->Width           = src->Width ;
+    dst->NHeights        = src->NHeights ;
+
+    if (src->NHeights == 0)
+    {
+        dst->Heights = NULL ;
+
+        return ;
+    }
+
+    dst->Heights = (CellDimension_t *)
+
+        malloc (src->NHeights * sizeof (CellDimension_t)) ;
+
+    if (dst->Heights == NULL)
+    {
+        fprintf (stderr, "Malloc heights error\n") ;
+
+        return ;
+    }
+
+    memcpy (dst->Heights, src->Heights,
+            src->NHeights * sizeof (CellDimension_t) ) ;
+}
+
+/******************************************************************************/
+
+void init_grid_dimensions (GridDimensions_t *this)
+{
+    this->NLayers      = (CellIndex_t) 0u ;
+    this->NRows        = (CellIndex_t) 0u ;
+    this->NColumns     = (CellIndex_t) 0u ;
+    this->NCells       = (CellIndex_t) 0u ;
+    this->NConnections = (CellIndex_t) 0u ;
+}
+
+/******************************************************************************/
+
+void copy_grid_dimensions (GridDimensions_t *dst, GridDimensions_t *src)
+{
+    dst->NLayers      = src->NLayers ;
+    dst->NRows        = src->NRows ;
+    dst->NColumns     = src->NColumns ;
+    dst->NCells       = src->NCells ;
+    dst->NConnections = src->NConnections ;
+}
+
+/******************************************************************************/
+
+void init_chip_dimensions (ChipDimensions_t *this)
+{
+    this->Length = (CellDimension_t) 0.0 ;
+    this->Width  = (CellDimension_t) 0.0 ;
+}
+
+/******************************************************************************/
+
+void copy_chip_dimensions (ChipDimensions_t *dst, ChipDimensions_t *src)
+{
+    dst->Length = src->Length ;
+    dst->Width  = src->Width ;
+}
+
+/******************************************************************************/
+
+void init_dimensions (Dimensions_t *this)
+{
+    init_cell_dimensions (&this->Cell) ;
+    init_grid_dimensions (&this->Grid) ;
+    init_chip_dimensions (&this->Chip) ;
+}
+
+/******************************************************************************/
+
+void copy_dimensions (Dimensions_t *dst, Dimensions_t *src)
+{
+    copy_cell_dimensions (&dst->Cell, &src->Cell) ;
+    copy_grid_dimensions (&dst->Grid, &src->Grid) ;
+    copy_chip_dimensions (&dst->Chip, &src->Chip) ;
+}
+
+/******************************************************************************/
+
+Dimensions_t *calloc_dimensions (void)
 {
     Dimensions_t *dimensions = (Dimensions_t *) malloc (sizeof(Dimensions_t)) ;
 
-    if (dimensions != NULL) init_dimensions (dimensions) ;
+    if (dimensions != NULL)
+
+        init_dimensions (dimensions) ;
 
     return dimensions ;
+}
+
+/******************************************************************************/
+
+Dimensions_t *clone_dimensions (Dimensions_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    Dimensions_t *dimensions = calloc_dimensions ( ) ;
+
+    if (dimensions != NULL)
+
+        copy_dimensions (dimensions, this) ;
+
+    return dimensions ;
+}
+
+/******************************************************************************/
+
+void free_dimensions (Dimensions_t *this)
+{
+    if (this == NULL)
+
+        return ;
+
+    if (this->Cell.Heights != NULL)
+
+        FREE_POINTER (free, this->Cell.Heights) ;
+
+    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -130,12 +244,16 @@ void print_detailed_dimensions
             prefix, this->Cell.Width) ;
 
     fprintf (stream,
+            "%s  Cell.NHeigths             = %d\t",
+            prefix, this->Cell.NHeights) ;
+
+    fprintf (stream,
             "%s  Cell.Heigths              = %p\t",
             prefix, this->Cell.Heights) ;
 
     CellIndex_t layer ;
 
-    for (layer = 0 ; layer != this->Grid.NLayers ; layer++)
+    for (layer = 0 ; layer != this->Cell.NHeights ; layer++)
 
     fprintf (stream, "%.1f ", this->Cell.Heights [layer]) ;
 
@@ -169,21 +287,6 @@ void print_detailed_dimensions
     fprintf (stream,
             "%s  Chip.Width                = %.1f\n",
             prefix, this->Chip.Width) ;
-}
-
-/******************************************************************************/
-
-void free_dimensions (Dimensions_t *this)
-{
-    if (this == NULL)
-
-        return ;
-
-    if (this->Cell.Heights != NULL)
-
-        FREE_POINTER (free, this->Cell.Heights) ;
-
-    FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -410,7 +513,7 @@ CellDimension_t get_cell_height
 
     // layer_index < 0 not tested since CellIndex_t is unsigned
 
-    if (layer_index > LAST_LAYER_INDEX (this))
+    if (layer_index > this->Cell.NHeights)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;

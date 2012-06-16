@@ -127,39 +127,63 @@ extern "C"
 
     /*! Copies all the fields of the coolant structure \a src into \a dest.
      *
-     * \param dest the left term of the assignement (destination)
+     * \param dst the left term of the assignement (destination)
      * \param src the right term of the assignement (source)
      */
 
-    void copy_coolant (Coolant_t *dest, Coolant_t *src) ;
+    void copy_coolant (Coolant_t *dst, Coolant_t *src) ;
 
 
 
-    /*! Sets all the fields of \a this to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the channel to initialize
+     * \param this the address of the channel structure to initialize
      */
 
     void init_channel (Channel_t *this) ;
 
 
 
-    /*! Allocates a channel in memory and sets its fields to their default
-     *  value with #init_channel
+    /*! Copies all the fields of \a src into \a dest.
      *
-     * \return the pointer to a new Channel
-     * \return \c NULL if the memory allocation fails
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
      */
 
-    Channel_t *alloc_and_init_channel (void) ;
+    void copy_channel (Channel_t *dst, Channel_t *src) ;
 
 
-    /*! Frees the memory related to \a this
+
+    /*! Allocates and inits memory for a structure of type Analysit_t
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_channel
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    Channel_t *calloc_channel ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type Channel_t and inits its
+     *  fields with the all the values taken from the parameter \a this
      *
-     * \param this the address of the channel structure to free
+     * \param this the address of the channel structure to clone
+     *
+     * \return a pointer to a new structure of type Channel_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    Channel_t *clone_channel (Channel_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_channel or \a clone_channel. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
      */
 
     void free_channel (Channel_t *this) ;

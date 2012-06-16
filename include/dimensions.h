@@ -99,6 +99,10 @@ extern "C"
 
         CellDimension_t Width ;
 
+        /*! The number of values stored by the vector \a Heights */
+
+        Quantity_t NHeights ;
+
         /*! The heights of all the cells in \f$ \mu m \f$. The vector stores
          *  as many values as layers in the 3D-IC */
 
@@ -109,6 +113,25 @@ extern "C"
     /*! Definition of the type CellDimension_t */
 
     typedef struct CellDimensions_t CellDimensions_t ;
+
+
+
+    /*! Sets all the fields to a default value (zero or \c NULL ).
+     *
+     * \param this the address of the cell dimensions structure to initialize
+     */
+
+    void init_cell_dimensions (CellDimensions_t *this) ;
+
+
+
+    /*! Copies all the fields of \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void copy_cell_dimensions (CellDimensions_t *dst, CellDimensions_t *src) ;
 
 /******************************************************************************/
 
@@ -167,6 +190,25 @@ extern "C"
 
     typedef struct GridDimensions_t GridDimensions_t ;
 
+
+
+    /*! Sets all the fields to a default value (zero or \c NULL ).
+     *
+     * \param this the address of the grid dimensions structure to initialize
+     */
+
+    void init_grid_dimensions (GridDimensions_t *this) ;
+
+
+
+    /*! Copies all the fields of \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void copy_grid_dimensions (GridDimensions_t *dst, GridDimensions_t *src) ;
+
 /******************************************************************************/
 
     /*! \struct ChipDimensions_t
@@ -188,6 +230,25 @@ extern "C"
     /*! Definition of the type ChipDimension */
 
     typedef struct ChipDimensions_t ChipDimensions_t ;
+
+
+
+    /*! Sets all the fields to a default value (zero or \c NULL ).
+     *
+     * \param this the address of the chip dimensions structure to initialize
+     */
+
+    void init_chip_dimensions (ChipDimensions_t *this) ;
+
+
+
+    /*! Copies all the fields of \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void copy_chip_dimensions (ChipDimensions_t *dst, ChipDimensions_t *src) ;
 
 /******************************************************************************/
 
@@ -219,7 +280,7 @@ extern "C"
 
 
 
-    /*! Sets all the fields to a default value (zero).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
      * \param this the address of the dimensions structure to initialize
      */
@@ -228,23 +289,46 @@ extern "C"
 
 
 
-    /*! Allocates a Dimensions structure in memory and sets its fields to their
-     *  default value with #init_dimensions
+    /*! Copies all the fields of \a src into \a dest.
      *
-     * \return the pointer to a new Dimensions
-     * \return \c NULL if the memory allocation fails
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
      */
 
-    Dimensions_t *alloc_and_init_dimensions (void) ;
+    void copy_dimensions (Dimensions_t *dst, Dimensions_t *src) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Allocates and inits memory for a structure of type Analysit_t
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_dimensions
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    Dimensions_t *calloc_dimensions (void) ;
+
+
+
+    /*! Makes a new copy of a structure of type Dimensions_t and inits its
+     *  fields with the all the values taken from the parameter \a this
      *
-     * \param this the address of the dimensions structure to free
+     * \param this the address of the dimensions structure to clone
+     *
+     * \return a pointer to a new structure of type Dimensions_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    Dimensions_t *clone_dimensions (Dimensions_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_dimensions or \a clone_dimensions. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
      */
 
     void free_dimensions (Dimensions_t *this) ;

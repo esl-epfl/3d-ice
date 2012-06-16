@@ -47,7 +47,7 @@
 void init_material (Material_t *this)
 {
     this->Id                     = NULL ;
-    this->Used                   = 0u ;
+    this->Used                   = (Quantity_t) 0u ;
     this->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
     this->ThermalConductivity    = (SolidTC_t) 0.0 ;
     this->Next                   = NULL ;
@@ -55,7 +55,18 @@ void init_material (Material_t *this)
 
 /******************************************************************************/
 
-Material_t *alloc_and_init_material (void)
+void copy_material (Material_t *dst, Material_t *src)
+{
+    dst->Id                     = strdup (src->Id) ;
+    dst->Used                   = src->Used ;
+    dst->VolumetricHeatCapacity = src->VolumetricHeatCapacity ;
+    dst->ThermalConductivity    = src->ThermalConductivity ;
+    dst->Next                   = src->Next ;
+}
+
+/******************************************************************************/
+
+Material_t *calloc_material ( void )
 {
     Material_t *material = (Material_t *) malloc (sizeof(Material_t)) ;
 
@@ -68,13 +79,67 @@ Material_t *alloc_and_init_material (void)
 
 /******************************************************************************/
 
+Material_t *clone_material (Material_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    Material_t *material = calloc_material ( ) ;
+
+    if (material != NULL)
+
+        copy_material (material, this) ;
+
+    return material ;
+}
+
+/******************************************************************************/
+
 void free_material (Material_t *this)
 {
+    if (this == NULL)
+
+        return ;
+
     if (this->Id != NULL)
 
         FREE_POINTER (free, this->Id) ;
 
     FREE_POINTER (free, this) ;
+}
+
+/******************************************************************************/
+
+Material_t *clone_materials_list (Material_t *list)
+{
+    if (list == NULL)
+
+        return NULL ;
+
+    Material_t *new_list = NULL ;
+    Material_t *prev     = NULL ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
+    {
+        Material_t *tmp = clone_material (material) ;
+
+        if (tmp == NULL)
+        {
+            free_materials_list (new_list) ;
+
+            new_list = NULL ;
+
+            break ;
+        }
+
+        if (new_list == NULL)    new_list   = tmp ;
+        else                     prev->Next = tmp ;
+
+        prev = tmp ;
+    }
+
+    return new_list ;
 }
 
 /******************************************************************************/

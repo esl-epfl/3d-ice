@@ -108,33 +108,67 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the ic element to initialize
+     * \param this the address of the ic element structure to initialize
      */
 
     void init_ic_element (ICElement_t *this) ;
 
 
 
-    /*! Allocates an ICElement in memory and sets its fields to their
-     *   default value with #init_ic_element
+    /*! Copies all the fields of \a src into \a dest.
      *
-     * \return the pointer to a new ICElement
-     * \return \c NULL if the memory allocation fails
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
      */
 
-    ICElement_t *alloc_and_init_ic_element (void) ;
+    void copy_ic_element (ICElement_t *dst, ICElement_t *src) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Allocates and inits memory for a structure of type Analysit_t
      *
-     * The parametrer \a this must be a pointer previously
-     *  obtained with #alloc_and_init_ic_element
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    ICElement_t *calloc_ic_element ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type ICElement_t and inits its
+     *  fields with the all the values taken from the parameter \a this
      *
-     * \param this the address of the ic element structure to free
+     * \param this the address of the ic element structure to clone
+     *
+     * \return a pointer to a new structure of type ICElement_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    ICElement_t *clone_ic_element (ICElement_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_ic_element or \a clone_ic_element. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
      */
 
     void free_ic_element (ICElement_t *this) ;
+
+
+    /*! Duplicates a list of ic elements
+     *
+     * \param list the pointer to the first elment in the list to clone
+     *
+     * \return the pointer to the first ic element in the new list
+     * \return \c NULL in case of error or if the parameter \a list is \c NULL
+     */
+
+    ICElement_t *clone_ic_elements_list (ICElement_t *list) ;
 
 
 

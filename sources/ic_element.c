@@ -43,22 +43,35 @@
 
 void init_ic_element (ICElement_t *this)
 {
-    this->SW_X   = 0.0 ;
-    this->SW_Y   = 0.0 ;
-    this->Length = 0.0 ;
-    this->Width  = 0.0 ;
-
-    this->SW_Row    = 0u ;
-    this->SW_Column = 0u ;
-    this->NE_Row    = 0u ;
-    this->NE_Column = 0u ;
-
-    this->Next = NULL ;
+    this->SW_X      = (ChipDimension_t) 0.0 ;
+    this->SW_Y      = (ChipDimension_t) 0.0 ;
+    this->Length    = (ChipDimension_t) 0.0 ;
+    this->Width     = (ChipDimension_t) 0.0 ;
+    this->SW_Row    = (CellIndex_t) 0u ;
+    this->SW_Column = (CellIndex_t) 0u ;
+    this->NE_Row    = (CellIndex_t) 0u ;
+    this->NE_Column = (CellIndex_t) 0u ;
+    this->Next      = NULL ;
 }
 
 /******************************************************************************/
 
-ICElement_t *alloc_and_init_ic_element (void)
+void copy_ic_element (ICElement_t *dst, ICElement_t *src)
+{
+    dst->SW_X      = src->SW_X ;
+    dst->SW_Y      = src->SW_Y ;
+    dst->Length    = src->Length ;
+    dst->Width     = src->Width ;
+    dst->SW_Row    = src->SW_Row ;
+    dst->SW_Column = src->SW_Column ;
+    dst->NE_Row    = src->NE_Row ;
+    dst->NE_Column = src->NE_Column ;
+    dst->Next      = src->Next ;
+}
+
+/******************************************************************************/
+
+ICElement_t *calloc_ic_element ( void )
 {
     ICElement_t *ic_element = (ICElement_t *) malloc (sizeof(ICElement_t));
 
@@ -71,9 +84,61 @@ ICElement_t *alloc_and_init_ic_element (void)
 
 /*****************************************************************************/
 
+ICElement_t *clone_ic_element (ICElement_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    ICElement_t *ic_element = calloc_ic_element ( ) ;
+
+    if (ic_element != NULL)
+
+        copy_ic_element (ic_element, this) ;
+
+    return ic_element ;
+}
+
+/*****************************************************************************/
+
 void free_ic_element (ICElement_t *this)
 {
-    FREE_POINTER (free, this) ;
+    if (this != NULL)
+
+        FREE_POINTER (free, this) ;
+}
+
+/******************************************************************************/
+
+ICElement_t *clone_ic_elements_list (ICElement_t *list)
+{
+    if (list == NULL)
+
+        return NULL ;
+
+    ICElement_t *new_list = NULL ;
+    ICElement_t *prev     = NULL ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el, list)
+    {
+        ICElement_t *tmp = clone_ic_element (ic_el) ;
+
+        if (tmp == NULL)
+        {
+            free_ic_elements_list (new_list) ;
+
+            new_list = NULL ;
+
+            break ;
+        }
+
+        if (new_list == NULL)    new_list   = tmp ;
+        else                     prev->Next = tmp ;
+
+        prev = tmp ;
+    }
+
+    return new_list ;
 }
 
 /******************************************************************************/

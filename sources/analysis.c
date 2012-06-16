@@ -46,12 +46,63 @@
 
 void init_analysis (Analysis_t *this)
 {
-    this->AnalysisType         = TDICE_ANALYSIS_TYPE_NONE ;
-    this->StepTime             = (Time_t) 0.0 ;
-    this->SlotTime             = (Time_t) 0.0 ;
-    this->SlotLength           = 0u ;
-    this->CurrentTime          = 0u ;
-    this->InitialTemperature   = (Temperature_t) 0.0 ;
+    this->AnalysisType       = (AnalysisType_t) TDICE_ANALYSIS_TYPE_NONE ;
+    this->StepTime           = (Time_t) 0.0 ;
+    this->SlotTime           = (Time_t) 0.0 ;
+    this->SlotLength         = (Quantity_t) 0u ;
+    this->CurrentTime        = (Quantity_t) 0u ;
+    this->InitialTemperature = (Temperature_t) 0.0 ;
+}
+
+/******************************************************************************/
+
+void copy_analysis (Analysis_t *dst, Analysis_t *src)
+{
+    dst->AnalysisType       = src->AnalysisType ;
+    dst->StepTime           = src->StepTime ;
+    dst->SlotTime           = src->SlotTime ;
+    dst->SlotLength         = src->SlotLength ;
+    dst->CurrentTime        = src->CurrentTime ;
+    dst->InitialTemperature = src->InitialTemperature ;
+}
+
+/******************************************************************************/
+
+Analysis_t *calloc_analysis ( void )
+{
+    Analysis_t *analysis = (Analysis_t *) malloc (sizeof (Analysis_t)) ;
+
+    if (analysis != NULL)
+
+        init_analysis (analysis) ;
+
+    return analysis ;
+}
+
+/******************************************************************************/
+
+Analysis_t *clone_analysis (Analysis_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    Analysis_t *analysis = calloc_analysis ( ) ;
+
+    if (analysis != NULL)
+
+        copy_analysis (analysis, this) ;
+
+    return analysis ;
+}
+
+/******************************************************************************/
+
+void free_analysis (Analysis_t *this)
+{
+    if (this != NULL)
+
+        FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/

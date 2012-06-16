@@ -104,6 +104,52 @@ extern "C"
 
 
 
+    /*! Copies all the fields of \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void copy_analysis (Analysis_t *dst, Analysis_t *src) ;
+
+
+
+    /*! Allocates and inits memory for a structure of type Analysit_t
+     *
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    Analysis_t *calloc_analysis ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type Analysis_t and inits its
+     *  fields with the all the values taken from the parameter \a this
+     *
+     * \param this the address of the analysis structure to clone
+     *
+     * \return a pointer to a new structure of type Analysis_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    Analysis_t *clone_analysis (Analysis_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_analysis or \a clone_analysis. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
+     */
+
+    void free_analysis (Analysis_t *this) ;
+
+
+
     /*! Returns the time, in seconds, sum of the time steps emulated so far
      *
      * \param this the address of the analysis structure

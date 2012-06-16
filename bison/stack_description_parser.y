@@ -273,7 +273,7 @@ material
         THERMAL CONDUCTIVITY     DVALUE ';'     // $6
         VOLUMETRIC HEAT CAPACITY DVALUE ';'     // $11
     {
-        Material_t *material = $$ = alloc_and_init_material () ;
+        Material_t *material = $$ = calloc_material () ;
 
         if (material == NULL)
         {
@@ -420,7 +420,7 @@ microchannel_opt
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'   //  $31
         COOLANT INCOMING TEMPERATURE DVALUE ';'       //  $36
     {
-        stkd->Channel = alloc_and_init_channel () ;
+        stkd->Channel = calloc_channel () ;
 
         if (stkd->Channel == NULL)
         {
@@ -474,7 +474,7 @@ microchannel_opt
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'  //  $29
         COOLANT INCOMING TEMPERATURE DVALUE ';'      //  $34
     {
-        stkd->Channel = alloc_and_init_channel () ;
+        stkd->Channel = calloc_channel () ;
 
         if (stkd->Channel == NULL)
         {
@@ -526,7 +526,7 @@ microchannel_opt
         COOLANT VOLUMETRIC HEAT CAPACITY DVALUE ';'    //  $30
         COOLANT INCOMING TEMPERATURE DVALUE ';'        //  $35
     {
-        stkd->Channel = alloc_and_init_channel () ;
+        stkd->Channel = calloc_channel () ;
 
         if (stkd->Channel == NULL)
         {
@@ -894,7 +894,7 @@ dimensions
         CHIP LENGTH DVALUE ',' WIDTH DVALUE ';'    // $5  $8
         CELL LENGTH DVALUE ',' WIDTH DVALUE ';'    // $12 $15
     {
-        stkd->Dimensions = alloc_and_init_dimensions () ;
+        stkd->Dimensions = calloc_dimensions () ;
 
         if (stkd->Dimensions == NULL)
         {
@@ -1088,7 +1088,8 @@ stack
 
         // Stores the vertical profile of cell heights
 
-        stkd->Dimensions->Cell.Heights = malloc (layer_index * sizeof (CellDimension_t)) ;
+        stkd->Dimensions->Cell.NHeights = layer_index ;
+        stkd->Dimensions->Cell.Heights  = malloc (layer_index * sizeof (CellDimension_t)) ;
 
         if (stkd->Dimensions->Cell.Heights == NULL)
         {
