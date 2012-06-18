@@ -194,7 +194,7 @@ void print_formatted_floorplan_element
         "%s   power values ",
         prefix) ;
 
-    print_formatted_powers_queue (this->PowerValues, stream) ;
+    print_formatted_powers_queue (this->PowerValues, stream, "") ;
 
     fprintf (stream, "\n") ;
 }
@@ -234,11 +234,7 @@ Error_t insert_power_values_floorplan_element
 
         return TDICE_FAILURE ;
 
-    Power_t power = get_from_powers_queue (pvalues) ;
-
-    put_into_powers_queue (this->PowerValues, power);
-
-    pop_from_powers_queue (pvalues) ;
+    put_into_powers_queue (this->PowerValues, get_from_powers_queue (pvalues));
 
     return TDICE_SUCCESS ;
 }

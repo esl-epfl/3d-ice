@@ -338,7 +338,7 @@ optional_power_values_list
   : // Declaring the entire subsection of power values is not mandatory
 
     {
-        PowersQueue_t* powers_list = $$ = alloc_and_init_powers_queue() ;
+        PowersQueue_t* powers_list = $$ = calloc_powers_queue() ;
 
         if (powers_list == NULL)
         {
@@ -346,6 +346,8 @@ optional_power_values_list
 
             YYABORT ;
         }
+
+        build_powers_queue (powers_list, 10) ;
     }
 
   | POWER VALUES power_values_list ';' // $3
@@ -360,7 +362,7 @@ power_values_list
   : DVALUE              // $1
                         // Here at least one power value is mandatory
     {
-        PowersQueue_t* powers_list = $$ = alloc_and_init_powers_queue() ;
+        PowersQueue_t* powers_list = $$ = calloc_powers_queue() ;
 
         if (powers_list == NULL)
         {
@@ -368,6 +370,8 @@ power_values_list
 
             YYABORT ;
         }
+
+        build_powers_queue (powers_list, 10) ;
 
         put_into_powers_queue (powers_list, $1) ;
     }

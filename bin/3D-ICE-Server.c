@@ -182,6 +182,8 @@ int main (int argc, char** argv)
 
                 extract_message_word (&request, &nflpel, 0) ;
 
+                build_powers_queue (&queue, nflpel) ;
+
                 for (index = 1, nflpel++ ; index != nflpel ; index++)
                 {
                     float power_value ;
@@ -197,10 +199,14 @@ int main (int argc, char** argv)
                 {
                     fprintf (stderr, "error: insert power values\n") ;
 
+                    destroy_powers_queue (&queue) ;
+
                     free_network_message (&request) ;
 
                     goto sim_error ;
                 }
+
+                destroy_powers_queue (&queue) ;
 
                 init_network_message (&reply) ;
                 build_message_head   (&reply, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;

@@ -158,7 +158,7 @@ FloorplanElement_t *get_floorplan_element
 
 Error_t fill_sources_floorplan (Floorplan_t *this, Source_t *sources)
 {
-    Quantity_t  index = 0u ;
+    Quantity_t index = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, this->ElementsList)
     {
@@ -167,8 +167,6 @@ Error_t fill_sources_floorplan (Floorplan_t *this, Source_t *sources)
             return TDICE_FAILURE ;
 
         this->Bpowers [ index++ ] = get_from_powers_queue (flp_el->PowerValues) ;
-
-        pop_from_powers_queue (flp_el->PowerValues) ;
     }
 
     // Does the mv multiplication to compute the source vector

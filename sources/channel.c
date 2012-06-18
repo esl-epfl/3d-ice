@@ -69,7 +69,7 @@ void copy_coolant (Coolant_t *dst, Coolant_t *src)
 
 void init_channel (Channel_t *this)
 {
-    this->ChannelModel      = (ChannelModelType_t) TDICE_CHANNEL_MODEL_NONE ;
+    this->ChannelModel      = (ChannelModel_t) TDICE_CHANNEL_MODEL_NONE ;
     this->Height            = (CellDimension_t) 0.0 ;
     this->Length            = (ChannelDimension_t) 0.0 ;
     this->Pitch             = (ChannelDimension_t) 0.0 ;

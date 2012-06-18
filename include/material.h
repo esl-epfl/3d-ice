@@ -116,7 +116,10 @@ extern "C"
 
 
 
-    /*! Copies all the fields of \a src into \a dest.
+    /*! Copies the material \a src into \a dest.
+     *
+     * After the copy, the ic elements \a dst and \a src will point
+     * to the same Next material
      *
      * \param dst the left term of the assignement (destination)
      * \param src the right term of the assignement (source)
@@ -126,7 +129,7 @@ extern "C"
 
 
 
-    /*! Allocates and inits memory for a structure of type Analysit_t
+    /*! Allocates and inits memory for a structure of type Material_t
      *
      * \return a pointer to the allocated memory.
      * \return \c NULL in case of error
