@@ -57,7 +57,8 @@ void init_material (Material_t *this)
 
 void copy_material (Material_t *dst, Material_t *src)
 {
-    dst->Id                     = strdup (src->Id) ;
+    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+
     dst->Used                   = src->Used ;
     dst->VolumetricHeatCapacity = src->VolumetricHeatCapacity ;
     dst->ThermalConductivity    = src->ThermalConductivity ;

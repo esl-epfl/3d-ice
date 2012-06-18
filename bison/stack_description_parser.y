@@ -669,7 +669,7 @@ layer
        HEIGHT DVALUE ';'       // $5
        MATERIAL IDENTIFIER ';' // $8
   {
-        Layer_t *layer = $$ = alloc_and_init_layer () ;
+        Layer_t *layer = $$ = calloc_layer () ;
 
         if (layer == NULL)
         {
@@ -730,7 +730,7 @@ die_layer_content :
     DVALUE IDENTIFIER ';' // $1 and $2
 
     {
-        Layer_t *layer = $$ = alloc_and_init_layer () ;
+        Layer_t *layer = $$ = calloc_layer () ;
 
         if (layer == NULL)
         {
@@ -797,7 +797,7 @@ die
         die_source_layer       // $5 source layer
         die_layers_list        // $6 list of layers (bottom -> below source)
     {
-        Die_t *die = $$ = alloc_and_init_die () ;
+        Die_t *die = $$ = calloc_die () ;
 
         if (die == NULL)
         {

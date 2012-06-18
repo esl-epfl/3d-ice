@@ -166,8 +166,8 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Channel_t and inits its
-     *  fields with the all the values taken from the parameter \a this
+    /*! Makes a new copy of a structure of type Channel_t and
+     *  copies \a this into it.
      *
      * \param this the address of the channel structure to clone
      *

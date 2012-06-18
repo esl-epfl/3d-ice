@@ -123,7 +123,7 @@ extern "C"
 
     /*! Copies the queue \a src into the queue \a dest.
      *
-     * All the information previously stored in \a src get lost. After the copy
+     * All the power values previously stored in \a src get lost. After the copy
      * \a src will have a new capacity if its own was smaller than the capacity
      * of \a dst. The internal state of \a dst can be different from the state
      * of \a src but the queue \a dst will store the same power values as
@@ -149,8 +149,8 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type PowersQueue_t and inits its
-     *  fields with the all the values taken from the parameter \a this
+    /*! Makes a new copy of a structure of type PowersQueue_t and
+     *  copies \a this into it
      *
      * \param this the address of the PowersQueue_t structure to clone
      *

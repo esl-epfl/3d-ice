@@ -105,41 +105,81 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the layer to initialize
+     * \param this the address of the layer structure to initialize
      */
 
     void init_layer (Layer_t *this) ;
 
 
 
-    /*! Allocates a Layer in memory and sets its fields to their default
-     *  value with \c init_layer
+    /*! Copies the layer \a src into the layer \a dest.
      *
-     * \return the pointer to a new Layer
-     * \return \c NULL if the memory allocation fails
+     * After the copy, the layers \a dst and \a src will point
+     * to the same Material and to the same Next and Prev layers
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
      */
 
-    Layer_t *alloc_and_init_layer (void) ;
+    void copy_layer (Layer_t *dst, Layer_t *src) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Allocates and inits memory for a structure of type Layer_t
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * \c alloc_and_init_layer
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    Layer_t *calloc_layer ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type Layer_t and
+     *  copies \a this into it.
      *
-     * \param this the address of the layer structure to free
+     * \param this the address of the layer structure to clone
+     *
+     * \return a pointer to a new structure of type Layer_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    Layer_t *clone_layer (Layer_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_layer or \a clone_layer. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
      */
 
     void free_layer (Layer_t *this) ;
 
 
 
+    /*! Duplicates a list of layers
+     *
+     * The function duplicates the list following the pointer Layer_t::Next
+     *
+     * \param list the pointer to the first elment in the list to clone
+     *
+     * \return the pointer to the first layer in the new list
+     * \return \c NULL in case of error or if the parameter \a list is \c NULL
+     */
+
+    Layer_t *clone_layers_list (Layer_t *list) ;
+
+
+
     /*! Frees a list of layers
      *
      * If frees, calling \c free_layer, the layer pointed by the
-     * parameter \a list and all the layer it finds following the
-     * linked list throught the field Layer::Next.
+     * parameter \a list and all the layers it finds following the
+     * linked list throught the field Layer_t::Next.
      *
      * \param list the pointer to the first elment in the list to be freed
      */

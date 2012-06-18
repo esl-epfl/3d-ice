@@ -46,17 +46,31 @@
 
 void init_layer (Layer_t *this)
 {
-    this->Height   = 0.0 ;
+    this->Height   = (CellDimension_t) 0.0 ;
     this->Material = NULL ;
     this->Id       = NULL ;
-    this->Used     = 0u ;
+    this->Used     = (Quantity_t) 0u ;
     this->Next     = NULL ;
     this->Prev     = NULL ;
 }
 
 /******************************************************************************/
 
-Layer_t *alloc_and_init_layer (void)
+void copy_layer (Layer_t *dst, Layer_t *src)
+{
+    dst->Height   = src->Height ;
+    dst->Material = src->Material ;
+
+    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+
+    dst->Used     = src->Used ;
+    dst->Next     = src->Next ;
+    dst->Prev     = src->Prev ;
+}
+
+/******************************************************************************/
+
+Layer_t *calloc_layer (void)
 {
     Layer_t *layer = (Layer_t *) malloc (sizeof(Layer_t));
 
@@ -69,13 +83,72 @@ Layer_t *alloc_and_init_layer (void)
 
 /******************************************************************************/
 
+Layer_t *clone_layer (Layer_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    Layer_t *layer = calloc_layer ( ) ;
+
+    if (layer != NULL)
+
+        copy_layer (layer, this) ;
+
+    return layer ;
+}
+
+/******************************************************************************/
+
 void free_layer (Layer_t *this)
 {
+    if (this == NULL)
+
+        return ;
+
     if (this->Id != NULL)
 
         FREE_POINTER (free, this->Id) ;
 
     FREE_POINTER (free, this) ;
+}
+
+/******************************************************************************/
+
+Layer_t *clone_layers_list (Layer_t *list)
+{
+    if (list == NULL)
+
+        return NULL ;
+
+    Layer_t *new_list = NULL ;
+    Layer_t *prev     = NULL ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
+    {
+        Layer_t *tmp = clone_layer (layer) ;
+
+        if (tmp == NULL)
+        {
+            free_layers_list (new_list) ;
+
+            new_list = NULL ;
+
+            break ;
+        }
+
+        if (new_list == NULL)
+
+            new_list = tmp ;
+
+        else
+
+            JOIN_ELEMENTS (prev, tmp) ;
+
+        prev = tmp ;
+    }
+
+    return new_list ;
 }
 
 /******************************************************************************/

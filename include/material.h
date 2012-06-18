@@ -118,7 +118,7 @@ extern "C"
 
     /*! Copies the material \a src into \a dest.
      *
-     * After the copy, the ic elements \a dst and \a src will point
+     * After the copy, the materials \a dst and \a src will point
      * to the same Next material
      *
      * \param dst the left term of the assignement (destination)
@@ -139,8 +139,8 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Material_t and inits its
-     *  fields with the all the values taken from the parameter \a this
+    /*! Makes a new copy of a structure of type Material_t and
+     *  copies \a this into it.
      *
      * \param this the address of the material structure to clone
      *

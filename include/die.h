@@ -108,35 +108,77 @@ extern "C"
 
 
 
-    /*! Sets all the fields of the die to a default value (zero or \c NULL ).
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the die to initialize
+     * \param this the address of the die structure to initialize
      */
 
     void init_die (Die_t *this) ;
 
 
 
-    /*! Allocates a die in memory and sets its fields to their default
-     *  value with \c init_die
+    /*! Copies the die \a src into the die \a dest.
      *
-     * \return the pointer to a new Die
-     * \return \c NULL if the memory allocation fails
+     * After the copy, the dies \a dst and \a src will point
+     * to the same Next die while the list of layers composing
+     * the die \a dst will be a clone of the list of \a src . The list of
+     * layers that were in \a dst will be deleted, if any.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
      */
 
-    Die_t *alloc_and_init_die (void) ;
+    void copy_die (Die_t *dst, Die_t *src) ;
 
 
 
-    /*! Frees the memory related to \a die
+    /*! Allocates and inits memory for a structure of type Die_t
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * \c alloc_and_init_die
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
+     */
+
+    Die_t *calloc_die ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type Die_t and
+     *  copies \a this into it.
      *
-     * \param this the address of the die structure to free
+     * \param this the address of the die structure to clone
+     *
+     * \return a pointer to a new structure of type Die_t
+     * \return \c NULL in case of error of if the parameter \a this is \c NULL
+     */
+
+    Die_t *clone_die (Die_t *this) ;
+
+
+
+    /*! Frees the memory space pointed to by \a this
+     *
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_die or \a clone_die. If \a this is \c NULL,
+     * no operation is performed.
+     *
+     * \param this the address to free
      */
 
     void free_die (Die_t *this) ;
+
+
+
+    /*! Duplicates a list of dies
+     *
+     * The function duplicates the list following the pointer Die_t::Next
+     *
+     * \param list the pointer to the first elment in the list to clone
+     *
+     * \return the pointer to the first die in the new list
+     * \return \c NULL in case of error or if the parameter \a list is \c NULL
+     */
+
+    Die_t *clone_dies_list (Die_t *list) ;
 
 
 
@@ -144,7 +186,7 @@ extern "C"
      *
      * If frees, calling \c free_die, the die pointed by the
      * parameter \a list and all the dies it finds following the
-     * linked list throught the field Die::Next .
+     * linked list throught the field Die_t::Next.
      *
      * \param list the pointer to the first elment in the list to be freed
      */

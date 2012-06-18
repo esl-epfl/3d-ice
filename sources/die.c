@@ -47,9 +47,9 @@
 void init_die (Die_t *this)
 {
     this->Id                = NULL ;
-    this->Used              = 0u ;
-    this->NLayers           = 0u ;
-    this->SourceLayerOffset = 0u ;
+    this->Used              = (Quantity_t) 0u ;
+    this->NLayers           = (CellIndex_t) 0u ;
+    this->SourceLayerOffset = (CellIndex_t) 0u ;
     this->TopLayer          = NULL ;
     this->SourceLayer       = NULL ;
     this->BottomLayer       = NULL ;
@@ -58,7 +58,37 @@ void init_die (Die_t *this)
 
 /******************************************************************************/
 
-Die_t *alloc_and_init_die (void)
+void copy_die (Die_t *dst, Die_t *src)
+{
+    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+
+    dst->Used              = src->Used ;
+    dst->NLayers           = src->NLayers ;
+    dst->SourceLayerOffset = src->SourceLayerOffset ;
+    dst->Next              = src->Next ;
+
+    if (dst->BottomLayer != NULL)
+
+        free_layers_list (dst->BottomLayer) ;
+
+    dst->BottomLayer = clone_layers_list (src->BottomLayer) ;
+
+    Layer_t *tmp_dst = dst->BottomLayer ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, tmp_src, src->BottomLayer)
+    {
+        if (tmp_src == src->SourceLayer)
+
+            dst->SourceLayer = tmp_dst ;
+
+        dst->TopLayer = tmp_dst ;
+        tmp_dst = tmp_dst->Next ;
+    }
+}
+
+/******************************************************************************/
+
+Die_t *calloc_die (void)
 {
     Die_t *die = (Die_t *) malloc (sizeof(Die_t)) ;
 
@@ -71,8 +101,29 @@ Die_t *alloc_and_init_die (void)
 
 /******************************************************************************/
 
+Die_t *clone_die (Die_t *this)
+{
+    if (this == NULL)
+
+        return NULL ;
+
+    Die_t *die = calloc_die ( ) ;
+
+    if (die != NULL)
+
+        copy_die (die, this) ;
+
+    return die ;
+}
+
+/******************************************************************************/
+
 void free_die (Die_t *this)
 {
+    if (this == NULL)
+
+        return ;
+
     if (this->Id != NULL)
 
         FREE_POINTER (free, this->Id) ;
@@ -81,6 +132,44 @@ void free_die (Die_t *this)
     FREE_POINTER (free_layers_list, this->BottomLayer) ;
 
     FREE_POINTER (free, this) ;
+}
+
+/******************************************************************************/
+
+Die_t *clone_dies_list (Die_t *list)
+{
+    if (list == NULL)
+
+        return NULL ;
+
+    Die_t *new_list = NULL ;
+    Die_t *prev     = NULL ;
+
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, list)
+    {
+        Die_t *tmp = clone_die (die) ;
+
+        if (tmp == NULL)
+        {
+            free_dies_list (new_list) ;
+
+            new_list = NULL ;
+
+            break ;
+        }
+
+        if (new_list == NULL)
+
+            new_list = tmp ;
+
+        else
+
+            prev->Next = tmp ;
+
+        prev = tmp ;
+    }
+
+    return new_list ;
 }
 
 /******************************************************************************/
