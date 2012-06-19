@@ -219,7 +219,18 @@ void fill_thermal_grid
                 {
                     case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
 
-                        this->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+                        if (this->LayersProfile [index] == TDICE_LAYER_SOLID)
+
+                            this->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+
+                        else if (this->LayersProfile [index] == TDICE_LAYER_SOURCE)
+
+                            this->LayersProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+
+                        else
+
+                            fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
+
                         this->VHCProfile    [index] = this->HeatSink->SinkMaterial->VolumetricHeatCapacity ;
                         this->TCProfile     [index] = this->HeatSink->SinkMaterial->ThermalConductivity ;
 
@@ -304,6 +315,7 @@ Capacity_t get_capacity
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
 
@@ -417,6 +429,7 @@ Conductance_t get_conductance_top
                         / (get_cell_height (dimensions, layer_index) / 2.0) ;
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  2.0
                     * this->TCProfile [ layer_index ]
@@ -569,6 +582,7 @@ Conductance_t get_conductance_bottom
                         / (get_cell_height (dimensions, layer_index) / 2.0) ;
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
 
@@ -669,6 +683,7 @@ Conductance_t get_conductance_north
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
@@ -756,6 +771,7 @@ Conductance_t get_conductance_south
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
@@ -843,6 +859,7 @@ Conductance_t get_conductance_east
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
                     * get_cell_width  (dimensions, row_index)
@@ -917,6 +934,7 @@ Conductance_t get_conductance_west
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  this->TCProfile [ layer_index ]
                     * get_cell_width  (dimensions, row_index)

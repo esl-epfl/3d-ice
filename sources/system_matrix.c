@@ -399,7 +399,8 @@ skip_west :
     }
 
     if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT)
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
+        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
 
         *this.Values += get_conductance_top
 
@@ -1446,6 +1447,7 @@ void fill_system_matrix
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SPREADER :
             case TDICE_LAYER_SINK :
             {

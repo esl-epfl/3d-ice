@@ -335,9 +335,13 @@ extern "C"
 
         TDICE_LAYER_SOURCE,
 
-        /*! Solid layer connected to the environment to dissipate heat */
+        /*! Solid layer (passive) connected to the environment to dissipate heat */
 
         TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT,
+
+        /*! Solid layer (active) connected to the environment to dissipate heat */
+
+        TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT,
 
         /*! Spreader layer between the chip and the sink */
 

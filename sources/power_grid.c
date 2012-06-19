@@ -218,7 +218,17 @@ void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
                 {
                     case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
 
-                        this->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+                        if (this->LayersProfile [index] == TDICE_LAYER_SOLID)
+
+                            this->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+
+                        else if (this->LayersProfile [index] == TDICE_LAYER_SOURCE)
+
+                            this->LayersProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+
+                        else
+
+                            fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
 
                         break ;
 
@@ -315,6 +325,33 @@ Error_t update_source_vector
 
                     } // FOR_EVERY_COLUMN
                 } // FOR_EVERY_ROW
+
+                break ;
+            }
+
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+            {
+                Source_t *tmp = sources ;
+
+                FOR_EVERY_ROW (row, dimensions)
+                {
+                    FOR_EVERY_COLUMN (column, dimensions)
+                    {
+                        *tmp++ += this->HeatSink->AmbientTemperature
+
+                                     * get_conductance_top (thermal_grid,
+                                           dimensions, layer, row, column) ;
+
+                    } // FOR_EVERY_COLUMN
+                } // FOR_EVERY_ROW
+
+                Error_t error = fill_sources_floorplan
+
+                    (this->FloorplansProfile [layer], sources) ;
+
+                if (error == TDICE_FAILURE)
+
+                    return TDICE_FAILURE ;
 
                 break ;
             }
@@ -417,6 +454,7 @@ void update_channel_sources (PowerGrid_t *this, Dimensions_t *dimensions)
 
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SINK :
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_SPREADER :
@@ -454,6 +492,7 @@ Error_t insert_power_values (PowerGrid_t *this, PowersQueue_t *pvalues)
         switch (this->LayersProfile [layer])
         {
             case TDICE_LAYER_SOURCE :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             {
                 Error_t result = insert_power_values_floorplan
 
