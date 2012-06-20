@@ -139,6 +139,9 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
 
     max_difference = 0.0 ;
+    max_ref = 0 ;
+    max_row = 0 ;
+    max_column = 0 ;
 
     for (counter = 0 ; counter != counter1 ; counter++)
     {

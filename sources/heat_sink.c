@@ -220,16 +220,6 @@ SolidTC_t get_sink_volumetric_heat_capacity
 
 /******************************************************************************/
 
-#   define LAMBDA(_e)                     \
-                                          \
-        ( PI + (1.0 / (sqrt (PI) * _e)) )
-
-#   define PHI(_lambda, _bi, _tau)                          \
-                                                            \
-        ( (tanh (_lambda * _tau) + (_lambda / _bi))         \
-          /                                                 \
-          (1.0 + (_lambda / _bi) * tanh (_lambda * _tau)) )
-
 SolidTC_t get_spreader_thermal_conductivity
 (
     HeatSink_t      *this,
@@ -257,12 +247,18 @@ SolidTC_t get_spreader_thermal_conductivity
 
                         / this->SinkMaterial->ThermalConductivity ;
 
+    SolidTC_t lambda_sink = PI + (1.0 / (sqrt (PI) * e_sink)) ;
+
+    SolidTC_t phi_sink = (tanh (lambda_sink * tau_sink) + (lambda_sink / Bi_sink))
+                         /
+                         (1.0 + (lambda_sink / Bi_sink) * tanh (lambda_sink * tau_sink)) ;
+
     SolidTC_t g_sink = (  2.0
                         * this->SinkMaterial->ThermalConductivity
                         * sqrt(this->SpreaderArea)
                        )
                        /
-                       (pow(1.0 - e_sink, 1.5) * PHI (LAMBDA(e_sink), Bi_sink, tau_sink)) ;
+                       (pow(1.0 - e_sink, 1.5) * phi_sink) ;
 
     SolidTC_t gm_sink = this->SinkMaterial->ThermalConductivity
 
@@ -286,12 +282,18 @@ SolidTC_t get_spreader_thermal_conductivity
 
                    / this->SpreaderMaterial->ThermalConductivity ;
 
+    SolidTC_t lambda = ( PI + (1.0 / (sqrt (PI) * e)) ) ;
+
+    SolidTC_t phi = (tanh (lambda * tau) + (lambda / Bi))
+                    /
+                    (1.0 + (lambda / Bi) * tanh (lambda * tau)) ;
+
     SolidTC_t g = (  2.0
                    * this->SpreaderMaterial->ThermalConductivity
                    * sqrt(chip_area)
                   )
                   /
-                  (pow(1.0 - e, 1.5) * PHI (LAMBDA(e), Bi, tau)) ;
+                  (pow(1.0 - e, 1.5) * phi) ;
 
     SolidTC_t gm = this->SpreaderMaterial->ThermalConductivity
 
@@ -326,12 +328,18 @@ SolidTC_t get_sink_thermal_conductivity
 
                    / this->SinkMaterial->ThermalConductivity ;
 
+    SolidTC_t lambda = ( PI + (1.0 / (sqrt (PI) * e)) ) ;
+
+    SolidTC_t phi = ( (tanh (lambda * tau) + (lambda / Bi))
+                    /
+                    (1.0 + (lambda / Bi) * tanh (lambda * tau)) ) ;
+
     SolidTC_t g = (  2.0
                    * this->SinkMaterial->ThermalConductivity
                    * sqrt(this->SpreaderArea)
                   )
                   /
-                  (pow(1.0 - e, 1.5) * PHI (LAMBDA(e), Bi, tau)) ;
+                  (pow(1.0 - e, 1.5) * phi) ;
 
     SolidTC_t gm = this->SinkMaterial->ThermalConductivity
 

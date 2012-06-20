@@ -66,7 +66,7 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-
 	@./GenerateSystemMatrix solid/transient/1die_four_elements.stk tr_solid.txt
 	@./CompareSystemMatrix  tr_solid.txt solid/transient/system_matrix.txt
 	@echo -n "solid steady    : "
-	@./GenerateSystemMatrix solid/steady/2dies_four_elements.stk st_solid.txt
+	@./GenerateSystemMatrix solid/steady/1die_four_elements.stk st_solid.txt
 	@./CompareSystemMatrix  st_solid.txt solid/steady/system_matrix.txt
 	@echo -n "mc4rm transient : "
 	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk tr_4rm.txt
