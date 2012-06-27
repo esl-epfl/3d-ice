@@ -56,7 +56,7 @@ void init_floorplan_element (FloorplanElement_t *this)
 
 /******************************************************************************/
 
-FloorplanElement_t *alloc_and_init_floorplan_element (void)
+FloorplanElement_t *calloc_floorplan_element (void)
 {
     FloorplanElement_t *floorplan_element = (FloorplanElement_t *)
 
@@ -88,94 +88,7 @@ void free_floorplan_elements_list (FloorplanElement_t *list)
 
 /******************************************************************************/
 
-void print_detailed_floorplan_element
-(
-    FloorplanElement_t *this,
-    FILE               *stream,
-    String_t            prefix
-)
-{
-    String_t new_prefix = (String_t)
-
-        malloc (sizeof (*new_prefix) * (5 + strlen(prefix))) ;
-
-    if (new_prefix == NULL) return ;
-
-    sprintf (new_prefix, "%s    ", prefix) ;
-
-    fprintf (stream,
-        "%sFloorplan Element           = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s    Id                      = %s\n",
-        prefix, this->Id) ;
-
-    fprintf (stream,
-        "%s    NICElements             = %d\n",
-        prefix, this->NICElements) ;
-
-    fprintf (stream,
-        "%s    ICElementsList          = %p\n",
-        prefix, this->ICElementsList) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    print_detailed_ic_elements_list
-
-        (this->ICElementsList, stream, new_prefix) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    fprintf (stream,
-        "%s    Area                    = %.3f\n",
-        prefix, this->Area) ;
-
-    fprintf (stream,
-        "%s    PowerValues             = %p\n",
-        prefix, this->PowerValues) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    print_detailed_powers_queue
-
-        (this->PowerValues, stream, new_prefix) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    fprintf (stream,
-        "%s    Next                    = %p\n",
-        prefix, this->Next) ;
-
-    FREE_POINTER (free, new_prefix) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_floorplan_elements_list
-(
-    FloorplanElement_t *list,
-    FILE               *stream,
-    String_t            prefix
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, list)
-    {
-        if (flp_el->Next == NULL)
-
-            break ;
-
-        print_detailed_floorplan_element (flp_el, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    print_detailed_floorplan_element (flp_el, stream, prefix) ;
-}
-
-/******************************************************************************/
-
-void print_formatted_floorplan_element
+void print_floorplan_element
 (
     FloorplanElement_t *this,
     FILE               *stream,
@@ -186,22 +99,20 @@ void print_formatted_floorplan_element
         "%s%s:\n",
         prefix, this->Id) ;
 
-    print_formatted_ic_elements_list
-
-        (this->ICElementsList, stream, prefix) ;
+    print_ic_elements_list (this->ICElementsList, stream, prefix) ;
 
     fprintf (stream,
         "%s   power values ",
         prefix) ;
 
-    print_formatted_powers_queue (this->PowerValues, stream, "") ;
+    print_powers_queue (this->PowerValues, stream, "") ;
 
     fprintf (stream, "\n") ;
 }
 
 /******************************************************************************/
 
-void print_formatted_floorplan_elements_list
+void print_floorplan_elements_list
 (
     FloorplanElement_t *list,
     FILE               *stream,
@@ -214,12 +125,12 @@ void print_formatted_floorplan_elements_list
 
             break ;
 
-        print_formatted_floorplan_element (flp_el, stream, prefix) ;
+        print_floorplan_element (flp_el, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_formatted_floorplan_element (flp_el, stream, prefix) ;
+    print_floorplan_element (flp_el, stream, prefix) ;
 }
 
 /******************************************************************************/

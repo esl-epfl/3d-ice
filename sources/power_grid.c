@@ -56,7 +56,7 @@ void init_power_grid (PowerGrid_t *this)
 
 /******************************************************************************/
 
-Error_t alloc_power_grid
+Error_t build_power_grid
 (
     PowerGrid_t *this,
     Quantity_t   nlayers,
@@ -108,7 +108,7 @@ Error_t alloc_power_grid
 
 /******************************************************************************/
 
-void free_power_grid (PowerGrid_t *this)
+void destroy_power_grid (PowerGrid_t *this)
 {
     FREE_POINTER (free, this->LayersProfile) ;
     FREE_POINTER (free, this->FloorplansProfile) ;

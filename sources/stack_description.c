@@ -58,7 +58,7 @@ void init_stack_description (StackDescription_t *this)
 
 /******************************************************************************/
 
-void free_stack_description (StackDescription_t *this)
+void destroy_stack_description (StackDescription_t *this)
 {
     FREE_POINTER (free,                     this->FileName) ;
     FREE_POINTER (free_materials_list,      this->MaterialsList) ;
@@ -74,7 +74,7 @@ void free_stack_description (StackDescription_t *this)
 
 /******************************************************************************/
 
-void print_formatted_stack_description
+void print_stack_description
 (
   StackDescription_t *this,
   FILE               *stream,
@@ -83,179 +83,42 @@ void print_formatted_stack_description
 {
     if (this->MaterialsList != NULL)
     {
-        print_formatted_materials_list (this->MaterialsList, stream, prefix) ;
+        print_materials_list (this->MaterialsList, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     if (this->HeatSink != NULL)
     {
-        print_formatted_heat_sink (this->HeatSink, stream, prefix) ;
+        print_heat_sink (this->HeatSink, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     if (this->Channel != NULL)
     {
-        print_formatted_channel
+        print_channel
 
             (this->Channel, stream, prefix, this->Dimensions) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_formatted_layers_list (this->LayersList, stream, prefix) ;
+    print_layers_list (this->LayersList, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_dies_list (this->DiesList, stream, prefix) ;
+    print_dies_list (this->DiesList, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_dimensions (this->Dimensions, stream, prefix) ;
+    print_dimensions (this->Dimensions, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_stack_elements_list (this->TopStackElement, stream, prefix) ;
+    print_stack_elements_list (this->TopStackElement, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_stack_description
-(
-  StackDescription_t *this,
-  FILE               *stream,
-  String_t            prefix
-)
-{
-    String_t new_prefix =
-
-        (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
-
-    if (new_prefix == NULL) return ;
-
-    sprintf (new_prefix, "%s    ", prefix) ;
-
-    fprintf (stream,
-             "%sStackDescription                = %p\n",
-             prefix, this) ;
-
-    fprintf (stream,
-             "%s  FileName                      = " "%s\n",
-             prefix, this->FileName) ;
-
-    fprintf (stream,
-             "%s  MaterialsList                 = %p\n",
-             prefix, this->MaterialsList) ;
-
-    if (this->MaterialsList != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_materials_list
-
-            (this->MaterialsList, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-             "%s  HeatSink                      = %p\n",
-             prefix, this->HeatSink) ;
-
-    if (this->HeatSink != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_heat_sink (this->HeatSink, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-             "%s  Channel                       = %p\n",
-             prefix, this->Channel) ;
-
-    if (this->Channel != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_channel (this->Channel, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-             "%s  LayersList                    = %p\n",
-             prefix, this->LayersList) ;
-
-    if (this->LayersList != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        sprintf (new_prefix, "%s        ", prefix) ;
-
-        print_detailed_layers_list
-
-            (this->LayersList, stream, new_prefix) ;
-
-        sprintf (new_prefix, "%s    ", prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-             "%s  DiesList                      = %p\n",
-             prefix, this->DiesList) ;
-
-    if (this->DiesList != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_dies_list
-
-            (this->DiesList, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-             "%s  Dimensions                    = %p\n",
-             prefix, this->Dimensions) ;
-
-    if (this->Dimensions != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_dimensions
-
-            (this->Dimensions, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-             "%s  TopStackElement               = %p\n",
-             prefix, this->TopStackElement) ;
-
-    fprintf (stream,
-             "%s  BottomStackElement            = %p\n",
-             prefix, this->BottomStackElement) ;
-
-    if (this->TopStackElement != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_stack_elements_list
-
-            (this->TopStackElement, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

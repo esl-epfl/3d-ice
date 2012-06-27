@@ -308,7 +308,7 @@ heat_sink_opt
         HEAT TRANSFER COEFFICIENT DVALUE ';'  // $27
         AMBIENT TEMPERATURE       DVALUE ';'  // $31
     {
-        stkd->HeatSink = alloc_and_init_heat_sink () ;
+        stkd->HeatSink = calloc_heat_sink () ;
 
         if (stkd->HeatSink == NULL)
         {
@@ -383,7 +383,7 @@ heat_sink_opt
         HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
         AMBIENT TEMPERATURE       DVALUE ';'  // $12
     {
-        stkd->HeatSink = alloc_and_init_heat_sink () ;
+        stkd->HeatSink = calloc_heat_sink () ;
 
         if (stkd->HeatSink == NULL)
         {
@@ -1046,7 +1046,7 @@ stack
 
             // Creates an extra stack element to be add in the 3d stack
 
-            StackElement_t *stack_element = alloc_and_init_stack_element () ;
+            StackElement_t *stack_element = calloc_stack_element () ;
 
             if (stack_element == NULL)
             {
@@ -1231,7 +1231,7 @@ stack_element
   : LAYER IDENTIFIER IDENTIFIER ';'    // $2 Identifier for the stack element
                                        // $3 Identifier of the layer
     {
-        StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement_t *stack_element = $$ = calloc_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1279,7 +1279,7 @@ stack_element
             YYABORT ;
         }
 
-        StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement_t *stack_element = $$ = calloc_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1302,7 +1302,7 @@ stack_element
     {
         num_dies++ ;
 
-        StackElement_t *stack_element = $$ = alloc_and_init_stack_element () ;
+        StackElement_t *stack_element = $$ = calloc_stack_element () ;
 
         if (stack_element == NULL)
         {
@@ -1335,7 +1335,7 @@ stack_element
         stack_element->Pointer.Die->Used++ ;
 
         stack_element->NLayers = stack_element->Pointer.Die->NLayers ;
-        stack_element->Floorplan = alloc_and_init_floorplan () ;
+        stack_element->Floorplan = calloc_floorplan () ;
 
         if (stack_element->Floorplan == NULL)
         {
@@ -1353,7 +1353,8 @@ stack_element
         {
             FREE_POINTER (free,                   $3) ;
             FREE_POINTER (free,                   $5) ;
-            FREE_POINTER (free_stack_description, stkd) ;
+
+            destroy_stack_description (stkd) ;
 
             YYABORT ; // CHECKME error messages printed in this case ....
         }
@@ -1474,7 +1475,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tcell_t *tcell = alloc_and_init_tcell () ;
+        Tcell_t *tcell = calloc_tcell () ;
 
         if (tcell == NULL)
         {
@@ -1488,7 +1489,7 @@ inspection_point
 
         align_tcell (tcell, $5, $7, stkd->Dimensions) ;
 
-        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = calloc_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1547,7 +1548,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tflp_t *tflp = alloc_and_init_tflp () ;
+        Tflp_t *tflp = calloc_tflp () ;
 
         if (tflp == NULL)
         {
@@ -1561,7 +1562,7 @@ inspection_point
 
         tflp->Quantity = $7 ;
 
-        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = calloc_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1640,7 +1641,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tflpel_t *tflpel = alloc_and_init_tflpel () ;
+        Tflpel_t *tflpel = calloc_tflpel () ;
 
         if (tflpel == NULL)
         {
@@ -1656,7 +1657,7 @@ inspection_point
         tflpel->FloorplanElement = floorplan_element ;
         tflpel->Quantity         = $9 ;
 
-        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = calloc_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1704,7 +1705,7 @@ inspection_point
             YYABORT ;
         }
 
-        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = calloc_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1759,7 +1760,7 @@ inspection_point
             YYABORT ;
         }
 
-        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = calloc_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1815,7 +1816,7 @@ inspection_point
             YYABORT ;
         }
 
-        InspectionPoint_t *inspection_point = $$ = alloc_and_init_inspection_point () ;
+        InspectionPoint_t *inspection_point = $$ = calloc_inspection_point () ;
 
         if (inspection_point == NULL)
         {
@@ -1827,7 +1828,7 @@ inspection_point
             YYABORT ;
         }
 
-        Tcoolant_t *tcoolant = alloc_and_init_tcoolant () ;
+        Tcoolant_t *tcoolant = calloc_tcoolant () ;
 
         if (tcoolant == NULL)
         {
@@ -1884,13 +1885,13 @@ void stack_description_error
              "%s:%d: %s\n",
             stkd->FileName, stack_description_get_lineno (scanner), message) ;
 
-    free_stack_description (stkd) ;
-    init_stack_description (stkd) ;
+    destroy_stack_description (stkd) ;
+    init_stack_description    (stkd) ;
 
     init_analysis (analysis) ;
 
-    free_output (output) ;
-    init_output (output) ;
+    destroy_output (output) ;
+    init_output    (output) ;
 }
 
 /******************************************************************************/
@@ -1958,15 +1959,15 @@ Error_t generate_stack_description_file
         return TDICE_FAILURE ;
     }
 
-    print_formatted_stack_description (stkd, out, "") ;
+    print_stack_description (stkd, out, "") ;
 
     fprintf (out, "\n") ;
 
-    print_formatted_analysis (analysis, out, "") ;
+    print_analysis (analysis, out, "") ;
 
     fprintf (out, "\n") ;
 
-    print_formatted_output (output, out, "") ;
+    print_output (output, out, "") ;
 
     fclose (out) ;
 

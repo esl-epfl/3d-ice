@@ -77,7 +77,7 @@ void init_system_matrix (SystemMatrix_t* this)
 
 /******************************************************************************/
 
-Error_t alloc_system_matrix
+Error_t build_system_matrix
 (
     SystemMatrix_t *this,
     CellIndex_t     size,
@@ -220,7 +220,7 @@ Error_t do_factorization (SystemMatrix_t *this)
 
 /******************************************************************************/
 
-void free_system_matrix (SystemMatrix_t *this)
+void destroy_system_matrix (SystemMatrix_t *this)
 {
     FREE_POINTER (free, this->ColumnPointers) ;
     FREE_POINTER (free, this->RowIndices) ;

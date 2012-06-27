@@ -123,16 +123,6 @@ extern "C"
 
     void init_cell_dimensions (CellDimensions_t *this) ;
 
-
-
-    /*! Copies the cell dimensions \a src into \a dest.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_cell_dimensions (CellDimensions_t *dst, CellDimensions_t *src) ;
-
 /******************************************************************************/
 
     /*! \struct GridDimensions_t
@@ -199,16 +189,6 @@ extern "C"
 
     void init_grid_dimensions (GridDimensions_t *this) ;
 
-
-
-    /*! Copies the grid dimensions \a src into \a dest.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_grid_dimensions (GridDimensions_t *dst, GridDimensions_t *src) ;
-
 /******************************************************************************/
 
     /*! \struct ChipDimensions_t
@@ -239,16 +219,6 @@ extern "C"
      */
 
     void init_chip_dimensions (ChipDimensions_t *this) ;
-
-
-
-    /*! Copies the chip dimensions \a src into \a dest.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_chip_dimensions (ChipDimensions_t *dst, ChipDimensions_t *src) ;
 
 /******************************************************************************/
 
@@ -289,16 +259,6 @@ extern "C"
 
 
 
-    /*! Copies all the dimensions in \a src into \a dest.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_dimensions (Dimensions_t *dst, Dimensions_t *src) ;
-
-
-
     /*! Allocates and inits memory for a structure of type Dimensions_t
      *
      * \return a pointer to the allocated memory.
@@ -309,24 +269,10 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Dimensions_t and
-     *  copies \a this into it
-     *
-     * \param this the address of the dimensions structure to clone
-     *
-     * \return a pointer to a new structure of type Dimensions_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    Dimensions_t *clone_dimensions (Dimensions_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_dimensions or \a clone_dimensions. If \a this is \c NULL,
-     * no operation is performed.
+     * to \a calloc_dimensions . If \a this is \c NULL, no operation is performed.
      *
      * \param this the address to free
      */
@@ -342,22 +288,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_dimensions
-
-        (Dimensions_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of \a this
-     *
-     * \param this   the dimensions to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-   void print_detailed_dimensions
-
-        (Dimensions_t *this, FILE *stream, String_t prefix) ;
+    void print_dimensions (Dimensions_t *this, FILE *stream, String_t prefix) ;
 
 
 

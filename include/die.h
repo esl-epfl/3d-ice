@@ -117,21 +117,6 @@ extern "C"
 
 
 
-    /*! Copies the die \a src into the die \a dest.
-     *
-     * After the copy, the dies \a dst and \a src will point
-     * to the same Next die while the list of layers composing
-     * the die \a dst will be a clone of the list of \a src . The list of
-     * layers that were in \a dst will be deleted, if any.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_die (Die_t *dst, Die_t *src) ;
-
-
-
     /*! Allocates and inits memory for a structure of type Die_t
      *
      * \return a pointer to the allocated memory.
@@ -142,43 +127,15 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Die_t and
-     *  copies \a this into it.
-     *
-     * \param this the address of the die structure to clone
-     *
-     * \return a pointer to a new structure of type Die_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    Die_t *clone_die (Die_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_die or \a clone_die. If \a this is \c NULL,
-     * no operation is performed.
+     * to \a calloc_die . If \a this is \c NULL, no operation is performed.
      *
      * \param this the address to free
      */
 
     void free_die (Die_t *this) ;
-
-
-
-    /*! Duplicates a list of dies
-     *
-     * The function duplicates the list following the pointer Die_t::Next
-     *
-     * \param list the pointer to the first elment in the list to clone
-     *
-     * \return the pointer to the first die in the new list
-     * \return \c NULL in case of error or if the parameter \a list is \c NULL
-     */
-
-    Die_t *clone_dies_list (Die_t *list) ;
 
 
 
@@ -217,7 +174,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_die (Die_t *this, FILE *stream, String_t prefix) ;
+    void print_die (Die_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -228,29 +185,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_dies_list (Die_t *list, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of a die
-     *
-     * \param this   the die to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_die (Die_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the dies
-     *
-     * \param list   the pointer to the first die in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_dies_list (Die_t *list, FILE *stream, String_t prefix) ;
+    void print_dies_list (Die_t *list, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

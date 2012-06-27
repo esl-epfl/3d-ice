@@ -130,7 +130,7 @@ extern "C"
      * \return \c TDICE_FAILURE if the memory allocation fails
      */
 
-    Error_t alloc_floorplan_matrix
+    Error_t build_floorplan_matrix
     (
         FloorplanMatrix_t *this,
         CellIndex_t        nrows,
@@ -145,7 +145,7 @@ extern "C"
      * \param this the address of the floorplan matrix structure
      */
 
-    void free_floorplan_matrix (FloorplanMatrix_t *this) ;
+    void destroy_floorplan_matrix (FloorplanMatrix_t *this) ;
 
 
 

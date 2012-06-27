@@ -55,7 +55,7 @@ void init_thermal_grid (ThermalGrid_t *this)
 
 /******************************************************************************/
 
-Error_t alloc_thermal_grid (ThermalGrid_t *this, Quantity_t size)
+Error_t build_thermal_grid (ThermalGrid_t *this, Quantity_t size)
 {
     this->Size = size ;
 
@@ -91,7 +91,7 @@ Error_t alloc_thermal_grid (ThermalGrid_t *this, Quantity_t size)
 
 /******************************************************************************/
 
-void free_thermal_grid (ThermalGrid_t *this)
+void destroy_thermal_grid (ThermalGrid_t *this)
 {
     FREE_POINTER (free, this->LayersProfile) ;
     FREE_POINTER (free, this->VHCProfile) ;

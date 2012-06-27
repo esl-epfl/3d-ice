@@ -112,19 +112,6 @@ extern "C"
 
 
 
-    /*! Copies the layer \a src into the layer \a dest.
-     *
-     * After the copy, the layers \a dst and \a src will point
-     * to the same Material and to the same Next and Prev layers
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_layer (Layer_t *dst, Layer_t *src) ;
-
-
-
     /*! Allocates and inits memory for a structure of type Layer_t
      *
      * \return a pointer to the allocated memory.
@@ -135,43 +122,16 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Layer_t and
-     *  copies \a this into it.
-     *
-     * \param this the address of the layer structure to clone
-     *
-     * \return a pointer to a new structure of type Layer_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    Layer_t *clone_layer (Layer_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_layer or \a clone_layer. If \a this is \c NULL,
+     * to \a calloc_layer . If \a this is \c NULL,
      * no operation is performed.
      *
      * \param this the address to free
      */
 
     void free_layer (Layer_t *this) ;
-
-
-
-    /*! Duplicates a list of layers
-     *
-     * The function duplicates the list following the pointer Layer_t::Next
-     *
-     * \param list the pointer to the first elment in the list to clone
-     *
-     * \return the pointer to the first layer in the new list
-     * \return \c NULL in case of error or if the parameter \a list is \c NULL
-     */
-
-    Layer_t *clone_layers_list (Layer_t *list) ;
 
 
 
@@ -210,9 +170,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_layer
-
-        (Layer_t *this, FILE *stream, String_t prefix) ;
+    void print_layer (Layer_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -223,35 +181,8 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_layers_list
+    void print_layers_list (Layer_t *list, FILE *stream, String_t prefix) ;
 
-        (Layer_t *list, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of a layer
-     *
-     * \param stream  the output stream (must be already open)
-     * \param prefix  a string to be printed as prefix at the beginning of each line
-     * \param this    the layer to print
-     */
-
-    void print_detailed_layer
-
-        (Layer_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the layers
-     *
-     * \param list the pointer to the first layer in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_layers_list
-
-        (Layer_t *list, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

@@ -146,7 +146,7 @@ int main (int argc, char** argv)
         {
             case TDICE_EXIT_SIMULATION :
             {
-                free_network_message (&request) ;
+                destroy_network_message (&request) ;
 
                 goto quit ;
             }
@@ -168,7 +168,7 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                free_network_message (&reply) ;
+                destroy_network_message (&reply) ;
 
                 break ;
             }
@@ -201,7 +201,7 @@ int main (int argc, char** argv)
 
                     destroy_powers_queue (&queue) ;
 
-                    free_network_message (&request) ;
+                    destroy_network_message (&request) ;
 
                     goto sim_error ;
                 }
@@ -219,7 +219,7 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                free_network_message (&reply) ;
+                destroy_network_message (&reply) ;
 
                 if (result != TDICE_SLOT_DONE)
                 {
@@ -260,8 +260,8 @@ int main (int argc, char** argv)
                     {
                         fprintf (stderr, "error: generate message content\n") ;
 
-                        free_network_message (&reply) ;
-                        free_network_message (&request) ;
+                        destroy_network_message (&reply) ;
+                        destroy_network_message (&request) ;
 
                         goto sim_error ;
                     }
@@ -269,7 +269,7 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                free_network_message (&reply) ;
+                destroy_network_message (&reply) ;
 
                 break ;
             }
@@ -279,7 +279,7 @@ int main (int argc, char** argv)
                 fprintf (stderr, "ERROR :: received unknown message type") ;
         }
 
-        free_network_message (&request) ;
+        destroy_network_message (&request) ;
 
     } while (1) ;
 
@@ -287,24 +287,24 @@ int main (int argc, char** argv)
 
 quit :
 
-    close_socket           (&client_socket) ;
-    close_socket           (&server_socket) ;
-    free_thermal_data      (&tdata) ;
-    free_stack_description (&stkd) ;
-    free_output            (&output) ;
+    close_socket              (&client_socket) ;
+    close_socket              (&server_socket) ;
+    destroy_thermal_data      (&tdata) ;
+    destroy_stack_description (&stkd) ;
+    destroy_output            (&output) ;
 
     return EXIT_SUCCESS ;
 
 sim_error :
-                            close_socket           (&client_socket) ;
+                            close_socket              (&client_socket) ;
 wait_error :
-                            close_socket           (&server_socket) ;
+                            close_socket              (&server_socket) ;
 socket_error :
-                            free_thermal_data      (&tdata) ;
+                            destroy_thermal_data      (&tdata) ;
 ftd_error :
 wrong_analysis_error :
-                            free_stack_description (&stkd) ;
-                            free_output            (&output) ;
+                            destroy_stack_description (&stkd) ;
+                            destroy_output            (&output) ;
 
                             return EXIT_FAILURE ;
 }

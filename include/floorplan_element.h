@@ -111,23 +111,23 @@ extern "C"
 
 
 
-    /*! Allocates a FloorplanElement in memory and sets its fields to their
-     *   default value with #init_floorplan_element
+    /*! Allocates and inits memory for a structure of type FloorplanElement_t
      *
-     * \return the pointer to a new FloorplanElement
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    FloorplanElement_t *alloc_and_init_floorplan_element (void) ;
+    FloorplanElement_t *calloc_floorplan_element (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously
-     *  obtained with #alloc_and_init_floorplan_element
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_floorplan_element . If \a this is \c NULL, no
+     * operation is performed.
      *
-     * \param this the address of the floorplan element structure to free
+     * \param this the address to free
      */
 
     void free_floorplan_element (FloorplanElement_t *this) ;
@@ -171,7 +171,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_floorplan_element
+    void print_floorplan_element
 
         (FloorplanElement_t *this, FILE *stream, String_t prefix) ;
 
@@ -184,33 +184,7 @@ extern "C"
      * \param prefix  a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_floorplan_elements_list
-
-        (FloorplanElement_t *list, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of a floorplan element
-     *
-     * \param this   the floorplan element to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_floorplan_element
-
-        (FloorplanElement_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the flooprlan elements
-     *
-     * \param list the pointer to the first floorplan element in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_floorplan_elements_list
+    void print_floorplan_elements_list
 
         (FloorplanElement_t *list, FILE *stream, String_t prefix) ;
 

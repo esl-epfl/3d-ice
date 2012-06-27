@@ -147,7 +147,7 @@ extern "C"
      * \param this the address of the ThermalData structure to free
      */
 
-    void free_thermal_data  (ThermalData_t *this) ;
+    void destroy_thermal_data  (ThermalData_t *this) ;
 
 
 

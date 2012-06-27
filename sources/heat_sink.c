@@ -61,7 +61,7 @@ void init_heat_sink (HeatSink_t *this)
 
 /******************************************************************************/
 
-HeatSink_t *alloc_and_init_heat_sink (void)
+HeatSink_t *calloc_heat_sink (void)
 {
     HeatSink_t *heat_sink = (HeatSink_t *) malloc (sizeof(HeatSink_t)) ;
 
@@ -76,12 +76,14 @@ HeatSink_t *alloc_and_init_heat_sink (void)
 
 void free_heat_sink (HeatSink_t *this)
 {
-    FREE_POINTER (free, this) ;
+    if (this != NULL)
+
+        FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
 
-void print_formatted_heat_sink
+void print_heat_sink
 (
   HeatSink_t *this,
   FILE       *stream,
@@ -118,64 +120,6 @@ void print_formatted_heat_sink
     fprintf (stream,
         "%s   ambient temperature       %.2f ;\n",
         prefix, this->AmbientTemperature) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_heat_sink
-(
-  HeatSink_t *this,
-  FILE       *stream,
-  String_t    prefix
-)
-{
-    fprintf (stream,
-        "%sheat_sink                   = %p\n",
-        prefix,   this) ;
-
-    fprintf (stream,
-        "%s  SinkModel                 = %d\n",
-        prefix,   this->SinkModel) ;
-
-    fprintf (stream,
-        "%s  NLayers                   = %d\n",
-        prefix,   this->NLayers) ;
-
-    fprintf (stream,
-        "%s  SourceLayerOffset         = %d\n",
-        prefix,   this->SourceLayerOffset) ;
-
-    fprintf (stream,
-        "%s  AmbientHTC                = %.4e\n",
-        prefix,   this->AmbientHTC) ;
-
-    fprintf (stream,
-        "%s  AmbientTemperature        = %.2f\n",
-        prefix,   this->AmbientTemperature) ;
-
-    fprintf (stream,
-        "%s  SinkHeight                = %.2f\n",
-        prefix,   this->SinkHeight) ;
-
-    fprintf (stream,
-        "%s  SinkArea                  = %.1e\n",
-        prefix,   this->SinkArea) ;
-
-    fprintf (stream,
-        "%s  SinkMaterial              = %p\n",
-        prefix,   this->SinkMaterial) ;
-
-    fprintf (stream,
-        "%s  SpreaderHeight            = %.2f\n",
-        prefix,   this->SpreaderHeight) ;
-
-    fprintf (stream,
-        "%s  SpreaderArea              = %.1e\n",
-        prefix,   this->SpreaderArea) ;
-
-    fprintf (stream,
-        "%s  SpreaderMaterial          = %p\n",
-        prefix,   this->SpreaderMaterial) ;
 }
 
 /******************************************************************************/

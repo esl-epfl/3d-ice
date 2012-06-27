@@ -106,23 +106,22 @@ extern "C"
 
 
 
-    /*! Allocates a Floorplan in memory and sets its fields to their
-     *  default value with #init_floorplan
+    /*! Allocates and inits memory for a structure of type Floorplan_t
      *
-     * \return the pointer to a new Floorplan
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    Floorplan_t *alloc_and_init_floorplan (void) ;
+    Floorplan_t *calloc_floorplan (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously
-     * obtained with #alloc_and_init_floorplan
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_floorplan . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the floorplan structure to free
+     * \param this the address to free
      */
 
     void free_floorplan (Floorplan_t *this) ;

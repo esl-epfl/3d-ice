@@ -103,7 +103,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the thermal grid */
 
-    result = alloc_thermal_grid
+    result = build_thermal_grid
 
         (&this->ThermalGrid, get_number_of_layers (dimensions)) ;
 
@@ -121,7 +121,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the power grid */
 
-    result = alloc_power_grid (&this->PowerGrid,
+    result = build_power_grid (&this->PowerGrid,
                                get_number_of_layers (dimensions),
                                get_number_of_cells(dimensions)) ;
 
@@ -132,7 +132,7 @@ Error_t fill_thermal_data
         Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
         FREE_POINTER (free, this->Temperatures) ;
 
-        free_thermal_grid (&this->ThermalGrid) ;
+        destroy_thermal_grid (&this->ThermalGrid) ;
 
         return TDICE_FAILURE ;
     }
@@ -141,7 +141,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
 
-    result = alloc_system_matrix
+    result = build_system_matrix
 
         (&this->SM_A, this->Size, get_number_of_connections (dimensions)) ;
 
@@ -152,8 +152,8 @@ Error_t fill_thermal_data
         Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
         FREE_POINTER (free, this->Temperatures) ;
 
-        free_thermal_grid (&this->ThermalGrid) ;
-        free_power_grid   (&this->PowerGrid) ;
+        destroy_thermal_grid (&this->ThermalGrid) ;
+        destroy_power_grid   (&this->PowerGrid) ;
 
         return TDICE_FAILURE ;
     }
@@ -166,7 +166,7 @@ Error_t fill_thermal_data
 
     if (result == TDICE_FAILURE)
     {
-        free_thermal_data (this) ;
+        destroy_thermal_data (this) ;
 
         return TDICE_FAILURE ;
     }
@@ -176,14 +176,14 @@ Error_t fill_thermal_data
 
 /******************************************************************************/
 
-void free_thermal_data (ThermalData_t *this)
+void destroy_thermal_data (ThermalData_t *this)
 {
     FREE_POINTER (free, this->Temperatures) ;
 
-    free_thermal_grid (&this->ThermalGrid) ;
-    free_power_grid   (&this->PowerGrid) ;
+    destroy_thermal_grid (&this->ThermalGrid) ;
+    destroy_power_grid   (&this->PowerGrid) ;
 
-    free_system_matrix (&this->SM_A) ;
+    destroy_system_matrix (&this->SM_A) ;
 
     Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
 }

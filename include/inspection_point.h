@@ -99,46 +99,32 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tcell to initialize
+     * \param this the address of the tcell structure to initialize
      */
 
     void init_tcell (Tcell_t *this) ;
 
 
 
-    /*! Allocates a Tcell in memory and sets its fields to their default
-     *  value with #init_tcell
+    /*! Allocates and inits memory for a structure of type Tcell_t
      *
-     * \return the pointer to a new Tcell
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    Tcell_t *alloc_and_init_tcell (void) ;
+    Tcell_t *calloc_tcell (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_tcell
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_tcell . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the Tcell structure to free
+     * \param this the address to free
      */
 
     void free_tcell (Tcell_t *this) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of a Tcell
-     *
-     * \param this   the address of the Tcell structure to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_tcell
-
-        (Tcell_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -186,46 +172,32 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tflp to initialize
+     * \param this the address of the tflp structure to initialize
      */
 
     void init_tflp (Tflp_t *this) ;
 
 
 
-    /*! Allocates a Tflp in memory and sets its fields to their default
-     *  value with #init_tflp
+    /*! Allocates and inits memory for a structure of type Tflp_t
      *
-     * \return the pointer to a new Tflp
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    Tflp_t *alloc_and_init_tflp (void) ;
+    Tflp_t *calloc_tflp (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_tflp
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_tflp . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the Tflp structure to free
+     * \param this the address to free
      */
 
     void free_tflp (Tflp_t *this) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of \a tflp
-     *
-     * \param this   the address of the Tflp structure to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_tflp
-
-        (Tflp_t *this, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -255,46 +227,32 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tflpel to initialize
+     * \param this the address of the tflpel structure to initialize
      */
 
     void init_tflpel (Tflpel_t *this) ;
 
 
 
-    /*! Allocates a Tflpel in memory and sets its fields to their default
-     *  value with #init_tflpel
+    /*! Allocates and inits memory for a structure of type Tflpel_t
      *
-     * \return the pointer to a new Tflpel
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    Tflpel_t *alloc_and_init_tflpel (void) ;
+    Tflpel_t *calloc_tflpel (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_tflpel
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_tflpel . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the Tflpel structure to free
+     * \param this the address to free
      */
 
     void free_tflpel (Tflpel_t *this) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of a Tflpel
-     *
-     * \param this the address of the Tflpel structure to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_tflpel
-
-        (Tflpel_t *this, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -321,46 +279,32 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tcoolant to initialize
+     * \param this the address of the tcoolant structure to initialize
      */
 
     void init_tcoolant (Tcoolant_t *this) ;
 
 
 
-    /*! Allocates a Tcoolant in memory and sets its fields to their default
-     *  value with #init_tcoolant
+    /*! Allocates and inits memory for a structure of type Tcoolant_t
      *
-     * \return the pointer to a new Tcoolant
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    Tcoolant_t *alloc_and_init_tcoolant (void) ;
+    Tcoolant_t *calloc_tcoolant (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_tcoolant
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_tcoolant . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the Tcoolant structure to free
+     * \param this the address to free
      */
 
     void free_tcoolant (Tcoolant_t *this) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of a Tcoolant
-     *
-     * \param this the address of the Tcoolant structure to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_tcoolant
-
-        (Tcoolant_t *this, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -429,30 +373,30 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the inspection point to initialize
+     * \param this the address of the inspection point structure to initialize
      */
 
     void init_inspection_point (InspectionPoint_t *this) ;
 
 
 
-    /*! Allocates a InspectionPoint in memory and sets its fields to their default
-     *  value with #init_inspection_point
+    /*! Allocates and inits memory for a structure of type InspectionPoint_t
      *
-     * \return the pointer to a new InspectionPoint
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    InspectionPoint_t *alloc_and_init_inspection_point (void) ;
+    InspectionPoint_t *calloc_inspection_point (void) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_inspection_point
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_inspection_point . If \a this is \c NULL, no
+     * operation is performed.
      *
-     * \param this the address of the InspectionPoint structure to free
+     * \param this the address to free
      */
 
     void free_inspection_point (InspectionPoint_t *this) ;
@@ -479,20 +423,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_inspection_point_list
-
-        (InspectionPoint_t *list, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the inspection points
-     *
-     * \param list   the pointer to the first inspection point in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_inspection_point_list
+    void print_inspection_point_list
 
         (InspectionPoint_t *list, FILE *stream, String_t prefix) ;
 

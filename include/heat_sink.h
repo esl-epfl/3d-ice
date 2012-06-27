@@ -127,23 +127,22 @@ extern "C"
 
 
 
-    /*! Allocates a heat sink in memory and sets its fields to
-     *  their default value with #init_heat_sink
+    /*! Allocates and inits memory for a structure of type HeatSink_t
      *
-     * \return the pointer to a new HeatSink
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    HeatSink_t *alloc_and_init_heat_sink (void) ;
+    HeatSink_t *calloc_heat_sink (void) ;
 
 
 
-    /*! Frees the memory related to an heat sink
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously
-     * obtained with #alloc_and_init_heat_sink
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_heat_sink . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the heat_sink structure to free
+     * \param this the address to free
      */
 
     void free_heat_sink (HeatSink_t *this) ;
@@ -157,20 +156,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_heat_sink
-
-        (HeatSink_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the heat sink
-     *
-     * \param this   the pointer to the heat sink
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_heat_sink
+    void print_heat_sink
 
         (HeatSink_t *this, FILE *stream, String_t prefix) ;
 

@@ -83,8 +83,8 @@ int main(int argc, char** argv)
 
     if (result != TDICE_SUCCESS)
     {
-        free_stack_description (&stkd) ;
-        free_output            (&output) ;
+        destroy_stack_description (&stkd) ;
+        destroy_output            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -98,9 +98,9 @@ int main(int argc, char** argv)
     // free all data
     ////////////////////////////////////////////////////////////////////////////
 
-    free_thermal_data      (&tdata) ;
-    free_stack_description (&stkd) ;
-    free_output            (&output) ;
+    destroy_thermal_data      (&tdata) ;
+    destroy_stack_description (&stkd) ;
+    destroy_output            (&output) ;
 
     return EXIT_SUCCESS ;
 }

@@ -125,34 +125,12 @@ extern "C"
 
 
 
-    /*! Copies the coolant structure \a src into \a dest.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_coolant (Coolant_t *dst, Coolant_t *src) ;
-
-
-
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
      * \param this the address of the channel structure to initialize
      */
 
     void init_channel (Channel_t *this) ;
-
-
-
-    /*! Copies the channel \a src into \a dest.
-     *
-     * After the copy, \a src and \a dst will point to the same WallMaterial
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_channel (Channel_t *dst, Channel_t *src) ;
 
 
 
@@ -166,24 +144,10 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Channel_t and
-     *  copies \a this into it.
-     *
-     * \param this the address of the channel structure to clone
-     *
-     * \return a pointer to a new structure of type Channel_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    Channel_t *clone_channel (Channel_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_channel or \a clone_channel. If \a this is \c NULL,
-     * no operation is performed.
+     * to \a calloc_channel . If \a this is \c NULL, no operation is performed.
      *
      * \param this the address to free
      */
@@ -200,22 +164,9 @@ extern "C"
      * \param dimensions pointer to the structure storing the dimensions
      */
 
-    void print_formatted_channel
+    void print_channel
 
         (Channel_t *this, FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
-
-
-
-    /*! Prints detailed information about all the fields of a channel
-     *
-     * \param this   the channel to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_channel
-
-        (Channel_t *this, FILE *stream, String_t prefix) ;
 
 
 

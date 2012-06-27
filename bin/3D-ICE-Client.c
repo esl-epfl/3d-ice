@@ -159,7 +159,7 @@ int main (int argc, char** argv)
 
     extract_message_word (&client_nflp, &nflpel, 0) ;
 
-    free_network_message (&client_nflp) ;
+    destroy_network_message (&client_nflp) ;
 
     for ( ; nslots != 0 ; nslots--)
     {
@@ -178,7 +178,7 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_powers) ;
 
-        free_network_message (&client_powers) ;
+        destroy_network_message (&client_powers) ;
 
         /* Client waits for simulation result *********************************/
 
@@ -190,14 +190,14 @@ int main (int argc, char** argv)
 
         if (sim_result != TDICE_SLOT_DONE)
         {
-            free_network_message (&server_reply) ;
+            destroy_network_message (&server_reply) ;
 
             close_socket (&client_socket) ;
 
             return EXIT_FAILURE ;
         }
 
-        free_network_message (&server_reply) ;
+        destroy_network_message (&server_reply) ;
 
         /* Client sends temperatures request for thermal sensors **************/
 
@@ -213,7 +213,7 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_temperatures) ;
 
-        free_network_message (&client_temperatures) ;
+        destroy_network_message (&client_temperatures) ;
 
         /* Client receives temperatures ***************************************/
 
@@ -233,7 +233,7 @@ int main (int argc, char** argv)
             fprintf (stdout, "%5.2f K \t", temperature) ;
         }
 
-        free_network_message (&server_reply) ;
+        destroy_network_message (&server_reply) ;
 
         /* Client sends thermal maps request **********************************/
 
@@ -249,7 +249,7 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_tmap) ;
 
-        free_network_message (&client_tmap) ;
+        destroy_network_message (&client_tmap) ;
 
         /* Client receives thermal maps ***************************************/
 
@@ -277,7 +277,7 @@ int main (int argc, char** argv)
             fprintf (tmap, "\n") ;
         }
 
-        free_network_message (&server_reply) ;
+        destroy_network_message (&server_reply) ;
 
         /* Client sends temperatures request for cores ************************/
 
@@ -293,7 +293,7 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_cores) ;
 
-        free_network_message (&client_cores) ;
+        destroy_network_message (&client_cores) ;
 
         /* Client receives cores temperatures  ********************************/
 
@@ -313,7 +313,7 @@ int main (int argc, char** argv)
 
         fprintf (stdout, "\n") ;
 
-        free_network_message (&server_reply) ;
+        destroy_network_message (&server_reply) ;
     }
 
     fclose (tmap) ;
@@ -325,7 +325,7 @@ int main (int argc, char** argv)
 
     send_message_to_socket (&client_socket, &client_close_sim) ;
 
-    free_network_message (&client_close_sim) ;
+    destroy_network_message (&client_close_sim) ;
 
     /* Closes client sockek ***************************************************/
 

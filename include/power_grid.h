@@ -103,16 +103,16 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Init a power grid using default values
+    /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the power grid to initialize
+     * \param this the address of the power grid structure to initialize
      */
 
     void init_power_grid (PowerGrid_t *this) ;
 
 
 
-    /*! Alloc memory to store power grid informations
+    /*! Allocs internal memory to store power grid informations
      *
      * \param this    pointer to the power grid structure
      * \param nlayers the number of layers in the 3d stack
@@ -122,7 +122,7 @@ extern "C"
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t alloc_power_grid
+    Error_t build_power_grid
     (
         PowerGrid_t *this,
         Quantity_t   nlayers,
@@ -132,12 +132,12 @@ extern "C"
 
 
     /*! Release the memory used by the power grid
-     *  (i.e. the memory allocated by \a alloc_power_grid )
+     *  (i.e. the memory allocated by \a build_power_grid )
      *
      * \param this the address of the power grid
      */
 
-    void free_power_grid (PowerGrid_t *this) ;
+    void destroy_power_grid (PowerGrid_t *this) ;
 
 
 
@@ -145,7 +145,6 @@ extern "C"
      *
      *  \param this pointer to the power grid
      *  \param list pointer to the list of stack elements
-     * \param  dimensions pointer to the structure storing the dimensions
      */
 
     void fill_power_grid (PowerGrid_t *this, StackElement_t *list) ;

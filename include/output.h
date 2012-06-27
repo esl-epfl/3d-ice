@@ -99,12 +99,15 @@ extern "C"
 
 
 
-    /*! Frees the memory used by the output structure
+    /*! Frees the memory used by the output structure, i.e. releases the
+     * memory used to store the inspection points.
+     *
+     * The parametrer \a this must be the address of a static variable
      *
      * \param this the address of the output structure to free
      */
 
-    void free_output (Output_t *this) ;
+    void destroy_output (Output_t *this) ;
 
 
 
@@ -136,22 +139,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_output
-
-        (Output_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of output
-     *
-     * \param this    the output information to print
-     * \param stream  the output stream (must be already open)
-     * \param prefix  a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_output
-
-        (Output_t *this, FILE *stream, String_t prefix) ;
+    void print_output (Output_t *this, FILE *stream, String_t prefix) ;
 
 
 

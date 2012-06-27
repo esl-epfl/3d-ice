@@ -172,7 +172,7 @@ floorplan_element
       ic_elements                         // $3
       optional_power_values_list          // $4
     {
-        FloorplanElement_t *floorplan_element = $$ = alloc_and_init_floorplan_element ( ) ;
+        FloorplanElement_t *floorplan_element = $$ = calloc_floorplan_element ( ) ;
 
         if (floorplan_element == NULL)
         {

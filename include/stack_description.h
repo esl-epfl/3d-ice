@@ -132,7 +132,7 @@ extern "C"
      * \param this the address of the StackDescription structure to free
      */
 
-    void free_stack_description (StackDescription_t *this) ;
+    void destroy_stack_description (StackDescription_t *this) ;
 
 
 
@@ -143,20 +143,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_stack_description
-
-        (StackDescription_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about the stack descritpion
-     *
-     * \param this   the pointer to the StackDescription to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_stack_description
+    void print_stack_description
 
         (StackDescription_t *this, FILE *stream, String_t prefix) ;
 

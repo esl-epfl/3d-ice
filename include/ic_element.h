@@ -115,19 +115,6 @@ extern "C"
 
 
 
-    /*! Copies the ic element \a src into \a dest.
-     *
-     * After the copy, the ic elements \a dst and \a src will point
-     * to the same Next ic element
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_ic_element (ICElement_t *dst, ICElement_t *src) ;
-
-
-
     /*! Allocates and inits memory for a structure of type ICElement_t
      *
      * \return a pointer to the allocated memory.
@@ -138,40 +125,15 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type ICElement_t and copies
-     *  \a this into it.
-     *
-     * \param this the address of the ic element structure to clone
-     *
-     * \return a pointer to a new structure of type ICElement_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    ICElement_t *clone_ic_element (ICElement_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_ic_element or \a clone_ic_element. If \a this is \c NULL,
-     * no operation is performed.
+     * to \a calloc_ic_element . If \a this is \c NULL, no operation is performed.
      *
      * \param this the address to free
      */
 
     void free_ic_element (ICElement_t *this) ;
-
-
-    /*! Duplicates a list of ic elements
-     *
-     * \param list the pointer to the first elment in the list to clone
-     *
-     * \return the pointer to the first ic element in the new list
-     * \return \c NULL in case of error or if the parameter \a list is \c NULL
-     */
-
-    ICElement_t *clone_ic_elements_list (ICElement_t *list) ;
 
 
 
@@ -188,32 +150,6 @@ extern "C"
 
 
 
-    /*! Prints detailed information about all the fields of an ic element
-     *
-     * \param this   the ic element to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_ic_element
-
-        (ICElement_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the icelements
-     *
-     * \param list   the pointer to the first ic element in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_ic_elements_list
-
-        (ICElement_t *list, FILE *stream, String_t prefix) ;
-
-
-
     /*! Prints the ic element as it looks in the stack file
      *
      * \param this   the ic element to print
@@ -221,7 +157,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_ic_element
+    void print_ic_element
 
         (ICElement_t *this, FILE *stream, String_t prefix) ;
 
@@ -234,7 +170,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_ic_elements_list
+    void print_ic_elements_list
 
         (ICElement_t *list, FILE *stream, String_t prefix) ;
 

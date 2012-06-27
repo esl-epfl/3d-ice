@@ -149,42 +149,16 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type PowersQueue_t and
-     *  copies \a this into it
-     *
-     * \param this the address of the PowersQueue_t structure to clone
-     *
-     * \return a pointer to a new structure of type PowersQueue_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    PowersQueue_t *clone_powers_queue (PowersQueue_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_powers_queue or \a clone_powers_queue. If \a this is \c NULL,
+     * to \a calloc_powers_queue . If \a this is \c NULL,
      * no operation is performed.
      *
      * \param this the address to free
      */
 
     void free_powers_queue (PowersQueue_t *this) ;
-
-
-
-    /*! Prints detailed information about all the fields of a power queue
-     *
-     * \param this the powers queue to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_powers_queue
-
-        (PowersQueue_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -195,7 +169,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_powers_queue
+    void print_powers_queue
 
         (PowersQueue_t *this, FILE *stream, String_t prefix) ;
 

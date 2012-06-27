@@ -53,7 +53,7 @@ void init_output (Output_t *this)
 
 /******************************************************************************/
 
-void free_output (Output_t *this)
+void destroy_output (Output_t *this)
 {
     FREE_LIST (InspectionPoint_t, this->InspectionPointListFinal, free_inspection_point) ;
     FREE_LIST (InspectionPoint_t, this->InspectionPointListSlot, free_inspection_point) ;
@@ -101,7 +101,7 @@ Quantity_t get_number_of_inspection_points
 
 /******************************************************************************/
 
-void print_formatted_output
+void print_output
 (
     Output_t *this,
     FILE     *stream,
@@ -112,90 +112,23 @@ void print_formatted_output
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_inspection_point_list
+    print_inspection_point_list
 
         (this->InspectionPointListFinal, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_inspection_point_list
+    print_inspection_point_list
 
         (this->InspectionPointListSlot, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_formatted_inspection_point_list
+    print_inspection_point_list
 
         (this->InspectionPointListStep, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_output
-(
-  Output_t *this,
-  FILE     *stream,
-  String_t  prefix
-)
-{
-    String_t new_prefix = (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
-
-    if (new_prefix == NULL) return ;
-
-    sprintf (new_prefix, "%s    ", prefix) ;
-
-    fprintf (stream,
-        "%sOutput                          = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  InspectionPointListFinal          = %p\n",
-        prefix, this->InspectionPointListFinal) ;
-
-    if (this->InspectionPointListFinal != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_inspection_point_list
-
-            (this->InspectionPointListFinal, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-        "%s  InspectionPointListSlot           = %p\n",
-        prefix, this->InspectionPointListSlot) ;
-
-    if (this->InspectionPointListSlot != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_inspection_point_list
-
-            (this->InspectionPointListSlot, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    fprintf (stream,
-        "%s  InspectionPointListStep           = %p\n",
-        prefix, this->InspectionPointListStep) ;
-
-    if (this->InspectionPointListStep != NULL)
-    {
-        fprintf (stream, "%s\n", prefix) ;
-
-        print_detailed_inspection_point_list
-
-            (this->InspectionPointListStep, stream, new_prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

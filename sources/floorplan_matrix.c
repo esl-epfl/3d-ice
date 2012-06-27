@@ -56,7 +56,7 @@ void init_floorplan_matrix (FloorplanMatrix_t* this)
 
 /******************************************************************************/
 
-Error_t alloc_floorplan_matrix
+Error_t build_floorplan_matrix
 (
     FloorplanMatrix_t *this,
     CellIndex_t        nrows,
@@ -102,7 +102,7 @@ Error_t alloc_floorplan_matrix
 
 /******************************************************************************/
 
-void free_floorplan_matrix (FloorplanMatrix_t* this)
+void destroy_floorplan_matrix (FloorplanMatrix_t* this)
 {
     FREE_POINTER (free, this->ColumnPointers) ;
     FREE_POINTER (free, this->RowIndices) ;

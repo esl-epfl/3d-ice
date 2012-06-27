@@ -162,7 +162,7 @@ extern "C"
      * \return \c TDICE_FAILURE if the memory allocation fails
      */
 
-    Error_t alloc_system_matrix
+    Error_t build_system_matrix
 
         (SystemMatrix_t *this, CellIndex_t size, CellIndex_t nnz) ;
 
@@ -173,7 +173,7 @@ extern "C"
      * \param this the address of the system matrix structure
      */
 
-    void free_system_matrix (SystemMatrix_t *this) ;
+    void destroy_system_matrix (SystemMatrix_t *this) ;
 
 
 

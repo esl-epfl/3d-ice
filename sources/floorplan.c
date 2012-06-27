@@ -56,7 +56,7 @@ void init_floorplan (Floorplan_t *this)
 
 /******************************************************************************/
 
-Floorplan_t *alloc_and_init_floorplan (void)
+Floorplan_t *calloc_floorplan (void)
 {
     Floorplan_t *floorplan = (Floorplan_t *) malloc (sizeof(Floorplan_t));
 
@@ -71,7 +71,7 @@ Floorplan_t *alloc_and_init_floorplan (void)
 
 void free_floorplan (Floorplan_t *this)
 {
-    free_floorplan_matrix (&this->SurfaceCoefficients) ;
+    destroy_floorplan_matrix (&this->SurfaceCoefficients) ;
 
     FREE_POINTER (free                        , this->Bpowers) ;
     FREE_POINTER (free_floorplan_elements_list, this->ElementsList) ;
@@ -118,7 +118,7 @@ Error_t fill_floorplan
         }
     }
 
-    result = alloc_floorplan_matrix
+    result = build_floorplan_matrix
 
         (&this->SurfaceCoefficients, get_layer_area (dimensions),
          this->NElements, nnz) ;

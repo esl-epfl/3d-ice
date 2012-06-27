@@ -130,19 +130,6 @@ PowersQueue_t *calloc_powers_queue ( void )
 
 /******************************************************************************/
 
-PowersQueue_t *clone_powers_queue (PowersQueue_t *this)
-{
-    PowersQueue_t *powers_queue = calloc_powers_queue ( ) ;
-
-    if (powers_queue != NULL)
-
-        copy_powers_queue (powers_queue, this) ;
-
-    return powers_queue ;
-}
-
-/******************************************************************************/
-
 void free_powers_queue (PowersQueue_t *this)
 {
     if (this == NULL)    return ;
@@ -154,49 +141,7 @@ void free_powers_queue (PowersQueue_t *this)
 
 /******************************************************************************/
 
-void print_detailed_powers_queue
-(
-    PowersQueue_t *this,
-    FILE          *stream,
-    String_t       prefix
-)
-{
-    fprintf (stream,
-            "%spowers_queue                = %p\n",
-            prefix, this) ;
-
-    fprintf (stream,
-            "%s  Capacity                  = %d\n",
-            prefix, this->Capacity) ;
-
-    fprintf (stream,
-            "%s  Cell.Memory               = %p\t",
-            prefix, this->Memory) ;
-
-    Quantity_t tmp = 0 ;
-
-    while (tmp != this->Capacity)
-
-        fprintf (stream, "%.3f ", this->Memory [tmp++]) ;
-
-    fprintf (stream, "\n") ;
-
-    fprintf (stream,
-            "%s  Size                      = %d\n",
-            prefix, this->Size) ;
-
-    fprintf (stream,
-            "%s  End                       = %d\n",
-            prefix, this->End) ;
-
-    fprintf (stream,
-            "%s  Start                     = %d\n",
-            prefix, this->Start) ;
-}
-
-/******************************************************************************/
-
-void print_formatted_powers_queue
+void print_powers_queue
 (
     PowersQueue_t *this,
     FILE          *stream,
@@ -260,6 +205,11 @@ void put_into_powers_queue (PowersQueue_t *this, Power_t power)
         Power_t *tmp = pq.Memory ;
            pq.Memory = this->Memory ;
         this->Memory = tmp ;
+
+        this->Capacity = pq.Capacity ;
+        this->Size     = pq.Size ;
+        this->Start    = pq.Start ;
+        this->End      = pq.End ;
 
         destroy_powers_queue (&pq) ;
     }

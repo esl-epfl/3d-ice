@@ -90,8 +90,8 @@ int main(int argc, char** argv)
     {
         fprintf (stderr, "unknown analysis type!\n ");
 
-        free_stack_description (&stkd) ;
-        free_output            (&output) ;
+        destroy_stack_description (&stkd) ;
+        destroy_output            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -109,8 +109,8 @@ int main(int argc, char** argv)
     {
         fprintf (stderr, "error in initializing output files \n ");
 
-        free_stack_description (&stkd) ;
-        free_output            (&output) ;
+        destroy_stack_description (&stkd) ;
+        destroy_output            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -128,8 +128,8 @@ int main(int argc, char** argv)
 
     if (error != TDICE_SUCCESS)
     {
-        free_stack_description (&stkd) ;
-        free_output            (&output) ;
+        destroy_stack_description (&stkd) ;
+        destroy_output            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -182,9 +182,9 @@ int main(int argc, char** argv)
     // free all data
     ////////////////////////////////////////////////////////////////////////////
 
-    free_thermal_data      (&tdata) ;
-    free_stack_description (&stkd) ;
-    free_output            (&output) ;
+    destroy_thermal_data      (&tdata) ;
+    destroy_stack_description (&stkd) ;
+    destroy_output            (&output) ;
 
     return EXIT_SUCCESS ;
 }

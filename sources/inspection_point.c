@@ -56,7 +56,7 @@ void init_tcell (Tcell_t *this)
 
 /******************************************************************************/
 
-Tcell_t *alloc_and_init_tcell (void)
+Tcell_t *calloc_tcell (void)
 {
     Tcell_t *tcell = (Tcell_t *) malloc (sizeof(Tcell_t)) ;
 
@@ -71,40 +71,9 @@ Tcell_t *alloc_and_init_tcell (void)
 
 void free_tcell (Tcell_t *this)
 {
-    FREE_POINTER(free, this) ;
-}
+    if (this != NULL)
 
-/******************************************************************************/
-
-void print_detailed_tcell (Tcell_t *this, FILE *stream, String_t prefix)
-{
-    fprintf (stream,
-        "%sTcell                   = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  Xval                  = %.2f\n",
-        prefix, this->Xval) ;
-
-    fprintf (stream,
-        "%s  actualXval            = %.2f\n",
-        prefix, this->ActualXval) ;
-
-    fprintf (stream,
-        "%s  Yval                  = %.2f\n",
-        prefix, this->Yval) ;
-
-    fprintf (stream,
-        "%s  actualYval            = %.2f\n",
-        prefix, this->ActualYval) ;
-
-    fprintf (stream,
-        "%s  RowIndex              = %d\n",
-        prefix, this->RowIndex) ;
-
-    fprintf (stream,
-        "%s  ColumnIndex           = %d\n",
-        prefix, this->ColumnIndex) ;
+        FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -157,7 +126,7 @@ void init_tflp (Tflp_t *this)
 
 /******************************************************************************/
 
-Tflp_t *alloc_and_init_tflp (void)
+Tflp_t *calloc_tflp (void)
 {
     Tflp_t *tflp = (Tflp_t *) malloc (sizeof(Tflp_t)) ;
 
@@ -172,20 +141,9 @@ Tflp_t *alloc_and_init_tflp (void)
 
 void free_tflp (Tflp_t *this)
 {
-    FREE_POINTER(free, this) ;
-}
+    if (this != NULL)
 
-/******************************************************************************/
-
-void print_detailed_tflp (Tflp_t *this, FILE *stream, String_t prefix)
-{
-    fprintf (stream,
-        "%sTflp                    = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  Quantity              = %d\n",
-        prefix, this->Quantity) ;
+        FREE_POINTER(free, this) ;
 }
 
 /******************************************************************************/
@@ -200,7 +158,7 @@ void init_tflpel (Tflpel_t *this)
 
 /******************************************************************************/
 
-Tflpel_t *alloc_and_init_tflpel (void)
+Tflpel_t *calloc_tflpel (void)
 {
     Tflpel_t *tflpel = (Tflpel_t *) malloc (sizeof(Tflpel_t)) ;
 
@@ -215,24 +173,9 @@ Tflpel_t *alloc_and_init_tflpel (void)
 
 void free_tflpel (Tflpel_t *this)
 {
-    FREE_POINTER(free, this) ;
-}
+    if (this != NULL)
 
-/******************************************************************************/
-
-void print_detailed_tflpel (Tflpel_t *this, FILE *stream, String_t prefix)
-{
-    fprintf (stream,
-        "%sTflpel                  = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  FloorplanElement      = %p\n",
-        prefix, this->FloorplanElement) ;
-
-    fprintf (stream,
-        "%s  Quantity              = %d\n",
-        prefix, this->Quantity) ;
+        FREE_POINTER(free, this) ;
 }
 
 /******************************************************************************/
@@ -246,7 +189,7 @@ void init_tcoolant (Tcoolant_t *this)
 
 /******************************************************************************/
 
-Tcoolant_t *alloc_and_init_tcoolant (void)
+Tcoolant_t *calloc_tcoolant (void)
 {
     Tcoolant_t *tcoolant = (Tcoolant_t *) malloc (sizeof(Tcoolant_t)) ;
 
@@ -261,20 +204,9 @@ Tcoolant_t *alloc_and_init_tcoolant (void)
 
 void free_tcoolant (Tcoolant_t *this)
 {
-    FREE_POINTER (free, this) ;
-}
+    if (this != NULL)
 
-/******************************************************************************/
-
-void print_detailed_tcoolant (Tcoolant_t *this, FILE *stream, String_t prefix)
-{
-    fprintf (stream,
-        "%sTcoolant                = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  Quantity              = %d\n",
-        prefix, this->Quantity) ;
+        FREE_POINTER (free, this) ;
 }
 
 /******************************************************************************/
@@ -296,7 +228,7 @@ void init_inspection_point (InspectionPoint_t *this)
 
 /******************************************************************************/
 
-InspectionPoint_t *alloc_and_init_inspection_point (void)
+InspectionPoint_t *calloc_inspection_point (void)
 {
     InspectionPoint_t *inspection_point = (InspectionPoint_t *) malloc (sizeof(InspectionPoint_t)) ;
 
@@ -346,7 +278,7 @@ void free_inspection_point_list (InspectionPoint_t *list)
 
 /******************************************************************************/
 
-void print_formatted_inspection_point_list
+void print_inspection_point_list
 (
     InspectionPoint_t *list,
     FILE              *stream,
@@ -463,129 +395,6 @@ void print_formatted_inspection_point_list
             fprintf(stream, "final );\n");
 
     } // FOR_EVERY_ELEMENT_IN_LIST
-}
-
-/******************************************************************************/
-
-void print_detailed_inspection_point_list
-(
-    InspectionPoint_t *list,
-    FILE              *stream,
-    String_t           prefix
-)
-{
-    String_t new_prefix =
-
-        (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
-
-    if (new_prefix == NULL) return ;
-
-    sprintf (new_prefix, "%s    ", prefix) ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, ipoint, list)
-    {
-        fprintf (stream,
-            "%sinspection_point                = %p\n",
-            prefix, ipoint);
-
-        fprintf (stream,
-            "%s  FileName                  = %s\n",
-            prefix, ipoint->FileName);
-
-        fprintf (stream,
-            "%s  Instant                   = %d\n",
-            prefix, ipoint->Instant);
-
-        fprintf (stream,
-            "%s  Type                      = %d\n",
-            prefix, ipoint->Type);
-
-        switch(ipoint->Type)
-        {
-            case TDICE_OUTPUT_TYPE_TCELL :
-
-                fprintf (stream,
-                    "%s  Pointer.Tcell             = %p\n",
-                    prefix, ipoint->Pointer.Tcell);
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                    print_detailed_tcell
-
-                        (ipoint->Pointer.Tcell, stream, new_prefix) ;
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                break ;
-
-            case TDICE_OUTPUT_TYPE_TFLP :
-
-                fprintf (stream,
-                    "%s  Pointer.Tflp              = %p\n",
-                    prefix, ipoint->Pointer.Tflp);
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                    print_detailed_tflp
-
-                        (ipoint->Pointer.Tflp, stream, new_prefix) ;
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                break ;
-
-            case TDICE_OUTPUT_TYPE_TFLPEL :
-
-                fprintf (stream,
-                    "%s  Pointer.Tflpel            = %p\n",
-                    prefix, ipoint->Pointer.Tflpel);
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                    print_detailed_tflpel
-
-                        (ipoint->Pointer.Tflpel, stream, new_prefix) ;
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                break ;
-
-            case TDICE_OUTPUT_TYPE_TCOOLANT :
-
-                fprintf (stream,
-                    "%s  Pointer.Tcoolant          = %p\n",
-                    prefix, ipoint->Pointer.Tcoolant);
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                    print_detailed_tcoolant
-
-                        (ipoint->Pointer.Tcoolant, stream, new_prefix) ;
-
-                    fprintf (stream, "%s\n", prefix) ;
-
-                break ;
-
-            default :
-
-                fprintf (stream, "Undefined inspection point command Type %d\n", ipoint->Type) ;
-
-                break ;
-        }
-
-        fprintf (stream,
-            "%s  StackElement              = %p\n",
-            prefix, ipoint->StackElement);
-
-        fprintf (stream,
-            "%s  Next                      = %p\n",
-            prefix, ipoint->Next);
-
-        fprintf (stream, "%s\n", prefix) ;
-
-    } // FOR_EVERY_ELEMENT_IN_LIST
-
-    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

@@ -61,7 +61,7 @@ init_stack_element (StackElement_t *this)
 
 /******************************************************************************/
 
-StackElement_t *alloc_and_init_stack_element (void)
+StackElement_t *calloc_stack_element (void)
 {
     StackElement_t *stack_element = (StackElement_t *) malloc (sizeof(StackElement_t)) ;
 
@@ -105,7 +105,7 @@ StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id)
 
 /******************************************************************************/
 
-void print_formatted_stack_elements_list
+void print_stack_elements_list
 (
     StackElement_t *list,
     FILE           *stream,
@@ -175,79 +175,6 @@ void print_formatted_stack_elements_list
                 fprintf (stderr, "Undefined stack element type %d\n", stack_element->Type) ;
         }
     }
-}
-
-/******************************************************************************/
-
-void print_detailed_stack_elements_list
-(
-    StackElement_t *list,
-    FILE           *stream,
-    String_t        prefix
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stk_el, list)
-    {
-        fprintf (stream,
-            "%sstk_el                      = %p\n",
-            prefix,   stk_el);
-
-        fprintf (stream,
-            "%s  Id                        = " "%s\n",
-            prefix,   stk_el->Id);
-
-        fprintf (stream,
-            "%s  Type                      = %d\n",
-            prefix,   stk_el->Type);
-
-        if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
-        {
-            fprintf (stream,
-                "%s  Pointer.Die               = %p\n",
-                prefix,   stk_el->Pointer.Die);
-        }
-        else if (stk_el->Type == TDICE_STACK_ELEMENT_CHANNEL)
-        {
-            fprintf (stream,
-                "%s  Pointer.Channel           = %p\n",
-                prefix,   stk_el->Pointer.Channel);
-        }
-        else if (stk_el->Type == TDICE_STACK_ELEMENT_LAYER)
-        {
-            fprintf (stream,
-                "%s  Pointer.Layer             = %p\n",
-                prefix,   stk_el->Pointer.Layer);
-        }
-        else if (stk_el->Type == TDICE_STACK_ELEMENT_HEATSINK)
-        {
-            fprintf (stream,
-                "%s  Pointer.HeatSink          = %p\n",
-                prefix,   stk_el->Pointer.HeatSink);
-        }
-
-        fprintf (stream,
-            "%s  NLayers                   = %d\n",
-            prefix,   stk_el->NLayers);
-
-        fprintf (stream,
-            "%s  Floorplan                 = %p\n",
-            prefix,   stk_el->Floorplan);
-
-        fprintf (stream,
-            "%s  Offset                    = %d\n",
-            prefix,   stk_el->Offset);
-
-        fprintf (stream,
-            "%s  Next                      = %p\n",
-            prefix,   stk_el->Next);
-
-        fprintf (stream,
-            "%s  Prev                      = %p\n",
-            prefix,   stk_el->Prev);
-
-        fprintf (stream, "%s\n", prefix) ;
-
-    } // FOR_EVERY_ELEMENT_IN_LIST
 }
 
 /******************************************************************************/

@@ -56,18 +56,6 @@ void init_analysis (Analysis_t *this)
 
 /******************************************************************************/
 
-void copy_analysis (Analysis_t *dst, Analysis_t *src)
-{
-    dst->AnalysisType       = src->AnalysisType ;
-    dst->StepTime           = src->StepTime ;
-    dst->SlotTime           = src->SlotTime ;
-    dst->SlotLength         = src->SlotLength ;
-    dst->CurrentTime        = src->CurrentTime ;
-    dst->InitialTemperature = src->InitialTemperature ;
-}
-
-/******************************************************************************/
-
 Analysis_t *calloc_analysis ( void )
 {
     Analysis_t *analysis = (Analysis_t *) malloc (sizeof (Analysis_t)) ;
@@ -75,23 +63,6 @@ Analysis_t *calloc_analysis ( void )
     if (analysis != NULL)
 
         init_analysis (analysis) ;
-
-    return analysis ;
-}
-
-/******************************************************************************/
-
-Analysis_t *clone_analysis (Analysis_t *this)
-{
-    if (this == NULL)
-
-        return NULL ;
-
-    Analysis_t *analysis = calloc_analysis ( ) ;
-
-    if (analysis != NULL)
-
-        copy_analysis (analysis, this) ;
 
     return analysis ;
 }
@@ -132,7 +103,7 @@ bool slot_completed (Analysis_t *this)
 
 /******************************************************************************/
 
-void print_formatted_analysis
+void print_analysis
 (
     Analysis_t *this,
     FILE       *stream,
@@ -156,52 +127,6 @@ void print_formatted_analysis
         prefix, this->InitialTemperature) ;
 
     fprintf (stream, "%s\n", prefix) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_analysis
-(
-  Analysis_t *this,
-  FILE       *stream,
-  String_t    prefix
-)
-{
-    String_t new_prefix = (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
-
-    if (new_prefix == NULL) return ;
-
-    sprintf (new_prefix, "%s    ", prefix) ;
-
-    fprintf (stream,
-        "%sAnalysis                        = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  AnalysisType                  = %d\n",
-        prefix, this->AnalysisType) ;
-
-    fprintf (stream,
-        "%s  StepTime                      = %.2f\n",
-        prefix, this->StepTime) ;
-
-    fprintf (stream,
-        "%s  SlotTime                      = %.2f\n",
-        prefix, this->SlotTime) ;
-
-    fprintf (stream,
-        "%s  SlotLength                    = %d\n",
-        prefix, this->SlotLength) ;
-
-    fprintf (stream,
-        "%s  CurrentTime                   = %d\n",
-        prefix, this->CurrentTime) ;
-
-    fprintf (stream,
-        "%s  InitialTemperature            = %.2f\n",
-        prefix, this->InitialTemperature) ;
-
-    FREE_POINTER (free, new_prefix) ;
 }
 
 /******************************************************************************/

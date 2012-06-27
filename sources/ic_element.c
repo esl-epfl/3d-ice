@@ -56,21 +56,6 @@ void init_ic_element (ICElement_t *this)
 
 /******************************************************************************/
 
-void copy_ic_element (ICElement_t *dst, ICElement_t *src)
-{
-    dst->SW_X      = src->SW_X ;
-    dst->SW_Y      = src->SW_Y ;
-    dst->Length    = src->Length ;
-    dst->Width     = src->Width ;
-    dst->SW_Row    = src->SW_Row ;
-    dst->SW_Column = src->SW_Column ;
-    dst->NE_Row    = src->NE_Row ;
-    dst->NE_Column = src->NE_Column ;
-    dst->Next      = src->Next ;
-}
-
-/******************************************************************************/
-
 ICElement_t *calloc_ic_element ( void )
 {
     ICElement_t *ic_element = (ICElement_t *) malloc (sizeof(ICElement_t));
@@ -78,23 +63,6 @@ ICElement_t *calloc_ic_element ( void )
     if (ic_element != NULL)
 
         init_ic_element (ic_element) ;
-
-    return ic_element ;
-}
-
-/*****************************************************************************/
-
-ICElement_t *clone_ic_element (ICElement_t *this)
-{
-    if (this == NULL)
-
-        return NULL ;
-
-    ICElement_t *ic_element = calloc_ic_element ( ) ;
-
-    if (ic_element != NULL)
-
-        copy_ic_element (ic_element, this) ;
 
     return ic_element ;
 }
@@ -110,39 +78,6 @@ void free_ic_element (ICElement_t *this)
 
 /******************************************************************************/
 
-ICElement_t *clone_ic_elements_list (ICElement_t *list)
-{
-    if (list == NULL)
-
-        return NULL ;
-
-    ICElement_t *new_list = NULL ;
-    ICElement_t *prev     = NULL ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, ic_el, list)
-    {
-        ICElement_t *tmp = clone_ic_element (ic_el) ;
-
-        if (tmp == NULL)
-        {
-            free_ic_elements_list (new_list) ;
-
-            new_list = NULL ;
-
-            break ;
-        }
-
-        if (new_list == NULL)    new_list   = tmp ;
-        else                     prev->Next = tmp ;
-
-        prev = tmp ;
-    }
-
-    return new_list ;
-}
-
-/******************************************************************************/
-
 void free_ic_elements_list (ICElement_t *list)
 {
     FREE_LIST (ICElement_t, list, free_ic_element) ;
@@ -150,75 +85,7 @@ void free_ic_elements_list (ICElement_t *list)
 
 /******************************************************************************/
 
-void print_detailed_ic_element
-(
-    ICElement_t *this,
-    FILE        *stream,
-    String_t     prefix
-)
-{
-    fprintf (stream,
-             "%sic element                  = %p\n",
-             prefix, this) ;
-
-    fprintf (stream,
-             "%s    SW_X                    = %.3f\n",
-             prefix, this->SW_X) ;
-
-    fprintf (stream,
-             "%s    SW_Y                    = %.3f\n",
-             prefix, this->SW_Y) ;
-
-    fprintf (stream,
-             "%s    Length                  = %.3f\n",
-             prefix, this->Length) ;
-
-    fprintf (stream,
-             "%s    Width                   = %.3f\n",
-             prefix, this->Width) ;
-
-    fprintf (stream,
-             "%s    SW_Row                  = %d\n",
-             prefix, this->SW_Row) ;
-
-    fprintf (stream,
-             "%s    SW_Column               = %d\n",
-             prefix, this->SW_Column) ;
-
-    fprintf (stream,
-             "%s    NE_Row                  = %d\n",
-             prefix, this->NE_Row) ;
-
-    fprintf (stream,
-             "%s    NE_Column               = %d\n",
-             prefix, this->NE_Column) ;
-
-    fprintf (stream,
-             "%s    Next                    = %p\n",
-             prefix, this->Next) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_ic_elements_list (ICElement_t *list, FILE *stream, String_t prefix)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
-    {
-        if (icelement->Next == NULL)
-
-            break ;
-
-        print_detailed_ic_element (icelement, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    print_detailed_ic_element (icelement, stream, prefix) ;
-}
-
-/******************************************************************************/
-
-void print_formatted_ic_element
+void print_ic_element
 (
     ICElement_t *this,
     FILE        *stream,
@@ -233,7 +100,7 @@ void print_formatted_ic_element
 
 /******************************************************************************/
 
-void print_formatted_ic_elements_list (ICElement_t *list, FILE *stream, String_t prefix)
+void print_ic_elements_list (ICElement_t *list, FILE *stream, String_t prefix)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
     {
@@ -241,12 +108,12 @@ void print_formatted_ic_elements_list (ICElement_t *list, FILE *stream, String_t
 
             break ;
 
-        print_formatted_ic_element (icelement, stream, prefix) ;
+        print_ic_element (icelement, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_formatted_ic_element (icelement, stream, prefix) ;
+    print_ic_element (icelement, stream, prefix) ;
 }
 
 /******************************************************************************/

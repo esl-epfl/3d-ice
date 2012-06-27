@@ -56,20 +56,6 @@ void init_layer (Layer_t *this)
 
 /******************************************************************************/
 
-void copy_layer (Layer_t *dst, Layer_t *src)
-{
-    dst->Height   = src->Height ;
-    dst->Material = src->Material ;
-
-    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
-
-    dst->Used     = src->Used ;
-    dst->Next     = src->Next ;
-    dst->Prev     = src->Prev ;
-}
-
-/******************************************************************************/
-
 Layer_t *calloc_layer (void)
 {
     Layer_t *layer = (Layer_t *) malloc (sizeof(Layer_t));
@@ -77,23 +63,6 @@ Layer_t *calloc_layer (void)
     if (layer != NULL)
 
         init_layer (layer) ;
-
-    return layer ;
-}
-
-/******************************************************************************/
-
-Layer_t *clone_layer (Layer_t *this)
-{
-    if (this == NULL)
-
-        return NULL ;
-
-    Layer_t *layer = calloc_layer ( ) ;
-
-    if (layer != NULL)
-
-        copy_layer (layer, this) ;
 
     return layer ;
 }
@@ -111,44 +80,6 @@ void free_layer (Layer_t *this)
         FREE_POINTER (free, this->Id) ;
 
     FREE_POINTER (free, this) ;
-}
-
-/******************************************************************************/
-
-Layer_t *clone_layers_list (Layer_t *list)
-{
-    if (list == NULL)
-
-        return NULL ;
-
-    Layer_t *new_list = NULL ;
-    Layer_t *prev     = NULL ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
-    {
-        Layer_t *tmp = clone_layer (layer) ;
-
-        if (tmp == NULL)
-        {
-            free_layers_list (new_list) ;
-
-            new_list = NULL ;
-
-            break ;
-        }
-
-        if (new_list == NULL)
-
-            new_list = tmp ;
-
-        else
-
-            JOIN_ELEMENTS (prev, tmp) ;
-
-        prev = tmp ;
-    }
-
-    return new_list ;
 }
 
 /******************************************************************************/
@@ -172,7 +103,7 @@ Layer_t *find_layer_in_list (Layer_t *list, String_t id)
 
 /******************************************************************************/
 
-void print_formatted_layer (Layer_t *this, FILE *stream, String_t prefix)
+void print_layer (Layer_t *this, FILE *stream, String_t prefix)
 {
     fprintf (stream,
         "%slayer %s :\n",
@@ -189,62 +120,11 @@ void print_formatted_layer (Layer_t *this, FILE *stream, String_t prefix)
 
 /******************************************************************************/
 
-void print_detailed_layer (Layer_t *this, FILE *stream, String_t prefix)
-{
-    fprintf (stream,
-        "%slayer                   = %p\n",
-        prefix, this) ;
-
-    fprintf (stream,
-        "%s  Height                = %.1f\n",
-        prefix, this->Height) ;
-
-    fprintf (stream,
-        "%s  Material              = %p\n",
-        prefix, this->Material) ;
-
-    fprintf (stream,
-        "%s  Id                    = %s\n",
-        prefix, this->Id) ;
-
-    fprintf (stream,
-        "%s  Used                  = %d\n",
-        prefix, this->Used) ;
-
-    fprintf (stream,
-        "%s  Next                  = %p\n",
-        prefix, this->Next) ;
-
-    fprintf (stream,
-        "%s  Prev                  = %p\n",
-        prefix, this->Prev) ;
-}
-
-/******************************************************************************/
-
-void print_formatted_layers_list (Layer_t *list, FILE *stream, String_t prefix)
+void print_layers_list (Layer_t *list, FILE *stream, String_t prefix)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
 
-        print_formatted_layer (layer, stream, prefix) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_layers_list (Layer_t *list, FILE *stream, String_t prefix)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
-    {
-        if (layer->Next == NULL)
-
-            break ;
-
-        print_detailed_layer (layer, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    print_detailed_layer (layer, stream, prefix) ;
+        print_layer (layer, stream, prefix) ;
 }
 
 /******************************************************************************/

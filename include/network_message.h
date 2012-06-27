@@ -110,7 +110,7 @@ extern "C"
      * \param this the address of the NetworkMessage to free
      */
 
-    void free_network_message (NetworkMessage_t *this) ;
+    void destroy_network_message (NetworkMessage_t *this) ;
 
 
 

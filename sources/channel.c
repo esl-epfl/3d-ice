@@ -54,19 +54,6 @@ void init_coolant (Coolant_t *this)
 
 /******************************************************************************/
 
-void copy_coolant (Coolant_t *dst, Coolant_t *src)
-{
-    dst->HTCSide       = src->HTCSide ;
-    dst->HTCTop        = src->HTCTop ;
-    dst->HTCBottom     = src->HTCBottom ;
-    dst->VHC           = src->VHC ;
-    dst->FlowRate      = src->FlowRate ;
-    dst->DarcyVelocity = src->DarcyVelocity ;
-    dst->TIn           = src->TIn ;
-}
-
-/******************************************************************************/
-
 void init_channel (Channel_t *this)
 {
     this->ChannelModel      = (ChannelModel_t) TDICE_CHANNEL_MODEL_NONE ;
@@ -85,24 +72,6 @@ void init_channel (Channel_t *this)
 
 /******************************************************************************/
 
-void copy_channel (Channel_t *dst, Channel_t *src)
-{
-    dst->ChannelModel          = src->ChannelModel ;
-    dst->Height                = src->Height ;
-    dst->Length                = src->Length ;
-    dst->Pitch                 = src->Pitch ;
-    dst->Porosity              = src->Porosity ;
-    dst->NChannels             = src->NChannels ;
-    dst->NLayers               = src->NLayers ;
-    dst->SourceLayerOffset     = src->SourceLayerOffset ;
-
-    copy_coolant (&dst->Coolant, &src->Coolant) ;
-
-    dst->WallMaterial = src->WallMaterial ;
-}
-
-/******************************************************************************/
-
 Channel_t *calloc_channel ( void )
 {
     Channel_t *channel = (Channel_t *) malloc (sizeof(Channel_t)) ;
@@ -110,23 +79,6 @@ Channel_t *calloc_channel ( void )
     if (channel != NULL)
 
         init_channel (channel) ;
-
-    return channel ;
-}
-
-/******************************************************************************/
-
-Channel_t *clone_channel (Channel_t *this)
-{
-    if (this == NULL)
-
-        return NULL ;
-
-    Channel_t *channel = calloc_channel ( ) ;
-
-    if (channel != NULL)
-
-        copy_channel (channel, this) ;
 
     return channel ;
 }
@@ -142,7 +94,7 @@ void free_channel (Channel_t *this)
 
 /******************************************************************************/
 
-void print_formatted_channel
+void print_channel
 (
     Channel_t    *this,
     FILE         *stream,
@@ -231,84 +183,6 @@ void print_formatted_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, this->Coolant.TIn ) ;
     }
-}
-
-/******************************************************************************/
-
-void print_detailed_channel
-(
-  Channel_t *this,
-  FILE      *stream,
-  String_t   prefix
-)
-{
-    fprintf (stream,
-        "%schannel                     = %p\n",
-        prefix,   this) ;
-
-    fprintf (stream,
-        "%s  ChannelModel              = %d\n",
-        prefix, this->ChannelModel) ;
-
-    fprintf (stream,
-        "%s  Height                    = %.1f\n",
-        prefix,  this->Height) ;
-
-    fprintf (stream,
-        "%s  Length                    = %.1f\n",
-        prefix,  this->Length) ;
-
-    fprintf (stream,
-        "%s  Pitch                     = %.1f\n",
-        prefix,  this->Pitch) ;
-
-    fprintf (stream,
-        "%s  Porosity                  = %.1f\n",
-        prefix,  this->Porosity) ;
-
-    fprintf (stream,
-        "%s  NChannels                 = %d\n",
-        prefix,  this->NChannels) ;
-
-    fprintf (stream,
-        "%s  NLayers                   = %d\n",
-        prefix,  this->NLayers) ;
-
-    fprintf (stream,
-        "%s  SourceLayerOffset         = %d\n",
-        prefix, this->SourceLayerOffset) ;
-
-    fprintf (stream,
-        "%s  Coolant.HTCSide           = %.4e\n",
-        prefix,  this->Coolant.HTCSide) ;
-
-    fprintf (stream,
-        "%s  Coolant.HTCTop            = %.4e\n",
-        prefix,  this->Coolant.HTCTop) ;
-
-    fprintf (stream,
-        "%s  Coolant.HTCBottom         = %.4e\n",
-        prefix,  this->Coolant.HTCBottom) ;
-
-    fprintf (stream,
-        "%s  Coolant.VHC               = %.4e\n",
-        prefix,  this->Coolant.VHC) ;
-
-    fprintf (stream,
-        "%s  Coolant.TIn               = %.2f\n",
-        prefix,  this->Coolant.TIn) ;
-
-    fprintf (stream,
-        "%s  CoolantFR                 = %.4e\n",
-        prefix,  this->Coolant.FlowRate) ;
-
-    fprintf (stream,
-        "%s  DarcyVelocity             = %.4e\n",
-        prefix,  this->Coolant.DarcyVelocity) ;
-
-    fprintf (stream,
-        "%s  WallMaterial              = %p\n",
-        prefix,  this->WallMaterial) ;
 }
 
 /******************************************************************************/

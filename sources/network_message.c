@@ -58,7 +58,7 @@ void init_network_message (NetworkMessage_t *this)
 
 /******************************************************************************/
 
-void free_network_message (NetworkMessage_t *this)
+void destroy_network_message (NetworkMessage_t *this)
 {
     FREE_POINTER (free, this->Memory) ;
 

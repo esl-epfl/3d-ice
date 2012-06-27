@@ -117,17 +117,17 @@ extern "C"
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t alloc_thermal_grid (ThermalGrid_t *this, Quantity_t size) ;
+    Error_t build_thermal_grid (ThermalGrid_t *this, Quantity_t size) ;
 
 
 
     /*! Release the memory used by the thermal grid (i.e. the memory allocated
-     *  by \a alloc_thermal_grid )
+     *  by \a build_thermal_grid )
      *
      * \param this the address of the thermal grid
      */
 
-    void free_thermal_grid (ThermalGrid_t *this) ;
+    void destroy_thermal_grid (ThermalGrid_t *this) ;
 
 
 

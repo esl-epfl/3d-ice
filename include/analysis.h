@@ -104,16 +104,6 @@ extern "C"
 
 
 
-    /*! Copies the analysis structure \a src into \a dest.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_analysis (Analysis_t *dst, Analysis_t *src) ;
-
-
-
     /*! Allocates and inits memory for a structure of type Analysis_t
      *
      * \return a pointer to the allocated memory.
@@ -124,24 +114,10 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Analysis_t and
-     *  copies \a this into it.
-     *
-     * \param this the address of the analysis structure to clone
-     *
-     * \return a pointer to a new structure of type Analysis_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    Analysis_t *clone_analysis (Analysis_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_analysis or \a clone_analysis. If \a this is \c NULL,
-     * no operation is performed.
+     * to \a calloc_analysis . If \a this is \c NULL, no operation is performed.
      *
      * \param this the address to free
      */
@@ -190,22 +166,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_analysis
-
-        (Analysis_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of analysis
-     *
-     * \param this    the analysis information to print
-     * \param stream  the output stream (must be already open)
-     * \param prefix  a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_analysis
-
-        (Analysis_t *this, FILE *stream, String_t prefix) ;
+    void print_analysis (Analysis_t *this, FILE *stream, String_t prefix) ;
 
 
 /******************************************************************************/

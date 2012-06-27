@@ -56,39 +56,6 @@ void init_cell_dimensions (CellDimensions_t *this)
 
 /******************************************************************************/
 
-void copy_cell_dimensions (CellDimensions_t *dst, CellDimensions_t *src)
-{
-    dst->FirstWallLength = src->FirstWallLength ;
-    dst->LastWallLength  = src->LastWallLength ;
-    dst->WallLength      = src->WallLength ;
-    dst->ChannelLength   = src->ChannelLength ;
-    dst->Width           = src->Width ;
-    dst->NHeights        = src->NHeights ;
-
-    if (src->NHeights == 0)
-    {
-        dst->Heights = NULL ;
-
-        return ;
-    }
-
-    dst->Heights = (CellDimension_t *)
-
-        malloc (src->NHeights * sizeof (CellDimension_t)) ;
-
-    if (dst->Heights == NULL)
-    {
-        fprintf (stderr, "Malloc heights error\n") ;
-
-        return ;
-    }
-
-    memcpy (dst->Heights, src->Heights,
-            src->NHeights * sizeof (CellDimension_t) ) ;
-}
-
-/******************************************************************************/
-
 void init_grid_dimensions (GridDimensions_t *this)
 {
     this->NLayers      = (CellIndex_t) 0u ;
@@ -100,29 +67,10 @@ void init_grid_dimensions (GridDimensions_t *this)
 
 /******************************************************************************/
 
-void copy_grid_dimensions (GridDimensions_t *dst, GridDimensions_t *src)
-{
-    dst->NLayers      = src->NLayers ;
-    dst->NRows        = src->NRows ;
-    dst->NColumns     = src->NColumns ;
-    dst->NCells       = src->NCells ;
-    dst->NConnections = src->NConnections ;
-}
-
-/******************************************************************************/
-
 void init_chip_dimensions (ChipDimensions_t *this)
 {
     this->Length = (CellDimension_t) 0.0 ;
     this->Width  = (CellDimension_t) 0.0 ;
-}
-
-/******************************************************************************/
-
-void copy_chip_dimensions (ChipDimensions_t *dst, ChipDimensions_t *src)
-{
-    dst->Length = src->Length ;
-    dst->Width  = src->Width ;
 }
 
 /******************************************************************************/
@@ -136,15 +84,6 @@ void init_dimensions (Dimensions_t *this)
 
 /******************************************************************************/
 
-void copy_dimensions (Dimensions_t *dst, Dimensions_t *src)
-{
-    copy_cell_dimensions (&dst->Cell, &src->Cell) ;
-    copy_grid_dimensions (&dst->Grid, &src->Grid) ;
-    copy_chip_dimensions (&dst->Chip, &src->Chip) ;
-}
-
-/******************************************************************************/
-
 Dimensions_t *calloc_dimensions (void)
 {
     Dimensions_t *dimensions = (Dimensions_t *) malloc (sizeof(Dimensions_t)) ;
@@ -152,23 +91,6 @@ Dimensions_t *calloc_dimensions (void)
     if (dimensions != NULL)
 
         init_dimensions (dimensions) ;
-
-    return dimensions ;
-}
-
-/******************************************************************************/
-
-Dimensions_t *clone_dimensions (Dimensions_t *this)
-{
-    if (this == NULL)
-
-        return NULL ;
-
-    Dimensions_t *dimensions = calloc_dimensions ( ) ;
-
-    if (dimensions != NULL)
-
-        copy_dimensions (dimensions, this) ;
 
     return dimensions ;
 }
@@ -190,7 +112,7 @@ void free_dimensions (Dimensions_t *this)
 
 /******************************************************************************/
 
-void print_formatted_dimensions
+void print_dimensions
 (
     Dimensions_t *this,
     FILE         *stream,
@@ -208,85 +130,6 @@ void print_formatted_dimensions
     fprintf (stream,
             "%s   cell length %7.1f , width %7.1f ;\n",
             prefix, this->Cell.WallLength, this->Cell.Width) ;
-}
-
-/******************************************************************************/
-
-void print_detailed_dimensions
-(
-  Dimensions_t *this,
-  FILE         *stream,
-  String_t      prefix
-)
-{
-    fprintf (stream,
-            "%sdimensions                  = %p\n",
-            prefix, this) ;
-
-    fprintf (stream,
-            "%s  Cell.FirstWallLength      = %.1f\n",
-            prefix, this->Cell.FirstWallLength) ;
-
-    fprintf (stream,
-            "%s  Cell.WallLength           = %.1f\n",
-            prefix, this->Cell.WallLength) ;
-
-    fprintf (stream,
-            "%s  Cell.LastWallLength       = %.1f\n",
-            prefix, this->Cell.LastWallLength) ;
-
-    fprintf (stream,
-            "%s  Cell.ChannelLength        = %.1f\n",
-            prefix, this->Cell.ChannelLength) ;
-
-    fprintf (stream,
-            "%s  Cell.Width                = %.1f\n",
-            prefix, this->Cell.Width) ;
-
-    fprintf (stream,
-            "%s  Cell.NHeigths             = %d\t",
-            prefix, this->Cell.NHeights) ;
-
-    fprintf (stream,
-            "%s  Cell.Heigths              = %p\t",
-            prefix, this->Cell.Heights) ;
-
-    CellIndex_t layer ;
-
-    for (layer = 0 ; layer != this->Cell.NHeights ; layer++)
-
-    fprintf (stream, "%.1f ", this->Cell.Heights [layer]) ;
-
-    fprintf (stream, "\n") ;
-
-
-    fprintf (stream,
-            "%s  Grid.NLayers              = %d\n",
-            prefix, this->Grid.NLayers) ;
-
-    fprintf (stream,
-            "%s  Grid.NRows                = %d\n",
-            prefix, this->Grid.NRows) ;
-
-    fprintf (stream,
-            "%s  Grid.NColumns             = %d\n",
-            prefix, this->Grid.NColumns) ;
-
-    fprintf (stream,
-            "%s  Grid.NCells               = %d\n",
-            prefix, this->Grid.NCells) ;
-
-    fprintf (stream,
-            "%s  Grid.Nconnections         = %d\n",
-            prefix, this->Grid.NConnections) ;
-
-    fprintf (stream,
-            "%s  Chip.Length               = %.1f\n",
-            prefix, this->Chip.Length) ;
-
-    fprintf (stream,
-            "%s  Chip.Width                = %.1f\n",
-            prefix, this->Chip.Width) ;
 }
 
 /******************************************************************************/

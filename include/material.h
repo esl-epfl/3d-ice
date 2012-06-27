@@ -116,19 +116,6 @@ extern "C"
 
 
 
-    /*! Copies the material \a src into \a dest.
-     *
-     * After the copy, the materials \a dst and \a src will point
-     * to the same Next material
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_material (Material_t *dst, Material_t *src) ;
-
-
-
     /*! Allocates and inits memory for a structure of type Material_t
      *
      * \return a pointer to the allocated memory.
@@ -139,41 +126,16 @@ extern "C"
 
 
 
-    /*! Makes a new copy of a structure of type Material_t and
-     *  copies \a this into it.
-     *
-     * \param this the address of the material structure to clone
-     *
-     * \return a pointer to a new structure of type Material_t
-     * \return \c NULL in case of error of if the parameter \a this is \c NULL
-     */
-
-    Material_t *clone_material (Material_t *this) ;
-
-
-
     /*! Frees the memory space pointed to by \a this
      *
      * The pointer \a this must have been returned by a previous call
-     * to \a calloc_material or \a clone_material. If \a this is \c NULL,
+     * to \a calloc_material . If \a this is \c NULL,
      * no operation is performed.
      *
      * \param this the address to free
      */
 
     void free_material (Material_t *this) ;
-
-
-
-    /*! Duplicates a list of materials
-     *
-     * \param list the pointer to the first elment in the list to clone
-     *
-     * \return the pointer to the first material in the new list
-     * \return \c NULL in case of error or if the parameter \a list is \c NULL
-     */
-
-    Material_t *clone_materials_list (Material_t *list) ;
 
 
 
@@ -212,9 +174,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_material
-
-         (Material_t *this, FILE *stream, String_t prefix) ;
+    void print_material (Material_t *this, FILE *stream, String_t prefix) ;
 
 
 
@@ -225,35 +185,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_materials_list
-
-         (Material_t *list, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints detailed information about all the fields of a material
-     *
-     * \param this   the material to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_material
-
-         (Material_t *this, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the materials
-     *
-     * \param list the pointer to the first material in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_materials_list
-
-         (Material_t *list, FILE *stream, String_t prefix) ;
+    void print_materials_list (Material_t *list, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

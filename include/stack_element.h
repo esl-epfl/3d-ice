@@ -145,23 +145,22 @@ extern "C"
 
 
 
-    /*! Allocates a stack element in memory and sets its fields to their default
-     *  value with #init_stack_element
+    /*! Allocates and inits memory for a structure of type StackElement_t
      *
-     * \return the pointer to a new StackElement
-     * \return \c NULL if the memory allocation fails
+     * \return a pointer to the allocated memory.
+     * \return \c NULL in case of error
      */
 
-    StackElement_t *alloc_and_init_stack_element (void) ;
+    StackElement_t *calloc_stack_element (void) ;
 
 
 
-    /*! Frees the memory related to \a stack \a element
+    /*! Frees the memory space pointed to by \a this
      *
-     * The parametrer \a this must be a pointer previously obtained with
-     * #alloc_and_init_stack_element
+     * The pointer \a this must have been returned by a previous call
+     * to \a calloc_stack_element . If \a this is \c NULL, no operation is performed.
      *
-     * \param this the address of the stack_element structure to free
+     * \param this the address to free
      */
 
     void free_stack_element (StackElement_t *this) ;
@@ -195,8 +194,7 @@ extern "C"
     StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id) ;
 
 
-    // FIXME : what about print_formatted_stack_element ??
-    // FIXME : what about print_detailed_stack_element  ??
+    // FIXME : what about print_stack_element ??
 
     /*! Prints a list of stack elements as they look in the stack file
      *
@@ -205,20 +203,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_formatted_stack_elements_list
-
-        (StackElement_t *list, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of detailed information about all the fields of the stack elements
-     *
-     * \param list   the pointer to the first stack element in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_detailed_stack_elements_list
+    void print_stack_elements_list
 
         (StackElement_t *list, FILE *stream, String_t prefix) ;
 
