@@ -36,6 +36,21 @@
  # 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html #
  ##############################################################################
 
+
+ ##############################################################################
+   * Enhanced network interface with new message types
+   * New type Output_t to decouple analysis parameters from output requests
+   * Removed ThermalCell array. Added ThermalGrid and PowerGrid instead. 
+   * Improved computation of source values
+   * New criteria for alignment of floorplan elements on thermal cells to
+     support ic elements smaller than cells as well as more than one ic
+     element per thermal cell 
+   * Changed implementation of powers queue to circular array
+   * New InspectionPoint Pmap for power maps 
+   * New heat sink model (spreader + sink) using constriction/spreading model
+   * Added Layer as element composing the stack
+   * New typedefs for a better integration with C++ code
+   * Minor changes in code
  ##############################################################################
  2012-03-23 3D-ICE 2.1
    * Reduction of memory requirement to store thermal cells

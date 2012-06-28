@@ -241,6 +241,7 @@ Error_t fill_output_message
     Output_t         *this,
     Dimensions_t     *dimensions,
     Temperature_t    *temperatures,
+    Source_t         *sources,
     OutputInstant_t   output_instant,
     OutputType_t      output_type,
     OutputQuantity_t  output_quantity,
@@ -271,7 +272,7 @@ Error_t fill_output_message
 
             fill_message_inspection_point
 
-                (ipoint, output_quantity, dimensions, temperatures, message) ;
+                (ipoint, output_quantity, dimensions, temperatures, sources, message) ;
 
    return TDICE_SUCCESS ;
 }

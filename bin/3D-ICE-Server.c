@@ -64,6 +64,8 @@ int main (int argc, char** argv)
 
     NetworkMessage_t request, reply ;
 
+    bool headers = false ;
+
     /* Checks if all arguments are there **************************************/
 
     if (argc != 3)
@@ -144,18 +146,27 @@ int main (int argc, char** argv)
 
         switch (*request.Type)
         {
+
+        /**********************************************************************/
+
             case TDICE_EXIT_SIMULATION :
             {
                 destroy_network_message (&request) ;
 
                 goto quit ;
             }
+
+        /**********************************************************************/
+
             case TDICE_RESET_THERMAL_STATE :
             {
                 reset_thermal_state (&tdata, &analysis) ;
 
                 break ;
             }
+
+        /**********************************************************************/
+
             case TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS :
             {
                 init_network_message (&reply) ;
@@ -172,6 +183,9 @@ int main (int argc, char** argv)
 
                 break ;
             }
+
+        /**********************************************************************/
+
             case TDICE_INSERT_POWERS_AND_SIMULATE_SLOT :
             {
                 Quantity_t nflpel, index ;
@@ -201,8 +215,6 @@ int main (int argc, char** argv)
 
                     destroy_powers_queue (&queue) ;
 
-                    destroy_network_message (&request) ;
-
                     goto sim_error ;
                 }
 
@@ -230,7 +242,10 @@ int main (int argc, char** argv)
 
                 break ;
             }
-            case TDICE_THERMAL_RESULTS :
+
+        /**********************************************************************/
+
+            case TDICE_SEND_OUTPUT :
             {
                 OutputInstant_t  instant ;
                 OutputType_t     type ;
@@ -241,7 +256,7 @@ int main (int argc, char** argv)
                 extract_message_word (&request, &quantity, 2) ;
 
                 init_network_message (&reply) ;
-                build_message_head   (&reply, TDICE_THERMAL_RESULTS) ;
+                build_message_head   (&reply, TDICE_SEND_OUTPUT) ;
 
                 float   time = get_simulated_time (&analysis) ;
                 Quantity_t n = get_number_of_inspection_points (&output, instant, type, quantity) ;
@@ -253,15 +268,15 @@ int main (int argc, char** argv)
                 {
                     error = fill_output_message
 
-                        (&output, stkd.Dimensions, tdata.Temperatures,
-                        instant, type, quantity, &reply) ;
+                        (&output, stkd.Dimensions,
+                         tdata.Temperatures, tdata.PowerGrid.Sources,
+                         instant, type, quantity, &reply) ;
 
                     if (error != TDICE_SUCCESS)
                     {
                         fprintf (stderr, "error: generate message content\n") ;
 
                         destroy_network_message (&reply) ;
-                        destroy_network_message (&request) ;
 
                         goto sim_error ;
                     }
@@ -273,6 +288,103 @@ int main (int argc, char** argv)
 
                 break ;
             }
+
+        /**********************************************************************/
+
+            case TDICE_PRINT_OUTPUT :
+            {
+                OutputInstant_t  instant ;
+
+                extract_message_word (&request, &instant,  0) ;
+
+                if (headers == false)
+                {
+                    Error_t error = generate_output_headers
+
+                        (&output, stkd.Dimensions, (String_t)"% ") ;
+
+                    if (error != TDICE_SUCCESS)
+                    {
+                        fprintf (stderr, "error in initializing output files \n ");
+
+                        goto sim_error ;
+                    }
+
+                    headers = true ;
+                }
+
+                generate_output
+
+                    (&output, stkd.Dimensions,
+                     tdata.Temperatures, tdata.PowerGrid.Sources,
+                     get_simulated_time (&analysis), instant) ;
+
+                break ;
+            }
+
+        /**********************************************************************/
+
+            case TDICE_SIMULATE_SLOT :
+            {
+                init_network_message (&reply) ;
+                build_message_head   (&reply, TDICE_SIMULATE_SLOT) ;
+
+                SimResult_t result = emulate_slot (&tdata, stkd.Dimensions, &analysis) ;
+
+                insert_message_word (&reply, &result) ;
+
+                send_message_to_socket (&client_socket, &reply) ;
+
+                destroy_network_message (&reply) ;
+
+                if (result == TDICE_END_OF_SIMULATION)
+                {
+                    destroy_network_message (&request) ;
+
+                    goto quit ;
+                }
+                else if (result != TDICE_SLOT_DONE)
+                {
+                    fprintf (stderr, "error %d: emulate slot\n", result) ;
+
+                    goto sim_error ;
+                }
+
+                break ;
+            }
+
+        /**********************************************************************/
+
+            case TDICE_SIMULATE_STEP :
+            {
+                init_network_message (&reply) ;
+                build_message_head   (&reply, TDICE_SIMULATE_STEP) ;
+
+                SimResult_t result = emulate_step (&tdata, stkd.Dimensions, &analysis) ;
+
+                insert_message_word (&reply, &result) ;
+
+                send_message_to_socket (&client_socket, &reply) ;
+
+                destroy_network_message (&reply) ;
+
+                if (result == TDICE_END_OF_SIMULATION)
+                {
+                    destroy_network_message (&request) ;
+
+                    goto quit ;
+                }
+                else if (result != TDICE_STEP_DONE && result != TDICE_SLOT_DONE)
+                {
+                    fprintf (stderr, "error %d: emulate step\n", result) ;
+
+                    goto sim_error ;
+                }
+
+                break ;
+            }
+
+        /**********************************************************************/
 
             default :
 
@@ -296,6 +408,7 @@ quit :
     return EXIT_SUCCESS ;
 
 sim_error :
+                            destroy_network_message   (&request) ;
                             close_socket              (&client_socket) ;
 wait_error :
                             close_socket              (&server_socket) ;

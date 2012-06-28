@@ -836,6 +836,7 @@ void fill_message_inspection_point
     OutputQuantity_t   output_quantity,
     Dimensions_t      *dimensions,
     Temperature_t     *temperatures,
+    Source_t          *sources,
     NetworkMessage_t  *message
 )
 {
@@ -856,11 +857,51 @@ void fill_message_inspection_point
 
             break ;
         }
-        case TDICE_OUTPUT_TYPE_TFLP :
 
-            fprintf (stderr, "TFLP output in message not supperted\n") ;
+        case TDICE_OUTPUT_TYPE_TFLP :
+        {
+            temperatures += get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(this->StackElement), 0, 0) ;
+
+            Temperature_t *tmp ;
+            Quantity_t nflp, index ;
+
+            if (output_quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
+
+                tmp = get_all_max_temperatures_floorplan
+
+                    (this->StackElement->Floorplan, dimensions,
+                      temperatures, &nflp, NULL) ;
+
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
+
+                tmp = get_all_min_temperatures_floorplan
+
+                    (this->StackElement->Floorplan, dimensions,
+                      temperatures, &nflp, NULL) ;
+
+            else
+
+                tmp = get_all_avg_temperatures_floorplan
+
+                    (this->StackElement->Floorplan, dimensions,
+                      temperatures, &nflp, NULL) ;
+
+            insert_message_word (message, &nflp) ;
+
+            for (index = 0 ; index != nflp ; index++)
+            {
+                Temperature_t t = tmp [ index ] ;
+
+                insert_message_word (message, &t) ;
+            }
+
+            free (tmp) ;
 
             break ;
+        }
 
         case TDICE_OUTPUT_TYPE_TFLPEL :
         {
@@ -896,6 +937,7 @@ void fill_message_inspection_point
 
             break ;
         }
+
         case TDICE_OUTPUT_TYPE_TMAP :
         {
             CellIndex_t n ;
@@ -926,11 +968,72 @@ void fill_message_inspection_point
 
             break ;
         }
-        case TDICE_OUTPUT_TYPE_TCOOLANT :
 
-            fprintf (stderr, "TCOOLANT output in message not supperted\n") ;
+        case TDICE_OUTPUT_TYPE_PMAP :
+        {
+            CellIndex_t n ;
+
+            n = get_number_of_rows (dimensions) ;
+
+            insert_message_word (message, &n) ;
+
+            n = get_number_of_columns (dimensions) ;
+
+            insert_message_word (message, &n) ;
+
+            Quantity_t index = get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(this->StackElement),
+                 0, 0) ;
+
+            FOR_EVERY_ROW (row_index, dimensions)
+            {
+                FOR_EVERY_COLUMN (column_index, dimensions)
+                {
+                    float source = *(sources + index++) ;
+
+                    insert_message_word (message, &source) ;
+                }
+            }
 
             break ;
+        }
+
+        case TDICE_OUTPUT_TYPE_TCOOLANT :
+        {
+            temperatures += get_cell_offset_in_stack
+
+                (dimensions,
+                 get_source_layer_offset(this->StackElement), 0, 0) ;
+
+            float temperature ;
+
+            if (output_quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
+
+                temperature = get_max_temperature_channel_outlet
+
+                    (this->StackElement->Pointer.Channel,
+                     dimensions, temperatures) ;
+
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_MINIMUM)
+
+                temperature = get_min_temperature_channel_outlet
+
+                    (this->StackElement->Pointer.Channel,
+                     dimensions, temperatures) ;
+
+            else
+
+                temperature = get_avg_temperature_channel_outlet
+
+                    (this->StackElement->Pointer.Channel,
+                     dimensions, temperatures) ;
+
+            insert_message_word (message, &temperature) ;
+
+            break ;
+        }
 
         default :
 

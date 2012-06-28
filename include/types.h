@@ -642,35 +642,77 @@ extern "C"
 
         TDICE_EXIT_SIMULATION = 0,
 
+
+
         /*! \brief Reset thermal state to initial temperature
          *
          * The client sends a message without payload :
          *
          * | 2 | TDICE_RESET_THERMAL_STATE |
          *
-         * The client sends a message without payload
          * The server resets the thermal state and does not reply
          */
 
         TDICE_RESET_THERMAL_STATE,
 
-        /*! \brief Request thermal results at a specific instant
+
+
+        /*! \brief Request a message with the thermal state at a specific instant
          *
          * The client sends a message with the following payload
          *
-         * | 4 | TDICE_RESET_THERMAL_STATE | OutputInstant_t instant | OutputType_t type |
+         * | 4 | TDICE_SEND_OUTPUT | OutputInstant_t | OutputType_t | OutputQuantity_t |
          *
-         * The server will process all the inspection point matching the parameters and
-         * will send back the following message
+         * The server will process all the inspection point (declared in the
+         * output section) matching the three parameters and will send back the
+         * following message
          *
-         * | length | TDICE_RESET_THERMAL_STATE | n_matching_inspection_points | ip 0 | ... | ip n-1 |
+         * | length | TDICE_SEND_OUTPUT | nip | ip 1 | ... | ip n |
          *
-         * The message will contain at word 0 the number of inspection points matching the
-         * request. The remaining payloas will contain temperatures according to the type of
-         * inspection point.
+         * The message will contain at word 0 the number nip of inspection points
+         * matching the request. All the ips will be inserted in the message
+         * following the same order with which they appear in the stack file.
+         * If nip is zero, the message should be discarded. Otherwise, the
+         * remaining payloas will contain temperatures according to the type
+         * of inspection point that has been requested.
+         *
+         * The content of the ips could be
+         *
+         * | Temperature |
+         *
+         * if OutputType_t is Tcell, Tflpel or Tcoolant.
+         *
+         * | nflp | T 1 | ... | T nflp |
+         *
+         * if OutputType_t is Tflp (nflp is its number of floorplan elements).
+         *
+         * | nrows | ncolumns | T 1 | ... | T (nrows x ncolumns) |
+         *
+         * if OutputType_t is Tmap.
+         *
+         * | nrows | ncolumns | S 1 | ... | S (nrows x ncolumns) |
+         *
+         * if OutputType_t is Pmap.
          */
 
-        TDICE_THERMAL_RESULTS,
+        TDICE_SEND_OUTPUT,
+
+
+
+        /*! \brief Request to print thermal state at a specific instant
+         *
+         * The client sends a message with the following payload
+         *
+         * | 4 | TDICE_PRINT_OUTPUT | OutputInstant_t |
+         *
+         * The server will process all the inspection point (declared in the
+         * output section) matching the output instant and will generate the output
+         * in their corresponding text file. The server does not reply.
+         */
+
+        TDICE_PRINT_OUTPUT,
+
+
 
         /*! \brief Request for the total number of florplan elements in the stack
          *
@@ -684,6 +726,8 @@ extern "C"
          */
 
         TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS,
+
+
 
         /*! \brief Insert a slot of power values into the queues and simulate the slot
          *
@@ -699,12 +743,36 @@ extern "C"
          */
 
         TDICE_INSERT_POWERS_AND_SIMULATE_SLOT,
-        
-        /*! \brief Tells the server to run a slot. Used in 3d-ice-gui */
+
+
+
+        /*! \brief Tells the server to run a slot
+         *
+         * The client sends a message with the following payload
+         *
+         * | 2 | TDICE_SIMULATE_SLOT |
+         *
+         * The server will execute emulate_slot (power values should be in the
+         * queues) and returns the state got after the simulation:
+         *
+         * | 3 | TDICE_SIMULATE_SLOT | SimResult_t |
+         */
 
         TDICE_SIMULATE_SLOT,
-        
-        /*! \brief Tells the server to run a step. Used in 3d-ice-gui */
+
+
+
+        /*! \brief Tells the server to run a step
+         *
+         * The client sends a message with the following payload
+         *
+         * | 2 | TDICE_SIMULATE_STEP |
+         *
+         * The server will execute emulate_step and returns the state got
+         * after the simulation:
+         *
+         * | 3 | TDICE_SIMULATE_STEP | SimResult_t |
+         */
 
         TDICE_SIMULATE_STEP,
     } ;

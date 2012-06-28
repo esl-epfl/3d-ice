@@ -206,7 +206,7 @@ int main (int argc, char** argv)
         quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 
         init_network_message (&client_temperatures) ;
-        build_message_head   (&client_temperatures, TDICE_THERMAL_RESULTS) ;
+        build_message_head   (&client_temperatures, TDICE_SEND_OUTPUT) ;
         insert_message_word  (&client_temperatures, &instant) ;
         insert_message_word  (&client_temperatures, &type) ;
         insert_message_word  (&client_temperatures, &quantity) ;
@@ -242,7 +242,7 @@ int main (int argc, char** argv)
         quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 
         init_network_message (&client_tmap) ;
-        build_message_head   (&client_tmap, TDICE_THERMAL_RESULTS) ;
+        build_message_head   (&client_tmap, TDICE_SEND_OUTPUT) ;
         insert_message_word  (&client_tmap, &instant) ;
         insert_message_word  (&client_tmap, &type) ;
         insert_message_word  (&client_tmap, &quantity) ;
@@ -286,7 +286,7 @@ int main (int argc, char** argv)
         quantity = TDICE_OUTPUT_QUANTITY_AVERAGE ;
 
         init_network_message (&client_cores) ;
-        build_message_head   (&client_cores, TDICE_THERMAL_RESULTS) ;
+        build_message_head   (&client_cores, TDICE_SEND_OUTPUT) ;
         insert_message_word  (&client_cores, &instant) ;
         insert_message_word  (&client_cores, &type) ;
         insert_message_word  (&client_cores, &quantity) ;

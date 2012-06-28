@@ -488,6 +488,7 @@ extern "C"
      * \param output_quantity the quantity to report (max, min, avg)
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
+     * \param sources      pointer to the first element of the source array
      * \param message the message to fill
 
      */
@@ -498,6 +499,7 @@ extern "C"
         OutputQuantity_t   output_quantity,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,
+        Source_t          *sources,
         NetworkMessage_t  *message
     ) ;
 
