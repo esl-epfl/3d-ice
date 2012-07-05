@@ -138,10 +138,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the stack element to initialize
+     * \param stkel the address of the stack element to initialize
      */
 
-    void init_stack_element (StackElement_t *this) ;
+    void init_stack_element (StackElement_t *stkel) ;
 
 
 
@@ -155,15 +155,15 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a stkel
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_stack_element . If \a this is \c NULL, no operation is performed.
+     * The pointer \a stkel must have been returned by a previous call
+     * to \a calloc_stack_element . If \a stkel is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param stkel the address to free
      */
 
-    void free_stack_element (StackElement_t *this) ;
+    void free_stack_element (StackElement_t *stkel) ;
 
 
 
@@ -211,18 +211,18 @@ extern "C"
 
     /*! Returns the offset of the source layer of the stack element within the stack
      *
-     *  \param this pointer to the stack element
+     *  \param stkel pointer to the stack element
      *
      *  \return the offset (\# layers) of the source layer within the stack
      */
 
-    CellIndex_t get_source_layer_offset (StackElement_t *this) ;
+    CellIndex_t get_source_layer_offset (StackElement_t *stkel) ;
 
 
 
     /*! Prints a matrix of temperatures as the thermal map of the stack element
      *
-     * \param this          pointer to the stack element to print
+     * \param stkel          pointer to the stack element to print
      * \param dimensions    pointer to the structure storing the dimensions
      * \param temperatures  pointer to the first element of the temparature array
      * \param stream        the reference to the (already opened) stream
@@ -230,7 +230,7 @@ extern "C"
 
     void print_thermal_map_stack_element
     (
-        StackElement_t  *this,
+        StackElement_t  *v,
         Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
         FILE            *stream
@@ -240,7 +240,7 @@ extern "C"
 
     /*! Prints a matrix of source values as the power map of the stack element
      *
-     * \param this          pointer to the stack element to print
+     * \param stkel          pointer to the stack element to print
      * \param dimensions    pointer to the structure storing the dimensions
      * \param sources       pointer to the first element of the source array
      * \param stream        the reference to the (already opened) stream
@@ -248,7 +248,7 @@ extern "C"
 
     void print_power_map_stack_element
     (
-        StackElement_t  *this,
+        StackElement_t  *stkel,
         Dimensions_t    *dimensions,
         Source_t        *sources,
         FILE            *stream
@@ -258,12 +258,12 @@ extern "C"
 
     /*! Returns the total number of floorplan elements
      *
-     * \param this address of the StackElement structure
+     * \param stkel address of the StackElement structure
      *
-     * \return the total nyumber of floorplan elements in \a this
+     * \return the total nyumber of floorplan elements in \a stkel
      */
 
-    Quantity_t get_number_of_floorplan_elements_stack_element (StackElement_t *this) ;
+    Quantity_t get_number_of_floorplan_elements_stack_element (StackElement_t *stkel) ;
 
 /******************************************************************************/
 

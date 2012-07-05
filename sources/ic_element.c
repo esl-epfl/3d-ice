@@ -41,17 +41,17 @@
 
 /******************************************************************************/
 
-void init_ic_element (ICElement_t *this)
+void init_ic_element (ICElement_t *icel)
 {
-    this->SW_X      = (ChipDimension_t) 0.0 ;
-    this->SW_Y      = (ChipDimension_t) 0.0 ;
-    this->Length    = (ChipDimension_t) 0.0 ;
-    this->Width     = (ChipDimension_t) 0.0 ;
-    this->SW_Row    = (CellIndex_t) 0u ;
-    this->SW_Column = (CellIndex_t) 0u ;
-    this->NE_Row    = (CellIndex_t) 0u ;
-    this->NE_Column = (CellIndex_t) 0u ;
-    this->Next      = NULL ;
+    icel->SW_X      = (ChipDimension_t) 0.0 ;
+    icel->SW_Y      = (ChipDimension_t) 0.0 ;
+    icel->Length    = (ChipDimension_t) 0.0 ;
+    icel->Width     = (ChipDimension_t) 0.0 ;
+    icel->SW_Row    = (CellIndex_t) 0u ;
+    icel->SW_Column = (CellIndex_t) 0u ;
+    icel->NE_Row    = (CellIndex_t) 0u ;
+    icel->NE_Column = (CellIndex_t) 0u ;
+    icel->Next      = NULL ;
 }
 
 /******************************************************************************/
@@ -69,11 +69,11 @@ ICElement_t *calloc_ic_element ( void )
 
 /*****************************************************************************/
 
-void free_ic_element (ICElement_t *this)
+void free_ic_element (ICElement_t *icel)
 {
-    if (this != NULL)
+    if (icel != NULL)
 
-        FREE_POINTER (free, this) ;
+        FREE_POINTER (free, icel) ;
 }
 
 /******************************************************************************/
@@ -87,15 +87,15 @@ void free_ic_elements_list (ICElement_t *list)
 
 void print_ic_element
 (
-    ICElement_t *this,
+    ICElement_t *icel,
     FILE        *stream,
     String_t     prefix
 )
 {
     fprintf (stream,
         "%s\trectangle (%.1f, %.1f, %.1f, %.1f ) ;\n",
-        prefix, this->SW_X, this->SW_Y,
-                this->Length, this->Width) ;
+        prefix, icel->SW_X, icel->SW_Y,
+                icel->Length, icel->Width) ;
 }
 
 /******************************************************************************/
@@ -147,20 +147,20 @@ bool check_intersection
 
 /******************************************************************************/
 
-bool check_location (ICElement_t *this, Dimensions_t *dimensions)
+bool check_location (ICElement_t *icel, Dimensions_t *dimensions)
 {
-    return (   (this->SW_X <  0)
+    return (   (icel->SW_X <  0)
 
-               || (this->SW_X + this->Length > get_chip_length (dimensions))
+               || (icel->SW_X + icel->Length > get_chip_length (dimensions))
 
-            || (this->SW_Y <  0)
+            || (icel->SW_Y <  0)
 
-               || (this->SW_Y + this->Width > get_chip_width (dimensions)) ) ;
+               || (icel->SW_Y + icel->Width > get_chip_width (dimensions)) ) ;
 }
 
 /******************************************************************************/
 
-void align_to_grid (ICElement_t *this, Dimensions_t *dimensions)
+void align_to_grid (ICElement_t *icel, Dimensions_t *dimensions)
 {
     /* We "search" for these values instead of computing them directly
        since the lengths of the cells along the length of the ic might not
@@ -171,58 +171,58 @@ void align_to_grid (ICElement_t *this, Dimensions_t *dimensions)
 
     CellIndex_t column_index = 0u ;
 
-    while (get_cell_location_x (dimensions, column_index + 1) <= this->SW_X)
+    while (get_cell_location_x (dimensions, column_index + 1) <= icel->SW_X)
 
         column_index++ ;
 
-    this->SW_Column = column_index-- ;
+    icel->SW_Column = column_index-- ;
 
     /* East side */
 
-    while (get_cell_location_x (dimensions, column_index + 1) < this->SW_X + this->Length)
+    while (get_cell_location_x (dimensions, column_index + 1) < icel->SW_X + icel->Length)
 
         column_index++ ;
 
-    this->NE_Column = column_index ;
+    icel->NE_Column = column_index ;
 
     /* South side */
 
     CellIndex_t row_index = 0u ;
 
-    while (get_cell_location_y (dimensions, row_index + 1) <= this->SW_Y)
+    while (get_cell_location_y (dimensions, row_index + 1) <= icel->SW_Y)
 
         row_index++ ;
 
-    this->SW_Row = row_index-- ;
+    icel->SW_Row = row_index-- ;
 
     /* North side */
 
-    while (get_cell_location_y (dimensions, row_index + 1) < this->SW_Y + this->Width)
+    while (get_cell_location_y (dimensions, row_index + 1) < icel->SW_Y + icel->Width)
 
         row_index++ ;
 
-    this->NE_Row = row_index ;
+    icel->NE_Row = row_index ;
 }
 
 /******************************************************************************/
 
 Temperature_t get_max_temperature_ic_element
 (
-    ICElement_t   *this,
+    ICElement_t   *icel,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
-    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(this) ;
-    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(this) ;
+    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(icel) ;
+    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(icel) ;
 
     Temperature_t max_temperature =
 
         *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, this)
+    FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, this)
+        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
         {
 
             max_temperature = MAX
@@ -241,21 +241,21 @@ Temperature_t get_max_temperature_ic_element
 
 Temperature_t get_min_temperature_ic_element
 (
-    ICElement_t   *this,
+    ICElement_t   *icel,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
 {
-    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(this) ;
-    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(this) ;
+    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(icel) ;
+    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(icel) ;
 
     Temperature_t min_temperature =
 
         *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, this)
+    FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, this)
+        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
         {
 
             min_temperature = MIN
@@ -274,7 +274,7 @@ Temperature_t get_min_temperature_ic_element
 
 Temperature_t get_avg_temperature_ic_element
 (
-    ICElement_t   *this,
+    ICElement_t   *icel,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
@@ -283,9 +283,9 @@ Temperature_t get_avg_temperature_ic_element
 
     Temperature_t avg_temperature = 0.0 ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, this)
+    FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, this)
+        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
         {
 
             avg_temperature +=

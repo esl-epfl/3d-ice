@@ -73,6 +73,7 @@
                   $(3DICE_SOURCES)/dimensions.c               \
                   $(3DICE_SOURCES)/floorplan_element.c        \
                   $(3DICE_SOURCES)/floorplan_matrix.c         \
+                  $(3DICE_SOURCES)/floorplan_file_parser.c    \
                   $(3DICE_SOURCES)/floorplan.c                \
                   $(3DICE_SOURCES)/heat_sink.c                \
                   $(3DICE_SOURCES)/ic_element.c               \
@@ -86,6 +87,7 @@
                   $(3DICE_SOURCES)/powers_queue.c             \
                   $(3DICE_SOURCES)/stack_description.c        \
                   $(3DICE_SOURCES)/stack_element.c            \
+                  $(3DICE_SOURCES)/stack_file_parser.c        \
                   $(3DICE_SOURCES)/system_matrix.c            \
                   $(3DICE_SOURCES)/thermal_data.c             \
                   $(3DICE_SOURCES)/thermal_grid.c

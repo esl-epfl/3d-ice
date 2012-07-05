@@ -120,10 +120,10 @@ extern "C"
 
     /*! Sets all the fields of an heat sink to a default value (zero or \c NULL ).
      *
-     * \param this the address of the heat sink element to initialize
+     * \param hsink the address of the heat sink element to initialize
      */
 
-    void init_heat_sink (HeatSink_t *this) ;
+    void init_heat_sink (HeatSink_t *hsink) ;
 
 
 
@@ -137,34 +137,34 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a hsink
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_heat_sink . If \a this is \c NULL, no operation is performed.
+     * The pointer \a hsink must have been returned by a previous call
+     * to \a calloc_heat_sink . If \a hsink is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param hsink the address to free
      */
 
-    void free_heat_sink (HeatSink_t *this) ;
+    void free_heat_sink (HeatSink_t *hsink) ;
 
 
 
     /*! Prints an heat sink as it looks in the stack file
      *
-     * \param this   the pointer to the heat sink to print
+     * \param hsink   the pointer to the heat sink to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_heat_sink
 
-        (HeatSink_t *this, FILE *stream, String_t prefix) ;
+        (HeatSink_t *hsink, FILE *stream, String_t prefix) ;
 
 
     /*! Returns the equivalent volumetric heat capacity of the material of the
      *  spread layer
      *
-     * \param this      the pointer to the heat sink
+     * \param hsink      the pointer to the heat sink
      * \param chip_area the area of the chip
      *
      * \return the equivalent volumetric heat capacity of the spread layer
@@ -173,7 +173,7 @@ extern "C"
 
     SolidTC_t get_spreader_volumetric_heat_capacity
     (
-        HeatSink_t      *this,
+        HeatSink_t      *hsink,
         CellDimension_t  chip_area
     ) ;
 
@@ -181,7 +181,7 @@ extern "C"
     /*! Returns the equivalent volumetric heat capacity of the material of the
      *  sink layer
      *
-     * \param this      the pointer to the heat sink
+     * \param hsink      the pointer to the heat sink
      * \param chip_area the area of the chip
      *
      * \return the equivalent volumetric heat capacity of the sink layer
@@ -190,7 +190,7 @@ extern "C"
 
     SolidTC_t get_sink_volumetric_heat_capacity
     (
-        HeatSink_t      *this,
+        HeatSink_t      *hsink,
         CellDimension_t  chip_area
     ) ;
 
@@ -199,7 +199,7 @@ extern "C"
     /*! Returns the equivalent thermal conductivity of the material of the
      *  spread layer
      *
-     * \param this      the pointer to the heat sink
+     * \param hsink      the pointer to the heat sink
      * \param chip_area the area of the chip
      *
      * \return the equivalent thermal conductivity of the spread layer
@@ -208,7 +208,7 @@ extern "C"
 
     SolidTC_t get_spreader_thermal_conductivity
     (
-        HeatSink_t      *this,
+        HeatSink_t      *hsink,
         CellDimension_t  chip_area
     ) ;
 
@@ -216,7 +216,7 @@ extern "C"
     /*! Returns the equivalent thermal conductivity of the material of the
      *  sink layer
      *
-     * \param this      the pointer to the heat sink
+     * \param hsink      the pointer to the heat sink
      * \param chip_area the area of the chip
      *
      * \return the equivalent thermal conductivity of the sink layer
@@ -225,7 +225,7 @@ extern "C"
 
     SolidTC_t get_sink_thermal_conductivity
     (
-        HeatSink_t      *this,
+        HeatSink_t      *hsink,
         CellDimension_t  chip_area
     ) ;
 

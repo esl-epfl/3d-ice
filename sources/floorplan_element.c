@@ -44,14 +44,14 @@
 
 /******************************************************************************/
 
-void init_floorplan_element (FloorplanElement_t *this)
+void init_floorplan_element (FloorplanElement_t *flpel)
 {
-    this->Id             = NULL ;
-    this->NICElements    = 0u ;
-    this->ICElementsList = NULL ;
-    this->Area           = 0u ;
-    this->PowerValues    = NULL ;
-    this->Next           = NULL ;
+    flpel->Id             = NULL ;
+    flpel->NICElements    = 0u ;
+    flpel->ICElementsList = NULL ;
+    flpel->Area           = 0u ;
+    flpel->PowerValues    = NULL ;
+    flpel->Next           = NULL ;
 }
 
 /******************************************************************************/
@@ -71,12 +71,12 @@ FloorplanElement_t *calloc_floorplan_element (void)
 
 /*****************************************************************************/
 
-void free_floorplan_element (FloorplanElement_t *this)
+void free_floorplan_element (FloorplanElement_t *flpel)
 {
-    FREE_POINTER (free,                  this->Id) ;
-    FREE_POINTER (free_ic_elements_list, this->ICElementsList) ;
-    FREE_POINTER (free_powers_queue,     this->PowerValues) ;
-    FREE_POINTER (free,                  this) ;
+    FREE_POINTER (free,                  flpel->Id) ;
+    FREE_POINTER (free_ic_elements_list, flpel->ICElementsList) ;
+    FREE_POINTER (free_powers_queue,     flpel->PowerValues) ;
+    FREE_POINTER (free,                  flpel) ;
 }
 
 /******************************************************************************/
@@ -90,22 +90,22 @@ void free_floorplan_elements_list (FloorplanElement_t *list)
 
 void print_floorplan_element
 (
-    FloorplanElement_t *this,
+    FloorplanElement_t *flpel,
     FILE               *stream,
     String_t            prefix
 )
 {
     fprintf (stream,
         "%s%s:\n",
-        prefix, this->Id) ;
+        prefix, flpel->Id) ;
 
-    print_ic_elements_list (this->ICElementsList, stream, prefix) ;
+    print_ic_elements_list (flpel->ICElementsList, stream, prefix) ;
 
     fprintf (stream,
         "%s   power values ",
         prefix) ;
 
-    print_powers_queue (this->PowerValues, stream, "") ;
+    print_powers_queue (flpel->PowerValues, stream, (String_t)"") ;
 
     fprintf (stream, "\n") ;
 }
@@ -137,7 +137,7 @@ void print_floorplan_elements_list
 
 Error_t insert_power_values_floorplan_element
 (
-    FloorplanElement_t *this,
+    FloorplanElement_t *flpel,
     PowersQueue_t      *pvalues
 )
 {
@@ -145,7 +145,7 @@ Error_t insert_power_values_floorplan_element
 
         return TDICE_FAILURE ;
 
-    put_into_powers_queue (this->PowerValues, get_from_powers_queue (pvalues));
+    put_into_powers_queue (flpel->PowerValues, get_from_powers_queue (pvalues));
 
     return TDICE_SUCCESS ;
 }
@@ -169,14 +169,14 @@ FloorplanElement_t *find_floorplan_element_in_list
 
 Temperature_t get_max_temperature_floorplan_element
 (
-    FloorplanElement_t *this,
+    FloorplanElement_t *flpel,
     Dimensions_t       *dimensions,
     Temperature_t      *temperatures
 )
 {
     Temperature_t tmp, max = 0.0 ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, this->ICElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, flpel->ICElementsList)
     {
         tmp = get_max_temperature_ic_element (icelement, dimensions, temperatures) ;
 
@@ -190,7 +190,7 @@ Temperature_t get_max_temperature_floorplan_element
 
 Temperature_t get_min_temperature_floorplan_element
 (
-    FloorplanElement_t *this,
+    FloorplanElement_t *flpel,
     Dimensions_t       *dimensions,
     Temperature_t      *temperatures
 )
@@ -199,11 +199,11 @@ Temperature_t get_min_temperature_floorplan_element
 
     min = get_min_temperature_ic_element
 
-        (this->ICElementsList, dimensions, temperatures) ;
+        (flpel->ICElementsList, dimensions, temperatures) ;
 
     // FIXME : skip the first here ...
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, this->ICElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, flpel->ICElementsList)
     {
         tmp = get_max_temperature_ic_element (icelement, dimensions, temperatures) ;
 
@@ -217,18 +217,18 @@ Temperature_t get_min_temperature_floorplan_element
 
 Temperature_t get_avg_temperature_floorplan_element
 (
-    FloorplanElement_t *this,
+    FloorplanElement_t *flpel,
     Dimensions_t       *dimensions,
     Temperature_t      *temperatures
 )
 {
     Temperature_t avg = 0.0 ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, this->ICElementsList)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, flpel->ICElementsList)
 
         avg += get_avg_temperature_ic_element (icelement, dimensions, temperatures) ;
 
-    return avg / (Temperature_t) this->NICElements ;
+    return avg / (Temperature_t) flpel->NICElements ;
 }
 
 /******************************************************************************/

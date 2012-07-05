@@ -36,97 +36,102 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include "stack_file_parser.h"
 
-#include "analysis.h"
-#include "macros.h"
+#include "../bison/stack_description_parser.h"
+#include "../flex/stack_description_scanner.h"
 
-/******************************************************************************/
+// From Bison manual:
+// The value returned by yyparse is 0 if parsing was successful (return is
+// due to end-of-input). The value is 1 if parsing failed (return is due to
+// a syntax error).
 
-void init_analysis (Analysis_t *analysis)
-{
-    analysis->AnalysisType       = (AnalysisType_t) TDICE_ANALYSIS_TYPE_NONE ;
-    analysis->StepTime           = (Time_t) 0.0 ;
-    analysis->SlotTime           = (Time_t) 0.0 ;
-    analysis->SlotLength         = (Quantity_t) 0u ;
-    analysis->CurrentTime        = (Quantity_t) 0u ;
-    analysis->InitialTemperature = (Temperature_t) 0.0 ;
-}
-
-/******************************************************************************/
-
-Analysis_t *calloc_analysis ( void )
-{
-    Analysis_t *analysis = (Analysis_t *) malloc (sizeof (Analysis_t)) ;
-
-    if (analysis != NULL)
-
-        init_analysis (analysis) ;
-
-    return analysis ;
-}
-
-/******************************************************************************/
-
-void free_analysis (Analysis_t *analysis)
-{
-    if (analysis != NULL)
-
-        FREE_POINTER (free, analysis) ;
-}
-
-/******************************************************************************/
-
-Time_t get_simulated_time (Analysis_t *analysis)
-{
-  return analysis->CurrentTime * analysis->StepTime ;
-}
-
-/******************************************************************************/
-
-void increase_by_step_time (Analysis_t *analysis)
-{
-    analysis->CurrentTime++ ;
-}
-
-/******************************************************************************/
-
-bool slot_completed (Analysis_t *analysis)
-{
-    if (analysis->CurrentTime % analysis->SlotLength == 0u)
-
-        return true ;
-
-    return false ;
-}
-
-/******************************************************************************/
-
-void print_analysis
+extern int stack_description_parse
 (
-    Analysis_t *analysis,
-    FILE       *stream,
-    String_t    prefix
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    Output_t           *output,
+    yyscan_t            scanner
+) ;
+
+/******************************************************************************/
+
+Error_t parse_stack_description_file
+(
+    String_t            filename,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    Output_t           *output
 )
 {
-    fprintf (stream, "%ssolver : ", prefix) ;
+    FILE*    input ;
+    int      result ;
+    yyscan_t scanner ;
 
-    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+    input = fopen (filename, "r") ;
+    if (input == NULL)
+    {
+        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
 
-        fprintf (stream, "steady ;\n") ;
+        return TDICE_FAILURE ;
+    }
+
+    stkd->FileName = strdup (filename) ;  // FIXME memory leak
+
+    stack_description_lex_init (&scanner) ;
+    stack_description_set_in (input, scanner) ;
+
+    result = stack_description_parse (stkd, analysis, output, scanner) ;
+
+    stack_description_lex_destroy (scanner) ;
+    fclose (input) ;
+
+//  From Bison manual:
+//  The value returned by yyparse is 0 if parsing was successful (return is
+//  due to end-of-input). The value is 1 if parsing failed (return is due to
+//  a syntax error).
+
+    if (result == 0)
+
+        return TDICE_SUCCESS ;
 
     else
 
-        fprintf (stream, "transient step %.2f, slot %.2f ;\n",
-            analysis->StepTime, analysis->SlotTime) ;
+        return TDICE_FAILURE ;
+}
 
-    fprintf (stream, "%s\n", prefix) ;
+/******************************************************************************/
 
-    fprintf (stream, "%sinitial temperature  %.2f ;\n",
-        prefix, analysis->InitialTemperature) ;
+Error_t generate_stack_description_file
+(
+    String_t            filename,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    Output_t           *output
+)
+{
+    FILE *out = fopen (filename, "w") ;
 
-    fprintf (stream, "%s\n", prefix) ;
+    if (out == NULL)
+    {
+        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    print_stack_description (stkd, out, (String_t) "") ;
+
+    fprintf (out, "\n") ;
+
+    print_analysis (analysis, out, (String_t) "") ;
+
+    fprintf (out, "\n") ;
+
+    print_output (output, out, (String_t) "") ;
+
+    fclose (out) ;
+
+    return TDICE_SUCCESS ;
 }
 
 /******************************************************************************/

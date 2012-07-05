@@ -99,10 +99,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tcell structure to initialize
+     * \param tcell the address of the tcell structure to initialize
      */
 
-    void init_tcell (Tcell_t *this) ;
+    void init_tcell (Tcell_t *tcell) ;
 
 
 
@@ -116,15 +116,15 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a tcell
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_tcell . If \a this is \c NULL, no operation is performed.
+     * The pointer \a tcell must have been returned by a previous call
+     * to \a calloc_tcell . If \a tcell is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param tcell the address to free
      */
 
-    void free_tcell (Tcell_t *this) ;
+    void free_tcell (Tcell_t *tcell) ;
 
 
 
@@ -134,7 +134,7 @@ extern "C"
      *  Tcell:RowIndex and Tcell:ColumnIndex while Tcell:XVal and Tcell:YVal
      *  are set as \a xval and \a yval
      *
-     *  \param this  the pointer to the Tcell to align
+     *  \param tcell  the pointer to the Tcell to align
      *  \param xval  the requested X coordinate of the cell
      *  \param yval  the requested Y coordinate of the cell
      *  \param dimensions pointer to the structure containing the dimensions of the IC
@@ -142,7 +142,7 @@ extern "C"
 
     void align_tcell
     (
-        Tcell_t         *this,
+        Tcell_t         *tcell,
         ChipDimension_t  xval,
         ChipDimension_t  yval,
         Dimensions_t    *dimensions
@@ -172,10 +172,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tflp structure to initialize
+     * \param tflp the address of the tflp structure to initialize
      */
 
-    void init_tflp (Tflp_t *this) ;
+    void init_tflp (Tflp_t *tflp) ;
 
 
 
@@ -189,15 +189,15 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a tflp
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_tflp . If \a this is \c NULL, no operation is performed.
+     * The pointer \a tflp must have been returned by a previous call
+     * to \a calloc_tflp . If \a tflp is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param tflp the address to free
      */
 
-    void free_tflp (Tflp_t *this) ;
+    void free_tflp (Tflp_t *tflp) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -227,10 +227,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tflpel structure to initialize
+     * \param tflpel the address of the tflpel structure to initialize
      */
 
-    void init_tflpel (Tflpel_t *this) ;
+    void init_tflpel (Tflpel_t *tflpel) ;
 
 
 
@@ -244,15 +244,15 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a tflpel
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_tflpel . If \a this is \c NULL, no operation is performed.
+     * The pointer \a tflpel must have been returned by a previous call
+     * to \a calloc_tflpel . If \a tflpel is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param tflpel the address to free
      */
 
-    void free_tflpel (Tflpel_t *this) ;
+    void free_tflpel (Tflpel_t *tflpel) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -279,10 +279,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the tcoolant structure to initialize
+     * \param tcoolant the address of the tcoolant structure to initialize
      */
 
-    void init_tcoolant (Tcoolant_t *this) ;
+    void init_tcoolant (Tcoolant_t *tcoolant) ;
 
 
 
@@ -296,15 +296,15 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a tcoolant
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_tcoolant . If \a this is \c NULL, no operation is performed.
+     * The pointer \a tcoolant must have been returned by a previous call
+     * to \a calloc_tcoolant . If \a tcoolant is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param tcoolant the address to free
      */
 
-    void free_tcoolant (Tcoolant_t *this) ;
+    void free_tcoolant (Tcoolant_t *tcoolant) ;
 
 /******************************************************************************/
 /******************************************************************************/
@@ -373,10 +373,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the inspection point structure to initialize
+     * \param ipoint the address of the inspection point structure to initialize
      */
 
-    void init_inspection_point (InspectionPoint_t *this) ;
+    void init_inspection_point (InspectionPoint_t *ipoint) ;
 
 
 
@@ -390,16 +390,16 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a ipoint
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_inspection_point . If \a this is \c NULL, no
+     * The pointer \a ipoint must have been returned by a previous call
+     * to \a calloc_inspection_point . If \a ipoint is \c NULL, no
      * operation is performed.
      *
-     * \param this the address to free
+     * \param ipoint the address to free
      */
 
-    void free_inspection_point (InspectionPoint_t *this) ;
+    void free_inspection_point (InspectionPoint_t *ipoint) ;
 
 
 
@@ -430,24 +430,24 @@ extern "C"
 
     /*! Checks if the inspection point has a specific set up
      *
-     * \param this     the address of the InspectionPoint structure
+     * \param ipoint     the address of the InspectionPoint structure
      * \param type     the type of the inspection point (tcell, tmap, ...)
      * \param quantity the quantity to be measured (max, min, avg)
      *
-     * \return \c true if \a this has type \a type and quantity
+     * \return \c true if \a ipoint has type \a type and quantity
      *         \a quantity, \c false otherwise
      */
 
     bool is_inspection_point
     (
-        InspectionPoint_t *this,
+        InspectionPoint_t *ipoint,
         OutputType_t       type,
         OutputQuantity_t   quantity
     ) ;
 
     /*! Generates the file in which a particular inspection point will be printed
      *
-     * \param this       the address of the InspectionPoint structure
+     * \param ipoint       the address of the InspectionPoint structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param prefix string to be printed as suffix for every line in the header
      *
@@ -456,13 +456,13 @@ extern "C"
 
     Error_t generate_inspection_point_header
 
-        (InspectionPoint_t *this, Dimensions_t *dimensions, String_t prefix) ;
+        (InspectionPoint_t *ipoint, Dimensions_t *dimensions, String_t prefix) ;
 
 
 
     /*! Generates the output implemented by the inspection point
      *
-     * \param this the address of the InspectionPoint structure
+     * \param ipoint the address of the InspectionPoint structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
@@ -473,7 +473,7 @@ extern "C"
 
     Error_t generate_inspection_point_output
     (
-        InspectionPoint_t *this,
+        InspectionPoint_t *ipoint,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,
         Source_t          *sources,
@@ -484,7 +484,7 @@ extern "C"
 
     /*! Fills a message with the output implemented by the inspection point
      *
-     * \param this the address of the InspectionPoint structure
+     * \param ipoint the address of the InspectionPoint structure
      * \param output_quantity the quantity to report (max, min, avg)
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
@@ -495,7 +495,7 @@ extern "C"
 
     void fill_message_inspection_point
     (
-        InspectionPoint_t *this,
+        InspectionPoint_t *ipoint,
         OutputQuantity_t   output_quantity,
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,

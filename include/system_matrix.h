@@ -143,18 +143,18 @@ extern "C"
 /******************************************************************************/
 
 
-    /*! Sets all the fields of \a this to a default value (zero or \c NULL ).
+    /*! Sets all the fields of \a sysmatrix to a default value (zero or \c NULL ).
      *
-     * \param this the address of the system matrix to initialize
+     * \param sysmatrix the address of the system matrix to initialize
      */
 
-    void init_system_matrix (SystemMatrix_t *this) ;
+    void init_system_matrix (SystemMatrix_t *sysmatrix) ;
 
 
 
     /*! Allocates memory to store indexes and coefficients of a SystemMatrix
      *
-     * \param this the address of the system matrix
+     * \param sysmatrix the address of the system matrix
      * \param size the dimension of the matrix
      * \param nnz  the number of nonzeroes coeffcients
      *
@@ -164,16 +164,16 @@ extern "C"
 
     Error_t build_system_matrix
 
-        (SystemMatrix_t *this, CellIndex_t size, CellIndex_t nnz) ;
+        (SystemMatrix_t *sysmatrix, CellIndex_t size, CellIndex_t nnz) ;
 
 
 
     /*! Frees the memory used to store indexes and coefficients of a system matrix
      *
-     * \param this the address of the system matrix structure
+     * \param sysmatrix the address of the system matrix structure
      */
 
-    void destroy_system_matrix (SystemMatrix_t *this) ;
+    void destroy_system_matrix (SystemMatrix_t *sysmatrix) ;
 
 
 
@@ -182,7 +182,7 @@ extern "C"
      *  The function fills, layer by layer, all the columns
      *  of the system matrix.
      *
-     *  \param this         pointer to the system matrix to fill
+     *  \param sysmatrix         pointer to the system matrix to fill
      *  \param thermal_grid pointer to the thermal grid structure
      *  \param analysis     pointer to the structure containing info
      *                      about the type of thermal analysis
@@ -192,7 +192,7 @@ extern "C"
 
     void fill_system_matrix
     (
-        SystemMatrix_t *this,
+        SystemMatrix_t *sysmatrix,
         ThermalGrid_t  *thermal_grid,
         Analysis_t     *analysis,
         Dimensions_t   *dimensions
@@ -202,26 +202,26 @@ extern "C"
 
     /*! Perform the A=LU decomposition on the system matrix
      *
-     * \param this pointer to the (system) matrix \a A to factorize
+     * \param sysmatrix pointer to the (system) matrix \a A to factorize
      *
      * \return \c TDICE_SUCCESS if the factorization succeded
      * \return \c TDICE_FAILURE if some error occured
      */
 
-    Error_t do_factorization (SystemMatrix_t *this) ;
+    Error_t do_factorization (SystemMatrix_t *sysmatrix) ;
 
 
 
     /*! Solve the linear system b = A/b
      *
-     * \param this pointer to the (system) matrix \a A
+     * \param sysmatrix pointer to the (system) matrix \a A
      * \param b    pointer to the input vector \a b
      *
      * \return \c TDICE_SUCCESS if the solution b has been found
      * \return \c TDICE_FAILURE if some error occured
      */
 
-    Error_t solve_sparse_linear_system (SystemMatrix_t *this, SuperMatrix *b) ;
+    Error_t solve_sparse_linear_system (SystemMatrix_t *sysmatrix, SuperMatrix *b) ;
 
 
 
@@ -231,11 +231,11 @@ extern "C"
      * zero coefficient (COO format). The first row (or column) has index 1
      * (matlab compatibile)
      *
-     * \param this      the system matrix structure
+     * \param sysmatrix      the system matrix structure
      * \param file_name the name of the file to create
      */
 
-    void print_system_matrix (SystemMatrix_t this, String_t file_name) ;
+    void print_system_matrix (SystemMatrix_t sysmatrix, String_t file_name) ;
 
 /******************************************************************************/
 

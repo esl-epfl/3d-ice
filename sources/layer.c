@@ -44,14 +44,14 @@
 
 /******************************************************************************/
 
-void init_layer (Layer_t *this)
+void init_layer (Layer_t *layer)
 {
-    this->Height   = (CellDimension_t) 0.0 ;
-    this->Material = NULL ;
-    this->Id       = NULL ;
-    this->Used     = (Quantity_t) 0u ;
-    this->Next     = NULL ;
-    this->Prev     = NULL ;
+    layer->Height   = (CellDimension_t) 0.0 ;
+    layer->Material = NULL ;
+    layer->Id       = NULL ;
+    layer->Used     = (Quantity_t) 0u ;
+    layer->Next     = NULL ;
+    layer->Prev     = NULL ;
 }
 
 /******************************************************************************/
@@ -69,17 +69,17 @@ Layer_t *calloc_layer (void)
 
 /******************************************************************************/
 
-void free_layer (Layer_t *this)
+void free_layer (Layer_t *layer)
 {
-    if (this == NULL)
+    if (layer == NULL)
 
         return ;
 
-    if (this->Id != NULL)
+    if (layer->Id != NULL)
 
-        FREE_POINTER (free, this->Id) ;
+        FREE_POINTER (free, layer->Id) ;
 
-    FREE_POINTER (free, this) ;
+    FREE_POINTER (free, layer) ;
 }
 
 /******************************************************************************/
@@ -103,19 +103,19 @@ Layer_t *find_layer_in_list (Layer_t *list, String_t id)
 
 /******************************************************************************/
 
-void print_layer (Layer_t *this, FILE *stream, String_t prefix)
+void print_layer (Layer_t *layer, FILE *stream, String_t prefix)
 {
     fprintf (stream,
         "%slayer %s :\n",
-        prefix, this->Id) ;
+        prefix, layer->Id) ;
 
     fprintf (stream,
         "%s   height %.1f ;\n",
-        prefix, this->Height) ;
+        prefix, layer->Height) ;
 
     fprintf (stream,
         "%s   material %s ;\n",
-        prefix, this->Material->Id) ;
+        prefix, layer->Material->Id) ;
 }
 
 /******************************************************************************/

@@ -91,33 +91,33 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the powers queue structure to initialize
+     * \param pqueue the address of the powers queue structure to initialize
      */
 
-    void init_powers_queue (PowersQueue_t *this) ;
+    void init_powers_queue (PowersQueue_t *pqueue) ;
 
 
 
     /*! Reserves space to store power values
      *
      * The function deletes old memory, if any, calling \a destroy_powers_queue
-     * on the parameter \a this.  Then, it reserves new memory.
+     * on the parameter \a pqueue.  Then, it reserves new memory.
      *
-     * \param this the address of the power queue
+     * \param pqueue the address of the power queue
      * \param capacity the new capacity of the power queue
      */
 
-    void build_powers_queue (PowersQueue_t *this, Quantity_t capacity) ;
+    void build_powers_queue (PowersQueue_t *pqueue, Quantity_t capacity) ;
 
 
 
     /*! Releases the memory that stores power values and reset all the fields
      *  to a default value calling \a init_powers_queue
      *
-     * \param this the address of the power queue
+     * \param pqueue the address of the power queue
      */
 
-    void destroy_powers_queue (PowersQueue_t *this) ;
+    void destroy_powers_queue (PowersQueue_t *pqueue) ;
 
 
 
@@ -149,77 +149,77 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a pqueue
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_powers_queue . If \a this is \c NULL,
+     * The pointer \a pqueue must have been returned by a previous call
+     * to \a calloc_powers_queue . If \a pqueue is \c NULL,
      * no operation is performed.
      *
-     * \param this the address to free
+     * \param pqueue the address to free
      */
 
-    void free_powers_queue (PowersQueue_t *this) ;
+    void free_powers_queue (PowersQueue_t *pqueue) ;
 
 
 
     /*! Prints the list of power values as it looks in the stack file
      *
-     * \param this the powers queue to print
+     * \param pqueue the powers queue to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_powers_queue
 
-        (PowersQueue_t *this, FILE *stream, String_t prefix) ;
+        (PowersQueue_t *pqueue, FILE *stream, String_t prefix) ;
 
 
 
     /*! Returns the state of the powers queue
      *
-     * \param this the powers queue
+     * \param pqueue the powers queue
      *
      * \return \c TRUE if the queue is empty
      * \return \c FALSE otherwise
      */
 
-    bool is_empty_powers_queue (PowersQueue_t *this) ;
+    bool is_empty_powers_queue (PowersQueue_t *pqueue) ;
 
 
 
     /*! Returns the state of the powers queue
      *
-     * \param this the powers queue
+     * \param pqueue the powers queue
      *
      * \return \c TRUE if the queue is full
      * \return \c FALSE otherwise
      */
 
-    bool is_full_powers_queue (PowersQueue_t *this) ;
+    bool is_full_powers_queue (PowersQueue_t *pqueue) ;
 
 
 
     /*! Inserts a power value at the end of the powers queue
      *
-     * If the power queue \a this is full, the Capacity will be doubled.
+     * If the power queue \a pqueue is full, the Capacity will be doubled.
      *
-     * \param this the powers queue
+     * \param pqueue the powers queue
      * \param power the power value to insert
      */
 
-    void put_into_powers_queue (PowersQueue_t *this, Power_t power) ;
+    void put_into_powers_queue (PowersQueue_t *pqueue, Power_t power) ;
 
 
 
     /*! Returns and remve the power value at the beginning of a powers queue
      *
-     * \param this the powers queue
+     * \param pqueue the powers queue
      *
-     * \return the first power value in \a this
-     * \return \c 0 if the power queue \a this is empty
+     * \return the first power value in \a pqueue
+     * \return \c 0 if the power queue \a pqueue is empty
      */
 
-    Power_t get_from_powers_queue (PowersQueue_t *this) ;
+    Power_t get_from_powers_queue (PowersQueue_t *pqueue) ;
 
 /******************************************************************************/
 

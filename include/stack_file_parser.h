@@ -77,18 +77,18 @@ extern "C"
 
 
 
-    /*! Generates a stack description file_name
+    /*! Generates a stack description file
      *
      * \param filename the path of the stack file to generate
-     * \param stkd     the address of the StackDescription structure to fill
-     * \param analysis the address of the Analysis structure to fill
-     * \param output   the address of the Output structure to fill
+     * \param stkd     the address of the StackDescription structure
+     * \param analysis the address of the Analysis structure
+     * \param output   the address of the Output structure
      *
      * \return \c TDICE_FAILURE if the file cannot be created
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    void generate_stack_description_file
+    Error_t generate_stack_description_file
     (
         String_t            filename,
         StackDescription_t *stkd,

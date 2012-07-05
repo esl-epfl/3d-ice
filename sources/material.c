@@ -44,13 +44,13 @@
 
 /******************************************************************************/
 
-void init_material (Material_t *this)
+void init_material (Material_t *material)
 {
-    this->Id                     = NULL ;
-    this->Used                   = (Quantity_t) 0u ;
-    this->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
-    this->ThermalConductivity    = (SolidTC_t) 0.0 ;
-    this->Next                   = NULL ;
+    material->Id                     = NULL ;
+    material->Used                   = (Quantity_t) 0u ;
+    material->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
+    material->ThermalConductivity    = (SolidTC_t) 0.0 ;
+    material->Next                   = NULL ;
 }
 
 /******************************************************************************/
@@ -68,17 +68,17 @@ Material_t *calloc_material ( void )
 
 /******************************************************************************/
 
-void free_material (Material_t *this)
+void free_material (Material_t *material)
 {
-    if (this == NULL)
+    if (material == NULL)
 
         return ;
 
-    if (this->Id != NULL)
+    if (material->Id != NULL)
 
-        FREE_POINTER (free, this->Id) ;
+        FREE_POINTER (free, material->Id) ;
 
-    FREE_POINTER (free, this) ;
+    FREE_POINTER (free, material) ;
 }
 
 /******************************************************************************/
@@ -104,22 +104,22 @@ Material_t *find_material_in_list (Material_t *list, String_t id)
 
 void print_material
 (
-    Material_t *this,
+    Material_t *material,
     FILE       *stream,
     String_t    prefix
 )
 {
     fprintf (stream,
              "%smaterial %s :\n",
-             prefix, this->Id) ;
+             prefix, material->Id) ;
 
     fprintf (stream,
              "%s   thermal conductivity     %.4e  ;\n",
-             prefix, this->ThermalConductivity) ;
+             prefix, material->ThermalConductivity) ;
 
     fprintf (stream,
              "%s   volumetric heat capacity %.4e  ;\n",
-             prefix, this->VolumetricHeatCapacity) ;
+             prefix, material->VolumetricHeatCapacity) ;
 }
 
 /******************************************************************************/

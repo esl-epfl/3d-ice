@@ -44,16 +44,16 @@
 
 /******************************************************************************/
 
-void init_die (Die_t *this)
+void init_die (Die_t *die)
 {
-    this->Id                = NULL ;
-    this->Used              = (Quantity_t) 0u ;
-    this->NLayers           = (CellIndex_t) 0u ;
-    this->SourceLayerOffset = (CellIndex_t) 0u ;
-    this->TopLayer          = NULL ;
-    this->SourceLayer       = NULL ;
-    this->BottomLayer       = NULL ;
-    this->Next              = NULL ;
+    die->Id                = NULL ;
+    die->Used              = (Quantity_t) 0u ;
+    die->NLayers           = (CellIndex_t) 0u ;
+    die->SourceLayerOffset = (CellIndex_t) 0u ;
+    die->TopLayer          = NULL ;
+    die->SourceLayer       = NULL ;
+    die->BottomLayer       = NULL ;
+    die->Next              = NULL ;
 }
 
 /******************************************************************************/
@@ -71,20 +71,20 @@ Die_t *calloc_die (void)
 
 /******************************************************************************/
 
-void free_die (Die_t *this)
+void free_die (Die_t *die)
 {
-    if (this == NULL)
+    if (die == NULL)
 
         return ;
 
-    if (this->Id != NULL)
+    if (die->Id != NULL)
 
-        FREE_POINTER (free, this->Id) ;
+        FREE_POINTER (free, die->Id) ;
 
-    this->TopLayer = NULL ;
-    FREE_POINTER (free_layers_list, this->BottomLayer) ;
+    die->TopLayer = NULL ;
+    FREE_POINTER (free_layers_list, die->BottomLayer) ;
 
-    FREE_POINTER (free, this) ;
+    FREE_POINTER (free, die) ;
 }
 
 /******************************************************************************/
@@ -107,13 +107,13 @@ Die_t *find_die_in_list (Die_t *list, String_t id)
 
 /******************************************************************************/
 
-void print_die (Die_t *this, FILE *stream, String_t prefix)
+void print_die (Die_t *die, FILE *stream, String_t prefix)
 {
-    fprintf (stream, "%sdie %s :\n", prefix, this->Id) ;
+    fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer_t, layer, this->TopLayer)
+    FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer_t, layer, die->TopLayer)
     {
-        if (layer == this->SourceLayer)
+        if (layer == die->SourceLayer)
 
             fprintf (stream,
                 "%s   source  %4.1f %s ;\n",

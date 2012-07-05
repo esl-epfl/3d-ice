@@ -118,19 +118,19 @@ extern "C"
 
     /*! Sets all the fields of \a coolant to a default value.
      *
-     * \param this the address of the coolant structure to initialize
+     * \param coolant the address of the coolant structure to initialize
      */
 
-    void init_coolant (Coolant_t *this) ;
+    void init_coolant (Coolant_t *coolant) ;
 
 
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the channel structure to initialize
+     * \param channel the address of the channel structure to initialize
      */
 
-    void init_channel (Channel_t *this) ;
+    void init_channel (Channel_t *channel) ;
 
 
 
@@ -144,21 +144,21 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a channel
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_channel . If \a this is \c NULL, no operation is performed.
+     * The pointer \a channel must have been returned by a previous call
+     * to \a calloc_channel . If \a channel is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param channel the address to free
      */
 
-    void free_channel (Channel_t *this) ;
+    void free_channel (Channel_t *channel) ;
 
 
 
     /*! Prints the channel as it looks in the stack file
      *
-     * \param this    the channel to print
+     * \param channel    the channel to print
      * \param stream  the output stream (must be already open)
      * \param prefix  a string to be printed as prefix at the beginning of each line
      * \param dimensions pointer to the structure storing the dimensions
@@ -166,14 +166,14 @@ extern "C"
 
     void print_channel
 
-        (Channel_t *this, FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
+        (Channel_t *channel, FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the convective C term, depending on the type of channel and
      *  the location of the thermal cell
      *
-     *  \param this         pointer to the channel
+     *  \param channel         pointer to the channel
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param layer_index  the index of the layer
      *  \param row_index    the index of the row
@@ -184,7 +184,7 @@ extern "C"
 
     Cconv_t get_convective_term
     (
-        Channel_t    *this,
+        Channel_t    *channel,
         Dimensions_t *dimensions,
         CellIndex_t   layer_index,
         CellIndex_t   row_index,
@@ -195,7 +195,7 @@ extern "C"
 
     /*! Returns the maximum temperature at the outlet of the channel
      *
-     *  \param this          pointer to the channel
+     *  \param channel          pointer to the channel
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param temperatures  pointer to the temperature of the first thermal
      *                       cell in the layer where \a channel is placed
@@ -205,13 +205,13 @@ extern "C"
 
     Temperature_t get_max_temperature_channel_outlet
 
-        (Channel_t *this, Dimensions_t *dimensions, Temperature_t *temperatures) ;
+        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
 
 
 
     /*! Returns the minimum temperature at the outlet of the channel
      *
-     *  \param this          pointer to the channel
+     *  \param channel          pointer to the channel
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param temperatures  pointer to the temperature of the first thermal
      *                       cell in the layer where the channel is placed
@@ -221,13 +221,13 @@ extern "C"
 
     Temperature_t get_min_temperature_channel_outlet
 
-        (Channel_t *this, Dimensions_t *dimensions, Temperature_t *temperatures) ;
+        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
 
 
 
     /*! Returns the average temperature at the outlet of the channel
      *
-     *  \param this          pointer to the channel
+     *  \param channel          pointer to the channel
      *  \param dimensions    pointer to the structure storing the dimensions
      *  \param temperatures  pointer to the temperature of the first thermal
      *                       cell in the layer where \a channel is placed
@@ -237,7 +237,7 @@ extern "C"
 
     Temperature_t get_avg_temperature_channel_outlet
 
-        (Channel_t *this, Dimensions_t *dimensions, Temperature_t *temperatures) ;
+        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
 
 /******************************************************************************/
 

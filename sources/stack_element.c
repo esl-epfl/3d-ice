@@ -45,18 +45,18 @@
 /******************************************************************************/
 
 void
-init_stack_element (StackElement_t *this)
+init_stack_element (StackElement_t *stkel)
 {
-    this->Type            = TDICE_STACK_ELEMENT_NONE ;
-    this->Pointer.Layer   = NULL ;
-    this->Pointer.Die     = NULL ;
-    this->Pointer.Channel = NULL ;
-    this->Floorplan       = NULL ;
-    this->Id              = NULL ;
-    this->NLayers         = 0u ;
-    this->Offset          = 0u ;
-    this->Next            = NULL ;
-    this->Prev            = NULL ;
+    stkel->Type            = TDICE_STACK_ELEMENT_NONE ;
+    stkel->Pointer.Layer   = NULL ;
+    stkel->Pointer.Die     = NULL ;
+    stkel->Pointer.Channel = NULL ;
+    stkel->Floorplan       = NULL ;
+    stkel->Id              = NULL ;
+    stkel->NLayers         = 0u ;
+    stkel->Offset          = 0u ;
+    stkel->Next            = NULL ;
+    stkel->Prev            = NULL ;
 }
 
 /******************************************************************************/
@@ -74,15 +74,15 @@ StackElement_t *calloc_stack_element (void)
 
 /******************************************************************************/
 
-void free_stack_element (StackElement_t *this)
+void free_stack_element (StackElement_t *stkel)
 {
-    if (   this->Type == TDICE_STACK_ELEMENT_DIE
-        && this->Floorplan != NULL)
+    if (   stkel->Type == TDICE_STACK_ELEMENT_DIE
+        && stkel->Floorplan != NULL)
 
-        FREE_POINTER (free_floorplan, this->Floorplan) ;
+        FREE_POINTER (free_floorplan, stkel->Floorplan) ;
 
-    FREE_POINTER (free, this->Id) ;
-    FREE_POINTER (free, this) ;
+    FREE_POINTER (free, stkel->Id) ;
+    FREE_POINTER (free, stkel) ;
 }
 
 /******************************************************************************/
@@ -179,17 +179,17 @@ void print_stack_elements_list
 
 /******************************************************************************/
 
-CellIndex_t get_source_layer_offset (StackElement_t *this)
+CellIndex_t get_source_layer_offset (StackElement_t *stkel)
 {
-    CellIndex_t layer_offset = this->Offset ;
+    CellIndex_t layer_offset = stkel->Offset ;
 
-    if (this->Type == TDICE_STACK_ELEMENT_DIE)
+    if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
 
-        layer_offset += this->Pointer.Die->SourceLayerOffset ;
+        layer_offset += stkel->Pointer.Die->SourceLayerOffset ;
 
-    else if (this->Type == TDICE_STACK_ELEMENT_CHANNEL)
+    else if (stkel->Type == TDICE_STACK_ELEMENT_CHANNEL)
 
-        layer_offset += this->Pointer.Channel->SourceLayerOffset ;
+        layer_offset += stkel->Pointer.Channel->SourceLayerOffset ;
 
     return layer_offset ;
 }
@@ -198,7 +198,7 @@ CellIndex_t get_source_layer_offset (StackElement_t *this)
 
 void print_thermal_map_stack_element
 (
-    StackElement_t  *this,
+    StackElement_t  *stkel,
     Dimensions_t    *dimensions,
     Temperature_t   *temperatures,
     FILE            *stream
@@ -206,7 +206,7 @@ void print_thermal_map_stack_element
 {
     temperatures += get_cell_offset_in_stack
 
-        (dimensions, get_source_layer_offset (this), 0, 0) ;
+        (dimensions, get_source_layer_offset (stkel), 0, 0) ;
 
     FOR_EVERY_ROW (row_index, dimensions)
     {
@@ -223,7 +223,7 @@ void print_thermal_map_stack_element
 
 void print_power_map_stack_element
 (
-    StackElement_t  *this,
+    StackElement_t  *stkel,
     Dimensions_t    *dimensions,
     Source_t        *sources,
     FILE            *stream
@@ -231,7 +231,7 @@ void print_power_map_stack_element
 {
     sources += get_cell_offset_in_stack
 
-        (dimensions, get_source_layer_offset (this), 0, 0) ;
+        (dimensions, get_source_layer_offset (stkel), 0, 0) ;
 
     FOR_EVERY_ROW (row_index, dimensions)
     {
@@ -248,14 +248,14 @@ void print_power_map_stack_element
 
 Quantity_t get_number_of_floorplan_elements_stack_element
 (
-    StackElement_t *this
+    StackElement_t *stkel
 )
 {
-    if (this->Type == TDICE_STACK_ELEMENT_DIE)
+    if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
 
         return get_number_of_floorplan_elements_floorplan
 
-            (this->Floorplan) ;
+            (stkel->Floorplan) ;
 
     else
 

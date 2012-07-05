@@ -50,25 +50,25 @@ static void init_data (double* data, uint32_t size, double init_value)
 
 /******************************************************************************/
 
-void init_thermal_data (ThermalData_t *this)
+void init_thermal_data (ThermalData_t *tdata)
 {
-    this->Size = 0u ;
+    tdata->Size = 0u ;
 
-    this->Temperatures = NULL ;
+    tdata->Temperatures = NULL ;
 
-    init_thermal_grid (&this->ThermalGrid) ;
-    init_power_grid   (&this->PowerGrid) ;
+    init_thermal_grid (&tdata->ThermalGrid) ;
+    init_power_grid   (&tdata->PowerGrid) ;
 
-    init_system_matrix (&this->SM_A) ;
+    init_system_matrix (&tdata->SM_A) ;
 
-    this->SLUMatrix_B.Store = NULL ;
+    tdata->SLUMatrix_B.Store = NULL ;
 }
 
 /******************************************************************************/
 
 Error_t fill_thermal_data
 (
-    ThermalData_t  *this,
+    ThermalData_t  *tdata,
     StackElement_t *stack_elements_list,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
@@ -76,15 +76,15 @@ Error_t fill_thermal_data
 {
     Error_t result ;
 
-    this->Size = get_number_of_cells (dimensions) ;
+    tdata->Size = get_number_of_cells (dimensions) ;
 
     /* Alloc and set temperatures */
 
-    this->Temperatures =
+    tdata->Temperatures =
 
-        (Temperature_t*) malloc (sizeof(Temperature_t) * this->Size) ;
+        (Temperature_t*) malloc (sizeof(Temperature_t) * tdata->Size) ;
 
-    if (this->Temperatures == NULL)
+    if (tdata->Temperatures == NULL)
     {
         fprintf (stderr, "Cannot malloc temperature array\n") ;
 
@@ -93,35 +93,35 @@ Error_t fill_thermal_data
 
     /* Set Temperatures to the initial thermal state and builds SLU vector B */
 
-    init_data (this->Temperatures, this->Size, analysis->InitialTemperature) ;
+    init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
 
     dCreate_Dense_Matrix  /* Vector B */
 
-        (&this->SLUMatrix_B, this->Size, 1,
-         this->Temperatures, this->Size,
+        (&tdata->SLUMatrix_B, tdata->Size, 1,
+         tdata->Temperatures, tdata->Size,
          SLU_DN, SLU_D, SLU_GE) ;
 
     /* Alloc and fill the thermal grid */
 
     result = build_thermal_grid
 
-        (&this->ThermalGrid, get_number_of_layers (dimensions)) ;
+        (&tdata->ThermalGrid, get_number_of_layers (dimensions)) ;
 
     if (result == TDICE_FAILURE)
     {
         fprintf (stderr, "Cannot malloc thermal grid\n") ;
 
-        Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
-        FREE_POINTER (free, this->Temperatures) ;
+        Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
+        FREE_POINTER (free, tdata->Temperatures) ;
 
         return TDICE_FAILURE ;
     }
 
-    fill_thermal_grid (&this->ThermalGrid, stack_elements_list, dimensions) ;
+    fill_thermal_grid (&tdata->ThermalGrid, stack_elements_list, dimensions) ;
 
     /* Alloc and fill the power grid */
 
-    result = build_power_grid (&this->PowerGrid,
+    result = build_power_grid (&tdata->PowerGrid,
                                get_number_of_layers (dimensions),
                                get_number_of_cells(dimensions)) ;
 
@@ -129,44 +129,44 @@ Error_t fill_thermal_data
     {
         fprintf (stderr, "Cannot malloc power grid\n") ;
 
-        Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
-        FREE_POINTER (free, this->Temperatures) ;
+        Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
+        FREE_POINTER (free, tdata->Temperatures) ;
 
-        destroy_thermal_grid (&this->ThermalGrid) ;
+        destroy_thermal_grid (&tdata->ThermalGrid) ;
 
         return TDICE_FAILURE ;
     }
 
-    fill_power_grid (&this->PowerGrid, stack_elements_list) ;
+    fill_power_grid (&tdata->PowerGrid, stack_elements_list) ;
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
 
     result = build_system_matrix
 
-        (&this->SM_A, this->Size, get_number_of_connections (dimensions)) ;
+        (&tdata->SM_A, tdata->Size, get_number_of_connections (dimensions)) ;
 
     if (result == TDICE_FAILURE)
     {
         fprintf (stderr, "Cannot malloc syatem matrix\n") ;
 
-        Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
-        FREE_POINTER (free, this->Temperatures) ;
+        Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
+        FREE_POINTER (free, tdata->Temperatures) ;
 
-        destroy_thermal_grid (&this->ThermalGrid) ;
-        destroy_power_grid   (&this->PowerGrid) ;
+        destroy_thermal_grid (&tdata->ThermalGrid) ;
+        destroy_power_grid   (&tdata->PowerGrid) ;
 
         return TDICE_FAILURE ;
     }
 
     fill_system_matrix
 
-        (&this->SM_A, &this->ThermalGrid, analysis, dimensions) ;
+        (&tdata->SM_A, &tdata->ThermalGrid, analysis, dimensions) ;
 
-    result = do_factorization (&this->SM_A) ;
+    result = do_factorization (&tdata->SM_A) ;
 
     if (result == TDICE_FAILURE)
     {
-        destroy_thermal_data (this) ;
+        destroy_thermal_data (tdata) ;
 
         return TDICE_FAILURE ;
     }
@@ -176,23 +176,23 @@ Error_t fill_thermal_data
 
 /******************************************************************************/
 
-void destroy_thermal_data (ThermalData_t *this)
+void destroy_thermal_data (ThermalData_t *tdata)
 {
-    FREE_POINTER (free, this->Temperatures) ;
+    FREE_POINTER (free, tdata->Temperatures) ;
 
-    destroy_thermal_grid (&this->ThermalGrid) ;
-    destroy_power_grid   (&this->PowerGrid) ;
+    destroy_thermal_grid (&tdata->ThermalGrid) ;
+    destroy_power_grid   (&tdata->PowerGrid) ;
 
-    destroy_system_matrix (&this->SM_A) ;
+    destroy_system_matrix (&tdata->SM_A) ;
 
-    Destroy_SuperMatrix_Store (&this->SLUMatrix_B) ;
+    Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
 }
 
 /******************************************************************************/
 
-void reset_thermal_state (ThermalData_t *this, Analysis_t *analysis)
+void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis)
 {
-    init_data (this->Temperatures, this->Size, analysis->InitialTemperature) ;
+    init_data (tdata->Temperatures, tdata->Size, analysis->InitialTemperature) ;
 }
 
 /******************************************************************************/
@@ -276,7 +276,7 @@ static void fill_system_vector_steady
 
 SimResult_t emulate_step
 (
-    ThermalData_t  *this,
+    ThermalData_t  *tdata,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
 )
@@ -289,7 +289,7 @@ SimResult_t emulate_step
     {
         Error_t result = update_source_vector
 
-            (&this->PowerGrid, &this->ThermalGrid, dimensions) ;
+            (&tdata->PowerGrid, &tdata->ThermalGrid, dimensions) ;
 
         if (result == TDICE_FAILURE)
 
@@ -298,10 +298,10 @@ SimResult_t emulate_step
 
     fill_system_vector
 
-        (dimensions, this->Temperatures, this->PowerGrid.Sources,
-         &this->ThermalGrid, this->Temperatures, analysis->StepTime) ;
+        (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources,
+         &tdata->ThermalGrid, tdata->Temperatures, analysis->StepTime) ;
 
-    Error_t res = solve_sparse_linear_system (&this->SM_A, &this->SLUMatrix_B) ;
+    Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
 
     if (res != TDICE_SUCCESS)
 
@@ -322,7 +322,7 @@ SimResult_t emulate_step
 
 SimResult_t emulate_slot
 (
-    ThermalData_t  *this,
+    ThermalData_t  *tdata,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
 )
@@ -332,7 +332,7 @@ SimResult_t emulate_slot
     do
     {
 
-        result = emulate_step (this, dimensions, analysis) ;
+        result = emulate_step (tdata, dimensions, analysis) ;
 
     }   while (result == TDICE_STEP_DONE) ;
 
@@ -343,7 +343,7 @@ SimResult_t emulate_slot
 
 SimResult_t emulate_steady
 (
-    ThermalData_t  *this,
+    ThermalData_t  *tdata,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis
 )
@@ -354,7 +354,7 @@ SimResult_t emulate_steady
 
     Error_t result = update_source_vector
 
-        (&this->PowerGrid, &this->ThermalGrid, dimensions) ;
+        (&tdata->PowerGrid, &tdata->ThermalGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -365,9 +365,9 @@ SimResult_t emulate_steady
         return TDICE_END_OF_SIMULATION ;
     }
 
-    fill_system_vector_steady (dimensions, this->Temperatures, this->PowerGrid.Sources) ;
+    fill_system_vector_steady (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources) ;
 
-    Error_t res = solve_sparse_linear_system (&this->SM_A, &this->SLUMatrix_B) ;
+    Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
 
     if (res != TDICE_SUCCESS)
 
@@ -380,25 +380,25 @@ SimResult_t emulate_steady
 
 Error_t update_coolant_flow_rate
 (
-    ThermalData_t  *this,
+    ThermalData_t  *tdata,
     Dimensions_t   *dimensions,
     Analysis_t     *analysis,
     CoolantFR_t     new_flow_rate
 )
 {
-    this->ThermalGrid.Channel->Coolant.FlowRate =
+    tdata->ThermalGrid.Channel->Coolant.FlowRate =
 
         FLOW_RATE_FROM_MLMIN_TO_UM3SEC(new_flow_rate) ;
 
     // TODO replace with "update"
 
-    fill_system_matrix (&this->SM_A, &this->ThermalGrid, analysis, dimensions) ;
+    fill_system_matrix (&tdata->SM_A, &tdata->ThermalGrid, analysis, dimensions) ;
 
-    if (do_factorization (&this->SM_A) == TDICE_FAILURE)
+    if (do_factorization (&tdata->SM_A) == TDICE_FAILURE)
 
         return TDICE_FAILURE ;
 
-    update_channel_sources (&this->PowerGrid, dimensions) ;
+    update_channel_sources (&tdata->PowerGrid, dimensions) ;
 
     return TDICE_SUCCESS ;
 }
@@ -407,7 +407,7 @@ Error_t update_coolant_flow_rate
 
 Temperature_t get_cell_temperature
 (
-    ThermalData_t *this,
+    ThermalData_t *tdata,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
@@ -424,14 +424,14 @@ Temperature_t get_cell_temperature
 
     else
 
-        return *(this->Temperatures + id) ;
+        return *(tdata->Temperatures + id) ;
 }
 
 /******************************************************************************/
 
 Error_t print_thermal_map
 (
-    ThermalData_t  *this,
+    ThermalData_t  *tdata,
     StackElement_t *stack_elements_list,
     Dimensions_t   *dimensions,
     String_t        stack_element_id,
@@ -457,7 +457,7 @@ Error_t print_thermal_map
 
     print_thermal_map_stack_element
 
-        (stack_element, dimensions, this->Temperatures, output_file) ;
+        (stack_element, dimensions, tdata->Temperatures, output_file) ;
 
     fclose (output_file) ;
 

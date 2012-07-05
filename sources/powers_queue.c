@@ -43,44 +43,44 @@
 
 /******************************************************************************/
 
-void init_powers_queue (PowersQueue_t *this)
+void init_powers_queue (PowersQueue_t *pqueue)
 {
-    this->Capacity = (Quantity_t) 0u ;
-    this->Memory   = NULL ;
-    this->Size     = (Quantity_t) 0u ;
-    this->End      = (Quantity_t) 0u ;
-    this->Start    = (Quantity_t) 0u ;
+    pqueue->Capacity = (Quantity_t) 0u ;
+    pqueue->Memory   = NULL ;
+    pqueue->Size     = (Quantity_t) 0u ;
+    pqueue->End      = (Quantity_t) 0u ;
+    pqueue->Start    = (Quantity_t) 0u ;
 }
 
 /******************************************************************************/
 
-void build_powers_queue (PowersQueue_t *this, Quantity_t capacity)
+void build_powers_queue (PowersQueue_t *pqueue, Quantity_t capacity)
 {
-    if (this == NULL)    return ;
+    if (pqueue == NULL)    return ;
 
-    destroy_powers_queue (this) ;
+    destroy_powers_queue (pqueue) ;
 
-    this->Memory = (Power_t *) calloc (capacity, sizeof (Power_t)) ;
+    pqueue->Memory = (Power_t *) calloc (capacity, sizeof (Power_t)) ;
 
-    if (this->Memory == NULL)
+    if (pqueue->Memory == NULL)
     {
         fprintf (stderr, "Malloc power queue error\n") ;
 
         return ;
     }
 
-    this->Capacity = capacity ;
+    pqueue->Capacity = capacity ;
 }
 
 /******************************************************************************/
 
-void destroy_powers_queue (PowersQueue_t *this)
+void destroy_powers_queue (PowersQueue_t *pqueue)
 {
-    if (this == NULL)    return ;
+    if (pqueue == NULL)    return ;
 
-    FREE_POINTER (free, this->Memory) ;
+    FREE_POINTER (free, pqueue->Memory) ;
 
-    init_powers_queue (this) ;
+    init_powers_queue (pqueue) ;
 }
 
 /******************************************************************************/
@@ -130,120 +130,120 @@ PowersQueue_t *calloc_powers_queue ( void )
 
 /******************************************************************************/
 
-void free_powers_queue (PowersQueue_t *this)
+void free_powers_queue (PowersQueue_t *pqueue)
 {
-    if (this == NULL)    return ;
+    if (pqueue == NULL)    return ;
 
-    destroy_powers_queue (this) ;
+    destroy_powers_queue (pqueue) ;
 
-    FREE_POINTER (free, this) ;
+    FREE_POINTER (free, pqueue) ;
 }
 
 /******************************************************************************/
 
 void print_powers_queue
 (
-    PowersQueue_t *this,
+    PowersQueue_t *pqueue,
     FILE          *stream,
     String_t       prefix
 )
 {
     fprintf (stream, "%s", prefix) ;
 
-    Quantity_t index = this->Start ;
+    Quantity_t index = pqueue->Start ;
 
-    if (index == this->End)
+    if (index == pqueue->End)
     {
-        fprintf (stream, "%.3f ", this->Memory [index]) ;
+        fprintf (stream, "%.3f ", pqueue->Memory [index]) ;
 
-        index = (index + 1) % this->Capacity ;
+        index = (index + 1) % pqueue->Capacity ;
     }
 
-    while (index != this->End)
+    while (index != pqueue->End)
     {
-        fprintf (stream, "%.3f ", this->Memory [index]) ;
+        fprintf (stream, "%.3f ", pqueue->Memory [index]) ;
 
-        index = (index + 1) % this->Capacity ;
+        index = (index + 1) % pqueue->Capacity ;
     }
 }
 
 /******************************************************************************/
 
-bool is_empty_powers_queue (PowersQueue_t *this)
+bool is_empty_powers_queue (PowersQueue_t *pqueue)
 {
-    return (this->Size == 0) ;
+    return (pqueue->Size == 0) ;
 }
 
 /******************************************************************************/
 
-bool is_full_powers_queue (PowersQueue_t *this)
+bool is_full_powers_queue (PowersQueue_t *pqueue)
 {
-    return (this->Size == this->Capacity) ;
+    return (pqueue->Size == pqueue->Capacity) ;
 }
 
 /******************************************************************************/
 
-void put_into_powers_queue (PowersQueue_t *this, Power_t power)
+void put_into_powers_queue (PowersQueue_t *pqueue, Power_t power)
 {
-    if (this->Memory == NULL)
+    if (pqueue->Memory == NULL)
     {
         fprintf (stderr, "ERROR: put into not-built powers queue\n") ;
 
         return ;
     }
 
-    if (is_full_powers_queue (this))
+    if (is_full_powers_queue (pqueue))
     {
         PowersQueue_t pq ;
 
         init_powers_queue (&pq) ;
 
-        build_powers_queue (&pq, this->Capacity * (Quantity_t) 2) ;
+        build_powers_queue (&pq, pqueue->Capacity * (Quantity_t) 2) ;
 
-        copy_powers_queue (&pq, this) ;
+        copy_powers_queue (&pq, pqueue) ;
 
         Power_t *tmp = pq.Memory ;
-           pq.Memory = this->Memory ;
-        this->Memory = tmp ;
+           pq.Memory = pqueue->Memory ;
+        pqueue->Memory = tmp ;
 
-        this->Capacity = pq.Capacity ;
-        this->Size     = pq.Size ;
-        this->Start    = pq.Start ;
-        this->End      = pq.End ;
+        pqueue->Capacity = pq.Capacity ;
+        pqueue->Size     = pq.Size ;
+        pqueue->Start    = pq.Start ;
+        pqueue->End      = pq.End ;
 
         destroy_powers_queue (&pq) ;
     }
 
-    this->Memory [this->End] = power ;
+    pqueue->Memory [pqueue->End] = power ;
 
-    this->End = (this->End + 1) % this->Capacity ;
+    pqueue->End = (pqueue->End + 1) % pqueue->Capacity ;
 
-    this->Size++ ;
+    pqueue->Size++ ;
 }
 
 /******************************************************************************/
 
-Power_t get_from_powers_queue (PowersQueue_t *this)
+Power_t get_from_powers_queue (PowersQueue_t *pqueue)
 {
-    if (this->Memory == NULL)
+    if (pqueue->Memory == NULL)
     {
         fprintf (stderr, "ERROR: get from not-built powers queue\n") ;
 
         return 0.0 ;
     }
 
-    if ( is_empty_powers_queue(this) )
+    if ( is_empty_powers_queue(pqueue) )
     {
         fprintf (stderr, "ERROR: get from empty power queue\n") ;
 
         return 0.0 ;
     }
 
-    Power_t power = this->Memory [this->Start] ;
+    Power_t power = pqueue->Memory [pqueue->Start] ;
 
-    this->Start = (this->Start + 1) % this->Capacity ;
+    pqueue->Start = (pqueue->Start + 1) % pqueue->Capacity ;
 
-    this->Size-- ;
+    pqueue->Size-- ;
 
     return power ;
 }

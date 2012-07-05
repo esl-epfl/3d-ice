@@ -43,58 +43,58 @@
 
 /******************************************************************************/
 
-void init_floorplan_matrix (FloorplanMatrix_t* this)
+void init_floorplan_matrix (FloorplanMatrix_t* flpmatrix)
 {
-    this->ColumnPointers  = NULL ;
-    this->RowIndices      = NULL ;
-    this->Values          = NULL ;
-    this->NRows           = 0u ;
-    this->NColumns        = 0u ;
-    this->NNz             = 0u ;
-    this->SLUMatrix.Store = NULL ;
+    flpmatrix->ColumnPointers  = NULL ;
+    flpmatrix->RowIndices      = NULL ;
+    flpmatrix->Values          = NULL ;
+    flpmatrix->NRows           = 0u ;
+    flpmatrix->NColumns        = 0u ;
+    flpmatrix->NNz             = 0u ;
+    flpmatrix->SLUMatrix.Store = NULL ;
 }
 
 /******************************************************************************/
 
 Error_t build_floorplan_matrix
 (
-    FloorplanMatrix_t *this,
+    FloorplanMatrix_t *flpmatrix,
     CellIndex_t        nrows,
     CellIndex_t        ncolumns,
     CellIndex_t        nnz
 )
 {
-    this->NRows    = nrows ;
-    this->NColumns = ncolumns ;
-    this->NNz      = nnz ;
+    flpmatrix->NRows    = nrows ;
+    flpmatrix->NColumns = ncolumns ;
+    flpmatrix->NNz      = nnz ;
 
-    this->RowIndices = (CellIndex_t *) malloc (sizeof(CellIndex_t) * nnz) ;
+    flpmatrix->RowIndices = (CellIndex_t *) malloc (sizeof(CellIndex_t) * nnz) ;
 
-    if (this->RowIndices == NULL)
+    if (flpmatrix->RowIndices == NULL)
 
         return TDICE_FAILURE ;
 
-    this->ColumnPointers = (CellIndex_t *) malloc (sizeof(CellIndex_t) * (ncolumns + 1)) ;
+    flpmatrix->ColumnPointers = (CellIndex_t *) malloc (sizeof(CellIndex_t) * (ncolumns + 1)) ;
 
-    if (this->ColumnPointers == NULL)
+    if (flpmatrix->ColumnPointers == NULL)
     {
-        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, flpmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
-    this->Values = (Source_t *) malloc (sizeof(Source_t) * nnz) ;
+    flpmatrix->Values = (Source_t *) malloc (sizeof(Source_t) * nnz) ;
 
-    if (this->Values == NULL)
+    if (flpmatrix->Values == NULL)
     {
-        FREE_POINTER (free, this->ColumnPointers) ;
-        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, flpmatrix->ColumnPointers) ;
+        FREE_POINTER (free, flpmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
     dCreate_CompCol_Matrix
 
-        (&this->SLUMatrix, this->NRows, this->NColumns, this->NNz,
-         this->Values, (int*) this->RowIndices, (int*) this->ColumnPointers,
+        (&flpmatrix->SLUMatrix, flpmatrix->NRows, flpmatrix->NColumns, flpmatrix->NNz,
+         flpmatrix->Values, (int*) flpmatrix->RowIndices, (int*) flpmatrix->ColumnPointers,
          SLU_NC, SLU_D, SLU_GE) ;
 
     return TDICE_SUCCESS ;
@@ -102,27 +102,27 @@ Error_t build_floorplan_matrix
 
 /******************************************************************************/
 
-void destroy_floorplan_matrix (FloorplanMatrix_t* this)
+void destroy_floorplan_matrix (FloorplanMatrix_t* flpmatrix)
 {
-    FREE_POINTER (free, this->ColumnPointers) ;
-    FREE_POINTER (free, this->RowIndices) ;
-    FREE_POINTER (free, this->Values) ;
+    FREE_POINTER (free, flpmatrix->ColumnPointers) ;
+    FREE_POINTER (free, flpmatrix->RowIndices) ;
+    FREE_POINTER (free, flpmatrix->Values) ;
 
-    Destroy_SuperMatrix_Store (&this->SLUMatrix) ;
+    Destroy_SuperMatrix_Store (&flpmatrix->SLUMatrix) ;
 }
 
 /******************************************************************************/
 
 void fill_floorplan_matrix
 (
-    FloorplanMatrix_t  *this,
+    FloorplanMatrix_t  *flpmatrix,
     FloorplanElement_t *list,
     Dimensions_t       *dimensions
 )
 {
-    CellIndex_t *c_pointers = this->ColumnPointers ;
-    CellIndex_t *r_indices  = this->RowIndices ;
-    Source_t    *values     = this->Values ;
+    CellIndex_t *c_pointers = flpmatrix->ColumnPointers ;
+    CellIndex_t *r_indices  = flpmatrix->RowIndices ;
+    Source_t    *values     = flpmatrix->Values ;
 
     *c_pointers++ = 0u ;
 
@@ -184,17 +184,17 @@ void fill_floorplan_matrix
 
 void multiply_floorplan_matrix
 (
-    FloorplanMatrix_t *this,
+    FloorplanMatrix_t *flpmatrix,
     Source_t          *x,
     Source_t          *b
 )
 {
-    sp_dgemv("N", 1.0, &this->SLUMatrix, b, 1, 1.0, x, 1) ;
+    sp_dgemv((char *)"N", 1.0, &flpmatrix->SLUMatrix, b, 1, 1.0, x, 1) ;
 }
 
 /******************************************************************************/
 
-void print_floorplan_matrix (FloorplanMatrix_t this, String_t file_name)
+void print_floorplan_matrix (FloorplanMatrix_t flpmatrix, String_t file_name)
 {
     FILE* file = fopen (file_name, "w") ;
 
@@ -206,15 +206,15 @@ void print_floorplan_matrix (FloorplanMatrix_t this, String_t file_name)
 
     CellIndex_t row, column ;
 
-    for (column = 0 ; column < this.NColumns ; column++)
+    for (column = 0 ; column < flpmatrix.NColumns ; column++)
 
-        for (row = this.ColumnPointers[column] ;
-             row < this.ColumnPointers[column + 1] ;
+        for (row = flpmatrix.ColumnPointers[column] ;
+             row < flpmatrix.ColumnPointers[column + 1] ;
              row++)
 
             fprintf (file, "%9d\t%9d\t%32.24f\n",
-                this.RowIndices[row] + 1, column + 1,
-                this.Values[row]) ;
+                flpmatrix.RowIndices[row] + 1, column + 1,
+                flpmatrix.Values[row]) ;
 
     fclose (file) ;
 }

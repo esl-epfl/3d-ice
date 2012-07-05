@@ -43,45 +43,45 @@
 
 /******************************************************************************/
 
-void init_thermal_grid (ThermalGrid_t *this)
+void init_thermal_grid (ThermalGrid_t *tgrid)
 {
-    this->Size             = 0u ;
-    this->LayersProfile    = NULL ;
-    this->VHCProfile       = NULL ;
-    this->TCProfile        = NULL ;
-    this->Channel          = NULL ;
-    this->HeatSink         = NULL ;
+    tgrid->Size             = 0u ;
+    tgrid->LayersProfile    = NULL ;
+    tgrid->VHCProfile       = NULL ;
+    tgrid->TCProfile        = NULL ;
+    tgrid->Channel          = NULL ;
+    tgrid->HeatSink         = NULL ;
 }
 
 /******************************************************************************/
 
-Error_t build_thermal_grid (ThermalGrid_t *this, Quantity_t size)
+Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size)
 {
-    this->Size = size ;
+    tgrid->Size = size ;
 
-    this->LayersProfile =
+    tgrid->LayersProfile =
 
         (StackLayerType_t *) calloc (size, sizeof (StackLayerType_t)) ;
 
-    if (this->LayersProfile == NULL)
+    if (tgrid->LayersProfile == NULL)
 
         return TDICE_FAILURE ;
 
-    this->VHCProfile = (SolidVHC_t *) calloc (size, sizeof (SolidVHC_t)) ;
+    tgrid->VHCProfile = (SolidVHC_t *) calloc (size, sizeof (SolidVHC_t)) ;
 
-    if (this->VHCProfile == NULL)
+    if (tgrid->VHCProfile == NULL)
     {
-        FREE_POINTER (free, this->LayersProfile) ;
+        FREE_POINTER (free, tgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
     }
 
-    this->TCProfile = (SolidTC_t *) calloc (size, sizeof (SolidTC_t)) ;
+    tgrid->TCProfile = (SolidTC_t *) calloc (size, sizeof (SolidTC_t)) ;
 
-    if (this->TCProfile == NULL)
+    if (tgrid->TCProfile == NULL)
     {
-        FREE_POINTER (free, this->VHCProfile) ;
-        FREE_POINTER (free, this->LayersProfile) ;
+        FREE_POINTER (free, tgrid->VHCProfile) ;
+        FREE_POINTER (free, tgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
     }
@@ -91,18 +91,18 @@ Error_t build_thermal_grid (ThermalGrid_t *this, Quantity_t size)
 
 /******************************************************************************/
 
-void destroy_thermal_grid (ThermalGrid_t *this)
+void destroy_thermal_grid (ThermalGrid_t *tgrid)
 {
-    FREE_POINTER (free, this->LayersProfile) ;
-    FREE_POINTER (free, this->VHCProfile) ;
-    FREE_POINTER (free, this->TCProfile) ;
+    FREE_POINTER (free, tgrid->LayersProfile) ;
+    FREE_POINTER (free, tgrid->VHCProfile) ;
+    FREE_POINTER (free, tgrid->TCProfile) ;
 }
 
 /******************************************************************************/
 
 void fill_thermal_grid
 (
-    ThermalGrid_t  *this,
+    ThermalGrid_t  *tgrid,
     StackElement_t *list,
     Dimensions_t   *dimensions
 )
@@ -123,14 +123,14 @@ void fill_thermal_grid
                 {
                     if (layer == stack_element->Pointer.Die->SourceLayer)
 
-                        this->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
+                        tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
 
                     else
 
-                        this->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+                        tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
 
-                    this->VHCProfile    [index + tmp] = layer->Material->VolumetricHeatCapacity ;
-                    this->TCProfile     [index + tmp] = layer->Material->ThermalConductivity ;
+                    tgrid->VHCProfile    [index + tmp] = layer->Material->VolumetricHeatCapacity ;
+                    tgrid->TCProfile     [index + tmp] = layer->Material->ThermalConductivity ;
 
                     tmp++ ;
                 }
@@ -139,15 +139,15 @@ void fill_thermal_grid
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
-                this->LayersProfile [index] = TDICE_LAYER_SOLID ;
-                this->VHCProfile    [index] = stack_element->Pointer.Layer->Material->VolumetricHeatCapacity ;
-                this->TCProfile     [index] = stack_element->Pointer.Layer->Material->ThermalConductivity ;
+                tgrid->LayersProfile [index] = TDICE_LAYER_SOLID ;
+                tgrid->VHCProfile    [index] = stack_element->Pointer.Layer->Material->VolumetricHeatCapacity ;
+                tgrid->TCProfile     [index] = stack_element->Pointer.Layer->Material->ThermalConductivity ;
 
                 break ;
             }
             case TDICE_STACK_ELEMENT_CHANNEL :
             {
-                this->Channel = stack_element->Pointer.Channel ;
+                tgrid->Channel = stack_element->Pointer.Channel ;
 
                 // Stores the wall material
 
@@ -155,42 +155,42 @@ void fill_thermal_grid
 
                 for (tmp = 0u ; tmp != stack_element->Pointer.Channel->NLayers ; tmp++)
                 {
-                    this->VHCProfile [index + tmp] = this->Channel->WallMaterial->VolumetricHeatCapacity ;
-                    this->TCProfile  [index + tmp] = this->Channel->WallMaterial->ThermalConductivity ;
+                    tgrid->VHCProfile [index + tmp] = tgrid->Channel->WallMaterial->VolumetricHeatCapacity ;
+                    tgrid->TCProfile  [index + tmp] = tgrid->Channel->WallMaterial->ThermalConductivity ;
                 }
 
-                switch (this->Channel->ChannelModel)
+                switch (tgrid->Channel->ChannelModel)
                 {
                     case TDICE_CHANNEL_MODEL_MC_4RM :
 
-                        this->LayersProfile [index] = TDICE_LAYER_CHANNEL_4RM ;
+                        tgrid->LayersProfile [index] = TDICE_LAYER_CHANNEL_4RM ;
 
                         break ;
 
                     case TDICE_CHANNEL_MODEL_MC_2RM :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_VWALL_CHANNEL ;
-                        this->LayersProfile [index + 2] = TDICE_LAYER_CHANNEL_2RM ;
-                        this->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
+                        tgrid->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
+                        tgrid->LayersProfile [index + 1] = TDICE_LAYER_VWALL_CHANNEL ;
+                        tgrid->LayersProfile [index + 2] = TDICE_LAYER_CHANNEL_2RM ;
+                        tgrid->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
 
                         break ;
 
                     case TDICE_CHANNEL_MODEL_PF_INLINE :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
-                        this->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_INLINE ;
-                        this->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
+                        tgrid->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
+                        tgrid->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
+                        tgrid->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_INLINE ;
+                        tgrid->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
 
                         break ;
 
                     case TDICE_CHANNEL_MODEL_PF_STAGGERED :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
-                        this->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_STAGGERED ;
-                        this->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
+                        tgrid->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
+                        tgrid->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
+                        tgrid->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_STAGGERED ;
+                        tgrid->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
 
                         break ;
 
@@ -213,50 +213,50 @@ void fill_thermal_grid
             }
             case TDICE_STACK_ELEMENT_HEATSINK :
             {
-                this->HeatSink = stack_element->Pointer.HeatSink ;
+                tgrid->HeatSink = stack_element->Pointer.HeatSink ;
 
-                switch (this->HeatSink->SinkModel)
+                switch (tgrid->HeatSink->SinkModel)
                 {
                     case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
 
-                        if (this->LayersProfile [index] == TDICE_LAYER_SOLID)
+                        if (tgrid->LayersProfile [index] == TDICE_LAYER_SOLID)
 
-                            this->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+                            tgrid->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
 
-                        else if (this->LayersProfile [index] == TDICE_LAYER_SOURCE)
+                        else if (tgrid->LayersProfile [index] == TDICE_LAYER_SOURCE)
 
-                            this->LayersProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+                            tgrid->LayersProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
 
                         else
 
                             fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
 
-                        this->VHCProfile    [index] = this->HeatSink->SinkMaterial->VolumetricHeatCapacity ;
-                        this->TCProfile     [index] = this->HeatSink->SinkMaterial->ThermalConductivity ;
+                        tgrid->VHCProfile    [index] = tgrid->HeatSink->SinkMaterial->VolumetricHeatCapacity ;
+                        tgrid->TCProfile     [index] = tgrid->HeatSink->SinkMaterial->ThermalConductivity ;
 
                         break ;
 
                     case TDICE_HEATSINK_MODEL_TRADITIONAL :
 
-                        this->LayersProfile [index] = TDICE_LAYER_SPREADER ;
+                        tgrid->LayersProfile [index] = TDICE_LAYER_SPREADER ;
 
-                        this->VHCProfile [index] = get_spreader_volumetric_heat_capacity
+                        tgrid->VHCProfile [index] = get_spreader_volumetric_heat_capacity
 
-                            (this->HeatSink, get_chip_area(dimensions)) ;
+                            (tgrid->HeatSink, get_chip_area(dimensions)) ;
 
-                        this->TCProfile  [index] = get_spreader_thermal_conductivity
+                        tgrid->TCProfile  [index] = get_spreader_thermal_conductivity
 
-                            (this->HeatSink, get_chip_area(dimensions)) ;
+                            (tgrid->HeatSink, get_chip_area(dimensions)) ;
 
-                        this->LayersProfile [index + 1] = TDICE_LAYER_SINK ;
+                        tgrid->LayersProfile [index + 1] = TDICE_LAYER_SINK ;
 
-                        this->VHCProfile [index + 1] = get_sink_volumetric_heat_capacity
+                        tgrid->VHCProfile [index + 1] = get_sink_volumetric_heat_capacity
 
-                            (this->HeatSink, get_chip_area(dimensions)) ;
+                            (tgrid->HeatSink, get_chip_area(dimensions)) ;
 
-                        this->TCProfile [index + 1] = get_sink_thermal_conductivity
+                        tgrid->TCProfile [index + 1] = get_sink_thermal_conductivity
 
-                             (this->HeatSink, get_chip_area(dimensions)) ;
+                             (tgrid->HeatSink, get_chip_area(dimensions)) ;
 
                         break ;
 
@@ -295,14 +295,14 @@ void fill_thermal_grid
 
 Capacity_t get_capacity
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -310,7 +310,7 @@ Capacity_t get_capacity
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
@@ -319,7 +319,7 @@ Capacity_t get_capacity
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
 
-            return (  this->VHCProfile [ layer_index ]
+            return (  tgrid->VHCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
@@ -329,7 +329,7 @@ Capacity_t get_capacity
 
             if (IS_CHANNEL_COLUMN (TDICE_CHANNEL_MODEL_MC_4RM, column_index))
 
-                return (  this->Channel->Coolant.VHC
+                return (  tgrid->Channel->Coolant.VHC
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
@@ -337,7 +337,7 @@ Capacity_t get_capacity
 
             else
 
-                return (  this->VHCProfile [ layer_index ]
+                return (  tgrid->VHCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
@@ -347,8 +347,8 @@ Capacity_t get_capacity
         case TDICE_LAYER_PINFINS_INLINE :
         case TDICE_LAYER_PINFINS_STAGGERED :
 
-            return (  this->Channel->Coolant.VHC
-                    * this->Channel->Porosity
+            return (  tgrid->Channel->Coolant.VHC
+                    * tgrid->Channel->Porosity
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
@@ -357,8 +357,8 @@ Capacity_t get_capacity
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
 
-            return (  this->VHCProfile [ layer_index ]
-                    * (1.0 - this->Channel->Porosity)
+            return (  tgrid->VHCProfile [ layer_index ]
+                    * (1.0 - tgrid->Channel->Porosity)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
@@ -378,7 +378,7 @@ Capacity_t get_capacity
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }
@@ -388,14 +388,14 @@ Capacity_t get_capacity
 
 Conductance_t get_conductance_top
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -403,7 +403,7 @@ Conductance_t get_conductance_top
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
@@ -414,7 +414,7 @@ Conductance_t get_conductance_top
 
             else if (IS_FIRST_LAYER (layer_index))
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -422,7 +422,7 @@ Conductance_t get_conductance_top
 
             else
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -432,39 +432,39 @@ Conductance_t get_conductance_top
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  2.0
-                    * this->TCProfile [ layer_index ]
-                    * this->HeatSink->AmbientHTC
+                    * tgrid->TCProfile [ layer_index ]
+                    * tgrid->HeatSink->AmbientHTC
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
                    /
                    (  get_cell_height (dimensions, layer_index)
-                    * this->HeatSink->AmbientHTC
+                    * tgrid->HeatSink->AmbientHTC
                     + 2.0
-                    * this->TCProfile [ layer_index ]
+                    * tgrid->TCProfile [ layer_index ]
                    ) ;
 
         case TDICE_LAYER_SINK :
 
 
             return (  2.0
-                    * this->TCProfile [ layer_index ]
-                    * this->HeatSink->AmbientHTC
-                    * (this->HeatSink->SinkArea / get_chip_area (dimensions))
+                    * tgrid->TCProfile [ layer_index ]
+                    * tgrid->HeatSink->AmbientHTC
+                    * (tgrid->HeatSink->SinkArea / get_chip_area (dimensions))
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
                    /
                    (  get_cell_height (dimensions, layer_index)
-                    * this->HeatSink->AmbientHTC
-                    * (this->HeatSink->SinkArea / get_chip_area (dimensions))
+                    * tgrid->HeatSink->AmbientHTC
+                    * (tgrid->HeatSink->SinkArea / get_chip_area (dimensions))
                     + 2.0
-                    * this->TCProfile [ layer_index ]
+                    * tgrid->TCProfile [ layer_index ]
                    ) ;
 
         case TDICE_LAYER_SPREADER :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     )
@@ -474,7 +474,7 @@ Conductance_t get_conductance_top
 
             if (IS_CHANNEL_COLUMN (TDICE_CHANNEL_MODEL_MC_4RM, column_index))
 
-                return    this->Channel->Coolant.HTCTop
+                return    tgrid->Channel->Coolant.HTCTop
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_length (dimensions, column_index) ;
 
@@ -483,7 +483,7 @@ Conductance_t get_conductance_top
                 // We assume that layer_index is not the top most layer
                 // or the bottom most layer
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -491,31 +491,31 @@ Conductance_t get_conductance_top
 
         case TDICE_LAYER_CHANNEL_2RM :
 
-            return    this->Channel->Coolant.HTCTop
+            return    tgrid->Channel->Coolant.HTCTop
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_length (dimensions, column_index) ;
 
         case TDICE_LAYER_PINFINS_INLINE :
 
-            return    EFFECTIVE_HTC_PF_INLINE (this->Channel->Coolant.DarcyVelocity)
+            return    EFFECTIVE_HTC_PF_INLINE (tgrid->Channel->Coolant.DarcyVelocity)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_length (dimensions, column_index) ;
 
         case TDICE_LAYER_PINFINS_STAGGERED :
 
-            return    EFFECTIVE_HTC_PF_STAGGERED (this->Channel->Coolant.DarcyVelocity)
+            return    EFFECTIVE_HTC_PF_STAGGERED (tgrid->Channel->Coolant.DarcyVelocity)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_length (dimensions, column_index) ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
                     / (get_cell_height (dimensions, layer_index) / 2.0)
-                    * (1.0 - this->Channel->Porosity) ;
+                    * (1.0 - tgrid->Channel->Porosity) ;
 
         case TDICE_LAYER_TOP_WALL :
         case TDICE_LAYER_BOTTOM_WALL :
@@ -531,7 +531,7 @@ Conductance_t get_conductance_top
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }
@@ -541,14 +541,14 @@ Conductance_t get_conductance_top
 
 Conductance_t get_conductance_bottom
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -556,7 +556,7 @@ Conductance_t get_conductance_bottom
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
@@ -567,7 +567,7 @@ Conductance_t get_conductance_bottom
 
             else if (IS_LAST_LAYER (layer_index, dimensions))
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -575,7 +575,7 @@ Conductance_t get_conductance_bottom
 
             else
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -586,7 +586,7 @@ Conductance_t get_conductance_bottom
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     )
@@ -596,7 +596,7 @@ Conductance_t get_conductance_bottom
 
             if (IS_CHANNEL_COLUMN (TDICE_CHANNEL_MODEL_MC_4RM, column_index))
 
-                return    this->Channel->Coolant.HTCBottom
+                return    tgrid->Channel->Coolant.HTCBottom
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_length (dimensions, column_index) ;
 
@@ -605,7 +605,7 @@ Conductance_t get_conductance_bottom
                 // We assume that layer_index is not the top most layer
                 // or the bottom most layer
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -613,31 +613,31 @@ Conductance_t get_conductance_bottom
 
         case TDICE_LAYER_CHANNEL_2RM :
 
-            return    this->Channel->Coolant.HTCBottom
+            return    tgrid->Channel->Coolant.HTCBottom
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_length (dimensions, column_index) ;
 
         case TDICE_LAYER_PINFINS_INLINE :
 
-            return    EFFECTIVE_HTC_PF_INLINE (this->Channel->Coolant.DarcyVelocity)
+            return    EFFECTIVE_HTC_PF_INLINE (tgrid->Channel->Coolant.DarcyVelocity)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_length (dimensions, column_index) ;
 
         case TDICE_LAYER_PINFINS_STAGGERED :
 
-            return    EFFECTIVE_HTC_PF_STAGGERED (this->Channel->Coolant.DarcyVelocity)
+            return    EFFECTIVE_HTC_PF_STAGGERED (tgrid->Channel->Coolant.DarcyVelocity)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_length (dimensions, column_index) ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
                     / (get_cell_height (dimensions, layer_index) / 2.0)
-                    * (1.0 - this->Channel->Porosity) ;
+                    * (1.0 - tgrid->Channel->Porosity) ;
 
         case TDICE_LAYER_TOP_WALL :
         case TDICE_LAYER_BOTTOM_WALL :
@@ -653,7 +653,7 @@ Conductance_t get_conductance_bottom
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }
@@ -663,14 +663,14 @@ Conductance_t get_conductance_bottom
 
 Conductance_t get_conductance_north
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -678,14 +678,14 @@ Conductance_t get_conductance_north
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -697,11 +697,11 @@ Conductance_t get_conductance_north
 
                 return get_convective_term
 
-                    (this->Channel, dimensions, layer_index, row_index, column_index) ;
+                    (tgrid->Channel, dimensions, layer_index, row_index, column_index) ;
 
             else
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -713,16 +713,16 @@ Conductance_t get_conductance_north
 
             return get_convective_term
 
-                    (this->Channel, dimensions, layer_index, row_index, column_index) ;
+                    (tgrid->Channel, dimensions, layer_index, row_index, column_index) ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
                     / (get_cell_width (dimensions, row_index) / 2.0)
-                    * (1.0 - this->Channel->Porosity) ;
+                    * (1.0 - tgrid->Channel->Porosity) ;
 
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
@@ -741,7 +741,7 @@ Conductance_t get_conductance_north
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }
@@ -751,14 +751,14 @@ Conductance_t get_conductance_north
 
 Conductance_t get_conductance_south
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -766,14 +766,14 @@ Conductance_t get_conductance_south
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -785,11 +785,11 @@ Conductance_t get_conductance_south
 
                 return - get_convective_term
 
-                    (this->Channel, dimensions, layer_index, row_index, column_index) ;
+                    (tgrid->Channel, dimensions, layer_index, row_index, column_index) ;
 
             else
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -801,16 +801,16 @@ Conductance_t get_conductance_south
 
             return - get_convective_term
 
-                (this->Channel, dimensions, layer_index, row_index, column_index) ;
+                (tgrid->Channel, dimensions, layer_index, row_index, column_index) ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
                     / (get_cell_width (dimensions, row_index) / 2.0)
-                    * (1.0 - this->Channel->Porosity) ;
+                    * (1.0 - tgrid->Channel->Porosity) ;
 
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
@@ -829,7 +829,7 @@ Conductance_t get_conductance_south
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }
@@ -839,14 +839,14 @@ Conductance_t get_conductance_south
 
 Conductance_t get_conductance_east
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -854,14 +854,14 @@ Conductance_t get_conductance_east
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -871,13 +871,13 @@ Conductance_t get_conductance_east
 
             if (IS_CHANNEL_COLUMN (TDICE_CHANNEL_MODEL_MC_4RM, column_index))
 
-                return this->Channel->Coolant.HTCSide
+                return tgrid->Channel->Coolant.HTCSide
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index) ;
 
             else
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -904,7 +904,7 @@ Conductance_t get_conductance_east
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }
@@ -914,14 +914,14 @@ Conductance_t get_conductance_east
 
 Conductance_t get_conductance_west
 (
-    ThermalGrid_t *this,
+    ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
     CellIndex_t    layer_index,
     CellIndex_t    row_index,
     CellIndex_t    column_index
 )
 {
-    if (layer_index > this->Size)
+    if (layer_index > tgrid->Size)
     {
         fprintf (stderr,
             "ERROR: layer index %d is out of range\n", layer_index) ;
@@ -929,14 +929,14 @@ Conductance_t get_conductance_west
         return 0.0 ;
     }
 
-    switch (this->LayersProfile [layer_index])
+    switch (tgrid->LayersProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
-            return (  this->TCProfile [ layer_index ]
+            return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -946,13 +946,13 @@ Conductance_t get_conductance_west
 
             if (IS_CHANNEL_COLUMN (TDICE_CHANNEL_MODEL_MC_4RM, column_index))
 
-                return this->Channel->Coolant.HTCSide
+                return tgrid->Channel->Coolant.HTCSide
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index) ;
 
             else
 
-                return (  this->TCProfile [ layer_index ]
+                return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -979,7 +979,7 @@ Conductance_t get_conductance_west
         default :
 
             fprintf (stderr, "ERROR: unknown layer type %d\n",
-                this->LayersProfile [layer_index]) ;
+                tgrid->LayersProfile [layer_index]) ;
 
             return 0.0 ;
     }

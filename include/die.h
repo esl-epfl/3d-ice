@@ -110,10 +110,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the die structure to initialize
+     * \param die the address of the die structure to initialize
      */
 
-    void init_die (Die_t *this) ;
+    void init_die (Die_t *die) ;
 
 
 
@@ -127,15 +127,15 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a die
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_die . If \a this is \c NULL, no operation is performed.
+     * The pointer \a die must have been returned by a previous call
+     * to \a calloc_die . If \a die is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param die the address to free
      */
 
-    void free_die (Die_t *this) ;
+    void free_die (Die_t *die) ;
 
 
 
@@ -169,12 +169,12 @@ extern "C"
 
     /*! Prints the die as it looks in the stack file
      *
-     * \param this   the die to print
+     * \param die   the die to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_die (Die_t *this, FILE *stream, String_t prefix) ;
+    void print_die (Die_t *die, FILE *stream, String_t prefix) ;
 
 
 

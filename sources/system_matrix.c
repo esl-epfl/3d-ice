@@ -43,121 +43,121 @@
 
 /******************************************************************************/
 
-void init_system_matrix (SystemMatrix_t* this)
+void init_system_matrix (SystemMatrix_t* sysmatrix)
 {
-    this->ColumnPointers = NULL ;
-    this->RowIndices     = NULL;
-    this->Values         = NULL ;
-    this->Size           = 0u ;
-    this->NNz            = 0u ;
+    sysmatrix->ColumnPointers = NULL ;
+    sysmatrix->RowIndices     = NULL;
+    sysmatrix->Values         = NULL ;
+    sysmatrix->Size           = 0u ;
+    sysmatrix->NNz            = 0u ;
 
-    this->SLU_PermutationMatrixR = NULL ;
-    this->SLU_PermutationMatrixC = NULL ;
-    this->SLU_Etree              = NULL ;
+    sysmatrix->SLU_PermutationMatrixR = NULL ;
+    sysmatrix->SLU_PermutationMatrixC = NULL ;
+    sysmatrix->SLU_Etree              = NULL ;
 
-    this->SLUMatrix_A.Store          = NULL ;
-    this->SLUMatrix_A_Permuted.Store = NULL ;
-    this->SLUMatrix_L.Store          = NULL ;
-    this->SLUMatrix_U.Store          = NULL ;
+    sysmatrix->SLUMatrix_A.Store          = NULL ;
+    sysmatrix->SLUMatrix_A_Permuted.Store = NULL ;
+    sysmatrix->SLUMatrix_L.Store          = NULL ;
+    sysmatrix->SLUMatrix_U.Store          = NULL ;
 
-    this->SLU_Info = 0 ;
+    sysmatrix->SLU_Info = 0 ;
 
-    StatInit (&this->SLU_Stat) ;
+    StatInit (&sysmatrix->SLU_Stat) ;
 
-    set_default_options (&this->SLU_Options) ;
+    set_default_options (&sysmatrix->SLU_Options) ;
 
-    this->SLU_Options.Fact            = DOFACT ;
-    this->SLU_Options.PrintStat       = NO ;
-    this->SLU_Options.Equil           = NO ;
-    this->SLU_Options.SymmetricMode   = YES ;
-    this->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
-    this->SLU_Options.RowPerm         = NOROWPERM ;
-    this->SLU_Options.DiagPivotThresh = 0.001 ;
+    sysmatrix->SLU_Options.Fact            = DOFACT ;
+    sysmatrix->SLU_Options.PrintStat       = NO ;
+    sysmatrix->SLU_Options.Equil           = NO ;
+    sysmatrix->SLU_Options.SymmetricMode   = YES ;
+    sysmatrix->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
+    sysmatrix->SLU_Options.RowPerm         = NOROWPERM ;
+    sysmatrix->SLU_Options.DiagPivotThresh = 0.001 ;
 }
 
 /******************************************************************************/
 
 Error_t build_system_matrix
 (
-    SystemMatrix_t *this,
+    SystemMatrix_t *sysmatrix,
     CellIndex_t     size,
     CellIndex_t     nnz
 )
 {
-    this->Size = size ;
-    this->NNz  = nnz ;
+    sysmatrix->Size = size ;
+    sysmatrix->NNz  = nnz ;
 
-    this->RowIndices = (CellIndex_t *) malloc (sizeof(CellIndex_t) * nnz) ;
+    sysmatrix->RowIndices = (CellIndex_t *) malloc (sizeof(CellIndex_t) * nnz) ;
 
-    if (this->RowIndices == NULL)
+    if (sysmatrix->RowIndices == NULL)
 
         return TDICE_FAILURE ;
 
-    this->ColumnPointers = (CellIndex_t *) malloc (sizeof(CellIndex_t) * (size + 1)) ;
+    sysmatrix->ColumnPointers = (CellIndex_t *) malloc (sizeof(CellIndex_t) * (size + 1)) ;
 
-    if (this->ColumnPointers == NULL)
+    if (sysmatrix->ColumnPointers == NULL)
     {
-        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, sysmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
-    this->Values = (SystemMatrixCoeff_t *) malloc (sizeof(SystemMatrixCoeff_t) * nnz) ;
+    sysmatrix->Values = (SystemMatrixCoeff_t *) malloc (sizeof(SystemMatrixCoeff_t) * nnz) ;
 
-    if (this->Values == NULL)
+    if (sysmatrix->Values == NULL)
     {
-        FREE_POINTER (free, this->ColumnPointers) ;
-        FREE_POINTER (free, this->RowIndices) ;
+        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
+        FREE_POINTER (free, sysmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
     dCreate_CompCol_Matrix
 
-        (&this->SLUMatrix_A, this->Size, this->Size, this->NNz,
-          this->Values, (int*) this->RowIndices, (int*) this->ColumnPointers,
+        (&sysmatrix->SLUMatrix_A, sysmatrix->Size, sysmatrix->Size, sysmatrix->NNz,
+          sysmatrix->Values, (int*) sysmatrix->RowIndices, (int*) sysmatrix->ColumnPointers,
          SLU_NC, SLU_D, SLU_GE) ;
 
     /* Alloc SLU permutation matrices and elimination tree */
 
-    this->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * this->Size) ;
+    sysmatrix->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * sysmatrix->Size) ;
 
-    if (this->SLU_PermutationMatrixR == NULL )
+    if (sysmatrix->SLU_PermutationMatrixR == NULL )
     {
-        FREE_POINTER (free, this->ColumnPointers) ;
-        FREE_POINTER (free, this->RowIndices) ;
-        FREE_POINTER (free, this->Values) ;
+        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
+        FREE_POINTER (free, sysmatrix->RowIndices) ;
+        FREE_POINTER (free, sysmatrix->Values) ;
 
-        Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
         return TDICE_FAILURE ;
     }
 
-    this->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * this->Size) ;
+    sysmatrix->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * sysmatrix->Size) ;
 
-    if (this->SLU_PermutationMatrixC == NULL )
+    if (sysmatrix->SLU_PermutationMatrixC == NULL )
     {
-        FREE_POINTER (free, this->ColumnPointers) ;
-        FREE_POINTER (free, this->RowIndices) ;
-        FREE_POINTER (free, this->Values) ;
+        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
+        FREE_POINTER (free, sysmatrix->RowIndices) ;
+        FREE_POINTER (free, sysmatrix->Values) ;
 
-        Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-        FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
+        FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixR) ;
 
         return TDICE_FAILURE ;
     }
 
-    this->SLU_Etree = (int *) malloc (sizeof(int) * this->Size) ;
+    sysmatrix->SLU_Etree = (int *) malloc (sizeof(int) * sysmatrix->Size) ;
 
-    if (this->SLU_Etree == NULL)
+    if (sysmatrix->SLU_Etree == NULL)
     {
-        FREE_POINTER (free, this->ColumnPointers) ;
-        FREE_POINTER (free, this->RowIndices) ;
-        FREE_POINTER (free, this->Values) ;
+        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
+        FREE_POINTER (free, sysmatrix->RowIndices) ;
+        FREE_POINTER (free, sysmatrix->Values) ;
 
-        Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-        FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
-        FREE_POINTER (free, this->SLU_PermutationMatrixC) ;
+        FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixR) ;
+        FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixC) ;
 
         return TDICE_FAILURE ;
     }
@@ -167,52 +167,52 @@ Error_t build_system_matrix
 
 /******************************************************************************/
 
-Error_t do_factorization (SystemMatrix_t *this)
+Error_t do_factorization (SystemMatrix_t *sysmatrix)
 {
-    if (this->SLU_Options.Fact == DOFACT)
+    if (sysmatrix->SLU_Options.Fact == DOFACT)
     {
         get_perm_c
 
-            (this->SLU_Options.ColPerm, &this->SLUMatrix_A,
-            this->SLU_PermutationMatrixC) ;
+            (sysmatrix->SLU_Options.ColPerm, &sysmatrix->SLUMatrix_A,
+            sysmatrix->SLU_PermutationMatrixC) ;
 
         sp_preorder
 
-            (&this->SLU_Options, &this->SLUMatrix_A,
-            this->SLU_PermutationMatrixC, this->SLU_Etree,
-            &this->SLUMatrix_A_Permuted) ;
+            (&sysmatrix->SLU_Options, &sysmatrix->SLUMatrix_A,
+            sysmatrix->SLU_PermutationMatrixC, sysmatrix->SLU_Etree,
+            &sysmatrix->SLUMatrix_A_Permuted) ;
     }
-    else if (this->SLU_Options.Fact == FACTORED)
+    else if (sysmatrix->SLU_Options.Fact == FACTORED)
     {
-         this->SLU_Options.Fact = SamePattern_SameRowPerm ;
+         sysmatrix->SLU_Options.Fact = SamePattern_SameRowPerm ;
     }
     else
     {
         fprintf (stderr, "ERROR: wrong factorization status %d\n",
-            this->SLU_Options.Fact) ;
+            sysmatrix->SLU_Options.Fact) ;
 
         return TDICE_FAILURE ;
     }
 
     dgstrf
 
-        (&this->SLU_Options, &this->SLUMatrix_A_Permuted,
+        (&sysmatrix->SLU_Options, &sysmatrix->SLUMatrix_A_Permuted,
          sp_ienv(2), sp_ienv(1), /* relax and panel size */
-         this->SLU_Etree,
+         sysmatrix->SLU_Etree,
          NULL, 0,                /* work and lwork */
-         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
-         &this->SLUMatrix_L, &this->SLUMatrix_U,
-         &this->SLU_Stat, &this->SLU_Info) ;
+         sysmatrix->SLU_PermutationMatrixC, sysmatrix->SLU_PermutationMatrixR,
+         &sysmatrix->SLUMatrix_L, &sysmatrix->SLUMatrix_U,
+         &sysmatrix->SLU_Stat, &sysmatrix->SLU_Info) ;
 
-    if (this->SLU_Info == 0)
+    if (sysmatrix->SLU_Info == 0)
     {
-        this->SLU_Options.Fact = FACTORED ;
+        sysmatrix->SLU_Options.Fact = FACTORED ;
 
         return TDICE_SUCCESS ;
     }
     else
     {
-        fprintf (stderr, "SuperLu factorization error %d\n", this->SLU_Info) ;
+        fprintf (stderr, "SuperLu factorization error %d\n", sysmatrix->SLU_Info) ;
 
         return TDICE_FAILURE ;
     }
@@ -220,25 +220,25 @@ Error_t do_factorization (SystemMatrix_t *this)
 
 /******************************************************************************/
 
-void destroy_system_matrix (SystemMatrix_t *this)
+void destroy_system_matrix (SystemMatrix_t *sysmatrix)
 {
-    FREE_POINTER (free, this->ColumnPointers) ;
-    FREE_POINTER (free, this->RowIndices) ;
-    FREE_POINTER (free, this->Values) ;
+    FREE_POINTER (free, sysmatrix->ColumnPointers) ;
+    FREE_POINTER (free, sysmatrix->RowIndices) ;
+    FREE_POINTER (free, sysmatrix->Values) ;
 
-    FREE_POINTER (free, this->SLU_PermutationMatrixR) ;
-    FREE_POINTER (free, this->SLU_PermutationMatrixC) ;
-    FREE_POINTER (free, this->SLU_Etree) ;
+    FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixR) ;
+    FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixC) ;
+    FREE_POINTER (free, sysmatrix->SLU_Etree) ;
 
-    StatFree (&this->SLU_Stat) ;
+    StatFree (&sysmatrix->SLU_Stat) ;
 
-    Destroy_SuperMatrix_Store (&this->SLUMatrix_A) ;
+    Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-    if (this->SLU_Options.Fact != DOFACT )
+    if (sysmatrix->SLU_Options.Fact != DOFACT )
     {
-        Destroy_CompCol_Permuted (&this->SLUMatrix_A_Permuted) ;
-        Destroy_SuperNode_Matrix (&this->SLUMatrix_L) ;
-        Destroy_CompCol_Matrix   (&this->SLUMatrix_U) ;
+        Destroy_CompCol_Permuted (&sysmatrix->SLUMatrix_A_Permuted) ;
+        Destroy_SuperNode_Matrix (&sysmatrix->SLUMatrix_L) ;
+        Destroy_CompCol_Matrix   (&sysmatrix->SLUMatrix_U) ;
     }
 }
 
@@ -246,7 +246,7 @@ void destroy_system_matrix (SystemMatrix_t *this)
 
 static SystemMatrix_t add_solid_column
 (
-    SystemMatrix_t  this,
+    SystemMatrix_t  sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions,
@@ -270,7 +270,7 @@ static SystemMatrix_t add_solid_column
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
 
     /********************************* BOTTOM *********************************/
 
@@ -278,7 +278,7 @@ static SystemMatrix_t add_solid_column
 
         goto skip_bottom ;
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index - 1, row_index, column_index) ;
 
@@ -298,15 +298,15 @@ static SystemMatrix_t add_solid_column
 
         conductance = PARALLEL (g_bottom, g_top) ;
 
-    *this.Values++  = -conductance ;
+    *sysmatrix.Values++  = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
-        *(this.RowIndices-1), *(this.Values-1), c_bottom, c_top) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), c_bottom, c_top) ;
 #endif
 
 skip_bottom :
@@ -319,7 +319,7 @@ skip_bottom :
 
         goto skip_south ;
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index - 1, column_index) ;
 
@@ -333,15 +333,15 @@ skip_bottom :
 
     conductance = PARALLEL (g_south, g_north) ;
 
-    *this.Values++  = -conductance ;
+    *sysmatrix.Values++  = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  south   \t%d\t% .4e = % .4e (S) || % .4e (N)\n",
-        *(this.RowIndices-1), *(this.Values-1), g_south, g_north) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_south, g_north) ;
 #endif
 
 skip_south :
@@ -354,7 +354,7 @@ skip_south :
 
         goto skip_west ;
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index - 1) ;
 
@@ -368,52 +368,52 @@ skip_south :
 
     conductance = PARALLEL (g_west, g_east) ;
 
-    *this.Values++  = -conductance ;
+    *sysmatrix.Values++  = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
-        *(this.RowIndices-1), *(this.Values-1), g_west, g_east) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_west, g_east) ;
 #endif
 
 skip_west :
 
     /********************************* DIAGONAL *******************************/
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = 0.0 ;
+    *sysmatrix.Values = 0.0 ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
     {
-        *this.Values = get_capacity
+        *sysmatrix.Values = get_capacity
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values /= analysis->StepTime ;
+        *sysmatrix.Values /= analysis->StepTime ;
     }
 
     if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
 
-        *this.Values += get_conductance_top
+        *sysmatrix.Values += get_conductance_top
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-    diagonal_pointer = this.Values++ ;
+    diagonal_pointer = sysmatrix.Values++ ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
     fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
 #endif
 
     /********************************* EAST ***********************************/
@@ -424,7 +424,7 @@ skip_west :
 
         goto skip_east ;
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index + 1) ;
 
@@ -438,15 +438,15 @@ skip_west :
 
     conductance = PARALLEL (g_east, g_west) ;
 
-    *this.Values++  = -conductance ;
+    *sysmatrix.Values++  = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
-        *(this.RowIndices-1), *(this.Values-1), g_east, g_west) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_east, g_west) ;
 #endif
 
 skip_east :
@@ -459,7 +459,7 @@ skip_east :
 
         goto skip_north ;
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index + 1, column_index) ;
 
@@ -473,15 +473,15 @@ skip_east :
 
     conductance = PARALLEL (g_north, g_south) ;
 
-    *this.Values++  = -conductance ;
+    *sysmatrix.Values++  = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  north   \t%d\t% .4e = % .4e (N) || % .4e (S)\n",
-        *(this.RowIndices-1), *(this.Values-1), g_north, g_south) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_north, g_south) ;
 #endif
 
 skip_north :
@@ -492,35 +492,35 @@ skip_north :
 
         goto skip_top ;
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index + 1, row_index, column_index) ;
 
-    Conductance_t c_top = get_conductance_top
+    g_top = get_conductance_top
 
         (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-    Conductance_t c_bottom = get_conductance_bottom
+    g_bottom = get_conductance_bottom
 
         (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
 
-    if (c_bottom == 0)
+    if (g_bottom == 0)
 
-        conductance = c_top ;
+        conductance = g_top ;
 
     else
 
-        conductance = PARALLEL (c_top, c_bottom) ;
+        conductance = PARALLEL (g_top, g_bottom) ;
 
-    *this.Values++  = -conductance ;
+    *sysmatrix.Values++  = -conductance ;
     diagonal_value +=  conductance ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
-        *(this.RowIndices-1), *(this.Values-1),
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
         c_top, c_bottom) ;
 #endif
 
@@ -536,19 +536,19 @@ skip_top :
     fprintf (stderr, "% .4e", *diagonal_pointer) ;
     fsetpos (stderr, &last_fpos) ;
 
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
 #endif
 
-    this.ColumnPointers++ ;
+    sysmatrix.ColumnPointers++ ;
 
-    return this ;
+    return sysmatrix ;
 }
 
 /******************************************************************************/
 
 static SystemMatrix_t add_liquid_column_4rm
 (
-    SystemMatrix_t  this,
+    SystemMatrix_t  sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions,
@@ -569,13 +569,13 @@ static SystemMatrix_t add_liquid_column_4rm
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
 
     /* BOTTOM */
 
     if ( ! IS_FIRST_LAYER(layer_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index - 1, row_index, column_index) ;
 
@@ -585,15 +585,15 @@ static SystemMatrix_t add_liquid_column_4rm
             get_conductance_top    (thermal_grid, dimensions, layer_index - 1, row_index, column_index)
         ) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
-            *(this.RowIndices-1), *(this.Values-1),
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
             get_conductance_bottom (thermal_grid, dimensions, layer_index    , row_index, column_index),
             get_conductance_top    (thermal_grid, dimensions, layer_index - 1, row_index, column_index)) ;
 #endif
@@ -603,20 +603,20 @@ static SystemMatrix_t add_liquid_column_4rm
 
     if ( ! IS_FIRST_ROW(row_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index - 1, column_index) ;
 
-        *this.Values++ = get_conductance_north /* == C */
+        *sysmatrix.Values++ = get_conductance_north /* == C */
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  south   \t%d\t% .4e (N)\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -624,7 +624,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     if ( ! IS_FIRST_COLUMN(column_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index, column_index - 1) ;
 
@@ -634,15 +634,15 @@ static SystemMatrix_t add_liquid_column_4rm
             get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index - 1)
         ) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
-            *(this.RowIndices-1), *(this.Values-1),
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
             get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index    ),
             get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index - 1));
 #endif
@@ -650,36 +650,36 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* DIAGONAL */
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = 0.0 ;
+    *sysmatrix.Values = 0.0 ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
     {
-        *this.Values = get_capacity
+        *sysmatrix.Values = get_capacity
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values /= analysis->StepTime ;
+        *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    diagonal_pointer = this.Values++ ;
+    diagonal_pointer = sysmatrix.Values++ ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
     fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
 #endif
 
     /* EAST */
 
     if ( ! IS_LAST_COLUMN(column_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index, column_index + 1) ;
 
@@ -689,15 +689,15 @@ static SystemMatrix_t add_liquid_column_4rm
             get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index + 1)
         ) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
-            *(this.RowIndices-1), *(this.Values-1),
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
             get_conductance_east (thermal_grid, dimensions, layer_index, row_index, column_index    ),
             get_conductance_west (thermal_grid, dimensions, layer_index, row_index, column_index + 1));
 #endif
@@ -707,20 +707,20 @@ static SystemMatrix_t add_liquid_column_4rm
 
     if ( ! IS_LAST_ROW(row_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index + 1, column_index) ;
 
-        *this.Values++ = get_conductance_south /* == - C */
+        *sysmatrix.Values++ = get_conductance_south /* == - C */
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  north   \t%d\t% .4e (S)\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -728,7 +728,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index + 1, row_index, column_index) ;
 
@@ -738,15 +738,15 @@ static SystemMatrix_t add_liquid_column_4rm
             get_conductance_bottom (thermal_grid, dimensions, layer_index + 1, row_index, column_index)
         ) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
-            *(this.RowIndices-1), *(this.Values-1),
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
             get_conductance_top    (thermal_grid, dimensions, layer_index    , row_index, column_index),
             get_conductance_bottom (thermal_grid, dimensions, layer_index + 1, row_index, column_index)) ;
 #endif
@@ -768,19 +768,19 @@ static SystemMatrix_t add_liquid_column_4rm
     fprintf (stderr, "% .4e", *diagonal_pointer) ;
     fsetpos (stderr, &last_fpos) ;
 
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
 #endif
 
-    this.ColumnPointers++ ;
+    sysmatrix.ColumnPointers++ ;
 
-    return this ;
+    return sysmatrix ;
 }
 
 /******************************************************************************/
 
 static SystemMatrix_t add_liquid_column_2rm
 (
-    SystemMatrix_t  this,
+    SystemMatrix_t  sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions,
@@ -801,13 +801,13 @@ static SystemMatrix_t add_liquid_column_2rm
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
 
     /* BOTTOM */
 
     if ( ! IS_FIRST_LAYER(layer_index) )  // FIXME
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index - 2, row_index, column_index) ;
 
@@ -815,15 +815,15 @@ static SystemMatrix_t add_liquid_column_2rm
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  bottom  \t%d\t% .4e (B)\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -831,68 +831,68 @@ static SystemMatrix_t add_liquid_column_2rm
 
     if ( ! IS_FIRST_ROW(row_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index - 1, column_index) ;
 
-        *this.Values++ = get_conductance_north /* == C */
+        *sysmatrix.Values++ = get_conductance_north /* == C */
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  south   \t%d\t% .4e (N)\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
     /* DIAGONAL */
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = 0.0 ;
+    *sysmatrix.Values = 0.0 ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
     {
-        *this.Values = get_capacity
+        *sysmatrix.Values = get_capacity
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values /= analysis->StepTime ;
+        *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    diagonal_pointer = this.Values++ ;
+    diagonal_pointer = sysmatrix.Values++ ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
     fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
 #endif
 
     /* NORTH */
 
     if ( ! IS_LAST_ROW(row_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index + 1, column_index) ;
 
-        *this.Values++ = get_conductance_south /* == -C */
+        *sysmatrix.Values++ = get_conductance_south /* == -C */
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  north   \t%d\t% .4e (S)\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -900,7 +900,7 @@ static SystemMatrix_t add_liquid_column_2rm
 
     if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index + 1, row_index, column_index) ;
 
@@ -908,15 +908,15 @@ static SystemMatrix_t add_liquid_column_2rm
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  top     \t%d\t% .4e (T)\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -936,19 +936,19 @@ static SystemMatrix_t add_liquid_column_2rm
     fprintf (stderr, "% .4e", *diagonal_pointer) ;
     fsetpos (stderr, &last_fpos) ;
 
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
 #endif
 
-    this.ColumnPointers++ ;
+    sysmatrix.ColumnPointers++ ;
 
-    return this ;
+    return sysmatrix ;
 }
 
 /******************************************************************************/
 
 static SystemMatrix_t add_bottom_wall_column_2rm
 (
-    SystemMatrix_t  this,
+    SystemMatrix_t  sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions,
@@ -969,13 +969,13 @@ static SystemMatrix_t add_bottom_wall_column_2rm
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
 
     /* BOTTOM connected to Silicon */
 
     if ( ! IS_FIRST_LAYER(layer_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index - 1, row_index, column_index) ;
 
@@ -983,50 +983,50 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index - 1, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  Bottom connected to Silicon     \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
     /* DIAGONAL */
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = 0.0 ;
+    *sysmatrix.Values = 0.0 ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
     {
-        *this.Values = get_capacity
+        *sysmatrix.Values = get_capacity
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values /= analysis->StepTime ;
+        *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    diagonal_pointer = this.Values++ ;
+    diagonal_pointer = sysmatrix.Values++ ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
     fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
 #endif
 
     /* Top connected to Virtual Wall */
 
     if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index + 1, row_index, column_index) ;
 
@@ -1034,15 +1034,15 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  Top connected to Channel  \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1050,7 +1050,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
     if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index + 2, row_index, column_index) ;
 
@@ -1058,15 +1058,15 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index + 2, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  Top connceted to Virtual Wall  \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1080,19 +1080,19 @@ static SystemMatrix_t add_bottom_wall_column_2rm
     fprintf (stderr, "% .4e", *diagonal_pointer) ;
     fsetpos (stderr, &last_fpos) ;
 
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
 #endif
 
-    this.ColumnPointers++ ;
+    sysmatrix.ColumnPointers++ ;
 
-    return this ;
+    return sysmatrix ;
 }
 
 /******************************************************************************/
 
 static SystemMatrix_t add_top_wall_column_2rm
 (
-    SystemMatrix_t  this,
+    SystemMatrix_t  sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions,
@@ -1113,13 +1113,13 @@ static SystemMatrix_t add_top_wall_column_2rm
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
 
     /* BOTTOM connected to Virtual Wall */
 
     if ( ! IS_FIRST_LAYER(layer_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index - 2, row_index, column_index) ;
 
@@ -1127,15 +1127,15 @@ static SystemMatrix_t add_top_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index - 2, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
            "  Bottom connected to Channel     \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1143,7 +1143,7 @@ static SystemMatrix_t add_top_wall_column_2rm
 
     if ( ! IS_FIRST_LAYER(layer_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index - 1, row_index, column_index) ;
 
@@ -1151,50 +1151,50 @@ static SystemMatrix_t add_top_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index - 1, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  Bottom connected to Virtual Wall     \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
     /* DIAGONAL */
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = 0.0 ;
+    *sysmatrix.Values = 0.0 ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
     {
-        *this.Values = get_capacity
+        *sysmatrix.Values = get_capacity
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values /= analysis->StepTime ;
+        *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    diagonal_pointer = this.Values++ ;
+    diagonal_pointer = sysmatrix.Values++ ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
     fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
 #endif
 
     /* Top connected to Silicon */
 
     if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index + 1, row_index, column_index) ;
 
@@ -1202,15 +1202,15 @@ static SystemMatrix_t add_top_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  Top connected to Silicon  \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1224,12 +1224,12 @@ static SystemMatrix_t add_top_wall_column_2rm
     fprintf (stderr, "% .4e", *diagonal_pointer) ;
     fsetpos (stderr, &last_fpos) ;
 
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
 #endif
 
-    this.ColumnPointers++ ;
+    sysmatrix.ColumnPointers++ ;
 
-    return this ;
+    return sysmatrix ;
 }
 
 
@@ -1237,7 +1237,7 @@ static SystemMatrix_t add_top_wall_column_2rm
 
 static SystemMatrix_t add_virtual_wall_column_2rm
 (
-    SystemMatrix_t  this,
+    SystemMatrix_t  sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions,
@@ -1259,13 +1259,13 @@ static SystemMatrix_t add_virtual_wall_column_2rm
         get_cell_offset_in_stack (dimensions, layer_index, row_index, column_index)) ;
 #endif
 
-    *this.ColumnPointers = *(this.ColumnPointers - 1) ;
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
 
     /* BOTTOM */
 
     if ( ! IS_FIRST_LAYER(layer_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index - 1, row_index, column_index) ;
 
@@ -1273,15 +1273,15 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
         "  bottom  \t%d\t% .4e\n",
-        *(this.RowIndices-1), *(this.Values-1)) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1290,7 +1290,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
     if (   channel_model == TDICE_CHANNEL_MODEL_MC_2RM
         && ! IS_FIRST_ROW(row_index) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index - 1, column_index) ;
 
@@ -1300,42 +1300,42 @@ static SystemMatrix_t add_virtual_wall_column_2rm
             get_conductance_north (thermal_grid, dimensions, layer_index, row_index, column_index)
         ) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
-        "  south   \t%d\t% .4e\n", *(this.RowIndices-1), *(this.Values-1)) ;
+        "  south   \t%d\t% .4e\n", *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
     /* DIAGONAL */
 
-    *this.RowIndices++ = get_cell_offset_in_stack
+    *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
         (dimensions, layer_index, row_index, column_index) ;
 
-    *this.Values = 0.0 ;
+    *sysmatrix.Values = 0.0 ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
     {
-        *this.Values = get_capacity
+        *sysmatrix.Values = get_capacity
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values /= analysis->StepTime ;
+        *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    diagonal_pointer = this.Values++ ;
+    diagonal_pointer = sysmatrix.Values++ ;
 
-    (*this.ColumnPointers)++ ;
+    (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  diagonal\t%d\t", *(this.RowIndices-1)) ;
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
     fgetpos (stderr, &diag_fposition) ;
-    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(this.Values-1)) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
 #endif
 
     /* NORTH */
@@ -1343,7 +1343,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
     if (     channel_model == TDICE_CHANNEL_MODEL_MC_2RM
         && ! IS_LAST_ROW(row_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index, row_index + 1, column_index) ;
 
@@ -1353,15 +1353,15 @@ static SystemMatrix_t add_virtual_wall_column_2rm
             get_conductance_south (thermal_grid, dimensions, layer_index, row_index, column_index)
         ) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  north   \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1369,7 +1369,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
     if ( ! IS_LAST_LAYER(layer_index, dimensions) )
     {
-        *this.RowIndices++ = get_cell_offset_in_stack
+        *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
             (dimensions, layer_index + 2, row_index, column_index) ;
 
@@ -1377,15 +1377,15 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-        *this.Values++  = -conductance ;
+        *sysmatrix.Values++  = -conductance ;
         diagonal_value +=  conductance ;
 
-        (*this.ColumnPointers)++ ;
+        (*sysmatrix.ColumnPointers)++ ;
 
 #ifdef PRINT_SYSTEM_MATRIX
         fprintf (stderr,
             "  top     \t%d\t% .4e\n",
-            *(this.RowIndices-1), *(this.Values-1)) ;
+            *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1)) ;
 #endif
     }
 
@@ -1399,19 +1399,19 @@ static SystemMatrix_t add_virtual_wall_column_2rm
     fprintf (stderr, "% .4e", *diagonal_pointer) ;
     fsetpos (stderr, &last_fpos) ;
 
-    fprintf (stderr, "  %d\n", *this.ColumnPointers) ;
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
 #endif
 
-    this.ColumnPointers++ ;
+    sysmatrix.ColumnPointers++ ;
 
-    return this ;
+    return sysmatrix ;
 }
 
 /******************************************************************************/
 
 void fill_system_matrix
 (
-    SystemMatrix_t *this,
+    SystemMatrix_t *sysmatrix,
     ThermalGrid_t  *thermal_grid,
     Analysis_t     *analysis,
     Dimensions_t   *dimensions
@@ -1427,12 +1427,12 @@ void fill_system_matrix
 
     SystemMatrix_t tmp_matrix ;
 
-    tmp_matrix.Size = this->Size ;
-    tmp_matrix.NNz  = this->NNz ;
+    tmp_matrix.Size = sysmatrix->Size ;
+    tmp_matrix.NNz  = sysmatrix->NNz ;
 
-    tmp_matrix.ColumnPointers = this->ColumnPointers ;
-    tmp_matrix.RowIndices     = this->RowIndices ;
-    tmp_matrix.Values         = this->Values ;
+    tmp_matrix.ColumnPointers = sysmatrix->ColumnPointers ;
+    tmp_matrix.RowIndices     = sysmatrix->RowIndices ;
+    tmp_matrix.Values         = sysmatrix->Values ;
 
     tmp_matrix.ColumnPointers[0] = 0u ;
 
@@ -1576,18 +1576,18 @@ void fill_system_matrix
 
 /******************************************************************************/
 
-Error_t solve_sparse_linear_system (SystemMatrix_t *this, SuperMatrix *b)
+Error_t solve_sparse_linear_system (SystemMatrix_t *sysmatrix, SuperMatrix *b)
 {
     dgstrs
 
-        (NOTRANS, &this->SLUMatrix_L, &this->SLUMatrix_U,
-         this->SLU_PermutationMatrixC, this->SLU_PermutationMatrixR,
-         b, &this->SLU_Stat, &this->SLU_Info) ;
+        (NOTRANS, &sysmatrix->SLUMatrix_L, &sysmatrix->SLUMatrix_U,
+         sysmatrix->SLU_PermutationMatrixC, sysmatrix->SLU_PermutationMatrixR,
+         b, &sysmatrix->SLU_Stat, &sysmatrix->SLU_Info) ;
 
-    if (this->SLU_Info < 0)
+    if (sysmatrix->SLU_Info < 0)
     {
         fprintf (stderr,
-            "Error (%d) while solving linear system\n", this->SLU_Info) ;
+            "Error (%d) while solving linear system\n", sysmatrix->SLU_Info) ;
 
         return TDICE_FAILURE ;
     }
@@ -1597,7 +1597,7 @@ Error_t solve_sparse_linear_system (SystemMatrix_t *this, SuperMatrix *b)
 
 /******************************************************************************/
 
-void print_system_matrix (SystemMatrix_t this, String_t file_name)
+void print_system_matrix (SystemMatrix_t sysmatrix, String_t file_name)
 {
     FILE* file = fopen (file_name, "w") ;
 
@@ -1609,15 +1609,15 @@ void print_system_matrix (SystemMatrix_t this, String_t file_name)
 
     CellIndex_t row, column ;
 
-    for (column = 0 ; column < this.Size ; column++)
+    for (column = 0 ; column < sysmatrix.Size ; column++)
 
-        for (row = this.ColumnPointers[column] ;
-             row < this.ColumnPointers[column + 1] ;
+        for (row = sysmatrix.ColumnPointers[column] ;
+             row < sysmatrix.ColumnPointers[column + 1] ;
              row++)
 
             fprintf (file, "%9d\t%9d\t%32.24f\n",
-                this.RowIndices[row] + 1, column + 1,
-                this.Values[row]) ;
+                sysmatrix.RowIndices[row] + 1, column + 1,
+                sysmatrix.Values[row]) ;
 
     fclose (file) ;
 }

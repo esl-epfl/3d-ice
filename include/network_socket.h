@@ -90,23 +90,23 @@ extern "C"
 
     /*! Initializes a socket
      *
-     * \param this the address of the Socket to initialize
+     * \param socket the address of the Socket to initialize
      */
 
-    void init_socket (Socket_t *this) ;
+    void init_socket (Socket_t *socket) ;
 
 
 
     /*! Open a socket for the client side
      *
-     * \param this the address of the Socket to open
+     * \param csocket the address of the Socket to open
      *
      * \return \c TDICE_SUCCESS if the opening succeeded
      * \return \c TDICE_FAILURE if the opening fails. A message will be
      *                          printed on standard error
      */
 
-    Error_t open_client_socket (Socket_t *this) ;
+    Error_t open_client_socket (Socket_t *csocket) ;
 
 
 
@@ -116,7 +116,7 @@ extern "C"
      * \a port_numebr over any kind of address. It finally enables the
      * listening.
      *
-     * \param this        the address of the Socket to open
+     * \param ssocket        the address of the Socket to open
      * \param port_number the port number of the server
      *
      * \return \c TDICE_SUCCESS if the opening succeeded
@@ -126,7 +126,7 @@ extern "C"
 
     Error_t open_server_socket
     (
-        Socket_t     *this,
+        Socket_t     *ssocket,
         PortNumber_t  port_number
     ) ;
 
@@ -138,7 +138,7 @@ extern "C"
      * The server side must be waiting for a connection. On error, the
      * socket is closed.
      *
-     * \param this        the address of the ClientSocket to initialize
+     * \param csocket        the address of the ClientSocket to initialize
      * \param host_name   the ip address of the server (as dotted string)
      * \param port_number the port number of the server
      *
@@ -149,7 +149,7 @@ extern "C"
 
     Error_t connect_client_to_server
     (
-        Socket_t     *this,
+        Socket_t     *csocket,
         String_t      host_name,
         PortNumber_t  port_number
     ) ;
@@ -158,7 +158,7 @@ extern "C"
 
     /*! Waits unitl a client sends a connect to the server
      *
-     * \param this   the address of the ServerSocket that will wait
+     * \param ssocket   the address of the ServerSocket that will wait
      * \param client the address of the ClientSocket that will connect_to_server
      *
      * \return \c TDICE_SUCCESS if the connection with the client succeeded
@@ -166,13 +166,13 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t wait_for_client (Socket_t *this, Socket_t *client) ;
+    Error_t wait_for_client (Socket_t *ssocket, Socket_t *client) ;
 
 
 
     /*! Sends a message to a socket
      *
-     * \param this    the socket where the message will be sent
+     * \param socket    the socket where the message will be sent
      * \param message the address of message to send
      *
      * \return \c TDICE_SUCCESS if the operation succeeded
@@ -182,7 +182,7 @@ extern "C"
 
     Error_t send_message_to_socket
     (
-        Socket_t         *this,
+        Socket_t         *socket,
         NetworkMessage_t *message
     ) ;
 
@@ -190,7 +190,7 @@ extern "C"
 
     /*! Receive a text message from a socket
      *
-     * \param this    the socket where the message will be received
+     * \param socket    the socket where the message will be received
      * \param message the address of message to receive
      *
      * \return \c TDICE_SUCCESS if the operation succeeded
@@ -200,7 +200,7 @@ extern "C"
 
     Error_t receive_message_from_socket
     (
-        Socket_t         *this,
+        Socket_t         *socket,
         NetworkMessage_t *message
     ) ;
 
@@ -208,14 +208,14 @@ extern "C"
 
     /*! Closes a socket
      *
-     * \param this the address of the Socket to close
+     * \param socket the address of the Socket to close
      *
      * \return \c TDICE_SUCCESS if the closure succeeded
      * \return \c TDICE_FAILURE if the closure fails. A message will be
      *                          printed on standard error
      */
 
-    Error_t close_socket (Socket_t *this) ;
+    Error_t close_socket (Socket_t *socket) ;
 
 #ifdef __cplusplus
 }

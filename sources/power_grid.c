@@ -43,62 +43,62 @@
 
 /******************************************************************************/
 
-void init_power_grid (PowerGrid_t *this)
+void init_power_grid (PowerGrid_t *pgrid)
 {
-    this->NLayers           = 0u ;
-    this->NCells            = 0u ;
-    this->LayersProfile     = NULL ;
-    this->FloorplansProfile = NULL ;
-    this->Sources           = NULL ;
-    this->Channel           = NULL ;
-    this->HeatSink          = NULL ;
+    pgrid->NLayers           = 0u ;
+    pgrid->NCells            = 0u ;
+    pgrid->LayersProfile     = NULL ;
+    pgrid->FloorplansProfile = NULL ;
+    pgrid->Sources           = NULL ;
+    pgrid->Channel           = NULL ;
+    pgrid->HeatSink          = NULL ;
 }
 
 /******************************************************************************/
 
 Error_t build_power_grid
 (
-    PowerGrid_t *this,
+    PowerGrid_t *pgrid,
     Quantity_t   nlayers,
     Quantity_t   ncells
 )
 {
-    this->NLayers = nlayers ;
-    this->NCells  = ncells ;
+    pgrid->NLayers = nlayers ;
+    pgrid->NCells  = ncells ;
 
-    this->LayersProfile =
+    pgrid->LayersProfile =
 
         (StackLayerType_t *) calloc (nlayers, sizeof (StackLayerType_t)) ;
 
-    if (this->LayersProfile == NULL)
+    if (pgrid->LayersProfile == NULL)
 
         return TDICE_FAILURE ;
 
-    this->FloorplansProfile =
+    pgrid->FloorplansProfile =
 
         (Floorplan_t **) calloc (nlayers, sizeof (Floorplan_t *)) ;
 
-    if (this->FloorplansProfile == NULL)
+    if (pgrid->FloorplansProfile == NULL)
     {
-        FREE_POINTER (free, this->LayersProfile) ;
+        FREE_POINTER (free, pgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
     }
 
     while (--nlayers != 0)
     {
-        this->LayersProfile     [nlayers] = TDICE_LAYER_NONE ;
-        this->FloorplansProfile [nlayers] = NULL ;
+        pgrid->LayersProfile     [nlayers] = TDICE_LAYER_NONE ;
+        pgrid->FloorplansProfile [nlayers] = NULL ;
     }
 
-    this->Sources = (Source_t *) calloc (ncells, sizeof(Source_t)) ;
+    pgrid->Sources = (Source_t *) calloc (ncells, sizeof(Source_t)) ;
 
-    if (this->Sources == NULL)
+    if (pgrid->Sources == NULL)
     {
         fprintf (stderr, "Cannot malloc source vector\n") ;
 
-        FREE_POINTER (free, this->LayersProfile) ;
-        FREE_POINTER (free, this->FloorplansProfile) ;
+        FREE_POINTER (free, pgrid->LayersProfile) ;
+        FREE_POINTER (free, pgrid->FloorplansProfile) ;
 
         return TDICE_FAILURE ;
     }
@@ -108,16 +108,16 @@ Error_t build_power_grid
 
 /******************************************************************************/
 
-void destroy_power_grid (PowerGrid_t *this)
+void destroy_power_grid (PowerGrid_t *pgrid)
 {
-    FREE_POINTER (free, this->LayersProfile) ;
-    FREE_POINTER (free, this->FloorplansProfile) ;
-    FREE_POINTER (free, this->Sources) ;
+    FREE_POINTER (free, pgrid->LayersProfile) ;
+    FREE_POINTER (free, pgrid->FloorplansProfile) ;
+    FREE_POINTER (free, pgrid->Sources) ;
 }
 
 /******************************************************************************/
 
-void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
+void fill_power_grid (PowerGrid_t *pgrid, StackElement_t *list)
 {
     FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stack_element, list)
     {
@@ -135,12 +135,12 @@ void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
                 {
                     if (layer == stack_element->Pointer.Die->SourceLayer)
                     {
-                        this->LayersProfile     [index + tmp] = TDICE_LAYER_SOURCE ;
-                        this->FloorplansProfile [index + tmp] = stack_element->Floorplan ;
+                        pgrid->LayersProfile     [index + tmp] = TDICE_LAYER_SOURCE ;
+                        pgrid->FloorplansProfile [index + tmp] = stack_element->Floorplan ;
                     }
                     else
 
-                        this->LayersProfile     [index + tmp] = TDICE_LAYER_SOLID ;
+                        pgrid->LayersProfile     [index + tmp] = TDICE_LAYER_SOLID ;
 
                     tmp++ ;
                 }
@@ -149,47 +149,47 @@ void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
-                this->LayersProfile     [index] = TDICE_LAYER_SOLID ;
-                this->FloorplansProfile [index] = NULL ;
+                pgrid->LayersProfile     [index] = TDICE_LAYER_SOLID ;
+                pgrid->FloorplansProfile [index] = NULL ;
 
                 break ;
             }
             case TDICE_STACK_ELEMENT_CHANNEL :
             {
-                this->Channel = stack_element->Pointer.Channel ;
+                pgrid->Channel = stack_element->Pointer.Channel ;
 
-                switch (this->Channel->ChannelModel)
+                switch (pgrid->Channel->ChannelModel)
                 {
                     case TDICE_CHANNEL_MODEL_MC_4RM :
 
-                        this->LayersProfile [index] = TDICE_LAYER_CHANNEL_4RM ;
+                        pgrid->LayersProfile [index] = TDICE_LAYER_CHANNEL_4RM ;
 
                         break ;
 
                     case TDICE_CHANNEL_MODEL_MC_2RM :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_VWALL_CHANNEL ;
-                        this->LayersProfile [index + 2] = TDICE_LAYER_CHANNEL_2RM ;
-                        this->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
+                        pgrid->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
+                        pgrid->LayersProfile [index + 1] = TDICE_LAYER_VWALL_CHANNEL ;
+                        pgrid->LayersProfile [index + 2] = TDICE_LAYER_CHANNEL_2RM ;
+                        pgrid->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
 
                         break ;
 
                     case TDICE_CHANNEL_MODEL_PF_INLINE :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
-                        this->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_INLINE ;
-                        this->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
+                        pgrid->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
+                        pgrid->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
+                        pgrid->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_INLINE ;
+                        pgrid->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
 
                         break ;
 
                     case TDICE_CHANNEL_MODEL_PF_STAGGERED :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
-                        this->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_STAGGERED ;
-                        this->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
+                        pgrid->LayersProfile [index    ] = TDICE_LAYER_BOTTOM_WALL ;
+                        pgrid->LayersProfile [index + 1] = TDICE_LAYER_VWALL_PINFINS ;
+                        pgrid->LayersProfile [index + 2] = TDICE_LAYER_PINFINS_STAGGERED ;
+                        pgrid->LayersProfile [index + 3] = TDICE_LAYER_TOP_WALL ;
 
                         break ;
 
@@ -212,19 +212,19 @@ void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
             }
             case TDICE_STACK_ELEMENT_HEATSINK :
             {
-                this->HeatSink = stack_element->Pointer.HeatSink ;
+                pgrid->HeatSink = stack_element->Pointer.HeatSink ;
 
-                switch (this->HeatSink->SinkModel)
+                switch (pgrid->HeatSink->SinkModel)
                 {
                     case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
 
-                        if (this->LayersProfile [index] == TDICE_LAYER_SOLID)
+                        if (pgrid->LayersProfile [index] == TDICE_LAYER_SOLID)
 
-                            this->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+                            pgrid->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
 
-                        else if (this->LayersProfile [index] == TDICE_LAYER_SOURCE)
+                        else if (pgrid->LayersProfile [index] == TDICE_LAYER_SOURCE)
 
-                            this->LayersProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+                            pgrid->LayersProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
 
                         else
 
@@ -234,8 +234,8 @@ void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
 
                     case TDICE_HEATSINK_MODEL_TRADITIONAL :
 
-                        this->LayersProfile [index    ] = TDICE_LAYER_SPREADER ;
-                        this->LayersProfile [index + 1] = TDICE_LAYER_SINK ;
+                        pgrid->LayersProfile [index    ] = TDICE_LAYER_SPREADER ;
+                        pgrid->LayersProfile [index + 1] = TDICE_LAYER_SINK ;
 
                         break ;
 
@@ -273,7 +273,7 @@ void fill_power_grid (PowerGrid_t *this, StackElement_t *list)
 
 Error_t update_source_vector
 (
-    PowerGrid_t    *this,
+    PowerGrid_t    *pgrid,
     ThermalGrid_t  *thermal_grid,
     Dimensions_t   *dimensions
 )
@@ -284,23 +284,23 @@ Error_t update_source_vector
     CellIndex_t  ccounter ;
     Source_t    *sources ;
 
-    for (ccounter  = 0u,            sources = this->Sources ;
-         ccounter != this->NCells ;
+    for (ccounter  = 0u,            sources = pgrid->Sources ;
+         ccounter != pgrid->NCells ;
          ccounter++,                sources++)
 
         *sources = (Source_t) 0.0 ;
 
-    for (layer  = 0u,             sources = this->Sources ;
-         layer != this->NLayers ;
+    for (layer  = 0u,             sources = pgrid->Sources ;
+         layer != pgrid->NLayers ;
          layer++,                 sources += get_layer_area (dimensions))
     {
-        switch (this->LayersProfile [layer])
+        switch (pgrid->LayersProfile [layer])
         {
             case TDICE_LAYER_SOURCE :
             {
                 Error_t error = fill_sources_floorplan
 
-                    (this->FloorplansProfile [layer], sources) ;
+                    (pgrid->FloorplansProfile [layer], sources) ;
 
                 if (error == TDICE_FAILURE)
 
@@ -318,7 +318,7 @@ Error_t update_source_vector
                 {
                     FOR_EVERY_COLUMN (column, dimensions)
                     {
-                        *tmp++ += this->HeatSink->AmbientTemperature
+                        *tmp++ += pgrid->HeatSink->AmbientTemperature
 
                                      * get_conductance_top (thermal_grid,
                                            dimensions, layer, row, column) ;
@@ -337,7 +337,7 @@ Error_t update_source_vector
                 {
                     FOR_EVERY_COLUMN (column, dimensions)
                     {
-                        *tmp++ += this->HeatSink->AmbientTemperature
+                        *tmp++ += pgrid->HeatSink->AmbientTemperature
 
                                      * get_conductance_top (thermal_grid,
                                            dimensions, layer, row, column) ;
@@ -347,7 +347,7 @@ Error_t update_source_vector
 
                 Error_t error = fill_sources_floorplan
 
-                    (this->FloorplansProfile [layer], sources) ;
+                    (pgrid->FloorplansProfile [layer], sources) ;
 
                 if (error == TDICE_FAILURE)
 
@@ -365,15 +365,15 @@ Error_t update_source_vector
 
                 FOR_EVERY_COLUMN (column, dimensions)
                 {
-                    if (IS_CHANNEL_COLUMN (this->Channel->ChannelModel, column) == true)
+                    if (IS_CHANNEL_COLUMN (pgrid->Channel->ChannelModel, column) == true)
                     {
                         *tmp =   (Source_t) 2.0
 
                                * get_convective_term
 
-                                    (this->Channel, dimensions, layer, 0, column)
+                                    (pgrid->Channel, dimensions, layer, 0, column)
 
-                               * this->Channel->Coolant.TIn ;
+                               * pgrid->Channel->Coolant.TIn ;
 
                     }
 
@@ -397,14 +397,14 @@ Error_t update_source_vector
 
                 fprintf (stderr, "ERROR: unset layer type\n") ;
 
-                return 0.0 ;
+                return TDICE_FAILURE ;
 
             default :
 
                 fprintf (stderr, "ERROR: unknown layer type %d\n",
-                    this->LayersProfile [layer]) ;
+                    pgrid->LayersProfile [layer]) ;
 
-                return 0.0 ;
+                return TDICE_FAILURE ;
         }
     }
 
@@ -413,16 +413,16 @@ Error_t update_source_vector
 
 /******************************************************************************/
 
-void update_channel_sources (PowerGrid_t *this, Dimensions_t *dimensions)
+void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions)
 {
     Quantity_t   layer ;
     Source_t    *sources ;
 
-    for (layer  = 0u,             sources = this->Sources ;
-         layer != this->NLayers ;
+    for (layer  = 0u,             sources = pgrid->Sources ;
+         layer != pgrid->NLayers ;
          layer++,                 sources += get_layer_area (dimensions))
     {
-        switch (this->LayersProfile [layer])
+        switch (pgrid->LayersProfile [layer])
         {
             case TDICE_LAYER_CHANNEL_4RM :
             case TDICE_LAYER_CHANNEL_2RM :
@@ -433,15 +433,15 @@ void update_channel_sources (PowerGrid_t *this, Dimensions_t *dimensions)
 
                 FOR_EVERY_COLUMN (column, dimensions)
                 {
-                    if (IS_CHANNEL_COLUMN (this->Channel->ChannelModel, column) == true)
+                    if (IS_CHANNEL_COLUMN (pgrid->Channel->ChannelModel, column) == true)
                     {
                         *tmp =   (Source_t) 2.0
 
                                * get_convective_term
 
-                                    (this->Channel, dimensions, layer, 0, column)
+                                    (pgrid->Channel, dimensions, layer, 0, column)
 
-                               * this->Channel->Coolant.TIn ;
+                               * pgrid->Channel->Coolant.TIn ;
 
                     }
 
@@ -474,7 +474,7 @@ void update_channel_sources (PowerGrid_t *this, Dimensions_t *dimensions)
             default :
 
                 fprintf (stderr, "ERROR: unknown layer type %d\n",
-                    this->LayersProfile [layer]) ;
+                    pgrid->LayersProfile [layer]) ;
 
                 return ;
         }
@@ -483,20 +483,20 @@ void update_channel_sources (PowerGrid_t *this, Dimensions_t *dimensions)
 
 /******************************************************************************/
 
-Error_t insert_power_values (PowerGrid_t *this, PowersQueue_t *pvalues)
+Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues)
 {
     Quantity_t layer ;
 
-    for (layer = 0u ; layer != this->NLayers ; layer++)
+    for (layer = 0u ; layer != pgrid->NLayers ; layer++)
     {
-        switch (this->LayersProfile [layer])
+        switch (pgrid->LayersProfile [layer])
         {
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             {
                 Error_t result = insert_power_values_floorplan
 
-                    (this->FloorplansProfile [layer], pvalues) ;
+                    (pgrid->FloorplansProfile [layer], pvalues) ;
 
                 if (result == TDICE_FAILURE)
 
@@ -529,7 +529,7 @@ Error_t insert_power_values (PowerGrid_t *this, PowersQueue_t *pvalues)
             default :
 
                 fprintf (stderr, "ERROR: unknown layer type %d\n",
-                    this->LayersProfile [layer]) ;
+                    pgrid->LayersProfile [layer]) ;
 
                 return TDICE_FAILURE ;
         }

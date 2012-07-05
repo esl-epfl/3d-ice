@@ -118,43 +118,43 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the StackDescription to initialize
+     * \param stkd the address of the StackDescription to initialize
      */
 
-    void init_stack_description (StackDescription_t* this) ;
+    void init_stack_description (StackDescription_t* stkd) ;
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory related to \a stkd
      *
-     * The parametrer \a this must be the address of a static variable
+     * The parametrer \a stkd must be the address of a static variable
      *
-     * \param this the address of the StackDescription structure to free
+     * \param stkd the address of the StackDescription structure to free
      */
 
-    void destroy_stack_description (StackDescription_t *this) ;
+    void destroy_stack_description (StackDescription_t *stkd) ;
 
 
 
     /*! Prints the stack descritpion as it looks in the stack file
      *
-     * \param this   the pointer to the StackDescription to print
+     * \param stkd   the pointer to the StackDescription to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_stack_description
 
-        (StackDescription_t *this, FILE *stream, String_t prefix) ;
+        (StackDescription_t *v, FILE *stream, String_t prefix) ;
 
 
 
     /*! Returns the number of floorplan elements in a stack element
      *
      * The parameter \a stack_element_id must refer to the ID given to a stack
-     * element (of type die) in the stack file used to to fill \a this
+     * element (of type die) in the stack file used to to fill \a stkd
      *
-     * \param this address of the StackDescription structure
+     * \param stkd address of the StackDescription structure
      * \param stack_element_id the id of the stack element
      *
      * \return \c 0 if stack_element_id does not exist in the stack or if it
@@ -164,18 +164,18 @@ extern "C"
 
     Quantity_t get_number_of_floorplan_elements
 
-        (StackDescription_t *this, String_t stack_element_id) ;
+        (StackDescription_t *stkd, String_t stack_element_id) ;
 
 
 
     /*! Returns the total number of floorplan elements in the whole 3d stack
      *
-     * \param this address of the StackDescription structure
+     * \param stkd address of the StackDescription structure
      *
      * \return the total nyumber of floorplan elements in the 3d stack
      */
 
-    Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *this) ;
+    Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd) ;
 
 /******************************************************************************/
 

@@ -36,97 +36,85 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include "floorplan_file_parser.h"
 
-#include "analysis.h"
-#include "macros.h"
+#include "../bison/floorplan_parser.h"
+#include "../flex/floorplan_scanner.h"
 
-/******************************************************************************/
+//  From Bison manual:
+//  The value returned by yyparse is 0 if parsing was successful (return is
+//  due to end-of-input). The value is 1 if parsing failed (return is due to
+//  a syntax error).
 
-void init_analysis (Analysis_t *analysis)
-{
-    analysis->AnalysisType       = (AnalysisType_t) TDICE_ANALYSIS_TYPE_NONE ;
-    analysis->StepTime           = (Time_t) 0.0 ;
-    analysis->SlotTime           = (Time_t) 0.0 ;
-    analysis->SlotLength         = (Quantity_t) 0u ;
-    analysis->CurrentTime        = (Quantity_t) 0u ;
-    analysis->InitialTemperature = (Temperature_t) 0.0 ;
-}
+extern int floorplan_parse
+
+    (Floorplan_t *floorplan, Dimensions_t *dimensions, yyscan_t scanner) ;
 
 /******************************************************************************/
 
-Analysis_t *calloc_analysis ( void )
-{
-    Analysis_t *analysis = (Analysis_t *) malloc (sizeof (Analysis_t)) ;
-
-    if (analysis != NULL)
-
-        init_analysis (analysis) ;
-
-    return analysis ;
-}
-
-/******************************************************************************/
-
-void free_analysis (Analysis_t *analysis)
-{
-    if (analysis != NULL)
-
-        FREE_POINTER (free, analysis) ;
-}
-
-/******************************************************************************/
-
-Time_t get_simulated_time (Analysis_t *analysis)
-{
-  return analysis->CurrentTime * analysis->StepTime ;
-}
-
-/******************************************************************************/
-
-void increase_by_step_time (Analysis_t *analysis)
-{
-    analysis->CurrentTime++ ;
-}
-
-/******************************************************************************/
-
-bool slot_completed (Analysis_t *analysis)
-{
-    if (analysis->CurrentTime % analysis->SlotLength == 0u)
-
-        return true ;
-
-    return false ;
-}
-
-/******************************************************************************/
-
-void print_analysis
+Error_t parse_floorplan_file
 (
-    Analysis_t *analysis,
-    FILE       *stream,
-    String_t    prefix
+    String_t      filename,
+    Floorplan_t  *floorplan,
+    Dimensions_t *dimensions
 )
 {
-    fprintf (stream, "%ssolver : ", prefix) ;
+    FILE *input ;
+    int result ;
+    yyscan_t scanner ;
 
-    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+    input = fopen (filename, "r") ;
 
-        fprintf (stream, "steady ;\n") ;
+    if (input == NULL)
+    {
+        fprintf (stderr, "Unable to open floorplan file %s\n", filename) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    floorplan->FileName = strdup (filename) ;  // FIXME memory leak
+
+    floorplan_lex_init  (&scanner) ;
+    floorplan_set_in    (input, scanner) ;
+    //floorplan_set_debug (1, scanner) ;
+
+    result = floorplan_parse (floorplan, dimensions, scanner) ;
+
+    floorplan_lex_destroy (scanner) ;
+    fclose (input) ;
+
+    if (result == 0)
+
+        return TDICE_SUCCESS ;
 
     else
 
-        fprintf (stream, "transient step %.2f, slot %.2f ;\n",
-            analysis->StepTime, analysis->SlotTime) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    fprintf (stream, "%sinitial temperature  %.2f ;\n",
-        prefix, analysis->InitialTemperature) ;
-
-    fprintf (stream, "%s\n", prefix) ;
+        return TDICE_FAILURE ;
 }
 
 /******************************************************************************/
+
+Error_t generate_floorplan_file
+(
+    String_t     filename,
+    Floorplan_t *floorplan
+)
+{
+    FILE *out = fopen (filename, "w") ;
+
+    if (out == NULL)
+    {
+        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    print_floorplan (floorplan, out, (String_t) "") ;
+
+    fclose (out) ;
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+

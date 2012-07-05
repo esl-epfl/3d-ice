@@ -109,10 +109,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the material structure to initialize
+     * \param material the address of the material structure to initialize
      */
 
-    void init_material (Material_t *this) ;
+    void init_material (Material_t *material) ;
 
 
 
@@ -126,16 +126,16 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a material
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_material . If \a this is \c NULL,
+     * The pointer \a material must have been returned by a previous call
+     * to \a calloc_material . If \a material is \c NULL,
      * no operation is performed.
      *
-     * \param this the address to free
+     * \param material the address to free
      */
 
-    void free_material (Material_t *this) ;
+    void free_material (Material_t *material) ;
 
 
 
@@ -169,12 +169,12 @@ extern "C"
 
     /*! Prints the material as it looks in the stack file
      *
-     * \param this   the material to print
+     * \param material   the material to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_material (Material_t *this, FILE *stream, String_t prefix) ;
+    void print_material (Material_t *material, FILE *stream, String_t prefix) ;
 
 
 

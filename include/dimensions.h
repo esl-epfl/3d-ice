@@ -118,10 +118,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the cell dimensions structure to initialize
+     * \param celld the address of the cell dimensions structure to initialize
      */
 
-    void init_cell_dimensions (CellDimensions_t *this) ;
+    void init_cell_dimensions (CellDimensions_t *delld) ;
 
 /******************************************************************************/
 
@@ -184,10 +184,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the grid dimensions structure to initialize
+     * \param gridd the address of the grid dimensions structure to initialize
      */
 
-    void init_grid_dimensions (GridDimensions_t *this) ;
+    void init_grid_dimensions (GridDimensions_t *gridd) ;
 
 /******************************************************************************/
 
@@ -215,10 +215,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the chip dimensions structure to initialize
+     * \param chipd the address of the chip dimensions structure to initialize
      */
 
-    void init_chip_dimensions (ChipDimensions_t *this) ;
+    void init_chip_dimensions (ChipDimensions_t *chipd) ;
 
 /******************************************************************************/
 
@@ -252,10 +252,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the dimensions structure to initialize
+     * \param dimensions the address of the dimensions structure to initialize
      */
 
-    void init_dimensions (Dimensions_t *this) ;
+    void init_dimensions (Dimensions_t *dimensions) ;
 
 
 
@@ -269,35 +269,35 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a dimensions
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_dimensions . If \a this is \c NULL, no operation is performed.
+     * The pointer \a dimensions must have been returned by a previous call
+     * to \a calloc_dimensions . If \a dimensions is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param dimensions the address to free
      */
 
-    void free_dimensions (Dimensions_t *this) ;
+    void free_dimensions (Dimensions_t *dimensions) ;
 
 
 
     /*! Prints the dimensions as they look in the stack file
      *
-     * \param this   the dimensions to print
+     * \param dimensions   the dimensions to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_dimensions (Dimensions_t *this, FILE *stream, String_t prefix) ;
+    void print_dimensions (Dimensions_t *dimensions, FILE *stream, String_t prefix) ;
 
 
 
     /*! Creates two text files containing the X and Y coordinates of the thermal cells
      *
-     *  \param this the address of the dimensions structure
+     *  \param dimensions the address of the dimensions structure
      */
 
-    void print_axes (Dimensions_t *this) ;
+    void print_axes (Dimensions_t *dimensions) ;
 
 
 
@@ -305,7 +305,7 @@ extern "C"
      *
      *  Sets the content of the field Dimensions::NConnections
      *
-     *  \param this          the address of the dimensions structure
+     *  \param dimensions          the address of the dimensions structure
      *  \param num_channels  number of channels (as stack element) in the stack
      *  \param channel_model the model of the channel used in the stack
      *  \param sink_model    the model of the heat sink used in the stack
@@ -313,7 +313,7 @@ extern "C"
 
     void compute_number_of_connections
     (
-        Dimensions_t   *this,
+        Dimensions_t   *dimensions,
         Quantity_t      num_channels,
         ChannelModel_t  channel_model,
         HeatSinkModel_t sink_model
@@ -326,14 +326,14 @@ extern "C"
      *  The function prints a warning on stderr if \a column_index is
      *  oustside of its correct range of values, i.e. [0, ncolumns].
      *
-     * \param this         the address of the structure containing all the dimensions
+     * \param dimensions         the address of the structure containing all the dimensions
      * \param column_index the column index of the thermal cell
      *
      * \return the length of the thermal cell in position \a column_index
      * \return \c 0 if \a column_index is out of range
      */
 
-    CellDimension_t get_cell_length (Dimensions_t *this, CellIndex_t column_index) ;
+    CellDimension_t get_cell_length (Dimensions_t *dimensions, CellIndex_t column_index) ;
 
 
 
@@ -342,14 +342,14 @@ extern "C"
      *  The function prints a warning on stderr if \a row_index is
      *  oustside of its correct range of values, i.e. [0, nrows].
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      * \param row_index  the row index of the thermal cell
      *
      * \return the width of the thermal cell in position \a row_index
      * \return \c 0 if \a row_index is out of range
      */
 
-    CellDimension_t get_cell_width (Dimensions_t *this, CellIndex_t row_index) ;
+    CellDimension_t get_cell_width (Dimensions_t *dimensions, CellIndex_t row_index) ;
 
 
 
@@ -359,7 +359,7 @@ extern "C"
      *  oustside of its correct range of values, i.e. [0, nlayers] or if
      *  the array of heights has not been created.
      *
-     * \param this        the address of the structure containing all the dimensions
+     * \param dimensions        the address of the structure containing all the dimensions
      * \param layer_index the layer index of the thermal cell
      *
      * \return the height of the thermal cell in position \a layer_index
@@ -367,121 +367,121 @@ extern "C"
      *         heights has not been created.
      */
 
-    CellDimension_t get_cell_height (Dimensions_t *this, CellIndex_t layer_index) ;
+    CellDimension_t get_cell_height (Dimensions_t *dimensions, CellIndex_t layer_index) ;
 
 
 
     /*! Returns the X coordinate of the center of the cell at \a column_index
      *
-     * \param this   the address of the structure containing all the dimensions
+     * \param dimensions   the address of the structure containing all the dimensions
      * \param column_index the column index of the thermal cell
      *
      * \return the X coordinate of the center of thermal cell in position \a column_index
      */
 
-    ChipDimension_t get_cell_center_x (Dimensions_t *this, CellIndex_t column_index) ;
+    ChipDimension_t get_cell_center_x (Dimensions_t *dimensions, CellIndex_t column_index) ;
 
 
 
     /*! Returns the Y coordinate of the center of the cell at \a row_index
      *
-     * \param this      the address of the structure containing all the dimensions
+     * \param dimensions      the address of the structure containing all the dimensions
      * \param row_index the row index of the thermal cell
      *
      * \return the Y coordinate of the center of thermal cell in position \a row_index
      */
 
-    ChipDimension_t get_cell_center_y (Dimensions_t *this, CellIndex_t row_index) ;
+    ChipDimension_t get_cell_center_y (Dimensions_t *dimensions, CellIndex_t row_index) ;
 
 
 
     /*! Returns the X coordinate of the south-west corner of the cell at \a column_index
      *
-     * \param this         the address of the structure containing all the dimensions
+     * \param dimensions         the address of the structure containing all the dimensions
      * \param column_index the column index of the thermal cell
      *
      * \return the X coordinate of the south-west corner of thermal cell in position \a column_index
      */
 
-    ChipDimension_t get_cell_location_x (Dimensions_t *this, CellIndex_t column_index) ;
+    ChipDimension_t get_cell_location_x (Dimensions_t *dimensions, CellIndex_t column_index) ;
 
 
 
     /*! Returns the Y coordinate of the south-west corner of the cell at \a row_index
      *
-     * \param this       the address of the structure containing all the dimensions
+     * \param dimensions       the address of the structure containing all the dimensions
      * \param row_index  the row index of the thermal cell
      *
      * \return the X coordinate of the south-west corner of thermal cell in position \a row_index
      */
 
-    ChipDimension_t get_cell_location_y (Dimensions_t *this, CellIndex_t row_index) ;
+    ChipDimension_t get_cell_location_y (Dimensions_t *dimensions, CellIndex_t row_index) ;
 
 
 
     /*! Returns the number of layers in the 3d stack
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the number of layers
      */
 
-    CellIndex_t get_number_of_layers (Dimensions_t *this) ;
+    CellIndex_t get_number_of_layers (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the number of rows in the 3d stack
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the number of rows
      */
 
-    CellIndex_t get_number_of_rows (Dimensions_t *this) ;
+    CellIndex_t get_number_of_rows (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the number of columns in the 3d stack
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the number of columns
      */
 
-    CellIndex_t get_number_of_columns (Dimensions_t *this) ;
+    CellIndex_t get_number_of_columns (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the number of thermal cells in the 3d stack
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the number of thermal cells
      */
 
-    CellIndex_t get_number_of_cells (Dimensions_t *this) ;
+    CellIndex_t get_number_of_cells (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the number of connections between the thermal cells in the 3d stack
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the number of connections
      */
 
-    CellIndex_t get_number_of_connections (Dimensions_t *this) ;
+    CellIndex_t get_number_of_connections (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the number of thermal cells in a layer
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the number of thermal cells in a layer
      */
 
-    CellIndex_t get_layer_area (Dimensions_t *this) ;
+    CellIndex_t get_layer_area (Dimensions_t *dimensions) ;
 
 
 
@@ -490,7 +490,7 @@ extern "C"
      *  The index is computed as \f$ C \cdot r + c \f$, where \f$ C \f$
      *  is the number of columns in the 3d grid.
      *
-     * \param this         the address of the structure containing all the dimensions
+     * \param dimensions         the address of the structure containing all the dimensions
      * \param row_index    the row index \f$ r \f$ of the thermal cell
      * \param column_index the column index \f$ c \f$ of the thermal cell
      *
@@ -499,7 +499,7 @@ extern "C"
 
     CellIndex_t get_cell_offset_in_layer
 
-        (Dimensions_t *this, CellIndex_t row_index, CellIndex_t column_index) ;
+        (Dimensions_t *dimensions, CellIndex_t row_index, CellIndex_t column_index) ;
 
 
 
@@ -509,7 +509,7 @@ extern "C"
      *  where \f$ R \f$ and \f$ C \f$ are, respectively, the number of rows and
      *  columns in the 3d grid
      *
-     * \param this         the address of the structure containing all the dimensions
+     * \param dimensions         the address of the structure containing all the dimensions
      * \param layer_index  the layer index \f$ l \f$ of the thermal cell
      * \param row_index    the row index \f$ r \f$ of the thermal cell
      * \param column_index the column index \f$ c \f$ of the thermal cell
@@ -519,41 +519,41 @@ extern "C"
 
     CellIndex_t get_cell_offset_in_stack
 
-        (Dimensions_t *this,
+        (Dimensions_t *dimensions,
          CellIndex_t layer_index, CellIndex_t row_index, CellIndex_t column_index) ;
 
 
 
     /*! Returns the length of the IC
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the length of the IC
      */
 
-    ChipDimension_t get_chip_length (Dimensions_t *this) ;
+    ChipDimension_t get_chip_length (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the width of the IC
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the width of the IC
      */
 
-    ChipDimension_t get_chip_width (Dimensions_t *this) ;
+    ChipDimension_t get_chip_width (Dimensions_t *dimensions) ;
 
 
 
     /*! Returns the area of the IC in \f$ \mu m^2 \f$
      *
-     * \param this the address of the structure containing all the dimensions
+     * \param dimensions the address of the structure containing all the dimensions
      *
      * \return the area of the IC
      */
 
-    ChipDimension_t get_chip_area (Dimensions_t *this) ;
+    ChipDimension_t get_chip_area (Dimensions_t *dimensions) ;
 
 /******************************************************************************/
 

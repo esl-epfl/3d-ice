@@ -69,6 +69,21 @@ extern "C"
 
         (String_t filename, Floorplan_t *floorplan, Dimensions_t *dimensions) ;
 
+
+
+    /*! Generates a floorplan file
+     *
+     * \param filename  the path of the stack file to generate
+     * \param flooprlan the floorplan to print
+     *
+     * \return \c TDICE_FAILURE if the file cannot be created
+     * \return \c TDICE_SUCCESS otherwise
+     */
+
+    Error_t generate_floorplan_file
+
+        (String_t filename, Floorplan_t *floorplan) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

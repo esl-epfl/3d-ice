@@ -111,16 +111,16 @@ extern "C"
     /*! Sets all the fields to a default value (zero or \c NULL )
      *  and configure the SLU fields to run a factorization
      *
-     * \param this the address of the thermal data to initialize
+     * \param tdata the address of the thermal data to initialize
      */
 
-    void init_thermal_data (ThermalData_t *this) ;
+    void init_thermal_data (ThermalData_t *tdata) ;
 
 
 
     /*! Allocs and initialize memory and prepares the LU factorization
      *
-     * \param this           the address of the ThermalData to fill
+     * \param tdata           the address of the ThermalData to fill
      * \param stack_elements_list  the list of stack element (bottom first)
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
@@ -132,7 +132,7 @@ extern "C"
 
     Error_t fill_thermal_data
     (
-        ThermalData_t  *this,
+        ThermalData_t  *tdata,
         StackElement_t *stack_elements_list,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
@@ -140,30 +140,30 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a this
+    /*! Frees the memory related to \a tdata
      *
-     * The parametrer \a this must be the address of a static variable
+     * The parametrer \a tdata must be the address of a static variable
      *
-     * \param this the address of the ThermalData structure to free
+     * \param tdata the address of the ThermalData structure to free
      */
 
-    void destroy_thermal_data  (ThermalData_t *this) ;
+    void destroy_thermal_data  (ThermalData_t *tdata) ;
 
 
 
     /*! Reset the thermal state to the initial temperature
      *
-     * \param this     the address of the ThermalData structure to reset
-     * \param analysis the address of the Analysis structure related to \a this
+     * \param tdata     the address of the ThermalData structure to reset
+     * \param analysis the address of the Analysis structure related to \a tdata
      */
 
-    void reset_thermal_state (ThermalData_t *this, Analysis_t *analysis) ;
+    void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis) ;
 
 
 
     /*! Simulates a time step
      *
-     * \param this           the address of the ThermalData to fill
+     * \param tdata           the address of the ThermalData to fill
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
      *
@@ -180,7 +180,7 @@ extern "C"
 
     SimResult_t emulate_step
     (
-        ThermalData_t  *this,
+        ThermalData_t  *tdata,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
     ) ;
@@ -189,7 +189,7 @@ extern "C"
 
     /*! Simulates a time slot
      *
-     * \param this           the address of the ThermalData to fill
+     * \param tdata           the address of the ThermalData to fill
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
      *
@@ -203,7 +203,7 @@ extern "C"
 
     SimResult_t emulate_slot
     (
-        ThermalData_t  *this,
+        ThermalData_t  *tdata,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
     ) ;
@@ -212,7 +212,7 @@ extern "C"
 
     /*! Execute steady state simulation
      *
-     * \param this           the address of the ThermalData to fill
+     * \param tdata           the address of the ThermalData to fill
      * \param dimensions     the dimensions of the IC
      * \param analysis       the address of the Analysis structure
      *
@@ -226,7 +226,7 @@ extern "C"
 
     SimResult_t emulate_steady
     (
-        ThermalData_t  *this,
+        ThermalData_t  *tdata,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis
     ) ;
@@ -236,11 +236,11 @@ extern "C"
     /*! Update the flow rate
      *
      * Sets the new value in the Channel structure, re-fill the system
-     * matrix A and then execute the factorization A=LU again. If this
+     * matrix A and then execute the factorization A=LU again. If tdata
      * succeeds then the source vector will be upadted with the new inlet
      * source value.
      *
-     * \param this address of the ThermalData structure
+     * \param tdata address of the ThermalData structure
      * \param dimensions the dimensions of the IC
      * \param analysis address of the Analisys structure
      * \param new_flow_rate the new flow rate (in ml/min)
@@ -251,7 +251,7 @@ extern "C"
 
     Error_t update_coolant_flow_rate
     (
-        ThermalData_t  *this,
+        ThermalData_t  *tdata,
         Dimensions_t   *dimensions,
         Analysis_t     *analysis,
         CoolantFR_t     new_flow_rate
@@ -263,7 +263,7 @@ extern "C"
      *
      * Coordinates of the cell must be within the ranges
      *
-     * \param this address of the ThermalData structure
+     * \param tdata address of the ThermalData structure
      * \param dimensions the dimensions of the IC
      * \param layer_index  the index \c L of the thermal cell
      * \param row_index    the index \c R of the thermal cell
@@ -275,7 +275,7 @@ extern "C"
 
     Temperature_t get_cell_temperature
     (
-        ThermalData_t *this,
+        ThermalData_t *tdata,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -286,7 +286,7 @@ extern "C"
 
     /*! Generate a text file with the thermal map of a stack element
      *
-     * \param this address of the ThermalData structure
+     * \param tdata address of the ThermalData structure
      * \param stack_elements_list  the list of stack element (bottom first)
      * \param dimensions the dimensions of the IC
      * \param stack_element_id the id of the stack element as it appears in the
@@ -300,7 +300,7 @@ extern "C"
 
     Error_t print_thermal_map
     (
-        ThermalData_t  *this,
+        ThermalData_t  *tdata,
         StackElement_t *stack_elements_list,
         Dimensions_t   *dimensions,
         String_t        stack_element_id,

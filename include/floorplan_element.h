@@ -104,10 +104,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the flooprlan element to initialize
+     * \param flpel the address of the flooprlan element to initialize
      */
 
-    void init_floorplan_element (FloorplanElement_t *this) ;
+    void init_floorplan_element (FloorplanElement_t *flpel) ;
 
 
 
@@ -121,16 +121,16 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a flpel
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_floorplan_element . If \a this is \c NULL, no
+     * The pointer \a flpel must have been returned by a previous call
+     * to \a calloc_floorplan_element . If \a flpel is \c NULL, no
      * operation is performed.
      *
-     * \param this the address to free
+     * \param flpel the address to free
      */
 
-    void free_floorplan_element (FloorplanElement_t *this) ;
+    void free_floorplan_element (FloorplanElement_t *flpel) ;
 
 
 
@@ -166,14 +166,14 @@ extern "C"
 
     /*! Prints the floorplan element as it looks in the stack file
      *
-     * \param this   the floorplan element to print
+     * \param flpel   the floorplan element to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
     void print_floorplan_element
 
-        (FloorplanElement_t *this, FILE *stream, String_t prefix) ;
+        (FloorplanElement_t *flpel, FILE *stream, String_t prefix) ;
 
 
 
@@ -192,19 +192,19 @@ extern "C"
 
     /*! Returns the maximum temperature of the floorplan element
      *
-     *  \param this         pointer to the floorplan element
+     *  \param flpel         pointer to the floorplan element
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
      *                      cell in the layer where the floorplan element
      *                      is placed
      *
      *  \return the maximum temperature among the thermal cells on the stack
-     *          layer where \a this is placed
+     *          layer where \a flpel is placed
      */
 
     Temperature_t get_max_temperature_floorplan_element
     (
-        FloorplanElement_t *this,
+        FloorplanElement_t *flpel,
         Dimensions_t       *dimensions,
         Temperature_t      *temperatures
     ) ;
@@ -213,19 +213,19 @@ extern "C"
 
     /*! Returns the minimum temperature of the floorplan element
      *
-     *  \param this         pointer to the floorplan element
+     *  \param flpel         pointer to the floorplan element
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
      *                      cell in the layer where the floorplan element
      *                      is placed
      *
      *  \return the minimum temperature among the thermal cells on the stack
-     *          layer where \a this is placed
+     *          layer where \a flpel is placed
      */
 
     Temperature_t get_min_temperature_floorplan_element
     (
-        FloorplanElement_t *this,
+        FloorplanElement_t *flpel,
         Dimensions_t       *dimensions,
         Temperature_t      *temperatures
     ) ;
@@ -234,30 +234,30 @@ extern "C"
 
     /*! Returns the average temperature of the floorplan element
      *
-     *  \param this         pointer to the floorplan element
+     *  \param flpel         pointer to the floorplan element
      *  \param dimensions   pointer to the structure storing the dimensions
      *  \param temperatures pointer to the temperature of the first thermal
-     *                      cell in the layer where \a this
+     *                      cell in the layer where \a flpel
      *                      is placed
      *
      *  \return the average temperature among the thermal cells on the stack
-     *          layer where \a this is placed
+     *          layer where \a flpel is placed
      */
 
     Temperature_t get_avg_temperature_floorplan_element
     (
-        FloorplanElement_t *this,
+        FloorplanElement_t *flpel,
         Dimensions_t       *dimensions,
         Temperature_t      *temperatures
     ) ;
 
 
 
-    /*! Moves one power value from \a pvalues into \a this
+    /*! Moves one power value from \a pvalues into \a flpel
      *
      *  The queue \a pvalues must contain at least one power value
      *
-     *  \param this    pointer to the floorplan element
+     *  \param flpel    pointer to the floorplan element
      *  \param pvalues pointer to the list of power values
      *
      *  \return \c TDICE_FAILURE if the queue \a pvalues is empty
@@ -266,7 +266,7 @@ extern "C"
 
     Error_t insert_power_values_floorplan_element
 
-        (FloorplanElement_t *this, PowersQueue_t *pvalues) ;
+        (FloorplanElement_t *flpel, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

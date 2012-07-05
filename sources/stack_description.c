@@ -43,80 +43,80 @@
 
 /******************************************************************************/
 
-void init_stack_description (StackDescription_t *this)
+void init_stack_description (StackDescription_t *stkd)
 {
-    this->FileName           = NULL ;
-    this->MaterialsList      = NULL ;
-    this->HeatSink           = NULL ;
-    this->Channel            = NULL ;
-    this->LayersList         = NULL ;
-    this->DiesList           = NULL ;
-    this->Dimensions         = NULL ;
-    this->TopStackElement    = NULL ;
-    this->BottomStackElement = NULL ;
+    stkd->FileName           = NULL ;
+    stkd->MaterialsList      = NULL ;
+    stkd->HeatSink           = NULL ;
+    stkd->Channel            = NULL ;
+    stkd->LayersList         = NULL ;
+    stkd->DiesList           = NULL ;
+    stkd->Dimensions         = NULL ;
+    stkd->TopStackElement    = NULL ;
+    stkd->BottomStackElement = NULL ;
 }
 
 /******************************************************************************/
 
-void destroy_stack_description (StackDescription_t *this)
+void destroy_stack_description (StackDescription_t *stkd)
 {
-    FREE_POINTER (free,                     this->FileName) ;
-    FREE_POINTER (free_materials_list,      this->MaterialsList) ;
-    FREE_POINTER (free_heat_sink,           this->HeatSink) ;
-    FREE_POINTER (free_channel,             this->Channel) ;
-    FREE_POINTER (free_layers_list,         this->LayersList) ;
-    FREE_POINTER (free_dies_list,           this->DiesList) ;
-    FREE_POINTER (free_dimensions,          this->Dimensions) ;
-    FREE_POINTER (free_stack_elements_list, this->BottomStackElement) ;
+    FREE_POINTER (free,                     stkd->FileName) ;
+    FREE_POINTER (free_materials_list,      stkd->MaterialsList) ;
+    FREE_POINTER (free_heat_sink,           stkd->HeatSink) ;
+    FREE_POINTER (free_channel,             stkd->Channel) ;
+    FREE_POINTER (free_layers_list,         stkd->LayersList) ;
+    FREE_POINTER (free_dies_list,           stkd->DiesList) ;
+    FREE_POINTER (free_dimensions,          stkd->Dimensions) ;
+    FREE_POINTER (free_stack_elements_list, stkd->BottomStackElement) ;
 
-    this->TopStackElement = NULL ;
+    stkd->TopStackElement = NULL ;
 }
 
 /******************************************************************************/
 
 void print_stack_description
 (
-  StackDescription_t *this,
+  StackDescription_t *stkd,
   FILE               *stream,
   String_t            prefix
 )
 {
-    if (this->MaterialsList != NULL)
+    if (stkd->MaterialsList != NULL)
     {
-        print_materials_list (this->MaterialsList, stream, prefix) ;
+        print_materials_list (stkd->MaterialsList, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    if (this->HeatSink != NULL)
+    if (stkd->HeatSink != NULL)
     {
-        print_heat_sink (this->HeatSink, stream, prefix) ;
+        print_heat_sink (stkd->HeatSink, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    if (this->Channel != NULL)
+    if (stkd->Channel != NULL)
     {
         print_channel
 
-            (this->Channel, stream, prefix, this->Dimensions) ;
+            (stkd->Channel, stream, prefix, stkd->Dimensions) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_layers_list (this->LayersList, stream, prefix) ;
+    print_layers_list (stkd->LayersList, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_dies_list (this->DiesList, stream, prefix) ;
+    print_dies_list (stkd->DiesList, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_dimensions (this->Dimensions, stream, prefix) ;
+    print_dimensions (stkd->Dimensions, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_stack_elements_list (this->TopStackElement, stream, prefix) ;
+    print_stack_elements_list (stkd->TopStackElement, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 }
@@ -125,13 +125,13 @@ void print_stack_description
 
 Quantity_t get_number_of_floorplan_elements
 (
-  StackDescription_t *this,
+  StackDescription_t *stkd,
   String_t            stack_element_id
 )
 {
     StackElement_t *stack_element = find_stack_element_in_list
 
-        (this->BottomStackElement, stack_element_id) ;
+        (stkd->BottomStackElement, stack_element_id) ;
 
     if (stack_element == NULL)
 
@@ -142,13 +142,13 @@ Quantity_t get_number_of_floorplan_elements
 
 /******************************************************************************/
 
-Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *this)
+Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd)
 {
     Quantity_t tmp = 0u ;
 
     FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-        (StackElement_t, stack_element, this->BottomStackElement)
+        (StackElement_t, stack_element, stkd->BottomStackElement)
 
         tmp += get_number_of_floorplan_elements_stack_element (stack_element) ;
 

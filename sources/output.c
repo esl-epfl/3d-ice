@@ -44,27 +44,27 @@
 
 /******************************************************************************/
 
-void init_output (Output_t *this)
+void init_output (Output_t *output)
 {
-    this->InspectionPointListFinal = NULL ;
-    this->InspectionPointListSlot  = NULL ;
-    this->InspectionPointListStep  = NULL ;
+    output->InspectionPointListFinal = NULL ;
+    output->InspectionPointListSlot  = NULL ;
+    output->InspectionPointListStep  = NULL ;
 }
 
 /******************************************************************************/
 
-void destroy_output (Output_t *this)
+void destroy_output (Output_t *output)
 {
-    FREE_LIST (InspectionPoint_t, this->InspectionPointListFinal, free_inspection_point) ;
-    FREE_LIST (InspectionPoint_t, this->InspectionPointListSlot, free_inspection_point) ;
-    FREE_LIST (InspectionPoint_t, this->InspectionPointListStep, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, output->InspectionPointListFinal, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, output->InspectionPointListSlot, free_inspection_point) ;
+    FREE_LIST (InspectionPoint_t, output->InspectionPointListStep, free_inspection_point) ;
 }
 
 /******************************************************************************/
 
 Quantity_t get_number_of_inspection_points
 (
-    Output_t         *this,
+    Output_t         *output,
     OutputInstant_t   instant,
     OutputType_t      type,
     OutputQuantity_t  quantity
@@ -76,15 +76,15 @@ Quantity_t get_number_of_inspection_points
 
     if (instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = this->InspectionPointListFinal ;
+        list = output->InspectionPointListFinal ;
 
     else if (instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = this->InspectionPointListStep ;
+        list = output->InspectionPointListStep ;
 
     else if (instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = this->InspectionPointListSlot ;
+        list = output->InspectionPointListSlot ;
 
     else
 
@@ -103,7 +103,7 @@ Quantity_t get_number_of_inspection_points
 
 void print_output
 (
-    Output_t *this,
+    Output_t *output,
     FILE     *stream,
     String_t  prefix
 )
@@ -114,19 +114,19 @@ void print_output
 
     print_inspection_point_list
 
-        (this->InspectionPointListFinal, stream, prefix) ;
+        (output->InspectionPointListFinal, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
     print_inspection_point_list
 
-        (this->InspectionPointListSlot, stream, prefix) ;
+        (output->InspectionPointListSlot, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
     print_inspection_point_list
 
-        (this->InspectionPointListStep, stream, prefix) ;
+        (output->InspectionPointListStep, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 }
@@ -135,7 +135,7 @@ void print_output
 
 void add_inspection_point
 (
-    Output_t          *this,
+    Output_t          *output,
     InspectionPoint_t *inspection_point
 )
 {
@@ -143,15 +143,15 @@ void add_inspection_point
 
     if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = &this->InspectionPointListFinal ;
+        list = &output->InspectionPointListFinal ;
 
     else if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = &this->InspectionPointListSlot ;
+        list = &output->InspectionPointListSlot ;
 
     else if (inspection_point->Instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = &this->InspectionPointListStep ;
+        list = &output->InspectionPointListStep ;
 
     while (*list != NULL) list = &( (*list)->Next ) ;
 
@@ -164,24 +164,24 @@ void add_inspection_point
 
 Error_t generate_output_headers
 (
-    Output_t     *this,
+    Output_t     *output,
     Dimensions_t *dimensions,
     String_t      prefix
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, final, this->InspectionPointListFinal)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, final, output->InspectionPointListFinal)
 
         if (generate_inspection_point_header (final, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, slot, this->InspectionPointListSlot)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, slot, output->InspectionPointListSlot)
 
         if (generate_inspection_point_header (slot, dimensions, prefix) != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, step, this->InspectionPointListStep)
+    FOR_EVERY_ELEMENT_IN_LIST_NEXT (InspectionPoint_t, step, output->InspectionPointListStep)
 
         if (generate_inspection_point_header (step, dimensions, prefix) != TDICE_SUCCESS)
 
@@ -194,7 +194,7 @@ Error_t generate_output_headers
 
 Error_t generate_output
 (
-    Output_t        *this,
+    Output_t        *output,
     Dimensions_t    *dimensions,
     Temperature_t   *temperatures,
     Source_t        *sources,
@@ -206,15 +206,15 @@ Error_t generate_output
 
     if (output_instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = this->InspectionPointListFinal ;
+        list = output->InspectionPointListFinal ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = this->InspectionPointListStep ;
+        list = output->InspectionPointListStep ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = this->InspectionPointListSlot ;
+        list = output->InspectionPointListSlot ;
 
     else
 
@@ -238,7 +238,7 @@ Error_t generate_output
 
 Error_t fill_output_message
 (
-    Output_t         *this,
+    Output_t         *output,
     Dimensions_t     *dimensions,
     Temperature_t    *temperatures,
     Source_t         *sources,
@@ -252,15 +252,15 @@ Error_t fill_output_message
 
     if (output_instant == TDICE_OUTPUT_INSTANT_FINAL)
 
-        list = this->InspectionPointListFinal ;
+        list = output->InspectionPointListFinal ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_STEP)
 
-        list = this->InspectionPointListStep ;
+        list = output->InspectionPointListStep ;
 
     else if (output_instant == TDICE_OUTPUT_INSTANT_SLOT)
 
-        list = this->InspectionPointListSlot ;
+        list = output->InspectionPointListSlot ;
 
     else
 

@@ -1089,7 +1089,9 @@ stack
         // Stores the vertical profile of cell heights
 
         stkd->Dimensions->Cell.NHeights = layer_index ;
-        stkd->Dimensions->Cell.Heights  = malloc (layer_index * sizeof (CellDimension_t)) ;
+        stkd->Dimensions->Cell.Heights  =
+
+            (CellDimension_t *) malloc (layer_index * sizeof (CellDimension_t)) ;
 
         if (stkd->Dimensions->Cell.Heights == NULL)
         {
@@ -1895,81 +1897,3 @@ void stack_description_error
 }
 
 /******************************************************************************/
-
-Error_t parse_stack_description_file
-(
-    String_t            filename,
-    StackDescription_t *stkd,
-    Analysis_t         *analysis,
-    Output_t           *output
-)
-{
-    FILE*    input ;
-    int      result ;
-    yyscan_t scanner ;
-
-    input = fopen (filename, "r") ;
-    if (input == NULL)
-    {
-        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    stkd->FileName = strdup (filename) ;  // FIXME memory leak
-
-    stack_description_lex_init (&scanner) ;
-    stack_description_set_in (input, scanner) ;
-
-    result = stack_description_parse (stkd, analysis, output, scanner) ;
-
-    stack_description_lex_destroy (scanner) ;
-    fclose (input) ;
-
-//  From Bison manual:
-//  The value returned by yyparse is 0 if parsing was successful (return is
-//  due to end-of-input). The value is 1 if parsing failed (return is due to
-//  a syntax error).
-
-    if (result == 0)
-
-        return TDICE_SUCCESS ;
-
-    else
-
-        return TDICE_FAILURE ;
-}
-
-/******************************************************************************/
-
-Error_t generate_stack_description_file
-(
-    String_t            filename,
-    StackDescription_t *stkd,
-    Analysis_t         *analysis,
-    Output_t           *output
-)
-{
-    FILE *out = fopen (filename, "w") ;
-
-    if (out == NULL)
-    {
-        fprintf (stderr, "Unable to open stack file %s\n", filename) ;
-
-        return TDICE_FAILURE ;
-    }
-
-    print_stack_description (stkd, out, "") ;
-
-    fprintf (out, "\n") ;
-
-    print_analysis (analysis, out, "") ;
-
-    fprintf (out, "\n") ;
-
-    print_output (output, out, "") ;
-
-    fclose (out) ;
-
-    return TDICE_SUCCESS ;
-}

@@ -110,18 +110,18 @@ extern "C"
 /******************************************************************************/
 
 
-    /*! Sets all the fields of \a this to a default value (zero or \c NULL ).
+    /*! Sets all the fields of \a flpmatrix to a default value (zero or \c NULL ).
      *
-     * \param this the address of the floorplan matrix to initialize
+     * \param flpmatrix the address of the floorplan matrix to initialize
      */
 
-    void init_floorplan_matrix (FloorplanMatrix_t *this) ;
+    void init_floorplan_matrix (FloorplanMatrix_t *flpmatrix) ;
 
 
 
     /*! Allocates memory to store indexes and coefficients of a FloorplanMatrix
      *
-     * \param this     the address of the floorplan matrix
+     * \param flpmatrix     the address of the floorplan matrix
      * \param nrows    the number of rows of the matrix
      * \param ncolumns the number of columns of the matrix
      * \param nnz      the number of nonzeroes coeffcients
@@ -132,7 +132,7 @@ extern "C"
 
     Error_t build_floorplan_matrix
     (
-        FloorplanMatrix_t *this,
+        FloorplanMatrix_t *flpmatrix,
         CellIndex_t        nrows,
         CellIndex_t        ncolumns,
         CellIndex_t        nnz
@@ -142,10 +142,10 @@ extern "C"
 
     /*! Frees the memory used to store indexes and coefficients of a floorplan matrix
      *
-     * \param this the address of the floorplan matrix structure
+     * \param flpmatrix the address of the floorplan matrix structure
      */
 
-    void destroy_floorplan_matrix (FloorplanMatrix_t *this) ;
+    void destroy_floorplan_matrix (FloorplanMatrix_t *flpmatrix) ;
 
 
 
@@ -154,14 +154,14 @@ extern "C"
      *  The function fills, floorplan element by floorplan element, all
      *  the columns of the floorplan matrix.
      *
-     *  \param this       pointer to the floorplan matrix to fill
+     *  \param flpmatrix       pointer to the floorplan matrix to fill
      *  \param list       pointer to the list of floorplan elements
      *  \param dimensions pointer to the structure containing the dimensions of the IC
      */
 
     void fill_floorplan_matrix
     (
-        FloorplanMatrix_t  *this,
+        FloorplanMatrix_t  *flpmatrix,
         FloorplanElement_t *list,
         Dimensions_t       *dimensions
     ) ;
@@ -170,7 +170,7 @@ extern "C"
 
     /*! Performs a Matrix-Vector Multiplication x = Ab
      *
-     * \param this pointer to the (floorplan) matrix \a A
+     * \param flpmatrix pointer to the (floorplan) matrix \a A
      * \param x    pointer to the output vector \a x
      * \param b    pointer to the input vector \a b
      *
@@ -178,7 +178,7 @@ extern "C"
 
     void multiply_floorplan_matrix
 
-        (FloorplanMatrix_t *this, Source_t *x, Source_t *b) ;
+        (FloorplanMatrix_t *flpmatrix, Source_t *x, Source_t *b) ;
 
 
 
@@ -188,11 +188,11 @@ extern "C"
      * zero coefficient (COO format). The first row (or column) has index 1
      * (matlab compatibile)
      *
-     * \param this      the floorplan matrix structure
+     * \param flpmatrix      the floorplan matrix structure
      * \param file_name the name of the file to create
      */
 
-    void print_floorplan_matrix (FloorplanMatrix_t this, String_t file_name) ;
+    void print_floorplan_matrix (FloorplanMatrix_t flpmatrix, String_t file_name) ;
 
 /******************************************************************************/
 

@@ -105,10 +105,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the layer structure to initialize
+     * \param layer the address of the layer structure to initialize
      */
 
-    void init_layer (Layer_t *this) ;
+    void init_layer (Layer_t *layer) ;
 
 
 
@@ -122,16 +122,16 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a layer
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_layer . If \a this is \c NULL,
+     * The pointer \a layer must have been returned by a previous call
+     * to \a calloc_layer . If \a layer is \c NULL,
      * no operation is performed.
      *
-     * \param this the address to free
+     * \param layer the address to free
      */
 
-    void free_layer (Layer_t *this) ;
+    void free_layer (Layer_t *layer) ;
 
 
 
@@ -165,12 +165,12 @@ extern "C"
 
     /*! Prints the layer as it looks in the stack file
      *
-     * \param this  the layer to print
+     * \param layer  the layer to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_layer (Layer_t *this, FILE *stream, String_t prefix) ;
+    void print_layer (Layer_t *layer, FILE *stream, String_t prefix) ;
 
 
 

@@ -101,46 +101,46 @@ extern "C"
 
     /*! Init a thermal grid using default values
      *
-     * \param this the address of the thermal grid to initialize
+     * \param tgrid the address of the thermal grid to initialize
      */
 
-    void init_thermal_grid (ThermalGrid_t *this) ;
+    void init_thermal_grid (ThermalGrid_t *tgrid) ;
 
 
 
     /*! Alloc memory to store thermal grid informations
      *
-     * \param this  pointer to the thermal grid structure
+     * \param tgrid  pointer to the thermal grid structure
      * \param size  the number of layers in the 3d stack
      *
      * \return \c TDICE_ERROR   if the memory allocation fails
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t build_thermal_grid (ThermalGrid_t *this, Quantity_t size) ;
+    Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size) ;
 
 
 
     /*! Release the memory used by the thermal grid (i.e. the memory allocated
      *  by \a build_thermal_grid )
      *
-     * \param this the address of the thermal grid
+     * \param tgrid the address of the thermal grid
      */
 
-    void destroy_thermal_grid (ThermalGrid_t *this) ;
+    void destroy_thermal_grid (ThermalGrid_t *tgrid) ;
 
 
 
     /*! Fills a thermal grid
      *
-     *  \param this pointer to the thermal grid
+     *  \param tgrid pointer to the thermal grid
      *  \param list pointer to the list of stack elements
      * \param  dimensions pointer to the structure storing the dimensions
      */
 
     void fill_thermal_grid
     (
-        ThermalGrid_t  *this,
+        ThermalGrid_t  *tgrid,
         StackElement_t *list,
         Dimensions_t   *dimensions
     ) ;
@@ -151,7 +151,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -163,7 +163,7 @@ extern "C"
 
     Capacity_t get_capacity
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -176,7 +176,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -188,7 +188,7 @@ extern "C"
 
     Conductance_t get_conductance_top
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -201,7 +201,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -213,7 +213,7 @@ extern "C"
 
     Conductance_t get_conductance_bottom
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -226,7 +226,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -238,7 +238,7 @@ extern "C"
 
     Conductance_t get_conductance_north
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -251,7 +251,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -263,7 +263,7 @@ extern "C"
 
     Conductance_t get_conductance_south
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -276,7 +276,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -288,7 +288,7 @@ extern "C"
 
     Conductance_t get_conductance_east
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,
@@ -301,7 +301,7 @@ extern "C"
      *
      * The function prints a message on stderr in case of error
      *
-     * \param this         pointer to the thermal grid structure
+     * \param tgrid         pointer to the thermal grid structure
      * \param dimensions   pointer to the structure storing the dimensions
      * \param layer_index  the index of the layer
      * \param row_index    the index of the row
@@ -313,7 +313,7 @@ extern "C"
 
     Conductance_t get_conductance_west
     (
-        ThermalGrid_t *this,
+        ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
         CellIndex_t    layer_index,
         CellIndex_t    row_index,

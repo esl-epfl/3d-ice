@@ -105,16 +105,16 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the power grid structure to initialize
+     * \param pgrid the address of the power grid structure to initialize
      */
 
-    void init_power_grid (PowerGrid_t *this) ;
+    void init_power_grid (PowerGrid_t *pgrid) ;
 
 
 
     /*! Allocs internal memory to store power grid informations
      *
-     * \param this    pointer to the power grid structure
+     * \param pgrid    pointer to the power grid structure
      * \param nlayers the number of layers in the 3d stack
      * \param ncells  the number of cells in the 3d stack
      *
@@ -124,7 +124,7 @@ extern "C"
 
     Error_t build_power_grid
     (
-        PowerGrid_t *this,
+        PowerGrid_t *pgrid,
         Quantity_t   nlayers,
         Quantity_t   ncells
     ) ;
@@ -134,26 +134,26 @@ extern "C"
     /*! Release the memory used by the power grid
      *  (i.e. the memory allocated by \a build_power_grid )
      *
-     * \param this the address of the power grid
+     * \param pgrid the address of the power grid
      */
 
-    void destroy_power_grid (PowerGrid_t *this) ;
+    void destroy_power_grid (PowerGrid_t *pgrid) ;
 
 
 
     /*! Fills a power grid
      *
-     *  \param this pointer to the power grid
+     *  \param pgrid pointer to the power grid
      *  \param list pointer to the list of stack elements
      */
 
-    void fill_power_grid (PowerGrid_t *this, StackElement_t *list) ;
+    void fill_power_grid (PowerGrid_t *pgrid, StackElement_t *list) ;
 
 
 
     /*! Update the source vector
      *
-     * \param this address of the PowerGrid structure storing the sources
+     * \param pgrid address of the PowerGrid structure storing the sources
      * \param thermal_grid pointer to the ThermalGrid structure
      * \param dimensions the dimensions of the IC
      *
@@ -165,7 +165,7 @@ extern "C"
 
     Error_t update_source_vector
     (
-        PowerGrid_t    *this,
+        PowerGrid_t    *pgrid,
         ThermalGrid_t  *thermal_grid,
         Dimensions_t   *dimensions
     ) ;
@@ -174,12 +174,12 @@ extern "C"
 
     /*! Update channel sources
      *
-     * \param this address of the PowerGrid structure storing the sources
+     * \param pgrid address of the PowerGrid structure storing the sources
      * \param dimensions the dimensions of the IC
      *
      */
 
-    void update_channel_sources (PowerGrid_t *this, Dimensions_t *dimensions) ;
+    void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions) ;
 
 
 
@@ -196,7 +196,7 @@ extern "C"
      *  first \c n power values will be given to \c A and the remaining will
      *  be assigned to \c B
      *
-     *  \param this    address of the PowerGrid structure
+     *  \param pgrid    address of the PowerGrid structure
      *  \param pvalues pointer to the list of power values
      *
      *  \return \c TDICE_FAILURE if the queue \a pvalues does not
@@ -204,7 +204,7 @@ extern "C"
      *  \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t insert_power_values (PowerGrid_t *this, PowersQueue_t *pvalues) ;
+    Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues) ;
 
 /******************************************************************************/
 

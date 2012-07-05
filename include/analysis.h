@@ -97,10 +97,10 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the analysis structure to initialize
+     * \param analysis the address of the analysis structure to initialize
      */
 
-    void init_analysis (Analysis_t *this) ;
+    void init_analysis (Analysis_t *analysis) ;
 
 
 
@@ -114,40 +114,40 @@ extern "C"
 
 
 
-    /*! Frees the memory space pointed to by \a this
+    /*! Frees the memory space pointed to by \a analysis
      *
-     * The pointer \a this must have been returned by a previous call
-     * to \a calloc_analysis . If \a this is \c NULL, no operation is performed.
+     * The pointer \a analysis must have been returned by a previous call
+     * to \a calloc_analysis . If \a analysis is \c NULL, no operation is performed.
      *
-     * \param this the address to free
+     * \param analysis the address to free
      */
 
-    void free_analysis (Analysis_t *this) ;
+    void free_analysis (Analysis_t *analysis) ;
 
 
 
     /*! Returns the time, in seconds, sum of the time steps emulated so far
      *
-     * \param this the address of the analysis structure
+     * \param analysis the address of the analysis structure
      * \return the simulated amount of time in seconds
      */
 
-    Time_t get_simulated_time (Analysis_t *this) ;
+    Time_t get_simulated_time (Analysis_t *analysis) ;
 
 
 
     /*! Increase the simulation time by a step
      *
-     * \param this the address of the analysis structure
+     * \param analysis the address of the analysis structure
      */
 
-    void increase_by_step_time (Analysis_t *this) ;
+    void increase_by_step_time (Analysis_t *analysis) ;
 
 
 
     /*! Returns the state of the slot simulation
      *
-     * \param this the address of the analysis structure
+     * \param analysis the address of the analysis structure
      *
      * \return \c TRUE  if the number of simulation steps done so far matches a
      *                  multiple of the slot length, i.e. it is time to update
@@ -155,18 +155,18 @@ extern "C"
      * \return \c FALSE otherwise
      */
 
-    bool slot_completed (Analysis_t *this) ;
+    bool slot_completed (Analysis_t *analysis) ;
 
 
 
     /*! Prints the analysis informations as they look in the stack file
      *
-     * \param this   the analysis information to print
+     * \param analysis   the analysis information to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_analysis (Analysis_t *this, FILE *stream, String_t prefix) ;
+    void print_analysis (Analysis_t *analysis, FILE *stream, String_t prefix) ;
 
 
 /******************************************************************************/

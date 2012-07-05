@@ -92,39 +92,39 @@ extern "C"
 
     /*! Sets all the fields to a default value (zero or \c NULL ).
      *
-     * \param this the address of the output structure to initialize
+     * \param output the address of the output structure to initialize
      */
 
-    void init_output (Output_t *this) ;
+    void init_output (Output_t *output) ;
 
 
 
     /*! Frees the memory used by the output structure, i.e. releases the
      * memory used to store the inspection points.
      *
-     * The parametrer \a this must be the address of a static variable
+     * The parametrer \a output must be the address of a static variable
      *
-     * \param this the address of the output structure to free
+     * \param output the address of the output structure to free
      */
 
-    void destroy_output (Output_t *this) ;
+    void destroy_output (Output_t *output) ;
 
 
 
     /*! Returns the number of a specific type of insection point
      *
-     *  \param this     the address of the output structure to query
+     *  \param output     the address of the output structure to query
      *  \param instant  the instant of the output (slot, step, final)
      *  \param type     the type of the inspection point (tcell, tmap, ...)
      *  \param quantity the quantity to be measured (max, min, avg)
      *
-     *  \return the number of inspection points recorded in \a this
+     *  \return the number of inspection points recorded in \a output
      *  \return \c 0 if either \a instant or \a type are not known
      */
 
     Quantity_t get_number_of_inspection_points
     (
-        Output_t         *this,
+        Output_t         *output,
         OutputInstant_t   instant,
         OutputType_t      type,
         OutputQuantity_t  quantity
@@ -134,24 +134,24 @@ extern "C"
 
     /*! Prints the output informations as they look in the stack file
      *
-     * \param this   the output information to print
+     * \param output   the output information to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_output (Output_t *this, FILE *stream, String_t prefix) ;
+    void print_output (Output_t *output, FILE *stream, String_t prefix) ;
 
 
 
     /*! Inserts an inspection point into the corresponding queue
      *
-     * \param this             pointer to the output structure
+     * \param output             pointer to the output structure
      * \param inspection_point pointer to the inspection point to add
      */
 
     void add_inspection_point
 
-        (Output_t *this, InspectionPoint_t *inspection_point) ;
+        (Output_t *output, InspectionPoint_t *inspection_point) ;
 
 
 
@@ -160,7 +160,7 @@ extern "C"
      * Generates, for every inspection point, the output file and print the header
      * If the target output file is already there, it will be overwritten.
      *
-     * \param this       pointer to the output structure
+     * \param output       pointer to the output structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param prefix string to be printed as suffix for every line in the header
      *
@@ -170,13 +170,13 @@ extern "C"
 
     Error_t generate_output_headers
 
-        (Output_t *this, Dimensions_t *dimensions, String_t prefix) ;
+        (Output_t *output, Dimensions_t *dimensions, String_t prefix) ;
 
 
 
     /*! Generates thermal outputs for each inspection point
      *
-     * \param this       pointer to the output structure
+     * \param output       pointer to the output structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
@@ -189,7 +189,7 @@ extern "C"
 
     Error_t generate_output
     (
-        Output_t        *this,
+        Output_t        *output,
         Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
         Source_t        *sources,
@@ -202,7 +202,7 @@ extern "C"
     /*! Fills a network message with thermal outputs for a specific
      *  set of inspection points
      *
-     * \param this       pointer to the output structure
+     * \param output       pointer to the output structure
      * \param dimensions pointer to the structure containing the dimensions of the IC
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
@@ -217,7 +217,7 @@ extern "C"
 
     Error_t fill_output_message
     (
-        Output_t         *this,
+        Output_t         *output,
         Dimensions_t     *dimensions,
         Temperature_t    *temperatures,
         Source_t         *sources,

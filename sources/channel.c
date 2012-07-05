@@ -41,33 +41,33 @@
 #include "channel.h"
 #include "macros.h"
 
-void init_coolant (Coolant_t *this)
+void init_coolant (Coolant_t *coolant)
 {
-    this->HTCSide       = (CoolantHTC_t) 0.0 ;
-    this->HTCTop        = (CoolantHTC_t) 0.0 ;
-    this->HTCBottom     = (CoolantHTC_t) 0.0 ;
-    this->VHC           = (CoolantVHC_t) 0.0 ;
-    this->FlowRate      = (CoolantFR_t) 0.0 ;
-    this->DarcyVelocity = (DarcyVelocity_t) 0.0 ;
-    this->TIn           = (Temperature_t) 0.0 ;
+    coolant->HTCSide       = (CoolantHTC_t) 0.0 ;
+    coolant->HTCTop        = (CoolantHTC_t) 0.0 ;
+    coolant->HTCBottom     = (CoolantHTC_t) 0.0 ;
+    coolant->VHC           = (CoolantVHC_t) 0.0 ;
+    coolant->FlowRate      = (CoolantFR_t) 0.0 ;
+    coolant->DarcyVelocity = (DarcyVelocity_t) 0.0 ;
+    coolant->TIn           = (Temperature_t) 0.0 ;
 }
 
 /******************************************************************************/
 
-void init_channel (Channel_t *this)
+void init_channel (Channel_t *channel)
 {
-    this->ChannelModel      = (ChannelModel_t) TDICE_CHANNEL_MODEL_NONE ;
-    this->Height            = (CellDimension_t) 0.0 ;
-    this->Length            = (ChannelDimension_t) 0.0 ;
-    this->Pitch             = (ChannelDimension_t) 0.0 ;
-    this->Porosity          = (ChannelDimension_t) 0.0 ;
-    this->NChannels         = (Quantity_t) 0u ;
-    this->NLayers           = (CellIndex_t) 0u ;
-    this->SourceLayerOffset = (CellIndex_t) 0u ;
+    channel->ChannelModel      = (ChannelModel_t) TDICE_CHANNEL_MODEL_NONE ;
+    channel->Height            = (CellDimension_t) 0.0 ;
+    channel->Length            = (ChannelDimension_t) 0.0 ;
+    channel->Pitch             = (ChannelDimension_t) 0.0 ;
+    channel->Porosity          = (ChannelDimension_t) 0.0 ;
+    channel->NChannels         = (Quantity_t) 0u ;
+    channel->NLayers           = (CellIndex_t) 0u ;
+    channel->SourceLayerOffset = (CellIndex_t) 0u ;
 
-    init_coolant ( &this->Coolant ) ;
+    init_coolant ( &channel->Coolant ) ;
 
-    this->WallMaterial = NULL ;
+    channel->WallMaterial = NULL ;
 }
 
 /******************************************************************************/
@@ -85,27 +85,27 @@ Channel_t *calloc_channel ( void )
 
 /******************************************************************************/
 
-void free_channel (Channel_t *this)
+void free_channel (Channel_t *channel)
 {
-    if (this != NULL)
+    if (channel != NULL)
 
-        FREE_POINTER (free, this) ;
+        FREE_POINTER (free, channel) ;
 }
 
 /******************************************************************************/
 
 void print_channel
 (
-    Channel_t    *this,
+    Channel_t    *channel,
     FILE         *stream,
     String_t      prefix,
     Dimensions_t *dimensions
 )
 {
-    if (this->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_4RM)
     {
         fprintf (stream, "%smicrochannel 4rm :\n", prefix) ;
-        fprintf (stream, "%s   height            %7.1f ;\n", prefix, this->Height) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, dimensions->Cell.ChannelLength) ;
         fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, dimensions->Cell.WallLength) ;
@@ -113,75 +113,75 @@ void print_channel
         fprintf (stream, "%s   first wall length %7.1f ;\n", prefix, dimensions->Cell.FirstWallLength) ;
         fprintf (stream, "%s    last wall length %7.1f ;\n", prefix, dimensions->Cell.LastWallLength) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   wall material %s ;\n", prefix, this->WallMaterial->Id) ;
+        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(this->Coolant.FlowRate)) ;
+        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->Coolant.FlowRate)) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant heat transfer coefficient side   %.4e ,\n", prefix, this->Coolant.HTCSide) ;
-        fprintf (stream, "%s                                     top    %.4e ,\n", prefix, this->Coolant.HTCTop) ;
-        fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, this->Coolant.HTCBottom) ;
+        fprintf (stream, "%s   coolant heat transfer coefficient side   %.4e ,\n", prefix, channel->Coolant.HTCSide) ;
+        fprintf (stream, "%s                                     top    %.4e ,\n", prefix, channel->Coolant.HTCTop) ;
+        fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, channel->Coolant.HTCBottom) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, this->Coolant.VHC) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, this->Coolant.TIn ) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
     }
 
-    if (this->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM)
     {
         fprintf (stream, "%smicrochannel 2rm :\n", prefix) ;
-        fprintf (stream, "%s   height            %7.1f ;\n", prefix, this->Height) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, this->Length) ;
-        fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, this->Pitch - this->Length) ;
+        fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, channel->Length) ;
+        fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, channel->Pitch - channel->Length) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   wall material %s ;\n", prefix, this->WallMaterial->Id) ;
+        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(this->Coolant.FlowRate)) ;
+        fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->Coolant.FlowRate)) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant heat transfer coefficient top    %.4e ,\n", prefix, this->Coolant.HTCTop) ;
-        fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, this->Coolant.HTCBottom) ;
+        fprintf (stream, "%s   coolant heat transfer coefficient top    %.4e ,\n", prefix, channel->Coolant.HTCTop) ;
+        fprintf (stream, "%s                                     bottom %.4e ;\n",  prefix, channel->Coolant.HTCBottom) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, this->Coolant.VHC) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, this->Coolant.TIn ) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
     }
 
-    if (this->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_INLINE)
     {
         fprintf (stream, "%spinfin :\n", prefix) ;
-        fprintf (stream, "%s   height            %7.1f ;\n", prefix, this->Height) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(this->Porosity, this->Pitch)) ;
-        fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, this->Pitch) ;
+        fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(channel->Porosity, channel->Pitch)) ;
+        fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, channel->Pitch) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin distribution inline ;\n", prefix) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   pin material %s ;\n", prefix, this->WallMaterial->Id) ;
+        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, this->Coolant.DarcyVelocity) ;
+        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->Coolant.DarcyVelocity) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, this->Coolant.VHC) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, this->Coolant.TIn ) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
     }
 
-    if (this->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
+    if (channel->ChannelModel == TDICE_CHANNEL_MODEL_PF_STAGGERED)
     {
         fprintf (stream, "%spinfin :\n", prefix) ;
-        fprintf (stream, "%s   height            %7.1f ;\n", prefix, this->Height) ;
+        fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(this->Porosity, this->Pitch)) ;
-        fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, this->Pitch) ;
+        fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(channel->Porosity, channel->Pitch)) ;
+        fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, channel->Pitch) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin distribution staggered ;\n", prefix) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   pin material %s ;\n", prefix, this->WallMaterial->Id) ;
+        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, this->Coolant.DarcyVelocity) ;
+        fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->Coolant.DarcyVelocity) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, this->Coolant.VHC) ;
+        fprintf (stream, "%s   coolant volumetric heat capacity %.4e ;\n", prefix, channel->Coolant.VHC) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, this->Coolant.TIn ) ;
+        fprintf (stream, "%s   coolant incoming temperature  %.2f ;\n", prefix, channel->Coolant.TIn ) ;
     }
 }
 
@@ -189,7 +189,7 @@ void print_channel
 
 Cconv_t get_convective_term
 (
-    Channel_t    *this,
+    Channel_t    *channel,
     Dimensions_t *dimensions,
     CellIndex_t   layer_index,
     CellIndex_t   __attribute__ ((unused)) row_index,
@@ -198,14 +198,14 @@ Cconv_t get_convective_term
 {
     Cconv_t C = 0.0 ;
 
-    switch (this->ChannelModel)
+    switch (channel->ChannelModel)
     {
         case TDICE_CHANNEL_MODEL_MC_4RM :
 
             C = CCONV_MC_4RM
 
-                (this->NChannels, this->Coolant.VHC,
-                 this->Coolant.FlowRate);
+                (channel->NChannels, channel->Coolant.VHC,
+                 channel->Coolant.FlowRate);
 
             break ;
 
@@ -213,10 +213,10 @@ Cconv_t get_convective_term
 
             C = CCONV_MC_2RM
 
-                (this->NChannels,        this->Coolant.VHC,
-                 this->Coolant.FlowRate, this->Porosity,
+                (channel->NChannels,        channel->Coolant.VHC,
+                 channel->Coolant.FlowRate, channel->Porosity,
                  get_cell_length (dimensions, column_index),
-                 this->Length) ;
+                 channel->Length) ;
 
             break ;
 
@@ -225,7 +225,7 @@ Cconv_t get_convective_term
 
             C = CCONV_PF
 
-                (this->Coolant.VHC, this->Coolant.DarcyVelocity,
+                (channel->Coolant.VHC, channel->Coolant.DarcyVelocity,
                  get_cell_length (dimensions, column_index),
                  get_cell_height (dimensions, layer_index));
 
@@ -240,7 +240,7 @@ Cconv_t get_convective_term
         default :
 
             fprintf (stderr, "ERROR: unknown channel model %d\n",
-                this->ChannelModel) ;
+                channel->ChannelModel) ;
     }
 
     return C ;
@@ -250,7 +250,7 @@ Cconv_t get_convective_term
 
 Temperature_t get_max_temperature_channel_outlet
 (
-    Channel_t     *this,
+    Channel_t     *channel,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
@@ -263,7 +263,7 @@ Temperature_t get_max_temperature_channel_outlet
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-        if (IS_CHANNEL_COLUMN(this->ChannelModel, column_index) == true)
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
 
             max = MAX (max, *temperatures) ;
 
@@ -277,7 +277,7 @@ Temperature_t get_max_temperature_channel_outlet
 
 Temperature_t get_min_temperature_channel_outlet
 (
-    Channel_t     *this,
+    Channel_t     *channel,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
@@ -290,7 +290,7 @@ Temperature_t get_min_temperature_channel_outlet
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-        if (IS_CHANNEL_COLUMN(this->ChannelModel, column_index) == true)
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
 
             min = MIN (min, *temperatures) ;
 
@@ -304,7 +304,7 @@ Temperature_t get_min_temperature_channel_outlet
 
 Temperature_t get_avg_temperature_channel_outlet
 (
-    Channel_t     *this,
+    Channel_t     *channel,
     Dimensions_t  *dimensions,
     Temperature_t *temperatures
 )
@@ -317,14 +317,14 @@ Temperature_t get_avg_temperature_channel_outlet
 
     FOR_EVERY_COLUMN (column_index, dimensions)
     {
-        if (IS_CHANNEL_COLUMN(this->ChannelModel, column_index) == true)
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
 
             avg += *temperatures ;
 
         temperatures++ ;
     }
 
-    return avg / (Temperature_t) this->NChannels ;
+    return avg / (Temperature_t) channel->NChannels ;
 }
 
 /******************************************************************************/
