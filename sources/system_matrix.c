@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_system_matrix (SystemMatrix_t* sysmatrix)
+void system_matrix_init (SystemMatrix_t* sysmatrix)
 {
     sysmatrix->ColumnPointers = NULL ;
     sysmatrix->RowIndices     = NULL;
@@ -77,7 +77,7 @@ void init_system_matrix (SystemMatrix_t* sysmatrix)
 
 /******************************************************************************/
 
-Error_t build_system_matrix
+Error_t system_matrix_build
 (
     SystemMatrix_t *sysmatrix,
     CellIndex_t     size,
@@ -97,7 +97,7 @@ Error_t build_system_matrix
 
     if (sysmatrix->ColumnPointers == NULL)
     {
-        FREE_POINTER (free, sysmatrix->RowIndices) ;
+        free (sysmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
@@ -105,8 +105,8 @@ Error_t build_system_matrix
 
     if (sysmatrix->Values == NULL)
     {
-        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
-        FREE_POINTER (free, sysmatrix->RowIndices) ;
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
@@ -122,9 +122,9 @@ Error_t build_system_matrix
 
     if (sysmatrix->SLU_PermutationMatrixR == NULL )
     {
-        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
-        FREE_POINTER (free, sysmatrix->RowIndices) ;
-        FREE_POINTER (free, sysmatrix->Values) ;
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
 
         Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
@@ -135,13 +135,13 @@ Error_t build_system_matrix
 
     if (sysmatrix->SLU_PermutationMatrixC == NULL )
     {
-        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
-        FREE_POINTER (free, sysmatrix->RowIndices) ;
-        FREE_POINTER (free, sysmatrix->Values) ;
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
 
         Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-        FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixR) ;
+        free (sysmatrix->SLU_PermutationMatrixR) ;
 
         return TDICE_FAILURE ;
     }
@@ -150,14 +150,14 @@ Error_t build_system_matrix
 
     if (sysmatrix->SLU_Etree == NULL)
     {
-        FREE_POINTER (free, sysmatrix->ColumnPointers) ;
-        FREE_POINTER (free, sysmatrix->RowIndices) ;
-        FREE_POINTER (free, sysmatrix->Values) ;
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
 
         Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-        FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixR) ;
-        FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixC) ;
+        free (sysmatrix->SLU_PermutationMatrixR) ;
+        free (sysmatrix->SLU_PermutationMatrixC) ;
 
         return TDICE_FAILURE ;
     }
@@ -220,15 +220,15 @@ Error_t do_factorization (SystemMatrix_t *sysmatrix)
 
 /******************************************************************************/
 
-void destroy_system_matrix (SystemMatrix_t *sysmatrix)
+void system_matrix_destroy (SystemMatrix_t *sysmatrix)
 {
-    FREE_POINTER (free, sysmatrix->ColumnPointers) ;
-    FREE_POINTER (free, sysmatrix->RowIndices) ;
-    FREE_POINTER (free, sysmatrix->Values) ;
+    free (sysmatrix->ColumnPointers) ;
+    free (sysmatrix->RowIndices) ;
+    free (sysmatrix->Values) ;
 
-    FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixR) ;
-    FREE_POINTER (free, sysmatrix->SLU_PermutationMatrixC) ;
-    FREE_POINTER (free, sysmatrix->SLU_Etree) ;
+    free (sysmatrix->SLU_PermutationMatrixR) ;
+    free (sysmatrix->SLU_PermutationMatrixC) ;
+    free (sysmatrix->SLU_Etree) ;
 
     StatFree (&sysmatrix->SLU_Stat) ;
 
@@ -306,7 +306,7 @@ static SystemMatrix_t add_solid_column
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
-        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), c_bottom, c_top) ;
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_bottom, g_top) ;
 #endif
 
 skip_bottom :
@@ -521,7 +521,7 @@ skip_north :
     fprintf (stderr,
         "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
         *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
-        c_top, c_bottom) ;
+        g_top, g_bottom) ;
 #endif
 
 skip_top :
@@ -1597,7 +1597,7 @@ Error_t solve_sparse_linear_system (SystemMatrix_t *sysmatrix, SuperMatrix *b)
 
 /******************************************************************************/
 
-void print_system_matrix (SystemMatrix_t sysmatrix, String_t file_name)
+void system_matrix_print (SystemMatrix_t sysmatrix, String_t file_name)
 {
     FILE* file = fopen (file_name, "w") ;
 

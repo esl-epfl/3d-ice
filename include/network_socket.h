@@ -93,7 +93,7 @@ extern "C"
      * \param socket the address of the Socket to initialize
      */
 
-    void init_socket (Socket_t *socket) ;
+    void socket_init (Socket_t *socket) ;
 
 
 
@@ -215,7 +215,7 @@ extern "C"
      *                          printed on standard error
      */
 
-    Error_t close_socket (Socket_t *socket) ;
+    Error_t socket_close (Socket_t *socket) ;
 
 #ifdef __cplusplus
 }

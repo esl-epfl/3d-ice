@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_floorplan_matrix (FloorplanMatrix_t* flpmatrix)
+void floorplan_matrix_init (FloorplanMatrix_t* flpmatrix)
 {
     flpmatrix->ColumnPointers  = NULL ;
     flpmatrix->RowIndices      = NULL ;
@@ -56,7 +56,36 @@ void init_floorplan_matrix (FloorplanMatrix_t* flpmatrix)
 
 /******************************************************************************/
 
-Error_t build_floorplan_matrix
+void floorplan_matrix_copy (FloorplanMatrix_t *dst, FloorplanMatrix_t *src)
+{
+    floorplan_matrix_destroy (dst) ;
+    floorplan_matrix_init    (dst) ;
+
+    if (src->NRows == 0u || src->NColumns == 0u || src->NNz == 0u)
+
+        return ;
+
+    floorplan_matrix_build (dst, src->NRows, src->NColumns, src->NNz) ;
+
+    if (src->ColumnPointers != NULL)
+
+        memcpy (dst->ColumnPointers, src->ColumnPointers,
+                sizeof(CellIndex_t) * (src->NColumns + 1)) ;
+
+    if (src->RowIndices != NULL)
+
+        memcpy (dst->RowIndices, src->RowIndices,
+                sizeof(CellIndex_t) * src->NNz) ;
+
+    if (src->Values != NULL)
+
+        memcpy (dst->Values, src->Values,
+                sizeof(Source_t) * src->NNz) ;
+}
+
+/******************************************************************************/
+
+Error_t floorplan_matrix_build
 (
     FloorplanMatrix_t *flpmatrix,
     CellIndex_t        nrows,
@@ -78,7 +107,7 @@ Error_t build_floorplan_matrix
 
     if (flpmatrix->ColumnPointers == NULL)
     {
-        FREE_POINTER (free, flpmatrix->RowIndices) ;
+        free (flpmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
@@ -86,8 +115,8 @@ Error_t build_floorplan_matrix
 
     if (flpmatrix->Values == NULL)
     {
-        FREE_POINTER (free, flpmatrix->ColumnPointers) ;
-        FREE_POINTER (free, flpmatrix->RowIndices) ;
+        free (flpmatrix->ColumnPointers) ;
+        free (flpmatrix->RowIndices) ;
         return TDICE_FAILURE ;
     }
 
@@ -102,22 +131,22 @@ Error_t build_floorplan_matrix
 
 /******************************************************************************/
 
-void destroy_floorplan_matrix (FloorplanMatrix_t* flpmatrix)
+void floorplan_matrix_destroy (FloorplanMatrix_t* flpmatrix)
 {
-    FREE_POINTER (free, flpmatrix->ColumnPointers) ;
-    FREE_POINTER (free, flpmatrix->RowIndices) ;
-    FREE_POINTER (free, flpmatrix->Values) ;
+    free (flpmatrix->ColumnPointers) ;
+    free (flpmatrix->RowIndices) ;
+    free (flpmatrix->Values) ;
 
     Destroy_SuperMatrix_Store (&flpmatrix->SLUMatrix) ;
 }
 
 /******************************************************************************/
 
-void fill_floorplan_matrix
+void floorplan_matrix_fill
 (
-    FloorplanMatrix_t  *flpmatrix,
-    FloorplanElement_t *list,
-    Dimensions_t       *dimensions
+    FloorplanMatrix_t      *flpmatrix,
+    FloorplanElementList_t *list,
+    Dimensions_t           *dimensions
 )
 {
     CellIndex_t *c_pointers = flpmatrix->ColumnPointers ;
@@ -126,46 +155,56 @@ void fill_floorplan_matrix
 
     *c_pointers++ = 0u ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, list)
+    FloorplanElementListNode_t *flpeln ;
+
+    for (flpeln  = floorplan_element_list_begin (list) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
     {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
         *c_pointers = *(c_pointers - 1) ;
 
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT
+        ICElementListNode_t *iceln ;
 
-        (ICElement_t, ic_el, flp_el->ICElementsList)
+        for (iceln  = ic_element_list_begin (&flpel->ICElements) ;
+             iceln != NULL ;
+             iceln  = ic_element_list_next (iceln))
         {
-            CellDimension_t width = 0u ;
-            CellDimension_t y     = ic_el->SW_Y ;
+            ICElement_t *icel = ic_element_list_data (iceln) ;
 
-            FOR_EVERY_IC_ELEMENT_ROW (row_index, ic_el)
+            CellDimension_t width = 0u ;
+            CellDimension_t y     = icel->SW_Y ;
+
+            FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
             {
-                if (row_index < ic_el->NE_Row)
+                if (row_index < icel->NE_Row)
 
                     width = get_cell_location_y (dimensions, row_index + 1) - y ;
 
                 else
 
-                    width = (ic_el->SW_Y + ic_el->Width) - y ;
+                    width = (icel->SW_Y + icel->Width) - y ;
 
 
                 CellDimension_t length = 0u ;
-                CellDimension_t x      = ic_el->SW_X ;
+                CellDimension_t x      = icel->SW_X ;
 
-                FOR_EVERY_IC_ELEMENT_COLUMN (column_index, ic_el)
+                FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
                 {
                     *r_indices++ = get_cell_offset_in_layer
 
                                    (dimensions, row_index, column_index) ;
 
-                    if (column_index < ic_el->NE_Column)
+                    if (column_index < icel->NE_Column)
 
                         length = get_cell_location_x (dimensions, column_index + 1) - x ;
 
                     else
 
-                        length = (ic_el->SW_X + ic_el->Length) - x ;
+                        length = (icel->SW_X + icel->Length) - x ;
 
-                    *values++ = (length * width) /  flp_el->Area ;
+                    *values++ = (length * width) /  flpel->Area ;
 
                     (*c_pointers)++ ;
 
@@ -182,19 +221,19 @@ void fill_floorplan_matrix
 
 /******************************************************************************/
 
-void multiply_floorplan_matrix
+void floorplan_matrix_multiply
 (
     FloorplanMatrix_t *flpmatrix,
     Source_t          *x,
     Source_t          *b
 )
 {
-    sp_dgemv((char *)"N", 1.0, &flpmatrix->SLUMatrix, b, 1, 1.0, x, 1) ;
+    sp_dgemv((String_t)"N", 1.0, &flpmatrix->SLUMatrix, b, 1, 1.0, x, 1) ;
 }
 
 /******************************************************************************/
 
-void print_floorplan_matrix (FloorplanMatrix_t flpmatrix, String_t file_name)
+void floorplan_matrix_print (FloorplanMatrix_t flpmatrix, String_t file_name)
 {
     FILE* file = fopen (file_name, "w") ;
 

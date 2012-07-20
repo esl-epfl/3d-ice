@@ -94,36 +94,19 @@ extern "C"
 /******************************************************************************/
 
 
+    void analysis_init (Analysis_t *analysis) ;
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param analysis the address of the analysis structure to initialize
-     */
+    void analysis_copy (Analysis_t *dst, Analysis_t *src) ;
 
-    void init_analysis (Analysis_t *analysis) ;
+    void analysis_destroy (Analysis_t *analysis) ;
 
+    Analysis_t *analysis_calloc ( void ) ;
 
+    Analysis_t *analysis_clone (Analysis_t *analysis) ;
 
-    /*! Allocates and inits memory for a structure of type Analysis_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    void analysis_free (Analysis_t *analysis) ;
 
-    Analysis_t *calloc_analysis ( void ) ;
-
-
-
-    /*! Frees the memory space pointed to by \a analysis
-     *
-     * The pointer \a analysis must have been returned by a previous call
-     * to \a calloc_analysis . If \a analysis is \c NULL, no operation is performed.
-     *
-     * \param analysis the address to free
-     */
-
-    void free_analysis (Analysis_t *analysis) ;
-
+    void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix) ;
 
 
     /*! Returns the time, in seconds, sum of the time steps emulated so far
@@ -156,17 +139,6 @@ extern "C"
      */
 
     bool slot_completed (Analysis_t *analysis) ;
-
-
-
-    /*! Prints the analysis informations as they look in the stack file
-     *
-     * \param analysis   the analysis information to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_analysis (Analysis_t *analysis, FILE *stream, String_t prefix) ;
 
 
 /******************************************************************************/

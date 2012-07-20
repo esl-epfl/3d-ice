@@ -44,105 +44,128 @@
 
 /******************************************************************************/
 
-void init_die (Die_t *die)
+void die_init (Die_t *die)
 {
     die->Id                = NULL ;
-    die->Used              = (Quantity_t) 0u ;
     die->NLayers           = (CellIndex_t) 0u ;
     die->SourceLayerOffset = (CellIndex_t) 0u ;
-    die->TopLayer          = NULL ;
-    die->SourceLayer       = NULL ;
-    die->BottomLayer       = NULL ;
-    die->Next              = NULL ;
+
+    layer_list_init (&die->Layers) ;
+
+    floorplan_init (&die->Floorplan) ;
 }
 
 /******************************************************************************/
 
-Die_t *calloc_die (void)
+void die_copy (Die_t *dst, Die_t *src)
+{
+    die_destroy (dst) ;
+    die_init    (dst) ;
+
+    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+
+    dst->NLayers           = src->NLayers ;
+    dst->SourceLayerOffset = src->SourceLayerOffset ;
+
+    layer_list_copy (&dst->Layers, &src->Layers) ;
+
+    floorplan_copy (&dst->Floorplan, &src->Floorplan) ;
+}
+
+/******************************************************************************/
+
+void die_destroy (Die_t *die)
+{
+    if (die->Id != NULL)
+
+        free (die->Id) ;
+
+    layer_list_destroy (&die->Layers) ;
+    floorplan_destroy  (&die->Floorplan) ;
+}
+
+/******************************************************************************/
+
+Die_t *die_calloc (void)
 {
     Die_t *die = (Die_t *) malloc (sizeof(Die_t)) ;
 
     if (die != NULL)
 
-        init_die (die) ;
+        die_init (die) ;
 
     return die ;
 }
 
 /******************************************************************************/
 
-void free_die (Die_t *die)
+Die_t *die_clone (Die_t *die)
+{
+    if (die == NULL)
+
+        return NULL ;
+
+    Die_t *newd = die_calloc ( ) ;
+
+    if (newd != NULL)
+
+        die_copy (newd, die) ;
+
+    return newd ;
+}
+
+/******************************************************************************/
+
+void die_free (Die_t *die)
 {
     if (die == NULL)
 
         return ;
 
-    if (die->Id != NULL)
+    die_destroy (die) ;
 
-        FREE_POINTER (free, die->Id) ;
-
-    die->TopLayer = NULL ;
-    FREE_POINTER (free_layers_list, die->BottomLayer) ;
-
-    FREE_POINTER (free, die) ;
+    free (die) ;
 }
 
 /******************************************************************************/
 
-void free_dies_list (Die_t *list)
+bool die_same_id (Die_t *die, Die_t *other)
 {
-    FREE_LIST (Die_t, list, free_die) ;
+    return strcmp (die->Id, other->Id) == 0 ? true : false ;
 }
 
 /******************************************************************************/
 
-Die_t *find_die_in_list (Die_t *list, String_t id)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, list)
-    {
-        if (strcmp(die->Id, id) == 0) break ;
-    }
-    return die ;
-}
-
-/******************************************************************************/
-
-void print_die (Die_t *die, FILE *stream, String_t prefix)
+void die_print (Die_t *die, FILE *stream, String_t prefix)
 {
     fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (Layer_t, layer, die->TopLayer)
+    Quantity_t counter = 0u ;
+
+    LayerListNode_t *lnd ;
+
+    for (lnd = layer_list_begin (&die->Layers) ;
+         lnd != NULL ;
+         lnd = layer_list_next (lnd))
     {
-        if (layer == die->SourceLayer)
+        if (counter == die->SourceLayerOffset)
 
             fprintf (stream,
                 "%s   source  %4.1f %s ;\n",
-                prefix, layer->Height, layer->Material->Id) ;
+                prefix,
+                layer_list_data(lnd)->Height,
+                layer_list_data(lnd)->Material.Id) ;
 
         else
 
             fprintf (stream,
                 "%s    layer  %4.1f %s ;\n",
-                prefix, layer->Height, layer->Material->Id) ;
+                prefix,
+                layer_list_data(lnd)->Height,
+                layer_list_data(lnd)->Material.Id) ;
+
+        counter++ ;
     }
-}
-
-/******************************************************************************/
-
-void print_dies_list (Die_t *list, FILE *stream, String_t prefix)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Die_t, die, list)
-    {
-        if (die->Next == NULL)
-
-            break ;
-
-        print_die (die, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    print_die (die, stream, prefix) ;
 }
 
 /******************************************************************************/

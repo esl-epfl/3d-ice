@@ -52,7 +52,8 @@ extern "C"
 
 #include "types.h"
 
-#include "layer.h"
+#include "floorplan.h"
+#include "layer_list.h"
 
 /******************************************************************************/
 
@@ -69,11 +70,6 @@ extern "C"
 
         String_t Id ;
 
-        /*! To know, after the parsing of a stack file, if a
-         *  die has been declared but never used in the stack */
-
-        Quantity_t Used ;
-
         /*! The number of layer composing the die */
 
         CellIndex_t NLayers ;
@@ -82,22 +78,16 @@ extern "C"
 
         CellIndex_t SourceLayerOffset ;
 
-        /*! Pointer to the top-most layer */
+        /*! The list of layers makeing the die. The first layer in the list
+         *  will be the bottom-most layer, the last layer in the list the
+         *  top most one.
+         */
 
-        Layer_t *TopLayer ;
+        LayerList_t Layers ;
 
-        /*! Pointer to the source layer */
+        /*! The floorplan used on the source layer */
 
-        Layer_t *SourceLayer ;
-
-        /*! Pointer to the bottom-most layer */
-
-        Layer_t *BottomLayer ;
-
-        /*! To collect dies in a linked list */
-
-        struct Die_t *Next ;
-
+        Floorplan_t Floorplan ;
     } ;
 
     /*! Definition of the type Die_t */
@@ -106,86 +96,23 @@ extern "C"
 
 /******************************************************************************/
 
+    void die_init (Die_t *die) ;
+
+    void die_copy (Die_t *dst, Die_t *src) ;
+
+    void die_destroy (Die_t *die) ;
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param die the address of the die structure to initialize
-     */
+    Die_t *die_calloc ( void ) ;
 
-    void init_die (Die_t *die) ;
+    Die_t *die_clone (Die_t *die) ;
 
+    void die_free (Die_t *die) ;
 
 
-    /*! Allocates and inits memory for a structure of type Die_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    bool die_same_id (Die_t *die, Die_t *other) ;
 
-    Die_t *calloc_die ( void ) ;
-
-
-
-    /*! Frees the memory space pointed to by \a die
-     *
-     * The pointer \a die must have been returned by a previous call
-     * to \a calloc_die . If \a die is \c NULL, no operation is performed.
-     *
-     * \param die the address to free
-     */
-
-    void free_die (Die_t *die) ;
-
-
-
-    /*! Frees a list of dies
-     *
-     * If frees, calling \c free_die, the die pointed by the
-     * parameter \a list and all the dies it finds following the
-     * linked list throught the field Die_t::Next.
-     *
-     * \param list the pointer to the first elment in the list to be freed
-     */
-
-    void free_dies_list (Die_t *list) ;
-
-
-
-    /*! Searches for a Die in a linked list of dies.
-     *
-     * Id based search of a Die structure in a list.
-     *
-     * \param list the pointer to the list
-     * \param id   the identifier of the die to be found
-     *
-     * \return the address of a Die, if founded
-     * \return \c NULL if the search fails
-     */
-
-    Die_t *find_die_in_list (Die_t *list, String_t id) ;
-
-
-
-    /*! Prints the die as it looks in the stack file
-     *
-     * \param die   the die to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_die (Die_t *die, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of dies as they look in the stack file
-     *
-     * \param list   the pointer to the first die in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_dies_list (Die_t *list, FILE *stream, String_t prefix) ;
+    void die_print (Die_t *die, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_thermal_grid (ThermalGrid_t *tgrid)
+void thermal_grid_init (ThermalGrid_t *tgrid)
 {
     tgrid->Size             = 0u ;
     tgrid->LayersProfile    = NULL ;
@@ -55,7 +55,7 @@ void init_thermal_grid (ThermalGrid_t *tgrid)
 
 /******************************************************************************/
 
-Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size)
+Error_t thermal_grid_build (ThermalGrid_t *tgrid, Quantity_t size)
 {
     tgrid->Size = size ;
 
@@ -71,7 +71,7 @@ Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size)
 
     if (tgrid->VHCProfile == NULL)
     {
-        FREE_POINTER (free, tgrid->LayersProfile) ;
+        free (tgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
     }
@@ -80,8 +80,8 @@ Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size)
 
     if (tgrid->TCProfile == NULL)
     {
-        FREE_POINTER (free, tgrid->VHCProfile) ;
-        FREE_POINTER (free, tgrid->LayersProfile) ;
+        free (tgrid->VHCProfile) ;
+        free (tgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
     }
@@ -91,24 +91,30 @@ Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size)
 
 /******************************************************************************/
 
-void destroy_thermal_grid (ThermalGrid_t *tgrid)
+void thermal_grid_destroy (ThermalGrid_t *tgrid)
 {
-    FREE_POINTER (free, tgrid->LayersProfile) ;
-    FREE_POINTER (free, tgrid->VHCProfile) ;
-    FREE_POINTER (free, tgrid->TCProfile) ;
+    free (tgrid->LayersProfile) ;
+    free (tgrid->VHCProfile) ;
+    free (tgrid->TCProfile) ;
 }
 
 /******************************************************************************/
 
 void fill_thermal_grid
 (
-    ThermalGrid_t  *tgrid,
-    StackElement_t *list,
-    Dimensions_t   *dimensions
+    ThermalGrid_t      *tgrid,
+    StackElementList_t *list,
+    Dimensions_t       *dimensions
 )
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stack_element, list)
+    StackElementListNode_t *stkeln ;
+
+    for (stkeln  = stack_element_list_end (list) ;
+         stkeln != NULL ;
+         stkeln  = stack_element_list_prev (stkeln))
     {
+        StackElement_t *stack_element = stack_element_list_data (stkeln) ;
+
         CellIndex_t index = stack_element->Offset ;
 
         switch (stack_element->Type)
@@ -117,31 +123,30 @@ void fill_thermal_grid
             {
                 CellIndex_t tmp = 0u ;
 
-                FOR_EVERY_ELEMENT_IN_LIST_NEXT
+                LayerListNode_t *lnd ;
 
-                (Layer_t, layer, stack_element->Pointer.Die->BottomLayer)
+                for (lnd  = layer_list_begin(&stack_element->Pointer.Die->Layers) ;
+                     lnd != NULL ;
+                     lnd  = layer_list_next (lnd))
                 {
-                    if (layer == stack_element->Pointer.Die->SourceLayer)
-
-                        tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
-
-                    else
-
-                        tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
-
-                    tgrid->VHCProfile    [index + tmp] = layer->Material->VolumetricHeatCapacity ;
-                    tgrid->TCProfile     [index + tmp] = layer->Material->ThermalConductivity ;
+                    tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+                    tgrid->VHCProfile    [index + tmp] = layer_list_data(lnd)->Material.VolumetricHeatCapacity ;
+                    tgrid->TCProfile     [index + tmp] = layer_list_data(lnd)->Material.ThermalConductivity ;
 
                     tmp++ ;
                 }
+
+                tmp = stack_element->Pointer.Die->SourceLayerOffset ;
+
+                tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
 
                 break ;
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
                 tgrid->LayersProfile [index] = TDICE_LAYER_SOLID ;
-                tgrid->VHCProfile    [index] = stack_element->Pointer.Layer->Material->VolumetricHeatCapacity ;
-                tgrid->TCProfile     [index] = stack_element->Pointer.Layer->Material->ThermalConductivity ;
+                tgrid->VHCProfile    [index] = stack_element->Pointer.Layer->Material.VolumetricHeatCapacity ;
+                tgrid->TCProfile     [index] = stack_element->Pointer.Layer->Material.ThermalConductivity ;
 
                 break ;
             }
@@ -155,8 +160,8 @@ void fill_thermal_grid
 
                 for (tmp = 0u ; tmp != stack_element->Pointer.Channel->NLayers ; tmp++)
                 {
-                    tgrid->VHCProfile [index + tmp] = tgrid->Channel->WallMaterial->VolumetricHeatCapacity ;
-                    tgrid->TCProfile  [index + tmp] = tgrid->Channel->WallMaterial->ThermalConductivity ;
+                    tgrid->VHCProfile [index + tmp] = tgrid->Channel->WallMaterial.VolumetricHeatCapacity ;
+                    tgrid->TCProfile  [index + tmp] = tgrid->Channel->WallMaterial.ThermalConductivity ;
                 }
 
                 switch (tgrid->Channel->ChannelModel)
@@ -231,8 +236,8 @@ void fill_thermal_grid
 
                             fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
 
-                        tgrid->VHCProfile    [index] = tgrid->HeatSink->SinkMaterial->VolumetricHeatCapacity ;
-                        tgrid->TCProfile     [index] = tgrid->HeatSink->SinkMaterial->ThermalConductivity ;
+                        tgrid->VHCProfile    [index] = tgrid->HeatSink->SinkMaterial.VolumetricHeatCapacity ;
+                        tgrid->TCProfile     [index] = tgrid->HeatSink->SinkMaterial.ThermalConductivity ;
 
                         break ;
 
@@ -682,7 +687,7 @@ Conductance_t get_conductance_north
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
-        case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
             return (  tgrid->TCProfile [ layer_index ]

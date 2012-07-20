@@ -44,66 +44,93 @@
 
 /******************************************************************************/
 
-void init_layer (Layer_t *layer)
+void layer_init (Layer_t *layer)
 {
     layer->Height   = (CellDimension_t) 0.0 ;
-    layer->Material = NULL ;
+
+    material_init (&layer->Material) ;
+
     layer->Id       = NULL ;
-    layer->Used     = (Quantity_t) 0u ;
-    layer->Next     = NULL ;
-    layer->Prev     = NULL ;
 }
 
 /******************************************************************************/
 
-Layer_t *calloc_layer (void)
+void layer_copy (Layer_t *dst, Layer_t *src)
+{
+    layer_destroy (dst) ;
+    layer_init    (dst) ;
+
+    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+
+    dst->Height   = src->Height ;
+
+    material_copy (&dst->Material, &src->Material) ;
+}
+
+/******************************************************************************/
+
+void layer_destroy (Layer_t *layer)
+{
+    if (layer->Id != NULL)
+
+        free (layer->Id) ;
+
+    material_destroy (&layer->Material) ;
+}
+
+/******************************************************************************/
+
+Layer_t *layer_calloc (void)
 {
     Layer_t *layer = (Layer_t *) malloc (sizeof(Layer_t));
 
     if (layer != NULL)
 
-        init_layer (layer) ;
+        layer_init (layer) ;
 
     return layer ;
 }
 
 /******************************************************************************/
 
-void free_layer (Layer_t *layer)
+Layer_t *layer_clone (Layer_t *layer)
+{
+    if (layer == NULL)
+
+        return NULL ;
+
+    Layer_t *newl = layer_calloc ( ) ;
+
+    if (newl != NULL)
+
+        layer_copy (newl, layer) ;
+
+    return newl ;
+}
+
+/******************************************************************************/
+
+void layer_free (Layer_t *layer)
 {
     if (layer == NULL)
 
         return ;
 
-    if (layer->Id != NULL)
+    layer_destroy (layer) ;
 
-        FREE_POINTER (free, layer->Id) ;
-
-    FREE_POINTER (free, layer) ;
+    free (layer) ;
 }
 
 /******************************************************************************/
 
-void free_layers_list (Layer_t *list)
+bool layer_same_id (Layer_t *layer, Layer_t *other)
 {
-    FREE_LIST (Layer_t, list, free_layer) ;
+    return strcmp (layer->Id, other->Id) == 0 ? true : false ;
 }
 
 /******************************************************************************/
 
-Layer_t *find_layer_in_list (Layer_t *list, String_t id)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
-    {
-        if (strcmp(layer->Id, id) == 0)
-            break ;
-    }
-    return layer ;
-}
-
-/******************************************************************************/
-
-void print_layer (Layer_t *layer, FILE *stream, String_t prefix)
+void layer_print (Layer_t *layer, FILE *stream, String_t prefix)
 {
     fprintf (stream,
         "%slayer %s :\n",
@@ -115,16 +142,7 @@ void print_layer (Layer_t *layer, FILE *stream, String_t prefix)
 
     fprintf (stream,
         "%s   material %s ;\n",
-        prefix, layer->Material->Id) ;
-}
-
-/******************************************************************************/
-
-void print_layers_list (Layer_t *list, FILE *stream, String_t prefix)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Layer_t, layer, list)
-
-        print_layer (layer, stream, prefix) ;
+        prefix, layer->Material.Id) ;
 }
 
 /******************************************************************************/

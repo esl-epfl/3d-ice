@@ -101,7 +101,7 @@ extern "C"
      * \param message the address of the NetworkMessage to initialize
      */
 
-    void init_network_message (NetworkMessage_t *message) ;
+    void network_message_init (NetworkMessage_t *message) ;
 
 
 
@@ -110,7 +110,7 @@ extern "C"
      * \param message the address of the NetworkMessage to free
      */
 
-    void destroy_network_message (NetworkMessage_t *message) ;
+    void network_message_destroy (NetworkMessage_t *message) ;
 
 
 

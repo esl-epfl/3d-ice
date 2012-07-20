@@ -104,7 +104,7 @@ extern "C"
 
         /*! The material composing the wall */
 
-        Material_t *WallMaterial ;
+        Material_t WallMaterial ;
 
     } ;
 
@@ -116,55 +116,27 @@ extern "C"
 
 
 
-    /*! Sets all the fields of \a coolant to a default value.
-     *
-     * \param coolant the address of the coolant structure to initialize
-     */
+    void coolant_init    (Coolant_t *coolant) ;
 
-    void init_coolant (Coolant_t *coolant) ;
+    void coolant_copy    (Coolant_t *dst, Coolant_t *src) ;
 
+    void coolant_destroy (Coolant_t *coolant) ;
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param channel the address of the channel structure to initialize
-     */
+    void channel_init    (Channel_t *channel) ;
 
-    void init_channel (Channel_t *channel) ;
+    void channel_copy    (Channel_t *dst, Channel_t *src) ;
 
+    void channel_destroy (Channel_t *channel) ;
 
+    Channel_t *channel_calloc ( void ) ;
 
-    /*! Allocates and inits memory for a structure of type Channel_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    Channel_t *channel_clone  (Channel_t *channel) ;
 
-    Channel_t *calloc_channel ( void ) ;
+    void channel_free         (Channel_t *channel) ;
 
 
-
-    /*! Frees the memory space pointed to by \a channel
-     *
-     * The pointer \a channel must have been returned by a previous call
-     * to \a calloc_channel . If \a channel is \c NULL, no operation is performed.
-     *
-     * \param channel the address to free
-     */
-
-    void free_channel (Channel_t *channel) ;
-
-
-
-    /*! Prints the channel as it looks in the stack file
-     *
-     * \param channel    the channel to print
-     * \param stream  the output stream (must be already open)
-     * \param prefix  a string to be printed as prefix at the beginning of each line
-     * \param dimensions pointer to the structure storing the dimensions
-     */
-
-    void print_channel
+    void channel_print
 
         (Channel_t *channel, FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
 

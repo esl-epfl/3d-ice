@@ -122,7 +122,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
-    init_socket (&client_socket) ;
+    socket_init (&client_socket) ;
 
     if (open_client_socket (&client_socket) != TDICE_SUCCESS)
 
@@ -151,7 +151,7 @@ int main (int argc, char** argv)
     /* Client-Server Communication ********************************************/
     /**************************************************************************/
 
-    init_network_message (&client_nflp) ;
+    network_message_init (&client_nflp) ;
     build_message_head   (&client_nflp, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
 
     send_message_to_socket      (&client_socket, &client_nflp) ;
@@ -159,13 +159,13 @@ int main (int argc, char** argv)
 
     extract_message_word (&client_nflp, &nflpel, 0) ;
 
-    destroy_network_message (&client_nflp) ;
+    network_message_destroy (&client_nflp) ;
 
     for ( ; nslots != 0 ; nslots--)
     {
         /* client sends power values ******************************************/
 
-        init_network_message (&client_powers) ;
+        network_message_init (&client_powers) ;
         build_message_head   (&client_powers, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
         insert_message_word  (&client_powers, &nflpel) ;
 
@@ -178,11 +178,11 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_powers) ;
 
-        destroy_network_message (&client_powers) ;
+        network_message_destroy (&client_powers) ;
 
         /* Client waits for simulation result *********************************/
 
-        init_network_message (&server_reply) ;
+        network_message_init (&server_reply) ;
 
         receive_message_from_socket (&client_socket, &server_reply) ;
 
@@ -190,14 +190,14 @@ int main (int argc, char** argv)
 
         if (sim_result != TDICE_SLOT_DONE)
         {
-            destroy_network_message (&server_reply) ;
+            network_message_destroy (&server_reply) ;
 
-            close_socket (&client_socket) ;
+            socket_close (&client_socket) ;
 
             return EXIT_FAILURE ;
         }
 
-        destroy_network_message (&server_reply) ;
+        network_message_destroy (&server_reply) ;
 
         /* Client sends temperatures request for thermal sensors **************/
 
@@ -205,7 +205,7 @@ int main (int argc, char** argv)
         type     = TDICE_OUTPUT_TYPE_TCELL ;
         quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 
-        init_network_message (&client_temperatures) ;
+        network_message_init (&client_temperatures) ;
         build_message_head   (&client_temperatures, TDICE_SEND_OUTPUT) ;
         insert_message_word  (&client_temperatures, &instant) ;
         insert_message_word  (&client_temperatures, &type) ;
@@ -213,11 +213,11 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_temperatures) ;
 
-        destroy_network_message (&client_temperatures) ;
+        network_message_destroy (&client_temperatures) ;
 
         /* Client receives temperatures ***************************************/
 
-        init_network_message (&server_reply) ;
+        network_message_init (&server_reply) ;
 
         receive_message_from_socket (&client_socket, &server_reply) ;
 
@@ -233,7 +233,7 @@ int main (int argc, char** argv)
             fprintf (stdout, "%5.2f K \t", temperature) ;
         }
 
-        destroy_network_message (&server_reply) ;
+        network_message_destroy (&server_reply) ;
 
         /* Client sends thermal maps request **********************************/
 
@@ -241,7 +241,7 @@ int main (int argc, char** argv)
         type     = TDICE_OUTPUT_TYPE_TMAP ;
         quantity = TDICE_OUTPUT_QUANTITY_NONE ;
 
-        init_network_message (&client_tmap) ;
+        network_message_init (&client_tmap) ;
         build_message_head   (&client_tmap, TDICE_SEND_OUTPUT) ;
         insert_message_word  (&client_tmap, &instant) ;
         insert_message_word  (&client_tmap, &type) ;
@@ -249,11 +249,11 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_tmap) ;
 
-        destroy_network_message (&client_tmap) ;
+        network_message_destroy (&client_tmap) ;
 
         /* Client receives thermal maps ***************************************/
 
-        init_network_message (&server_reply) ;
+        network_message_init (&server_reply) ;
 
         receive_message_from_socket (&client_socket, &server_reply) ;
 
@@ -277,7 +277,7 @@ int main (int argc, char** argv)
             fprintf (tmap, "\n") ;
         }
 
-        destroy_network_message (&server_reply) ;
+        network_message_destroy (&server_reply) ;
 
         /* Client sends temperatures request for cores ************************/
 
@@ -285,7 +285,7 @@ int main (int argc, char** argv)
         type     = TDICE_OUTPUT_TYPE_TFLPEL ;
         quantity = TDICE_OUTPUT_QUANTITY_AVERAGE ;
 
-        init_network_message (&client_cores) ;
+        network_message_init (&client_cores) ;
         build_message_head   (&client_cores, TDICE_SEND_OUTPUT) ;
         insert_message_word  (&client_cores, &instant) ;
         insert_message_word  (&client_cores, &type) ;
@@ -293,11 +293,11 @@ int main (int argc, char** argv)
 
         send_message_to_socket (&client_socket, &client_cores) ;
 
-        destroy_network_message (&client_cores) ;
+        network_message_destroy (&client_cores) ;
 
         /* Client receives cores temperatures  ********************************/
 
-        init_network_message (&server_reply) ;
+        network_message_init (&server_reply) ;
 
         receive_message_from_socket (&client_socket, &server_reply) ;
 
@@ -313,23 +313,23 @@ int main (int argc, char** argv)
 
         fprintf (stdout, "\n") ;
 
-        destroy_network_message (&server_reply) ;
+        network_message_destroy (&server_reply) ;
     }
 
     fclose (tmap) ;
 
     /* Closes the simulation on the server ************************************/
 
-    init_network_message (&client_close_sim) ;
+    network_message_init (&client_close_sim) ;
     build_message_head   (&client_close_sim, TDICE_EXIT_SIMULATION) ;
 
     send_message_to_socket (&client_socket, &client_close_sim) ;
 
-    destroy_network_message (&client_close_sim) ;
+    network_message_destroy (&client_close_sim) ;
 
     /* Closes client sockek ***************************************************/
 
-    if (close_socket (&client_socket) != TDICE_SUCCESS)
+    if (socket_close (&client_socket) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
 

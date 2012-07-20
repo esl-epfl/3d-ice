@@ -44,136 +44,163 @@
 
 /******************************************************************************/
 
-void
-init_stack_element (StackElement_t *stkel)
+void stack_element_init (StackElement_t *stkel)
 {
-    stkel->Type            = TDICE_STACK_ELEMENT_NONE ;
-    stkel->Pointer.Layer   = NULL ;
-    stkel->Pointer.Die     = NULL ;
-    stkel->Pointer.Channel = NULL ;
-    stkel->Floorplan       = NULL ;
-    stkel->Id              = NULL ;
-    stkel->NLayers         = 0u ;
-    stkel->Offset          = 0u ;
-    stkel->Next            = NULL ;
-    stkel->Prev            = NULL ;
+    stkel->Type             = TDICE_STACK_ELEMENT_NONE ;
+    stkel->Pointer.Layer    = NULL ;
+    stkel->Pointer.Die      = NULL ;
+    stkel->Pointer.Channel  = NULL ;
+    stkel->Pointer.HeatSink = NULL ;
+    stkel->Id               = NULL ;
+    stkel->NLayers          = 0u ;
+    stkel->Offset           = 0u ;
 }
 
 /******************************************************************************/
 
-StackElement_t *calloc_stack_element (void)
+void stack_element_copy (StackElement_t *dst, StackElement_t *src)
+{
+    stack_element_destroy (dst) ;
+    stack_element_init (dst) ;
+
+    dst->Type     = src->Type ;
+    dst->NLayers  = src->NLayers ;
+    dst->Offset   = src->Offset ;
+
+    dst->Id = src->Id == NULL ? NULL : strdup (src->Id) ;
+
+    if (src->Type == TDICE_STACK_ELEMENT_LAYER)
+
+        dst->Pointer.Layer = layer_clone (src->Pointer.Layer) ;
+
+    else if (src->Type == TDICE_STACK_ELEMENT_DIE)
+
+        dst->Pointer.Die = die_clone (src->Pointer.Die) ;
+
+    else
+
+        // Channel or HeatSink
+
+        dst->Pointer = src->Pointer ;
+}
+
+/******************************************************************************/
+
+void stack_element_destroy (StackElement_t *stkel)
+{
+    if (stkel->Id != NULL)
+
+        free (stkel->Id) ;
+
+    if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
+
+        die_free (stkel->Pointer.Die) ;
+
+    else if (stkel->Type == TDICE_STACK_ELEMENT_LAYER)
+
+        layer_free (stkel->Pointer.Layer) ;
+}
+
+/******************************************************************************/
+
+StackElement_t *stack_element_calloc (void)
 {
     StackElement_t *stack_element = (StackElement_t *) malloc (sizeof(StackElement_t)) ;
 
     if (stack_element != NULL)
 
-        init_stack_element(stack_element) ;
+        stack_element_init (stack_element) ;
 
     return stack_element ;
 }
 
 /******************************************************************************/
 
-void free_stack_element (StackElement_t *stkel)
+StackElement_t *stack_element_clone (StackElement_t *stkel)
 {
-    if (   stkel->Type == TDICE_STACK_ELEMENT_DIE
-        && stkel->Floorplan != NULL)
+    if (stkel == NULL)
 
-        FREE_POINTER (free_floorplan, stkel->Floorplan) ;
+        return NULL ;
 
-    FREE_POINTER (free, stkel->Id) ;
-    FREE_POINTER (free, stkel) ;
+    StackElement_t *news = stack_element_calloc ( ) ;
+
+    if (news != NULL)
+
+        stack_element_copy (news, stkel) ;
+
+    return news ;
 }
 
 /******************************************************************************/
 
-void free_stack_elements_list (StackElement_t *list)
+void stack_element_free (StackElement_t *stkel)
 {
-    FREE_LIST (StackElement_t, list, free_stack_element) ;
+    if (stkel == NULL)
+
+        return ;
+
+    stack_element_destroy (stkel) ;
+
+    free (stkel) ;
 }
 
 /******************************************************************************/
 
-StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id)
+bool stack_element_same_id (StackElement_t *stkel, StackElement_t *other)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stk_el, list)
-    {
-        if (strcmp(stk_el->Id, id) == 0)  break ;
-    }
-    return stk_el ;
+    return strcmp (stkel->Id, other->Id) == 0 ? true : false ;
 }
 
 /******************************************************************************/
 
-void print_stack_elements_list
+void stack_element_print
 (
-    StackElement_t *list,
+    StackElement_t *stkel,
     FILE           *stream,
     String_t        prefix
 )
 {
-    Quantity_t max_stk_el_id_length = 0 ;
-    Quantity_t max_die_id_length = 0 ;
-
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stk_el, list)
+    switch (stkel->Type)
     {
-        max_stk_el_id_length =
+        case TDICE_STACK_ELEMENT_CHANNEL :
 
-            MAX (max_stk_el_id_length, strlen (stk_el->Id)) ;
+            fprintf (stream,
+                "%s   channel  %s ;\n",
+                prefix, stkel->Id) ;
+            break ;
 
-        if (stk_el->Type == TDICE_STACK_ELEMENT_DIE)
+        case TDICE_STACK_ELEMENT_DIE :
 
-            max_die_id_length =
+            fprintf (stream,
+                "%s   die      %s %s floorplan \"%s\" ;\n",
+                prefix,
+                stkel->Id,
+                stkel->Pointer.Die->Id,
+                stkel->Pointer.Die->Floorplan.FileName) ;
 
-                MAX (max_die_id_length, strlen (stk_el->Pointer.Die->Id)) ;
-    }
+            break ;
 
-    fprintf (stream, "%sstack : \n", prefix) ;
+        case TDICE_STACK_ELEMENT_LAYER :
 
-    FOR_EVERY_ELEMENT_IN_LIST_PREV (StackElement_t, stack_element, list)
-    {
-        switch (stack_element->Type)
-        {
-            case TDICE_STACK_ELEMENT_CHANNEL :
+            fprintf (stream,
+                "%s   layer    %s %s\n",
+                prefix,
+                stkel->Id, stkel->Pointer.Layer->Id) ;
 
-                fprintf (stream,
-                    "%s   channel  %-*s ;\n",
-                    prefix, max_stk_el_id_length, stack_element->Id) ;
-                break ;
+            break ;
 
-            case TDICE_STACK_ELEMENT_DIE :
+        case TDICE_STACK_ELEMENT_HEATSINK :
 
-                fprintf (stream,
-                    "%s   die      %-*s %-*s floorplan \"%s\" ;\n",
-                    prefix,
-                    max_stk_el_id_length, stack_element->Id,
-                    max_die_id_length, stack_element->Pointer.Die->Id,
-                    stack_element->Floorplan->FileName) ;
-                break ;
+            break ;
 
-            case TDICE_STACK_ELEMENT_LAYER :
+        case TDICE_STACK_ELEMENT_NONE :
 
-                fprintf (stream,
-                    "%s   layer    %-*s %s",
-                    prefix,
-                    max_stk_el_id_length, stack_element->Id,
-                    stack_element->Pointer.Layer->Id) ;
+            fprintf (stderr, "Warning: found stack element type none\n") ;
+            break ;
 
-                break ;
+        default :
 
-            case TDICE_STACK_ELEMENT_HEATSINK :
-
-                break ;
-
-            case TDICE_STACK_ELEMENT_NONE :
-
-                fprintf (stderr, "Warning: found stack element type none\n") ;
-                break ;
-
-            default :
-
-                fprintf (stderr, "Undefined stack element type %d\n", stack_element->Type) ;
-        }
+            fprintf (stderr, "Undefined stack element type %d\n", stkel->Type) ;
     }
 }
 
@@ -196,7 +223,7 @@ CellIndex_t get_source_layer_offset (StackElement_t *stkel)
 
 /******************************************************************************/
 
-void print_thermal_map_stack_element
+void stack_element_print_thermal_map
 (
     StackElement_t  *stkel,
     Dimensions_t    *dimensions,
@@ -221,7 +248,7 @@ void print_thermal_map_stack_element
 
 /******************************************************************************/
 
-void print_power_map_stack_element
+void stack_element_print_power_map
 (
     StackElement_t  *stkel,
     Dimensions_t    *dimensions,
@@ -255,7 +282,7 @@ Quantity_t get_number_of_floorplan_elements_stack_element
 
         return get_number_of_floorplan_elements_floorplan
 
-            (stkel->Floorplan) ;
+            (&stkel->Pointer.Die->Floorplan) ;
 
     else
 

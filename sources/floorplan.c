@@ -44,50 +44,122 @@
 
 /******************************************************************************/
 
-void init_floorplan (Floorplan_t *floorplan)
+void floorplan_init (Floorplan_t *floorplan)
 {
     floorplan->FileName     = NULL ;
     floorplan->NElements    = 0u ;
-    floorplan->ElementsList = NULL ;
     floorplan->Bpowers      = NULL ;
 
-    init_floorplan_matrix (&floorplan->SurfaceCoefficients) ;
+    floorplan_element_list_init (&floorplan->ElementsList) ;
+    floorplan_matrix_init       (&floorplan->SurfaceCoefficients) ;
 }
 
 /******************************************************************************/
 
-Floorplan_t *calloc_floorplan (void)
+void floorplan_copy (Floorplan_t *dst, Floorplan_t *src)
+{
+    floorplan_destroy (dst) ;
+    floorplan_init    (dst) ;
+
+    dst->FileName = (src->FileName == NULL) ? NULL : strdup (src->FileName) ;
+
+    dst->NElements = src->NElements ;
+
+    floorplan_element_list_copy (&dst->ElementsList, &src->ElementsList) ;
+
+    floorplan_matrix_copy (&dst->SurfaceCoefficients, &src->SurfaceCoefficients) ;
+
+    if (src->Bpowers == NULL)
+    {
+        dst->Bpowers = NULL ;
+
+        return ;
+    }
+
+    dst->Bpowers = (Power_t *) malloc (sizeof (Power_t) * src->NElements) ;
+
+    if (dst->Bpowers == NULL)
+    {
+        fprintf (stderr, "ERROR: malloc Bpowers in floorplan copy\n") ;
+
+        return ;
+    }
+
+    memcpy (dst->Bpowers, src->Bpowers, sizeof (Power_t) * src->NElements) ;
+}
+
+/******************************************************************************/
+
+void floorplan_destroy (Floorplan_t *floorplan)
+{
+    if (floorplan->FileName != NULL)
+
+        free (floorplan->FileName) ;
+
+    if (floorplan->Bpowers != NULL)
+
+        free (floorplan->Bpowers) ;
+
+    floorplan_element_list_destroy (&floorplan->ElementsList) ;
+    floorplan_matrix_destroy       (&floorplan->SurfaceCoefficients) ;
+}
+
+/******************************************************************************/
+
+Floorplan_t *floorplan_calloc (void)
 {
     Floorplan_t *floorplan = (Floorplan_t *) malloc (sizeof(Floorplan_t));
 
     if (floorplan != NULL)
 
-        init_floorplan (floorplan) ;
+        floorplan_init (floorplan) ;
 
     return floorplan ;
 }
 
 /******************************************************************************/
 
-void free_floorplan (Floorplan_t *floorplan)
+Floorplan_t *floorplan_clone (Floorplan_t *floorplan)
 {
-    destroy_floorplan_matrix (&floorplan->SurfaceCoefficients) ;
+    if (floorplan == NULL)
 
-    FREE_POINTER (free                        , floorplan->Bpowers) ;
-    FREE_POINTER (free_floorplan_elements_list, floorplan->ElementsList) ;
-    FREE_POINTER (free,                         floorplan->FileName) ;
-    FREE_POINTER (free,                         floorplan) ;
+        return NULL ;
+
+    Floorplan_t *newf = floorplan_calloc ( ) ;
+
+    if (newf != NULL)
+
+        floorplan_copy (newf, floorplan) ;
+
+    return newf ;
 }
 
 /******************************************************************************/
 
-void print_floorplan (Floorplan_t *floorplan, FILE *stream, String_t prefix)
+void floorplan_free (Floorplan_t *floorplan)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    if (floorplan == NULL)
 
-    (FloorplanElement_t, flp_el, floorplan->ElementsList)
+        return ;
+
+    floorplan_destroy (floorplan) ;
+
+    free (floorplan) ;
+}
+
+/******************************************************************************/
+
+void floorplan_print (Floorplan_t *floorplan, FILE *stream, String_t prefix)
+{
+    FloorplanElementListNode_t *flpeln ;
+
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
     {
-        print_floorplan_element (flp_el, stream, prefix) ;
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
+        floorplan_element_print (flpel, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
@@ -110,7 +182,9 @@ Error_t fill_floorplan
 
         return TDICE_FAILURE ;
 
-    floorplan->Bpowers = (Power_t*) malloc (sizeof (Power_t) * floorplan->NElements) ;
+    floorplan->Bpowers =
+
+        (Power_t *) malloc (sizeof (Power_t) * floorplan->NElements) ;
 
     if (floorplan->Bpowers == NULL)
     {
@@ -121,18 +195,28 @@ Error_t fill_floorplan
 
     CellIndex_t nnz = 0u ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    FloorplanElementListNode_t *flpeln ;
 
-    (FloorplanElement_t, flp_el, floorplan->ElementsList)
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
     {
-        FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icel, flp_el->ICElementsList)
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
+        ICElementListNode_t *iceln ;
+
+        for (iceln  = ic_element_list_begin(&flpel->ICElements) ;
+             iceln != NULL ;
+             iceln  = ic_element_list_next (iceln))
         {
+            ICElement_t *icel = ic_element_list_data(iceln) ;
+
             nnz +=    (icel->NE_Row    - icel->SW_Row    + 1)
                     * (icel->NE_Column - icel->SW_Column + 1) ;
         }
     }
 
-    result = build_floorplan_matrix
+    result = floorplan_matrix_build
 
         (&floorplan->SurfaceCoefficients, get_layer_area (dimensions),
          floorplan->NElements, nnz) ;
@@ -141,9 +225,9 @@ Error_t fill_floorplan
 
         return TDICE_FAILURE ;
 
-    fill_floorplan_matrix
+    floorplan_matrix_fill
 
-        (&floorplan->SurfaceCoefficients, floorplan->ElementsList, dimensions) ;
+        (&floorplan->SurfaceCoefficients, &floorplan->ElementsList, dimensions) ;
 
     return TDICE_SUCCESS ;
 }
@@ -163,9 +247,13 @@ FloorplanElement_t *get_floorplan_element
     String_t     floorplan_element_id
 )
 {
-    return find_floorplan_element_in_list
+    FloorplanElement_t flpel ;
 
-        (floorplan->ElementsList, floorplan_element_id) ;
+    floorplan_element_init (&flpel) ;
+
+    flpel.Id = floorplan_element_id ;
+
+    return floorplan_element_list_find (&floorplan->ElementsList, &flpel) ;
 }
 
 /******************************************************************************/
@@ -174,18 +262,24 @@ Error_t fill_sources_floorplan (Floorplan_t *floorplan, Source_t *sources)
 {
     Quantity_t index = 0u ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (FloorplanElement_t, flp_el, floorplan->ElementsList)
+    FloorplanElementListNode_t *flpeln ;
+
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+            flpeln != NULL ;
+            flpeln  = floorplan_element_list_next (flpeln))
     {
-        if (is_empty_powers_queue (flp_el->PowerValues) == true)
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
+        if (is_empty_powers_queue (flpel->PowerValues) == true)
 
             return TDICE_FAILURE ;
 
-        floorplan->Bpowers [ index++ ] = get_from_powers_queue (flp_el->PowerValues) ;
+        floorplan->Bpowers [ index++ ] = get_from_powers_queue (flpel->PowerValues) ;
     }
 
     // Does the mv multiplication to compute the source vector
 
-    multiply_floorplan_matrix
+    floorplan_matrix_multiply
 
         (&floorplan->SurfaceCoefficients, sources, floorplan->Bpowers) ;
 
@@ -202,13 +296,15 @@ Error_t insert_power_values_floorplan
 {
     Error_t result ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    FloorplanElementListNode_t *flpeln ;
 
-    (FloorplanElement_t, floorplan_element, floorplan->ElementsList)
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
     {
-        result = insert_power_values_floorplan_element
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
 
-                    (floorplan_element, pvalues) ;
+        result = insert_power_values_floorplan_element (flpel, pvalues) ;
 
         if (result == TDICE_FAILURE)
 
@@ -242,13 +338,18 @@ Temperature_t *get_all_max_temperatures_floorplan
 
     Temperature_t *tmp = max_temperatures ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    FloorplanElementListNode_t *flpeln ;
 
-    (FloorplanElement_t, flp_el, floorplan->ElementsList)
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
+    {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
 
         *tmp++ = get_max_temperature_floorplan_element
 
-                     (flp_el, dimensions, temperatures) ;
+                     (flpel, dimensions, temperatures) ;
+    }
 
     return max_temperatures ;
 }
@@ -277,13 +378,18 @@ Temperature_t *get_all_min_temperatures_floorplan
 
     Temperature_t *tmp = min_temperatures ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    FloorplanElementListNode_t *flpeln ;
 
-    (FloorplanElement_t, flp_el, floorplan->ElementsList)
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
+    {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
 
         *tmp++ = get_min_temperature_floorplan_element
 
-                     (flp_el, dimensions, temperatures) ;
+                     (flpel, dimensions, temperatures) ;
+    }
 
     return min_temperatures ;
 }
@@ -312,13 +418,19 @@ Temperature_t *get_all_avg_temperatures_floorplan
 
     Temperature_t *tmp = avg_temperatures ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
 
-    (FloorplanElement_t, flp_el, floorplan->ElementsList)
+    FloorplanElementListNode_t *flpeln ;
+
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
+    {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
 
         *tmp++ = get_avg_temperature_floorplan_element
 
-                     (flp_el, dimensions, temperatures) ;
+                     (flpel, dimensions, temperatures) ;
+    }
 
     return avg_temperatures ;
 }

@@ -53,7 +53,7 @@ extern "C"
 #include "types.h"
 
 #include "dimensions.h"
-#include "ic_element.h"
+#include "ic_element_list.h"
 #include "powers_queue.h"
 
 /******************************************************************************/
@@ -76,7 +76,7 @@ extern "C"
 
         /*! The list of IC elements that defines the surface of the floorplan element */
 
-        ICElement_t *ICElementsList ;
+        ICElementList_t ICElements ;
 
         /*! The area of the floorplan element, in \f$ \mu m^2 \f$,
          *  computed as the sum of the effective area of each ic element */
@@ -87,11 +87,6 @@ extern "C"
          *  the floorplan element during the thermal simulation */
 
         PowersQueue_t *PowerValues ;
-
-        /*! Pointer to collect floorplan elements in a linked list */
-
-        struct FloorplanElement_t *Next ;
-
     } ;
 
     /*! Definition of the type FloorplanElement_t */
@@ -101,92 +96,29 @@ extern "C"
 /******************************************************************************/
 
 
+    void floorplan_element_init (FloorplanElement_t *flpel) ;
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param flpel the address of the flooprlan element to initialize
-     */
+    void floorplan_element_copy
 
-    void init_floorplan_element (FloorplanElement_t *flpel) ;
+        (FloorplanElement_t *dst, FloorplanElement_t *src) ;
 
-
-
-    /*! Allocates and inits memory for a structure of type FloorplanElement_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
-
-    FloorplanElement_t *calloc_floorplan_element (void) ;
+    void floorplan_element_destroy (FloorplanElement_t *flpel) ;
 
 
+    FloorplanElement_t *floorplan_element_calloc (void) ;
 
-    /*! Frees the memory space pointed to by \a flpel
-     *
-     * The pointer \a flpel must have been returned by a previous call
-     * to \a calloc_floorplan_element . If \a flpel is \c NULL, no
-     * operation is performed.
-     *
-     * \param flpel the address to free
-     */
+    FloorplanElement_t *floorplan_element_clone (FloorplanElement_t *flpel) ;
 
-    void free_floorplan_element (FloorplanElement_t *flpel) ;
+    void floorplan_element_free (FloorplanElement_t *flpel) ;
 
 
+    bool floorplan_element_same_id
 
-    /*! Frees a list of floorplan elements
-     *
-     * If frees, calling #free_floorplan_element, the floorplan element pointed
-     * by the parameter \a list and all the floorplan elements it finds following
-     * the linked list throught the field FloorplanElement::Next .
-     *
-     * \param list the pointer to the first elment in the list to be freed
-     */
+        (FloorplanElement_t *flpel, FloorplanElement_t *other) ;
 
-    void free_floorplan_elements_list (FloorplanElement_t *list) ;
-
-
-
-    /*! Searches for a StackElement in a linked list of floorplan elements.
-     *
-     * Id based search of a StackElement structure in a list.
-     *
-     * \param list the pointer to the list
-     * \param id   the identifier of the floorplan element to be found
-     *
-     * \return the address of a StackElement, if founded
-     * \return \c NULL if the search fails
-     */
-
-    FloorplanElement_t *find_floorplan_element_in_list
-
-        (FloorplanElement_t *list, String_t id) ;
-
-
-
-    /*! Prints the floorplan element as it looks in the stack file
-     *
-     * \param flpel   the floorplan element to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_floorplan_element
+    void floorplan_element_print
 
         (FloorplanElement_t *flpel, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of floorplan elements as they look in the stack file
-     *
-     * \param list    the pointer to the first floorplan element in the list
-     * \param stream  the output stream (must be already open)
-     * \param prefix  a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_floorplan_elements_list
-
-        (FloorplanElement_t *list, FILE *stream, String_t prefix) ;
 
 
 

@@ -94,30 +94,30 @@ extern "C"
      * \param pqueue the address of the powers queue structure to initialize
      */
 
-    void init_powers_queue (PowersQueue_t *pqueue) ;
+    void powers_queue_init (PowersQueue_t *pqueue) ;
 
 
 
     /*! Reserves space to store power values
      *
-     * The function deletes old memory, if any, calling \a destroy_powers_queue
+     * The function deletes old memory, if any, calling \a powers_queue_destroy
      * on the parameter \a pqueue.  Then, it reserves new memory.
      *
      * \param pqueue the address of the power queue
      * \param capacity the new capacity of the power queue
      */
 
-    void build_powers_queue (PowersQueue_t *pqueue, Quantity_t capacity) ;
+    void powers_queue_build (PowersQueue_t *pqueue, Quantity_t capacity) ;
 
 
 
     /*! Releases the memory that stores power values and reset all the fields
-     *  to a default value calling \a init_powers_queue
+     *  to a default value calling \a powers_queue_init
      *
      * \param pqueue the address of the power queue
      */
 
-    void destroy_powers_queue (PowersQueue_t *pqueue) ;
+    void powers_queue_destroy (PowersQueue_t *pqueue) ;
 
 
 
@@ -145,20 +145,33 @@ extern "C"
      * \return \c NULL in case of error
      */
 
-    PowersQueue_t *calloc_powers_queue ( void ) ;
+    PowersQueue_t *powers_queue_calloc ( void ) ;
+
+
+
+    /*! Makes a new copy of a structure of type PowersQueue_t and
+     *  copies \a pqueue into it
+     *
+     * \param pqueue the address of the PowersQueue_t structure to clone
+     *
+     * \return a pointer to a new structure of type PowersQueue_t
+     * \return \c NULL in case of error of if the parameter \a pqueue is \c NULL
+     */
+
+    PowersQueue_t *powers_queue_clone (PowersQueue_t *pqueue) ;
 
 
 
     /*! Frees the memory space pointed to by \a pqueue
      *
      * The pointer \a pqueue must have been returned by a previous call
-     * to \a calloc_powers_queue . If \a pqueue is \c NULL,
+     * to \a powers_queue_calloc or \a clone_powers_queue. If \a pqueue is \c NULL,
      * no operation is performed.
      *
      * \param pqueue the address to free
      */
 
-    void free_powers_queue (PowersQueue_t *pqueue) ;
+    void powers_queue_free (PowersQueue_t *pqueue) ;
 
 
 
@@ -169,7 +182,7 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_powers_queue
+    void powers_queue_print
 
         (PowersQueue_t *pqueue, FILE *stream, String_t prefix) ;
 

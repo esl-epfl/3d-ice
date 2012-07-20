@@ -54,7 +54,7 @@ extern "C"
 
 #include "dimensions.h"
 #include "floorplan_matrix.h"
-#include "floorplan_element.h"
+#include "floorplan_element_list.h"
 #include "powers_queue.h"
 
 /******************************************************************************/
@@ -76,7 +76,7 @@ extern "C"
 
         /*! Pointer to the list of floorplan elements */
 
-        FloorplanElement_t *ElementsList ;
+        FloorplanElementList_t ElementsList ;
 
         /*! Matrix that stores the surface coefficients to transform
             power traces of each floorplan element into a source vector */
@@ -95,41 +95,21 @@ extern "C"
 
 /******************************************************************************/
 
+    void floorplan_init (Floorplan_t *floorplan) ;
 
+    void floorplan_copy (Floorplan_t *dst, Floorplan_t *src) ;
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param floorplan the address of the flooprlan to initialize
-     */
+    void floorplan_destroy (Floorplan_t *floorplan) ;
 
-    void init_floorplan (Floorplan_t *floorplan) ;
+    Floorplan_t *floorplan_calloc (void) ;
 
+    Floorplan_t *floorplan_clone (Floorplan_t *floorplan) ;
 
+    void floorplan_free (Floorplan_t *floorplan) ;
 
-    /*! Allocates and inits memory for a structure of type Floorplan_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    void floorplan_print (Floorplan_t *floorplan, FILE *stream, String_t prefix) ;
 
-    Floorplan_t *calloc_floorplan (void) ;
-
-
-
-    /*! Frees the memory space pointed to by \a floorplan
-     *
-     * The pointer \a floorplan must have been returned by a previous call
-     * to \a calloc_floorplan . If \a floorplan is \c NULL, no operation is performed.
-     *
-     * \param floorplan the address to free
-     */
-
-    void free_floorplan (Floorplan_t *floorplan) ;
-
-
-
-    /*! Parses the file pointed by Floorplan::FileName and fills the floorplan structure
-     *  \a floorplan
+    /*! Parses the floorplan file and fills the floorplan structure
      *
      * \param floorplan       the floorplan structure to fill
      * \param dimensions pointer to the structure storing the dimensions of the stack
@@ -143,10 +123,6 @@ extern "C"
     Error_t fill_floorplan
 
         (Floorplan_t *floorplan, Dimensions_t *dimensions, String_t file_name) ;
-
-
-
-    void print_floorplan (Floorplan_t *floorplan, FILE *stream, String_t prefix) ;
 
 
 

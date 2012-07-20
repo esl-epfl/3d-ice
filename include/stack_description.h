@@ -54,11 +54,11 @@ extern "C"
 
 #include "channel.h"
 #include "heat_sink.h"
-#include "die.h"
-#include "layer.h"
+#include "die_list.h"
+#include "layer_list.h"
 #include "dimensions.h"
-#include "material.h"
-#include "stack_element.h"
+#include "material_list.h"
+#include "stack_element_list.h"
 
 /******************************************************************************/
 
@@ -75,7 +75,7 @@ extern "C"
 
         /*! The list of materials componing the layers and channel walls */
 
-        Material_t *MaterialsList ;
+        MaterialList_t Materials ;
 
         /*! Information about the heat dissipation throught the top surface */
 
@@ -87,23 +87,24 @@ extern "C"
 
         /*! The list of layers available to compose the 3d stack */
 
-        Layer_t *LayersList ;
+        LayerList_t Layers ;
 
         /*! The list of dies available to compose the 3d stack */
 
-        Die_t *DiesList ;
+        DieList_t Dies ;
 
         /*! Collection of all the dimensions (chip, grid of cells, cell) */
 
         Dimensions_t *Dimensions ;
 
-        /*! Pointer to the top-most stack elements componing the 3Dstack */
+        /*! The list of stack elements componing the 3Dstack. The list
+         *  stores the stack elements in such a way that the head/begin/first
+         *  of the list points to the top most stack element while the
+         *  tail/end/last points to the bottom most one. Crossing the list
+         *  in a reverse order is necessary to get stack elements from bottom
+         *  to top. */
 
-        StackElement_t *TopStackElement ;
-
-        /*! Pointer to the bottom-most stack elements componing the 3Dstack */
-
-        StackElement_t *BottomStackElement ;
+        StackElementList_t StackElements ;
     } ;
 
 
@@ -115,13 +116,7 @@ extern "C"
 /******************************************************************************/
 
 
-
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param stkd the address of the StackDescription to initialize
-     */
-
-    void init_stack_description (StackDescription_t* stkd) ;
+    void stack_description_init (StackDescription_t* stkd) ;
 
 
 
@@ -132,7 +127,7 @@ extern "C"
      * \param stkd the address of the StackDescription structure to free
      */
 
-    void destroy_stack_description (StackDescription_t *stkd) ;
+    void stack_description_destroy (StackDescription_t *stkd) ;
 
 
 
@@ -143,9 +138,9 @@ extern "C"
      * \param prefix a string to be printed as prefix at the beginning of each line
      */
 
-    void print_stack_description
+    void stack_description_print
 
-        (StackDescription_t *v, FILE *stream, String_t prefix) ;
+        (StackDescription_t *stkd, FILE *stream, String_t prefix) ;
 
 
 

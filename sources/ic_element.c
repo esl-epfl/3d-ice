@@ -36,12 +36,15 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "ic_element.h"
 #include "macros.h"
 
 /******************************************************************************/
 
-void init_ic_element (ICElement_t *icel)
+void ic_element_init (ICElement_t *icel)
 {
     icel->SW_X      = (ChipDimension_t) 0.0 ;
     icel->SW_Y      = (ChipDimension_t) 0.0 ;
@@ -51,41 +54,88 @@ void init_ic_element (ICElement_t *icel)
     icel->SW_Column = (CellIndex_t) 0u ;
     icel->NE_Row    = (CellIndex_t) 0u ;
     icel->NE_Column = (CellIndex_t) 0u ;
-    icel->Next      = NULL ;
 }
 
 /******************************************************************************/
 
-ICElement_t *calloc_ic_element ( void )
+void ic_element_copy (ICElement_t *dst, ICElement_t *src)
+{
+    ic_element_destroy (dst) ;
+    ic_element_init    (dst) ;
+
+    dst->SW_X      = src->SW_X ;
+    dst->SW_Y      = src->SW_Y ;
+    dst->Length    = src->Length ;
+    dst->Width     = src->Width ;
+    dst->SW_Row    = src->SW_Row ;
+    dst->SW_Column = src->SW_Column ;
+    dst->NE_Row    = src->NE_Row ;
+    dst->NE_Column = src->NE_Column ;
+}
+
+/******************************************************************************/
+
+void ic_element_destroy (ICElement_t __attribute__ ((unused))*icel)
+{
+    return ;
+}
+
+/******************************************************************************/
+
+ICElement_t *ic_element_calloc ( void )
 {
     ICElement_t *ic_element = (ICElement_t *) malloc (sizeof(ICElement_t));
 
     if (ic_element != NULL)
 
-        init_ic_element (ic_element) ;
+        ic_element_init (ic_element) ;
 
     return ic_element ;
 }
 
 /*****************************************************************************/
 
-void free_ic_element (ICElement_t *icel)
+ICElement_t *ic_element_clone (ICElement_t *icel)
 {
-    if (icel != NULL)
+    if (icel == NULL)
 
-        FREE_POINTER (free, icel) ;
+        return NULL ;
+
+    ICElement_t *newi = ic_element_calloc ( ) ;
+
+    if (newi != NULL)
+
+        ic_element_copy (newi, icel) ;
+
+    return newi ;
+}
+
+/*****************************************************************************/
+
+void ic_element_free (ICElement_t *icel)
+{
+    if (icel == NULL)
+
+        return ;
+
+    ic_element_destroy (icel) ;
+
+    free (icel) ;
 }
 
 /******************************************************************************/
 
-void free_ic_elements_list (ICElement_t *list)
+bool ic_element_equal (ICElement_t *icel, ICElement_t *other)
 {
-    FREE_LIST (ICElement_t, list, free_ic_element) ;
+    return    icel->SW_X   == other->SW_X
+           && icel->SW_Y   == other->SW_Y
+           && icel->Length == other->Length
+           && icel->Width  == other->Width ;
 }
 
 /******************************************************************************/
 
-void print_ic_element
+void ic_element_print
 (
     ICElement_t *icel,
     FILE        *stream,
@@ -96,24 +146,6 @@ void print_ic_element
         "%s\trectangle (%.1f, %.1f, %.1f, %.1f ) ;\n",
         prefix, icel->SW_X, icel->SW_Y,
                 icel->Length, icel->Width) ;
-}
-
-/******************************************************************************/
-
-void print_ic_elements_list (ICElement_t *list, FILE *stream, String_t prefix)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (ICElement_t, icelement, list)
-    {
-        if (icelement->Next == NULL)
-
-            break ;
-
-        print_ic_element (icelement, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    print_ic_element (icelement, stream, prefix) ;
 }
 
 /******************************************************************************/

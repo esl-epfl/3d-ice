@@ -53,7 +53,7 @@ extern "C"
 #include "types.h"
 
 #include "analysis.h"
-#include "stack_element.h"
+#include "stack_element_list.h"
 #include "system_matrix.h"
 #include "thermal_grid.h"
 #include "power_grid.h"
@@ -114,16 +114,16 @@ extern "C"
      * \param tdata the address of the thermal data to initialize
      */
 
-    void init_thermal_data (ThermalData_t *tdata) ;
+    void thermal_data_init (ThermalData_t *tdata) ;
 
 
 
     /*! Allocs and initialize memory and prepares the LU factorization
      *
-     * \param tdata           the address of the ThermalData to fill
-     * \param stack_elements_list  the list of stack element (bottom first)
-     * \param dimensions     the dimensions of the IC
-     * \param analysis       the address of the Analysis structure
+     * \param tdata       the address of the ThermalData to fill
+     * \param list       the list of stack element (bottom first)
+     * \param dimensions the dimensions of the IC
+     * \param analysis   the address of the Analysis structure
      *
      * \return \c TDICE_FAILURE if the memory allocation fails or the syatem
      *              matrix cannot be split in A=LU.
@@ -132,10 +132,10 @@ extern "C"
 
     Error_t fill_thermal_data
     (
-        ThermalData_t  *tdata,
-        StackElement_t *stack_elements_list,
-        Dimensions_t   *dimensions,
-        Analysis_t     *analysis
+        ThermalData_t      *tdata,
+        StackElementList_t *list,
+        Dimensions_t       *dimensions,
+        Analysis_t         *analysis
     ) ;
 
 
@@ -147,7 +147,7 @@ extern "C"
      * \param tdata the address of the ThermalData structure to free
      */
 
-    void destroy_thermal_data  (ThermalData_t *tdata) ;
+    void thermal_data_destroy  (ThermalData_t *tdata) ;
 
 
 
@@ -287,7 +287,7 @@ extern "C"
     /*! Generate a text file with the thermal map of a stack element
      *
      * \param tdata address of the ThermalData structure
-     * \param stack_elements_list  the list of stack element (bottom first)
+     * \param list  the list of stack element (bottom first)
      * \param dimensions the dimensions of the IC
      * \param stack_element_id the id of the stack element as it appears in the
                         stack file
@@ -300,11 +300,11 @@ extern "C"
 
     Error_t print_thermal_map
     (
-        ThermalData_t  *tdata,
-        StackElement_t *stack_elements_list,
-        Dimensions_t   *dimensions,
-        String_t        stack_element_id,
-        String_t        file_name
+        ThermalData_t      *tdata,
+        StackElementList_t *list,
+        Dimensions_t       *dimensions,
+        String_t            stack_element_id,
+        String_t            file_name
     ) ;
 
 /******************************************************************************/

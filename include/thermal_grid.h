@@ -54,7 +54,7 @@ extern "C"
 #include "heat_sink.h"
 
 #include "dimensions.h"
-#include "stack_element.h"
+#include "stack_element_list.h"
 
 /******************************************************************************/
 
@@ -65,7 +65,7 @@ extern "C"
 
     struct ThermalGrid_t
     {
-        /*! The size of all the vectors that belong to this structure,
+        /*! The size of all the vectors that belong to tgrid structure,
             i.e. the number of layers in the 3d-ic */
 
         Quantity_t Size ;
@@ -104,7 +104,7 @@ extern "C"
      * \param tgrid the address of the thermal grid to initialize
      */
 
-    void init_thermal_grid (ThermalGrid_t *tgrid) ;
+    void thermal_grid_init (ThermalGrid_t *tgrid) ;
 
 
 
@@ -117,17 +117,17 @@ extern "C"
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t build_thermal_grid (ThermalGrid_t *tgrid, Quantity_t size) ;
+    Error_t thermal_grid_build (ThermalGrid_t *tgrid, Quantity_t size) ;
 
 
 
     /*! Release the memory used by the thermal grid (i.e. the memory allocated
-     *  by \a build_thermal_grid )
+     *  by \a thermal_grid_build )
      *
      * \param tgrid the address of the thermal grid
      */
 
-    void destroy_thermal_grid (ThermalGrid_t *tgrid) ;
+    void thermal_grid_destroy (ThermalGrid_t *tgrid) ;
 
 
 
@@ -140,9 +140,9 @@ extern "C"
 
     void fill_thermal_grid
     (
-        ThermalGrid_t  *tgrid,
-        StackElement_t *list,
-        Dimensions_t   *dimensions
+        ThermalGrid_t      *tgrid,
+        StackElementList_t *list,
+        Dimensions_t       *dimensions
     ) ;
 
 

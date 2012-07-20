@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_network_message (NetworkMessage_t *message)
+void network_message_init (NetworkMessage_t *message)
 {
     message->Memory    = (MessageWord_t *) calloc (MESSAGE_LENGTH, sizeof (MessageWord_t)) ;
 
@@ -58,9 +58,13 @@ void init_network_message (NetworkMessage_t *message)
 
 /******************************************************************************/
 
-void destroy_network_message (NetworkMessage_t *message)
+void network_message_destroy (NetworkMessage_t *message)
 {
-    FREE_POINTER (free, message->Memory) ;
+    if (message == NULL)
+
+        return ;
+
+    free (message->Memory) ;
 
     message->Memory    = NULL ;
     message->MaxLength = 0 ;

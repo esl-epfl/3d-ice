@@ -49,7 +49,7 @@
 
 /******************************************************************************/
 
-void init_socket (Socket_t *socket)
+void socket_init (Socket_t *socket)
 {
     socket->Id = 0 ;
 
@@ -102,7 +102,7 @@ Error_t open_server_socket
     {
         perror ("ERROR :: server bind") ;
 
-        close_socket (ssocket) ;
+        socket_close (ssocket) ;
 
         return TDICE_FAILURE ;
     }
@@ -111,7 +111,7 @@ Error_t open_server_socket
     {
         perror ("ERROR :: server listen") ;
 
-        close_socket (ssocket) ;
+        socket_close (ssocket) ;
 
         return TDICE_FAILURE ;
     }
@@ -139,7 +139,7 @@ Error_t connect_client_to_server
     {
         perror ("ERROR :: server address creation") ;
 
-        close_socket (csocket) ;
+        socket_close (csocket) ;
 
         return TDICE_FAILURE ;
     }
@@ -149,7 +149,7 @@ Error_t connect_client_to_server
     {
         perror ("ERROR :: client to server connection") ;
 
-        close_socket (csocket) ;
+        socket_close (csocket) ;
 
         return TDICE_FAILURE ;
     }
@@ -171,7 +171,7 @@ Error_t wait_for_client (Socket_t *ssocket, Socket_t *client)
     {
         perror ("ERROR :: server accept") ;
 
-        close_socket (ssocket) ;
+        socket_close (ssocket) ;
 
         return TDICE_FAILURE ;
     }
@@ -183,8 +183,8 @@ Error_t wait_for_client (Socket_t *ssocket, Socket_t *client)
     {
         perror ("ERROR :: client name translation") ;
 
-        close_socket (client) ;
-        close_socket (ssocket) ;
+        socket_close (client) ;
+        socket_close (ssocket) ;
 
         return TDICE_FAILURE ;
     }
@@ -315,7 +315,7 @@ Error_t receive_message_from_socket
 
 /******************************************************************************/
 
-Error_t close_socket (Socket_t *socket)
+Error_t socket_close (Socket_t *socket)
 {
     if (close (socket->Id) != 0)
     {

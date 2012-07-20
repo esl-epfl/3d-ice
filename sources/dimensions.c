@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_cell_dimensions (CellDimensions_t *celld)
+void cell_dimensions_init (CellDimensions_t *celld)
 {
     celld->FirstWallLength = (CellDimension_t) 0.0 ;
     celld->LastWallLength  = (CellDimension_t) 0.0 ;
@@ -56,7 +56,51 @@ void init_cell_dimensions (CellDimensions_t *celld)
 
 /******************************************************************************/
 
-void init_grid_dimensions (GridDimensions_t *gridd)
+void cell_dimensions_copy (CellDimensions_t *dst, CellDimensions_t *src)
+{
+    dst->FirstWallLength = src->FirstWallLength ;
+    dst->LastWallLength  = src->LastWallLength ;
+    dst->WallLength      = src->WallLength ;
+    dst->ChannelLength   = src->ChannelLength ;
+    dst->Width           = src->Width ;
+    dst->NHeights        = src->NHeights ;
+
+    if (src->Heights == NULL)
+    {
+        dst->Heights = NULL ;
+
+        return ;
+    }
+
+    dst->Heights = (CellDimension_t *)
+
+        malloc (src->NHeights * sizeof (CellDimension_t)) ;
+
+    if (dst->Heights == NULL)
+    {
+        fprintf (stderr, "Malloc heights error\n") ;
+
+        return ;
+    }
+
+    memcpy (dst->Heights, src->Heights,
+            src->NHeights * sizeof (CellDimension_t) ) ;
+}
+
+/******************************************************************************/
+
+void cell_dimensions_destroy (CellDimensions_t *celld)
+{
+    if (celld->Heights != NULL)
+
+        free (celld->Heights) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void grid_dimensions_init (GridDimensions_t *gridd)
 {
     gridd->NLayers      = (CellIndex_t) 0u ;
     gridd->NRows        = (CellIndex_t) 0u ;
@@ -67,7 +111,27 @@ void init_grid_dimensions (GridDimensions_t *gridd)
 
 /******************************************************************************/
 
-void init_chip_dimensions (ChipDimensions_t *chipd)
+void grid_dimensions_copy (GridDimensions_t *dst, GridDimensions_t *src)
+{
+    dst->NLayers      = src->NLayers ;
+    dst->NRows        = src->NRows ;
+    dst->NColumns     = src->NColumns ;
+    dst->NCells       = src->NCells ;
+    dst->NConnections = src->NConnections ;
+}
+
+/******************************************************************************/
+
+void grid_dimensions_destroy (GridDimensions_t __attribute__ ((unused))*gridd)
+{
+    return ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void chip_dimensions_init (ChipDimensions_t *chipd)
 {
     chipd->Length = (CellDimension_t) 0.0 ;
     chipd->Width  = (CellDimension_t) 0.0 ;
@@ -75,44 +139,94 @@ void init_chip_dimensions (ChipDimensions_t *chipd)
 
 /******************************************************************************/
 
-void init_dimensions (Dimensions_t *dimensions)
+void chip_dimensions_copy (ChipDimensions_t *dst, ChipDimensions_t *src)
 {
-    init_cell_dimensions (&dimensions->Cell) ;
-    init_grid_dimensions (&dimensions->Grid) ;
-    init_chip_dimensions (&dimensions->Chip) ;
+    dst->Length = src->Length ;
+    dst->Width  = src->Width ;
 }
 
 /******************************************************************************/
 
-Dimensions_t *calloc_dimensions (void)
+void chip_dimensions_destroy (ChipDimensions_t __attribute__ ((unused))*chipd)
+{
+    return ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void dimensions_init (Dimensions_t *dimensions)
+{
+    cell_dimensions_init (&dimensions->Cell) ;
+    grid_dimensions_init (&dimensions->Grid) ;
+    chip_dimensions_init (&dimensions->Chip) ;
+}
+
+/******************************************************************************/
+
+void dimensions_copy (Dimensions_t *dst, Dimensions_t *src)
+{
+    cell_dimensions_copy (&dst->Cell, &src->Cell) ;
+    grid_dimensions_copy (&dst->Grid, &src->Grid) ;
+    chip_dimensions_copy (&dst->Chip, &src->Chip) ;
+}
+
+/******************************************************************************/
+
+void dimensions_destroy (Dimensions_t *dimensions)
+{
+    cell_dimensions_destroy (&dimensions->Cell) ;
+    grid_dimensions_destroy (&dimensions->Grid) ;
+    chip_dimensions_destroy (&dimensions->Chip) ;
+}
+
+/******************************************************************************/
+
+Dimensions_t *dimensions_calloc (void)
 {
     Dimensions_t *dimensions = (Dimensions_t *) malloc (sizeof(Dimensions_t)) ;
 
     if (dimensions != NULL)
 
-        init_dimensions (dimensions) ;
+        dimensions_init (dimensions) ;
 
     return dimensions ;
 }
 
 /******************************************************************************/
 
-void free_dimensions (Dimensions_t *dimensions)
+Dimensions_t *dimensions_clone (Dimensions_t *dimensions)
+{
+    if (dimensions == NULL)
+
+        return NULL ;
+
+    Dimensions_t *newd = dimensions_calloc ( ) ;
+
+    if (newd != NULL)
+
+        dimensions_copy (newd, dimensions) ;
+
+    return newd ;
+}
+
+/******************************************************************************/
+
+void dimensions_free (Dimensions_t *dimensions)
 {
     if (dimensions == NULL)
 
         return ;
 
-    if (dimensions->Cell.Heights != NULL)
+    dimensions_destroy (dimensions) ;
 
-        FREE_POINTER (free, dimensions->Cell.Heights) ;
-
-    FREE_POINTER (free, dimensions) ;
+    free (dimensions) ;
 }
 
 /******************************************************************************/
 
-void print_dimensions
+void dimensions_print
 (
     Dimensions_t *dimensions,
     FILE         *stream,

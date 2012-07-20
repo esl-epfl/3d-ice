@@ -148,7 +148,7 @@ extern "C"
      * \param sysmatrix the address of the system matrix to initialize
      */
 
-    void init_system_matrix (SystemMatrix_t *sysmatrix) ;
+    void system_matrix_init (SystemMatrix_t *sysmatrix) ;
 
 
 
@@ -162,7 +162,7 @@ extern "C"
      * \return \c TDICE_FAILURE if the memory allocation fails
      */
 
-    Error_t build_system_matrix
+    Error_t system_matrix_build
 
         (SystemMatrix_t *sysmatrix, CellIndex_t size, CellIndex_t nnz) ;
 
@@ -173,7 +173,7 @@ extern "C"
      * \param sysmatrix the address of the system matrix structure
      */
 
-    void destroy_system_matrix (SystemMatrix_t *sysmatrix) ;
+    void system_matrix_destroy (SystemMatrix_t *sysmatrix) ;
 
 
 
@@ -235,7 +235,7 @@ extern "C"
      * \param file_name the name of the file to create
      */
 
-    void print_system_matrix (SystemMatrix_t sysmatrix, String_t file_name) ;
+    void system_matrix_print (SystemMatrix_t sysmatrix, String_t file_name) ;
 
 /******************************************************************************/
 

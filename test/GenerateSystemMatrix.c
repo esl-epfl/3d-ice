@@ -64,9 +64,9 @@ int main(int argc, char** argv)
     // Init StackDescription and parse the input file
     ////////////////////////////////////////////////////////////////////////////
 
-    init_stack_description (&stkd) ;
-    init_analysis          (&analysis) ;
-    init_output            (&output) ;
+    stack_description_init (&stkd) ;
+    analysis_init          (&analysis) ;
+    output_init            (&output) ;
 
     if (parse_stack_description_file (argv[1], &stkd, &analysis, &output) != 0)
 
@@ -75,16 +75,16 @@ int main(int argc, char** argv)
     // Init thermal data and fill it using the StackDescription
     ////////////////////////////////////////////////////////////////////////////
 
-    init_thermal_data (&tdata) ;
+    thermal_data_init (&tdata) ;
 
     Error_t result = fill_thermal_data
 
-        (&tdata, stkd.BottomStackElement, stkd.Dimensions, &analysis) ;
+        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis) ;
 
     if (result != TDICE_SUCCESS)
     {
-        destroy_stack_description (&stkd) ;
-        destroy_output            (&output) ;
+        stack_description_destroy (&stkd) ;
+        output_destroy            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -92,15 +92,15 @@ int main(int argc, char** argv)
     // Run the simulation and print the output
     ////////////////////////////////////////////////////////////////////////////
 
-    print_system_matrix (tdata.SM_A, argv[2]) ;
+    system_matrix_print (tdata.SM_A, argv[2]) ;
 
 
     // free all data
     ////////////////////////////////////////////////////////////////////////////
 
-    destroy_thermal_data      (&tdata) ;
-    destroy_stack_description (&stkd) ;
-    destroy_output            (&output) ;
+    thermal_data_destroy      (&tdata) ;
+    stack_description_destroy (&stkd) ;
+    output_destroy            (&output) ;
 
     return EXIT_SUCCESS ;
 }

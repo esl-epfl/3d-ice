@@ -70,9 +70,9 @@ int main(int argc, char** argv)
 
     fprintf (stdout, "Preparing stk data ... ") ; fflush (stdout) ;
 
-    init_stack_description (&stkd) ;
-    init_analysis          (&analysis) ;
-    init_output            (&output) ;
+    stack_description_init (&stkd) ;
+    analysis_init          (&analysis) ;
+    output_init            (&output) ;
 
     error = parse_stack_description_file (argv[1], &stkd, &analysis, &output) ;
 
@@ -90,8 +90,8 @@ int main(int argc, char** argv)
     {
         fprintf (stderr, "unknown analysis type!\n ");
 
-        destroy_stack_description (&stkd) ;
-        destroy_output            (&output) ;
+        stack_description_destroy (&stkd) ;
+        output_destroy            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -109,8 +109,8 @@ int main(int argc, char** argv)
     {
         fprintf (stderr, "error in initializing output files \n ");
 
-        destroy_stack_description (&stkd) ;
-        destroy_output            (&output) ;
+        stack_description_destroy (&stkd) ;
+        output_destroy            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -120,16 +120,16 @@ int main(int argc, char** argv)
 
     fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
 
-    init_thermal_data (&tdata) ;
+    thermal_data_init (&tdata) ;
 
     error = fill_thermal_data
 
-        (&tdata, stkd.BottomStackElement, stkd.Dimensions, &analysis) ;
+        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis) ;
 
     if (error != TDICE_SUCCESS)
     {
-        destroy_stack_description (&stkd) ;
-        destroy_output            (&output) ;
+        stack_description_destroy (&stkd) ;
+        output_destroy            (&output) ;
 
         return EXIT_FAILURE ;
     }
@@ -182,9 +182,9 @@ int main(int argc, char** argv)
     // free all data
     ////////////////////////////////////////////////////////////////////////////
 
-    destroy_thermal_data      (&tdata) ;
-    destroy_stack_description (&stkd) ;
-    destroy_output            (&output) ;
+    thermal_data_destroy      (&tdata) ;
+    stack_description_destroy (&stkd) ;
+    output_destroy            (&output) ;
 
     return EXIT_SUCCESS ;
 }

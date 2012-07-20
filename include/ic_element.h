@@ -93,11 +93,6 @@ extern "C"
          *  corner of the ic element is placed */
 
         CellIndex_t NE_Column ;
-
-        /*! pointer to collect IC elements in a linked list */
-
-        struct ICElement_t *Next ;
-
     } ;
 
     /*! Definition of the type ICElement_t */
@@ -106,73 +101,21 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param icel the address of the ic element structure to initialize
-     */
+    void ic_element_init (ICElement_t *icel) ;
 
-    void init_ic_element (ICElement_t *icel) ;
+    void ic_element_copy (ICElement_t *dst, ICElement_t *src) ;
 
+    void ic_element_destroy (ICElement_t *icel) ;
 
+    ICElement_t *ic_element_calloc ( void ) ;
 
-    /*! Allocates and inits memory for a structure of type ICElement_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    ICElement_t *ic_element_clone (ICElement_t *icel) ;
 
-    ICElement_t *calloc_ic_element ( void ) ;
+    void ic_element_free (ICElement_t *icel) ;
 
+    bool ic_element_equal (ICElement_t *icel, ICElement_t *other) ;
 
-
-    /*! Frees the memory space pointed to by \a icel
-     *
-     * The pointer \a icel must have been returned by a previous call
-     * to \a calloc_ic_element . If \a icel is \c NULL, no operation is performed.
-     *
-     * \param icel the address to free
-     */
-
-    void free_ic_element (ICElement_t *icel) ;
-
-
-
-    /*! Frees a list of ic elements
-     *
-     * If frees, calling \c free_ic_element, the ic element pointed by the
-     * parameter \a list and all the ic elements it finds following the
-     * linked list throught the field ICElement::Next .
-     *
-     * \param list the pointer to the first elment in the list to be freed
-     */
-
-    void free_ic_elements_list (ICElement_t *list) ;
-
-
-
-    /*! Prints the ic element as it looks in the stack file
-     *
-     * \param icel   the ic element to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_ic_element
-
-        (ICElement_t *icel, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of ic elements as they look in the stack file
-     *
-     * \param list   the pointer to the first ic element in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_ic_elements_list
-
-        (ICElement_t *list, FILE *stream, String_t prefix) ;
+    void ic_element_print (ICElement_t *icel, FILE *stream, String_t prefix) ;
 
 
 

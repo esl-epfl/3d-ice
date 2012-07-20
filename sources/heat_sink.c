@@ -44,7 +44,7 @@
 
 /******************************************************************************/
 
-void init_heat_sink (HeatSink_t *hsink)
+void heat_sink_init (HeatSink_t *hsink)
 {
     hsink->SinkModel          = TDICE_HEATSINK_MODEL_NONE ;
     hsink->NLayers            = 0u ;
@@ -53,42 +53,88 @@ void init_heat_sink (HeatSink_t *hsink)
     hsink->AmbientTemperature = 0.0 ;
     hsink->SinkHeight         = 0.0 ;
     hsink->SinkArea           = 0.0 ;
-    hsink->SinkMaterial       = NULL ;
     hsink->SpreaderHeight     = 0.0 ;
     hsink->SpreaderArea       = 0.0 ;
-    hsink->SpreaderMaterial   = NULL ;
+
+    material_init (&hsink->SinkMaterial) ;
+    material_init (&hsink->SpreaderMaterial) ;
 }
 
 /******************************************************************************/
 
-HeatSink_t *calloc_heat_sink (void)
+void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
+{
+    heat_sink_destroy (dst) ;
+    heat_sink_init    (dst) ;
+
+    dst->SinkModel          = src->SinkModel ;
+    dst->NLayers            = src->NLayers ;
+    dst->SourceLayerOffset  = src->SourceLayerOffset ;
+    dst->AmbientHTC         = src->AmbientHTC ;
+    dst->AmbientTemperature = src->AmbientTemperature ;
+    dst->SinkHeight         = src->SinkHeight ;
+    dst->SinkArea           = src->SinkArea ;
+    dst->SpreaderHeight     = src->SpreaderHeight ;
+    dst->SpreaderArea       = src->SpreaderArea ;
+
+    material_copy (&dst->SinkMaterial,     &src->SinkMaterial) ;
+    material_copy (&dst->SpreaderMaterial, &src->SpreaderMaterial) ;
+}
+
+/******************************************************************************/
+
+void heat_sink_destroy (HeatSink_t *hsink)
+{
+    material_destroy (&hsink->SinkMaterial) ;
+    material_destroy (&hsink->SpreaderMaterial) ;
+}
+
+/******************************************************************************/
+
+HeatSink_t *heat_sink_calloc (void)
 {
     HeatSink_t *heat_sink = (HeatSink_t *) malloc (sizeof(HeatSink_t)) ;
 
     if (heat_sink != NULL)
 
-        init_heat_sink (heat_sink) ;
+        heat_sink_init (heat_sink) ;
 
     return heat_sink ;
 }
 
 /******************************************************************************/
 
-void free_heat_sink (HeatSink_t *hsink)
+HeatSink_t *heat_sink_clone (HeatSink_t *hsink)
 {
-    if (hsink != NULL)
+    if (hsink == NULL)
 
-        FREE_POINTER (free, hsink) ;
+        return NULL ;
+
+    HeatSink_t *newh = heat_sink_calloc ( ) ;
+
+    if (newh != NULL)
+
+        heat_sink_copy (newh, hsink) ;
+
+    return newh ;
 }
 
 /******************************************************************************/
 
-void print_heat_sink
-(
-  HeatSink_t *hsink,
-  FILE       *stream,
-  String_t    prefix
-)
+void heat_sink_free (HeatSink_t *hsink)
+{
+    if (hsink == NULL)
+
+        return ;
+
+    heat_sink_destroy (hsink) ;
+
+    free (hsink) ;
+}
+
+/******************************************************************************/
+
+void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
 {
     if (hsink->SinkModel == TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
 
@@ -103,14 +149,14 @@ void print_heat_sink
             prefix,
             hsink->SinkHeight,
             hsink->SinkArea,
-            hsink->SinkMaterial->Id) ;
+            hsink->SinkMaterial.Id) ;
 
         fprintf (stream,
             "%s   spreader height %.2f, area %.1e, material %s ;\n",
             prefix,
             hsink->SpreaderHeight,
             hsink->SpreaderArea,
-            hsink->SpreaderMaterial->Id) ;
+            hsink->SpreaderMaterial.Id) ;
     }
 
     fprintf (stream,
@@ -138,7 +184,7 @@ SolidTC_t get_spreader_volumetric_heat_capacity
         return 0.0 ;
     }
 
-    return hsink->SpreaderMaterial->VolumetricHeatCapacity
+    return hsink->SpreaderMaterial.VolumetricHeatCapacity
            * (hsink->SpreaderArea / chip_area) ;
 }
 
@@ -158,7 +204,7 @@ SolidTC_t get_sink_volumetric_heat_capacity
         return 0.0 ;
     }
 
-    return hsink->SinkMaterial->VolumetricHeatCapacity
+    return hsink->SinkMaterial.VolumetricHeatCapacity
            * (hsink->SinkArea / chip_area) ;
 }
 
@@ -189,7 +235,7 @@ SolidTC_t get_spreader_thermal_conductivity
 
     SolidTC_t Bi_sink =   (hsink->AmbientHTC * sqrt (hsink->SinkArea / PI))
 
-                        / hsink->SinkMaterial->ThermalConductivity ;
+                        / hsink->SinkMaterial.ThermalConductivity ;
 
     SolidTC_t lambda_sink = PI + (1.0 / (sqrt (PI) * e_sink)) ;
 
@@ -198,13 +244,13 @@ SolidTC_t get_spreader_thermal_conductivity
                          (1.0 + (lambda_sink / Bi_sink) * tanh (lambda_sink * tau_sink)) ;
 
     SolidTC_t g_sink = (  2.0
-                        * hsink->SinkMaterial->ThermalConductivity
+                        * hsink->SinkMaterial.ThermalConductivity
                         * sqrt(hsink->SpreaderArea)
                        )
                        /
                        (pow(1.0 - e_sink, 1.5) * phi_sink) ;
 
-    SolidTC_t gm_sink = hsink->SinkMaterial->ThermalConductivity
+    SolidTC_t gm_sink = hsink->SinkMaterial.ThermalConductivity
 
                       * (hsink->SinkArea / hsink->SinkHeight) ;
 
@@ -224,7 +270,7 @@ SolidTC_t get_spreader_thermal_conductivity
 
     SolidTC_t Bi =   (H_sink * sqrt (hsink->SpreaderArea / PI))
 
-                   / hsink->SpreaderMaterial->ThermalConductivity ;
+                   / hsink->SpreaderMaterial.ThermalConductivity ;
 
     SolidTC_t lambda = ( PI + (1.0 / (sqrt (PI) * e)) ) ;
 
@@ -233,13 +279,13 @@ SolidTC_t get_spreader_thermal_conductivity
                     (1.0 + (lambda / Bi) * tanh (lambda * tau)) ;
 
     SolidTC_t g = (  2.0
-                   * hsink->SpreaderMaterial->ThermalConductivity
+                   * hsink->SpreaderMaterial.ThermalConductivity
                    * sqrt(chip_area)
                   )
                   /
                   (pow(1.0 - e, 1.5) * phi) ;
 
-    SolidTC_t gm = hsink->SpreaderMaterial->ThermalConductivity
+    SolidTC_t gm = hsink->SpreaderMaterial.ThermalConductivity
 
                    * (hsink->SpreaderArea / hsink->SpreaderHeight) ;
 
@@ -270,7 +316,7 @@ SolidTC_t get_sink_thermal_conductivity
 
     SolidTC_t Bi =   (hsink->AmbientHTC * sqrt (hsink->SinkArea / PI))
 
-                   / hsink->SinkMaterial->ThermalConductivity ;
+                   / hsink->SinkMaterial.ThermalConductivity ;
 
     SolidTC_t lambda = ( PI + (1.0 / (sqrt (PI) * e)) ) ;
 
@@ -279,13 +325,13 @@ SolidTC_t get_sink_thermal_conductivity
                     (1.0 + (lambda / Bi) * tanh (lambda * tau)) ) ;
 
     SolidTC_t g = (  2.0
-                   * hsink->SinkMaterial->ThermalConductivity
+                   * hsink->SinkMaterial.ThermalConductivity
                    * sqrt(hsink->SpreaderArea)
                   )
                   /
                   (pow(1.0 - e, 1.5) * phi) ;
 
-    SolidTC_t gm = hsink->SinkMaterial->ThermalConductivity
+    SolidTC_t gm = hsink->SinkMaterial.ThermalConductivity
 
                    * (hsink->SinkArea / hsink->SinkHeight) ;
 

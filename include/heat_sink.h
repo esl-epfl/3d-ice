@@ -93,10 +93,6 @@ extern "C"
 
         CellDimension_t SinkArea ;
 
-        /*! Material of the sink layer (used in case of connection to ambient) */
-
-        Material_t *SinkMaterial ;
-
         /*! Height of the spreader layer */
 
         CellDimension_t SpreaderHeight ;
@@ -105,9 +101,13 @@ extern "C"
 
         CellDimension_t SpreaderArea ;
 
+        /*! Material of the sink layer (used in case of connection to ambient) */
+
+        Material_t SinkMaterial ;
+
         /*! Material of the spreader layer */
 
-        Material_t *SpreaderMaterial ;
+        Material_t SpreaderMaterial ;
     } ;
 
     /*! Definition of the type HeatSink_t */
@@ -118,47 +118,19 @@ extern "C"
 
 
 
-    /*! Sets all the fields of an heat sink to a default value (zero or \c NULL ).
-     *
-     * \param hsink the address of the heat sink element to initialize
-     */
+    void heat_sink_init (HeatSink_t *hsink) ;
 
-    void init_heat_sink (HeatSink_t *hsink) ;
+    void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src) ;
 
+    void heat_sink_destroy (HeatSink_t *hsink) ;
 
+    HeatSink_t *heat_sink_calloc (void) ;
 
-    /*! Allocates and inits memory for a structure of type HeatSink_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    HeatSink_t *heat_sink_clone (HeatSink_t *hsink) ;
 
-    HeatSink_t *calloc_heat_sink (void) ;
+    void heat_sink_free (HeatSink_t *hsink) ;
 
-
-
-    /*! Frees the memory space pointed to by \a hsink
-     *
-     * The pointer \a hsink must have been returned by a previous call
-     * to \a calloc_heat_sink . If \a hsink is \c NULL, no operation is performed.
-     *
-     * \param hsink the address to free
-     */
-
-    void free_heat_sink (HeatSink_t *hsink) ;
-
-
-
-    /*! Prints an heat sink as it looks in the stack file
-     *
-     * \param hsink   the pointer to the heat sink to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_heat_sink
-
-        (HeatSink_t *hsink, FILE *stream, String_t prefix) ;
+    void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix) ;
 
 
     /*! Returns the equivalent volumetric heat capacity of the material of the

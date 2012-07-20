@@ -54,7 +54,7 @@
 /* Changes the default `yy' prefix used by flex for all globally-visible */
 /* variable and function names to instead be `PREFIX'.                   */
 
-%option prefix="floorplan_"
+%option prefix="floorplan_parser_"
 
 /* Directs flex to generate a scanner that maintains the number of the */
 /* current line read from its input in the global variable yylineno.   */

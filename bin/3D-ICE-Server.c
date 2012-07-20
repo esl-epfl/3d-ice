@@ -81,9 +81,9 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Preparing stk data ... ") ; fflush (stdout) ;
 
-    init_stack_description (&stkd) ;
-    init_analysis          (&analysis) ;
-    init_output            (&output) ;
+    stack_description_init (&stkd) ;
+    analysis_init          (&analysis) ;
+    output_init            (&output) ;
 
     error = parse_stack_description_file (argv[1], &stkd, &analysis, &output) ;
 
@@ -102,11 +102,11 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
 
-    init_thermal_data (&tdata) ;
+    thermal_data_init (&tdata) ;
 
     error = fill_thermal_data
 
-        (&tdata, stkd.BottomStackElement, stkd.Dimensions, &analysis) ;
+        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis) ;
 
     if (error != TDICE_SUCCESS)    goto ftd_error ;
 
@@ -116,7 +116,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
-    init_socket (&server_socket) ;
+    socket_init (&server_socket) ;
 
     error = open_server_socket (&server_socket, server_port) ;
 
@@ -128,7 +128,7 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "Waiting for client ... ") ; fflush (stdout) ;
 
-    init_socket (&client_socket) ;
+    socket_init (&client_socket) ;
 
     error = wait_for_client (&server_socket, &client_socket) ;
 
@@ -140,7 +140,7 @@ int main (int argc, char** argv)
 
     do
     {
-        init_network_message (&request) ;
+        network_message_init (&request) ;
 
         receive_message_from_socket (&client_socket, &request) ;
 
@@ -151,7 +151,7 @@ int main (int argc, char** argv)
 
             case TDICE_EXIT_SIMULATION :
             {
-                destroy_network_message (&request) ;
+                network_message_destroy (&request) ;
 
                 goto quit ;
             }
@@ -169,7 +169,7 @@ int main (int argc, char** argv)
 
             case TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS :
             {
-                init_network_message (&reply) ;
+                network_message_init (&reply) ;
 
                 build_message_head   (&reply, TDICE_TOTAL_NUMBER_OF_FLOORPLAN_ELEMENTS) ;
 
@@ -179,7 +179,7 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                destroy_network_message (&reply) ;
+                network_message_destroy (&reply) ;
 
                 break ;
             }
@@ -192,11 +192,11 @@ int main (int argc, char** argv)
 
                 PowersQueue_t queue ;
 
-                init_powers_queue (&queue) ;
+                powers_queue_init (&queue) ;
 
                 extract_message_word (&request, &nflpel, 0) ;
 
-                build_powers_queue (&queue, nflpel) ;
+                powers_queue_build (&queue, nflpel) ;
 
                 for (index = 1, nflpel++ ; index != nflpel ; index++)
                 {
@@ -213,14 +213,14 @@ int main (int argc, char** argv)
                 {
                     fprintf (stderr, "error: insert power values\n") ;
 
-                    destroy_powers_queue (&queue) ;
+                    powers_queue_destroy (&queue) ;
 
                     goto sim_error ;
                 }
 
-                destroy_powers_queue (&queue) ;
+                powers_queue_destroy (&queue) ;
 
-                init_network_message (&reply) ;
+                network_message_init (&reply) ;
                 build_message_head   (&reply, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
 
                 SimResult_t result = emulate_slot
@@ -231,7 +231,7 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                destroy_network_message (&reply) ;
+                network_message_destroy (&reply) ;
 
                 if (result != TDICE_SLOT_DONE)
                 {
@@ -255,7 +255,7 @@ int main (int argc, char** argv)
                 extract_message_word (&request, &type,     1) ;
                 extract_message_word (&request, &quantity, 2) ;
 
-                init_network_message (&reply) ;
+                network_message_init (&reply) ;
                 build_message_head   (&reply, TDICE_SEND_OUTPUT) ;
 
                 float   time = get_simulated_time (&analysis) ;
@@ -276,7 +276,7 @@ int main (int argc, char** argv)
                     {
                         fprintf (stderr, "error: generate message content\n") ;
 
-                        destroy_network_message (&reply) ;
+                        network_message_destroy (&reply) ;
 
                         goto sim_error ;
                     }
@@ -284,7 +284,7 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                destroy_network_message (&reply) ;
+                network_message_destroy (&reply) ;
 
                 break ;
             }
@@ -326,7 +326,7 @@ int main (int argc, char** argv)
 
             case TDICE_SIMULATE_SLOT :
             {
-                init_network_message (&reply) ;
+                network_message_init (&reply) ;
                 build_message_head   (&reply, TDICE_SIMULATE_SLOT) ;
 
                 SimResult_t result = emulate_slot (&tdata, stkd.Dimensions, &analysis) ;
@@ -335,11 +335,11 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                destroy_network_message (&reply) ;
+                network_message_destroy (&reply) ;
 
                 if (result == TDICE_END_OF_SIMULATION)
                 {
-                    destroy_network_message (&request) ;
+                    network_message_destroy (&request) ;
 
                     goto quit ;
                 }
@@ -357,7 +357,7 @@ int main (int argc, char** argv)
 
             case TDICE_SIMULATE_STEP :
             {
-                init_network_message (&reply) ;
+                network_message_init (&reply) ;
                 build_message_head   (&reply, TDICE_SIMULATE_STEP) ;
 
                 SimResult_t result = emulate_step (&tdata, stkd.Dimensions, &analysis) ;
@@ -366,11 +366,11 @@ int main (int argc, char** argv)
 
                 send_message_to_socket (&client_socket, &reply) ;
 
-                destroy_network_message (&reply) ;
+                network_message_destroy (&reply) ;
 
                 if (result == TDICE_END_OF_SIMULATION)
                 {
-                    destroy_network_message (&request) ;
+                    network_message_destroy (&request) ;
 
                     goto quit ;
                 }
@@ -391,7 +391,7 @@ int main (int argc, char** argv)
                 fprintf (stderr, "ERROR :: received unknown message type") ;
         }
 
-        destroy_network_message (&request) ;
+        network_message_destroy (&request) ;
 
     } while (1) ;
 
@@ -399,25 +399,25 @@ int main (int argc, char** argv)
 
 quit :
 
-    close_socket              (&client_socket) ;
-    close_socket              (&server_socket) ;
-    destroy_thermal_data      (&tdata) ;
-    destroy_stack_description (&stkd) ;
-    destroy_output            (&output) ;
+    socket_close              (&client_socket) ;
+    socket_close              (&server_socket) ;
+    thermal_data_destroy      (&tdata) ;
+    stack_description_destroy (&stkd) ;
+    output_destroy            (&output) ;
 
     return EXIT_SUCCESS ;
 
 sim_error :
-                            destroy_network_message   (&request) ;
-                            close_socket              (&client_socket) ;
+                            network_message_destroy   (&request) ;
+                            socket_close              (&client_socket) ;
 wait_error :
-                            close_socket              (&server_socket) ;
+                            socket_close              (&server_socket) ;
 socket_error :
-                            destroy_thermal_data      (&tdata) ;
+                            thermal_data_destroy      (&tdata) ;
 ftd_error :
 wrong_analysis_error :
-                            destroy_stack_description (&stkd) ;
-                            destroy_output            (&output) ;
+                            stack_description_destroy (&stkd) ;
+                            output_destroy            (&output) ;
 
                             return EXIT_FAILURE ;
 }

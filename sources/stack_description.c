@@ -43,80 +43,75 @@
 
 /******************************************************************************/
 
-void init_stack_description (StackDescription_t *stkd)
+void stack_description_init (StackDescription_t *stkd)
 {
-    stkd->FileName           = NULL ;
-    stkd->MaterialsList      = NULL ;
-    stkd->HeatSink           = NULL ;
-    stkd->Channel            = NULL ;
-    stkd->LayersList         = NULL ;
-    stkd->DiesList           = NULL ;
-    stkd->Dimensions         = NULL ;
-    stkd->TopStackElement    = NULL ;
-    stkd->BottomStackElement = NULL ;
+    stkd->FileName   = NULL ;
+    stkd->HeatSink   = NULL ;
+    stkd->Channel    = NULL ;
+    stkd->Dimensions = NULL ;
+
+         material_list_init (&stkd->Materials) ;
+            layer_list_init (&stkd->Layers) ;
+              die_list_init (&stkd->Dies) ;
+    stack_element_list_init (&stkd->StackElements) ;
 }
 
 /******************************************************************************/
 
-void destroy_stack_description (StackDescription_t *stkd)
+void stack_description_destroy (StackDescription_t *stkd)
 {
-    FREE_POINTER (free,                     stkd->FileName) ;
-    FREE_POINTER (free_materials_list,      stkd->MaterialsList) ;
-    FREE_POINTER (free_heat_sink,           stkd->HeatSink) ;
-    FREE_POINTER (free_channel,             stkd->Channel) ;
-    FREE_POINTER (free_layers_list,         stkd->LayersList) ;
-    FREE_POINTER (free_dies_list,           stkd->DiesList) ;
-    FREE_POINTER (free_dimensions,          stkd->Dimensions) ;
-    FREE_POINTER (free_stack_elements_list, stkd->BottomStackElement) ;
+    if (stkd->FileName != NULL)
 
-    stkd->TopStackElement = NULL ;
+        free (stkd->FileName) ;
+
+    heat_sink_free  (stkd->HeatSink) ;
+    channel_free    (stkd->Channel) ;
+    dimensions_free (stkd->Dimensions) ;
+
+         material_list_destroy (&stkd->Materials) ;
+            layer_list_destroy (&stkd->Layers) ;
+              die_list_destroy (&stkd->Dies) ;
+    stack_element_list_destroy (&stkd->StackElements) ;
 }
 
 /******************************************************************************/
 
-void print_stack_description
+void stack_description_print
 (
   StackDescription_t *stkd,
   FILE               *stream,
   String_t            prefix
 )
 {
-    if (stkd->MaterialsList != NULL)
-    {
-        print_materials_list (stkd->MaterialsList, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
+    material_list_print (&stkd->Materials, stream, prefix) ;
 
     if (stkd->HeatSink != NULL)
     {
-        print_heat_sink (stkd->HeatSink, stream, prefix) ;
+        heat_sink_print (stkd->HeatSink, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
     if (stkd->Channel != NULL)
     {
-        print_channel
-
-            (stkd->Channel, stream, prefix, stkd->Dimensions) ;
+        channel_print (stkd->Channel, stream, prefix, stkd->Dimensions) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }
 
-    print_layers_list (stkd->LayersList, stream, prefix) ;
+    layer_list_print (&stkd->Layers, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_dies_list (stkd->DiesList, stream, prefix) ;
+    die_list_print (&stkd->Dies, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_dimensions (stkd->Dimensions, stream, prefix) ;
+    dimensions_print (stkd->Dimensions, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 
-    print_stack_elements_list (stkd->TopStackElement, stream, prefix) ;
+    stack_element_list_print (&stkd->StackElements, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;
 }
@@ -129,15 +124,19 @@ Quantity_t get_number_of_floorplan_elements
   String_t            stack_element_id
 )
 {
-    StackElement_t *stack_element = find_stack_element_in_list
+    StackElement_t stkel ;
 
-        (stkd->BottomStackElement, stack_element_id) ;
+    stack_element_init (&stkel) ;
 
-    if (stack_element == NULL)
+    stkel.Id = stack_element_id ;
 
-        return 0 ;
+    StackElement_t *tmp = stack_element_list_find (&stkd->StackElements, &stkel) ;
 
-    return get_number_of_floorplan_elements_stack_element (stack_element) ;
+    if (tmp == NULL)
+
+        return 0u ;
+
+    return get_number_of_floorplan_elements_stack_element (tmp) ;
 }
 
 /******************************************************************************/
@@ -146,11 +145,16 @@ Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd)
 {
     Quantity_t tmp = 0u ;
 
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT
+    StackElementListNode_t *stkeln ;
 
-        (StackElement_t, stack_element, stkd->BottomStackElement)
+    for (stkeln  = stack_element_list_begin (&stkd->StackElements) ;
+         stkeln != NULL ;
+         stkeln  = stack_element_list_next (stkeln))
+    {
+        StackElement_t *stkel = stack_element_list_data (stkeln) ;
 
-        tmp += get_number_of_floorplan_elements_stack_element (stack_element) ;
+        tmp += get_number_of_floorplan_elements_stack_element (stkel) ;
+    }
 
     return tmp ;
 }

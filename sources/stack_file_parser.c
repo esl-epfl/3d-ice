@@ -119,15 +119,15 @@ Error_t generate_stack_description_file
         return TDICE_FAILURE ;
     }
 
-    print_stack_description (stkd, out, (String_t) "") ;
+    stack_description_print (stkd, out, (String_t) "") ;
 
     fprintf (out, "\n") ;
 
-    print_analysis (analysis, out, (String_t) "") ;
+    analysis_print (analysis, out, (String_t) "") ;
 
     fprintf (out, "\n") ;
 
-    print_output (output, out, (String_t) "") ;
+    output_print (output, out, (String_t) "") ;
 
     fclose (out) ;
 

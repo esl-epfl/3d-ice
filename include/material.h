@@ -71,13 +71,6 @@ extern "C"
         String_t Id ;
 
         /*!
-         * To know, after the parsing of a stack file, if a
-         * material has been declared but never used
-         */
-
-        Quantity_t Used ;
-
-        /*!
          * The volume-specific heat capacity of the material,
          * expressed as \f$ \frac{J}{\mu m^3 \cdot K } \f$
          */
@@ -90,12 +83,6 @@ extern "C"
          */
 
         SolidTC_t ThermalConductivity ;
-
-        /*!
-         * Pointer to collect materials in a linked list
-         */
-
-        struct Material_t *Next ;
     } ;
 
     /*! Definition of the type Material_t
@@ -106,86 +93,21 @@ extern "C"
 /******************************************************************************/
 
 
+    void material_init (Material_t *material) ;
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param material the address of the material structure to initialize
-     */
+    void material_copy (Material_t *dst, Material_t *src) ;
 
-    void init_material (Material_t *material) ;
+    void material_destroy (Material_t *material) ;
 
+    Material_t *material_calloc ( void ) ;
 
+    Material_t *material_clone (Material_t *material) ;
 
-    /*! Allocates and inits memory for a structure of type Material_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    void material_free (Material_t *material) ;
 
-    Material_t *calloc_material ( void ) ;
+    bool material_same_id (Material_t *material, Material_t *other) ;
 
-
-
-    /*! Frees the memory space pointed to by \a material
-     *
-     * The pointer \a material must have been returned by a previous call
-     * to \a calloc_material . If \a material is \c NULL,
-     * no operation is performed.
-     *
-     * \param material the address to free
-     */
-
-    void free_material (Material_t *material) ;
-
-
-
-    /*! Frees a list of materials
-     *
-     * If frees, calling \c free_material, the material pointed by the
-     * parameter \a list and all the materials it finds following the
-     * linked list throught the field Material_t::Next.
-     *
-     * \param list the pointer to the first elment in the list to be freed
-     */
-
-    void free_materials_list (Material_t *list) ;
-
-
-
-    /*! Searches for a Material_t in a linked list of materials.
-     *
-     * Id based search of a Material_t structure in a list.
-     *
-     * \param list the pointer to the list
-     * \param id   the identifier of the material to be found
-     *
-     * \return the address of a Material_t, if founded
-     * \return \c NULL if the search fails
-     */
-
-    Material_t *find_material_in_list (Material_t *list, String_t id) ;
-
-
-
-    /*! Prints the material as it looks in the stack file
-     *
-     * \param material   the material to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_material (Material_t *material, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of materials as they look in the stack file
-     *
-     * \param list   the pointer to the first material in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_materials_list (Material_t *list, FILE *stream, String_t prefix) ;
+    void material_print (Material_t *material, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

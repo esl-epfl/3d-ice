@@ -51,7 +51,7 @@ extern "C"
 #include <stdio.h>
 
 #include "types.h"
-#include "floorplan_element.h"
+#include "floorplan_element_list.h"
 #include "dimensions.h"
 
 #include "slu_ddefs.h"
@@ -115,7 +115,11 @@ extern "C"
      * \param flpmatrix the address of the floorplan matrix to initialize
      */
 
-    void init_floorplan_matrix (FloorplanMatrix_t *flpmatrix) ;
+    void floorplan_matrix_init (FloorplanMatrix_t *flpmatrix) ;
+
+
+
+    void floorplan_matrix_copy (FloorplanMatrix_t *dst, FloorplanMatrix_t *src) ;
 
 
 
@@ -130,7 +134,7 @@ extern "C"
      * \return \c TDICE_FAILURE if the memory allocation fails
      */
 
-    Error_t build_floorplan_matrix
+    Error_t floorplan_matrix_build
     (
         FloorplanMatrix_t *flpmatrix,
         CellIndex_t        nrows,
@@ -145,7 +149,7 @@ extern "C"
      * \param flpmatrix the address of the floorplan matrix structure
      */
 
-    void destroy_floorplan_matrix (FloorplanMatrix_t *flpmatrix) ;
+    void floorplan_matrix_destroy (FloorplanMatrix_t *flpmatrix) ;
 
 
 
@@ -159,11 +163,11 @@ extern "C"
      *  \param dimensions pointer to the structure containing the dimensions of the IC
      */
 
-    void fill_floorplan_matrix
+    void floorplan_matrix_fill
     (
-        FloorplanMatrix_t  *flpmatrix,
-        FloorplanElement_t *list,
-        Dimensions_t       *dimensions
+        FloorplanMatrix_t      *flpmatrix,
+        FloorplanElementList_t *list,
+        Dimensions_t           *dimensions
     ) ;
 
 
@@ -176,7 +180,7 @@ extern "C"
      *
      */
 
-    void multiply_floorplan_matrix
+    void floorplan_matrix_multiply
 
         (FloorplanMatrix_t *flpmatrix, Source_t *x, Source_t *b) ;
 
@@ -192,7 +196,7 @@ extern "C"
      * \param file_name the name of the file to create
      */
 
-    void print_floorplan_matrix (FloorplanMatrix_t flpmatrix, String_t file_name) ;
+    void floorplan_matrix_print (FloorplanMatrix_t flpmatrix, String_t file_name) ;
 
 /******************************************************************************/
 

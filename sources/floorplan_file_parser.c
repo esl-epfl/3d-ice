@@ -46,7 +46,7 @@
 //  due to end-of-input). The value is 1 if parsing failed (return is due to
 //  a syntax error).
 
-extern int floorplan_parse
+extern int floorplan_parser_parse
 
     (Floorplan_t *floorplan, Dimensions_t *dimensions, yyscan_t scanner) ;
 
@@ -74,13 +74,13 @@ Error_t parse_floorplan_file
 
     floorplan->FileName = strdup (filename) ;  // FIXME memory leak
 
-    floorplan_lex_init  (&scanner) ;
-    floorplan_set_in    (input, scanner) ;
+    floorplan_parser_lex_init  (&scanner) ;
+    floorplan_parser_set_in    (input, scanner) ;
     //floorplan_set_debug (1, scanner) ;
 
-    result = floorplan_parse (floorplan, dimensions, scanner) ;
+    result = floorplan_parser_parse (floorplan, dimensions, scanner) ;
 
-    floorplan_lex_destroy (scanner) ;
+    floorplan_parser_lex_destroy (scanner) ;
     fclose (input) ;
 
     if (result == 0)
@@ -109,7 +109,7 @@ Error_t generate_floorplan_file
         return TDICE_FAILURE ;
     }
 
-    print_floorplan (floorplan, out, (String_t) "") ;
+    floorplan_print (floorplan, out, (String_t) "") ;
 
     fclose (out) ;
 

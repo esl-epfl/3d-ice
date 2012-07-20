@@ -56,7 +56,6 @@ extern "C"
 #include "heat_sink.h"
 #include "die.h"
 #include "dimensions.h"
-#include "floorplan.h"
 #include "layer.h"
 
 /******************************************************************************/
@@ -108,26 +107,10 @@ extern "C"
 
         CellIndex_t NLayers ;
 
-        /*! A pointer to a Floorplan. This field is
-         *  used only if StaclElement::Type is \c TDICE_STACK_ELEMENT_DIE */
-
-        Floorplan_t *Floorplan ;
-
         /*! The offset (\# layers) of the first layer of the
          *  stack element, counting from the first layer in the stack */
 
         CellIndex_t Offset ;
-
-        /*! Pointer to the 'next' stack element (towards the top of the stack),
-         *  to collect stack elements in a double linked list */
-
-        struct StackElement_t *Next ;
-
-        /*! Pointer to the 'previous' stack element (towards the bottom of the stack),
-         *  to collect stack elements in a double linked list */
-
-        struct StackElement_t *Prev ;
-
     } ;
 
     /*! Definition of the type StackElement_t */
@@ -136,76 +119,24 @@ extern "C"
 
 /******************************************************************************/
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param stkel the address of the stack element to initialize
-     */
+    void stack_element_init (StackElement_t *stkel) ;
 
-    void init_stack_element (StackElement_t *stkel) ;
+    void stack_element_copy (StackElement_t *dst, StackElement_t *src) ;
 
+    void stack_element_destroy (StackElement_t *stkel) ;
 
 
-    /*! Allocates and inits memory for a structure of type StackElement_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    StackElement_t *stack_element_calloc (void) ;
 
-    StackElement_t *calloc_stack_element (void) ;
+    StackElement_t *stack_element_clone (StackElement_t *stkel) ;
 
+    void stack_element_free (StackElement_t *stkel) ;
 
+    bool stack_element_same_id (StackElement_t *stkel, StackElement_t *other) ;
 
-    /*! Frees the memory space pointed to by \a stkel
-     *
-     * The pointer \a stkel must have been returned by a previous call
-     * to \a calloc_stack_element . If \a stkel is \c NULL, no operation is performed.
-     *
-     * \param stkel the address to free
-     */
+    void stack_element_print
 
-    void free_stack_element (StackElement_t *stkel) ;
-
-
-
-    /*! Frees a list of stack elements
-     *
-     * If frees, calling #free_stack_element, the stack element pointed by the
-     * parameter \a list and all the stack elements it finds following the
-     * linked list throught the field StackElement::Next .
-     *
-     * \param list the pointer to the first elment in the list to be freed
-     */
-
-    void free_stack_elements_list (StackElement_t *list) ;
-
-
-
-    /*! Searches for a StackElement in a linked list of stack elements.
-     *
-     * Id based search of a StackElement structure in a list.
-     *
-     * \param list the pointer to the list
-     * \param id   the identifier of the stack element to be found
-     *
-     * \return the address of a StackElement, if founded
-     * \return \c NULL if the search fails
-     */
-
-    StackElement_t *find_stack_element_in_list (StackElement_t *list, String_t id) ;
-
-
-    // FIXME : what about print_stack_element ??
-
-    /*! Prints a list of stack elements as they look in the stack file
-     *
-     * \param list   the pointer to the first stack element in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_stack_elements_list
-
-        (StackElement_t *list, FILE *stream, String_t prefix) ;
+        (StackElement_t *stkel, FILE *stream, String_t prefix) ;
 
 
 
@@ -228,9 +159,9 @@ extern "C"
      * \param stream        the reference to the (already opened) stream
      */
 
-    void print_thermal_map_stack_element
+    void stack_element_print_thermal_map
     (
-        StackElement_t  *v,
+        StackElement_t  *stkel,
         Dimensions_t    *dimensions,
         Temperature_t   *temperatures,
         FILE            *stream
@@ -246,7 +177,7 @@ extern "C"
      * \param stream        the reference to the (already opened) stream
      */
 
-    void print_power_map_stack_element
+    void stack_element_print_power_map
     (
         StackElement_t  *stkel,
         Dimensions_t    *dimensions,

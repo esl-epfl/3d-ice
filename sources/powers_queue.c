@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_powers_queue (PowersQueue_t *pqueue)
+void powers_queue_init (PowersQueue_t *pqueue)
 {
     pqueue->Capacity = (Quantity_t) 0u ;
     pqueue->Memory   = NULL ;
@@ -54,11 +54,11 @@ void init_powers_queue (PowersQueue_t *pqueue)
 
 /******************************************************************************/
 
-void build_powers_queue (PowersQueue_t *pqueue, Quantity_t capacity)
+void powers_queue_build (PowersQueue_t *pqueue, Quantity_t capacity)
 {
     if (pqueue == NULL)    return ;
 
-    destroy_powers_queue (pqueue) ;
+    powers_queue_destroy (pqueue) ;
 
     pqueue->Memory = (Power_t *) calloc (capacity, sizeof (Power_t)) ;
 
@@ -74,13 +74,13 @@ void build_powers_queue (PowersQueue_t *pqueue, Quantity_t capacity)
 
 /******************************************************************************/
 
-void destroy_powers_queue (PowersQueue_t *pqueue)
+void powers_queue_destroy (PowersQueue_t *pqueue)
 {
     if (pqueue == NULL)    return ;
 
-    FREE_POINTER (free, pqueue->Memory) ;
+    free (pqueue->Memory) ;
 
-    init_powers_queue (pqueue) ;
+    powers_queue_init (pqueue) ;
 }
 
 /******************************************************************************/
@@ -89,7 +89,7 @@ void copy_powers_queue (PowersQueue_t *dst, PowersQueue_t *src)
 {
     if (dst->Capacity < src->Capacity || dst->Memory == NULL)
     {
-        build_powers_queue (dst, src->Capacity) ;
+        powers_queue_build (dst, src->Capacity) ;
     }
     else
     {
@@ -117,31 +117,50 @@ void copy_powers_queue (PowersQueue_t *dst, PowersQueue_t *src)
 
 /******************************************************************************/
 
-PowersQueue_t *calloc_powers_queue ( void )
+PowersQueue_t *powers_queue_calloc  ( void )
 {
     PowersQueue_t *powers_queue = (PowersQueue_t *) malloc (sizeof(PowersQueue_t)) ;
 
     if (powers_queue != NULL)
 
-        init_powers_queue (powers_queue) ;
+        powers_queue_init (powers_queue) ;
 
     return powers_queue ;
 }
 
 /******************************************************************************/
 
-void free_powers_queue (PowersQueue_t *pqueue)
+PowersQueue_t *powers_queue_clone (PowersQueue_t *pqueue)
 {
-    if (pqueue == NULL)    return ;
+    if (pqueue == NULL)
 
-    destroy_powers_queue (pqueue) ;
+        return NULL ;
 
-    FREE_POINTER (free, pqueue) ;
+    PowersQueue_t *newpq = powers_queue_calloc  ( ) ;
+
+    if (newpq != NULL)
+
+        copy_powers_queue (newpq, pqueue) ;
+
+    return newpq ;
 }
 
 /******************************************************************************/
 
-void print_powers_queue
+void powers_queue_free (PowersQueue_t *pqueue)
+{
+    if (pqueue == NULL)
+
+        return ;
+
+    powers_queue_destroy (pqueue) ;
+
+    free (pqueue) ;
+}
+
+/******************************************************************************/
+
+void powers_queue_print
 (
     PowersQueue_t *pqueue,
     FILE          *stream,
@@ -196,9 +215,9 @@ void put_into_powers_queue (PowersQueue_t *pqueue, Power_t power)
     {
         PowersQueue_t pq ;
 
-        init_powers_queue (&pq) ;
+        powers_queue_init (&pq) ;
 
-        build_powers_queue (&pq, pqueue->Capacity * (Quantity_t) 2) ;
+        powers_queue_build (&pq, pqueue->Capacity * (Quantity_t) 2) ;
 
         copy_powers_queue (&pq, pqueue) ;
 
@@ -211,7 +230,7 @@ void put_into_powers_queue (PowersQueue_t *pqueue, Power_t power)
         pqueue->Start    = pq.Start ;
         pqueue->End      = pq.End ;
 
-        destroy_powers_queue (&pq) ;
+        powers_queue_destroy (&pq) ;
     }
 
     pqueue->Memory [pqueue->End] = power ;

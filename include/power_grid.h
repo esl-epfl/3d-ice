@@ -55,7 +55,7 @@ extern "C"
 #include "floorplan.h"
 
 #include "thermal_grid.h"
-#include "stack_element.h"
+#include "stack_element_list.h"
 #include "powers_queue.h"
 #include "dimensions.h"
 
@@ -108,11 +108,11 @@ extern "C"
      * \param pgrid the address of the power grid structure to initialize
      */
 
-    void init_power_grid (PowerGrid_t *pgrid) ;
+    void power_grid_init (PowerGrid_t *pgrid) ;
 
 
 
-    /*! Allocs internal memory to store power grid informations
+    /*! Allocs internal memory to store power grid information
      *
      * \param pgrid    pointer to the power grid structure
      * \param nlayers the number of layers in the 3d stack
@@ -122,7 +122,7 @@ extern "C"
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t build_power_grid
+    Error_t power_grid_build
     (
         PowerGrid_t *pgrid,
         Quantity_t   nlayers,
@@ -132,12 +132,12 @@ extern "C"
 
 
     /*! Release the memory used by the power grid
-     *  (i.e. the memory allocated by \a build_power_grid )
+     *  (i.e. the memory allocated by \a power_grid_build )
      *
      * \param pgrid the address of the power grid
      */
 
-    void destroy_power_grid (PowerGrid_t *pgrid) ;
+    void power_grid_destroy (PowerGrid_t *pgrid) ;
 
 
 
@@ -147,7 +147,7 @@ extern "C"
      *  \param list pointer to the list of stack elements
      */
 
-    void fill_power_grid (PowerGrid_t *pgrid, StackElement_t *list) ;
+    void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list) ;
 
 
 

@@ -44,70 +44,88 @@
 
 /******************************************************************************/
 
-void init_material (Material_t *material)
+void material_init (Material_t *material)
 {
     material->Id                     = NULL ;
-    material->Used                   = (Quantity_t) 0u ;
     material->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
     material->ThermalConductivity    = (SolidTC_t) 0.0 ;
-    material->Next                   = NULL ;
 }
 
 /******************************************************************************/
 
-Material_t *calloc_material ( void )
+void material_copy (Material_t *dst, Material_t *src)
+{
+    material_destroy (dst) ;
+    material_init    (dst) ;
+
+    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+
+    dst->VolumetricHeatCapacity = src->VolumetricHeatCapacity ;
+    dst->ThermalConductivity    = src->ThermalConductivity ;
+}
+
+/******************************************************************************/
+
+void material_destroy (Material_t *material)
+{
+    if (material->Id != NULL)
+
+        free (material->Id) ;
+}
+
+/******************************************************************************/
+
+Material_t *material_calloc ( void )
 {
     Material_t *material = (Material_t *) malloc (sizeof(Material_t)) ;
 
     if (material != NULL)
 
-        init_material (material) ;
+        material_init (material) ;
 
     return material ;
 }
 
 /******************************************************************************/
 
-void free_material (Material_t *material)
+Material_t *material_clone (Material_t *material)
+{
+    if (material == NULL)
+
+        return NULL ;
+
+    Material_t *newm = material_calloc ( ) ;
+
+    if (newm != NULL)
+
+        material_copy (newm, material) ;
+
+    return newm ;
+}
+
+/******************************************************************************/
+
+void material_free (Material_t *material)
 {
     if (material == NULL)
 
         return ;
 
-    if (material->Id != NULL)
+    material_destroy (material) ;
 
-        FREE_POINTER (free, material->Id) ;
-
-    FREE_POINTER (free, material) ;
+    free (material) ;
 }
 
 /******************************************************************************/
 
-void free_materials_list (Material_t *list)
+bool material_same_id (Material_t *material, Material_t *other)
 {
-    FREE_LIST (Material_t, list, free_material) ;
+    return strcmp (material->Id, other->Id) == 0 ? true : false ;
 }
 
 /******************************************************************************/
 
-Material_t *find_material_in_list (Material_t *list, String_t id)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
-    {
-        if (strcmp(material->Id, id) == 0)
-            break ;
-    }
-    return material ;
-}
-
-/******************************************************************************/
-
-void print_material
-(
-    Material_t *material,
-    FILE       *stream,
-    String_t    prefix
-)
+void material_print (Material_t *material, FILE *stream, String_t prefix)
 {
     fprintf (stream,
              "%smaterial %s :\n",
@@ -120,29 +138,6 @@ void print_material
     fprintf (stream,
              "%s   volumetric heat capacity %.4e  ;\n",
              prefix, material->VolumetricHeatCapacity) ;
-}
-
-/******************************************************************************/
-
-void print_materials_list
-(
-    Material_t *list,
-    FILE       *stream,
-    String_t    prefix
-)
-{
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (Material_t, material, list)
-    {
-        if (material->Next == NULL)
-
-            break ;
-
-        print_material (material, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    print_material (material, stream, prefix) ;
 }
 
 /******************************************************************************/

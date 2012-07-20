@@ -71,28 +71,11 @@ extern "C"
 
         /*! The material composing the layer */
 
-        Material_t *Material ;
+        Material_t Material ;
 
         /*! The Id given to the layer if declared for stack element */
 
         String_t Id ;
-
-        /*!
-         * To know, after the parsing of a stack file, if a
-         * layer has been declared but never used
-         */
-
-        Quantity_t Used ;
-
-        /*! Pointer to the 'next' layer (towards the top of the die),
-         *  to collect layers in a double linked list */
-
-        struct Layer_t *Next ;
-
-        /*! Pointer to the 'previous' layer (towards the bottom of the die),
-         *  to collect layers in a double linked list */
-
-        struct Layer_t *Prev ;
     } ;
 
     /*! Definition of the type Layer_t */
@@ -101,88 +84,22 @@ extern "C"
 
 /******************************************************************************/
 
+    void layer_init (Layer_t *layer) ;
+
+    void layer_copy (Layer_t *dst, Layer_t *src) ;
+
+    void layer_destroy (Layer_t *layer) ;
+
+    Layer_t *layer_calloc ( void ) ;
+
+    Layer_t *layer_clone (Layer_t *layer) ;
+
+    void layer_free (Layer_t *layer) ;
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param layer the address of the layer structure to initialize
-     */
+    bool layer_same_id (Layer_t *layer, Layer_t *other) ;
 
-    void init_layer (Layer_t *layer) ;
-
-
-
-    /*! Allocates and inits memory for a structure of type Layer_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
-
-    Layer_t *calloc_layer ( void ) ;
-
-
-
-    /*! Frees the memory space pointed to by \a layer
-     *
-     * The pointer \a layer must have been returned by a previous call
-     * to \a calloc_layer . If \a layer is \c NULL,
-     * no operation is performed.
-     *
-     * \param layer the address to free
-     */
-
-    void free_layer (Layer_t *layer) ;
-
-
-
-    /*! Frees a list of layers
-     *
-     * If frees, calling \c free_layer, the layer pointed by the
-     * parameter \a list and all the layers it finds following the
-     * linked list throught the field Layer_t::Next.
-     *
-     * \param list the pointer to the first elment in the list to be freed
-     */
-
-    void free_layers_list (Layer_t *list) ;
-
-
-
-    /*! Searches for a Layer_t in a linked list of layers.
-     *
-     * Id based search of a Layer_t structure in a list.
-     *
-     * \param list the pointer to the list
-     * \param id   the identifier of the layer to be found
-     *
-     * \return the address of a Layer_t, if founded
-     * \return \c NULL if the search fails
-     */
-
-    Layer_t *find_layer_in_list (Layer_t *list, String_t id) ;
-
-
-
-    /*! Prints the layer as it looks in the stack file
-     *
-     * \param layer  the layer to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_layer (Layer_t *layer, FILE *stream, String_t prefix) ;
-
-
-
-    /*! Prints a list of layers as they look in the stack file
-     *
-     * \param list   the pointer to the first layer in the list
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_layers_list (Layer_t *list, FILE *stream, String_t prefix) ;
-
+    void layer_print (Layer_t *layer, FILE *stream, String_t prefix) ;
 
 /******************************************************************************/
 

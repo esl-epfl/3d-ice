@@ -44,7 +44,7 @@
 
 /******************************************************************************/
 
-void init_analysis (Analysis_t *analysis)
+void analysis_init (Analysis_t *analysis)
 {
     analysis->AnalysisType       = (AnalysisType_t) TDICE_ANALYSIS_TYPE_NONE ;
     analysis->StepTime           = (Time_t) 0.0 ;
@@ -56,29 +56,73 @@ void init_analysis (Analysis_t *analysis)
 
 /******************************************************************************/
 
-Analysis_t *calloc_analysis ( void )
+void analysis_copy (Analysis_t *dst, Analysis_t *src)
+{
+    analysis_destroy (dst) ;
+    analysis_init    (dst) ;
+
+    dst->AnalysisType       = src->AnalysisType ;
+    dst->StepTime           = src->StepTime ;
+    dst->SlotTime           = src->SlotTime ;
+    dst->SlotLength         = src->SlotLength ;
+    dst->CurrentTime        = src->CurrentTime ;
+    dst->InitialTemperature = src->InitialTemperature ;
+}
+
+/******************************************************************************/
+
+void analysis_destroy (Analysis_t __attribute__ ((unused))*analysis)
+{
+    return ;
+}
+
+/******************************************************************************/
+
+Analysis_t *analysis_calloc ( void )
 {
     Analysis_t *analysis = (Analysis_t *) malloc (sizeof (Analysis_t)) ;
 
     if (analysis != NULL)
 
-        init_analysis (analysis) ;
+        analysis_init (analysis) ;
 
     return analysis ;
 }
 
 /******************************************************************************/
 
-void free_analysis (Analysis_t *analysis)
+Analysis_t *analysis_clone (Analysis_t *analysis)
 {
-    if (analysis != NULL)
+    if (analysis == NULL)
 
-        FREE_POINTER (free, analysis) ;
+        return NULL ;
+
+    Analysis_t *newa = analysis_calloc ( ) ;
+
+    if (newa != NULL)
+
+        analysis_copy (newa, analysis) ;
+
+    return newa ;
 }
 
 /******************************************************************************/
 
-Time_t get_simulated_time (Analysis_t *analysis)
+void analysys_free (Analysis_t *analysis)
+{
+    if (analysis == NULL)
+
+        return ;
+
+    analysis_destroy (analysis) ;
+
+    free (analysis) ;
+}
+
+/******************************************************************************/
+
+Time_t get_simulated_time (Analysis_t *analysis
+)
 {
   return analysis->CurrentTime * analysis->StepTime ;
 }
@@ -103,12 +147,7 @@ bool slot_completed (Analysis_t *analysis)
 
 /******************************************************************************/
 
-void print_analysis
-(
-    Analysis_t *analysis,
-    FILE       *stream,
-    String_t    prefix
-)
+void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix)
 {
     fprintf (stream, "%ssolver : ", prefix) ;
 

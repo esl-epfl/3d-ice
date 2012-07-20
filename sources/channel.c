@@ -41,7 +41,7 @@
 #include "channel.h"
 #include "macros.h"
 
-void init_coolant (Coolant_t *coolant)
+void coolant_init (Coolant_t *coolant)
 {
     coolant->HTCSide       = (CoolantHTC_t) 0.0 ;
     coolant->HTCTop        = (CoolantHTC_t) 0.0 ;
@@ -54,7 +54,27 @@ void init_coolant (Coolant_t *coolant)
 
 /******************************************************************************/
 
-void init_channel (Channel_t *channel)
+void coolant_copy (Coolant_t *dst, Coolant_t *src)
+{
+    dst->HTCSide       = src->HTCSide ;
+    dst->HTCTop        = src->HTCTop ;
+    dst->HTCBottom     = src->HTCBottom ;
+    dst->VHC           = src->VHC ;
+    dst->FlowRate      = src->FlowRate ;
+    dst->DarcyVelocity = src->DarcyVelocity ;
+    dst->TIn           = src->TIn ;
+}
+
+/******************************************************************************/
+
+void coolant_destroy (Coolant_t __attribute__ ((unused))*coolant)
+{
+    return ;
+}
+
+/******************************************************************************/
+
+void channel_init (Channel_t *channel)
 {
     channel->ChannelModel      = (ChannelModel_t) TDICE_CHANNEL_MODEL_NONE ;
     channel->Height            = (CellDimension_t) 0.0 ;
@@ -65,36 +85,83 @@ void init_channel (Channel_t *channel)
     channel->NLayers           = (CellIndex_t) 0u ;
     channel->SourceLayerOffset = (CellIndex_t) 0u ;
 
-    init_coolant ( &channel->Coolant ) ;
-
-    channel->WallMaterial = NULL ;
+    coolant_init  ( &channel->Coolant ) ;
+    material_init (&channel->WallMaterial) ;
 }
 
 /******************************************************************************/
 
-Channel_t *calloc_channel ( void )
+void channel_copy (Channel_t *dst, Channel_t *src)
+{
+    channel_destroy (dst) ;
+    channel_init    (dst) ;
+
+    dst->ChannelModel          = src->ChannelModel ;
+    dst->Height                = src->Height ;
+    dst->Length                = src->Length ;
+    dst->Pitch                 = src->Pitch ;
+    dst->Porosity              = src->Porosity ;
+    dst->NChannels             = src->NChannels ;
+    dst->NLayers               = src->NLayers ;
+    dst->SourceLayerOffset     = src->SourceLayerOffset ;
+
+    coolant_copy  (&dst->Coolant,      &src->Coolant) ;
+    material_copy (&dst->WallMaterial, &src->WallMaterial) ;
+}
+
+/******************************************************************************/
+
+void channel_destroy (Channel_t *channel)
+{
+    coolant_destroy  (&channel->Coolant) ;
+    material_destroy (&channel->WallMaterial) ;
+}
+/******************************************************************************/
+
+Channel_t *channel_calloc ( void )
 {
     Channel_t *channel = (Channel_t *) malloc (sizeof(Channel_t)) ;
 
     if (channel != NULL)
 
-        init_channel (channel) ;
+        channel_init (channel) ;
 
     return channel ;
 }
 
 /******************************************************************************/
 
-void free_channel (Channel_t *channel)
+Channel_t *channel_clone (Channel_t *channel)
 {
-    if (channel != NULL)
+    if (channel == NULL)
 
-        FREE_POINTER (free, channel) ;
+        return NULL ;
+
+    Channel_t *newc = channel_calloc ( ) ;
+
+    if (newc != NULL)
+
+        channel_copy (newc, channel) ;
+
+    return newc ;
 }
 
 /******************************************************************************/
 
-void print_channel
+void channel_free (Channel_t *channel)
+{
+    if (channel == NULL)
+
+        return ;
+
+    channel_destroy (channel) ;
+
+    free (channel) ;
+}
+
+/******************************************************************************/
+
+void channel_print
 (
     Channel_t    *channel,
     FILE         *stream,
@@ -113,7 +180,7 @@ void print_channel
         fprintf (stream, "%s   first wall length %7.1f ;\n", prefix, dimensions->Cell.FirstWallLength) ;
         fprintf (stream, "%s    last wall length %7.1f ;\n", prefix, dimensions->Cell.LastWallLength) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial.Id) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->Coolant.FlowRate)) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -134,7 +201,7 @@ void print_channel
         fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, channel->Length) ;
         fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, channel->Pitch - channel->Length) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s   wall material %s ;\n", prefix, channel->WallMaterial.Id) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   coolant flow rate  %.2f ;\n", prefix, FLOW_RATE_FROM_UM3SEC_TO_MLMIN(channel->Coolant.FlowRate)) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -156,7 +223,7 @@ void print_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin distribution inline ;\n", prefix) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial.Id) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->Coolant.DarcyVelocity) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -175,7 +242,7 @@ void print_channel
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin distribution staggered ;\n", prefix) ;
         fprintf (stream, "%s\n", prefix) ;
-        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial->Id) ;
+        fprintf (stream, "%s   pin material %s ;\n", prefix, channel->WallMaterial.Id) ;
         fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   darcy velocity  %.4e ;\n", prefix, channel->Coolant.DarcyVelocity) ;
         fprintf (stream, "%s\n", prefix) ;

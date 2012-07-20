@@ -53,7 +53,7 @@ extern "C"
 #include "types.h"
 
 #include "dimensions.h"
-#include "inspection_point.h"
+#include "inspection_point_list.h"
 #include "network_message.h"
 
 /******************************************************************************/
@@ -68,17 +68,17 @@ extern "C"
         /*! Pointer to the list of inspection points to print
          *  at the end of the simulation */
 
-        InspectionPoint_t *InspectionPointListFinal ;
+        InspectionPointList_t InspectionPointListFinal ;
 
         /*! Pointer to the list of inspection points to print
          *  at the end of the time slot */
 
-        InspectionPoint_t *InspectionPointListSlot ;
+        InspectionPointList_t InspectionPointListSlot ;
 
         /*! Pointer to the list of inspection points to print
          *  at every time step */
 
-        InspectionPoint_t *InspectionPointListStep ;
+        InspectionPointList_t InspectionPointListStep ;
 
     } ;
 
@@ -89,26 +89,13 @@ extern "C"
 /******************************************************************************/
 
 
+    void output_init (Output_t *output) ;
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param output the address of the output structure to initialize
-     */
+    void output_copy (Output_t *dst, Output_t *src) ;
 
-    void init_output (Output_t *output) ;
+    void output_destroy (Output_t *output) ;
 
-
-
-    /*! Frees the memory used by the output structure, i.e. releases the
-     * memory used to store the inspection points.
-     *
-     * The parametrer \a output must be the address of a static variable
-     *
-     * \param output the address of the output structure to free
-     */
-
-    void destroy_output (Output_t *output) ;
-
+    void output_print (Output_t *output, FILE *stream, String_t prefix) ;
 
 
     /*! Returns the number of a specific type of insection point
@@ -132,26 +119,13 @@ extern "C"
 
 
 
-    /*! Prints the output informations as they look in the stack file
-     *
-     * \param output   the output information to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_output (Output_t *output, FILE *stream, String_t prefix) ;
-
-
-
     /*! Inserts an inspection point into the corresponding queue
      *
-     * \param output             pointer to the output structure
-     * \param inspection_point pointer to the inspection point to add
+     * \param output   pointer to the output structure
+     * \param ipoint pointer to the inspection point to add
      */
 
-    void add_inspection_point
-
-        (Output_t *output, InspectionPoint_t *inspection_point) ;
+    void add_inspection_point (Output_t *output, InspectionPoint_t *ipoint) ;
 
 
 

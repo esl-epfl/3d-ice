@@ -50,16 +50,15 @@ static void init_data (double* data, uint32_t size, double init_value)
 
 /******************************************************************************/
 
-void init_thermal_data (ThermalData_t *tdata)
+void thermal_data_init (ThermalData_t *tdata)
 {
     tdata->Size = 0u ;
 
     tdata->Temperatures = NULL ;
 
-    init_thermal_grid (&tdata->ThermalGrid) ;
-    init_power_grid   (&tdata->PowerGrid) ;
-
-    init_system_matrix (&tdata->SM_A) ;
+    thermal_grid_init  (&tdata->ThermalGrid) ;
+    power_grid_init    (&tdata->PowerGrid) ;
+    system_matrix_init (&tdata->SM_A) ;
 
     tdata->SLUMatrix_B.Store = NULL ;
 }
@@ -68,10 +67,10 @@ void init_thermal_data (ThermalData_t *tdata)
 
 Error_t fill_thermal_data
 (
-    ThermalData_t  *tdata,
-    StackElement_t *stack_elements_list,
-    Dimensions_t   *dimensions,
-    Analysis_t     *analysis
+    ThermalData_t      *tdata,
+    StackElementList_t *stack_elements_list,
+    Dimensions_t       *dimensions,
+    Analysis_t         *analysis
 )
 {
     Error_t result ;
@@ -103,7 +102,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the thermal grid */
 
-    result = build_thermal_grid
+    result = thermal_grid_build
 
         (&tdata->ThermalGrid, get_number_of_layers (dimensions)) ;
 
@@ -112,7 +111,8 @@ Error_t fill_thermal_data
         fprintf (stderr, "Cannot malloc thermal grid\n") ;
 
         Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
-        FREE_POINTER (free, tdata->Temperatures) ;
+
+        free (tdata->Temperatures) ;
 
         return TDICE_FAILURE ;
     }
@@ -121,7 +121,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the power grid */
 
-    result = build_power_grid (&tdata->PowerGrid,
+    result = power_grid_build (&tdata->PowerGrid,
                                get_number_of_layers (dimensions),
                                get_number_of_cells(dimensions)) ;
 
@@ -130,9 +130,10 @@ Error_t fill_thermal_data
         fprintf (stderr, "Cannot malloc power grid\n") ;
 
         Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
-        FREE_POINTER (free, tdata->Temperatures) ;
 
-        destroy_thermal_grid (&tdata->ThermalGrid) ;
+        free (tdata->Temperatures) ;
+
+        thermal_grid_destroy (&tdata->ThermalGrid) ;
 
         return TDICE_FAILURE ;
     }
@@ -141,7 +142,7 @@ Error_t fill_thermal_data
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
 
-    result = build_system_matrix
+    result = system_matrix_build
 
         (&tdata->SM_A, tdata->Size, get_number_of_connections (dimensions)) ;
 
@@ -150,10 +151,11 @@ Error_t fill_thermal_data
         fprintf (stderr, "Cannot malloc syatem matrix\n") ;
 
         Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
-        FREE_POINTER (free, tdata->Temperatures) ;
 
-        destroy_thermal_grid (&tdata->ThermalGrid) ;
-        destroy_power_grid   (&tdata->PowerGrid) ;
+        free (tdata->Temperatures) ;
+
+        thermal_grid_destroy (&tdata->ThermalGrid) ;
+        power_grid_destroy   (&tdata->PowerGrid) ;
 
         return TDICE_FAILURE ;
     }
@@ -166,7 +168,7 @@ Error_t fill_thermal_data
 
     if (result == TDICE_FAILURE)
     {
-        destroy_thermal_data (tdata) ;
+        thermal_data_destroy (tdata) ;
 
         return TDICE_FAILURE ;
     }
@@ -176,14 +178,14 @@ Error_t fill_thermal_data
 
 /******************************************************************************/
 
-void destroy_thermal_data (ThermalData_t *tdata)
+void thermal_data_destroy (ThermalData_t *tdata)
 {
-    FREE_POINTER (free, tdata->Temperatures) ;
+    free (tdata->Temperatures) ;
 
-    destroy_thermal_grid (&tdata->ThermalGrid) ;
-    destroy_power_grid   (&tdata->PowerGrid) ;
+    thermal_grid_destroy (&tdata->ThermalGrid) ;
+    power_grid_destroy   (&tdata->PowerGrid) ;
 
-    destroy_system_matrix (&tdata->SM_A) ;
+    system_matrix_destroy (&tdata->SM_A) ;
 
     Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
 }
@@ -431,18 +433,22 @@ Temperature_t get_cell_temperature
 
 Error_t print_thermal_map
 (
-    ThermalData_t  *tdata,
-    StackElement_t *stack_elements_list,
-    Dimensions_t   *dimensions,
-    String_t        stack_element_id,
-    String_t        file_name
+    ThermalData_t      *tdata,
+    StackElementList_t *list,
+    Dimensions_t       *dimensions,
+    String_t            stack_element_id,
+    String_t            file_name
 )
 {
-    StackElement_t *stack_element = find_stack_element_in_list
+    StackElement_t stkel ;
 
-         (stack_elements_list, stack_element_id) ;
+    stack_element_init (&stkel) ;
 
-    if (stack_element == NULL)
+    stkel.Id = stack_element_id ;
+
+    StackElement_t *tmp = stack_element_list_find (list, &stkel) ;
+
+    if (tmp == NULL)
 
         return TDICE_FAILURE ;
 
@@ -455,9 +461,9 @@ Error_t print_thermal_map
         return TDICE_FAILURE ;
     }
 
-    print_thermal_map_stack_element
+    stack_element_print_thermal_map
 
-        (stack_element, dimensions, tdata->Temperatures, output_file) ;
+        (tmp, dimensions, tdata->Temperatures, output_file) ;
 
     fclose (output_file) ;
 

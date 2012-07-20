@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-void init_power_grid (PowerGrid_t *pgrid)
+void power_grid_init (PowerGrid_t *pgrid)
 {
     pgrid->NLayers           = 0u ;
     pgrid->NCells            = 0u ;
@@ -56,7 +56,7 @@ void init_power_grid (PowerGrid_t *pgrid)
 
 /******************************************************************************/
 
-Error_t build_power_grid
+Error_t power_grid_build
 (
     PowerGrid_t *pgrid,
     Quantity_t   nlayers,
@@ -80,7 +80,7 @@ Error_t build_power_grid
 
     if (pgrid->FloorplansProfile == NULL)
     {
-        FREE_POINTER (free, pgrid->LayersProfile) ;
+        free (pgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
     }
@@ -97,8 +97,8 @@ Error_t build_power_grid
     {
         fprintf (stderr, "Cannot malloc source vector\n") ;
 
-        FREE_POINTER (free, pgrid->LayersProfile) ;
-        FREE_POINTER (free, pgrid->FloorplansProfile) ;
+        free (pgrid->LayersProfile) ;
+        free (pgrid->FloorplansProfile) ;
 
         return TDICE_FAILURE ;
     }
@@ -108,42 +108,51 @@ Error_t build_power_grid
 
 /******************************************************************************/
 
-void destroy_power_grid (PowerGrid_t *pgrid)
+void power_grid_destroy (PowerGrid_t *pgrid)
 {
-    FREE_POINTER (free, pgrid->LayersProfile) ;
-    FREE_POINTER (free, pgrid->FloorplansProfile) ;
-    FREE_POINTER (free, pgrid->Sources) ;
+    if (pgrid == NULL)
+
+        return ;
+
+    free (pgrid->LayersProfile) ;
+    free (pgrid->FloorplansProfile) ;
+    free (pgrid->Sources) ;
 }
 
 /******************************************************************************/
 
-void fill_power_grid (PowerGrid_t *pgrid, StackElement_t *list)
+void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list)
 {
-    FOR_EVERY_ELEMENT_IN_LIST_NEXT (StackElement_t, stack_element, list)
+    StackElementListNode_t *stkeln ;
+
+    for (stkeln  = stack_element_list_end (list) ;
+         stkeln != NULL ;
+         stkeln  = stack_element_list_prev (stkeln))
     {
+        StackElement_t *stack_element = stack_element_list_data (stkeln) ;
+
         CellIndex_t index = stack_element->Offset ;
 
         switch (stack_element->Type)
         {
             case TDICE_STACK_ELEMENT_DIE :
             {
-                CellIndex_t tmp = 0u ;
+                CellIndex_t        tmp = 0u ;
+                LayerListNode_t *lnd ;
 
-                FOR_EVERY_ELEMENT_IN_LIST_NEXT
-
-                (Layer_t, layer, stack_element->Pointer.Die->BottomLayer)
+                for (lnd = layer_list_begin (&stack_element->Pointer.Die->Layers) ;
+                     lnd != NULL ;
+                     lnd = layer_list_next (lnd))
                 {
-                    if (layer == stack_element->Pointer.Die->SourceLayer)
-                    {
-                        pgrid->LayersProfile     [index + tmp] = TDICE_LAYER_SOURCE ;
-                        pgrid->FloorplansProfile [index + tmp] = stack_element->Floorplan ;
-                    }
-                    else
-
-                        pgrid->LayersProfile     [index + tmp] = TDICE_LAYER_SOLID ;
+                    pgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
 
                     tmp++ ;
                 }
+
+                tmp = stack_element->Pointer.Die->SourceLayerOffset ;
+
+                pgrid->LayersProfile     [index + tmp] = TDICE_LAYER_SOURCE ;
+                pgrid->FloorplansProfile [index + tmp] = &stack_element->Pointer.Die->Floorplan ;
 
                 break ;
             }
@@ -229,6 +238,7 @@ void fill_power_grid (PowerGrid_t *pgrid, StackElement_t *list)
                         else
 
                             fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
+
 
                         break ;
 

@@ -121,7 +121,19 @@ extern "C"
      * \param celld the address of the cell dimensions structure to initialize
      */
 
-    void init_cell_dimensions (CellDimensions_t *delld) ;
+    void cell_dimensions_init (CellDimensions_t *celld) ;
+
+
+
+    /*! Copies the cell dimensions \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void cell_dimensions_copy (CellDimensions_t *dst, CellDimensions_t *src) ;
+
+    void cell_dimensions_destroy (CellDimensions_t *celld) ;
 
 /******************************************************************************/
 
@@ -187,7 +199,20 @@ extern "C"
      * \param gridd the address of the grid dimensions structure to initialize
      */
 
-    void init_grid_dimensions (GridDimensions_t *gridd) ;
+    void grid_dimensions_init (GridDimensions_t *gridd) ;
+
+
+
+    /*! Copies the grid dimensions \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void grid_dimensions_copy (GridDimensions_t *dst, GridDimensions_t *src) ;
+
+
+    void grid_dimensions_destroy (GridDimensions_t *gridd) ;
 
 /******************************************************************************/
 
@@ -218,7 +243,19 @@ extern "C"
      * \param chipd the address of the chip dimensions structure to initialize
      */
 
-    void init_chip_dimensions (ChipDimensions_t *chipd) ;
+    void chip_dimensions_init (ChipDimensions_t *chipd) ;
+
+
+
+    /*! Copies the chip dimensions \a src into \a dest.
+     *
+     * \param dst the left term of the assignement (destination)
+     * \param src the right term of the assignement (source)
+     */
+
+    void chip_dimensions_copy (ChipDimensions_t *dst, ChipDimensions_t *src) ;
+
+    void chip_dimensions_destroy (ChipDimensions_t *chipd) ;
 
 /******************************************************************************/
 
@@ -249,46 +286,22 @@ extern "C"
 /******************************************************************************/
 
 
+    void dimensions_init (Dimensions_t *dimensions) ;
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
-     *
-     * \param dimensions the address of the dimensions structure to initialize
-     */
+    void dimensions_copy (Dimensions_t *dst, Dimensions_t *src) ;
 
-    void init_dimensions (Dimensions_t *dimensions) ;
+    void dimensions_destroy (Dimensions_t *dimensions) ;
 
 
+    Dimensions_t *dimensions_calloc (void) ;
 
-    /*! Allocates and inits memory for a structure of type Dimensions_t
-     *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
-     */
+    Dimensions_t *dimensions_clone (Dimensions_t *dimensions) ;
 
-    Dimensions_t *calloc_dimensions (void) ;
+    void dimensions_free (Dimensions_t *dimensions) ;
 
+    void dimensions_print
 
-
-    /*! Frees the memory space pointed to by \a dimensions
-     *
-     * The pointer \a dimensions must have been returned by a previous call
-     * to \a calloc_dimensions . If \a dimensions is \c NULL, no operation is performed.
-     *
-     * \param dimensions the address to free
-     */
-
-    void free_dimensions (Dimensions_t *dimensions) ;
-
-
-
-    /*! Prints the dimensions as they look in the stack file
-     *
-     * \param dimensions   the dimensions to print
-     * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
-     */
-
-    void print_dimensions (Dimensions_t *dimensions, FILE *stream, String_t prefix) ;
+        (Dimensions_t *dimensions, FILE *stream, String_t prefix) ;
 
 
 
