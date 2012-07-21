@@ -158,15 +158,61 @@ extern "C"
     void inspection_point_destroy (InspectionPoint_t *ipoint) ;
 
 
+
+    /*! Allocates memory for a structure of type InspectionPoint_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a inspection_point_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     InspectionPoint_t *inspection_point_calloc (void) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a ipoint
+     *
+     * \param ipoint the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a ipoint is \c NULL
+     */
+
     InspectionPoint_t *inspection_point_clone (InspectionPoint_t *ipoint) ;
+
+
+
+    /*! Frees the memory space pointed by \a ipoint
+     *
+     * The function destroys the structure \a ipoint and then frees
+     * its memory. The pointer \a ipoint must have been returned by
+     * a previous call to \a inspection_point_calloc or
+     * \a inspection_point_clone .
+     *
+     * If \a ipoint is \c NULL, no operation is performed.
+     *
+     * \param ipoint the pointer to free
+     */
 
     void inspection_point_free (InspectionPoint_t *ipoint) ;
 
     bool inspection_point_same_filename (InspectionPoint_t *ipoint, InspectionPoint_t *other) ;
 
-    void inspection_point_print (InspectionPoint_t *ipoint, FILE *stream, String_t prefix) ;
+
+
+    /*! Prints the insection point declaration as it looks in the stack file
+     *
+     * \param ipoint the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
+
+    void inspection_point_print
+
+        (InspectionPoint_t *ipoint, FILE *stream, String_t prefix) ;
 
 
     /*! Aligns the Tcell inspection point to the grid of thermal cells

@@ -94,15 +94,15 @@ void floorplan_element_destroy (FloorplanElement_t *flpel)
 
 FloorplanElement_t *floorplan_element_calloc (void)
 {
-    FloorplanElement_t *floorplan_element = (FloorplanElement_t *)
+    FloorplanElement_t *flpel =
 
-        malloc (sizeof(FloorplanElement_t));
+        (FloorplanElement_t *) malloc (sizeof(FloorplanElement_t));
 
-    if (floorplan_element != NULL)
+    if (flpel != NULL)
 
-        floorplan_element_init (floorplan_element) ;
+        floorplan_element_init (flpel) ;
 
-    return floorplan_element ;
+    return flpel ;
 }
 
 /*****************************************************************************/

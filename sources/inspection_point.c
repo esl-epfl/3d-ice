@@ -96,7 +96,9 @@ void inspection_point_destroy (InspectionPoint_t *ipoint)
 
 InspectionPoint_t *inspection_point_calloc (void)
 {
-    InspectionPoint_t *ipoint = (InspectionPoint_t *) malloc (sizeof(InspectionPoint_t)) ;
+    InspectionPoint_t *ipoint =
+
+        (InspectionPoint_t *) malloc (sizeof(InspectionPoint_t)) ;
 
     if (ipoint != NULL)
 

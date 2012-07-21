@@ -132,14 +132,56 @@ extern "C"
     void die_destroy (Die_t *die) ;
 
 
+
+    /*! Allocates memory for a structure of type Die_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a die_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Die_t *die_calloc ( void ) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a die
+     *
+     * \param die the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a die is \c NULL
+     */
+
     Die_t *die_clone (Die_t *die) ;
+
+
+
+    /*! Frees the memory space pointed by \a die
+     *
+     * The function destroys the structure \a die and then frees
+     * its memory. The pointer \a die must have been returned by
+     * a previous call to \a die_calloc or \a die_clone .
+     *
+     * If \a die is \c NULL, no operation is performed.
+     *
+     * \param die the pointer to free
+     */
 
     void die_free (Die_t *die) ;
 
 
     bool die_same_id (Die_t *die, Die_t *other) ;
+
+
+    /*! Prints the die declaration as it looks in the stack file
+     *
+     * \param die the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void die_print (Die_t *die, FILE *stream, String_t prefix) ;
 

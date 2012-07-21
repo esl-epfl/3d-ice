@@ -99,7 +99,7 @@ extern "C"
 
     /*! Inits the fields of the \a analysis structure with default values
      *
-     * \param anlysis the address of the structure to initalize
+     * \param analysis the address of the structure to initalize
      */
 
     void analysis_init (Analysis_t *analysis) ;
@@ -118,21 +118,65 @@ extern "C"
 
 
 
-    /*! Destroys the content of the fields of the structure \a anaysis
+    /*! Destroys the content of the fields of the structure \a analysis
      *
      * The function releases any dynamic memory used by the structure and
      * resets its state calling \a analysis_init .
      *
-     * \param anlysis the address of the structure to destroy
+     * \param analysis the address of the structure to destroy
      */
 
     void analysis_destroy (Analysis_t *analysis) ;
 
+
+
+    /*! Allocates memory for a structure of type Analysis_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a analysis_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Analysis_t *analysis_calloc ( void ) ;
+
+
+
+    /*! Allocates memory for a new copy of the structure \a analysis
+     *
+     * \param analysis the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a analysis is \c NULL
+     */
 
     Analysis_t *analysis_clone (Analysis_t *analysis) ;
 
+
+
+    /*! Frees the memory space pointed by \a analysis
+     *
+     * The function destroys the structure \a analysis and then frees
+     * its memory. The pointer \a analysis must have been returned by
+     * a previous call to \a analysis_calloc or \a analysis_clone .
+     *
+     * If \a analysis is \c NULL, no operation is performed.
+     *
+     * \param analysis the pointer to free
+     */
+
     void analysis_free (Analysis_t *analysis) ;
+
+
+
+    /*! Prints the analysis declaration as it looks in the stack file
+     *
+     * \param analysis the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix) ;
 

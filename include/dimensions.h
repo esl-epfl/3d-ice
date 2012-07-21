@@ -356,11 +356,54 @@ extern "C"
     void dimensions_destroy (Dimensions_t *dimensions) ;
 
 
+
+    /*! Allocates memory for a structure of type Dimensions_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a dimensions_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Dimensions_t *dimensions_calloc (void) ;
+
+
+
+    /*! Allocates memory for a new copy of the structure \a dimensions
+     *
+     * \param dimensions the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a dimensions is \c NULL
+     */
 
     Dimensions_t *dimensions_clone (Dimensions_t *dimensions) ;
 
+
+
+    /*! Frees the memory space pointed by \a dimensions
+     *
+     * The function destroys the structure \a dimensions and then frees
+     * its memory. The pointer \a dimensions must have been returned by
+     * a previous call to \a dimensions_calloc or \a dimensions_clone .
+     *
+     * If \a dimensions is \c NULL, no operation is performed.
+     *
+     * \param dimensions the pointer to free
+     */
+
     void dimensions_free (Dimensions_t *dimensions) ;
+
+
+
+    /*! Prints the dimension declaration as it looks in the stack file
+     *
+     * \param dimensions the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void dimensions_print
 

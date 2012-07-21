@@ -136,13 +136,57 @@ extern "C"
 
     void ic_element_destroy (ICElement_t *icel) ;
 
+
+
+    /*! Allocates memory for a structure of type ICElement_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a ic_element_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     ICElement_t *ic_element_calloc ( void ) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a icel
+     *
+     * \param icel the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a icel is \c NULL
+     */
+
     ICElement_t *ic_element_clone (ICElement_t *icel) ;
+
+
+
+    /*! Frees the memory space pointed by \a icel
+     *
+     * The function destroys the structure \a icel and then frees
+     * its memory. The pointer \a icel must have been returned by
+     * a previous call to \a ic_element_calloc or \a ic_element_clone .
+     *
+     * If \a icel is \c NULL, no operation is performed.
+     *
+     * \param icel the pointer to free
+     */
 
     void ic_element_free (ICElement_t *icel) ;
 
     bool ic_element_equal (ICElement_t *icel, ICElement_t *other) ;
+
+
+
+    /*! Prints the ic element location as it looks in the floorplan file
+     *
+     * \param icel the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void ic_element_print (ICElement_t *icel, FILE *stream, String_t prefix) ;
 

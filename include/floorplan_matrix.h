@@ -200,13 +200,13 @@ extern "C"
 
 
 
-    /*! Generates a text file storing the nonzeroes coefficients
+    /*! Generates a text file storing the sparse matrix
      *
      * The file will contain one row of the form row-column-value" for each
      * zero coefficient (COO format). The first row (or column) has index 1
      * (matlab compatibile)
      *
-     * \param flpmatrix      the floorplan matrix structure
+     * \param flpmatrix the floorplan matrix structure
      * \param file_name the name of the file to create
      */
 

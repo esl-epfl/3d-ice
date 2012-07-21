@@ -206,6 +206,13 @@ FPROTO2 (
 
 
 
+    /*! Prints the content of the list
+     *
+     * \param list the address of the list to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
+
 FPROTO3 (
 
     void, TTT_list_print, TTTList_t *list, FILE *stream, String_t prefix) ;

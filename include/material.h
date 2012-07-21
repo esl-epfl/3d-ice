@@ -127,13 +127,57 @@ extern "C"
 
     void material_destroy (Material_t *material) ;
 
+
+
+    /*! Allocates memory for a structure of type Material_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a material_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Material_t *material_calloc ( void ) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a material
+     *
+     * \param material the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a material is \c NULL
+     */
+
     Material_t *material_clone (Material_t *material) ;
+
+
+
+    /*! Frees the memory space pointed by \a material
+     *
+     * The function destroys the structure \a material and then frees
+     * its memory. The pointer \a material must have been returned by
+     * a previous call to \a material_calloc or \a material_clone .
+     *
+     * If \a material is \c NULL, no operation is performed.
+     *
+     * \param material the pointer to free
+     */
 
     void material_free (Material_t *material) ;
 
     bool material_same_id (Material_t *material, Material_t *other) ;
+
+
+
+    /*! Prints the material declaration as it looks in the stack file
+     *
+     * \param material the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void material_print (Material_t *material, FILE *stream, String_t prefix) ;
 

@@ -119,14 +119,58 @@ extern "C"
 
     void layer_destroy (Layer_t *layer) ;
 
+
+
+    /*! Allocates memory for a structure of type Layer_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a layer_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Layer_t *layer_calloc ( void ) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a layer
+     *
+     * \param layer the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a layer is \c NULL
+     */
+
     Layer_t *layer_clone (Layer_t *layer) ;
+
+
+
+    /*! Frees the memory space pointed by \a layer
+     *
+     * The function destroys the structure \a layer and then frees
+     * its memory. The pointer \a layer must have been returned by
+     * a previous call to \a layer_calloc or \a layer_clone .
+     *
+     * If \a layer is \c NULL, no operation is performed.
+     *
+     * \param layer the pointer to free
+     */
 
     void layer_free (Layer_t *layer) ;
 
 
     bool layer_same_id (Layer_t *layer, Layer_t *other) ;
+
+
+
+    /*! Prints the layer declaration as it looks in the stack file
+     *
+     * \param layer the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void layer_print (Layer_t *layer, FILE *stream, String_t prefix) ;
 

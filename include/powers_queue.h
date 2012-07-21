@@ -137,45 +137,48 @@ extern "C"
 
 
 
-    /*! Allocates and inits memory for a structure of type PowersQueue_t
+    /*! Allocates memory for a structure of type PowersQueue_t
      *
-     * The new power power queue will be empty and without memory for storage.
+     * The content of the new structure is set to default values
+     * calling \a powers_queue_init
      *
-     * \return a pointer to the allocated memory.
-     * \return \c NULL in case of error
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
      */
 
     PowersQueue_t *powers_queue_calloc ( void ) ;
 
 
 
-    /*! Makes a new copy of a structure of type PowersQueue_t and
-     *  copies \a pqueue into it
+    /*! Allocates memory for a new copy of the structure \a pqueue
      *
-     * \param pqueue the address of the PowersQueue_t structure to clone
+     * \param pqueue the address of the structure to clone
      *
-     * \return a pointer to a new structure of type PowersQueue_t
-     * \return \c NULL in case of error of if the parameter \a pqueue is \c NULL
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a pqueue is \c NULL
      */
 
     PowersQueue_t *powers_queue_clone (PowersQueue_t *pqueue) ;
 
 
 
-    /*! Frees the memory space pointed to by \a pqueue
+    /*! Frees the memory space pointed by \a pqueue
      *
-     * The pointer \a pqueue must have been returned by a previous call
-     * to \a powers_queue_calloc or \a clone_powers_queue. If \a pqueue is \c NULL,
-     * no operation is performed.
+     * The function destroys the structure \a pqueue and then frees
+     * its memory. The pointer \a pqueue must have been returned by
+     * a previous call to \a powers_queue_calloc or \a powers_queue_clone .
      *
-     * \param pqueue the address to free
+     * If \a pqueue is \c NULL, no operation is performed.
+     *
+     * \param pqueue the pointer to free
      */
 
     void powers_queue_free (PowersQueue_t *pqueue) ;
 
 
 
-    /*! Prints the list of power values as it looks in the stack file
+    /*! Prints the list of power values as it looks in the floorplan file
      *
      * \param pqueue the powers queue to print
      * \param stream the output stream (must be already open)

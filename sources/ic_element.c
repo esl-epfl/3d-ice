@@ -85,13 +85,13 @@ void ic_element_destroy (ICElement_t *icel)
 
 ICElement_t *ic_element_calloc ( void )
 {
-    ICElement_t *ic_element = (ICElement_t *) malloc (sizeof(ICElement_t));
+    ICElement_t *icel = (ICElement_t *) malloc (sizeof(ICElement_t));
 
-    if (ic_element != NULL)
+    if (icel != NULL)
 
-        ic_element_init (ic_element) ;
+        ic_element_init (icel) ;
 
-    return ic_element ;
+    return icel ;
 }
 
 /*****************************************************************************/

@@ -155,13 +155,57 @@ extern "C"
     void stack_element_destroy (StackElement_t *stkel) ;
 
 
+
+    /*! Allocates memory for a structure of type StackElement_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a stack_element_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     StackElement_t *stack_element_calloc (void) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a stkel
+     *
+     * \param stkel the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a stkel is \c NULL
+     */
+
     StackElement_t *stack_element_clone (StackElement_t *stkel) ;
+
+
+
+    /*! Frees the memory space pointed by \a stkel
+     *
+     * The function destroys the structure \a stkel and then frees
+     * its memory. The pointer \a stkel must have been returned by
+     * a previous call to \a stack_element_calloc or
+     * \a stack_element_clone .
+     *
+     * If \a stkel is \c NULL, no operation is performed.
+     *
+     * \param stkel the pointer to free
+     */
 
     void stack_element_free (StackElement_t *stkel) ;
 
     bool stack_element_same_id (StackElement_t *stkel, StackElement_t *other) ;
+
+
+
+    /*! Prints the stack element declaration as it looks in the stack file
+     *
+     * \param stkel the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void stack_element_print
 

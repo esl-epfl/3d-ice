@@ -123,6 +123,15 @@ extern "C"
 
     void output_destroy (Output_t *output) ;
 
+
+
+    /*! Prints the output declaration as it looks in the stack file
+     *
+     * \param output the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
+
     void output_print (Output_t *output, FILE *stream, String_t prefix) ;
 
 

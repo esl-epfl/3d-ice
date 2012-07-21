@@ -140,9 +140,9 @@ extern "C"
 
 
 
-    /*! Prints the stack descritpion as it looks in the stack file
+    /*! Prints the sack descritpion as it looks in the stack file
      *
-     * \param stkd   the pointer to the StackDescription to print
+     * \param stkd the address of the structure to print
      * \param stream the output stream (must be already open)
      * \param prefix a string to be printed as prefix at the beginning of each line
      */

@@ -151,11 +151,55 @@ extern "C"
 
     void heat_sink_destroy (HeatSink_t *hsink) ;
 
+
+
+    /*! Allocates memory for a structure of type HeatSink_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a heat_sink_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     HeatSink_t *heat_sink_calloc (void) ;
+
+
+
+    /*! Allocates memory for a new copy of the structure \a hsink
+     *
+     * \param hsink the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a hsink is \c NULL
+     */
 
     HeatSink_t *heat_sink_clone (HeatSink_t *hsink) ;
 
+
+
+    /*! Frees the memory space pointed by \a hsink
+     *
+     * The function destroys the structure \a hsink and then frees
+     * its memory. The pointer \a hsink must have been returned by
+     * a previous call to \a heat_sink_calloc or \a heat_sink_clone .
+     *
+     * If \a hsink is \c NULL, no operation is performed.
+     *
+     * \param hsink the pointer to free
+     */
+
     void heat_sink_free (HeatSink_t *hsink) ;
+
+
+
+    /*! Prints the heat sink declaration as it looks in the stack file
+     *
+     * \param hsink the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix) ;
 

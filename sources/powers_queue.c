@@ -112,13 +112,13 @@ void powers_queue_copy (PowersQueue_t *dst, PowersQueue_t *src)
 
 PowersQueue_t *powers_queue_calloc  ( void )
 {
-    PowersQueue_t *powers_queue = (PowersQueue_t *) malloc (sizeof(PowersQueue_t)) ;
+    PowersQueue_t *pqueue = (PowersQueue_t *) malloc (sizeof(PowersQueue_t)) ;
 
-    if (powers_queue != NULL)
+    if (pqueue != NULL)
 
-        powers_queue_init (powers_queue) ;
+        powers_queue_init (pqueue) ;
 
-    return powers_queue ;
+    return pqueue ;
 }
 
 /******************************************************************************/

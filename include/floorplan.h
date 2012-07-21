@@ -130,13 +130,59 @@ extern "C"
 
     void floorplan_destroy (Floorplan_t *floorplan) ;
 
+
+
+    /*! Allocates memory for a structure of type Floorplan_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a floorplan_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Floorplan_t *floorplan_calloc (void) ;
+
+
+
+    /*! Allocates memory for a new copy of the structure \a floorplan
+     *
+     * \param floorplan the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a floorplan is \c NULL
+     */
 
     Floorplan_t *floorplan_clone (Floorplan_t *floorplan) ;
 
+
+
+    /*! Frees the memory space pointed by \a floorplan
+     *
+     * The function destroys the structure \a floorplan and then frees
+     * its memory. The pointer \a floorplan must have been returned by
+     * a previous call to \a floorplan_calloc or \a floorplan_clone .
+     *
+     * If \a floorplan is \c NULL, no operation is performed.
+     *
+     * \param floorplan the pointer to free
+     */
+
     void floorplan_free (Floorplan_t *floorplan) ;
 
+
+
+    /*! Prints the structure of the floorplan as it looks in the floorplan file
+     *
+     * \param floorplan the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
+
     void floorplan_print (Floorplan_t *floorplan, FILE *stream, String_t prefix) ;
+
+
 
     /*! Parses the floorplan file and fills the floorplan structure
      *

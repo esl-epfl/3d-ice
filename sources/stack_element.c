@@ -106,13 +106,13 @@ void stack_element_destroy (StackElement_t *stkel)
 
 StackElement_t *stack_element_calloc (void)
 {
-    StackElement_t *stack_element = (StackElement_t *) malloc (sizeof(StackElement_t)) ;
+    StackElement_t *stkel = (StackElement_t *) malloc (sizeof(StackElement_t)) ;
 
-    if (stack_element != NULL)
+    if (stkel != NULL)
 
-        stack_element_init (stack_element) ;
+        stack_element_init (stkel) ;
 
-    return stack_element ;
+    return stkel ;
 }
 
 /******************************************************************************/

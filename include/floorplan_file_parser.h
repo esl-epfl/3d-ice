@@ -74,7 +74,7 @@ extern "C"
     /*! Generates a floorplan file
      *
      * \param filename  the path of the stack file to generate
-     * \param flooprlan the floorplan to print
+     * \param floorplan the floorplan to print
      *
      * \return \c TDICE_FAILURE if the file cannot be created
      * \return \c TDICE_SUCCESS otherwise

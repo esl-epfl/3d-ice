@@ -133,9 +133,44 @@ extern "C"
     void floorplan_element_destroy (FloorplanElement_t *flpel) ;
 
 
+
+    /*! Allocates memory for a structure of type FloorplanElement_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a floorplan_element_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     FloorplanElement_t *floorplan_element_calloc (void) ;
 
+
+
+    /*! Allocates memory for a new copy of the structure \a flpel
+     *
+     * \param flpel the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a flpel is \c NULL
+     */
+
     FloorplanElement_t *floorplan_element_clone (FloorplanElement_t *flpel) ;
+
+
+
+    /*! Frees the memory space pointed by \a flpel
+     *
+     * The function destroys the structure \a flpel and then frees
+     * its memory. The pointer \a flpel must have been returned by
+     * a previous call to \a floorplan_element_calloc or
+     * \a floorplan_element_clone .
+     *
+     * If \a flpel is \c NULL, no operation is performed.
+     *
+     * \param flpel the pointer to free
+     */
 
     void floorplan_element_free (FloorplanElement_t *flpel) ;
 
@@ -143,6 +178,15 @@ extern "C"
     bool floorplan_element_same_id
 
         (FloorplanElement_t *flpel, FloorplanElement_t *other) ;
+
+
+
+    /*! Prints the floorplan element structure as it looks in the floorplan file
+     *
+     * \param flpel the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     */
 
     void floorplan_element_print
 

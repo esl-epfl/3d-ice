@@ -177,17 +177,60 @@ extern "C"
      * The function releases any dynamic memory used by the structure and
      * resets its state calling \a channel_init .
      *
-     * \param chanel the address of the structure to destroy
+     * \param channel the address of the structure to destroy
      */
 
     void channel_destroy (Channel_t *channel) ;
 
+
+
+    /*! Allocates memory for a structure of type Channel_t
+     *
+     * The content of the new structure is set to default values
+     * calling \a channel_init
+     *
+     * \return the pointer to the new structure
+     * \return \c NULL if the memory allocation fails
+     */
+
     Channel_t *channel_calloc ( void ) ;
+
+
+
+    /*! Allocates memory for a new copy of the structure \a channel
+     *
+     * \param channel the address of the structure to clone
+     *
+     * \return a pointer to a new structure
+     * \return \c NULL if the memory allocation fails
+     * \return \c NULL if the parameter \a channel is \c NULL
+     */
 
     Channel_t *channel_clone  (Channel_t *channel) ;
 
-    void channel_free         (Channel_t *channel) ;
 
+
+    /*! Frees the memory space pointed by \a channel
+     *
+     * The function destroys the structure \a channel and then frees
+     * its memory. The pointer \a channel must have been returned by
+     * a previous call to \a channel_calloc or \a channel_clone .
+     *
+     * If \a channel is \c NULL, no operation is performed.
+     *
+     * \param channel the pointer to free
+     */
+
+    void channel_free (Channel_t *channel) ;
+
+
+    /*! Prints the channel declaration as it looks in the stack file
+     *
+     * \param channel the address of the structure to print
+     * \param stream the output stream (must be already open)
+     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param dimensions pointer to the structure storing the dimensions
+     */
 
     void channel_print
 

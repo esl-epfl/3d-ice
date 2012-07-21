@@ -94,13 +94,13 @@ void heat_sink_destroy (HeatSink_t *hsink)
 
 HeatSink_t *heat_sink_calloc (void)
 {
-    HeatSink_t *heat_sink = (HeatSink_t *) malloc (sizeof(HeatSink_t)) ;
+    HeatSink_t *hsink = (HeatSink_t *) malloc (sizeof(HeatSink_t)) ;
 
-    if (heat_sink != NULL)
+    if (hsink != NULL)
 
-        heat_sink_init (heat_sink) ;
+        heat_sink_init (hsink) ;
 
-    return heat_sink ;
+    return hsink ;
 }
 
 /******************************************************************************/
