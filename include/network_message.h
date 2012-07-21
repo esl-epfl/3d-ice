@@ -96,18 +96,28 @@ extern "C"
     typedef struct NetworkMessage_t NetworkMessage_t ;
 
 
-    /*! Initializes a NetworkMessage
+
+/******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a message structure with default values
      *
-     * \param message the address of the NetworkMessage to initialize
+     * The function reserves memory to store \c MESSAGE_LENGTH words
+     *
+     * \param message the address of the structure to initalize
      */
 
     void network_message_init (NetworkMessage_t *message) ;
 
 
 
-    /*! Frees a message
+    /*! Destroys the content of the fields of the structure \a message
      *
-     * \param message the address of the NetworkMessage to free
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a network_message_init .
+     *
+     * \param message the address of the structure to destroy
      */
 
     void network_message_destroy (NetworkMessage_t *message) ;

@@ -70,11 +70,11 @@ extern "C"
     {
         /*! The number of layers/floorplans in the 3d-ic */
 
-        Quantity_t NLayers ;
+        CellIndex_t NLayers ;
 
         /*! The number of cells in the 3d-ic */
 
-        Quantity_t NCells ;
+        CellIndex_t NCells ;
 
         /*! Vector storing the types of layer along the vertical profile. */
 
@@ -101,11 +101,15 @@ extern "C"
 
     typedef struct PowerGrid_t PowerGrid_t ;
 
+
+
 /******************************************************************************/
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
+
+
+    /*! Inits the fields of the \a pgrid structure with default values
      *
-     * \param pgrid the address of the power grid structure to initialize
+     * \param pgrid the address of the structure to initalize
      */
 
     void power_grid_init (PowerGrid_t *pgrid) ;
@@ -131,10 +135,12 @@ extern "C"
 
 
 
-    /*! Release the memory used by the power grid
-     *  (i.e. the memory allocated by \a power_grid_build )
+    /*! Destroys the content of the fields of the structure \a pgrid
      *
-     * \param pgrid the address of the power grid
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a power_grid_init .
+     *
+     * \param pgrid the address of the structure to destroy
      */
 
     void power_grid_destroy (PowerGrid_t *pgrid) ;

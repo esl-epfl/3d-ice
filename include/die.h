@@ -94,11 +94,40 @@ extern "C"
 
     typedef struct Die_t Die_t ;
 
+
+
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a die structure with default values
+     *
+     * \param die the address of the structure to initalize
+     */
 
     void die_init (Die_t *die) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void die_copy (Die_t *dst, Die_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a die
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a die_init .
+     *
+     * \param die the address of the structure to destroy
+     */
 
     void die_destroy (Die_t *die) ;
 

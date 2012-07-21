@@ -47,15 +47,15 @@
 void inspection_point_init (InspectionPoint_t *ipoint)
 {
     ipoint->FileName         = NULL ;
-    ipoint->Instant          = TDICE_OUTPUT_INSTANT_NONE ;
-    ipoint->Type             = TDICE_OUTPUT_TYPE_NONE ;
-    ipoint->Quantity         = TDICE_OUTPUT_QUANTITY_NONE ;
-    ipoint->Xval             = 0.0 ;
-    ipoint->ActualXval       = 0.0 ;
-    ipoint->Yval             = 0.0 ;
-    ipoint->ActualYval       = 0.0 ;
-    ipoint->RowIndex         = 0u ;
-    ipoint->ColumnIndex      = 0u ;
+    ipoint->Instant          = (OutputInstant_t)  TDICE_OUTPUT_INSTANT_NONE ;
+    ipoint->Type             = (OutputType_t)     TDICE_OUTPUT_TYPE_NONE ;
+    ipoint->Quantity         = (OutputQuantity_t) TDICE_OUTPUT_QUANTITY_NONE ;
+    ipoint->Xval             = (ChipDimension_t) 0.0 ;
+    ipoint->ActualXval       = (ChipDimension_t) 0.0 ;
+    ipoint->Yval             = (ChipDimension_t) 0.0 ;
+    ipoint->ActualYval       = (ChipDimension_t) 0.0 ;
+    ipoint->RowIndex         = (CellIndex_t) 0u ;
+    ipoint->ColumnIndex      = (CellIndex_t) 0u ;
     ipoint->StackElement     = NULL ;
     ipoint->FloorplanElement = NULL ;
 }
@@ -65,7 +65,6 @@ void inspection_point_init (InspectionPoint_t *ipoint)
 void inspection_point_copy (InspectionPoint_t *dst, InspectionPoint_t *src)
 {
     inspection_point_destroy (dst) ;
-    inspection_point_init    (dst) ;
 
     dst->Instant          = src->Instant ;
     dst->Type             = src->Type ;
@@ -89,6 +88,8 @@ void inspection_point_destroy (InspectionPoint_t *ipoint)
     if (ipoint->FileName != NULL)
 
         free (ipoint->FileName) ;
+
+    inspection_point_init (ipoint) ;
 }
 
 /******************************************************************************/

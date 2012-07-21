@@ -72,6 +72,8 @@ void stack_description_destroy (StackDescription_t *stkd)
             layer_list_destroy (&stkd->Layers) ;
               die_list_destroy (&stkd->Dies) ;
     stack_element_list_destroy (&stkd->StackElements) ;
+
+    stack_description_init (stkd) ;
 }
 
 /******************************************************************************/

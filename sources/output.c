@@ -56,7 +56,6 @@ void output_init (Output_t *output)
 void output_copy (Output_t *dst, Output_t *src)
 {
     output_destroy (dst) ;
-    output_init    (dst) ;
 
     inspection_point_list_copy
 
@@ -78,6 +77,8 @@ void output_destroy (Output_t *output)
     inspection_point_list_destroy (&output->InspectionPointListFinal) ;
     inspection_point_list_destroy (&output->InspectionPointListSlot) ;
     inspection_point_list_destroy (&output->InspectionPointListStep) ;
+
+    output_init (output) ;
 }
 
 /******************************************************************************/

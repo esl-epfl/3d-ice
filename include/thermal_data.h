@@ -106,12 +106,15 @@ extern "C"
 
     typedef struct ThermalData_t ThermalData_t ;
 
+
+
 /******************************************************************************/
 
-    /*! Sets all the fields to a default value (zero or \c NULL )
-     *  and configure the SLU fields to run a factorization
+
+
+    /*! Inits the fields of the \a tdata structure with default values
      *
-     * \param tdata the address of the thermal data to initialize
+     * \param tdata the address of the structure to initalize
      */
 
     void thermal_data_init (ThermalData_t *tdata) ;
@@ -140,11 +143,12 @@ extern "C"
 
 
 
-    /*! Frees the memory related to \a tdata
+    /*! Destroys the content of the fields of the structure \a tdata
      *
-     * The parametrer \a tdata must be the address of a static variable
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a thermal_data_init .
      *
-     * \param tdata the address of the ThermalData structure to free
+     * \param tdata the address of the structure to destroy
      */
 
     void thermal_data_destroy  (ThermalData_t *tdata) ;

@@ -46,11 +46,10 @@
 
 void layer_init (Layer_t *layer)
 {
-    layer->Height   = (CellDimension_t) 0.0 ;
+    layer->Id     = NULL ;
+    layer->Height = (CellDimension_t) 0.0 ;
 
     material_init (&layer->Material) ;
-
-    layer->Id       = NULL ;
 }
 
 /******************************************************************************/
@@ -58,7 +57,6 @@ void layer_init (Layer_t *layer)
 void layer_copy (Layer_t *dst, Layer_t *src)
 {
     layer_destroy (dst) ;
-    layer_init    (dst) ;
 
     dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
 
@@ -76,6 +74,8 @@ void layer_destroy (Layer_t *layer)
         free (layer->Id) ;
 
     material_destroy (&layer->Material) ;
+
+    layer_init (layer) ;
 }
 
 /******************************************************************************/

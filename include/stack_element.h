@@ -117,11 +117,40 @@ extern "C"
 
     typedef struct StackElement_t StackElement_t ;
 
+
+
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a stkel structure with default values
+     *
+     * \param stkel the address of the structure to initalize
+     */
 
     void stack_element_init (StackElement_t *stkel) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void stack_element_copy (StackElement_t *dst, StackElement_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a stkel
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a stac_element_init .
+     *
+     * \param stkel the address of the structure to destroy
+     */
 
     void stack_element_destroy (StackElement_t *stkel) ;
 

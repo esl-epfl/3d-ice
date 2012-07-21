@@ -52,7 +52,7 @@ static void init_data (double* data, uint32_t size, double init_value)
 
 void thermal_data_init (ThermalData_t *tdata)
 {
-    tdata->Size = 0u ;
+    tdata->Size = (CellIndex_t) 0u ;
 
     tdata->Temperatures = NULL ;
 
@@ -188,6 +188,8 @@ void thermal_data_destroy (ThermalData_t *tdata)
     system_matrix_destroy (&tdata->SM_A) ;
 
     Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
+
+    thermal_data_init (tdata) ;
 }
 
 /******************************************************************************/

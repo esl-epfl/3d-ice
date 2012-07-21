@@ -60,11 +60,9 @@ void network_message_init (NetworkMessage_t *message)
 
 void network_message_destroy (NetworkMessage_t *message)
 {
-    if (message == NULL)
+    if (message->Memory != NULL)
 
-        return ;
-
-    free (message->Memory) ;
+        free (message->Memory) ;
 
     message->Memory    = NULL ;
     message->MaxLength = 0 ;

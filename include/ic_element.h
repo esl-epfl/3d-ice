@@ -99,11 +99,40 @@ extern "C"
 
     typedef struct ICElement_t ICElement_t ;
 
+
+
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a icel structure with default values
+     *
+     * \param icel the address of the structure to initalize
+     */
 
     void ic_element_init (ICElement_t *icel) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void ic_element_copy (ICElement_t *dst, ICElement_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a icel
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a ic_element_init .
+     *
+     * \param icel the address of the structure to destroy
+     */
 
     void ic_element_destroy (ICElement_t *icel) ;
 

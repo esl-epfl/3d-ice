@@ -47,7 +47,7 @@
 void floorplan_init (Floorplan_t *floorplan)
 {
     floorplan->FileName     = NULL ;
-    floorplan->NElements    = 0u ;
+    floorplan->NElements    = (Quantity_t) 0u ;
     floorplan->Bpowers      = NULL ;
 
     floorplan_element_list_init (&floorplan->ElementsList) ;
@@ -59,7 +59,6 @@ void floorplan_init (Floorplan_t *floorplan)
 void floorplan_copy (Floorplan_t *dst, Floorplan_t *src)
 {
     floorplan_destroy (dst) ;
-    floorplan_init    (dst) ;
 
     dst->FileName = (src->FileName == NULL) ? NULL : strdup (src->FileName) ;
 
@@ -102,6 +101,8 @@ void floorplan_destroy (Floorplan_t *floorplan)
 
     floorplan_element_list_destroy (&floorplan->ElementsList) ;
     floorplan_matrix_destroy       (&floorplan->SurfaceCoefficients) ;
+
+    floorplan_init (floorplan) ;
 }
 
 /******************************************************************************/

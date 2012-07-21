@@ -48,8 +48,8 @@ void system_matrix_init (SystemMatrix_t* sysmatrix)
     sysmatrix->ColumnPointers = NULL ;
     sysmatrix->RowIndices     = NULL;
     sysmatrix->Values         = NULL ;
-    sysmatrix->Size           = 0u ;
-    sysmatrix->NNz            = 0u ;
+    sysmatrix->Size           = (CellIndex_t) 0u ;
+    sysmatrix->NNz            = (CellIndex_t) 0u ;
 
     sysmatrix->SLU_PermutationMatrixR = NULL ;
     sysmatrix->SLU_PermutationMatrixC = NULL ;
@@ -240,6 +240,8 @@ void system_matrix_destroy (SystemMatrix_t *sysmatrix)
         Destroy_SuperNode_Matrix (&sysmatrix->SLUMatrix_L) ;
         Destroy_CompCol_Matrix   (&sysmatrix->SLUMatrix_U) ;
     }
+
+    system_matrix_init (sysmatrix) ;
 }
 
 /******************************************************************************/

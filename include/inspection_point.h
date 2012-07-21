@@ -120,11 +120,40 @@ extern "C"
 
     typedef struct InspectionPoint_t InspectionPoint_t ;
 
+
+
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a ipoint structure with default values
+     *
+     * \param ipoint the address of the structure to initalize
+     */
 
     void inspection_point_init (InspectionPoint_t *ipoint) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void inspection_point_copy (InspectionPoint_t *dst, InspectionPoint_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a ipoint
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a inspection_point_init .
+     *
+     * \param ipoint the address of the structure to destroy
+     */
 
     void inspection_point_destroy (InspectionPoint_t *ipoint) ;
 

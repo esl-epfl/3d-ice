@@ -47,14 +47,14 @@
 void heat_sink_init (HeatSink_t *hsink)
 {
     hsink->SinkModel          = TDICE_HEATSINK_MODEL_NONE ;
-    hsink->NLayers            = 0u ;
-    hsink->SourceLayerOffset  = 0u ;
-    hsink->AmbientHTC         = 0.0 ;
-    hsink->AmbientTemperature = 0.0 ;
-    hsink->SinkHeight         = 0.0 ;
-    hsink->SinkArea           = 0.0 ;
-    hsink->SpreaderHeight     = 0.0 ;
-    hsink->SpreaderArea       = 0.0 ;
+    hsink->NLayers            = (CellIndex_t) 0u ;
+    hsink->SourceLayerOffset  = (CellIndex_t) 0u ;
+    hsink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
+    hsink->AmbientTemperature = (Temperature_t) 0.0 ;
+    hsink->SinkHeight         = (CellDimension_t) 0.0 ;
+    hsink->SinkArea           = (CellDimension_t) 0.0 ;
+    hsink->SpreaderHeight     = (CellDimension_t) 0.0 ;
+    hsink->SpreaderArea       = (CellDimension_t) 0.0 ;
 
     material_init (&hsink->SinkMaterial) ;
     material_init (&hsink->SpreaderMaterial) ;
@@ -65,7 +65,6 @@ void heat_sink_init (HeatSink_t *hsink)
 void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
 {
     heat_sink_destroy (dst) ;
-    heat_sink_init    (dst) ;
 
     dst->SinkModel          = src->SinkModel ;
     dst->NLayers            = src->NLayers ;
@@ -87,6 +86,8 @@ void heat_sink_destroy (HeatSink_t *hsink)
 {
     material_destroy (&hsink->SinkMaterial) ;
     material_destroy (&hsink->SpreaderMaterial) ;
+
+    heat_sink_init (hsink) ;
 }
 
 /******************************************************************************/

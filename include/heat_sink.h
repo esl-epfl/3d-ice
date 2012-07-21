@@ -114,13 +114,40 @@ extern "C"
 
     typedef struct HeatSink_t HeatSink_t ;
 
+
+
 /******************************************************************************/
 
 
 
+    /*! Inits the fields of the \a hsink structure with default values
+     *
+     * \param hsink the address of the structure to initalize
+     */
+
     void heat_sink_init (HeatSink_t *hsink) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a hsink
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a heat_sink_init .
+     *
+     * \param hsink the address of the structure to destroy
+     */
 
     void heat_sink_destroy (HeatSink_t *hsink) ;
 

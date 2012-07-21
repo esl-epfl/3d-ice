@@ -86,12 +86,40 @@ extern "C"
 
     typedef struct Output_t Output_t;
 
+
+
 /******************************************************************************/
 
 
+
+    /*! Inits the fields of the \a output structure with default values
+     *
+     * \param output the address of the structure to initalize
+     */
+
     void output_init (Output_t *output) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void output_copy (Output_t *dst, Output_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a output
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a output_init .
+     *
+     * \param output the address of the structure to destroy
+     */
 
     void output_destroy (Output_t *output) ;
 

@@ -60,7 +60,6 @@ void die_init (Die_t *die)
 void die_copy (Die_t *dst, Die_t *src)
 {
     die_destroy (dst) ;
-    die_init    (dst) ;
 
     dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
 
@@ -82,6 +81,8 @@ void die_destroy (Die_t *die)
 
     layer_list_destroy (&die->Layers) ;
     floorplan_destroy  (&die->Floorplan) ;
+
+    die_init (die) ;
 }
 
 /******************************************************************************/

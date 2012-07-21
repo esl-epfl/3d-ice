@@ -93,11 +93,40 @@ extern "C"
 
     typedef struct Floorplan_t Floorplan_t ;
 
+
+
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a floorplan structure with default values
+     *
+     * \param floorplan the address of the structure to initalize
+     */
 
     void floorplan_init (Floorplan_t *floorplan) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void floorplan_copy (Floorplan_t *dst, Floorplan_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a floorplan
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a florplan_init .
+     *
+     * \param floorplan the address of the structure to destroy
+     */
 
     void floorplan_destroy (Floorplan_t *floorplan) ;
 

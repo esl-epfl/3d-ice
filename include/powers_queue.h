@@ -85,16 +85,30 @@ extern "C"
 
     typedef struct PowersQueue_t PowersQueue_t ;
 
+
+
 /******************************************************************************/
 
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
+    /*! Inits the fields of the \a pqueue structure with default values
      *
-     * \param pqueue the address of the powers queue structure to initialize
+     * \param pqueue the address of the structure to initalize
      */
 
     void powers_queue_init (PowersQueue_t *pqueue) ;
+
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy.
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
+    void powers_queue_copy (PowersQueue_t *dst, PowersQueue_t *src) ;
 
 
 
@@ -111,29 +125,15 @@ extern "C"
 
 
 
-    /*! Releases the memory that stores power values and reset all the fields
-     *  to a default value calling \a powers_queue_init
+    /*! Destroys the content of the fields of the structure \a pqueue
      *
-     * \param pqueue the address of the power queue
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a powers_queue_init .
+     *
+     * \param pqueue the address of the structure to destroy
      */
 
     void powers_queue_destroy (PowersQueue_t *pqueue) ;
-
-
-
-    /*! Copies the queue \a src into the queue \a dest.
-     *
-     * All the power values previously stored in \a src get lost. After the copy
-     * \a src will have a new capacity if its own was smaller than the capacity
-     * of \a dst. The internal state of \a dst can be different from the state
-     * of \a src but the queue \a dst will store the same power values as
-     * \a src anyway. The function works also when \a dst has no storage.
-     *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
-     */
-
-    void copy_powers_queue (PowersQueue_t *dst, PowersQueue_t *src) ;
 
 
 

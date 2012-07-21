@@ -58,6 +58,8 @@ void cell_dimensions_init (CellDimensions_t *celld)
 
 void cell_dimensions_copy (CellDimensions_t *dst, CellDimensions_t *src)
 {
+    cell_dimensions_destroy (dst) ;
+
     dst->FirstWallLength = src->FirstWallLength ;
     dst->LastWallLength  = src->LastWallLength ;
     dst->WallLength      = src->WallLength ;
@@ -94,6 +96,8 @@ void cell_dimensions_destroy (CellDimensions_t *celld)
     if (celld->Heights != NULL)
 
         free (celld->Heights) ;
+
+    cell_dimensions_init (celld) ;
 }
 
 /******************************************************************************/
@@ -113,6 +117,8 @@ void grid_dimensions_init (GridDimensions_t *gridd)
 
 void grid_dimensions_copy (GridDimensions_t *dst, GridDimensions_t *src)
 {
+    grid_dimensions_destroy (dst) ;
+
     dst->NLayers      = src->NLayers ;
     dst->NRows        = src->NRows ;
     dst->NColumns     = src->NColumns ;
@@ -122,9 +128,11 @@ void grid_dimensions_copy (GridDimensions_t *dst, GridDimensions_t *src)
 
 /******************************************************************************/
 
-void grid_dimensions_destroy (GridDimensions_t __attribute__ ((unused))*gridd)
+void grid_dimensions_destroy (GridDimensions_t *gridd)
 {
-    return ;
+    // Nothing to do ...
+
+    grid_dimensions_init (gridd) ;
 }
 
 /******************************************************************************/
@@ -141,15 +149,19 @@ void chip_dimensions_init (ChipDimensions_t *chipd)
 
 void chip_dimensions_copy (ChipDimensions_t *dst, ChipDimensions_t *src)
 {
+    chip_dimensions_destroy (dst) ;
+
     dst->Length = src->Length ;
     dst->Width  = src->Width ;
 }
 
 /******************************************************************************/
 
-void chip_dimensions_destroy (ChipDimensions_t __attribute__ ((unused))*chipd)
+void chip_dimensions_destroy (ChipDimensions_t *chipd)
 {
-    return ;
+    // Nothing to do ...
+
+    chip_dimensions_init (chipd) ;
 }
 
 /******************************************************************************/
@@ -167,6 +179,8 @@ void dimensions_init (Dimensions_t *dimensions)
 
 void dimensions_copy (Dimensions_t *dst, Dimensions_t *src)
 {
+    dimensions_destroy (dst) ;
+
     cell_dimensions_copy (&dst->Cell, &src->Cell) ;
     grid_dimensions_copy (&dst->Grid, &src->Grid) ;
     chip_dimensions_copy (&dst->Chip, &src->Chip) ;
@@ -179,6 +193,8 @@ void dimensions_destroy (Dimensions_t *dimensions)
     cell_dimensions_destroy (&dimensions->Cell) ;
     grid_dimensions_destroy (&dimensions->Grid) ;
     chip_dimensions_destroy (&dimensions->Chip) ;
+
+    dimensions_init (dimensions) ;
 }
 
 /******************************************************************************/

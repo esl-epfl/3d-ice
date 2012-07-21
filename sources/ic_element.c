@@ -61,7 +61,6 @@ void ic_element_init (ICElement_t *icel)
 void ic_element_copy (ICElement_t *dst, ICElement_t *src)
 {
     ic_element_destroy (dst) ;
-    ic_element_init    (dst) ;
 
     dst->SW_X      = src->SW_X ;
     dst->SW_Y      = src->SW_Y ;
@@ -75,9 +74,11 @@ void ic_element_copy (ICElement_t *dst, ICElement_t *src)
 
 /******************************************************************************/
 
-void ic_element_destroy (ICElement_t __attribute__ ((unused))*icel)
+void ic_element_destroy (ICElement_t *icel)
 {
-    return ;
+    // Nothing to do ...
+
+    ic_element_init (icel) ;
 }
 
 /******************************************************************************/

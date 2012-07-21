@@ -56,7 +56,6 @@ void material_init (Material_t *material)
 void material_copy (Material_t *dst, Material_t *src)
 {
     material_destroy (dst) ;
-    material_init    (dst) ;
 
     dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
 
@@ -71,6 +70,8 @@ void material_destroy (Material_t *material)
     if (material->Id != NULL)
 
         free (material->Id) ;
+
+    material_init (material) ;
 }
 
 /******************************************************************************/

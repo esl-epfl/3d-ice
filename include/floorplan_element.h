@@ -93,14 +93,42 @@ extern "C"
 
     typedef struct FloorplanElement_t FloorplanElement_t ;
 
+
+
 /******************************************************************************/
 
 
+
+    /*! Inits the fields of the \a flpel structure with default values
+     *
+     * \param flpel the address of the structure to initalize
+     */
+
     void floorplan_element_init (FloorplanElement_t *flpel) ;
+
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
 
     void floorplan_element_copy
 
         (FloorplanElement_t *dst, FloorplanElement_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a flpel
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a floorplan_element_init .
+     *
+     * \param flpel the address of the structure to destroy
+     */
 
     void floorplan_element_destroy (FloorplanElement_t *flpel) ;
 

@@ -118,22 +118,43 @@ DEF_LIST (TTTList_t, TTTListNode_t)
 /******************************************************************************/
 
 
+
+    /*! Inits the fields of the \a list structure with default values
+     *
+     * \param list the address of the structure to initalize
+     */
+
 FPROTO1 (
 
     void, TTT_list_init, TTTList_t *list) ;
 
 
 
-FPROTO1 (
-
-    void, TTT_list_destroy, TTTList_t *list) ;
-
-
-
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
 
 FPROTO2 (
 
     void, TTT_list_copy, TTTList_t *dst, TTTList_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a list
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a TTT_list_init .
+     *
+     * \param list the address of the structure to destroy
+     */
+
+FPROTO1 (
+
+    void, TTT_list_destroy, TTTList_t *list) ;
 
 
 

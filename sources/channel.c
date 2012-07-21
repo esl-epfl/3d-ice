@@ -56,6 +56,8 @@ void coolant_init (Coolant_t *coolant)
 
 void coolant_copy (Coolant_t *dst, Coolant_t *src)
 {
+    coolant_destroy (dst) ;
+
     dst->HTCSide       = src->HTCSide ;
     dst->HTCTop        = src->HTCTop ;
     dst->HTCBottom     = src->HTCBottom ;
@@ -67,9 +69,11 @@ void coolant_copy (Coolant_t *dst, Coolant_t *src)
 
 /******************************************************************************/
 
-void coolant_destroy (Coolant_t __attribute__ ((unused))*coolant)
+void coolant_destroy (Coolant_t *coolant)
 {
-    return ;
+    // Nothing to do ...
+
+    coolant_init (coolant) ;
 }
 
 /******************************************************************************/
@@ -85,7 +89,7 @@ void channel_init (Channel_t *channel)
     channel->NLayers           = (CellIndex_t) 0u ;
     channel->SourceLayerOffset = (CellIndex_t) 0u ;
 
-    coolant_init  ( &channel->Coolant ) ;
+    coolant_init  (&channel->Coolant) ;
     material_init (&channel->WallMaterial) ;
 }
 
@@ -94,7 +98,6 @@ void channel_init (Channel_t *channel)
 void channel_copy (Channel_t *dst, Channel_t *src)
 {
     channel_destroy (dst) ;
-    channel_init    (dst) ;
 
     dst->ChannelModel          = src->ChannelModel ;
     dst->Height                = src->Height ;
@@ -115,6 +118,8 @@ void channel_destroy (Channel_t *channel)
 {
     coolant_destroy  (&channel->Coolant) ;
     material_destroy (&channel->WallMaterial) ;
+
+    channel_init (channel) ;
 }
 /******************************************************************************/
 

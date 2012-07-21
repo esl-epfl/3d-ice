@@ -112,20 +112,73 @@ extern "C"
 
     typedef struct Channel_t Channel_t ;
 
+
+
 /******************************************************************************/
 
 
 
+    /*! Inits the fields of the \a coolant structure with default values
+     *
+     * \param coolant the address of the structure to initalize
+     */
+
     void coolant_init    (Coolant_t *coolant) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void coolant_copy    (Coolant_t *dst, Coolant_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a coolant
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a coolant_init .
+     *
+     * \param coolant the address of the structure to destroy
+     */
 
     void coolant_destroy (Coolant_t *coolant) ;
 
 
+
+    /*! Inits the fields of the \a channel structure with default values
+     *
+     * \param channel the address of the structure to initalize
+     */
+
     void channel_init    (Channel_t *channel) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure
+     * \param src the address of the right term structure
+     */
+
     void channel_copy    (Channel_t *dst, Channel_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a channel
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a channel_init .
+     *
+     * \param chanel the address of the structure to destroy
+     */
 
     void channel_destroy (Channel_t *channel) ;
 

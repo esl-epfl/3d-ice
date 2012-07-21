@@ -45,8 +45,8 @@
 
 void power_grid_init (PowerGrid_t *pgrid)
 {
-    pgrid->NLayers           = 0u ;
-    pgrid->NCells            = 0u ;
+    pgrid->NLayers           = (CellIndex_t) 0u ;
+    pgrid->NCells            = (CellIndex_t) 0u ;
     pgrid->LayersProfile     = NULL ;
     pgrid->FloorplansProfile = NULL ;
     pgrid->Sources           = NULL ;
@@ -110,13 +110,19 @@ Error_t power_grid_build
 
 void power_grid_destroy (PowerGrid_t *pgrid)
 {
-    if (pgrid == NULL)
+    if (pgrid->LayersProfile != NULL)
 
-        return ;
+        free (pgrid->LayersProfile) ;
 
-    free (pgrid->LayersProfile) ;
-    free (pgrid->FloorplansProfile) ;
-    free (pgrid->Sources) ;
+    if (pgrid->FloorplansProfile != NULL)
+
+        free (pgrid->FloorplansProfile) ;
+
+    if (pgrid->Sources != NULL)
+
+        free (pgrid->Sources) ;
+
+    power_grid_init (pgrid) ;
 }
 
 /******************************************************************************/

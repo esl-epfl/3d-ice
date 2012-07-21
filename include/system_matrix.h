@@ -140,12 +140,15 @@ extern "C"
 
     typedef struct SystemMatrix_t SystemMatrix_t ;
 
+
+
 /******************************************************************************/
 
 
-    /*! Sets all the fields of \a sysmatrix to a default value (zero or \c NULL ).
+
+    /*! Inits the fields of the \a sysmatrix structure with default values
      *
-     * \param sysmatrix the address of the system matrix to initialize
+     * \param sysmatrix the address of the structure to initalize
      */
 
     void system_matrix_init (SystemMatrix_t *sysmatrix) ;
@@ -168,9 +171,12 @@ extern "C"
 
 
 
-    /*! Frees the memory used to store indexes and coefficients of a system matrix
+    /*! Destroys the content of the fields of the structure \a sysmatrix
      *
-     * \param sysmatrix the address of the system matrix structure
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a system_matrix_init .
+     *
+     * \param sysmatrix the address of the structure to destroy
      */
 
     void system_matrix_destroy (SystemMatrix_t *sysmatrix) ;

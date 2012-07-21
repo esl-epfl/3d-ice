@@ -82,11 +82,40 @@ extern "C"
 
     typedef struct Layer_t Layer_t ;
 
+
+
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a layer structure with default values
+     *
+     * \param layer the address of the structure to initalize
+     */
 
     void layer_init (Layer_t *layer) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void layer_copy (Layer_t *dst, Layer_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a layer
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a layer_init .
+     *
+     * \param layer the address of the structure to destroy
+     */
 
     void layer_destroy (Layer_t *layer) ;
 

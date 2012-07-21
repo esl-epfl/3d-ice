@@ -48,9 +48,9 @@ void floorplan_matrix_init (FloorplanMatrix_t* flpmatrix)
     flpmatrix->ColumnPointers  = NULL ;
     flpmatrix->RowIndices      = NULL ;
     flpmatrix->Values          = NULL ;
-    flpmatrix->NRows           = 0u ;
-    flpmatrix->NColumns        = 0u ;
-    flpmatrix->NNz             = 0u ;
+    flpmatrix->NRows           = (CellIndex_t) 0u ;
+    flpmatrix->NColumns        = (CellIndex_t) 0u ;
+    flpmatrix->NNz             = (CellIndex_t) 0u ;
     flpmatrix->SLUMatrix.Store = NULL ;
 }
 
@@ -59,7 +59,6 @@ void floorplan_matrix_init (FloorplanMatrix_t* flpmatrix)
 void floorplan_matrix_copy (FloorplanMatrix_t *dst, FloorplanMatrix_t *src)
 {
     floorplan_matrix_destroy (dst) ;
-    floorplan_matrix_init    (dst) ;
 
     if (src->NRows == 0u || src->NColumns == 0u || src->NNz == 0u)
 
@@ -133,11 +132,21 @@ Error_t floorplan_matrix_build
 
 void floorplan_matrix_destroy (FloorplanMatrix_t* flpmatrix)
 {
-    free (flpmatrix->ColumnPointers) ;
-    free (flpmatrix->RowIndices) ;
-    free (flpmatrix->Values) ;
+    if (flpmatrix->ColumnPointers != NULL)
+
+        free (flpmatrix->ColumnPointers) ;
+
+    if (flpmatrix->RowIndices != NULL)
+
+        free (flpmatrix->RowIndices) ;
+
+    if (flpmatrix->Values != NULL)
+
+        free (flpmatrix->Values) ;
 
     Destroy_SuperMatrix_Store (&flpmatrix->SLUMatrix) ;
+
+    floorplan_matrix_init (flpmatrix) ;
 }
 
 /******************************************************************************/

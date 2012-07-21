@@ -45,7 +45,7 @@
 
 void thermal_grid_init (ThermalGrid_t *tgrid)
 {
-    tgrid->Size             = 0u ;
+    tgrid->Size             = (CellIndex_t) 0u ;
     tgrid->LayersProfile    = NULL ;
     tgrid->VHCProfile       = NULL ;
     tgrid->TCProfile        = NULL ;
@@ -96,6 +96,8 @@ void thermal_grid_destroy (ThermalGrid_t *tgrid)
     free (tgrid->LayersProfile) ;
     free (tgrid->VHCProfile) ;
     free (tgrid->TCProfile) ;
+
+    thermal_grid_init (tgrid) ;
 }
 
 /******************************************************************************/

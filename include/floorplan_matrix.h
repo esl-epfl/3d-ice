@@ -107,17 +107,28 @@ extern "C"
 
     typedef struct FloorplanMatrix_t FloorplanMatrix_t ;
 
+
+
 /******************************************************************************/
 
 
-    /*! Sets all the fields of \a flpmatrix to a default value (zero or \c NULL ).
+
+    /*! Inits the fields of the \a flpmatrix structure with default values
      *
-     * \param flpmatrix the address of the floorplan matrix to initialize
+     * \param flpmatrix the address of the structure to initalize
      */
 
     void floorplan_matrix_init (FloorplanMatrix_t *flpmatrix) ;
 
 
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
 
     void floorplan_matrix_copy (FloorplanMatrix_t *dst, FloorplanMatrix_t *src) ;
 
@@ -144,9 +155,12 @@ extern "C"
 
 
 
-    /*! Frees the memory used to store indexes and coefficients of a floorplan matrix
+    /*! Destroys the content of the fields of the structure \a flpmatrix
      *
-     * \param flpmatrix the address of the floorplan matrix structure
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a floorplan_matrix_init .
+     *
+     * \param flpmatrix the address of the structure to destroy
      */
 
     void floorplan_matrix_destroy (FloorplanMatrix_t *flpmatrix) ;

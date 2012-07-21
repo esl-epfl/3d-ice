@@ -84,13 +84,15 @@ extern "C"
 
     typedef struct Socket_t Socket_t ;
 
+
+
 /******************************************************************************/
 
 
 
-    /*! Initializes a socket
+    /*! Inits the fields of the \a socket structure with default values
      *
-     * \param socket the address of the Socket to initialize
+     * \param socket the address of the structure to initalize
      */
 
     void socket_init (Socket_t *socket) ;

@@ -91,12 +91,40 @@ extern "C"
 
     typedef struct Analysis_t Analysis_t;
 
+
+
 /******************************************************************************/
 
 
+
+    /*! Inits the fields of the \a analysis structure with default values
+     *
+     * \param anlysis the address of the structure to initalize
+     */
+
     void analysis_init (Analysis_t *analysis) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void analysis_copy (Analysis_t *dst, Analysis_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a anaysis
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a analysis_init .
+     *
+     * \param anlysis the address of the structure to destroy
+     */
 
     void analysis_destroy (Analysis_t *analysis) ;
 

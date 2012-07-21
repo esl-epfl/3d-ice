@@ -116,22 +116,34 @@ extern "C"
 
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
+    /*! Inits the fields of the \a celld structure with default values
      *
-     * \param celld the address of the cell dimensions structure to initialize
+     * \param celld the address of the structure to initalize
      */
 
     void cell_dimensions_init (CellDimensions_t *celld) ;
 
 
 
-    /*! Copies the cell dimensions \a src into \a dest.
+    /*! Copies the structure \a src into \a dst , as an assignement
      *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
      */
 
     void cell_dimensions_copy (CellDimensions_t *dst, CellDimensions_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a celld
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a cell_dimensions_init .
+     *
+     * \param celld the address of the structure to destroy
+     */
 
     void cell_dimensions_destroy (CellDimensions_t *celld) ;
 
@@ -194,23 +206,34 @@ extern "C"
 
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
+    /*! Inits the fields of the \a gridd structure with default values
      *
-     * \param gridd the address of the grid dimensions structure to initialize
+     * \param gridd the address of the structure to initalize
      */
 
     void grid_dimensions_init (GridDimensions_t *gridd) ;
 
 
 
-    /*! Copies the grid dimensions \a src into \a dest.
+    /*! Copies the structure \a src into \a dst , as an assignement
      *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
      */
 
     void grid_dimensions_copy (GridDimensions_t *dst, GridDimensions_t *src) ;
 
+
+
+    /*! Destroys the content of the fields of the structure \a gridd
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a grid_dimensions_init .
+     *
+     * \param gridd the address of the structure to destroy
+     */
 
     void grid_dimensions_destroy (GridDimensions_t *gridd) ;
 
@@ -238,22 +261,34 @@ extern "C"
 
 
 
-    /*! Sets all the fields to a default value (zero or \c NULL ).
+    /*! Inits the fields of the \a chipd structure with default values
      *
-     * \param chipd the address of the chip dimensions structure to initialize
+     * \param chipd the address of the structure to initalize
      */
 
     void chip_dimensions_init (ChipDimensions_t *chipd) ;
 
 
 
-    /*! Copies the chip dimensions \a src into \a dest.
+    /*! Copies the structure \a src into \a dst , as an assignement
      *
-     * \param dst the left term of the assignement (destination)
-     * \param src the right term of the assignement (source)
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
      */
 
     void chip_dimensions_copy (ChipDimensions_t *dst, ChipDimensions_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a chipd
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a chip_dimensions_init .
+     *
+     * \param chipd the address of the structure to destroy
+     */
 
     void chip_dimensions_destroy (ChipDimensions_t *chipd) ;
 
@@ -283,12 +318,40 @@ extern "C"
 
     typedef struct Dimensions_t Dimensions_t ;
 
+
+
 /******************************************************************************/
 
 
+
+    /*! Inits the fields of the \a dimensions structure with default values
+     *
+     * \param dimensions the address of the structure to initalize
+     */
+
     void dimensions_init (Dimensions_t *dimensions) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void dimensions_copy (Dimensions_t *dst, Dimensions_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a dimensions
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a dimensions_init .
+     *
+     * \param dimensions the address of the structure to destroy
+     */
 
     void dimensions_destroy (Dimensions_t *dimensions) ;
 

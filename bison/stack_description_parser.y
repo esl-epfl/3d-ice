@@ -1115,7 +1115,7 @@ stack
         if (ncells > INT32_MAX)
         {
             sprintf (error_message,
-                "%llu are too many cells ... (SuperLU uses 'int')",
+                "%lu are too many cells ... (SuperLU uses 'int')",
                 ncells) ;
 
             STKERROR (error_message) ;
@@ -1833,12 +1833,8 @@ void stack_description_error
             stkd->FileName, stack_description_get_lineno (scanner), message) ;
 
     stack_description_destroy (stkd) ;
-    stack_description_init    (stkd) ;
-
-    analysis_init (analysis) ;
-
-    output_destroy (output) ;
-    output_init    (output) ;
+    analysis_destroy          (analysis) ;
+    output_destroy            (output) ;
 }
 
 /******************************************************************************/

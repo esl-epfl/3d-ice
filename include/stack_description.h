@@ -113,18 +113,27 @@ extern "C"
 
     typedef struct StackDescription_t StackDescription_t ;
 
+
+
 /******************************************************************************/
 
+
+
+    /*! Inits the fields of the \a skd structure with default values
+     *
+     * \param stkd the address of the structure to initalize
+     */
 
     void stack_description_init (StackDescription_t* stkd) ;
 
 
 
-    /*! Frees the memory related to \a stkd
+    /*! Destroys the content of the fields of the structure \a stkd
      *
-     * The parametrer \a stkd must be the address of a static variable
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a stack_description_init .
      *
-     * \param stkd the address of the StackDescription structure to free
+     * \param stkd the address of the structure to destroy
      */
 
     void stack_description_destroy (StackDescription_t *stkd) ;

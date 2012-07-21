@@ -47,11 +47,11 @@
 void floorplan_element_init (FloorplanElement_t *flpel)
 {
     flpel->Id             = NULL ;
-    flpel->NICElements    = 0u ;
+    flpel->NICElements    = (Quantity_t) 0u ;
 
     ic_element_list_init (&flpel->ICElements) ;
 
-    flpel->Area           = 0u ;
+    flpel->Area           = (ChipDimension_t) 0.0 ;
     flpel->PowerValues    = NULL ;
 }
 
@@ -64,7 +64,6 @@ void floorplan_element_copy
 )
 {
     floorplan_element_destroy (dst) ;
-    floorplan_element_init    (dst) ;
 
     dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
 
@@ -87,6 +86,8 @@ void floorplan_element_destroy (FloorplanElement_t *flpel)
     ic_element_list_destroy (&flpel->ICElements) ;
 
     powers_queue_free (flpel->PowerValues) ;
+
+    floorplan_element_init (flpel) ;
 }
 
 /******************************************************************************/

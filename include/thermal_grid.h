@@ -68,7 +68,7 @@ extern "C"
         /*! The size of all the vectors that belong to tgrid structure,
             i.e. the number of layers in the 3d-ic */
 
-        Quantity_t Size ;
+        CellIndex_t Size ;
 
         /*! Vector storing the types of layer along the vertical profile. */
 
@@ -97,11 +97,15 @@ extern "C"
 
     typedef struct ThermalGrid_t ThermalGrid_t ;
 
+
+
 /******************************************************************************/
 
-    /*! Init a thermal grid using default values
+
+
+    /*! Inits the fields of the \a tgrid structure with default values
      *
-     * \param tgrid the address of the thermal grid to initialize
+     * \param tgrid the address of the structure to initalize
      */
 
     void thermal_grid_init (ThermalGrid_t *tgrid) ;
@@ -121,10 +125,12 @@ extern "C"
 
 
 
-    /*! Release the memory used by the thermal grid (i.e. the memory allocated
-     *  by \a thermal_grid_build )
+    /*! Destroys the content of the fields of the structure \a tgrid
      *
-     * \param tgrid the address of the thermal grid
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a thermal_grid_init .
+     *
+     * \param tgrid the address of the structure to destroy
      */
 
     void thermal_grid_destroy (ThermalGrid_t *tgrid) ;

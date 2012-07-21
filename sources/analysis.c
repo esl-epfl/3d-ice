@@ -59,7 +59,6 @@ void analysis_init (Analysis_t *analysis)
 void analysis_copy (Analysis_t *dst, Analysis_t *src)
 {
     analysis_destroy (dst) ;
-    analysis_init    (dst) ;
 
     dst->AnalysisType       = src->AnalysisType ;
     dst->StepTime           = src->StepTime ;
@@ -71,9 +70,11 @@ void analysis_copy (Analysis_t *dst, Analysis_t *src)
 
 /******************************************************************************/
 
-void analysis_destroy (Analysis_t __attribute__ ((unused))*analysis)
+void analysis_destroy (Analysis_t *analysis)
 {
-    return ;
+    // Nothing to do ...
+
+    analysis_init (analysis) ;
 }
 
 /******************************************************************************/
@@ -121,6 +122,29 @@ void analysys_free (Analysis_t *analysis)
 
 /******************************************************************************/
 
+void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix)
+{
+    fprintf (stream, "%ssolver : ", prefix) ;
+
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
+
+        fprintf (stream, "steady ;\n") ;
+
+    else
+
+        fprintf (stream, "transient step %.2f, slot %.2f ;\n",
+            analysis->StepTime, analysis->SlotTime) ;
+
+    fprintf (stream, "%s\n", prefix) ;
+
+    fprintf (stream, "%sinitial temperature  %.2f ;\n",
+        prefix, analysis->InitialTemperature) ;
+
+    fprintf (stream, "%s\n", prefix) ;
+}
+
+/******************************************************************************/
+
 Time_t get_simulated_time (Analysis_t *analysis
 )
 {
@@ -143,29 +167,6 @@ bool slot_completed (Analysis_t *analysis)
         return true ;
 
     return false ;
-}
-
-/******************************************************************************/
-
-void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix)
-{
-    fprintf (stream, "%ssolver : ", prefix) ;
-
-    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
-
-        fprintf (stream, "steady ;\n") ;
-
-    else
-
-        fprintf (stream, "transient step %.2f, slot %.2f ;\n",
-            analysis->StepTime, analysis->SlotTime) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    fprintf (stream, "%sinitial temperature  %.2f ;\n",
-        prefix, analysis->InitialTemperature) ;
-
-    fprintf (stream, "%s\n", prefix) ;
 }
 
 /******************************************************************************/

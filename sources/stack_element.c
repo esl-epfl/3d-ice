@@ -46,14 +46,14 @@
 
 void stack_element_init (StackElement_t *stkel)
 {
-    stkel->Type             = TDICE_STACK_ELEMENT_NONE ;
+    stkel->Type             = (StackElementType_t) TDICE_STACK_ELEMENT_NONE ;
     stkel->Pointer.Layer    = NULL ;
     stkel->Pointer.Die      = NULL ;
     stkel->Pointer.Channel  = NULL ;
     stkel->Pointer.HeatSink = NULL ;
     stkel->Id               = NULL ;
-    stkel->NLayers          = 0u ;
-    stkel->Offset           = 0u ;
+    stkel->NLayers          = (CellIndex_t) 0u ;
+    stkel->Offset           = (CellIndex_t) 0u ;
 }
 
 /******************************************************************************/
@@ -61,7 +61,6 @@ void stack_element_init (StackElement_t *stkel)
 void stack_element_copy (StackElement_t *dst, StackElement_t *src)
 {
     stack_element_destroy (dst) ;
-    stack_element_init (dst) ;
 
     dst->Type     = src->Type ;
     dst->NLayers  = src->NLayers ;
@@ -99,6 +98,8 @@ void stack_element_destroy (StackElement_t *stkel)
     else if (stkel->Type == TDICE_STACK_ELEMENT_LAYER)
 
         layer_free (stkel->Pointer.Layer) ;
+
+    stack_element_init (stkel) ;
 }
 
 /******************************************************************************/

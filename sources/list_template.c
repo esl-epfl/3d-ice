@@ -69,6 +69,23 @@ void, TTT_list_init, TTTList_t *list),
 
 /******************************************************************************/
 
+FIMP (FPROTO2 (
+
+void, TTT_list_copy, TTTList_t *dst, TTTList_t *src),
+
+    TTT_list_destroy (dst) ;
+
+    TTTListNode_t *node ;
+
+    for (node  = TTT_list_begin (src) ;
+         node != NULL ;
+         node  = TTT_list_next (node))
+
+        TTT_list_insert_end (dst, TTT_list_data(node)) ;
+)
+
+/******************************************************************************/
+
 FIMP (FPROTO1 (
 
 void, TTT_list_destroy, TTTList_t *list),
@@ -87,23 +104,6 @@ void, TTT_list_destroy, TTTList_t *list),
     }
 
     TTT_list_init (list) ;
-)
-
-/******************************************************************************/
-
-FIMP (FPROTO2 (
-
-void, TTT_list_copy, TTTList_t *dst, TTTList_t *src),
-
-    TTT_list_destroy (dst) ;
-
-    TTTListNode_t *node ;
-
-    for (node  = TTT_list_begin (src) ;
-         node != NULL ;
-         node  = TTT_list_next (node))
-
-        TTT_list_insert_end (dst, TTT_list_data(node)) ;
 )
 
 /******************************************************************************/

@@ -90,12 +90,40 @@ extern "C"
 
     typedef struct Material_t Material_t ;
 
+
+
 /******************************************************************************/
 
 
+
+    /*! Inits the fields of the \a material structure with default values
+     *
+     * \param material the address of the structure to initalize
+     */
+
     void material_init (Material_t *material) ;
 
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
     void material_copy (Material_t *dst, Material_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a material
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a material_init .
+     *
+     * \param material the address of the structure to destroy
+     */
 
     void material_destroy (Material_t *material) ;
 
