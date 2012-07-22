@@ -62,7 +62,12 @@ void system_matrix_init (SystemMatrix_t* sysmatrix)
 
     sysmatrix->SLU_Info = 0 ;
 
-    StatInit (&sysmatrix->SLU_Stat) ;
+    sysmatrix->SLU_Stat.panel_histo = NULL ;
+    sysmatrix->SLU_Stat.utime       = NULL ;
+    sysmatrix->SLU_Stat.ops         = NULL ;
+    sysmatrix->SLU_Stat.TinyPivots  = (int) 0 ;
+    sysmatrix->SLU_Stat.RefineSteps = (int) 0 ;
+    sysmatrix->SLU_Stat.expansions  = (int) 0 ;
 
     set_default_options (&sysmatrix->SLU_Options) ;
 
@@ -161,6 +166,8 @@ Error_t system_matrix_build
 
         return TDICE_FAILURE ;
     }
+
+    StatInit (&sysmatrix->SLU_Stat) ;
 
     return TDICE_SUCCESS ;
 }
