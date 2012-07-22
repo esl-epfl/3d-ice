@@ -87,9 +87,17 @@ void powers_queue_destroy (PowersQueue_t *pqueue)
 
 void powers_queue_copy (PowersQueue_t *dst, PowersQueue_t *src)
 {
-    powers_queue_destroy (dst) ;
+    if (dst->Capacity < src->Capacity || dst->Memory == NULL)
+    {
+        powers_queue_build (dst, src->Capacity) ;
+    }
+    else
+    {
+        dst->Size  = (Quantity_t) 0u ;
+        dst->Start = (Quantity_t) 0u ;
+        dst->End   = (Quantity_t) 0u ;
+    }
 
-    powers_queue_build (dst, src->Capacity) ;
 
     Quantity_t index = src->Start ;
 
