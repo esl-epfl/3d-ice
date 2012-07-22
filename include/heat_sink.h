@@ -101,7 +101,8 @@ extern "C"
 
         CellDimension_t SpreaderArea ;
 
-        /*! Material of the sink layer (used in case of connection to ambient) */
+        /*! Material of the sink layer (used in case of connection
+         *  to ambient) */
 
         Material_t SinkMaterial ;
 
@@ -198,10 +199,12 @@ extern "C"
      *
      * \param hsink the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix) ;
+
 
 
     /*! Returns the equivalent volumetric heat capacity of the material of the
@@ -219,6 +222,7 @@ extern "C"
         HeatSink_t      *hsink,
         CellDimension_t  chip_area
     ) ;
+
 
 
     /*! Returns the equivalent volumetric heat capacity of the material of the
@@ -254,6 +258,7 @@ extern "C"
         HeatSink_t      *hsink,
         CellDimension_t  chip_area
     ) ;
+
 
 
     /*! Returns the equivalent thermal conductivity of the material of the

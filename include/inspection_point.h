@@ -61,7 +61,8 @@ extern "C"
 
     /*! \struct InspectionPoint_t
      *
-     *  \brief Structure containing info about the output to be printed while simulating
+     *  \brief Structure containing info about the output to be printed
+     *         while simulating
      */
 
     struct InspectionPoint_t
@@ -143,7 +144,9 @@ extern "C"
      * \param src the address of the right term structure (source)
      */
 
-    void inspection_point_copy (InspectionPoint_t *dst, InspectionPoint_t *src) ;
+    void inspection_point_copy
+
+        (InspectionPoint_t *dst, InspectionPoint_t *src) ;
 
 
 
@@ -199,7 +202,20 @@ extern "C"
 
     void inspection_point_free (InspectionPoint_t *ipoint) ;
 
-    bool inspection_point_same_filename (InspectionPoint_t *ipoint, InspectionPoint_t *other) ;
+
+
+    /*! Tests if two insection points generates he output into the same file
+     *
+     * \param ipoint the first inspection point
+     * \param other the second inspection point
+     *
+     * \return \c TRUE if \a ipoint and \a other have the same FileName
+     * \return \c FALSE otherwise
+     */
+
+    bool inspection_point_same_filename
+
+        (InspectionPoint_t *ipoint, InspectionPoint_t *other) ;
 
 
 
@@ -207,7 +223,8 @@ extern "C"
      *
      * \param ipoint the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void inspection_point_print
@@ -215,15 +232,17 @@ extern "C"
         (InspectionPoint_t *ipoint, FILE *stream, String_t prefix) ;
 
 
+
     /*! Aligns the Tcell inspection point to the grid of thermal cells
      *
      *  The function computes the values ActualXval, ActualYval,
-     *  RowIndex and ColumnIndex while XVal and YVal are set to \a xval and \a yval
+     *  RowIndex and ColumnIndex while XVal and YVal are set to
+     *  \a xval and \a yval
      *
      *  \param ipoint  the pointer to the Tcell inspection point to align
      *  \param xval  the requested X coordinate of the cell
      *  \param yval  the requested Y coordinate of the cell
-     *  \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param dimensions the address of the dimension structure
      */
 
     void align_tcell
@@ -253,10 +272,13 @@ extern "C"
         OutputQuantity_t   quantity
     ) ;
 
-    /*! Generates the file in which a particular inspection point will be printed
+
+
+    /*! Generates the file in which a particular inspection point
+     *  will be printed
      *
-     * \param ipoint       the address of the InspectionPoint structure
-     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param ipoint     the address of the InspectionPoint structure
+     * \param dimensions the address of the dimension structure
      * \param prefix string to be printed as suffix for every line in the header
      *
      *  \return FIXME
@@ -271,7 +293,7 @@ extern "C"
     /*! Generates the output implemented by the inspection point
      *
      * \param ipoint the address of the InspectionPoint structure
-     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param dimensions the address of the dimension structure
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
      * \param current_time time instant of the measurement
@@ -294,7 +316,7 @@ extern "C"
      *
      * \param ipoint the address of the InspectionPoint structure
      * \param output_quantity the quantity to report (max, min, avg)
-     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param dimensions the address of the dimension structure
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
      * \param message the message to fill

@@ -188,8 +188,8 @@ extern "C"
      * \param row_index    the index of the row
      * \param column_index the index of the column
      *
-     * \return the top conductance of the thermal cell in position (\a layer_index ,
-     *         \a row_index , \a column_index ).
+     * \return the top conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
      */
 
     Conductance_t get_conductance_top
@@ -213,8 +213,8 @@ extern "C"
      * \param row_index    the index of the row
      * \param column_index the index of the column
      *
-     * \return the bottom conductance of the thermal cell in position (\a layer_index ,
-     *         \a row_index , \a column_index ).
+     * \return the bottom conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
      */
 
     Conductance_t get_conductance_bottom
@@ -238,8 +238,8 @@ extern "C"
      * \param row_index    the index of the row
      * \param column_index the index of the column
      *
-     * \return the north conductance of the thermal cell in position (\a layer_index ,
-     *         \a row_index , \a column_index ).
+     * \return the north conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
      */
 
     Conductance_t get_conductance_north
@@ -263,8 +263,8 @@ extern "C"
      * \param row_index    the index of the row
      * \param column_index the index of the column
      *
-     * \return the south conductance of the thermal cell in position (\a layer_index ,
-     *         \a row_index , \a column_index ).
+     * \return the south conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
      */
 
     Conductance_t get_conductance_south
@@ -288,8 +288,8 @@ extern "C"
      * \param row_index    the index of the row
      * \param column_index the index of the column
      *
-     * \return the east conductance of the thermal cell in position (\a layer_index ,
-     *         \a row_index , \a column_index ).
+     * \return the east conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
      */
 
     Conductance_t get_conductance_east
@@ -313,8 +313,8 @@ extern "C"
      * \param row_index    the index of the row
      * \param column_index the index of the column
      *
-     * \return the west conductance of the thermal cell in position (\a layer_index ,
-     *         \a row_index , \a column_index ).
+     * \return the west conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
      */
 
     Conductance_t get_conductance_west

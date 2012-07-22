@@ -56,7 +56,8 @@ extern "C"
 
     /*! \struct Material_t
      *
-     *  \brief Structure used to store data about the materials that compose the 2D/3D stack.
+     *  \brief Structure used to store data about the materials that compose
+     *         the 2D/3D stack.
      *
      *  Material_ts are used when declaring layers composing a die or the
      *  stack or when declaring the properties of the walls in a channel.
@@ -168,6 +169,17 @@ extern "C"
 
     void material_free (Material_t *material) ;
 
+
+
+    /*! Tests if two materials have the same Id
+     *
+     * \param material the first material
+     * \param other the second material
+     *
+     * \return \c TRUE if \a material and \a other have the same Id
+     * \return \c FALSE otherwise
+     */
+
     bool material_same_id (Material_t *material, Material_t *other) ;
 
 
@@ -176,7 +188,8 @@ extern "C"
      *
      * \param material the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void material_print (Material_t *material, FILE *stream, String_t prefix) ;

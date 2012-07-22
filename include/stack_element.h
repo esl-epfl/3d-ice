@@ -62,7 +62,8 @@ extern "C"
 
     /*! \union StackElement_p
      *
-     *  \brief A union of pointers to types that can be an instance of a StackElement
+     *  \brief A union of pointers to types that can be an instance
+     *         of a StackElement
      */
 
     union StackElement_p
@@ -81,10 +82,11 @@ extern "C"
 
     /*! \struct StackElement_t
      *
-     *  \brief Structure used to store data about the stack element that compose the 2D/3D stack.
+     *  \brief Structure used to store data about the stack element
+     *         that compose the 2D/3D stack.
      *
-     *  A stack element is the main componenent of a 3d stack. It can be a layer,
-     *  a die or a channel.
+     *  A stack element is the main componenent of a 3d stack. It can
+     *  be a layer, a die or a channel.
      */
 
     struct StackElement_t
@@ -196,6 +198,17 @@ extern "C"
 
     void stack_element_free (StackElement_t *stkel) ;
 
+
+
+    /*! Tests if two stack elements have the same Id
+     *
+     * \param stkel the first stack element
+     * \param other the second stack element
+     *
+     * \return \c TRUE if \a stkel and \a other have the same Id
+     * \return \c FALSE otherwise
+     */
+
     bool stack_element_same_id (StackElement_t *stkel, StackElement_t *other) ;
 
 
@@ -204,7 +217,8 @@ extern "C"
      *
      * \param stkel the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void stack_element_print
@@ -213,7 +227,8 @@ extern "C"
 
 
 
-    /*! Returns the offset of the source layer of the stack element within the stack
+    /*! Returns the offset of the source layer of the stack element
+     *  within the stack
      *
      *  \param stkel pointer to the stack element
      *
@@ -267,7 +282,9 @@ extern "C"
      * \return the total nyumber of floorplan elements in \a stkel
      */
 
-    Quantity_t get_number_of_floorplan_elements_stack_element (StackElement_t *stkel) ;
+    Quantity_t get_number_of_floorplan_elements_stack_element
+
+        (StackElement_t *stkel) ;
 
 /******************************************************************************/
 

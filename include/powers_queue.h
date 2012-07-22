@@ -182,7 +182,8 @@ extern "C"
      *
      * \param pqueue the powers queue to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the beginning
+     *               of each line
      */
 
     void powers_queue_print

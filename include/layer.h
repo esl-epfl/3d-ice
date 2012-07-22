@@ -58,7 +58,8 @@ extern "C"
 
     /*! \struct Layer_t
      *
-     *  \brief Structure used to store data about the layers that compose the 2D/3D stack.
+     *  \brief Structure used to store data about the layers that compose
+     *         the 2D/3D stack.
      *
      *  Layers are used to build dies os as stack elements
      */
@@ -161,6 +162,16 @@ extern "C"
     void layer_free (Layer_t *layer) ;
 
 
+
+    /*! Tests if two layers have the same Id
+     *
+     * \param layer the first layer
+     * \param other the second layer
+     *
+     * \return \c TRUE if \a layer and \a other have the same Id
+     * \return \c FALSE otherwise
+     */
+
     bool layer_same_id (Layer_t *layer, Layer_t *other) ;
 
 
@@ -169,7 +180,8 @@ extern "C"
      *
      * \param layer the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void layer_print (Layer_t *layer, FILE *stream, String_t prefix) ;

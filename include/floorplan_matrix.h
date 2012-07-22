@@ -130,7 +130,9 @@ extern "C"
      * \param src the address of the right term structure (source)
      */
 
-    void floorplan_matrix_copy (FloorplanMatrix_t *dst, FloorplanMatrix_t *src) ;
+    void floorplan_matrix_copy
+
+        (FloorplanMatrix_t *dst, FloorplanMatrix_t *src) ;
 
 
 
@@ -172,9 +174,9 @@ extern "C"
      *  The function fills, floorplan element by floorplan element, all
      *  the columns of the floorplan matrix.
      *
-     *  \param flpmatrix       pointer to the floorplan matrix to fill
+     *  \param flpmatrix  pointer to the floorplan matrix to fill
      *  \param list       pointer to the list of floorplan elements
-     *  \param dimensions pointer to the structure containing the dimensions of the IC
+     *  \param dimensions the address of the dimension structure
      */
 
     void floorplan_matrix_fill
@@ -210,7 +212,9 @@ extern "C"
      * \param file_name the name of the file to create
      */
 
-    void floorplan_matrix_print (FloorplanMatrix_t flpmatrix, String_t file_name) ;
+    void floorplan_matrix_print
+
+        (FloorplanMatrix_t flpmatrix, String_t file_name) ;
 
 /******************************************************************************/
 

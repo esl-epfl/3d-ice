@@ -59,7 +59,8 @@ extern "C"
 
     /*! \struct Die_t
      *
-     *  \brief Structure used to store data about the dies that compose the 2D/3D stack.
+     *  \brief Structure used to store data about the dies that compose
+     *         the 2D/3D stack.
      *
      *  Dies are one of the elements that can be used to build a 3d stack
      */
@@ -173,14 +174,26 @@ extern "C"
     void die_free (Die_t *die) ;
 
 
+
+    /*! Tests if two dies have the same Id
+     *
+     * \param die the first die
+     * \param other the second die
+     *
+     * \return \c TRUE if \a die and \a other have the same Id
+     * \return \c FALSE otherwise
+     */
+
     bool die_same_id (Die_t *die, Die_t *other) ;
+
 
 
     /*! Prints the die declaration as it looks in the stack file
      *
      * \param die the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void die_print (Die_t *die, FILE *stream, String_t prefix) ;

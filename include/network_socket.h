@@ -219,6 +219,8 @@ extern "C"
 
     Error_t socket_close (Socket_t *socket) ;
 
+/******************************************************************************/
+
 #ifdef __cplusplus
 }
 #endif

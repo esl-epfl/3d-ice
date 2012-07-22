@@ -163,7 +163,7 @@ extern "C"
      * \param thermal_grid pointer to the ThermalGrid structure
      * \param dimensions the dimensions of the IC
      *
-     *  \return \c TDICE_SUCCESS if the source vector has been updated successfully
+     *  \return \c TDICE_SUCCESS if the source vector has been updated
      *  \return \c TDICE_FAILURE if it not possible to fill the source vector
      *                           (at least one floorplan element with no power
      *                            values in its queue)

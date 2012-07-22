@@ -59,7 +59,8 @@ extern "C"
 
     /*! \struct Channel_t
      *
-     *  \brief Structure used to store data about the channel that compose the 2D/3D stack.
+     *  \brief Structure used to store data about the channel that compose
+     *         the 2D/3D stack.
      *
      *  Channel is one of the elements that can be used to build a 3d stack
      */
@@ -224,17 +225,23 @@ extern "C"
     void channel_free (Channel_t *channel) ;
 
 
+
     /*! Prints the channel declaration as it looks in the stack file
      *
      * \param channel the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      * \param dimensions pointer to the structure storing the dimensions
      */
 
     void channel_print
-
-        (Channel_t *channel, FILE *stream, String_t prefix, Dimensions_t *dimensions) ;
+    (
+        Channel_t    *channel,
+        FILE         *stream,
+        String_t      prefix,
+        Dimensions_t *dimensions
+    ) ;
 
 
 
@@ -272,8 +279,11 @@ extern "C"
      */
 
     Temperature_t get_max_temperature_channel_outlet
-
-        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
+    (
+        Channel_t     *channel,
+        Dimensions_t  *dimensions,
+        Temperature_t *temperatures
+    ) ;
 
 
 
@@ -288,8 +298,11 @@ extern "C"
      */
 
     Temperature_t get_min_temperature_channel_outlet
-
-        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
+    (
+        Channel_t     *channel,
+        Dimensions_t  *dimensions,
+        Temperature_t *temperatures
+    ) ;
 
 
 
@@ -304,8 +317,11 @@ extern "C"
      */
 
     Temperature_t get_avg_temperature_channel_outlet
-
-        (Channel_t *channel, Dimensions_t *dimensions, Temperature_t *temperatures) ;
+    (
+        Channel_t     *channel,
+        Dimensions_t  *dimensions,
+        Temperature_t *temperatures
+    ) ;
 
 /******************************************************************************/
 

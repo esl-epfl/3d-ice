@@ -78,7 +78,7 @@ extern "C"
 
         Quantity_t SlotLength ;
 
-        /*! Number of steps simulated so far ... */
+        /*! Number of steps simulated */
 
         Quantity_t CurrentTime ;
 
@@ -175,10 +175,12 @@ extern "C"
      *
      * \param analysis the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix) ;
+
 
 
     /*! Returns the time, in seconds, sum of the time steps emulated so far

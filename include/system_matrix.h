@@ -62,8 +62,9 @@ extern "C"
 
     /*! \struct SystemMatrix_t
      *
-     *  \brief Structure representing the squared matrix storing the coefficients of the
-     *         linear system that is solved tu run the thermal simulation
+     *  \brief Structure representing the squared matrix storing the
+     *         coefficients of the linear system that is solved tu run
+     *         the thermal simulation
      *
      * Compressed Column Storage (CCS): the matrix stores non zero values as
      * sequences of columns.

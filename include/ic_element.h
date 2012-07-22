@@ -177,6 +177,18 @@ extern "C"
 
     void ic_element_free (ICElement_t *icel) ;
 
+
+
+    /*! Tests if two ic elements have the same position and dimensions
+     *
+     * \param icel the first ic element
+     * \param other the second ic element
+     *
+     * \return \c TRUE if \a icel and \a other have the same position
+     *            and dimensions
+     * \return \c FALSE otherwise
+     */
+
     bool ic_element_equal (ICElement_t *icel, ICElement_t *other) ;
 
 

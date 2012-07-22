@@ -70,11 +70,13 @@ extern "C"
 
         String_t Id ;
 
-        /*! The number of IC elements that defines the surface of the floorplan element */
+        /*! The number of IC elements that defines the surface of
+         *  the floorplan element */
 
         Quantity_t NICElements ;
 
-        /*! The list of IC elements that defines the surface of the floorplan element */
+        /*! The list of IC elements that defines the surface of
+         *  the floorplan element */
 
         ICElementList_t ICElements ;
 
@@ -175,17 +177,29 @@ extern "C"
     void floorplan_element_free (FloorplanElement_t *flpel) ;
 
 
+
+    /*! Tests if two floorplan elements have the same Id
+     *
+     * \param flpel the first floorplan element
+     * \param other the second floorplan element
+     *
+     * \return \c TRUE if \a flpel and \a other have the same Id
+     * \return \c FALSE otherwise
+     */
+
     bool floorplan_element_same_id
 
         (FloorplanElement_t *flpel, FloorplanElement_t *other) ;
 
 
 
-    /*! Prints the floorplan element structure as it looks in the floorplan file
+    /*! Prints the floorplan element structure as it looks in the
+     *  floorplan file
      *
      * \param flpel the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void floorplan_element_print

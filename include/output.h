@@ -60,7 +60,8 @@ extern "C"
 
     /*! \struct Output_t
      *
-     *  \brief Informations about the type of thermal simulation to be run and its initial settings
+     *  \brief Informations about the type of thermal simulation to
+     *         be run and its initial settings
      */
 
     struct Output_t
@@ -129,7 +130,8 @@ extern "C"
      *
      * \param output the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void output_print (Output_t *output, FILE *stream, String_t prefix) ;
@@ -168,12 +170,14 @@ extern "C"
 
     /*! Initializes output files for each inspection point
      *
-     * Generates, for every inspection point, the output file and print the header
-     * If the target output file is already there, it will be overwritten.
+     * Generates, for every inspection point, the output file and
+     * print the header. If the target output file is already there,
+     * it will be overwritten.
      *
      * \param output       pointer to the output structure
-     * \param dimensions pointer to the structure containing the dimensions of the IC
-     * \param prefix string to be printed as suffix for every line in the header
+     * \param dimensions the address of the dimension structure
+     * \param prefix string to be printed as prefix for every
+     *               line in the header
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
      * \return \c TDICE_FAILURE if one of the files can not be created
@@ -188,7 +192,7 @@ extern "C"
     /*! Generates thermal outputs for each inspection point
      *
      * \param output       pointer to the output structure
-     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param dimensions the address of the dimension structure
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
      * \param current_time the time instant at which the output is printed
@@ -214,7 +218,7 @@ extern "C"
      *  set of inspection points
      *
      * \param output       pointer to the output structure
-     * \param dimensions pointer to the structure containing the dimensions of the IC
+     * \param dimensions the address of the dimension structure
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
      * \param output_instant the instant of the output (slot, step, final)

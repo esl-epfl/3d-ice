@@ -131,7 +131,9 @@ extern "C"
      *
      */
 
-    void increase_message_memory (NetworkMessage_t *message, Quantity_t new_size) ;
+    void increase_message_memory
+
+        (NetworkMessage_t *message, Quantity_t new_size) ;
 
 
 
@@ -169,15 +171,19 @@ extern "C"
      *
      * \param message  the address of the message to access
      * \param word  (out) the address of the word to extrcact
-     * \param index the index of the word (starting from the beginning of the content)
+     * \param index the index of the word (starting from the beginning
+     *              of the content)
      *
      * \return \c TDICE_SUCCESS if the operation succeeded
-     * \return \c TDICE_FAILURE if there index specifies a word out of the message
+     * \return \c TDICE_FAILURE if there index specifies a word out
+     *                          of the message
      */
 
     Error_t extract_message_word
 
         (NetworkMessage_t *message, void *word, Quantity_t index) ;
+
+/******************************************************************************/
 
 #ifdef __cplusplus
 }

@@ -81,7 +81,7 @@ extern "C"
 
         HeatSink_t *HeatSink ;
 
-        /*! Information about the (unique) type of channel used in the 3d stack */
+        /*! Information about the type of channel used in the 3d stack */
 
         Channel_t *Channel ;
 
@@ -144,7 +144,8 @@ extern "C"
      *
      * \param stkd the address of the structure to print
      * \param stream the output stream (must be already open)
-     * \param prefix a string to be printed as prefix at the beginning of each line
+     * \param prefix a string to be printed as prefix at the
+     *               beginning of each line
      */
 
     void stack_description_print
@@ -179,7 +180,9 @@ extern "C"
      * \return the total nyumber of floorplan elements in the 3d stack
      */
 
-    Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd) ;
+    Quantity_t get_total_number_of_floorplan_elements
+
+        (StackDescription_t *stkd) ;
 
 /******************************************************************************/
 
