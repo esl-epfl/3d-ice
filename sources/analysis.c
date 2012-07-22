@@ -124,20 +124,18 @@ void analysys_free (Analysis_t *analysis)
 
 void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix)
 {
-    fprintf (stream, "%ssolver : ", prefix) ;
+    fprintf (stream, "%ssolver : \n", prefix) ;
 
     if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_STEADY)
 
-        fprintf (stream, "steady ;\n") ;
+        fprintf (stream, "  steady ;\n") ;
 
     else
 
-        fprintf (stream, "transient step %.2f, slot %.2f ;\n",
+        fprintf (stream, "  transient step %.2f, slot %.2f ;\n",
             analysis->StepTime, analysis->SlotTime) ;
 
-    fprintf (stream, "%s\n", prefix) ;
-
-    fprintf (stream, "%sinitial temperature  %.2f ;\n",
+    fprintf (stream, "%s  initial temperature  %.2f ;\n",
         prefix, analysis->InitialTemperature) ;
 
     fprintf (stream, "%s\n", prefix) ;

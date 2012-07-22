@@ -136,8 +136,6 @@ void output_print (Output_t *output, FILE *stream, String_t prefix)
 {
     fprintf (stream, "%soutput :\n", prefix) ;
 
-    fprintf (stream, "%s\n", prefix) ;
-
     String_t new_prefix = (String_t) malloc (sizeof(*new_prefix) * (5 + strlen(prefix))) ;
 
     if (new_prefix == NULL) return ;

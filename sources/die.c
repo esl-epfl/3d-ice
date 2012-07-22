@@ -141,7 +141,7 @@ void die_print (Die_t *die, FILE *stream, String_t prefix)
 {
     fprintf (stream, "%sdie %s :\n", prefix, die->Id) ;
 
-    Quantity_t counter = 0u ;
+    Quantity_t counter = die->NLayers ;
 
     LayerListNode_t *lnd ;
 
@@ -149,7 +149,7 @@ void die_print (Die_t *die, FILE *stream, String_t prefix)
          lnd != NULL ;
          lnd = layer_list_next (lnd))
     {
-        if (counter == die->SourceLayerOffset)
+        if (--counter == die->SourceLayerOffset)
 
             fprintf (stream,
                 "%s   source  %4.1f %s ;\n",
@@ -164,8 +164,6 @@ void die_print (Die_t *die, FILE *stream, String_t prefix)
                 prefix,
                 layer_list_data(lnd)->Height,
                 layer_list_data(lnd)->Material.Id) ;
-
-        counter++ ;
     }
 }
 

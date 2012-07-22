@@ -127,9 +127,9 @@ void fill_thermal_grid
 
                 LayerListNode_t *lnd ;
 
-                for (lnd  = layer_list_begin(&stack_element->Pointer.Die->Layers) ;
+                for (lnd  = layer_list_end (&stack_element->Pointer.Die->Layers) ;
                      lnd != NULL ;
-                     lnd  = layer_list_next (lnd))
+                     lnd  = layer_list_prev (lnd))
                 {
                     tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
                     tgrid->VHCProfile    [index + tmp] = layer_list_data(lnd)->Material.VolumetricHeatCapacity ;

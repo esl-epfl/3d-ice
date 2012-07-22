@@ -113,6 +113,8 @@ void stack_description_print
 
     fprintf (stream, "%s\n", prefix) ;
 
+    fprintf (stream, "%sstack :\n", prefix) ;
+
     stack_element_list_print (&stkd->StackElements, stream, prefix) ;
 
     fprintf (stream, "%s\n", prefix) ;

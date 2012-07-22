@@ -41,6 +41,8 @@
 #include "channel.h"
 #include "macros.h"
 
+/******************************************************************************/
+
 void coolant_init (Coolant_t *coolant)
 {
     coolant->HTCSide       = (CoolantHTC_t) 0.0 ;
@@ -76,6 +78,8 @@ void coolant_destroy (Coolant_t *coolant)
     coolant_init (coolant) ;
 }
 
+/******************************************************************************/
+/******************************************************************************/
 /******************************************************************************/
 
 void channel_init (Channel_t *channel)
@@ -178,7 +182,6 @@ void channel_print
     {
         fprintf (stream, "%smicrochannel 4rm :\n", prefix) ;
         fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
-        fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, dimensions->Cell.ChannelLength) ;
         fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, dimensions->Cell.WallLength) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -202,7 +205,6 @@ void channel_print
     {
         fprintf (stream, "%smicrochannel 2rm :\n", prefix) ;
         fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
-        fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   channel    length %7.1f ;\n", prefix, channel->Length) ;
         fprintf (stream, "%s   wall       length %7.1f ;\n", prefix, channel->Pitch - channel->Length) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -222,7 +224,6 @@ void channel_print
     {
         fprintf (stream, "%spinfin :\n", prefix) ;
         fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
-        fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(channel->Porosity, channel->Pitch)) ;
         fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, channel->Pitch) ;
         fprintf (stream, "%s\n", prefix) ;
@@ -241,7 +242,6 @@ void channel_print
     {
         fprintf (stream, "%spinfin :\n", prefix) ;
         fprintf (stream, "%s   height            %7.1f ;\n", prefix, channel->Height) ;
-        fprintf (stream, "%s\n", prefix) ;
         fprintf (stream, "%s   pin diameter %7.1f ;\n",   prefix, DIAMETER(channel->Porosity, channel->Pitch)) ;
         fprintf (stream, "%s   pin pitch    %7.1f ;\n", prefix, channel->Pitch) ;
         fprintf (stream, "%s\n", prefix) ;

@@ -79,10 +79,12 @@ extern "C"
 
         CellIndex_t SourceLayerOffset ;
 
-        /*! The list of layers makeing the die. The first layer in the list
-         *  will be the bottom-most layer, the last layer in the list the
-         *  top most one.
-         */
+        /*! The list of layers composing the die. The list
+         *  stores the layers in such a way that the head/begin/first
+         *  of the list points to the top most layer while the
+         *  tail/end/last points to the bottom most one. Crossing the list
+         *  in a reverse order is necessary to get layers from bottom
+         *  to top. */
 
         LayerList_t Layers ;
 

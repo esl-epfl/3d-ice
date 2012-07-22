@@ -97,7 +97,7 @@ extern "C"
 
         Dimensions_t *Dimensions ;
 
-        /*! The list of stack elements componing the 3Dstack. The list
+        /*! The list of stack elements composing the 3Dstack. The list
          *  stores the stack elements in such a way that the head/begin/first
          *  of the list points to the top most stack element while the
          *  tail/end/last points to the bottom most one. Crossing the list

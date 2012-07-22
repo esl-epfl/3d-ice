@@ -184,7 +184,7 @@ void stack_element_print
         case TDICE_STACK_ELEMENT_LAYER :
 
             fprintf (stream,
-                "%s   layer    %s %s\n",
+                "%s   layer    %s %s ;\n",
                 prefix,
                 stkel->Id, stkel->Pointer.Layer->Id) ;
 

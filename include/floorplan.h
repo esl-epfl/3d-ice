@@ -218,14 +218,16 @@ extern "C"
 
 
 
-    /*! Returns the total number of floorplan elements in the floorplan \a floorplan
+    /*! Returns the total number of floorplan elements in the floorplan
      *
      * \param floorplan address of the Floorplan structure
      *
      * \return the total nyumber of floorplan elements in \a floorplan
      */
 
-    Quantity_t get_number_of_floorplan_elements_floorplan (Floorplan_t *floorplan) ;
+    Quantity_t get_number_of_floorplan_elements_floorplan
+
+        (Floorplan_t *floorplan) ;
 
 
 
@@ -235,7 +237,7 @@ extern "C"
      * \param floorplan_element_id id of the floorplan element as in the
      *                             floorplan file
      *
-     * \return \c NULL if \a floorplan_element_id does not exist in the floorplan
+     * \return \c NULL if \a floorplan_element_id does not exist
      * \return the pointer to the floorplan element \a floorplan_element_id
      */
 
@@ -304,7 +306,7 @@ extern "C"
      *                      cell in the layer where \a floorplan is placed
      *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
      *  \param min_temperatures (\c IN/OUT) addres to the memory where
-     *                      temperatures will be written into.
+s     *                      temperatures will be written into.
      *
      *  \return the same address as \a min_temperatures if \a min_temperatures
      *          is not \c NULL.

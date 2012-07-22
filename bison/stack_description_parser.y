@@ -708,7 +708,7 @@ die_top_layers_list
 
   | die_top_layers_list die_layer
     {
-        layer_list_insert_begin (&dielayers, $2) ;
+        layer_list_insert_end (&dielayers, $2) ;
 
         layer_free ($2) ;
     }
@@ -720,7 +720,7 @@ die_bottom_layers_list
 
   | die_bottom_layers_list die_layer
     {
-        layer_list_insert_begin (&dielayers, $2) ;
+        layer_list_insert_end (&dielayers, $2) ;
 
         source_layer_offset ++ ;
 
@@ -740,7 +740,7 @@ die_source_layer
 
   : SOURCE die_layer_content
     {
-        layer_list_insert_begin (&dielayers, $2) ;
+        layer_list_insert_end (&dielayers, $2) ;
 
         layer_free ($2) ;
     }
@@ -927,7 +927,7 @@ dimensions
             }
         }
 
-		// Check if the spreader is larger than the chip
+        // Check if the spreader is larger than the chip
 
         if (   stkd->HeatSink != NULL
             && stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_TRADITIONAL
@@ -987,7 +987,7 @@ stack
                 {
                     material_copy (
                         &stkd->HeatSink->SinkMaterial,
-                        &layer_list_data (layer_list_end (&tmost->Pointer.Die->Layers))->Material) ;
+                        &layer_list_data (layer_list_begin (&tmost->Pointer.Die->Layers))->Material) ;
                 }
             }
 
@@ -1076,9 +1076,9 @@ stack
             {
                 LayerListNode_t *lnd ;
 
-                for (lnd  = layer_list_begin(&stk_el_->Pointer.Die->Layers) ;
+                for (lnd  = layer_list_end(&stk_el_->Pointer.Die->Layers) ;
                      lnd != NULL ;
-                     lnd = layer_list_next (lnd))
+                     lnd = layer_list_prev (lnd))
                 {
                     stkd->Dimensions->Cell.Heights [ layer_index++ ] = layer_list_data(lnd)->Height ;
                 }

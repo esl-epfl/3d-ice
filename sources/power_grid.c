@@ -146,9 +146,9 @@ void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list)
                 CellIndex_t        tmp = 0u ;
                 LayerListNode_t *lnd ;
 
-                for (lnd = layer_list_begin (&stack_element->Pointer.Die->Layers) ;
+                for (lnd = layer_list_end (&stack_element->Pointer.Die->Layers) ;
                      lnd != NULL ;
-                     lnd = layer_list_next (lnd))
+                     lnd = layer_list_prev (lnd))
                 {
                     pgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
 

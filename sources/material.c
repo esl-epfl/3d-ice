@@ -133,11 +133,11 @@ void material_print (Material_t *material, FILE *stream, String_t prefix)
              prefix, material->Id) ;
 
     fprintf (stream,
-             "%s   thermal conductivity     %.4e  ;\n",
+             "%s   thermal conductivity     %.4e ;\n",
              prefix, material->ThermalConductivity) ;
 
     fprintf (stream,
-             "%s   volumetric heat capacity %.4e  ;\n",
+             "%s   volumetric heat capacity %.4e ;\n",
              prefix, material->VolumetricHeatCapacity) ;
 }
 

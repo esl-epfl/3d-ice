@@ -211,7 +211,7 @@ void inspection_point_print
 
         case TDICE_OUTPUT_TYPE_TMAP :
 
-            fprintf (stream, "%sTmap   (%s, \"%s\", ",
+            fprintf (stream, "%sTmap     (%s, \"%s\", ",
                 prefix, ipoint->StackElement->Id,
                 ipoint->FileName) ;
 
@@ -219,7 +219,7 @@ void inspection_point_print
 
         case TDICE_OUTPUT_TYPE_PMAP :
 
-            fprintf (stream, "%sPmap   (%s, \"%s\", ",
+            fprintf (stream, "%sPmap     (%s, \"%s\", ",
                 prefix, ipoint->StackElement->Id,
                 ipoint->FileName) ;
 
