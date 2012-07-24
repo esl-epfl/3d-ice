@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.1 .                                 *
+ * This file is part of 3D-ICE, version 2.2 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -104,7 +104,7 @@ int main (int argc, char** argv)
 
     thermal_data_init (&tdata) ;
 
-    error = fill_thermal_data
+    error = thermal_data_build
 
         (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis) ;
 

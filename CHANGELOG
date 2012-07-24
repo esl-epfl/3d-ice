@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 2.1 .                                 #
+ # This file is part of 3D-ICE, version 2.2 .                                 #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -38,11 +38,12 @@
 
 
  ##############################################################################
-   * Enhanced network interface with new message types
+ 2012-07-24 3D-ICE 2.2
+   * Enhanced/Completed network interface with new message types
    * New type Output_t to decouple analysis parameters from output requests
    * Removed ThermalCell array. Added ThermalGrid and PowerGrid instead. 
-   * Improved computation of source values
-   * New criteria for alignment of floorplan elements on thermal cells to
+   * Improved computation of source values (floorplan matrix)
+   * New technique to align of floorplan elements on thermal cells to
      support ic elements smaller than cells as well as more than one ic
      element per thermal cell 
    * Changed implementation of powers queue to circular array
@@ -50,7 +51,7 @@
    * New heat sink model (spreader + sink) using constriction/spreading model
    * Added Layer as element composing the stack
    * New typedefs for a better integration with C++ code
-   * Minor changes in code
+   * Changes in code: interface toward objects and usage of list template
  ##############################################################################
  2012-03-23 3D-ICE 2.1
    * Reduction of memory requirement to store thermal cells

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.1 .                                 *
+ * This file is part of 3D-ICE, version 2.2 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -36,6 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+/*! \file list_template.h */
+
 #ifndef ListType
 #error missing macro ListType
 #endif
@@ -47,30 +49,50 @@
 #define PASTER(x,y) x ## y
 #define CNT(x,y)    PASTER(x,y)
 
-#define DEF_LIST_NODE(nodetype, datatype)                                      \
+#define LIST_NODE(nodetype, datatype)                                          \
+                                                                               \
+    /*! The node od a double-linked list */                                    \
                                                                                \
     struct nodetype                                                            \
     {                                                                          \
+        /*! The item (data) stored by the node of the list */                  \
+                                                                               \
         datatype Data ;                                                        \
                                                                                \
+        /*! The poiner to the following node in the list */                    \
+                                                                               \
         struct nodetype *Prev ;                                                \
+                                                                               \
+        /*! The poiner to the previous node in the list */                     \
                                                                                \
         struct nodetype *Next ;                                                \
     } ;                                                                        \
                                                                                \
+    /*! Definition of the type nodetype */                                     \
+                                                                               \
     typedef struct nodetype nodetype ;
 
 
-#define DEF_LIST(listtype, nodetype)                                           \
+#define LIST(listtype, nodetype)                                               \
+                                                                               \
+    /*! A double-linked list */                                                \
                                                                                \
     struct listtype                                                            \
     {                                                                          \
+        /*! The number of nodes in the list */                                 \
+                                                                               \
         Quantity_t Size ;                                                      \
+                                                                               \
+        /*! The poiner to the first node in the list */                        \
                                                                                \
         nodetype *First ;                                                      \
                                                                                \
+        /*! The poiner to the last node in the list */                         \
+                                                                               \
         nodetype *Last ;                                                       \
     } ;                                                                        \
+                                                                               \
+    /*! Definition of the type nodetype */                                     \
                                                                                \
     typedef struct listtype listtype ;
 
@@ -111,9 +133,9 @@
 
 /******************************************************************************/
 
-DEF_LIST_NODE (TTTListNode_t, TTT_t)
+LIST_NODE (TTTListNode_t, TTT_t)
 
-DEF_LIST (TTTList_t, TTTListNode_t)
+LIST (TTTList_t, TTTListNode_t)
 
 /******************************************************************************/
 
@@ -158,11 +180,27 @@ FPROTO1 (
 
 
 
+    /*! Returns the first node in the list
+     *
+     * \param list the address of the list
+     *
+     * \return a pointer to the first node in the list
+     * \return \c NULL if the list is empty
+     */
+
 FPROTO1 (
 
     TTTListNode_t *, TTT_list_begin, TTTList_t *list) ;
 
 
+
+    /*! Returns the last node in the list
+     *
+     * \param list the address of the list
+     *
+     * \return a pointer to the last node in the list
+     * \return \c NULL if the list is empty
+     */
 
 FPROTO1 (
 
@@ -170,11 +208,27 @@ FPROTO1 (
 
 
 
+    /*! Returns the next node in the list
+     *
+     * \param node the pointer to the current position
+     *
+     * \return a pointer to the node in the list that follows \a node
+     * \return \c NULL if the next node does not exist
+     */
+
 FPROTO1 (
 
     TTTListNode_t *, TTT_list_next, TTTListNode_t *node) ;
 
 
+
+    /*! Returns the previous node in the list
+     *
+     * \param node the pointer to the current position
+     *
+     * \return a pointer to the node in the list that precede \a node
+     * \return \c NULL if the previous node does not exist
+     */
 
 FPROTO1 (
 
@@ -182,11 +236,27 @@ FPROTO1 (
 
 
 
+    /*! Returns the data stored by a node in the list
+     *
+     * \param node the pointer to the node
+     *
+     * \return a pointer to the data stored in \a node
+     */
+
 FPROTO1 (
 
     TTT_t *, TTT_list_data, TTTListNode_t *node) ;
 
 
+
+    /*! Inserts new data at the beginning of the list
+     *
+     * The function creates a new node to be added at the beginning of
+     * the \a list. Then, it makes a local copy of \a data .
+     *
+     * \param list the address of the list
+     * \param data the address of the data to insert
+     */
 
 FPROTO2 (
 
@@ -194,11 +264,29 @@ FPROTO2 (
 
 
 
+    /*! Inserts new data at the end of the list
+     *
+     * The function creates a new node to be added at the end of
+     * the \a list. Then, it makes a local copy of \a data .
+     *
+     * \param list the address of the list
+     * \param data the address of the data to insert
+     */
+
 FPROTO2 (
 
     void, TTT_list_insert_end, TTTList_t *list, TTT_t *data) ;
 
 
+
+    /*! Finds an elemnt in the list
+     *
+     * \param list the address of the list
+     * \param data the address of the data to find
+     *
+     * \return a pointer to the data, if found
+     * \return \c NULL if the list does not contain \a data
+     */
 
 FPROTO2 (
 

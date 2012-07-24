@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.1 .                                 *
+ * This file is part of 3D-ICE, version 2.2 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -65,7 +65,7 @@ void thermal_data_init (ThermalData_t *tdata)
 
 /******************************************************************************/
 
-Error_t fill_thermal_data
+Error_t thermal_data_build
 (
     ThermalData_t      *tdata,
     StackElementList_t *stack_elements_list,
