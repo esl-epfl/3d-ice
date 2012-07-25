@@ -36,7 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdlib.h> // For the memory functions malloc/free
+#include <string.h> // For the memory function memcpy
 
 #include "dimensions.h"
 #include "macros.h"

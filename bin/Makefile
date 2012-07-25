@@ -50,17 +50,17 @@ CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 -include 3D-ICE-Emulator.d
 
 3D-ICE-Emulator: 3D-ICE-Emulator.o $(3DICE_LIB_A)
-	$(CC) $< $(CLIBS) -o $@
+	$(CC) $(CFLAGS)  $< $(CLIBS) -o $@
 
 -include 3D-ICE-Client.d
 
 3D-ICE-Client: 3D-ICE-Client.o $(3DICE_LIB_A)
-	$(CC) $< $(CLIBS) -o $@
+	$(CC) $(CFLAGS) $< $(CLIBS) -o $@
 
 -include 3D-ICE-Server.d
 
 3D-ICE-Server: 3D-ICE-Server.o $(3DICE_LIB_A)
-	$(CC) $< $(CLIBS) -o $@
+	$(CC) $(CFLAGS) $< $(CLIBS) -o $@
 
 clean:
 	@$(RM) $(RMFLAGS) 3D-ICE-Emulator

@@ -48,8 +48,6 @@ extern "C"
 
 /******************************************************************************/
 
-#include <stdio.h>
-
 #include "types.h"
 
 #include "analysis.h"

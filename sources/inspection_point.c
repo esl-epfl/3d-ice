@@ -36,8 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h> // For the memory functions malloc/free
 
 #include "inspection_point.h"
 #include "macros.h"
@@ -46,7 +45,8 @@
 
 void inspection_point_init (InspectionPoint_t *ipoint)
 {
-    ipoint->FileName         = NULL ;
+    string_init (&ipoint->FileName) ;
+
     ipoint->Instant          = (OutputInstant_t)  TDICE_OUTPUT_INSTANT_NONE ;
     ipoint->Type             = (OutputType_t)     TDICE_OUTPUT_TYPE_NONE ;
     ipoint->Quantity         = (OutputQuantity_t) TDICE_OUTPUT_QUANTITY_NONE ;
@@ -78,16 +78,14 @@ void inspection_point_copy (InspectionPoint_t *dst, InspectionPoint_t *src)
     dst->StackElement     = src->StackElement ;
     dst->FloorplanElement = src->FloorplanElement ;
 
-    dst->FileName = (src->FileName == NULL) ? NULL : strdup (src->FileName) ;
+    string_copy (&dst->FileName, &src->FileName) ;
 }
 
 /******************************************************************************/
 
 void inspection_point_destroy (InspectionPoint_t *ipoint)
 {
-    if (ipoint->FileName != NULL)
-
-        free (ipoint->FileName) ;
+    string_destroy (&ipoint->FileName) ;
 
     inspection_point_init (ipoint) ;
 }
@@ -145,7 +143,7 @@ bool inspection_point_same_filename
     InspectionPoint_t *other
 )
 {
-    return strcmp (ipoint->FileName, other->FileName) == 0 ? true : false ;
+    return string_equal (&ipoint->FileName, &other->FileName) ;
 }
 
 /******************************************************************************/

@@ -46,7 +46,6 @@ extern "C"
 {
 #endif
 
-#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -57,6 +56,64 @@ extern "C"
     typedef char* String_t ;
 
 
+
+    /*! Inits the \a string structure with a default value
+     *
+     * \param string the address of the string to initalize
+     */
+
+    void string_init (String_t *string) ;
+
+
+
+    /*! Tests if two strings are equal
+     *
+     * \param string the first string
+     * \param other the second string
+     *
+     * \return \c TRUE if \a string and \a other are the same string
+     * \return \c FALSE otherwise
+     */
+
+    bool string_equal (String_t *string, String_t *other) ;
+
+
+
+    /*! Copies the string \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term string (destination)
+     * \param src the address of the right term string (source)
+     */
+
+    void string_copy (String_t *dst, String_t *src) ;
+
+
+
+    /*! Copies the C string \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term string (destination)
+     * \param src the address of the right term C string (source)
+     */
+
+    void string_copy_cstr (String_t *dst, char *src) ;
+
+
+
+    /*! Destroys the content of the \a string
+     *
+     * The function releases the memory used by the string and
+     * resets its state calling \a string_init .
+     *
+     * \param string the address of the string to destroy
+     */
+
+    void string_destroy (String_t *string) ;
+
+/******************************************************************************/
 
     /*! Definition of the type Quantity_t
      *
@@ -221,6 +278,39 @@ extern "C"
     /*! Definition of the type Coolant_t */
 
     typedef struct Coolant_t Coolant_t ;
+
+
+
+    /*! Inits the fields of the \a coolant structure with default values
+     *
+     * \param coolant the address of the structure to initalize
+     */
+
+    void coolant_init    (Coolant_t *coolant) ;
+
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
+    void coolant_copy    (Coolant_t *dst, Coolant_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a coolant
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a coolant_init .
+     *
+     * \param coolant the address of the structure to destroy
+     */
+
+    void coolant_destroy (Coolant_t *coolant) ;
 
 /******************************************************************************/
 

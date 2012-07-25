@@ -36,7 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdlib.h> // For the memory functions malloc/calloc/free
 
 #include "macros.h"
 #include "power_grid.h"
@@ -68,7 +68,7 @@ Error_t power_grid_build
 
     pgrid->LayersProfile =
 
-        (StackLayerType_t *) calloc (nlayers, sizeof (StackLayerType_t)) ;
+        (StackLayerType_t *) malloc (nlayers * sizeof (StackLayerType_t)) ;
 
     if (pgrid->LayersProfile == NULL)
 
@@ -76,7 +76,7 @@ Error_t power_grid_build
 
     pgrid->FloorplansProfile =
 
-        (Floorplan_t **) calloc (nlayers, sizeof (Floorplan_t *)) ;
+        (Floorplan_t **) malloc (nlayers * sizeof (Floorplan_t *)) ;
 
     if (pgrid->FloorplansProfile == NULL)
     {

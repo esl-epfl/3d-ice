@@ -36,7 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdlib.h> // For the memory functions calloc/free
 
 #include "macros.h"
 #include "thermal_grid.h"

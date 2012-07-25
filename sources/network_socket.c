@@ -36,8 +36,9 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
+#include <stdio.h>  // For the function perror
+#include <errno.h>  // For the function perror
+#include <string.h> // For the memory function memset
 #include <unistd.h>
 #include <errno.h>
 

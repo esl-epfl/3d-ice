@@ -46,8 +46,6 @@ extern "C"
 
 /******************************************************************************/
 
-#include <stdio.h>
-
 #include "types.h"
 #include "inspection_point.h"
 

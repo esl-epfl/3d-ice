@@ -46,6 +46,10 @@ extern "C"
 {
 #endif
 
+/******************************************************************************/
+
+#include <stdio.h> // For the file type FILE
+
 #include "types.h"
 #include "dimensions.h"
 

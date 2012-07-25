@@ -36,7 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdio.h> // For the file type FILE
 
 #include "thermal_data.h"
 #include "macros.h"
@@ -446,13 +446,18 @@ Error_t print_thermal_map
 
     stack_element_init (&stkel) ;
 
-    stkel.Id = stack_element_id ;
+    string_copy (&stkel.Id, &stack_element_id) ;
 
     StackElement_t *tmp = stack_element_list_find (list, &stkel) ;
 
     if (tmp == NULL)
+    {
+        stack_element_destroy (&stkel) ;
 
         return TDICE_FAILURE ;
+    }
+
+    stack_element_destroy (&stkel) ;
 
     FILE *output_file = fopen (file_name, "w") ;
 

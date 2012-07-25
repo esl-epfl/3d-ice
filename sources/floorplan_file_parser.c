@@ -36,6 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <stdio.h> // For the file type FILE
+
 #include "floorplan_file_parser.h"
 
 #include "../bison/floorplan_parser.h"
@@ -72,7 +74,7 @@ Error_t parse_floorplan_file
         return TDICE_FAILURE ;
     }
 
-    floorplan->FileName = strdup (filename) ;  // FIXME memory leak
+    string_copy (&floorplan->FileName, &filename) ;  // FIXME memory leak
 
     floorplan_parser_lex_init  (&scanner) ;
     floorplan_parser_set_in    (input, scanner) ;

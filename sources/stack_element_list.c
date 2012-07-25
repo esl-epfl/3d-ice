@@ -36,9 +36,6 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "stack_element_list.h"
 
 #define ListType StackElement

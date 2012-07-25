@@ -36,8 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h> // For the memory functions malloc/free
 
 #include "die.h"
 #include "macros.h"
@@ -46,7 +45,8 @@
 
 void die_init (Die_t *die)
 {
-    die->Id                = NULL ;
+    string_init (&die->Id) ;
+
     die->NLayers           = (CellIndex_t) 0u ;
     die->SourceLayerOffset = (CellIndex_t) 0u ;
 
@@ -61,7 +61,7 @@ void die_copy (Die_t *dst, Die_t *src)
 {
     die_destroy (dst) ;
 
-    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+    string_copy (&dst->Id, &src->Id) ;
 
     dst->NLayers           = src->NLayers ;
     dst->SourceLayerOffset = src->SourceLayerOffset ;
@@ -75,10 +75,7 @@ void die_copy (Die_t *dst, Die_t *src)
 
 void die_destroy (Die_t *die)
 {
-    if (die->Id != NULL)
-
-        free (die->Id) ;
-
+    string_destroy     (&die->Id) ;
     layer_list_destroy (&die->Layers) ;
     floorplan_destroy  (&die->Floorplan) ;
 
@@ -132,7 +129,7 @@ void die_free (Die_t *die)
 
 bool die_same_id (Die_t *die, Die_t *other)
 {
-    return strcmp (die->Id, other->Id) == 0 ? true : false ;
+    return string_equal (&die->Id, &other->Id) ;
 }
 
 /******************************************************************************/

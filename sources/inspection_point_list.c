@@ -38,9 +38,6 @@
 
 /******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "inspection_point_list.h"
 
 #define ListType InspectionPoint

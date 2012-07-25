@@ -36,6 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <stdio.h> // For the file type FILE
+
 #include "stack_file_parser.h"
 
 #include "../bison/stack_description_parser.h"
@@ -76,7 +78,7 @@ Error_t parse_stack_description_file
         return TDICE_FAILURE ;
     }
 
-    stkd->FileName = strdup (filename) ;  // FIXME memory leak
+    string_copy (&stkd->FileName, &filename) ;  // FIXME memory leak
 
     stack_description_lex_init (&scanner) ;
     stack_description_set_in (input, scanner) ;

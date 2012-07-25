@@ -36,7 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdlib.h> // For the memory functions malloc/free
+#include <string.h> // For the memory function memcpy
 
 #include "macros.h"
 #include "floorplan.h"
@@ -46,7 +47,8 @@
 
 void floorplan_init (Floorplan_t *floorplan)
 {
-    floorplan->FileName     = NULL ;
+    string_init (&floorplan->FileName) ;
+
     floorplan->NElements    = (Quantity_t) 0u ;
     floorplan->Bpowers      = NULL ;
 
@@ -60,7 +62,7 @@ void floorplan_copy (Floorplan_t *dst, Floorplan_t *src)
 {
     floorplan_destroy (dst) ;
 
-    dst->FileName = (src->FileName == NULL) ? NULL : strdup (src->FileName) ;
+    string_copy (&dst->FileName, &src->FileName) ;
 
     dst->NElements = src->NElements ;
 
@@ -91,9 +93,7 @@ void floorplan_copy (Floorplan_t *dst, Floorplan_t *src)
 
 void floorplan_destroy (Floorplan_t *floorplan)
 {
-    if (floorplan->FileName != NULL)
-
-        free (floorplan->FileName) ;
+    string_destroy (&floorplan->FileName) ;
 
     if (floorplan->Bpowers != NULL)
 
@@ -252,9 +252,15 @@ FloorplanElement_t *get_floorplan_element
 
     floorplan_element_init (&flpel) ;
 
-    flpel.Id = floorplan_element_id ;
+    string_copy (&flpel.Id, &floorplan_element_id) ;
 
-    return floorplan_element_list_find (&floorplan->ElementsList, &flpel) ;
+    FloorplanElement_t *tmp =
+
+        floorplan_element_list_find (&floorplan->ElementsList, &flpel) ;
+
+    floorplan_element_destroy (&flpel) ;
+
+    return tmp ;
 }
 
 /******************************************************************************/

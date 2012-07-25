@@ -38,9 +38,6 @@
 
 /******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "ic_element_list.h"
 
 #define ListType ICElement

@@ -36,8 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h> // For the memory functions malloc/free
 
 #include "layer.h"
 #include "macros.h"
@@ -46,7 +45,8 @@
 
 void layer_init (Layer_t *layer)
 {
-    layer->Id     = NULL ;
+    string_init (&layer->Id) ;
+
     layer->Height = (CellDimension_t) 0.0 ;
 
     material_init (&layer->Material) ;
@@ -58,7 +58,7 @@ void layer_copy (Layer_t *dst, Layer_t *src)
 {
     layer_destroy (dst) ;
 
-    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+    string_copy (&dst->Id, &src->Id) ;
 
     dst->Height   = src->Height ;
 
@@ -69,9 +69,7 @@ void layer_copy (Layer_t *dst, Layer_t *src)
 
 void layer_destroy (Layer_t *layer)
 {
-    if (layer->Id != NULL)
-
-        free (layer->Id) ;
+    string_destroy (&layer->Id) ;
 
     material_destroy (&layer->Material) ;
 
@@ -125,7 +123,7 @@ void layer_free (Layer_t *layer)
 
 bool layer_same_id (Layer_t *layer, Layer_t *other)
 {
-    return strcmp (layer->Id, other->Id) == 0 ? true : false ;
+    return string_equal (&layer->Id, &other->Id) ;
 }
 
 /******************************************************************************/

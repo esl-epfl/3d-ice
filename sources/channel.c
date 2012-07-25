@@ -36,50 +36,11 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdlib.h> // For the memory functions malloc/free
 
 #include "channel.h"
 #include "macros.h"
 
-/******************************************************************************/
-
-void coolant_init (Coolant_t *coolant)
-{
-    coolant->HTCSide       = (CoolantHTC_t) 0.0 ;
-    coolant->HTCTop        = (CoolantHTC_t) 0.0 ;
-    coolant->HTCBottom     = (CoolantHTC_t) 0.0 ;
-    coolant->VHC           = (CoolantVHC_t) 0.0 ;
-    coolant->FlowRate      = (CoolantFR_t) 0.0 ;
-    coolant->DarcyVelocity = (DarcyVelocity_t) 0.0 ;
-    coolant->TIn           = (Temperature_t) 0.0 ;
-}
-
-/******************************************************************************/
-
-void coolant_copy (Coolant_t *dst, Coolant_t *src)
-{
-    coolant_destroy (dst) ;
-
-    dst->HTCSide       = src->HTCSide ;
-    dst->HTCTop        = src->HTCTop ;
-    dst->HTCBottom     = src->HTCBottom ;
-    dst->VHC           = src->VHC ;
-    dst->FlowRate      = src->FlowRate ;
-    dst->DarcyVelocity = src->DarcyVelocity ;
-    dst->TIn           = src->TIn ;
-}
-
-/******************************************************************************/
-
-void coolant_destroy (Coolant_t *coolant)
-{
-    // Nothing to do ...
-
-    coolant_init (coolant) ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
 void channel_init (Channel_t *channel)

@@ -48,8 +48,6 @@ extern "C"
 
 /******************************************************************************/
 
-#include <stdio.h>
-
 #include "types.h"
 #include "floorplan_element_list.h"
 #include "dimensions.h"

@@ -187,8 +187,8 @@
 %token <string>   IDENTIFIER "identifier"
 %token <string>   PATH       "path to file"
 
-%destructor { free       ($$) ; } <string>
-%destructor { layer_free ($$) ; } <layer_p>
+%destructor { string_destroy (&$$) ; } <string>
+%destructor { layer_free ($$) ;      } <layer_p>
 
 %name-prefix "stack_description_"
 %output      "stack_description_parser.c"
@@ -257,9 +257,9 @@ materials_list
         {
             sprintf (error_message, "Material %s already declared", $2->Id) ;
 
-            material_free ($2) ;
-
             STKERROR (error_message) ;
+
+            material_free ($2) ;
 
             YYABORT ;
         }
@@ -280,16 +280,19 @@ material
 
         if (material == NULL)
         {
-            free ($2) ;
-
             STKERROR ("Malloc material failed") ;
+
+            string_destroy (&$2) ;
 
             YYABORT ;
         }
 
-        material->Id                     = $2 ;
+        string_copy (&material->Id, &$2) ;
+
         material->ThermalConductivity    = (SolidTC_t) $6 ;
         material->VolumetricHeatCapacity = (SolidVHC_t) $11 ;
+
+        string_destroy (&$2) ;
     }
   ;
 
@@ -317,6 +320,9 @@ heat_sink_opt
         {
             STKERROR ("Malloc heat sink failed") ;
 
+            string_destroy (&$12) ;
+            string_destroy (&$22) ;
+
             YYABORT ;
         }
 
@@ -325,10 +331,14 @@ heat_sink_opt
         stkd->HeatSink->SourceLayerOffset   = SOURCE_OFFSET_HEATSINK_TRADITIONAL ;
         stkd->HeatSink->SinkHeight          = $6 ;
         stkd->HeatSink->SinkArea            = $9 ;
-        stkd->HeatSink->SinkMaterial.Id     = $12 ;
+
+        string_copy (&stkd->HeatSink->SinkMaterial.Id, &$12) ;
+
         stkd->HeatSink->SpreaderHeight      = $16 ;
         stkd->HeatSink->SpreaderArea        = $19 ;
-        stkd->HeatSink->SpreaderMaterial.Id = $22 ;
+
+        string_copy (&stkd->HeatSink->SpreaderMaterial.Id, &$22) ;
+
         stkd->HeatSink->AmbientHTC          = (AmbientHTC_t) $27 ;
         stkd->HeatSink->AmbientTemperature  = $31 ;
 
@@ -337,10 +347,10 @@ heat_sink_opt
             sprintf (error_message,
                 "Error: the area of the spreader must be smaller than the sink") ;
 
-            free ($12) ;
-            free ($22) ;
-
             STKERROR (error_message) ;
+
+            string_destroy (&$12) ;
+            string_destroy (&$22) ;
 
             YYABORT ;
         }
@@ -354,6 +364,9 @@ heat_sink_opt
             sprintf (error_message, "Unknown sink material %s", $12) ;
 
             STKERROR (error_message) ;
+
+            string_destroy (&$12) ;
+            string_destroy (&$22) ;
 
             YYABORT ;
         }
@@ -370,10 +383,16 @@ heat_sink_opt
 
             STKERROR (error_message) ;
 
+            string_destroy (&$12) ;
+            string_destroy (&$22) ;
+
             YYABORT ;
         }
 
         material_copy (&stkd->HeatSink->SpreaderMaterial, tmp) ;
+
+        string_destroy (&$12) ;
+        string_destroy (&$22) ;
     }
 
   | CONNECTION TO AMBIENT ':'
@@ -421,9 +440,9 @@ microchannel_opt
 
         if (stkd->Channel == NULL)
         {
-            free ($19) ;
-
             STKERROR ("Malloc channel failed") ;
+
+            string_destroy (&$19) ;
 
             YYABORT ;
         }
@@ -437,7 +456,9 @@ microchannel_opt
         stkd->Channel->NLayers           = NUM_LAYERS_CHANNEL_4RM ;
         stkd->Channel->SourceLayerOffset = SOURCE_OFFSET_CHANNEL_4RM ;
         stkd->Channel->Height            = $5 ;
-        stkd->Channel->WallMaterial.Id   = $19 ;
+
+        string_copy (&stkd->Channel->WallMaterial.Id, &$19) ;
+
         stkd->Channel->Coolant.FlowRate  = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($24) ;
         stkd->Channel->Coolant.HTCSide   = $26.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $26.HTCTop ;
@@ -455,10 +476,14 @@ microchannel_opt
 
             STKERROR (error_message) ;
 
+            string_destroy (&$19) ;
+
             YYABORT ;
         }
 
         material_copy (&stkd->Channel->WallMaterial, tmp) ;
+
+        string_destroy (&$19) ;
     }
 
   |  MICROCHANNEL _2RM ':'
@@ -475,9 +500,9 @@ microchannel_opt
 
         if (stkd->Channel == NULL)
         {
-            free ($17) ;
-
             STKERROR ("Malloc channel failed") ;
+
+            string_destroy (&$17) ;
 
             YYABORT ;
         }
@@ -489,7 +514,9 @@ microchannel_opt
         stkd->Channel->Length            = $9 ;
         stkd->Channel->Pitch             = $13 + $9 ;
         stkd->Channel->Porosity          = stkd->Channel->Length / stkd->Channel->Pitch ;
-        stkd->Channel->WallMaterial.Id   = $17 ;
+
+        string_copy (&stkd->Channel->WallMaterial.Id, &$17) ;
+
         stkd->Channel->Coolant.FlowRate  = FLOW_RATE_FROM_MLMIN_TO_UM3SEC ($22) ;
         stkd->Channel->Coolant.HTCSide   = $24.HTCSide ;
         stkd->Channel->Coolant.HTCTop    = $24.HTCTop ;
@@ -507,10 +534,14 @@ microchannel_opt
 
             STKERROR (error_message) ;
 
+            string_destroy (&$17) ;
+
             YYABORT ;
         }
 
         material_copy (&stkd->Channel->WallMaterial, tmp) ;
+
+        string_destroy (&$17) ;
     }
 
   |  PINFIN ':'
@@ -527,9 +558,9 @@ microchannel_opt
 
         if (stkd->Channel == NULL)
         {
-            free ($20) ;
-
             STKERROR ("Malloc channel failed") ;
+
+            string_destroy (&$20) ;
 
             YYABORT ;
         }
@@ -540,7 +571,9 @@ microchannel_opt
         stkd->Channel->ChannelModel          = $16 ;
         stkd->Channel->NLayers               = NUM_LAYERS_CHANNEL_2RM ;
         stkd->Channel->SourceLayerOffset     = SOURCE_OFFSET_CHANNEL_2RM ;
-        stkd->Channel->WallMaterial.Id       = $20 ;
+
+        string_copy (&stkd->Channel->WallMaterial.Id, &$20) ;
+
         stkd->Channel->Coolant.DarcyVelocity = $24 ;
         stkd->Channel->Coolant.HTCSide       = 0.0 ;
         stkd->Channel->Coolant.HTCTop        = 0.0 ;
@@ -558,10 +591,14 @@ microchannel_opt
 
             STKERROR (error_message) ;
 
+            string_destroy (&$20) ;
+
             YYABORT ;
         }
 
         material_copy (&stkd->Channel->WallMaterial, tmp) ;
+
+        string_destroy (&$20) ;
     }
   ;
 
@@ -645,9 +682,9 @@ layers_list
         {
             sprintf (error_message, "Layer %s already declared", $2->Id) ;
 
-            layer_free ($2) ;
-
             STKERROR (error_message) ;
+
+            layer_free ($2) ;
 
             YYABORT ;
         }
@@ -668,17 +705,18 @@ layer
 
         if (layer == NULL)
         {
-            free ($2) ;
-            free ($8) ;
-
             STKERROR ("Malloc layer failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$8) ;
 
             YYABORT ;
         }
 
         layer->Height      = $5 ;
-        layer->Id          = $2 ;
-        layer->Material.Id = $8 ;
+
+        string_copy (&layer->Id, &$2) ;
+        string_copy (&layer->Material.Id, &$8) ;
 
         Material_t *tmp = material_list_find
 
@@ -688,14 +726,20 @@ layer
         {
             sprintf (error_message, "Unknown material %s", $8) ;
 
+            STKERROR (error_message) ;
+
             layer_free (layer) ;
 
-            STKERROR (error_message) ;
+            string_destroy (&$2) ;
+            string_destroy (&$8) ;
 
             YYABORT ;
         }
 
         material_copy (&layer->Material, tmp) ;
+
+        string_destroy (&$2) ;
+        string_destroy (&$8) ;
   }
 
 /******************************************************************************/
@@ -754,18 +798,18 @@ die_layer_content
 
         if (layer == NULL)
         {
-            free ($2) ;
+            STKERROR ("Malloc layer failed") ;
+
+            string_destroy (&$2) ;
 
             layer_list_destroy (&dielayers) ;
-
-            STKERROR ("Malloc layer failed") ;
 
             YYABORT ;
         }
 
-        layer->Height      = $1 ;
-        layer->Id          = NULL ;
-        layer->Material.Id = $2 ;
+        layer->Height = $1 ;
+
+        string_copy (&layer->Material.Id, &$2) ;
 
         Material_t *tmp = material_list_find (&stkd->Materials, &layer->Material) ;
 
@@ -773,16 +817,20 @@ die_layer_content
         {
             sprintf (error_message, "Unknown material %s", $2) ;
 
+            STKERROR (error_message) ;
+
             layer_list_destroy (&dielayers) ;
 
-            layer_free (layer) ;
+            string_destroy (&$2) ;
 
-            STKERROR (error_message) ;
+            layer_free (layer) ;
 
             YYABORT ;
         }
 
         material_copy (&layer->Material, tmp) ;
+
+        string_destroy (&$2) ;
     }
   ;
 
@@ -801,9 +849,9 @@ dies_list
         {
             sprintf (error_message, "Die %s already declared", $2->Id) ;
 
-            die_free ($2) ;
-
             STKERROR (error_message) ;
+
+            die_free ($2) ;
 
             YYABORT ;
         }
@@ -825,16 +873,17 @@ die
 
         if (die == NULL)
         {
-            free ($2) ;
+            STKERROR ("Malloc die failed") ;
+
+            string_destroy (&$2) ;
 
             layer_list_destroy (&dielayers) ;
-
-            STKERROR ("Malloc die failed") ;
 
             YYABORT ;
         }
 
-        die->Id                = $2 ;
+        string_copy (&die->Id, &$2) ;
+
         die->NLayers           = dielayers.Size ;
         die->SourceLayerOffset = source_layer_offset ;
 
@@ -844,6 +893,8 @@ die
         layer_list_init    (&dielayers) ;
 
         source_layer_offset = 0u ;
+
+        string_destroy (&$2) ;
     }
   ;
 
@@ -997,7 +1048,8 @@ stack
 
             stack_element_init (&stack_element) ;
 
-            stack_element.Id               = strdup ("Ambient") ;
+            string_copy_cstr (&stack_element.Id, "Ambient") ;
+
             stack_element.Type             = TDICE_STACK_ELEMENT_HEATSINK ;
             stack_element.Pointer.HeatSink = stkd->HeatSink ;
             stack_element.NLayers          = stkd->HeatSink->NLayers ;
@@ -1162,9 +1214,9 @@ stack_elements
         {
             sprintf (error_message, "Stack element %s already declared", $2->Id) ;
 
-            stack_element_free ($2) ;
-
             STKERROR (error_message) ;
+
+            stack_element_free ($2) ;
 
             YYABORT ;
         }
@@ -1196,10 +1248,10 @@ stack_element
 
         if (stack_element == NULL)
         {
-            free ($2) ;
-            free ($3) ;
-
             STKERROR ("Malloc stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
 
             YYABORT ;
         }
@@ -1208,15 +1260,15 @@ stack_element
 
         if (layer == NULL)
         {
-            free ($2) ;
-            free ($3) ;
-
             STKERROR ("Malloc layer for stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
 
             YYABORT ;
         }
 
-        layer->Id = $3 ;
+        string_copy (&layer->Id, &$3) ;
 
         Layer_t *tmp = layer_list_find (&stkd->Layers, layer) ;
 
@@ -1224,13 +1276,14 @@ stack_element
         {
             sprintf (error_message, "Unknown layer %s", $3) ;
 
+            STKERROR (error_message) ;
+
             layer_free (layer) ;
 
-            free ($2) ;
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
 
             stack_element_free (stack_element) ;
-
-            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -1239,8 +1292,12 @@ stack_element
 
         stack_element->Type          = TDICE_STACK_ELEMENT_LAYER ;
         stack_element->Pointer.Layer = layer ;
-        stack_element->Id            = $2 ;
         stack_element->NLayers       = 1 ;
+
+        string_copy (&stack_element->Id, &$2) ;
+
+        string_destroy (&$2) ;
+        string_destroy (&$3) ;
     }
 
   | CHANNEL IDENTIFIER ';'  // $2 Identifier for the stack element
@@ -1251,6 +1308,8 @@ stack_element
         {
             STKERROR ("Error: channel used in stack but not declared") ;
 
+            string_destroy (&$2) ;
+
             YYABORT ;
         }
 
@@ -1258,17 +1317,20 @@ stack_element
 
         if (stack_element == NULL)
         {
-            free ($2) ;
-
             STKERROR ("Malloc stack element failed") ;
+
+            string_destroy (&$2) ;
 
             YYABORT ;
         }
 
         stack_element->Type            = TDICE_STACK_ELEMENT_CHANNEL ;
         stack_element->Pointer.Channel = stkd->Channel ; // This might be NULL !!!
-        stack_element->Id              = $2 ;
         stack_element->NLayers         = stkd->Channel->NLayers ;
+
+        string_copy (&stack_element->Id, &$2) ;
+
+        string_destroy (&$2) ;
     }
 
   | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH ';'  // $2 Identifier for the stack element
@@ -1281,11 +1343,11 @@ stack_element
 
         if (stack_element == NULL)
         {
-            free ($2) ;
-            free ($3) ;
-            free ($5) ;
-
             STKERROR ("Malloc stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             YYABORT ;
         }
@@ -1294,18 +1356,18 @@ stack_element
 
         if (die == NULL)
         {
-            free ($2) ;
-            free ($3) ;
-            free ($5) ;
+            STKERROR ("Malloc die for stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             stack_element_free (stack_element) ;
-
-            STKERROR ("Malloc die for stack element failed") ;
 
             YYABORT ;
         }
 
-        die->Id = $3 ;
+        string_copy (&die->Id, &$3) ;
 
         Die_t *tmp = die_list_find (&stkd->Dies, die) ;
 
@@ -1313,14 +1375,15 @@ stack_element
         {
             sprintf (error_message, "Unknown die %s", $3) ;
 
+            STKERROR (error_message) ;
+
             die_free (die) ;
 
-            free ($2) ;
-            free ($5) ;
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             stack_element_free (stack_element) ;
-
-            STKERROR (error_message) ;
 
             YYABORT ;
         }
@@ -1330,19 +1393,24 @@ stack_element
         if (   fill_floorplan (&die->Floorplan, stkd->Dimensions, $5)
             == TDICE_FAILURE)
         {
-            free ($5) ;
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             stack_description_destroy (stkd) ;
 
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
-        free ($5) ;
-
         stack_element->Type        = TDICE_STACK_ELEMENT_DIE ;
-        stack_element->Id          = $2 ;
         stack_element->Pointer.Die = die ;
         stack_element->NLayers     = stack_element->Pointer.Die->NLayers ;
+
+        string_copy (&stack_element->Id, &$2) ;
+
+        string_destroy (&$2) ;
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
     }
   ;
 
@@ -1447,7 +1515,7 @@ inspection_point
 
         stack_element_init (&stack_element) ;
 
-        stack_element.Id = $3 ;
+        string_copy (&stack_element.Id, &$3) ;
 
         StackElement_t *tmp = stack_element_list_find
 
@@ -1459,9 +1527,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$9) ;
 
-            free ($9) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1472,19 +1541,24 @@ inspection_point
 
         if (ipoint == NULL)
         {
-            free ($9) ;
-
             STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            string_destroy (&$9) ;
 
             YYABORT ;
         }
 
         ipoint->Type          = TDICE_OUTPUT_TYPE_TCELL ;
         ipoint->Instant       = $10 ;
-        ipoint->FileName      = $9 ;
         ipoint->StackElement  = tmp ;
 
+        string_copy (&ipoint->FileName, &$9) ;
+
         align_tcell (ipoint, $5, $7, stkd->Dimensions) ;
+
+        string_destroy (&$3) ;
+        string_destroy (&$9) ;
      }
 
   |  TFLP  '(' IDENTIFIER ',' PATH ',' maxminavg when ')'  ';'
@@ -1499,7 +1573,7 @@ inspection_point
 
         stack_element_init (&stack_element) ;
 
-        stack_element.Id = $3 ;
+        string_copy (&stack_element.Id, &$3) ;
 
         StackElement_t *tmp = stack_element_list_find
 
@@ -1511,9 +1585,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
-            free ($5) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1524,9 +1599,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
-            free ($5) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1537,18 +1613,23 @@ inspection_point
 
         if (ipoint == NULL)
         {
-            free ($5) ;
-
             STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             YYABORT ;
         }
 
         ipoint->Type         = TDICE_OUTPUT_TYPE_TFLP ;
-        ipoint->FileName     = $5 ;
         ipoint->Quantity     = $7 ;
         ipoint->Instant      = $8 ;
         ipoint->StackElement = tmp ;
+
+        string_copy (&ipoint->FileName, &$5) ;
+
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
      }
 
   |  TFLPEL '(' IDENTIFIER '.' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
@@ -1564,7 +1645,7 @@ inspection_point
 
         stack_element_init (&stack_element) ;
 
-        stack_element.Id = $3 ;
+        string_copy (&stack_element.Id, &$3) ;
 
         StackElement_t *tmp = stack_element_list_find
 
@@ -1576,10 +1657,11 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+            string_destroy (&$7) ;
 
-            free ($5) ;
-            free ($7) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1590,10 +1672,11 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+            string_destroy (&$7) ;
 
-            free ($5) ;
-            free ($7) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1608,8 +1691,9 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            free ($5) ;
-            free ($7) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+            string_destroy (&$7) ;
 
             YYABORT ;
         }
@@ -1618,22 +1702,26 @@ inspection_point
 
         if (ipoint == NULL)
         {
-            free ($5) ;
-            free ($7) ;
-
             STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+            string_destroy (&$7) ;
 
             YYABORT ;
         }
 
         ipoint->Type             = TDICE_OUTPUT_TYPE_TFLPEL ;
         ipoint->FloorplanElement = flpel ;
-        ipoint->FileName         = $7 ;
         ipoint->Quantity         = $9 ;
         ipoint->Instant          = $10 ;
         ipoint->StackElement     = tmp ;
 
-        free ($5) ;
+        string_copy (&ipoint->FileName, &$7) ;
+
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
+        string_destroy (&$7) ;
      }
 
   |  TMAP '(' IDENTIFIER ',' PATH when ')' ';'
@@ -1647,7 +1735,7 @@ inspection_point
 
         stack_element_init (&stack_element) ;
 
-        stack_element.Id = $3 ;
+        string_copy (&stack_element.Id, &$3) ;
 
         StackElement_t *tmp = stack_element_list_find
 
@@ -1659,9 +1747,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
-            free ($5) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1672,17 +1761,22 @@ inspection_point
 
         if (ipoint == NULL)
         {
-            free ($5) ;
-
             STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             YYABORT ;
         }
 
         ipoint->Type         = TDICE_OUTPUT_TYPE_TMAP ;
         ipoint->Instant      = $6 ;
-        ipoint->FileName     = $5 ;
         ipoint->StackElement = tmp ;
+
+        string_copy (&ipoint->FileName, &$5) ;
+
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
      }
 
   |  PMAP '(' IDENTIFIER ',' PATH when ')' ';'
@@ -1696,7 +1790,7 @@ inspection_point
 
         stack_element_init (&stack_element) ;
 
-        stack_element.Id = $3 ;
+        string_copy (&stack_element.Id, &$3) ;
 
         StackElement_t *tmp = stack_element_list_find
 
@@ -1708,9 +1802,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
-            free ($5) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1721,17 +1816,22 @@ inspection_point
 
         if (ipoint == NULL)
         {
-            free ($5) ;
-
             STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             YYABORT ;
         }
 
         ipoint->Type         = TDICE_OUTPUT_TYPE_PMAP ;
         ipoint->Instant      = $6 ;
-        ipoint->FileName     = $5 ;
         ipoint->StackElement = tmp ;
+
+        string_copy (&ipoint->FileName, &$5) ;
+
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
     }
 
   |  TCOOLANT '(' IDENTIFIER ',' PATH ',' maxminavg when ')' ';'
@@ -1746,7 +1846,7 @@ inspection_point
 
         stack_element_init (&stack_element) ;
 
-        stack_element.Id = $3 ;
+        string_copy (&stack_element.Id, &$3) ;
 
         StackElement_t *tmp = stack_element_list_find
 
@@ -1758,9 +1858,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
-            free ($5) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1771,9 +1872,10 @@ inspection_point
 
             STKERROR (error_message) ;
 
-            stack_element_destroy (&stack_element) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
-            free ($5) ;
+            stack_element_destroy (&stack_element) ;
 
             YYABORT ;
         }
@@ -1784,18 +1886,23 @@ inspection_point
 
         if (ipoint == NULL)
         {
-            free ($5) ;
-
             STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
 
             YYABORT ;
         }
 
         ipoint->Type         = TDICE_OUTPUT_TYPE_TCOOLANT ;
-        ipoint->FileName     = $5 ;
         ipoint->Quantity     = $7 ;
         ipoint->Instant      = $8 ;
         ipoint->StackElement = tmp ;
+
+        string_copy (&ipoint->FileName, &$5) ;
+
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
      }
   ;
 

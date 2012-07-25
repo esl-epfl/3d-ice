@@ -36,31 +36,91 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#ifndef _3DICE_FLOORPLAN_ELEMENT_LIST_H_
-#define _3DICE_FLOORPLAN_ELEMENT_LIST_H_
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-/******************************************************************************/
+#include <string.h> // For the string function strcpy
+#include <stdlib.h> // For the memory function free
 
 #include "types.h"
-#include "floorplan_element.h"
-
-#define ListType FloorplanElement
-#define ListName floorplan_element
-
-#include "list_template.h"
-
-#undef ListType
-#undef ListName
 
 /******************************************************************************/
 
-
-#ifdef __cplusplus
+void string_init (String_t *string)
+{
+    *string = NULL ;
 }
-#endif
-#endif    /* _3DICE_FLOORPLAN_ELEMENT_LIST_H_ */
+
+/******************************************************************************/
+
+void string_copy (String_t *dst, String_t *src)
+{
+    string_destroy (dst) ;
+
+    *dst = *src == NULL ? NULL : strdup (*src) ;
+}
+
+/******************************************************************************/
+
+void string_copy_cstr (String_t *dst, char *src)
+{
+    string_destroy (dst) ;
+
+    *dst = strdup (src) ;
+}
+
+/******************************************************************************/
+
+bool string_equal (String_t *string, String_t *other)
+{
+   return strcmp (*string, *other) == 0 ? true : false ;
+}
+
+/******************************************************************************/
+
+void string_destroy (String_t *string)
+{
+    if (*string != NULL)
+
+        free (*string) ;
+
+    string_init (string) ;
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+void coolant_init (Coolant_t *coolant)
+{
+    coolant->HTCSide       = (CoolantHTC_t) 0.0 ;
+    coolant->HTCTop        = (CoolantHTC_t) 0.0 ;
+    coolant->HTCBottom     = (CoolantHTC_t) 0.0 ;
+    coolant->VHC           = (CoolantVHC_t) 0.0 ;
+    coolant->FlowRate      = (CoolantFR_t) 0.0 ;
+    coolant->DarcyVelocity = (DarcyVelocity_t) 0.0 ;
+    coolant->TIn           = (Temperature_t) 0.0 ;
+}
+
+/******************************************************************************/
+
+void coolant_copy (Coolant_t *dst, Coolant_t *src)
+{
+    coolant_destroy (dst) ;
+
+    dst->HTCSide       = src->HTCSide ;
+    dst->HTCTop        = src->HTCTop ;
+    dst->HTCBottom     = src->HTCBottom ;
+    dst->VHC           = src->VHC ;
+    dst->FlowRate      = src->FlowRate ;
+    dst->DarcyVelocity = src->DarcyVelocity ;
+    dst->TIn           = src->TIn ;
+}
+
+/******************************************************************************/
+
+void coolant_destroy (Coolant_t *coolant)
+{
+    // Nothing to do ...
+
+    coolant_init (coolant) ;
+}
+
+/******************************************************************************/

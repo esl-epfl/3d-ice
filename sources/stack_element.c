@@ -36,8 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib.h> // For the memory functions malloc/free
 
 #include "stack_element.h"
 #include "macros.h"
@@ -51,7 +50,9 @@ void stack_element_init (StackElement_t *stkel)
     stkel->Pointer.Die      = NULL ;
     stkel->Pointer.Channel  = NULL ;
     stkel->Pointer.HeatSink = NULL ;
-    stkel->Id               = NULL ;
+
+    string_init (&stkel->Id) ;
+
     stkel->NLayers          = (CellIndex_t) 0u ;
     stkel->Offset           = (CellIndex_t) 0u ;
 }
@@ -66,7 +67,7 @@ void stack_element_copy (StackElement_t *dst, StackElement_t *src)
     dst->NLayers  = src->NLayers ;
     dst->Offset   = src->Offset ;
 
-    dst->Id = src->Id == NULL ? NULL : strdup (src->Id) ;
+    string_copy (&dst->Id, &src->Id) ;
 
     if (src->Type == TDICE_STACK_ELEMENT_LAYER)
 
@@ -87,9 +88,7 @@ void stack_element_copy (StackElement_t *dst, StackElement_t *src)
 
 void stack_element_destroy (StackElement_t *stkel)
 {
-    if (stkel->Id != NULL)
-
-        free (stkel->Id) ;
+    string_destroy (&stkel->Id) ;
 
     if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
 
@@ -149,7 +148,7 @@ void stack_element_free (StackElement_t *stkel)
 
 bool stack_element_same_id (StackElement_t *stkel, StackElement_t *other)
 {
-    return strcmp (stkel->Id, other->Id) == 0 ? true : false ;
+    return string_equal (&stkel->Id, &other->Id) ;
 }
 
 /******************************************************************************/

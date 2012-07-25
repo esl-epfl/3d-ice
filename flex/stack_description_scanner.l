@@ -201,7 +201,9 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
                    }
 
 {identifier}       {
-                     yylval->string = strdup(yytext) ;
+                     string_init      (&yylval->string) ;
+                     string_copy_cstr (&yylval->string, yytext) ;
+
                      return IDENTIFIER ;
                    }
 

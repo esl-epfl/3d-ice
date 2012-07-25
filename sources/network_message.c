@@ -36,7 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <string.h>
+#include <stdlib.h> // For the memory function calloc
+#include <string.h> // For the memory function memcpy
 
 #include "macros.h"
 #include "network_message.h"

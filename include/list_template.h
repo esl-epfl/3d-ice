@@ -38,6 +38,8 @@
 
 /*! \file list_template.h */
 
+#include <stdio.h> // For the file type FILE
+
 #ifndef ListType
 #error missing macro ListType
 #endif

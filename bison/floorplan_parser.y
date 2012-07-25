@@ -79,7 +79,7 @@
 %type <p_powers_queue>      power_values_list ;
 %type <p_icelement>         ic_element ;
 
-%destructor { free              ($$) ; } <identifier>
+%destructor { string_destroy (&$$) ;   } <identifier>
 %destructor { powers_queue_free ($$) ; } <p_powers_queue>
 
 %token DIMENSION  "keyword dimension"
@@ -173,16 +173,17 @@ floorplan_element
 
         if (floorplan_element == NULL)
         {
-            free ($1) ;
+            floorplan_parser_error (floorplan, dimensions, scanner, "Malloc floorplan element failed") ;
+
+            string_destroy (&$1) ;
 
             ic_element_list_destroy (&ic_element_list) ;
-
-            floorplan_parser_error (floorplan, dimensions, scanner, "Malloc floorplan element failed") ;
 
             YYABORT ;
         }
 
-        floorplan_element->Id           = $1 ;
+        string_copy (&floorplan_element->Id, &$1) ;
+
         floorplan_element->NICElements  = ic_element_list.Size ;
         floorplan_element->PowerValues  = $4 ;
 
@@ -214,9 +215,9 @@ floorplan_element
                     sprintf (error_message,
                         "Intersection between %s (%.1f, %.1f, %.1f, %.1f)" \
                                         " and %s (%.1f, %.1f, %.1f, %.1f)\n",
-                        $1,
+                        floorplan_element->Id,
                         icel1->SW_X, icel1->SW_Y, icel1->Length, icel1->Width,
-                        $1,
+                        floorplan_element->Id,
                         icel2->SW_X, icel2->SW_Y, icel2->Length, icel2->Width) ;
 
                     floorplan_parser_error (floorplan, dimensions, scanner, error_message) ;
@@ -247,7 +248,7 @@ floorplan_element
                         sprintf (error_message,
                             "Intersection between %s (%.1f, %.1f, %.1f, %.1f)" \
                                             " and %s (%.1f, %.1f, %.1f, %.1f)\n",
-                            $1,
+                            floorplan_element->Id,
                             icel1->SW_X, icel1->SW_Y, icel1->Length, icel1->Width,
                             flpel->Id,
                             icel3->SW_X, icel3->SW_Y, icel3->Length, icel3->Width) ;
@@ -259,6 +260,8 @@ floorplan_element
                 }
             }
         }
+
+        string_destroy (&$1) ;
     }
   ;
 

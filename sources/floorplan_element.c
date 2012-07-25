@@ -36,8 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <string.h>
-#include <stdlib.h>
+#include <stdlib.h> // For the memory functions malloc/free
 
 #include "floorplan_element.h"
 #include "macros.h"
@@ -46,7 +45,8 @@
 
 void floorplan_element_init (FloorplanElement_t *flpel)
 {
-    flpel->Id             = NULL ;
+    string_init (&flpel->Id) ;
+
     flpel->NICElements    = (Quantity_t) 0u ;
 
     ic_element_list_init (&flpel->ICElements) ;
@@ -65,7 +65,7 @@ void floorplan_element_copy
 {
     floorplan_element_destroy (dst) ;
 
-    dst->Id = (src->Id == NULL) ? NULL : strdup (src->Id) ;
+    string_copy (&dst->Id, &src->Id) ;
 
     dst->NICElements = src->NICElements ;
     dst->Area        = src->Area ;
@@ -79,9 +79,7 @@ void floorplan_element_copy
 
 void floorplan_element_destroy (FloorplanElement_t *flpel)
 {
-    if (flpel->Id != NULL)
-
-        free (flpel->Id) ;
+    string_destroy (&flpel->Id) ;
 
     ic_element_list_destroy (&flpel->ICElements) ;
 
@@ -143,7 +141,7 @@ bool floorplan_element_same_id
     FloorplanElement_t *other
 )
 {
-    return strcmp (flpel->Id, other->Id) == 0 ? true : false ;
+    return string_equal (&flpel->Id, &other->Id) ;
 }
 
 /******************************************************************************/

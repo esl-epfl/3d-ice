@@ -38,9 +38,6 @@
 
 /******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "die_list.h"
 
 #define ListType Die

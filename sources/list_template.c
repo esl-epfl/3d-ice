@@ -56,6 +56,8 @@
 #error missing macro node_data_print
 #endif
 
+#include <stdlib.h> // For the memory functions malloc/free
+
 /******************************************************************************/
 
 FIMP (FPROTO1 (

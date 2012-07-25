@@ -134,7 +134,9 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
 "values"              return VALUES ;
 
 {identifier}          {
-                        yylval->identifier = strdup(yytext) ;
+                        string_init      (&yylval->identifier) ;
+                        string_copy_cstr (&yylval->identifier, yytext) ;
+
                         return IDENTIFIER ;
                       }
 

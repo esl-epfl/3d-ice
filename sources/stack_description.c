@@ -36,8 +36,6 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <stdlib.h>
-
 #include "stack_description.h"
 #include "macros.h"
 
@@ -45,7 +43,8 @@
 
 void stack_description_init (StackDescription_t *stkd)
 {
-    stkd->FileName   = NULL ;
+    string_init (&stkd->FileName) ;
+
     stkd->HeatSink   = NULL ;
     stkd->Channel    = NULL ;
     stkd->Dimensions = NULL ;
@@ -60,9 +59,7 @@ void stack_description_init (StackDescription_t *stkd)
 
 void stack_description_destroy (StackDescription_t *stkd)
 {
-    if (stkd->FileName != NULL)
-
-        free (stkd->FileName) ;
+    string_destroy (&stkd->FileName) ;
 
     heat_sink_free  (stkd->HeatSink) ;
     channel_free    (stkd->Channel) ;
@@ -132,13 +129,18 @@ Quantity_t get_number_of_floorplan_elements
 
     stack_element_init (&stkel) ;
 
-    stkel.Id = stack_element_id ;
+    string_copy (&stkel.Id, &stack_element_id) ;
 
     StackElement_t *tmp = stack_element_list_find (&stkd->StackElements, &stkel) ;
 
     if (tmp == NULL)
+    {
+        stack_element_destroy (&stkel) ;
 
         return 0u ;
+    }
+
+    stack_element_destroy (&stkel) ;
 
     return get_number_of_floorplan_elements_stack_element (tmp) ;
 }
