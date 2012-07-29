@@ -447,6 +447,72 @@ extern "C"
 
 
 
+    /*! Returns the index of the first row of thermal cells in a layer
+     *
+     * \param dimensions   the address of the dimension structure
+     *
+     * \return The index of the first row in a layer
+     */
+
+    CellIndex_t first_row (Dimensions_t *dimensions) ;
+
+
+
+    /*! Returns the index of the last row of thermal cells in a layer
+     *
+     * \param dimensions   the address of the dimension structure
+     *
+     * \return The index of the last row in a layer
+     */
+
+    CellIndex_t last_row (Dimensions_t *dimensions) ;
+
+
+
+    /*! Returns the index of the first column of thermal cells in a layer
+     *
+     * \param dimensions   the address of the dimension structure
+     *
+     * \return The index of the first column in a layer
+     */
+
+    CellIndex_t first_column (Dimensions_t *dimensions) ;
+
+
+
+    /*! Returns the index of the last column of thermal cells in a layer
+     *
+     * \param dimensions   the address of the dimension structure
+     *
+     * \return The index of the last column in a layer
+     */
+
+    CellIndex_t last_column (Dimensions_t *dimensions) ;
+
+
+
+    /*! Returns the index of the first layer of thermal cells in a layer
+     *
+     * \param dimensions   the address of the dimension structure
+     *
+     * \return The index of the first layer in a layer
+     */
+
+    CellIndex_t first_layer (Dimensions_t *dimensions) ;
+
+
+
+    /*! Returns the index of the last layer of thermal cells in a layer
+     *
+     * \param dimensions   the address of the dimension structure
+     *
+     * \return The index of the last layer in a layer
+     */
+
+    CellIndex_t last_layer (Dimensions_t *dimensions) ;
+
+
+
     /*! Returns the length of a thermal cell
      *
      *  The function prints a warning on stderr if \a column_index is

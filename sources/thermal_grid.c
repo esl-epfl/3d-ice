@@ -38,8 +38,8 @@
 
 #include <stdlib.h> // For the memory functions calloc/free
 
-#include "macros.h"
 #include "thermal_grid.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -415,11 +415,11 @@ Conductance_t get_conductance_top
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
 
-            if (IS_LAST_LAYER (layer_index, dimensions))
+            if (layer_index == last_layer (dimensions))
 
                 return 0.0 ;
 
-            else if (IS_FIRST_LAYER (layer_index))
+            else if (layer_index == first_layer (dimensions))
 
                 return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)
@@ -568,11 +568,11 @@ Conductance_t get_conductance_bottom
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
 
-            if (IS_FIRST_LAYER (layer_index))
+            if (layer_index == first_layer (dimensions))
 
                 return 0.0 ;
 
-            else if (IS_LAST_LAYER (layer_index, dimensions))
+                else if (layer_index == last_layer (dimensions))
 
                 return (  tgrid->TCProfile [ layer_index ]
                         * get_cell_length (dimensions, column_index)

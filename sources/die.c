@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "die.h"
-#include "macros.h"
 
 /******************************************************************************/
 

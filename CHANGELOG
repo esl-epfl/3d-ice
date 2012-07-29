@@ -37,6 +37,7 @@
  ##############################################################################
 
 
+   * Implemented first/last cell index functions. Less macroes
    * Implemented functions for type String_t
  ##############################################################################
  2012-07-24 3D-ICE 2.2

@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory functions malloc/calloc/free
 
 #include "powers_queue.h"
-#include "macros.h"
 
 /******************************************************************************/
 

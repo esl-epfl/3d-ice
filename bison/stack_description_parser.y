@@ -1063,7 +1063,7 @@ stack
         // the bottom most element in the stack. This operation can be done only
         // here since the parser processes elements in the stack from the top most.
 
-        CellIndex_t layer_index = 0u ;
+        CellIndex_t layer_index = first_layer (stkd->Dimensions) ;
 
         StackElementListNode_t *stkeln ;
 
@@ -1100,7 +1100,7 @@ stack
             YYABORT ;
         }
 
-        layer_index  = 0u ;
+        layer_index  = first_layer (stkd->Dimensions) ;
 
         for (stkeln  = stack_element_list_end (&stkd->StackElements) ;
              stkeln != NULL ;

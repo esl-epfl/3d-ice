@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "inspection_point.h"
-#include "macros.h"
 
 /******************************************************************************/
 
@@ -272,28 +271,33 @@ void align_tcell
     Dimensions_t    *dimensions
 )
 {
-    FOR_EVERY_ROW (row_index, dimensions)
-    {
-        ipoint->RowIndex   = row_index ;
 
-        if (   yval >= get_cell_location_y (dimensions, row_index)
-            && yval <  get_cell_location_y (dimensions, row_index + 1))
+    CellIndex_t row ;
+
+    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+    {
+        ipoint->RowIndex = row ;
+
+        if (   yval >= get_cell_location_y (dimensions, row)
+            && yval <  get_cell_location_y (dimensions, row + 1))
         {
-            ipoint->ActualYval = get_cell_location_y (dimensions, row_index) ;
+            ipoint->ActualYval = get_cell_location_y (dimensions, row) ;
             break ;
         }
     }
 
     ipoint->Yval = yval ;
 
-    FOR_EVERY_COLUMN (column_index, dimensions)
-    {
-        ipoint->ColumnIndex = column_index ;
+    CellIndex_t column ;
 
-        if (   xval >= get_cell_location_x (dimensions, column_index)
-            && xval <  get_cell_location_x (dimensions, column_index + 1))
+    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+    {
+        ipoint->ColumnIndex = column ;
+
+        if (   xval >= get_cell_location_x (dimensions, column)
+            && xval <  get_cell_location_x (dimensions, column + 1))
         {
-            ipoint->ActualXval = get_cell_location_x (dimensions, column_index) ;
+            ipoint->ActualXval = get_cell_location_x (dimensions, column) ;
             break ;
         }
     }
@@ -579,7 +583,8 @@ Error_t generate_inspection_point_output
             temperatures += get_cell_offset_in_stack
 
                 (dimensions,
-                 get_source_layer_offset(ipoint->StackElement), 0, 0) ;
+                 get_source_layer_offset(ipoint->StackElement),
+                 first_row (dimensions), first_column (dimensions)) ;
 
             result = NULL ;
 
@@ -619,7 +624,8 @@ Error_t generate_inspection_point_output
             temperatures += get_cell_offset_in_stack
 
                 (dimensions,
-                 get_source_layer_offset(ipoint->StackElement), 0, 0) ;
+                 get_source_layer_offset(ipoint->StackElement),
+                 first_row (dimensions), first_column (dimensions)) ;
 
             if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
@@ -671,7 +677,8 @@ Error_t generate_inspection_point_output
             temperatures += get_cell_offset_in_stack
 
                 (dimensions,
-                 get_source_layer_offset(ipoint->StackElement), 0, 0) ;
+                 get_source_layer_offset(ipoint->StackElement),
+                 first_row (dimensions), first_column (dimensions)) ;
 
             if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 
@@ -749,7 +756,8 @@ void fill_message_inspection_point
             temperatures += get_cell_offset_in_stack
 
                 (dimensions,
-                 get_source_layer_offset(ipoint->StackElement), 0, 0) ;
+                 get_source_layer_offset(ipoint->StackElement),
+                 first_row (dimensions), first_column (dimensions)) ;
 
             Temperature_t *tmp ;
             Quantity_t nflp, index ;
@@ -793,7 +801,9 @@ void fill_message_inspection_point
             temperatures += get_cell_offset_in_stack
 
                 (dimensions,
-                 get_source_layer_offset(ipoint->StackElement), 0, 0) ;
+                 get_source_layer_offset(ipoint->StackElement),
+                 first_row (dimensions), first_column (dimensions)) ;
+
 
             float temperature ;
 
@@ -835,11 +845,14 @@ void fill_message_inspection_point
 
                 (dimensions,
                  get_source_layer_offset(ipoint->StackElement),
-                 0, 0) ;
+                 first_row (dimensions), first_column (dimensions)) ;
 
-            FOR_EVERY_ROW (row_index, dimensions)
+            CellIndex_t row ;
+            CellIndex_t column ;
+
+            for (row = first_row (dimensions) ; row <= last_row  (dimensions) ; row++)
             {
-                FOR_EVERY_COLUMN (column_index, dimensions)
+                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                 {
                     float temperature = *(temperatures + index++) ;
 
@@ -865,11 +878,14 @@ void fill_message_inspection_point
 
                 (dimensions,
                  get_source_layer_offset(ipoint->StackElement),
-                 0, 0) ;
+                 first_row (dimensions), first_column (dimensions)) ;
 
-            FOR_EVERY_ROW (row_index, dimensions)
+            CellIndex_t row ;
+            CellIndex_t column ;
+
+            for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
             {
-                FOR_EVERY_COLUMN (column_index, dimensions)
+                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                 {
                     float source = *(sources + index++) ;
 
@@ -884,7 +900,8 @@ void fill_message_inspection_point
             temperatures += get_cell_offset_in_stack
 
                 (dimensions,
-                 get_source_layer_offset(ipoint->StackElement), 0, 0) ;
+                 get_source_layer_offset(ipoint->StackElement),
+                 first_row (dimensions), first_column (dimensions)) ;
 
             float temperature ;
 

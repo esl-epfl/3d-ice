@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory function calloc
 #include <string.h> // For the memory function memcpy
 
-#include "macros.h"
 #include "network_message.h"
 
 /******************************************************************************/

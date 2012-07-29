@@ -229,7 +229,7 @@ Cconv_t get_convective_term
     CellIndex_t   column_index
 )
 {
-    Cconv_t C = 0.0 ;
+    Cconv_t C = (Cconv_t) 0.0 ;
 
     switch (channel->ChannelModel)
     {
@@ -290,13 +290,15 @@ Temperature_t get_max_temperature_channel_outlet
 {
     temperatures += get_cell_offset_in_layer
 
-        (dimensions, LAST_ROW_INDEX(dimensions), 0) ;
+        (dimensions, last_row(dimensions), first_column (dimensions)) ;
 
     Temperature_t max = *temperatures ;
 
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    CellIndex_t column ;
+
+    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
     {
-        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column) == true)
 
             max = MAX (max, *temperatures) ;
 
@@ -317,13 +319,15 @@ Temperature_t get_min_temperature_channel_outlet
 {
     temperatures += get_cell_offset_in_layer
 
-        (dimensions, LAST_ROW_INDEX(dimensions), 0) ;
+        (dimensions, last_row(dimensions), first_column (dimensions)) ;
 
     Temperature_t min = *temperatures ;
 
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    CellIndex_t column ;
+
+    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
     {
-        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column) == true)
 
             min = MIN (min, *temperatures) ;
 
@@ -344,13 +348,15 @@ Temperature_t get_avg_temperature_channel_outlet
 {
     temperatures += get_cell_offset_in_layer
 
-        (dimensions, LAST_ROW_INDEX(dimensions), 0) ;
+        (dimensions, last_row (dimensions), first_column (dimensions)) ;
 
     Temperature_t avg = *temperatures ;
 
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    CellIndex_t column ;
+
+    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
     {
-        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column_index) == true)
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column) == true)
 
             avg += *temperatures ;
 

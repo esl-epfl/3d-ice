@@ -36,6 +36,7 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
+#include <math.h>   // Fo the math function sqrt
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "heat_sink.h"

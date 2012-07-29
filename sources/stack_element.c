@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "stack_element.h"
-#include "macros.h"
 
 /******************************************************************************/
 
@@ -233,11 +232,16 @@ void stack_element_print_thermal_map
 {
     temperatures += get_cell_offset_in_stack
 
-        (dimensions, get_source_layer_offset (stkel), 0, 0) ;
+        (dimensions, get_source_layer_offset (stkel),
+         first_row (dimensions), first_column (dimensions)) ;
 
-    FOR_EVERY_ROW (row_index, dimensions)
+
+    CellIndex_t row ;
+    CellIndex_t column ;
+
+    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
     {
-        FOR_EVERY_COLUMN (column_index, dimensions)
+        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
         {
             fprintf (stream, "%7.3f  ", *temperatures++) ;
         }
@@ -258,11 +262,15 @@ void stack_element_print_power_map
 {
     sources += get_cell_offset_in_stack
 
-        (dimensions, get_source_layer_offset (stkel), 0, 0) ;
+        (dimensions, get_source_layer_offset (stkel),
+         first_row (dimensions), first_column (dimensions)) ;
 
-    FOR_EVERY_ROW (row_index, dimensions)
+    CellIndex_t row ;
+    CellIndex_t column ;
+
+    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
     {
-        FOR_EVERY_COLUMN (column_index, dimensions)
+        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
         {
             fprintf (stream, "%7.3f  ", *sources++) ;
         }

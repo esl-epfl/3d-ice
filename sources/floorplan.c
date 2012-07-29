@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory functions malloc/free
 #include <string.h> // For the memory function memcpy
 
-#include "macros.h"
 #include "floorplan.h"
 #include "floorplan_file_parser.h"
 
@@ -272,8 +271,8 @@ Error_t fill_sources_floorplan (Floorplan_t *floorplan, Source_t *sources)
     FloorplanElementListNode_t *flpeln ;
 
     for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
-            flpeln != NULL ;
-            flpeln  = floorplan_element_list_next (flpeln))
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
     {
         FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
 

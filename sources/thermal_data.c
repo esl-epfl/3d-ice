@@ -215,11 +215,15 @@ static void fill_system_vector
     Temperature_t old ;
 #endif
 
-    FOR_EVERY_LAYER (layer, dimensions)
+    CellIndex_t layer ;
+    CellIndex_t row ;
+    CellIndex_t column ;
+
+    for (layer = first_layer (dimensions) ; layer <= last_layer (dimensions) ; layer++)
     {
-        FOR_EVERY_ROW (row, dimensions)
+        for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
         {
-            FOR_EVERY_COLUMN (column, dimensions)
+            for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
             {
 
 #ifdef PRINT_SYSTEM_VECTOR
@@ -255,11 +259,15 @@ static void fill_system_vector_steady
     Source_t     *sources
 )
 {
-    FOR_EVERY_LAYER (layer, dimensions)
+    CellIndex_t layer ;
+    CellIndex_t row ;
+    CellIndex_t column ;
+
+    for (layer = first_layer (dimensions) ; layer <= last_layer (dimensions) ; layer++)
     {
-        FOR_EVERY_ROW (row, dimensions)
+        for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
         {
-            FOR_EVERY_COLUMN (column, dimensions)
+            for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
             {
                 *vector++ =   *sources++ ;
 

@@ -283,7 +283,7 @@ static SystemMatrix_t add_solid_column
 
     /********************************* BOTTOM *********************************/
 
-    if (IS_FIRST_LAYER(layer_index))
+    if (layer_index == first_layer (dimensions))
 
         goto skip_bottom ;
 
@@ -322,7 +322,7 @@ skip_bottom :
 
     /********************************* SOUTH **********************************/
 
-    if (   IS_FIRST_ROW(row_index)
+    if (   row_index == first_row (dimensions)
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
@@ -357,7 +357,7 @@ skip_south :
 
     /********************************* WEST ***********************************/
 
-    if (   IS_FIRST_COLUMN(column_index)
+    if (   column_index == first_column (dimensions)
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
@@ -427,7 +427,7 @@ skip_west :
 
     /********************************* EAST ***********************************/
 
-    if (   IS_LAST_COLUMN(column_index, dimensions)
+    if (   column_index == last_column (dimensions)
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
@@ -462,7 +462,7 @@ skip_east :
 
     /********************************* NORTH **********************************/
 
-    if (   IS_LAST_ROW(row_index, dimensions)
+    if (   row_index == last_row (dimensions)
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
         || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
 
@@ -497,7 +497,7 @@ skip_north :
 
     /********************************* TOP ************************************/
 
-    if (IS_LAST_LAYER(layer_index, dimensions))
+    if (layer_index == last_layer (dimensions))
 
         goto skip_top ;
 
@@ -513,7 +513,7 @@ skip_north :
 
         (thermal_grid, dimensions, layer_index + 1, row_index, column_index) ;
 
-    if (g_bottom == 0)
+    if (g_bottom == 0.0)
 
         conductance = g_top ;
 
@@ -582,7 +582,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* BOTTOM */
 
-    if ( ! IS_FIRST_LAYER(layer_index) )
+    if ( layer_index != first_layer(dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -610,7 +610,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* SOUTH */
 
-    if ( ! IS_FIRST_ROW(row_index) )
+    if ( row_index != first_row (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -631,7 +631,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* WEST */
 
-    if ( ! IS_FIRST_COLUMN(column_index) )
+    if ( column_index != first_column (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -686,7 +686,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* EAST */
 
-    if ( ! IS_LAST_COLUMN(column_index, dimensions) )
+    if ( column_index != last_column (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -714,7 +714,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* NORTH */
 
-    if ( ! IS_LAST_ROW(row_index, dimensions) )
+    if ( row_index != last_row(dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -735,7 +735,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
+    if ( layer_index != last_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -765,7 +765,7 @@ static SystemMatrix_t add_liquid_column_4rm
 
     *diagonal_pointer += diagonal_value ;
 
-    if (IS_FIRST_ROW(row_index) || IS_LAST_ROW(row_index, dimensions))
+    if (row_index == first_row (dimensions) || row_index == last_row (dimensions))
 
         *diagonal_pointer += get_conductance_north /* == C */
 
@@ -814,7 +814,7 @@ static SystemMatrix_t add_liquid_column_2rm
 
     /* BOTTOM */
 
-    if ( ! IS_FIRST_LAYER(layer_index) )  // FIXME
+    if ( layer_index != first_layer (dimensions) )  // FIXME
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -838,7 +838,7 @@ static SystemMatrix_t add_liquid_column_2rm
 
     /* SOUTH */
 
-    if ( ! IS_FIRST_ROW(row_index) )
+    if ( row_index != first_row (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -886,7 +886,7 @@ static SystemMatrix_t add_liquid_column_2rm
 
     /* NORTH */
 
-    if ( ! IS_LAST_ROW(row_index, dimensions) )
+    if ( row_index != last_row(dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -907,7 +907,7 @@ static SystemMatrix_t add_liquid_column_2rm
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
+    if ( layer_index != last_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -933,7 +933,7 @@ static SystemMatrix_t add_liquid_column_2rm
 
     *diagonal_pointer += diagonal_value ;
 
-    if (IS_FIRST_ROW (row_index) || IS_LAST_ROW (row_index, dimensions))
+    if (row_index == first_row (dimensions) || row_index == last_row (dimensions))
 
         *diagonal_pointer += get_conductance_north /* == C */
 
@@ -982,7 +982,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
     /* BOTTOM connected to Silicon */
 
-    if ( ! IS_FIRST_LAYER(layer_index) )
+    if ( layer_index != first_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1033,7 +1033,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
     /* Top connected to Virtual Wall */
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
+    if ( layer_index != last_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1057,7 +1057,7 @@ static SystemMatrix_t add_bottom_wall_column_2rm
 
     /* Top connected to Channel */
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
+    if ( layer_index != last_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1126,7 +1126,7 @@ static SystemMatrix_t add_top_wall_column_2rm
 
     /* BOTTOM connected to Virtual Wall */
 
-    if ( ! IS_FIRST_LAYER(layer_index) )
+    if ( layer_index != first_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1150,7 +1150,7 @@ static SystemMatrix_t add_top_wall_column_2rm
 
     /* BOTTOM connected to Channel */
 
-    if ( ! IS_FIRST_LAYER(layer_index) )
+    if ( layer_index != first_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1201,7 +1201,7 @@ static SystemMatrix_t add_top_wall_column_2rm
 
     /* Top connected to Silicon */
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
+    if ( layer_index != last_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1272,7 +1272,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
     /* BOTTOM */
 
-    if ( ! IS_FIRST_LAYER(layer_index) )
+    if ( layer_index != first_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1297,7 +1297,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
     /* SOUTH */
 
     if (   channel_model == TDICE_CHANNEL_MODEL_MC_2RM
-        && ! IS_FIRST_ROW(row_index) )
+        && row_index     != first_row (dimensions))
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1349,8 +1349,8 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
     /* NORTH */
 
-    if (     channel_model == TDICE_CHANNEL_MODEL_MC_2RM
-        && ! IS_LAST_ROW(row_index, dimensions) )
+    if (   channel_model == TDICE_CHANNEL_MODEL_MC_2RM
+        && row_index     != last_row (dimensions))
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1376,7 +1376,7 @@ static SystemMatrix_t add_virtual_wall_column_2rm
 
     /* TOP */
 
-    if ( ! IS_LAST_LAYER(layer_index, dimensions) )
+    if ( layer_index != last_layer (dimensions) )
     {
         *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1461,14 +1461,17 @@ void fill_system_matrix
             case TDICE_LAYER_SINK :
             {
 
-                FOR_EVERY_ROW (row_index, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         tmp_matrix = add_solid_column
 
                             (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row_index, column_index) ;
+                             lindex, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 } // FOR_EVERY_ROW
@@ -1478,23 +1481,26 @@ void fill_system_matrix
             }
             case TDICE_LAYER_CHANNEL_4RM :
             {
-                FOR_EVERY_ROW (row_index, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
-                        if (IS_CHANNEL_COLUMN (thermal_grid->Channel->ChannelModel, column_index) == true)
+                        if (IS_CHANNEL_COLUMN (thermal_grid->Channel->ChannelModel, column) == true)
 
                             tmp_matrix = add_liquid_column_4rm
 
                                 (tmp_matrix, thermal_grid, analysis, dimensions,
-                                 lindex, row_index, column_index) ;
+                                 lindex, row, column) ;
 
                         else
 
                             tmp_matrix = add_solid_column
 
                                 (tmp_matrix, thermal_grid, analysis, dimensions,
-                                 lindex, row_index, column_index) ;
+                                 lindex, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 }  // FOR_EVERY_ROW
@@ -1505,14 +1511,17 @@ void fill_system_matrix
             case TDICE_LAYER_PINFINS_INLINE :
             case TDICE_LAYER_PINFINS_STAGGERED :
             {
-                FOR_EVERY_ROW (row_index, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         tmp_matrix = add_liquid_column_2rm
 
                             (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row_index, column_index) ;
+                             lindex, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 }  // FOR_EVERY_ROW
@@ -1522,15 +1531,18 @@ void fill_system_matrix
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :
             {
-                FOR_EVERY_ROW (row_index, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         tmp_matrix = add_virtual_wall_column_2rm
 
                             (tmp_matrix, thermal_grid, analysis, dimensions,
                              thermal_grid->Channel->ChannelModel,
-                             lindex, row_index, column_index) ;
+                             lindex, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 }  // FOR_EVERY_ROW
@@ -1539,14 +1551,17 @@ void fill_system_matrix
             }
             case TDICE_LAYER_TOP_WALL :
             {
-                FOR_EVERY_ROW (row_index, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         tmp_matrix = add_top_wall_column_2rm
 
                             (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row_index, column_index) ;
+                             lindex, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 }  // FOR_EVERY_ROW
@@ -1555,14 +1570,17 @@ void fill_system_matrix
             }
             case TDICE_LAYER_BOTTOM_WALL :
             {
-                FOR_EVERY_ROW (row_index, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column_index, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         tmp_matrix = add_bottom_wall_column_2rm
 
                             (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row_index, column_index) ;
+                             lindex, row, column) ;
 
                     } // FOR_EVERY_COLUMN
                 }  // FOR_EVERY_ROW

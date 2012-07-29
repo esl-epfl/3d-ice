@@ -40,7 +40,6 @@
 #include <string.h> // For the memory function memcpy
 
 #include "dimensions.h"
-#include "macros.h"
 
 /******************************************************************************/
 
@@ -275,9 +274,11 @@ void print_axes (Dimensions_t *dimensions)
         return ;
     }
 
-    FOR_EVERY_COLUMN (column_index, dimensions)
+    CellIndex_t column ;
 
-        fprintf (file, "%5.2f\n", get_cell_center_x (dimensions, column_index)) ;
+    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+
+        fprintf (file, "%5.2f\n", get_cell_center_x (dimensions, column)) ;
 
     fclose (file) ;
 
@@ -289,9 +290,11 @@ void print_axes (Dimensions_t *dimensions)
         return ;
     }
 
-    FOR_EVERY_ROW (row_index, dimensions)
+    CellIndex_t row ;
 
-        fprintf (file, "%5.2f\n", get_cell_center_y (dimensions, row_index)) ;
+    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+
+        fprintf (file, "%5.2f\n", get_cell_center_y (dimensions, row)) ;
 
     fclose (file) ;
 }
@@ -414,6 +417,48 @@ void compute_number_of_connections
 
 /******************************************************************************/
 
+CellIndex_t first_row (Dimensions_t __attribute__ ((unused)) *dimensions)
+{
+    return 0u ;
+}
+
+/******************************************************************************/
+
+CellIndex_t last_row (Dimensions_t *dimensions)
+{
+    return get_number_of_rows (dimensions) - 1 ;
+}
+
+/******************************************************************************/
+
+CellIndex_t first_column (Dimensions_t __attribute__ ((unused)) *dimensions)
+{
+    return 0u ;
+}
+
+/******************************************************************************/
+
+CellIndex_t last_column (Dimensions_t *dimensions)
+{
+    return get_number_of_columns (dimensions) - 1 ;
+}
+
+/******************************************************************************/
+
+CellIndex_t first_layer (Dimensions_t __attribute__ ((unused)) *dimensions)
+{
+    return 0u ;
+}
+
+/******************************************************************************/
+
+CellIndex_t last_layer (Dimensions_t *dimensions)
+{
+    return get_number_of_layers (dimensions) - 1 ;
+}
+
+/******************************************************************************/
+
 CellDimension_t get_cell_length
 (
   Dimensions_t *dimensions,
@@ -422,7 +467,7 @@ CellDimension_t get_cell_length
 {
     // column_index < 0 not tested since CellIndex_t is unsigned
 
-    if (column_index > LAST_COLUMN_INDEX (dimensions))
+    if (column_index > last_column (dimensions))
     {
         fprintf (stderr,
             "ERROR: column index %d is out of range\n", column_index) ;
@@ -430,11 +475,11 @@ CellDimension_t get_cell_length
         return 0.0 ;
     }
 
-    if (IS_FIRST_COLUMN (column_index))
+    if (column_index == first_column (dimensions))
 
         return dimensions->Cell.FirstWallLength ;
 
-    else if (IS_LAST_COLUMN (column_index, dimensions))
+    else if (column_index == last_column (dimensions))
 
         return dimensions->Cell.LastWallLength ;
 
@@ -459,7 +504,7 @@ CellDimension_t get_cell_width
 {
     // column_index < 0 not tested since CellIndex_t is unsigned
 
-    if (row_index > LAST_ROW_INDEX (dimensions))
+    if (row_index > last_row (dimensions))
     {
         fprintf (stderr,
             "ERROR: row index %d is out of range\n", row_index) ;
@@ -506,11 +551,11 @@ ChipDimension_t get_cell_center_x
     CellIndex_t   column_index
 )
 {
-    if (IS_FIRST_COLUMN (column_index))
+    if (column_index == first_column (dimensions))
 
         return dimensions->Cell.FirstWallLength / 2.0 ;
 
-    else if (IS_LAST_COLUMN (column_index, dimensions))
+    else if (column_index == last_column (dimensions))
 
         return   (dimensions->Cell.FirstWallLength      )
                + (dimensions->Cell.ChannelLength   / 2.0) * (column_index    )
@@ -544,7 +589,7 @@ ChipDimension_t get_cell_location_x
     CellIndex_t   column_index
 )
 {
-    if (IS_FIRST_COLUMN (column_index))
+    if (column_index == first_column (dimensions))
 
         return 0.0 ;
 

@@ -40,7 +40,6 @@
 #include <string.h> // For the memory function memcpy
 
 #include "floorplan_matrix.h"
-#include "macros.h"
 
 /******************************************************************************/
 
@@ -183,32 +182,35 @@ void floorplan_matrix_fill
         {
             ICElement_t *icel = ic_element_list_data (iceln) ;
 
-            CellDimension_t width = 0u ;
+            CellDimension_t width = 0.0 ;
             CellDimension_t y     = icel->SW_Y ;
 
-            FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
-            {
-                if (row_index < icel->NE_Row)
+            CellIndex_t row ;
+            CellIndex_t column ;
 
-                    width = get_cell_location_y (dimensions, row_index + 1) - y ;
+            for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+            {
+                if (row < icel->NE_Row)
+
+                    width = get_cell_location_y (dimensions, row + 1) - y ;
 
                 else
 
                     width = (icel->SW_Y + icel->Width) - y ;
 
 
-                CellDimension_t length = 0u ;
+                CellDimension_t length = 0.0 ;
                 CellDimension_t x      = icel->SW_X ;
 
-                FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
+                for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
                 {
                     *r_indices++ = get_cell_offset_in_layer
 
-                                   (dimensions, row_index, column_index) ;
+                                   (dimensions, row, column) ;
 
-                    if (column_index < icel->NE_Column)
+                    if (column < icel->NE_Column)
 
-                        length = get_cell_location_x (dimensions, column_index + 1) - x ;
+                        length = get_cell_location_x (dimensions, column + 1) - x ;
 
                     else
 

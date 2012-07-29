@@ -38,8 +38,8 @@
 
 #include <stdlib.h> // For the memory functions malloc/calloc/free
 
-#include "macros.h"
 #include "power_grid.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -143,7 +143,7 @@ void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list)
         {
             case TDICE_STACK_ELEMENT_DIE :
             {
-                CellIndex_t        tmp = 0u ;
+                CellIndex_t tmp = 0u ;
                 LayerListNode_t *lnd ;
 
                 for (lnd = layer_list_end (&stack_element->Pointer.Die->Layers) ;
@@ -330,9 +330,12 @@ Error_t update_source_vector
             {
                 Source_t *tmp = sources ;
 
-                FOR_EVERY_ROW (row, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         *tmp++ += pgrid->HeatSink->AmbientTemperature
 
@@ -349,9 +352,12 @@ Error_t update_source_vector
             {
                 Source_t *tmp = sources ;
 
-                FOR_EVERY_ROW (row, dimensions)
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                 {
-                    FOR_EVERY_COLUMN (column, dimensions)
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                     {
                         *tmp++ += pgrid->HeatSink->AmbientTemperature
 
@@ -379,7 +385,9 @@ Error_t update_source_vector
             {
                 Source_t *tmp = sources ;
 
-                FOR_EVERY_COLUMN (column, dimensions)
+                CellIndex_t column ;
+
+                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                 {
                     if (IS_CHANNEL_COLUMN (pgrid->Channel->ChannelModel, column) == true)
                     {
@@ -387,7 +395,7 @@ Error_t update_source_vector
 
                                * get_convective_term
 
-                                    (pgrid->Channel, dimensions, layer, 0, column)
+                                    (pgrid->Channel, dimensions, layer, first_row (dimensions), column)
 
                                * pgrid->Channel->Coolant.TIn ;
 
@@ -447,7 +455,9 @@ void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions)
             {
                 Source_t *tmp = sources ;
 
-                FOR_EVERY_COLUMN (column, dimensions)
+                CellIndex_t column ;
+
+                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
                 {
                     if (IS_CHANNEL_COLUMN (pgrid->Channel->ChannelModel, column) == true)
                     {
@@ -455,7 +465,7 @@ void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions)
 
                                * get_convective_term
 
-                                    (pgrid->Channel, dimensions, layer, 0, column)
+                                    (pgrid->Channel, dimensions, layer, first_row (dimensions), column)
 
                                * pgrid->Channel->Coolant.TIn ;
 

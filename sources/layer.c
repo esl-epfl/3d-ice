@@ -39,7 +39,6 @@
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "layer.h"
-#include "macros.h"
 
 /******************************************************************************/
 

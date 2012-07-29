@@ -181,11 +181,11 @@ bool check_intersection
 
 bool check_location (ICElement_t *icel, Dimensions_t *dimensions)
 {
-    return (   (icel->SW_X <  0)
+    return (   (icel->SW_X <  0.0)
 
                || (icel->SW_X + icel->Length > get_chip_length (dimensions))
 
-            || (icel->SW_Y <  0)
+            || (icel->SW_Y <  0.0)
 
                || (icel->SW_Y + icel->Width > get_chip_width (dimensions)) ) ;
 }
@@ -201,7 +201,7 @@ void align_to_grid (ICElement_t *icel, Dimensions_t *dimensions)
 
     /* West side */
 
-    CellIndex_t column_index = 0u ;
+    CellIndex_t column_index = first_column (dimensions) ;
 
     while (get_cell_location_x (dimensions, column_index + 1) <= icel->SW_X)
 
@@ -219,7 +219,7 @@ void align_to_grid (ICElement_t *icel, Dimensions_t *dimensions)
 
     /* South side */
 
-    CellIndex_t row_index = 0u ;
+    CellIndex_t row_index = first_row (dimensions) ;
 
     while (get_cell_location_y (dimensions, row_index + 1) <= icel->SW_Y)
 
@@ -245,22 +245,21 @@ Temperature_t get_max_temperature_ic_element
     Temperature_t *temperatures
 )
 {
-    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(icel) ;
-    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(icel) ;
+    CellIndex_t row    = icel->SW_Row ;
+    CellIndex_t column = icel->SW_Column ;
 
     Temperature_t max_temperature =
 
-        *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
+        *(temperatures + get_cell_offset_in_layer(dimensions, row, column)) ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
+    for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
+        for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
         {
-
             max_temperature = MAX
             (
                 max_temperature,
-                *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index))
+                *(temperatures + get_cell_offset_in_layer (dimensions, row, column))
             ) ;
 
         } // FOR_EVERY_IC_ELEMENT_COLUMN
@@ -278,22 +277,21 @@ Temperature_t get_min_temperature_ic_element
     Temperature_t *temperatures
 )
 {
-    CellIndex_t first_row    = FIRST_IC_ELEMENT_ROW_INDEX(icel) ;
-    CellIndex_t first_column = FIRST_IC_ELEMENT_COLUMN_INDEX(icel) ;
+    CellIndex_t row    = icel->SW_Row ;
+    CellIndex_t column = icel->SW_Column ;
 
     Temperature_t min_temperature =
 
-        *(temperatures + get_cell_offset_in_layer(dimensions, first_row, first_column)) ;
+        *(temperatures + get_cell_offset_in_layer(dimensions, row, column)) ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
+    for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
+        for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
         {
-
             min_temperature = MIN
             (
                 min_temperature,
-                *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index))
+                *(temperatures + get_cell_offset_in_layer (dimensions, row, column))
             ) ;
 
         } // FOR_EVERY_IC_ELEMENT_COLUMN
@@ -311,18 +309,19 @@ Temperature_t get_avg_temperature_ic_element
     Temperature_t *temperatures
 )
 {
+    CellIndex_t row ;
+    CellIndex_t column ;
     CellIndex_t counter = 0u ;
 
     Temperature_t avg_temperature = 0.0 ;
 
-    FOR_EVERY_IC_ELEMENT_ROW (row_index, icel)
+    for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
     {
-        FOR_EVERY_IC_ELEMENT_COLUMN (column_index, icel)
+        for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
         {
-
             avg_temperature +=
 
-                *(temperatures + get_cell_offset_in_layer (dimensions, row_index, column_index)) ;
+                *(temperatures + get_cell_offset_in_layer (dimensions, row, column)) ;
 
             counter++ ;
 
