@@ -166,7 +166,7 @@ void floorplan_element_print
 
     powers_queue_print (flpel->PowerValues, stream, (String_t)"") ;
 
-    fprintf (stream, "\n") ;
+    fprintf (stream, " ;\n%s\n", prefix) ;
 }
 
 /******************************************************************************/

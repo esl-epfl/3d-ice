@@ -143,7 +143,7 @@ void ic_element_print
 )
 {
     fprintf (stream,
-        "%s\trectangle (%.1f, %.1f, %.1f, %.1f ) ;\n",
+        "%s   rectangle (%.1f, %.1f, %.1f, %.1f ) ;\n",
         prefix, icel->SW_X, icel->SW_Y,
                 icel->Length, icel->Width) ;
 }

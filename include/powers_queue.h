@@ -102,7 +102,13 @@ extern "C"
 
     /*! Copies the structure \a src into \a dst , as an assignement
      *
-     * The function destroys the content of \a dst and then makes the copy.
+     * If \a src is an empty queue, then \a dst will be set as an empty
+     * queue as well. Its capacity will not be affected.
+     *
+     * If \a src is not empty, then the capacity of \a dst will change
+     * (i.e. set as the capacity of \a src ) only if it is less than
+     * the capacity of \a src. Otherwise, it will not be affected by
+     * the copy.
      *
      * \param dst the address of the left term sructure (destination)
      * \param src the address of the right term structure (source)

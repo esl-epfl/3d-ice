@@ -86,28 +86,32 @@ void powers_queue_destroy (PowersQueue_t *pqueue)
 
 void powers_queue_copy (PowersQueue_t *dst, PowersQueue_t *src)
 {
+    if (is_empty_powers_queue (src) == true)
+    {
+        dst->Start = 0u ;
+        dst->End   = 0u ;
+        dst->Size  = 0u ;
+
+        return ;
+    }
+
     if (dst->Capacity < src->Capacity || dst->Memory == NULL)
     {
-        powers_queue_build (dst, src->Capacity) ;
+        powers_queue_destroy (dst) ;
+        powers_queue_init    (dst) ;
+        powers_queue_build   (dst, src->Capacity) ;
     }
     else
     {
-        dst->Size  = (Quantity_t) 0u ;
-        dst->Start = (Quantity_t) 0u ;
-        dst->End   = (Quantity_t) 0u ;
+        dst->Start = 0u ;
+        dst->End   = 0u ;
+        dst->Size  = 0u ;
     }
 
+    Quantity_t tocopy = src->Size ;
+    Quantity_t index  = src->Start ;
 
-    Quantity_t index = src->Start ;
-
-    if (index == src->End)
-    {
-        put_into_powers_queue (dst, src->Memory [index]) ;
-
-        index = (index + 1) % src->Capacity ;
-    }
-
-    while (index != src->End)
+    while (tocopy-- > 0)
     {
         put_into_powers_queue (dst, src->Memory [index]) ;
 
@@ -167,23 +171,23 @@ void powers_queue_print
     String_t       prefix
 )
 {
-    fprintf (stream, "%s", prefix) ;
+    fprintf (stream, "%s ", prefix) ;
 
-    Quantity_t index = pqueue->Start ;
+    if (is_empty_powers_queue (pqueue))
 
-    if (index == pqueue->End)
+        return ;
+
+    Quantity_t toprint = pqueue->Size ;
+    Quantity_t index   = pqueue->Start ;
+
+    while (toprint-- > 1)
     {
-        fprintf (stream, "%.3f ", pqueue->Memory [index]) ;
+        fprintf (stream, "%.3f, ", pqueue->Memory [index]) ;
 
         index = (index + 1) % pqueue->Capacity ;
     }
 
-    while (index != pqueue->End)
-    {
-        fprintf (stream, "%.3f ", pqueue->Memory [index]) ;
-
-        index = (index + 1) % pqueue->Capacity ;
-    }
+    fprintf (stream, "%.3f ", pqueue->Memory [index]) ;
 }
 
 /******************************************************************************/
