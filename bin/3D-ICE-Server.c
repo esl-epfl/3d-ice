@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.1 .                               *
+ * This file is part of 3D-ICE, version 2.2.2 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -58,7 +58,7 @@ int main (int argc, char** argv)
 
     Error_t error ;
 
-    Quantity_t server_port ;
+    Quantity_t server_port, slot_counter = 0u ;
 
     Socket_t server_socket, client_socket ;
 
@@ -186,7 +186,7 @@ int main (int argc, char** argv)
 
         /**********************************************************************/
 
-            case TDICE_INSERT_POWERS_AND_SIMULATE_SLOT :
+            case TDICE_INSERT_POWERS :
             {
                 Quantity_t nflpel, index ;
 
@@ -221,24 +221,12 @@ int main (int argc, char** argv)
                 powers_queue_destroy (&queue) ;
 
                 network_message_init (&reply) ;
-                build_message_head   (&reply, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
-
-                SimResult_t result = emulate_slot
-
-                    (&tdata, stkd.Dimensions, &analysis) ;
-
-                insert_message_word (&reply, &result) ;
+                build_message_head   (&reply, TDICE_INSERT_POWERS) ;
+                insert_message_word (&reply, &error) ;
 
                 send_message_to_socket (&client_socket, &reply) ;
 
                 network_message_destroy (&reply) ;
-
-                if (result != TDICE_SLOT_DONE)
-                {
-                    fprintf (stderr, "error %d: emulate slot\n", result) ;
-
-                    goto sim_error ;
-                }
 
                 break ;
             }
@@ -350,6 +338,17 @@ int main (int argc, char** argv)
                     goto sim_error ;
                 }
 
+                fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
+
+                fflush (stdout) ;
+
+                if (++slot_counter == 10)
+                {
+                    fprintf (stdout, "\n") ;
+
+                    slot_counter = 0 ;
+                }
+
                 break ;
             }
 
@@ -380,6 +379,14 @@ int main (int argc, char** argv)
 
                     goto sim_error ;
                 }
+
+                fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
+
+                fflush (stdout) ;
+
+                if (slot_completed (&analysis))
+
+                    fprintf (stdout, "\n") ;
 
                 break ;
             }

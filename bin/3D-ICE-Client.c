@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.1 .                               *
+ * This file is part of 3D-ICE, version 2.2.2 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -75,7 +75,7 @@ int main (int argc, char** argv)
     Socket_t client_socket ;
 
     NetworkMessage_t client_nflp, client_powers, client_temperatures, client_cores ;
-    NetworkMessage_t client_tmap, client_close_sim, server_reply ;
+    NetworkMessage_t client_tmap, client_simulate, client_close_sim, server_reply ;
 
     Quantity_t nflpel, index, index2, nslots, nresults, server_port ;
 
@@ -166,7 +166,7 @@ int main (int argc, char** argv)
         /* client sends power values ******************************************/
 
         network_message_init (&client_powers) ;
-        build_message_head   (&client_powers, TDICE_INSERT_POWERS_AND_SIMULATE_SLOT) ;
+        build_message_head   (&client_powers, TDICE_INSERT_POWERS) ;
         insert_message_word  (&client_powers, &nflpel) ;
 
         for (index = 0 ; index != nflpel ; index++)
@@ -179,6 +179,34 @@ int main (int argc, char** argv)
         send_message_to_socket (&client_socket, &client_powers) ;
 
         network_message_destroy (&client_powers) ;
+
+        /* Client waits for power insertion result ****************************/
+
+        network_message_init (&server_reply) ;
+
+        receive_message_from_socket (&client_socket, &server_reply) ;
+
+        extract_message_word (&server_reply, &sim_result, 0) ;
+
+        if (sim_result != TDICE_SUCCESS)
+        {
+            network_message_destroy (&server_reply) ;
+
+            socket_close (&client_socket) ;
+
+            return EXIT_FAILURE ;
+        }
+
+        network_message_destroy (&server_reply) ;
+
+        /* client sends request for slot simlation ****************************/
+
+        network_message_init (&client_simulate) ;
+        build_message_head   (&client_simulate, TDICE_SIMULATE_SLOT) ;
+
+        send_message_to_socket (&client_socket, &client_simulate) ;
+
+        network_message_destroy (&client_simulate) ;
 
         /* Client waits for simulation result *********************************/
 

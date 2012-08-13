@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.1 .                               *
+ * This file is part of 3D-ICE, version 2.2.2 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -86,15 +86,6 @@ void powers_queue_destroy (PowersQueue_t *pqueue)
 
 void powers_queue_copy (PowersQueue_t *dst, PowersQueue_t *src)
 {
-    if (is_empty_powers_queue (src) == true)
-    {
-        dst->Start = 0u ;
-        dst->End   = 0u ;
-        dst->Size  = 0u ;
-
-        return ;
-    }
-
     if (dst->Capacity < src->Capacity || dst->Memory == NULL)
     {
         powers_queue_destroy (dst) ;
@@ -107,6 +98,10 @@ void powers_queue_copy (PowersQueue_t *dst, PowersQueue_t *src)
         dst->End   = 0u ;
         dst->Size  = 0u ;
     }
+
+    if (is_empty_powers_queue (src) == true)
+
+        return ;
 
     Quantity_t tocopy = src->Size ;
     Quantity_t index  = src->Start ;

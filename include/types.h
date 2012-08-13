@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.1 .                               *
+ * This file is part of 3D-ICE, version 2.2.2 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -819,20 +819,21 @@ extern "C"
 
 
 
-        /*! \brief Insert a slot of power values into the queues and simulate the slot
+        /*! \brief Insert a slot of power values into the power queues
          *
          * The client sends a message with the following payload
          *
-         * | n + 3 | TDICE_INSERT_POWERS_AND_SIMULATE_SLOT | n | power0 | ... | power n-1 |
+         * | n + 3 | TDICE_INSERT_POWERS | n | power0 | ... | power n-1 |
          *
-         * where n is the total number of floorplan elements in the stack. The server
-         * will use the power values to simulate a slot and it will reply sending back the
-         * state after the simulation:
+         * where n is the total number of floorplan elements in the stack.
+         * The server will access the power vaues received and put them
+         * into the power queue of each floorplan element. The server will
+         * respond with the message:
          *
-         * | 3 | TDICE_INSERT_POWERS_AND_SIMULATE_SLOT | SimResult_t |
+         * | 3 | TDICE_INSERT_POWERS | Error_t |
          */
 
-        TDICE_INSERT_POWERS_AND_SIMULATE_SLOT,
+        TDICE_INSERT_POWERS,
 
 
 
