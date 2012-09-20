@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 2.2.2 .                               #
+ # This file is part of 3D-ICE, version 2.2.3 .                               #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -39,6 +39,19 @@
 
    * Implemented first/last cell index functions. Less macroes
    * Implemented functions for type String_t
+ ##############################################################################
+ 2012-09-20 3D-ICE 2.2.3
+   * Bug fix: Error in LU decomposition when SpreaderArea equal to SinkArea
+ ##############################################################################
+ 2012-08-13 3D-ICE 2.2.2
+   * Network message TDICE_INSERT_POWERS_AND_SIMULATE_SLOT reduced to
+     TDICE_INSERT_POWERS only. Simulation step must be run sending its proper
+     message type
+   * Bug fix: fixed copy of empty power queue
+ ##############################################################################
+ 2012-07-31 3D-ICE 2.2.1
+   * Bug fix: fixed implementation of powers_queue_copy
+   * Bug fix: fixed floorplan/ic_element/powers_queue print functions 
  ##############################################################################
  2012-07-24 3D-ICE 2.2
    * Enhanced/Completed network interface with new message types

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.2 .                               *
+ * This file is part of 3D-ICE, version 2.2.3 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -341,6 +341,32 @@ heat_sink_opt
 
         stkd->HeatSink->AmbientHTC          = (AmbientHTC_t) $27 ;
         stkd->HeatSink->AmbientTemperature  = $31 ;
+
+        if (stkd->HeatSink->SinkArea <= 0)
+        {
+            sprintf (error_message,
+                "Error: the area of the sink must be a positive value!") ;
+
+            free ($12) ;
+            free ($22) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
+
+        if (stkd->HeatSink->SpreaderArea <= 0)
+        {
+            sprintf (error_message,
+                "Error: the area of the spreader must be a positive value!") ;
+
+            free ($12) ;
+            free ($22) ;
+
+            STKERROR (error_message) ;
+
+            YYABORT ;
+        }
 
         if (stkd->HeatSink->SinkArea < stkd->HeatSink->SpreaderArea)
         {

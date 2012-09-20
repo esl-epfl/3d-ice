@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.2 .                               *
+ * This file is part of 3D-ICE, version 2.2.3 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -244,16 +244,21 @@ SolidTC_t get_spreader_thermal_conductivity
                          /
                          (1.0 + (lambda_sink / Bi_sink) * tanh (lambda_sink * tau_sink)) ;
 
-    SolidTC_t g_sink = (  2.0
-                        * hsink->SinkMaterial.ThermalConductivity
-                        * sqrt(hsink->SpreaderArea)
-                       )
-                       /
-                       (pow(1.0 - e_sink, 1.5) * phi_sink) ;
-
     SolidTC_t gm_sink = hsink->SinkMaterial.ThermalConductivity
 
                       * (hsink->SinkArea / hsink->SinkHeight) ;
+
+    if (e_sink != 1.0) // SpreaderArea != hsink->SinkArea
+    {
+        SolidTC_t g_sink = (  2.0
+                            * hsink->SinkMaterial.ThermalConductivity
+                            * sqrt(hsink->SpreaderArea)
+                           )
+                           /
+                           (pow(1.0 - e_sink, 1.5) * phi_sink) ;
+
+        gm_sink = PARALLEL (g_sink, gm_sink) ;
+    }
 
     // Values just for the spreader
 
@@ -263,7 +268,7 @@ SolidTC_t get_spreader_thermal_conductivity
 
     AmbientHTC_t R_air  = 1.0 / (hsink->AmbientHTC * hsink->SinkArea) ;
 
-    AmbientHTC_t R_sink = 1.0 / PARALLEL (g_sink, gm_sink) ;
+    AmbientHTC_t R_sink = 1.0 / gm_sink ;
 
     AmbientHTC_t H_sink =   (1.0 / (R_air + R_sink))
 
@@ -279,18 +284,23 @@ SolidTC_t get_spreader_thermal_conductivity
                     /
                     (1.0 + (lambda / Bi) * tanh (lambda * tau)) ;
 
-    SolidTC_t g = (  2.0
-                   * hsink->SpreaderMaterial.ThermalConductivity
-                   * sqrt(chip_area)
-                  )
-                  /
-                  (pow(1.0 - e, 1.5) * phi) ;
-
     SolidTC_t gm = hsink->SpreaderMaterial.ThermalConductivity
 
                    * (hsink->SpreaderArea / hsink->SpreaderHeight) ;
 
-    return PARALLEL (g, gm) * (hsink->SpreaderHeight / chip_area) ;
+    if (e != 1.0) // chip_area != SpreaderArea
+    {
+        SolidTC_t g = (  2.0
+                       * hsink->SpreaderMaterial.ThermalConductivity
+                       * sqrt(chip_area)
+                      )
+                      /
+                      (pow(1.0 - e, 1.5) * phi) ;
+
+        gm = PARALLEL (g, gm) ;
+    }
+
+    return gm * (hsink->SpreaderHeight / chip_area) ;
 }
 
 /******************************************************************************/
@@ -325,16 +335,21 @@ SolidTC_t get_sink_thermal_conductivity
                     /
                     (1.0 + (lambda / Bi) * tanh (lambda * tau)) ) ;
 
-    SolidTC_t g = (  2.0
-                   * hsink->SinkMaterial.ThermalConductivity
-                   * sqrt(hsink->SpreaderArea)
-                  )
-                  /
-                  (pow(1.0 - e, 1.5) * phi) ;
-
     SolidTC_t gm = hsink->SinkMaterial.ThermalConductivity
 
                    * (hsink->SinkArea / hsink->SinkHeight) ;
 
-    return PARALLEL (g, gm) * (hsink->SinkHeight / chip_area) ;
+    if (e != 1.0) // SinkArea != SpreadArea
+    {
+        SolidTC_t g = (  2.0
+                       * hsink->SinkMaterial.ThermalConductivity
+                       * sqrt(hsink->SpreaderArea)
+                      )
+                      /
+                      (pow(1.0 - e, 1.5) * phi) ;
+
+        gm = PARALLEL (gm, g) ;
+    }
+
+    return gm * (hsink->SinkHeight / chip_area) ;
 }
