@@ -65,6 +65,8 @@
 
 %code
 {
+    #include <math.h>
+
     #include "analysis.h"
     #include "output.h"
     #include "channel.h"
@@ -1488,13 +1490,30 @@ solver
             YYABORT ;
         }
 
-        analysis->AnalysisType = TDICE_ANALYSIS_TYPE_TRANSIENT ;
-        analysis->StepTime     = (Time_t) $5 ;
-        analysis->SlotTime     = (Time_t) $8 ;
-        analysis->SlotLength   = (Quantity_t) ( $8 / $5 ) ;
+        analysis->AnalysisType       = TDICE_ANALYSIS_TYPE_TRANSIENT ;
+        analysis->StepTime           = (Time_t) $5 ;
+        analysis->SlotTime           = (Time_t) $8 ;
+        analysis->InitialTemperature = (Temperature_t) $12 ;
 
+        // Execute correct division Slot / Step avoiding floating point issues
+        // i.e. both slot and step are mutiplied by 10 until the decimal part
+        // is removed. Then run division ...
 
-        analysis->InitialTemperature = (Temperature_t) $12;
+        Time_t sl_int, sl_dec, sl = analysis->SlotTime ;
+        Time_t st_int, st_dec, st = analysis->StepTime ;
+
+        sl_dec = modf (sl, &sl_int) ;
+        st_dec = modf (st, &st_int) ;
+
+        while (sl_dec != 0.0 || st_dec != 0.0)
+        {
+            sl *= 10.0 ; st *= 10.0 ;
+
+            sl_dec = modf (sl, &sl_int) ;
+            st_dec = modf (st, &st_int) ;
+        }
+
+        analysis->SlotLength   = (Quantity_t) sl_int / (Quantity_t) st_int ;
     }
   ;
 
