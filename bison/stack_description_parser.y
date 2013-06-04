@@ -52,6 +52,7 @@
 {
     double                double_v ;
     String_t              string ;
+    String_t             *string_p ;
     Material_t           *material_p ;
     Coolant_t             coolant_v ;
     ChannelModel_t        channel_model_v ;
@@ -116,6 +117,7 @@
 %type <inspection_point_p> inspection_point
 %type <output_instant_v>   when
 %type <output_quantity_v>  maxminavg
+%type <string_p>           optional_layout
 
 %token _2RM                  "keyword 2rm"
 %token _4RM                  "keyword 4rm"
@@ -147,6 +149,7 @@
 %token INLINE                "keyword inline"
 %token LAST                  "keyword last"
 %token LAYER                 "keyword layer"
+%token LAYOUT                "keyword layout"
 %token LENGTH                "keyword length"
 %token MATERIAL              "keyword material"
 %token MAXIMUM               "keyword maximum"
@@ -234,9 +237,9 @@ stack_description_file
     heat_sink_opt
     pcb_opt
     microchannel_opt
+    dimensions
     layers_list_opt
     dies_list
-    dimensions
     stack
     solver
     inspection_points
@@ -755,6 +758,7 @@ layer
   : LAYER IDENTIFIER ':'       // $2
        HEIGHT DVALUE ';'       // $5
        MATERIAL IDENTIFIER ';' // $8
+       optional_layout         // $10
   {
         Layer_t *layer = $$ = layer_calloc () ;
 
@@ -765,10 +769,14 @@ layer
             string_destroy (&$2) ;
             string_destroy (&$8) ;
 
+            if ($10 != NULL)
+
+                string_destroy ($10) ;
+
             YYABORT ;
         }
 
-        layer->Height      = $5 ;
+        layer->Height = $5 ;
 
         string_copy (&layer->Id, &$2) ;
         string_copy (&layer->Material.Id, &$8) ;
@@ -788,14 +796,57 @@ layer
             string_destroy (&$2) ;
             string_destroy (&$8) ;
 
+            if ($10 != NULL)
+
+                string_destroy ($10) ;
+
             YYABORT ;
         }
 
         material_copy (&layer->Material, tmp) ;
 
+        if ($10 != NULL
+            &&  fill_layout (layer, stkd->Dimensions, &stkd->Materials, *$10) == TDICE_FAILURE)
+        {
+            layer_free (layer) ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$8) ;
+
+            if ($10 != NULL)
+
+                string_destroy ($10) ;
+
+           stack_description_destroy (stkd) ;
+
+           YYABORT ; // CHECKME error messages printed in this case ....
+        }
+
         string_destroy (&$2) ;
         string_destroy (&$8) ;
+
+        if ($10 != NULL)
+
+            string_destroy ($10) ;
   }
+
+  ;
+
+optional_layout
+
+  : /* empty */
+
+    {
+        $$ = NULL ;
+    }
+
+  | LAYOUT PATH ';' // $2
+
+    {
+        $$ = &$2 ;
+    }
+
+  ;
 
 /******************************************************************************/
 /******************************* Dies *****************************************/
@@ -886,6 +937,45 @@ die_layer_content
         material_copy (&layer->Material, tmp) ;
 
         string_destroy (&$2) ;
+    }
+
+  | IDENTIFIER ';' // $1 the id of a layer in the layer section
+    {
+        Layer_t *layer = $$ = layer_calloc () ;
+
+        if (layer == NULL)
+        {
+            STKERROR ("Malloc layer failed") ;
+
+            string_destroy (&$1) ;
+
+            layer_list_destroy (&dielayers) ;
+
+            YYABORT ;
+        }
+
+        string_copy (&layer->Id, &$1) ;
+
+        Layer_t *tmp = layer_list_find (&stkd->Layers, layer) ;
+
+        if (tmp == NULL)
+        {
+            sprintf (error_message, "Unknown layer %s", $1) ;
+
+            STKERROR (error_message) ;
+
+            layer_free (layer) ;
+
+            string_destroy (&$1) ;
+
+            layer_list_destroy (&dielayers) ;
+
+            YYABORT ;
+        }
+
+        layer_copy (layer, tmp) ;
+
+        string_destroy (&$1) ;
     }
   ;
 

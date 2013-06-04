@@ -39,16 +39,20 @@
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "layer.h"
+#include "layout_file_parser.h"
 
 /******************************************************************************/
 
 void layer_init (Layer_t *layer)
 {
     string_init (&layer->Id) ;
+    string_init (&layer->LayoutFileName) ;
 
     layer->Height = (CellDimension_t) 0.0 ;
 
     material_init (&layer->Material) ;
+
+    material_element_list_init (&layer->MaterialLayout) ;
 }
 
 /******************************************************************************/
@@ -58,10 +62,13 @@ void layer_copy (Layer_t *dst, Layer_t *src)
     layer_destroy (dst) ;
 
     string_copy (&dst->Id, &src->Id) ;
+    string_copy (&dst->LayoutFileName, &src->LayoutFileName) ;
 
-    dst->Height   = src->Height ;
+    dst->Height = src->Height ;
 
     material_copy (&dst->Material, &src->Material) ;
+
+    material_element_list_copy (&dst->MaterialLayout, &src->MaterialLayout) ;
 }
 
 /******************************************************************************/
@@ -69,8 +76,11 @@ void layer_copy (Layer_t *dst, Layer_t *src)
 void layer_destroy (Layer_t *layer)
 {
     string_destroy (&layer->Id) ;
+    string_destroy (&layer->LayoutFileName) ;
 
     material_destroy (&layer->Material) ;
+
+    material_element_list_destroy (&layer->MaterialLayout) ;
 
     layer_init (layer) ;
 }
@@ -140,6 +150,87 @@ void layer_print (Layer_t *layer, FILE *stream, String_t prefix)
     fprintf (stream,
         "%s   material %s ;\n",
         prefix, layer->Material.Id) ;
+
+    fprintf (stream,
+        "%s   layout   \"%s\" ;\n",
+        prefix, layer->LayoutFileName) ;
+}
+
+/******************************************************************************/
+
+Error_t fill_layout
+(
+    Layer_t        *layer,
+    Dimensions_t   *dimensions,
+    MaterialList_t *materials,
+    String_t        filename
+)
+{
+    Error_t result ;
+
+    result = parse_layout_file (filename, layer, materials, dimensions) ;
+
+    if (result == TDICE_FAILURE)
+
+        return TDICE_FAILURE ;
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+SolidTC_t get_thermal_conductivity
+(
+    Layer_t      *layer,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
+    Dimensions_t *dimensions
+)
+{
+    Material_t *tmp = NULL ;
+
+    MaterialElementListNode_t *melementn ;
+
+    for (melementn  = material_element_list_begin (&layer->MaterialLayout) ;
+         melementn != NULL ;
+         melementn  = material_element_list_next (melementn))
+    {
+        MaterialElement_t *melement = material_element_list_data (melementn) ;
+
+        tmp = get_material_at_location (melement, row_index, column_index, dimensions) ;
+
+        if (tmp != NULL)    return tmp->ThermalConductivity ;
+    }
+
+    return layer->Material.ThermalConductivity ;
+}
+
+/******************************************************************************/
+
+SolidTC_t get_volumetric_heat_capacity
+(
+    Layer_t      *layer,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index,
+    Dimensions_t *dimensions
+)
+{
+    Material_t *tmp = NULL ;
+
+    MaterialElementListNode_t *melementn ;
+
+    for (melementn  = material_element_list_begin (&layer->MaterialLayout) ;
+         melementn != NULL ;
+         melementn  = material_element_list_next (melementn))
+    {
+        MaterialElement_t *melement = material_element_list_data (melementn) ;
+
+        tmp = get_material_at_location (melement, row_index, column_index, dimensions) ;
+
+        if (tmp != NULL)    return tmp->VolumetricHeatCapacity ;
+    }
+
+    return layer->Material.VolumetricHeatCapacity ;
 }
 
 /******************************************************************************/

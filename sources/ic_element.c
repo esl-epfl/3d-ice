@@ -150,6 +150,21 @@ void ic_element_print
 
 /******************************************************************************/
 
+bool ic_element_has_center
+(
+    ICElement_t     *icelement,
+    CellDimension_t  cellx,
+    CellDimension_t  celly
+)
+{
+    return (    cellx >= icelement->SW_X
+            &&  celly >= icelement->SW_Y
+            &&  cellx  < icelement->SW_X + icelement->Length
+            &&  celly  < icelement->SW_Y + icelement->Width) ;
+}
+
+/******************************************************************************/
+
 bool check_intersection
 (
     ICElement_t *icelement_a,

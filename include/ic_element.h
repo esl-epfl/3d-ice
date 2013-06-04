@@ -208,6 +208,26 @@ extern "C"
 
 
 
+    /*! Checks if the center of a thermal cell belongs to the ic element
+     *
+     *  The control is based on the real coordinates of the ic element, i.e. the
+     *  coordinates read from the floorplan file.
+     *
+     *  \param icelement the ic element to test
+     *  \param cellx     the x coordinate of the center of the thermal cell
+     *  \param celly     the y coordinate of the center of the thermal cell
+     *
+     *  \return \c true if the point (\a cellx, \a celly) is in the area covered by
+     *                  the ic element
+     *  \return \c false otherwise
+     */
+
+    bool ic_element_has_center
+
+        (ICElement_t *icelement, CellDimension_t cellx, CellDimension_t celly) ;
+
+
+
     /*! Checks if two ic elements overlap
      *
      *  The control is based on the real coordinates of the ic element, i.e. the

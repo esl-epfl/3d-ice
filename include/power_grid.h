@@ -76,9 +76,13 @@ extern "C"
 
         CellIndex_t NCells ;
 
+        /*! The number of thermal cells in a layer */
+
+        CellIndex_t NCellsLayer ;
+
         /*! Vector storing the types of layer along the vertical profile. */
 
-        StackLayerType_t *LayersProfile ;
+        StackLayerType_t *LayersTypeProfile ;
 
         /*! Vector storing a pointer to floorplans along the vertical profile */
 
@@ -100,6 +104,29 @@ extern "C"
 
         HeatSink_t *SecondaryPath ;
 
+        /*! Pointer to a vector storing the TOP thermal conductivities
+         *  of the thermal cells in the topmost layer. This vector is filled
+         *  whenever the HeatSink is used to improve the performance of the
+         *  simulator when the source vector is updated.
+         */
+
+        SolidTC_t *HeatSinkTopTcs ;
+
+        /*! Pointer to a vector storing the BOTTOM thermal conductivities
+         *  of the thermal cells in the bottommost layer. This vector is filled
+         *  whenever the SecondaryPath is used to improve the performance of the
+         *  simulator when the source vector is updated.
+         */
+
+        SolidTC_t *HeatSinkBottomTcs ;
+
+        /*! Pointer to a vector storing the thermal capacities
+         *  of the thermal cells in the entire 3d-ic. This vector is used
+         *  to improve the performance of the simulator when the system vector
+         *  is updated.
+         */
+
+        Capacity_t *CellsCapacities ;
     } ;
 
     /*! Definition of the type PowerGrid_t */
@@ -124,19 +151,13 @@ extern "C"
     /*! Allocs internal memory to store power grid information
      *
      * \param pgrid    pointer to the power grid structure
-     * \param nlayers the number of layers in the 3d stack
-     * \param ncells  the number of cells in the 3d stack
+     * \param dimensions pointer to the structure storing the dimensions
      *
      * \return \c TDICE_ERROR   if the memory allocation fails
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t power_grid_build
-    (
-        PowerGrid_t *pgrid,
-        Quantity_t   nlayers,
-        Quantity_t   ncells
-    ) ;
+    Error_t power_grid_build (PowerGrid_t *pgrid, Dimensions_t *dimensions) ;
 
 
 
@@ -155,17 +176,24 @@ extern "C"
     /*! Fills a power grid
      *
      *  \param pgrid pointer to the power grid
+     *  \param tgrid pointer to the ThermalGrid structure
      *  \param list pointer to the list of stack elements
+     *  \param dimensions pointer to the structure storing the dimensions
      */
 
-    void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list) ;
+    void power_grid_fill
+    (
+        PowerGrid_t        *pgrid,
+        ThermalGrid_t      *tgrid,
+        StackElementList_t *list,
+        Dimensions_t       *dimensions
+    ) ;
 
 
 
     /*! Update the source vector
      *
      * \param pgrid address of the PowerGrid structure storing the sources
-     * \param thermal_grid pointer to the ThermalGrid structure
      * \param dimensions the dimensions of the IC
      *
      *  \return \c TDICE_SUCCESS if the source vector has been updated
@@ -174,12 +202,7 @@ extern "C"
      *                            values in its queue)
      */
 
-    Error_t update_source_vector
-    (
-        PowerGrid_t    *pgrid,
-        ThermalGrid_t  *thermal_grid,
-        Dimensions_t   *dimensions
-    ) ;
+    Error_t update_source_vector (PowerGrid_t *pgrid, Dimensions_t *dimensions) ;
 
 
 

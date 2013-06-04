@@ -15,6 +15,11 @@ microchannel 2rm :
    coolant volumetric heat capacity         4.172638e-12 ;
    coolant incoming temperature             300.0 ;
 
+dimensions :
+
+  chip length 10000 , width  10000 ;
+  cell length   200 , width    200 ;
+
 die bottomdie :
 
    layer  48 silicon ;
@@ -24,11 +29,6 @@ die topdie :
 
    source  2 silicon ;
    layer  48 silicon ;
-
-dimensions :
-
-  chip length 10000 , width  10000 ;
-  cell length   200 , width    200 ;
 
 stack:
 

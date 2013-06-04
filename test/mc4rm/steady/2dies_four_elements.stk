@@ -19,6 +19,12 @@ microchannel 4rm :
    coolant incoming temperature             300.0 ;
 
 
+dimensions :
+
+  chip length 10000 , width  10000 ;
+  cell length    50 , width    200 ;
+
+
 die bottomdie :
 
    layer  48 silicon ;
@@ -28,11 +34,6 @@ die topdie :
 
    source  2 silicon ;
    layer  48 silicon ;
-
-dimensions :
-
-  chip length 10000 , width  10000 ;
-  cell length    50 , width    200 ;
 
 stack:
 

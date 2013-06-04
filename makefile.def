@@ -54,6 +54,7 @@
 3DICE_TEST      = $(3DICE_MAIN)/test
 
 3DICE_FLEX_L    = $(3DICE_FLEX)/floorplan_scanner.l         \
+                  $(3DICE_FLEX)/layout_scanner.l            \
                   $(3DICE_FLEX)/stack_description_scanner.l
 3DICE_FLEX_C    = $(3DICE_FLEX_L:.l=.c)
 3DICE_FLEX_H    = $(3DICE_FLEX_L:.l=.h)
@@ -61,6 +62,7 @@
 3DICE_FLEX_D    = $(3DICE_FLEX_L:.l=.d)
 
 3DICE_BISON_Y   = $(3DICE_BISON)/floorplan_parser.y         \
+                  $(3DICE_BISON)/layout_parser.y            \
                   $(3DICE_BISON)/stack_description_parser.y
 3DICE_BISON_C   = $(3DICE_BISON_Y:.y=.c)
 3DICE_BISON_H   = $(3DICE_BISON_Y:.y=.h)
@@ -84,8 +86,11 @@
                   $(3DICE_SOURCES)/inspection_point_list.c    \
                   $(3DICE_SOURCES)/layer.c                    \
                   $(3DICE_SOURCES)/layer_list.c               \
+                  $(3DICE_SOURCES)/layout_file_parser.c       \
                   $(3DICE_SOURCES)/material.c                 \
                   $(3DICE_SOURCES)/material_list.c            \
+                  $(3DICE_SOURCES)/material_element.c         \
+                  $(3DICE_SOURCES)/material_element_list.c    \
                   $(3DICE_SOURCES)/network_message.c          \
                   $(3DICE_SOURCES)/network_socket.c           \
                   $(3DICE_SOURCES)/output.c                   \

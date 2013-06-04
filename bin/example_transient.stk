@@ -21,22 +21,27 @@ microchannel 2rm :
    coolant volumetric heat capacity 4.172e-12 ;
    coolant incoming temperature 300.0 ;
 
+dimensions :
+   chip length 10000, width 10000 ;
+   cell length   500, width   500 ;
+
 layer PCB :
    height 10 ;
    material BEOL ;
 
+layer TOP_IC_LAYOUT :
+   height 50 ;
+   material SILICON ;
+   layout "metal1.mlt" ;
+
 die TOP_IC :
    source  2 SILICON ;
-   layer  50 SILICON ;
+   layer     TOP_IC_LAYOUT ;
 
 die BOTTOM_IC :
    layer  10 BEOL ;
    source  2 SILICON ;
    layer  50 SILICON ;
-
-dimensions :
-   chip length 10000, width 10000 ;
-   cell length   100, width   100 ;
 
 stack:
    die     MEMORY_DIE     TOP_IC    floorplan "./mem.flp" ;

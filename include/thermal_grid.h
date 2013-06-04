@@ -52,6 +52,7 @@ extern "C"
 
 #include "channel.h"
 #include "heat_sink.h"
+#include "layer.h"
 
 #include "dimensions.h"
 #include "stack_element_list.h"
@@ -65,24 +66,18 @@ extern "C"
 
     struct ThermalGrid_t
     {
-        /*! The size of all the vectors that belong to tgrid structure,
-            i.e. the number of layers in the 3d-ic */
+        /*! The number of layers in the 3d-ic. */
 
-        CellIndex_t Size ;
+        CellIndex_t NLayers ;
 
         /*! Vector storing the types of layer along the vertical profile. */
 
-        StackLayerType_t *LayersProfile ;
+        StackLayerType_t *LayersTypeProfile ;
 
-        /*! Vector storing the volumetric heat capacity of the solid materials
-            along the vertical profile of the 3d-ic */
+        /*! Vector storing the pointer to solid layer along the vertical
+            profile of the 3d-ic */
 
-        SolidVHC_t *VHCProfile ;
-
-        /*! Vector storing the thermal conductivity of the solid materials
-            along the vertical profile of the 3d-ic */
-
-        SolidTC_t *TCProfile ;
+        Layer_t *LayersProfile ;
 
         /*! Pointer to the channel structure */
 
@@ -118,14 +113,14 @@ extern "C"
 
     /*! Alloc memory to store thermal grid informations
      *
-     * \param tgrid  pointer to the thermal grid structure
-     * \param size  the number of layers in the 3d stack
+     * \param tgrid       pointer to the thermal grid structure
+     * \param dimensions  pointer to the structure storing the dimensions
      *
      * \return \c TDICE_ERROR   if the memory allocation fails
      * \return \c TDICE_SUCCESS otherwise
      */
 
-    Error_t thermal_grid_build (ThermalGrid_t *tgrid, Quantity_t size) ;
+    Error_t thermal_grid_build (ThermalGrid_t *tgrid, Dimensions_t *dimensions) ;
 
 
 
@@ -145,10 +140,10 @@ extern "C"
      *
      *  \param tgrid pointer to the thermal grid
      *  \param list pointer to the list of stack elements
-     * \param  dimensions pointer to the structure storing the dimensions
+     *  \param  dimensions pointer to the structure storing the dimensions
      */
 
-    void fill_thermal_grid
+    void thermal_grid_fill
     (
         ThermalGrid_t      *tgrid,
         StackElementList_t *list,

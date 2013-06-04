@@ -323,8 +323,8 @@ skip_bottom :
     /********************************* SOUTH **********************************/
 
     if (   row_index == first_row (dimensions)
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
 
         goto skip_south ;
 
@@ -358,8 +358,8 @@ skip_south :
     /********************************* WEST ***********************************/
 
     if (   column_index == first_column (dimensions)
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
 
         goto skip_west ;
 
@@ -407,16 +407,16 @@ skip_west :
         *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
+    if (   thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
 
         *sysmatrix.Values += get_conductance_top
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
-    else if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB
-             || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_PCB)
+    else if (   thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB
+             || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_PCB)
 
         *sysmatrix.Values += get_conductance_bottom
 
@@ -435,8 +435,8 @@ skip_west :
     /********************************* EAST ***********************************/
 
     if (   column_index == last_column (dimensions)
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
 
         goto skip_east ;
 
@@ -470,8 +470,8 @@ skip_east :
     /********************************* NORTH **********************************/
 
     if (   row_index == last_row (dimensions)
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SINK)
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
+        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
 
         goto skip_north ;
 
@@ -1456,9 +1456,9 @@ void fill_system_matrix
 
     CellIndex_t lindex ;
 
-    for (lindex = 0u ; lindex != thermal_grid->Size ; lindex++)
+    for (lindex = 0u ; lindex != thermal_grid->NLayers ; lindex++)
     {
-        switch (thermal_grid->LayersProfile [lindex])
+        switch (thermal_grid->LayersTypeProfile [lindex])
         {
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_SOURCE :
@@ -1604,7 +1604,7 @@ void fill_system_matrix
             }
             default :
 
-                fprintf (stderr, "ERROR: unknown layer type %d\n", thermal_grid->LayersProfile [lindex]) ;
+                fprintf (stderr, "ERROR: unknown layer type %d\n", thermal_grid->LayersTypeProfile [lindex]) ;
         }
 
     }

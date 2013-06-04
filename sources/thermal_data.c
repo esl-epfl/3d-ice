@@ -102,9 +102,7 @@ Error_t thermal_data_build
 
     /* Alloc and fill the thermal grid */
 
-    result = thermal_grid_build
-
-        (&tdata->ThermalGrid, get_number_of_layers (dimensions)) ;
+    result = thermal_grid_build (&tdata->ThermalGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -117,13 +115,11 @@ Error_t thermal_data_build
         return TDICE_FAILURE ;
     }
 
-    fill_thermal_grid (&tdata->ThermalGrid, stack_elements_list, dimensions) ;
+    thermal_grid_fill (&tdata->ThermalGrid, stack_elements_list, dimensions) ;
 
     /* Alloc and fill the power grid */
 
-    result = power_grid_build (&tdata->PowerGrid,
-                               get_number_of_layers (dimensions),
-                               get_number_of_cells(dimensions)) ;
+    result = power_grid_build (&tdata->PowerGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -138,7 +134,9 @@ Error_t thermal_data_build
         return TDICE_FAILURE ;
     }
 
-    fill_power_grid (&tdata->PowerGrid, stack_elements_list) ;
+    power_grid_fill
+
+        (&tdata->PowerGrid, &tdata->ThermalGrid, stack_elements_list, dimensions) ;
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
 
@@ -206,7 +204,7 @@ static void fill_system_vector
     Dimensions_t  *dimensions,
     double        *vector,
     Source_t      *sources,
-    ThermalGrid_t *thermal_grid,
+    Capacity_t    *capacities,
     Temperature_t *temperatures,
     Time_t         step_time
 )
@@ -230,19 +228,16 @@ static void fill_system_vector
                 old = *temperatures ;
 #endif
 
-                *vector++ =   *sources++
-                            +
-                              (  get_capacity (thermal_grid, dimensions, layer, row, column)
-                               / step_time)
-                            * *temperatures++ ;
+                *vector++ = *sources++
+                            + (*capacities++ / step_time)
+                              * *temperatures++ ;
 
 #ifdef PRINT_SYSTEM_VECTOR
                 fprintf (stderr,
                     " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
                     layer, row, column,
                     get_cell_offset_in_stack (dimensions, layer, row, column),
-                    *(vector-1), *(sources-1),
-                    get_capacity (thermal_grid, dimensions, layer, row, column), old) ;
+                    *(vector-1), *(sources-1), *(capacities-1), old) ;
 #endif
 
             } // FOR_EVERY_COLUMN
@@ -299,9 +294,7 @@ SimResult_t emulate_step
 
     if (slot_completed (analysis) == true)
     {
-        Error_t result = update_source_vector
-
-            (&tdata->PowerGrid, &tdata->ThermalGrid, dimensions) ;
+        Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
 
         if (result == TDICE_FAILURE)
 
@@ -311,7 +304,7 @@ SimResult_t emulate_step
     fill_system_vector
 
         (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources,
-         &tdata->ThermalGrid, tdata->Temperatures, analysis->StepTime) ;
+         tdata->PowerGrid.CellsCapacities, tdata->Temperatures, analysis->StepTime) ;
 
     Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
 
@@ -364,9 +357,7 @@ SimResult_t emulate_steady
 
         return TDICE_WRONG_CONFIG ;
 
-    Error_t result = update_source_vector
-
-        (&tdata->PowerGrid, &tdata->ThermalGrid, dimensions) ;
+    Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
     {

@@ -157,6 +157,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "inline"                     return INLINE ;
 "last"                       return LAST ;
 "layer"                      return LAYER ;
+"layout"                     return LAYOUT ;
 "length"                     return LENGTH ;
 "material"                   return MATERIAL ;
 "maximum"                    return MAXIMUM ;
