@@ -52,8 +52,6 @@ extern "C"
 #include "floorplan_element_list.h"
 #include "dimensions.h"
 
-#include "slu_ddefs.h"
-
 /******************************************************************************/
 
     /*! \struct FloorplanMatrix_t
@@ -94,11 +92,6 @@ extern "C"
         /*! The number of nonzeroes coefficients */
 
         CellIndex_t NNz ;
-
-        /*! SuperLU matrix to perform a mv-multiplication */
-
-        SuperMatrix SLUMatrix ;
-
     } ;
 
     /*! Definition of the type FloorplanMatrix_t */
@@ -187,6 +180,10 @@ extern "C"
 
 
     /*! Performs a Matrix-Vector Multiplication x = Ab
+     *
+     * The multiplication corresponds to the routine DGEMV
+     * \c y := \c alpha * \c A* \c x + \c beta * \c y where \c alpha = 1.0 and
+     * \c beta = 1.0 .
      *
      * \param flpmatrix pointer to the (floorplan) matrix \a A
      * \param x    pointer to the output vector \a x

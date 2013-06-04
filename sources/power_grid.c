@@ -86,16 +86,6 @@ Error_t power_grid_build (PowerGrid_t *pgrid, Dimensions_t *dimensions)
         return TDICE_FAILURE ;
     }
 
-    CellIndex_t lindex = 0 ;
-
-    while (lindex != pgrid->NLayers)
-    {
-        pgrid->LayersTypeProfile [lindex] = TDICE_LAYER_NONE ;
-        pgrid->FloorplansProfile [lindex] = NULL ;
-
-        lindex++ ;
-    }
-
     pgrid->Sources = (Source_t *) calloc (pgrid->NCells, sizeof(Source_t)) ;
 
     if (pgrid->Sources == NULL)
@@ -142,6 +132,17 @@ Error_t power_grid_build (PowerGrid_t *pgrid, Dimensions_t *dimensions)
         free (pgrid->HeatSinkBottomTcs) ;
 
         return TDICE_FAILURE ;
+    }
+
+
+    CellIndex_t lindex = 0 ;
+
+    while (lindex != pgrid->NLayers)
+    {
+        pgrid->LayersTypeProfile [lindex] = TDICE_LAYER_NONE ;
+        pgrid->FloorplansProfile [lindex] = NULL ;
+
+        lindex++ ;
     }
 
     return TDICE_SUCCESS ;

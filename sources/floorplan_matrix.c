@@ -51,7 +51,6 @@ void floorplan_matrix_init (FloorplanMatrix_t* flpmatrix)
     flpmatrix->NRows           = (CellIndex_t) 0u ;
     flpmatrix->NColumns        = (CellIndex_t) 0u ;
     flpmatrix->NNz             = (CellIndex_t) 0u ;
-    flpmatrix->SLUMatrix.Store = NULL ;
 }
 
 /******************************************************************************/
@@ -119,12 +118,6 @@ Error_t floorplan_matrix_build
         return TDICE_FAILURE ;
     }
 
-    dCreate_CompCol_Matrix
-
-        (&flpmatrix->SLUMatrix, flpmatrix->NRows, flpmatrix->NColumns, flpmatrix->NNz,
-         flpmatrix->Values, (int*) flpmatrix->RowIndices, (int*) flpmatrix->ColumnPointers,
-         SLU_NC, SLU_D, SLU_GE) ;
-
     return TDICE_SUCCESS ;
 }
 
@@ -143,8 +136,6 @@ void floorplan_matrix_destroy (FloorplanMatrix_t* flpmatrix)
     if (flpmatrix->Values != NULL)
 
         free (flpmatrix->Values) ;
-
-    Destroy_SuperMatrix_Store (&flpmatrix->SLUMatrix) ;
 
     floorplan_matrix_init (flpmatrix) ;
 }
@@ -240,7 +231,27 @@ void floorplan_matrix_multiply
     Source_t          *b
 )
 {
-    sp_dgemv((String_t)"N", 1.0, &flpmatrix->SLUMatrix, b, 1, 1.0, x, 1) ;
+    CellIndex_t j, i;
+
+    if (   flpmatrix->NRows    == 0 || flpmatrix->RowIndices     == NULL
+        || flpmatrix->NColumns == 0 || flpmatrix->ColumnPointers == NULL
+        || flpmatrix->NNz      == 0 || flpmatrix->Values         == NULL)
+    {
+        fprintf (stderr, "matrix multiply error: matrix unset\n") ;
+
+        return ;
+    }
+
+    for (j = 0; j < flpmatrix->NColumns; ++j)
+
+    if (b[j] != 0.)
+
+    for (i = flpmatrix->ColumnPointers[j] ;
+         i < flpmatrix->ColumnPointers[j+1] ; ++i)
+
+    x [ flpmatrix->RowIndices [i] ] += b[j] * flpmatrix -> Values [i] ;
+
+    return ;
 }
 
 /******************************************************************************/

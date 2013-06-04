@@ -18,12 +18,10 @@ microchannel 4rm :
    coolant volumetric heat capacity         4.172638e-12 ;
    coolant incoming temperature             300.0 ;
 
-
 dimensions :
 
   chip length 10000 , width  10000 ;
   cell length    50 , width    200 ;
-
 
 die bottomdie :
 

@@ -20,7 +20,6 @@ dimensions :
   chip length 10000 , width  10000 ;
   cell length   200 , width    200 ;
 
-
 die maindie :
 
    source  2 silicon ;

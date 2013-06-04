@@ -1,0 +1,73 @@
+material MCore0 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore1 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore2 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore3 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore4 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore5 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore6 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material MCore7 :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+
+MCore0 :
+
+  position       0,    0 ;
+  dimension   2500, 3500 ;
+
+MCore1 :
+
+  position    2500,    0 ;
+  dimension   2500, 3500 ;
+
+MCore2 :
+
+  position    5000,    0 ;
+  dimension   2500, 3500 ;
+
+MCore3 :
+
+  position    7500,    0 ;
+  dimension   2500, 3500 ;
+
+MCore4 :
+
+  position       0, 6500 ;
+  dimension   2500, 3500 ;
+
+MCore5 :
+
+  position    2500, 6500 ;
+  dimension   2500, 3500 ;
+
+MCore6 :
+
+  position    5000, 6500 ;
+  dimension   2500, 3500 ;
+
+MCore7 :
+
+  position    7500, 6500 ;
+  dimension   2500, 3500 ;
+

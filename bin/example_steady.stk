@@ -25,10 +25,8 @@ microchannel 4rm :
    coolant incoming temperature 300.0 ;
 
 dimensions :
-
-  chip length 10000 , width  10000 ;
-  cell length   200 , width    200 ;
-
+   chip length 10000, width 10000 ;
+   cell length   100, width   100 ;
 
 layer PCB :
    height 10 ;

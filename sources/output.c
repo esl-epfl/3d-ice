@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include <stdlib.h> // For the memory functions malloc/free
+#include <string.h> // For strlen
 
 #include "output.h"
 
