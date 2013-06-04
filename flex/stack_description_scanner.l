@@ -163,6 +163,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "microchannel"               return MICROCHANNEL ;
 "minimum"                    return MINIMUM ;
 "output"                     return OUTPUT ;
+"pcb"                        return PCB ;
 "pin"                        return PIN ;
 "pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
@@ -215,19 +216,24 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 
                      // but we add one place for ‘\0’ when allocating
 
-                     yylval->string =
+                     char *newstring =
 
-                         (String_t) malloc (sizeof(*yylval->string) * (n + 1)) ;
+                         (char *) malloc (sizeof(*yylval->string) * (n + 1)) ;
 
                      // we copy from the character after the first "
 
-                     strncpy (yylval->string,
+                     strncpy (newstring,
                               yytext + (1 * sizeof (*yylval->string)),
                               n * sizeof(*yylval->string)) ;
 
                      // We finally add the ‘\0’ at the and of the string
 
-                     yylval->string [n] = '\0' ;
+                     newstring [n] = '\0' ;
+
+                     string_init      (&yylval->string) ;
+                     string_copy_cstr (&yylval->string, newstring) ;
+
+                     free (newstring) ;
 
                      return PATH ;
                    }

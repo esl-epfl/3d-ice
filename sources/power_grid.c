@@ -52,6 +52,7 @@ void power_grid_init (PowerGrid_t *pgrid)
     pgrid->Sources           = NULL ;
     pgrid->Channel           = NULL ;
     pgrid->HeatSink          = NULL ;
+    pgrid->SecondaryPath     = NULL ;
 }
 
 /******************************************************************************/
@@ -68,7 +69,7 @@ Error_t power_grid_build
 
     pgrid->LayersProfile =
 
-        (StackLayerType_t *) malloc (nlayers * sizeof (StackLayerType_t)) ;
+        (StackLayerType_t *) calloc (nlayers, sizeof (StackLayerType_t)) ;
 
     if (pgrid->LayersProfile == NULL)
 
@@ -76,7 +77,7 @@ Error_t power_grid_build
 
     pgrid->FloorplansProfile =
 
-        (Floorplan_t **) malloc (nlayers * sizeof (Floorplan_t *)) ;
+        (Floorplan_t **) calloc (nlayers, sizeof (Floorplan_t *)) ;
 
     if (pgrid->FloorplansProfile == NULL)
     {
@@ -85,10 +86,14 @@ Error_t power_grid_build
         return TDICE_FAILURE ;
     }
 
-    while (--nlayers != 0)
+    CellIndex_t lindex = 0 ;
+
+    while (lindex != pgrid->NLayers)
     {
-        pgrid->LayersProfile     [nlayers] = TDICE_LAYER_NONE ;
-        pgrid->FloorplansProfile [nlayers] = NULL ;
+        pgrid->LayersProfile     [lindex] = TDICE_LAYER_NONE ;
+        pgrid->FloorplansProfile [lindex] = NULL ;
+
+        lindex++ ;
     }
 
     pgrid->Sources = (Source_t *) calloc (ncells, sizeof(Source_t)) ;
@@ -146,25 +151,39 @@ void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list)
                 CellIndex_t tmp = 0u ;
                 LayerListNode_t *lnd ;
 
-                for (lnd = layer_list_end (&stack_element->Pointer.Die->Layers) ;
+                for (lnd  = layer_list_end (&stack_element->Pointer.Die->Layers) ;
                      lnd != NULL ;
-                     lnd = layer_list_prev (lnd))
+                     lnd  = layer_list_prev (lnd))
                 {
-                    pgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+                    if (pgrid->LayersProfile [index + tmp] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
+
+                        pgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+
+                    pgrid->FloorplansProfile [index + tmp] = NULL ;
 
                     tmp++ ;
                 }
 
                 tmp = stack_element->Pointer.Die->SourceLayerOffset ;
 
-                pgrid->LayersProfile     [index + tmp] = TDICE_LAYER_SOURCE ;
+                if (pgrid->LayersProfile [index + tmp] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
+
+                    pgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
+
+                else
+
+                    pgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
+
                 pgrid->FloorplansProfile [index + tmp] = &stack_element->Pointer.Die->Floorplan ;
 
                 break ;
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
-                pgrid->LayersProfile     [index] = TDICE_LAYER_SOLID ;
+                if (pgrid->LayersProfile [index] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
+
+                    pgrid->LayersProfile [index] = TDICE_LAYER_SOLID ;
+
                 pgrid->FloorplansProfile [index] = NULL ;
 
                 break ;
@@ -255,7 +274,7 @@ void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list)
 
                         break ;
 
-                    case TDICE_CHANNEL_MODEL_NONE :
+                    case TDICE_HEATSINK_MODEL_NONE :
 
                         fprintf (stderr, "WARNING: unset heatsink model\n") ;
 
@@ -263,15 +282,25 @@ void fill_power_grid (PowerGrid_t *pgrid, StackElementList_t *list)
 
                     default :
 
-                        fprintf (stderr,
-                            "WARNING: unknown heatsink model %d\n",
-                            stack_element->Pointer.Channel->ChannelModel) ;
+                        // warning includes heat sink type "secondary path"
 
-                        break ;
+                        fprintf (stderr,
+                           "WARNING: unknown heatsink model %d\n",
+                           pgrid->HeatSink->SinkModel) ;
                 }
 
                 break ;
             }
+
+            case TDICE_STACK_ELEMENT_SECONDARYPATH :
+            {
+                pgrid->SecondaryPath = stack_element->Pointer.HeatSink ;
+
+                pgrid->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
+
+                break ;
+            }
+
             case TDICE_STACK_ELEMENT_NONE :
 
                 fprintf (stderr, "Error! Found stack element with unset type\n") ;
@@ -378,6 +407,58 @@ Error_t update_source_vector
                 break ;
             }
 
+            case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+            {
+                Source_t *tmp = sources ;
+
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                {
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    {
+                        *tmp++ += pgrid->SecondaryPath->AmbientTemperature
+
+                                     * get_conductance_top (thermal_grid,
+                                           dimensions, layer, row, column) ;
+
+                    } // FOR_EVERY_COLUMN
+                } // FOR_EVERY_ROW
+
+                break ;
+            }
+
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+            {
+                Source_t *tmp = sources ;
+
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                {
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    {
+                        *tmp++ += pgrid->SecondaryPath->AmbientTemperature
+
+                                     * get_conductance_top (thermal_grid,
+                                           dimensions, layer, row, column) ;
+
+                    } // FOR_EVERY_COLUMN
+                } // FOR_EVERY_ROW
+
+                Error_t error = fill_sources_floorplan
+
+                    (pgrid->FloorplansProfile [layer], sources) ;
+
+                if (error == TDICE_FAILURE)
+
+                    return TDICE_FAILURE ;
+
+                break ;
+            }
+
             case TDICE_LAYER_CHANNEL_4RM :
             case TDICE_LAYER_CHANNEL_2RM :
             case TDICE_LAYER_PINFINS_INLINE :
@@ -423,12 +504,12 @@ Error_t update_source_vector
 
                 return TDICE_FAILURE ;
 
-            default :
+           default :
 
-                fprintf (stderr, "ERROR: unknown layer type %d\n",
-                    pgrid->LayersProfile [layer]) ;
+               fprintf (stderr, "ERROR: unknown layer type %d\n",
+                   pgrid->LayersProfile [layer]) ;
 
-                return TDICE_FAILURE ;
+               return TDICE_FAILURE ;
         }
     }
 
@@ -480,7 +561,9 @@ void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions)
 
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             case TDICE_LAYER_SINK :
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_SPREADER :
@@ -519,6 +602,7 @@ Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues)
         {
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             {
                 Error_t result = insert_power_values_floorplan
 
@@ -536,6 +620,7 @@ Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues)
             case TDICE_LAYER_PINFINS_INLINE :
             case TDICE_LAYER_PINFINS_STAGGERED :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
             case TDICE_LAYER_SINK :
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_SPREADER :

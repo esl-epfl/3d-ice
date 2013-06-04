@@ -340,7 +340,9 @@ void compute_number_of_connections
 
         default :
 
-            fprintf (stderr, "Error: unknown sihk model %d\n", sink_model) ;
+            // this error includes secondary heat path
+
+            fprintf (stderr, "Error: unknown sink model %d\n", sink_model) ;
     }
 
     CellIndex_t tmp = 2u ;

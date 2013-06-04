@@ -82,6 +82,7 @@ int main (int argc, char** argv)
     char server_ip [MAX_SERVER_IP] ;
 
     SimResult_t sim_result ;
+    Error_t error ;
 
     OutputInstant_t  instant ;
     OutputType_t     type ;
@@ -186,9 +187,9 @@ int main (int argc, char** argv)
 
         receive_message_from_socket (&client_socket, &server_reply) ;
 
-        extract_message_word (&server_reply, &sim_result, 0) ;
+        extract_message_word (&server_reply, &error, 0) ;
 
-        if (sim_result != TDICE_SUCCESS)
+        if (error != TDICE_SUCCESS)
         {
             network_message_destroy (&server_reply) ;
 

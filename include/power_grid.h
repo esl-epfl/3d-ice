@@ -95,6 +95,11 @@ extern "C"
         /*! Pointer to the heat sink structure */
 
         HeatSink_t *HeatSink ;
+
+        /*! Pointer to the heat sink structure for secondary path */
+
+        HeatSink_t *SecondaryPath ;
+
     } ;
 
     /*! Definition of the type PowerGrid_t */

@@ -192,6 +192,10 @@ void stack_element_print
 
             break ;
 
+        case TDICE_STACK_ELEMENT_SECONDARYPATH :
+
+            break ;
+
         case TDICE_STACK_ELEMENT_NONE :
 
             fprintf (stderr, "Warning: found stack element type none\n") ;

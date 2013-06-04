@@ -361,7 +361,8 @@ extern "C"
     {
         TDICE_HEATSINK_MODEL_NONE = 0,               //!< Undefined type
         TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT,  //!< Connection to ambient
-        TDICE_HEATSINK_MODEL_TRADITIONAL             //!< Traditional Heat Sink
+        TDICE_HEATSINK_MODEL_TRADITIONAL,            //!< Traditional Heat Sink
+        TDICE_HEATSINK_MODEL_SECONDARY_PATH          //!< Secondary path through bottom surface
     } ;
 
     /*! The definition of the type HeatSinkModel_t */
@@ -386,6 +387,14 @@ extern "C"
 
 #   define NUM_LAYERS_HEATSINK_TRADITIONAL 2
 
+    /*! \def NUM_LAYERS_HEATSINK_SECONDARY_PATH
+     *
+     *  The number of layers of thermal cells needed to model the
+     *  dissipation through the bottom surface
+     */
+
+#   define NUM_LAYERS_HEATSINK_SECONDARY_PATH 0
+
     /*! \def SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT
      *
      *  The offset (\# layers) within an heat sink of type
@@ -403,6 +412,15 @@ extern "C"
      */
 
 #   define SOURCE_OFFSET_HEATSINK_TRADITIONAL 1
+
+    /*! \def SOURCE_OFFSET_HEATSINK_SECONDARY_PATH
+     *
+     *  The offset (\# layers) within an heat sink of type
+     *  \a TDICE_HEATSINK_MODEL_SECONDARY_PATH to be added to
+     *  the offset of the stack element to locate the source layer
+     */
+
+#   define SOURCE_OFFSET_HEATSINK_SECONDARY_PATH 0
 
 /******************************************************************************/
 
@@ -429,9 +447,17 @@ extern "C"
 
         TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT,
 
+        /*! Solid layer (passive) connected to the pcb to dissipate heat */
+
+        TDICE_LAYER_SOLID_CONNECTED_TO_PCB,
+
         /*! Solid layer (active) connected to the environment to dissipate heat */
 
         TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT,
+
+        /*! Solid layer (active) connected to the pcb to dissipate heat */
+
+        TDICE_LAYER_SOURCE_CONNECTED_TO_PCB,
 
         /*! Spreader layer between the chip and the sink */
 
@@ -471,7 +497,7 @@ extern "C"
 
         /*! Bottom wall layer in Channel/PinFins 2 rm */
 
-        TDICE_LAYER_BOTTOM_WALL,
+        TDICE_LAYER_BOTTOM_WALL
     } ;
 
     /*! The definition of the type StackLayerType_t */
@@ -487,11 +513,12 @@ extern "C"
 
     enum StackElementType_t
     {
-        TDICE_STACK_ELEMENT_NONE = 0,   //!< Undefined type
-        TDICE_STACK_ELEMENT_LAYER   ,   //!< Layer
-        TDICE_STACK_ELEMENT_CHANNEL ,   //!< Channel
-        TDICE_STACK_ELEMENT_DIE     ,   //!< Die
-        TDICE_STACK_ELEMENT_HEATSINK    //!< Heat Sink
+        TDICE_STACK_ELEMENT_NONE = 0,     //!< Undefined type
+        TDICE_STACK_ELEMENT_LAYER   ,     //!< Layer
+        TDICE_STACK_ELEMENT_CHANNEL ,     //!< Channel
+        TDICE_STACK_ELEMENT_DIE     ,     //!< Die
+        TDICE_STACK_ELEMENT_HEATSINK,     //!< Heat Sink
+        TDICE_STACK_ELEMENT_SECONDARYPATH //!< Secondary Path
     } ;
 
     /*! The definition of the type StackElementType_t */

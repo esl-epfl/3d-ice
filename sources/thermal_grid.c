@@ -51,6 +51,7 @@ void thermal_grid_init (ThermalGrid_t *tgrid)
     tgrid->TCProfile        = NULL ;
     tgrid->Channel          = NULL ;
     tgrid->HeatSink         = NULL ;
+    tgrid->SecondaryPath    = NULL ;
 }
 
 /******************************************************************************/
@@ -84,6 +85,18 @@ Error_t thermal_grid_build (ThermalGrid_t *tgrid, Quantity_t size)
         free (tgrid->LayersProfile) ;
 
         return TDICE_FAILURE ;
+    }
+
+    CellIndex_t lindex = 0 ;
+
+    while (lindex != tgrid->Size)
+    {
+        tgrid->LayersProfile [lindex] = TDICE_LAYER_NONE ;
+
+        tgrid->VHCProfile [lindex] = 0.0 ;
+        tgrid->TCProfile  [lindex] = 0.0 ;
+
+        lindex ++ ;
     }
 
     return TDICE_SUCCESS ;
@@ -131,7 +144,10 @@ void fill_thermal_grid
                      lnd != NULL ;
                      lnd  = layer_list_prev (lnd))
                 {
-                    tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+                    if (tgrid->LayersProfile [index + tmp] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
+
+                        tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOLID ;
+
                     tgrid->VHCProfile    [index + tmp] = layer_list_data(lnd)->Material.VolumetricHeatCapacity ;
                     tgrid->TCProfile     [index + tmp] = layer_list_data(lnd)->Material.ThermalConductivity ;
 
@@ -140,13 +156,22 @@ void fill_thermal_grid
 
                 tmp = stack_element->Pointer.Die->SourceLayerOffset ;
 
-                tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
+                if (tgrid->LayersProfile [index + tmp] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
+
+                    tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
+
+                else
+
+                    tgrid->LayersProfile [index + tmp] = TDICE_LAYER_SOURCE ;
 
                 break ;
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
-                tgrid->LayersProfile [index] = TDICE_LAYER_SOLID ;
+                if (tgrid->LayersProfile [index] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
+
+                    tgrid->LayersProfile [index] = TDICE_LAYER_SOLID ;
+
                 tgrid->VHCProfile    [index] = stack_element->Pointer.Layer->Material.VolumetricHeatCapacity ;
                 tgrid->TCProfile     [index] = stack_element->Pointer.Layer->Material.ThermalConductivity ;
 
@@ -275,15 +300,29 @@ void fill_thermal_grid
 
                     default :
 
+                        // warning includes heat sink type "secondary path"
+
                         fprintf (stderr,
-                            "WARNING: unknown heatsink model %d\n",
-                            stack_element->Pointer.Channel->ChannelModel) ;
+                           "WARNING: unknown heatsink model %d\n",
+                            tgrid->HeatSink->SinkModel) ;
 
                         break ;
                 }
 
                 break ;
             }
+
+            case TDICE_STACK_ELEMENT_SECONDARYPATH :
+            {
+                tgrid->SecondaryPath = stack_element->Pointer.HeatSink ;
+
+                tgrid->LayersProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
+                tgrid->VHCProfile    [index] = tgrid->SecondaryPath->SinkMaterial.VolumetricHeatCapacity ;
+                tgrid->TCProfile     [index] = tgrid->SecondaryPath->SinkMaterial.ThermalConductivity ;
+
+                break ;
+            }
+
             case TDICE_STACK_ELEMENT_NONE :
 
                 fprintf (stderr, "Error! Found stack element with unset type\n") ;
@@ -323,6 +362,8 @@ Capacity_t get_capacity
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
         case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SINK :
 
@@ -470,6 +511,8 @@ Conductance_t get_conductance_top
                    ) ;
 
         case TDICE_LAYER_SPREADER :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
@@ -599,6 +642,22 @@ Conductance_t get_conductance_bottom
                     )
                     / (get_cell_height (dimensions, layer_index) / 2.0) ;
 
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+
+            return (  2.0
+                    * tgrid->TCProfile [ layer_index ]
+                    * tgrid->SecondaryPath->AmbientHTC
+                    * get_cell_length (dimensions, column_index)
+                    * get_cell_width  (dimensions, row_index)
+                   )
+                   /
+                   (  get_cell_height (dimensions, layer_index)
+                    * tgrid->SecondaryPath->AmbientHTC
+                    + 2.0
+                    * tgrid->TCProfile [ layer_index ]
+                   ) ;
+
         case TDICE_LAYER_CHANNEL_4RM :
 
             if (IS_CHANNEL_COLUMN (TDICE_CHANNEL_MODEL_MC_4RM, column_index))
@@ -689,8 +748,10 @@ Conductance_t get_conductance_north
     {
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
-            case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
@@ -779,6 +840,8 @@ Conductance_t get_conductance_south
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_length (dimensions, column_index)
@@ -867,6 +930,8 @@ Conductance_t get_conductance_east
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_width  (dimensions, row_index)
@@ -942,6 +1007,8 @@ Conductance_t get_conductance_west
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (  tgrid->TCProfile [ layer_index ]
                     * get_cell_width  (dimensions, row_index)

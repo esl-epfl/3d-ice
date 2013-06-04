@@ -415,6 +415,13 @@ skip_west :
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
 
+    else if (   thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB
+             || thermal_grid->LayersProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_PCB)
+
+        *sysmatrix.Values += get_conductance_bottom
+
+            (thermal_grid, dimensions, layer_index, row_index, column_index) ;
+
     diagonal_pointer = sysmatrix.Values++ ;
 
     (*sysmatrix.ColumnPointers)++ ;
@@ -1457,6 +1464,8 @@ void fill_system_matrix
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             case TDICE_LAYER_SPREADER :
             case TDICE_LAYER_SINK :
             {

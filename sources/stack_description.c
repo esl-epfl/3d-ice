@@ -44,9 +44,10 @@ void stack_description_init (StackDescription_t *stkd)
 {
     string_init (&stkd->FileName) ;
 
-    stkd->HeatSink   = NULL ;
-    stkd->Channel    = NULL ;
-    stkd->Dimensions = NULL ;
+    stkd->HeatSink      = NULL ;
+    stkd->SecondaryPath = NULL ;
+    stkd->Channel       = NULL ;
+    stkd->Dimensions    = NULL ;
 
          material_list_init (&stkd->Materials) ;
             layer_list_init (&stkd->Layers) ;
@@ -61,6 +62,7 @@ void stack_description_destroy (StackDescription_t *stkd)
     string_destroy (&stkd->FileName) ;
 
     heat_sink_free  (stkd->HeatSink) ;
+    heat_sink_free  (stkd->SecondaryPath) ;
     channel_free    (stkd->Channel) ;
     dimensions_free (stkd->Dimensions) ;
 
@@ -86,6 +88,13 @@ void stack_description_print
     if (stkd->HeatSink != NULL)
     {
         heat_sink_print (stkd->HeatSink, stream, prefix) ;
+
+        fprintf (stream, "%s\n", prefix) ;
+    }
+
+    if (stkd->SecondaryPath != NULL)
+    {
+        heat_sink_print (stkd->SecondaryPath, stream, prefix) ;
 
         fprintf (stream, "%s\n", prefix) ;
     }

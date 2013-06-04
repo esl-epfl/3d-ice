@@ -91,6 +91,10 @@ extern "C"
         /*! Pointer to the heat sink structure */
 
         HeatSink_t *HeatSink ;
+
+        /*! Pointer to the secondary path heat sink structure */
+
+        HeatSink_t *SecondaryPath ;
     } ;
 
     /*! Definition of the type ThermalGrid_t */

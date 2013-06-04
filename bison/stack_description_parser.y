@@ -153,6 +153,7 @@
 %token MICROCHANNEL          "keyword microchannel"
 %token MINIMUM               "keyword minimum"
 %token OUTPUT                "keyword output"
+%token PCB                   "keyword pcb"
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
@@ -231,6 +232,7 @@ stack_description_file
 
   : materials_list
     heat_sink_opt
+    pcb_opt
     microchannel_opt
     layers_list_opt
     dies_list
@@ -441,6 +443,31 @@ heat_sink_opt
         stkd->HeatSink->SourceLayerOffset  = SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT ;
         stkd->HeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
         stkd->HeatSink->AmbientTemperature = $12 ;
+    }
+  ;
+
+pcb_opt
+
+  : // Declaring the heat sink section is not mandatory
+
+  | CONNECTION TO PCB ':'
+        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
+        AMBIENT TEMPERATURE       DVALUE ';'  // $12
+    {
+        stkd->SecondaryPath = heat_sink_calloc () ;
+
+        if (stkd->SecondaryPath == NULL)
+        {
+            STKERROR ("Malloc heat sink failed") ;
+
+            YYABORT ;
+        }
+
+        stkd->SecondaryPath->SinkModel          = TDICE_HEATSINK_MODEL_SECONDARY_PATH ;
+        stkd->SecondaryPath->NLayers            = NUM_LAYERS_HEATSINK_SECONDARY_PATH ;
+        stkd->SecondaryPath->SourceLayerOffset  = SOURCE_OFFSET_HEATSINK_SECONDARY_PATH ;
+        stkd->SecondaryPath->AmbientHTC         = (AmbientHTC_t) $8 ;
+        stkd->SecondaryPath->AmbientTemperature = $12 ;
     }
   ;
 
@@ -1048,9 +1075,9 @@ stack
             YYABORT ;
         }
 
-        if (stkd->HeatSink == NULL && stkd->Channel == NULL)
+        if (stkd->HeatSink == NULL && stkd->SecondaryPath == NULL && stkd->Channel == NULL)
 
-            fprintf (stderr, "Warning: neither heat sink nor channel has been declared\n") ;
+            fprintf (stderr, "Warning: no dissipation has been declared\n") ;
 
         if (stkd->HeatSink != NULL)
         {
@@ -1083,6 +1110,42 @@ stack
             stack_element.NLayers          = stkd->HeatSink->NLayers ;
 
             stack_element_list_insert_begin (&stkd->StackElements, &stack_element) ;
+
+            stack_element_destroy (&stack_element) ;
+        }
+
+        if (stkd->SecondaryPath != NULL)
+        {
+            if (stkd->SecondaryPath->SinkModel != TDICE_HEATSINK_MODEL_SECONDARY_PATH)
+
+                fprintf (stderr, "This is a big error ....\n") ;
+
+            if (bmost->Type == TDICE_STACK_ELEMENT_LAYER)
+            {
+                material_copy (
+                     &stkd->SecondaryPath->SinkMaterial,
+                     &bmost->Pointer.Layer->Material) ;
+            }
+            else
+            {
+                material_copy (
+                    &stkd->SecondaryPath->SinkMaterial,
+                    &layer_list_data (layer_list_end (&bmost->Pointer.Die->Layers))->Material) ;
+            }
+
+            // Creates an extra stack element to be add in the 3d stack
+
+            StackElement_t stack_element ;
+
+            stack_element_init (&stack_element) ;
+
+            string_copy_cstr (&stack_element.Id, "Secondary") ;
+
+            stack_element.Type             = TDICE_STACK_ELEMENT_SECONDARYPATH ;
+            stack_element.Pointer.HeatSink = stkd->SecondaryPath ;
+            stack_element.NLayers          = stkd->SecondaryPath->NLayers ;
+
+            stack_element_list_insert_end (&stkd->StackElements, &stack_element) ;
 
             stack_element_destroy (&stack_element) ;
         }
@@ -1175,6 +1238,12 @@ stack
 
                         = stkd->HeatSink->SinkHeight ;
                 }
+            }
+            else if (stk_el_->Type == TDICE_STACK_ELEMENT_SECONDARYPATH)
+            {
+                if (stkd->SecondaryPath->SinkModel != TDICE_HEATSINK_MODEL_SECONDARY_PATH)
+
+                    fprintf (stderr, "This is a big error ....\n") ;
             }
             else
             {

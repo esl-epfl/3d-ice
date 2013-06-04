@@ -81,6 +81,10 @@ extern "C"
 
         HeatSink_t *HeatSink ;
 
+        /*! Information about the heat dissipation throught the bottom surface */
+
+        HeatSink_t *SecondaryPath ;
+
         /*! Information about the type of channel used in the 3d stack */
 
         Channel_t *Channel ;
