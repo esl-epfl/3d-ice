@@ -62,12 +62,6 @@ CompareTemperatures: CompareTemperatures.o
 
 runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-ICE-Emulator
 	@echo "Comparison of system matrices ...."
-	@echo -n "solid transient : "
-	@./GenerateSystemMatrix solid/transient/1die_four_elements.stk tr_solid.txt
-	@./CompareSystemMatrix  tr_solid.txt solid/transient/system_matrix.txt
-	@echo -n "solid steady    : "
-	@./GenerateSystemMatrix solid/steady/1die_four_elements.stk st_solid.txt
-	@./CompareSystemMatrix  st_solid.txt solid/steady/system_matrix.txt
 	@echo -n "mc4rm transient : "
 	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk tr_4rm.txt
 	@./CompareSystemMatrix  tr_4rm.txt mc4rm/transient/system_matrix.txt
@@ -89,20 +83,6 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-
 	@echo ""
 	@echo "Comparison of transient results ...."
 	@echo "------------------------------------"
-	@echo "solid 4e"
-	@echo "--------"
-	@../bin/3D-ICE-Emulator solid/transient/1die_four_elements.stk
-	@./CompareTemperatures solid/transient/four_elements_node1.txt \
-                               solid/transient/four_elements_node2.txt \
-                               solid/transient/output_four_elements.txt
-	@echo "--------"
-	@echo "solid bg"
-	@echo "--------"
-	@../bin/3D-ICE-Emulator solid/transient/1die_background.stk
-	@./CompareTemperatures solid/transient/background_node1.txt  \
-                               solid/transient/background_node2.txt  \
-                               solid/transient/output_background.txt
-	@echo "--------"
 	@echo "mc4rm 4e"
 	@echo "--------"
 	@../bin/3D-ICE-Emulator mc4rm/transient/2dies_four_elements.stk
@@ -147,20 +127,6 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-
 	@echo ""
 	@echo "Comparison of steady state results ...."
 	@echo "---------------------------------------"
-	@echo "solid 4e"
-	@echo "--------"
-	@../bin/3D-ICE-Emulator solid/steady/1die_four_elements.stk
-	@./CompareTemperatures solid/steady/four_elements_node1.txt \
-                               solid/steady/four_elements_node2.txt \
-                               solid/steady/output_four_elements.txt
-	@echo "--------"
-	@echo "solid bg"
-	@echo "--------"
-	@../bin/3D-ICE-Emulator solid/steady/1die_background.stk
-	@./CompareTemperatures solid/steady/background_node1.txt  \
-                               solid/steady/background_node2.txt  \
-                               solid/steady/output_background.txt
-	@echo "--------"
 	@echo "mc4rm 4e"
 	@echo "--------"
 	@../bin/3D-ICE-Emulator mc4rm/steady/2dies_four_elements.stk

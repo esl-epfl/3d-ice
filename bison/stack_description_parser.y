@@ -122,7 +122,6 @@
 %token _2RM                  "keyword 2rm"
 %token _4RM                  "keyword 4rm"
 %token AMBIENT               "keyword ambient"
-%token AREA                  "keyword area"
 %token AVERAGE               "keyword average"
 %token BOTTOM                "keyword bottom"
 %token CAPACITY              "keyword capacity"
@@ -163,11 +162,9 @@
 %token PMAP                  "keyword Pmap"
 %token RATE                  "keyword rate"
 %token SIDE                  "keyword side"
-%token SINK                  "keywork sink"
 %token SLOT                  "keyword slot"
 %token SOLVER                "keyword solver"
 %token SOURCE                "keyword source"
-%token SPREADER              "keyword spreader"
 %token STACK                 "keyword stack"
 %token STAGGERED             "keyword staggered"
 %token STATE                 "keyword state"
@@ -234,7 +231,7 @@
 stack_description_file
 
   : materials_list
-    heat_sink_opt
+    ambient_opt
     pcb_opt
     microchannel_opt
     dimensions
@@ -307,126 +304,9 @@ material
 /******************************* Heatsink *************************************/
 /******************************************************************************/
 
-heat_sink_opt
+ambient_opt
 
-  : // Declaring the heat sink section is not mandatory
-
-  | HEAT SINK ':'
-        SINK     HEIGHT   DVALUE     ',' // $6
-                 AREA     DVALUE     ',' // $9
-                 MATERIAL IDENTIFIER ';' // $12
-        SPREADER HEIGHT   DVALUE     ',' // $16
-                 AREA     DVALUE     ',' // $19
-                 MATERIAL IDENTIFIER ';' // $22
-        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $27
-        AMBIENT TEMPERATURE       DVALUE ';'  // $31
-    {
-        stkd->HeatSink = heat_sink_calloc () ;
-
-        if (stkd->HeatSink == NULL)
-        {
-            STKERROR ("Malloc heat sink failed") ;
-
-            string_destroy (&$12) ;
-            string_destroy (&$22) ;
-
-            YYABORT ;
-        }
-
-        stkd->HeatSink->SinkModel           = TDICE_HEATSINK_MODEL_TRADITIONAL ;
-        stkd->HeatSink->NLayers             = NUM_LAYERS_HEATSINK_TRADITIONAL ;
-        stkd->HeatSink->SourceLayerOffset   = SOURCE_OFFSET_HEATSINK_TRADITIONAL ;
-        stkd->HeatSink->SinkHeight          = $6 ;
-        stkd->HeatSink->SinkArea            = $9 ;
-
-        string_copy (&stkd->HeatSink->SinkMaterial.Id, &$12) ;
-
-        stkd->HeatSink->SpreaderHeight      = $16 ;
-        stkd->HeatSink->SpreaderArea        = $19 ;
-
-        string_copy (&stkd->HeatSink->SpreaderMaterial.Id, &$22) ;
-
-        stkd->HeatSink->AmbientHTC          = (AmbientHTC_t) $27 ;
-        stkd->HeatSink->AmbientTemperature  = $31 ;
-
-        if (stkd->HeatSink->SinkArea <= 0)
-        {
-            sprintf (error_message,
-                "Error: the area of the sink must be a positive value!") ;
-
-            free ($12) ;
-            free ($22) ;
-
-            STKERROR (error_message) ;
-
-            YYABORT ;
-        }
-
-        if (stkd->HeatSink->SpreaderArea <= 0)
-        {
-            sprintf (error_message,
-                "Error: the area of the spreader must be a positive value!") ;
-
-            free ($12) ;
-            free ($22) ;
-
-            STKERROR (error_message) ;
-
-            YYABORT ;
-        }
-
-        if (stkd->HeatSink->SinkArea < stkd->HeatSink->SpreaderArea)
-        {
-            sprintf (error_message,
-                "Error: the area of the spreader must be smaller than the sink") ;
-
-            STKERROR (error_message) ;
-
-            string_destroy (&$12) ;
-            string_destroy (&$22) ;
-
-            YYABORT ;
-        }
-
-        Material_t *tmp = material_list_find
-
-            (&stkd->Materials, &stkd->HeatSink->SinkMaterial) ;
-
-        if (tmp == NULL)
-        {
-            sprintf (error_message, "Unknown sink material %s", $12) ;
-
-            STKERROR (error_message) ;
-
-            string_destroy (&$12) ;
-            string_destroy (&$22) ;
-
-            YYABORT ;
-        }
-
-        material_copy (&stkd->HeatSink->SinkMaterial, tmp) ;
-
-        tmp = material_list_find
-
-            (&stkd->Materials, &stkd->HeatSink->SpreaderMaterial) ;
-
-        if (tmp == NULL)
-        {
-            sprintf (error_message, "Unknown spreader material %s", $22) ;
-
-            STKERROR (error_message) ;
-
-            string_destroy (&$12) ;
-            string_destroy (&$22) ;
-
-            YYABORT ;
-        }
-
-        material_copy (&stkd->HeatSink->SpreaderMaterial, tmp) ;
-
-        string_destroy (&$12) ;
-        string_destroy (&$22) ;
-    }
+  : // Declaring this section is not mandatory
 
   | CONNECTION TO AMBIENT ':'
         HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
@@ -442,8 +322,6 @@ heat_sink_opt
         }
 
         stkd->HeatSink->SinkModel          = TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT ;
-        stkd->HeatSink->NLayers            = NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT ;
-        stkd->HeatSink->SourceLayerOffset  = SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT ;
         stkd->HeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
         stkd->HeatSink->AmbientTemperature = $12 ;
     }
@@ -451,7 +329,7 @@ heat_sink_opt
 
 pcb_opt
 
-  : // Declaring the heat sink section is not mandatory
+  : // Declaring this section is not mandatory
 
   | CONNECTION TO PCB ':'
         HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
@@ -466,9 +344,7 @@ pcb_opt
             YYABORT ;
         }
 
-        stkd->SecondaryPath->SinkModel          = TDICE_HEATSINK_MODEL_SECONDARY_PATH ;
-        stkd->SecondaryPath->NLayers            = NUM_LAYERS_HEATSINK_SECONDARY_PATH ;
-        stkd->SecondaryPath->SourceLayerOffset  = SOURCE_OFFSET_HEATSINK_SECONDARY_PATH ;
+        stkd->SecondaryPath->SinkModel          = TDICE_HEATSINK_MODEL_CONNECTION_TO_PCB ;
         stkd->SecondaryPath->AmbientHTC         = (AmbientHTC_t) $8 ;
         stkd->SecondaryPath->AmbientTemperature = $12 ;
     }
@@ -1122,20 +998,6 @@ dimensions
                 stkd->Channel->NChannels = (($5 / stkd->Channel->Pitch) + 0.5) ; // round function
             }
         }
-
-        // Check if the spreader is larger than the chip
-
-        if (   stkd->HeatSink != NULL
-            && stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_TRADITIONAL
-            && stkd->HeatSink->SpreaderArea < get_chip_area (stkd->Dimensions))
-        {
-            sprintf (error_message,
-                "Error: the area of the spreader must be smaller than the chip") ;
-
-            STKERROR (error_message) ;
-
-            YYABORT ;
-        }
     }
   ;
 
@@ -1171,21 +1033,9 @@ stack
 
         if (stkd->HeatSink != NULL)
         {
-            if (stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
-            {
-                if (tmost->Type == TDICE_STACK_ELEMENT_LAYER)
-                {
-                    material_copy (
-                         &stkd->HeatSink->SinkMaterial,
-                         &tmost->Pointer.Layer->Material) ;
-                }
-                else
-                {
-                    material_copy (
-                        &stkd->HeatSink->SinkMaterial,
-                        &layer_list_data (layer_list_begin (&tmost->Pointer.Die->Layers))->Material) ;
-                }
-            }
+            if (stkd->HeatSink->SinkModel != TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
+
+                fprintf (stderr, "This is a big error ....\n") ;
 
             // Creates an extra stack element to be add in the 3d stack
 
@@ -1193,11 +1043,11 @@ stack
 
             stack_element_init (&stack_element) ;
 
-            string_copy_cstr (&stack_element.Id, "Ambient") ;
+            string_copy_cstr (&stack_element.Id, "ConnectionToAmbient") ;
 
             stack_element.Type             = TDICE_STACK_ELEMENT_HEATSINK ;
             stack_element.Pointer.HeatSink = stkd->HeatSink ;
-            stack_element.NLayers          = stkd->HeatSink->NLayers ;
+            stack_element.NLayers          = 0u ;
 
             stack_element_list_insert_begin (&stkd->StackElements, &stack_element) ;
 
@@ -1206,22 +1056,9 @@ stack
 
         if (stkd->SecondaryPath != NULL)
         {
-            if (stkd->SecondaryPath->SinkModel != TDICE_HEATSINK_MODEL_SECONDARY_PATH)
+            if (stkd->SecondaryPath->SinkModel != TDICE_HEATSINK_MODEL_CONNECTION_TO_PCB)
 
                 fprintf (stderr, "This is a big error ....\n") ;
-
-            if (bmost->Type == TDICE_STACK_ELEMENT_LAYER)
-            {
-                material_copy (
-                     &stkd->SecondaryPath->SinkMaterial,
-                     &bmost->Pointer.Layer->Material) ;
-            }
-            else
-            {
-                material_copy (
-                    &stkd->SecondaryPath->SinkMaterial,
-                    &layer_list_data (layer_list_end (&bmost->Pointer.Die->Layers))->Material) ;
-            }
 
             // Creates an extra stack element to be add in the 3d stack
 
@@ -1229,11 +1066,11 @@ stack
 
             stack_element_init (&stack_element) ;
 
-            string_copy_cstr (&stack_element.Id, "Secondary") ;
+            string_copy_cstr (&stack_element.Id, "ConnectionToPCB") ;
 
             stack_element.Type             = TDICE_STACK_ELEMENT_SECONDARYPATH ;
             stack_element.Pointer.HeatSink = stkd->SecondaryPath ;
-            stack_element.NLayers          = stkd->SecondaryPath->NLayers ;
+            stack_element.NLayers          = 0u ;
 
             stack_element_list_insert_end (&stkd->StackElements, &stack_element) ;
 
@@ -1318,20 +1155,7 @@ stack
             }
             else if (stk_el_->Type == TDICE_STACK_ELEMENT_HEATSINK)
             {
-                if (stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_TRADITIONAL)
-                {
-                    stkd->Dimensions->Cell.Heights [ layer_index++ ]
-
-                        = stkd->HeatSink->SpreaderHeight ;
-
-                    stkd->Dimensions->Cell.Heights [ layer_index++ ]
-
-                        = stkd->HeatSink->SinkHeight ;
-                }
-            }
-            else if (stk_el_->Type == TDICE_STACK_ELEMENT_SECONDARYPATH)
-            {
-                if (stkd->SecondaryPath->SinkModel != TDICE_HEATSINK_MODEL_SECONDARY_PATH)
+                if (stkd->SecondaryPath->SinkModel == TDICE_HEATSINK_MODEL_NONE)
 
                     fprintf (stderr, "This is a big error ....\n") ;
             }
@@ -1368,13 +1192,9 @@ stack
                              TDICE_CHANNEL_MODEL_NONE    :
                              stkd->Channel->ChannelModel ;
 
-        HeatSinkModel_t hm = stkd->HeatSink == NULL    ?
-                             TDICE_HEATSINK_MODEL_NONE :
-                             stkd->HeatSink->SinkModel ;
-
         compute_number_of_connections
 
-            (stkd->Dimensions, num_channels, cm, hm) ;
+            (stkd->Dimensions, num_channels, cm) ;
    }
   ;
 

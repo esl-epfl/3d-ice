@@ -313,15 +313,6 @@ void power_grid_fill
 
                         break ;
 
-                    case TDICE_HEATSINK_MODEL_TRADITIONAL :
-
-                        pgrid->LayersTypeProfile [index    ] = TDICE_LAYER_SPREADER ;
-                        pgrid->LayersTypeProfile [index + 1] = TDICE_LAYER_SINK ;
-
-                        lastLayer = index + 1 ;
-
-                        break ;
-
                     case TDICE_HEATSINK_MODEL_NONE :
 
                         fprintf (stderr, "WARNING: unset heatsink model\n") ;
@@ -455,7 +446,6 @@ Error_t update_source_vector
             }
 
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-            case TDICE_LAYER_SINK :
             {
                 Source_t  *tmpS = sources ;
                 SolidTC_t *tmpT = pgrid->HeatSinkTopTcs ;
@@ -562,7 +552,6 @@ Error_t update_source_vector
             }
 
             case TDICE_LAYER_SOLID :
-            case TDICE_LAYER_SPREADER :
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :
             case TDICE_LAYER_TOP_WALL :
@@ -636,9 +625,7 @@ void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions)
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
-            case TDICE_LAYER_SINK :
             case TDICE_LAYER_SOLID :
-            case TDICE_LAYER_SPREADER :
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :
             case TDICE_LAYER_TOP_WALL :
@@ -693,9 +680,7 @@ Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues)
             case TDICE_LAYER_PINFINS_STAGGERED :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
-            case TDICE_LAYER_SINK :
             case TDICE_LAYER_SOLID :
-            case TDICE_LAYER_SPREADER :
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :
             case TDICE_LAYER_TOP_WALL :

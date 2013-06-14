@@ -305,8 +305,7 @@ void compute_number_of_connections
 (
     Dimensions_t   *dimensions,
     Quantity_t      num_channels,
-    ChannelModel_t  channel_model,
-    HeatSinkModel_t sink_model
+    ChannelModel_t  channel_model
 )
 {
     CellIndex_t nlayers  = dimensions->Grid.NLayers ;
@@ -315,35 +314,6 @@ void compute_number_of_connections
 
     CellIndex_t nlayers_for_channel    = num_channels * NUM_LAYERS_CHANNEL_2RM ;
     CellIndex_t nlayers_except_channel = nlayers - nlayers_for_channel ;
-
-    CellIndex_t nlayers_heatsink = 0u ;
-
-    switch (sink_model)
-    {
-        case TDICE_HEATSINK_MODEL_NONE :
-
-            nlayers_heatsink = 0u ;
-
-            break ;
-
-        case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
-
-            nlayers_heatsink = NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT ;
-
-            break ;
-
-        case TDICE_HEATSINK_MODEL_TRADITIONAL :
-
-            nlayers_heatsink = NUM_LAYERS_HEATSINK_TRADITIONAL ;
-
-            break ;
-
-        default :
-
-            // this error includes secondary heat path
-
-            fprintf (stderr, "Error: unknown sink model %d\n", sink_model) ;
-    }
 
     CellIndex_t tmp = 2u ;
 
@@ -363,10 +333,10 @@ void compute_number_of_connections
                 2 * (nlayers - 1) * nrows * ncolumns
                 +
                 // Number of coefficients North <-> South
-                2 * (nlayers - nlayers_heatsink) * (nrows - 1) * ncolumns
+                2 * nlayers * (nrows - 1) * ncolumns
                 +
                 // Number of coefficients East <-> West
-                2 * (nlayers - nlayers_heatsink) * nrows * (ncolumns - 1) ;
+                2 * nlayers * nrows * (ncolumns - 1) ;
 
             break ;
         }
@@ -388,10 +358,10 @@ void compute_number_of_connections
                 2 * nlayers_except_channel * nrows * ncolumns
                 +
                 // Number of coefficients North <-> South
-                2 * (nlayers_except_channel - nlayers_heatsink) * (nrows - 1) * ncolumns
+                2 * nlayers_except_channel * (nrows - 1) * ncolumns
                 +
                 // Number of coefficients East <-> West
-                2 * (nlayers_except_channel - nlayers_heatsink) * nrows * (ncolumns - 1)
+                2 * nlayers_except_channel * nrows * (ncolumns - 1)
                 +
 
                 // For Channel Cells

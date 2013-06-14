@@ -115,7 +115,7 @@ Error_t thermal_data_build
         return TDICE_FAILURE ;
     }
 
-    thermal_grid_fill (&tdata->ThermalGrid, stack_elements_list, dimensions) ;
+    thermal_grid_fill (&tdata->ThermalGrid, stack_elements_list) ;
 
     /* Alloc and fill the power grid */
 

@@ -322,11 +322,7 @@ skip_bottom :
 
     /********************************* SOUTH **********************************/
 
-    if (   row_index == first_row (dimensions)
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
-
-        goto skip_south ;
+    if (row_index == first_row (dimensions))    goto skip_south ;
 
     *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -357,11 +353,7 @@ skip_south :
 
     /********************************* WEST ***********************************/
 
-    if (   column_index == first_column (dimensions)
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
-
-        goto skip_west ;
+    if (column_index == first_column (dimensions))    goto skip_west ;
 
     *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -407,8 +399,7 @@ skip_west :
         *sysmatrix.Values /= analysis->StepTime ;
     }
 
-    if (   thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
+    if (   thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
         || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
 
         *sysmatrix.Values += get_conductance_top
@@ -434,11 +425,7 @@ skip_west :
 
     /********************************* EAST ***********************************/
 
-    if (   column_index == last_column (dimensions)
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
-
-        goto skip_east ;
+    if (column_index == last_column (dimensions))    goto skip_east ;
 
     *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -469,11 +456,7 @@ skip_east :
 
     /********************************* NORTH **********************************/
 
-    if (   row_index == last_row (dimensions)
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SPREADER
-        || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SINK)
-
-        goto skip_north ;
+    if (row_index == last_row (dimensions))    goto skip_north ;
 
     *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -504,9 +487,7 @@ skip_north :
 
     /********************************* TOP ************************************/
 
-    if (layer_index == last_layer (dimensions))
-
-        goto skip_top ;
+    if (layer_index == last_layer (dimensions))    goto skip_top ;
 
     *sysmatrix.RowIndices++ = get_cell_offset_in_stack
 
@@ -1466,8 +1447,6 @@ void fill_system_matrix
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
-            case TDICE_LAYER_SPREADER :
-            case TDICE_LAYER_SINK :
             {
 
                 CellIndex_t row ;

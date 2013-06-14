@@ -130,7 +130,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "2rm"                        return _2RM ;
 "4rm"                        return _4RM ;
 "ambient"                    return AMBIENT ;
-"area"                       return AREA ;
 "average"                    return AVERAGE ;
 "bottom"                     return BOTTOM ;
 "capacity"                   return CAPACITY ;
@@ -171,11 +170,9 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "Pmap"                       return PMAP ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;
-"sink"                       return SINK ;
 "slot"                       return SLOT ;
 "solver"                     return SOLVER ;
 "source"                     return SOURCE ;
-"spreader"                   return SPREADER ;
 "stack"                      return STACK ;
 "staggered"                  return STAGGERED ;
 "state"                      return STATE ;

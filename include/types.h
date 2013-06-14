@@ -360,67 +360,13 @@ extern "C"
     enum HeatSinkModel_t
     {
         TDICE_HEATSINK_MODEL_NONE = 0,               //!< Undefined type
-        TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT,  //!< Connection to ambient
-        TDICE_HEATSINK_MODEL_TRADITIONAL,            //!< Traditional Heat Sink
-        TDICE_HEATSINK_MODEL_SECONDARY_PATH          //!< Secondary path through bottom surface
+        TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT,  //!< Connection to ambient (top-most layer)
+        TDICE_HEATSINK_MODEL_CONNECTION_TO_PCB       //!< Connection to PCB (bottom-most layer)
     } ;
 
     /*! The definition of the type HeatSinkModel_t */
 
     typedef enum HeatSinkModel_t HeatSinkModel_t ;
-
-
-
-    /*! \def NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT
-     *
-     *  The number of layers of thermal cells needed to model the
-     * connection of the top layer to the enviroment
-     */
-
-#   define NUM_LAYERS_HEATSINK_CONNECTION_TO_AMBIENT 0
-
-    /*! \def NUM_LAYERS_HEATSINK_TRADITIONAL
-     *
-     *  The number of layers of thermal cells needed to model the
-     *  heat sink made with spreader and sink
-     */
-
-#   define NUM_LAYERS_HEATSINK_TRADITIONAL 2
-
-    /*! \def NUM_LAYERS_HEATSINK_SECONDARY_PATH
-     *
-     *  The number of layers of thermal cells needed to model the
-     *  dissipation through the bottom surface
-     */
-
-#   define NUM_LAYERS_HEATSINK_SECONDARY_PATH 0
-
-    /*! \def SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT
-     *
-     *  The offset (\# layers) within an heat sink of type
-     *  \a TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT to be added
-     *  to the offset of the stack element to locate the source layer
-     */
-
-#   define SOURCE_OFFSET_HEATSINK_CONNECTION_TO_AMBIENT 0
-
-    /*! \def SOURCE_OFFSET_HEATSINK_TRADITIONAL
-     *
-     *  The offset (\# layers) within an heat sink of type
-     *  \a TDICE_HEATSINK_MODEL_TRADITIONAL to be added to
-     *  the offset of the stack element to locate the source layer
-     */
-
-#   define SOURCE_OFFSET_HEATSINK_TRADITIONAL 1
-
-    /*! \def SOURCE_OFFSET_HEATSINK_SECONDARY_PATH
-     *
-     *  The offset (\# layers) within an heat sink of type
-     *  \a TDICE_HEATSINK_MODEL_SECONDARY_PATH to be added to
-     *  the offset of the stack element to locate the source layer
-     */
-
-#   define SOURCE_OFFSET_HEATSINK_SECONDARY_PATH 0
 
 /******************************************************************************/
 
@@ -458,14 +404,6 @@ extern "C"
         /*! Solid layer (active) connected to the pcb to dissipate heat */
 
         TDICE_LAYER_SOURCE_CONNECTED_TO_PCB,
-
-        /*! Spreader layer between the chip and the sink */
-
-        TDICE_LAYER_SPREADER,
-
-        /*! Sink layer between the spreader and the environment */
-
-        TDICE_LAYER_SINK,
 
         /*! Liquid layer in Channel 4 resistors model */
 

@@ -434,15 +434,13 @@ extern "C"
      *  \param dimensions    the address of the dimensions structure
      *  \param num_channels  number of channels (as stack element) in the stack
      *  \param channel_model the model of the channel used in the stack
-     *  \param sink_model    the model of the heat sink used in the stack
      */
 
     void compute_number_of_connections
     (
         Dimensions_t   *dimensions,
         Quantity_t      num_channels,
-        ChannelModel_t  channel_model,
-        HeatSinkModel_t sink_model
+        ChannelModel_t  channel_model
     ) ;
 
 

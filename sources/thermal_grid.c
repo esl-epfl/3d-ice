@@ -113,12 +113,7 @@ void thermal_grid_destroy (ThermalGrid_t *tgrid)
 
 /******************************************************************************/
 
-void thermal_grid_fill
-(
-    ThermalGrid_t      *tgrid,
-    StackElementList_t *list,
-    Dimensions_t       *dimensions
-)
+void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 {
     StackElementListNode_t *stkeln ;
 
@@ -127,8 +122,6 @@ void thermal_grid_fill
          stkeln  = stack_element_list_prev (stkeln))
     {
         StackElement_t *stack_element = stack_element_list_data (stkeln) ;
-
-        Layer_t tmplayer ;
 
         CellIndex_t index = stack_element->Offset ;
 
@@ -180,6 +173,8 @@ void thermal_grid_fill
                 tgrid->Channel = stack_element->Pointer.Channel ;
 
                 // Stores the wall material as a new layer (without ID and layout)
+
+                Layer_t tmplayer ;
 
                 layer_init (&tmplayer) ;
 
@@ -267,60 +262,6 @@ void thermal_grid_fill
 
                             fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
 
-                        layer_init (&tmplayer) ;
-
-                        material_copy (&(tmplayer.Material), &(tgrid->HeatSink->SinkMaterial)) ;
-
-                        layer_copy (tgrid->LayersProfile + index, &tmplayer) ;
-
-                        layer_destroy (&tmplayer) ;
-
-                        break ;
-
-                    case TDICE_HEATSINK_MODEL_TRADITIONAL :
-
-                        tgrid->LayersTypeProfile [index] = TDICE_LAYER_SPREADER ;
-
-                        layer_init (&tmplayer) ;
-
-                        tmplayer.Height = tgrid->HeatSink->SpreaderHeight ;
-
-                        material_copy (&(tmplayer.Material), &(tgrid->HeatSink->SpreaderMaterial)) ;
-
-                        tmplayer.Material.VolumetricHeatCapacity =
-
-                            get_spreader_volumetric_heat_capacity (tgrid->HeatSink, get_chip_area(dimensions)) ;
-
-                        tmplayer.Material.ThermalConductivity =
-
-                            get_spreader_thermal_conductivity (tgrid->HeatSink, get_chip_area(dimensions)) ;
-
-                        layer_copy (tgrid->LayersProfile + index, &tmplayer) ;
-
-                        layer_destroy (&tmplayer) ;
-
-                        ////////////////////////////////////////////////////////
-
-                        tgrid->LayersTypeProfile [index + 1] = TDICE_LAYER_SINK ;
-
-                        layer_init (&tmplayer) ;
-
-                        tmplayer.Height = tgrid->HeatSink->SinkHeight ;
-
-                        material_copy (&(tmplayer.Material), &(tgrid->HeatSink->SinkMaterial)) ;
-
-                        tmplayer.Material.VolumetricHeatCapacity =
-
-                            get_sink_volumetric_heat_capacity (tgrid->HeatSink, get_chip_area(dimensions)) ;
-
-                        tmplayer.Material.ThermalConductivity =
-
-                            get_sink_thermal_conductivity (tgrid->HeatSink, get_chip_area(dimensions)) ;
-
-                        layer_copy (tgrid->LayersProfile + index + 1, &tmplayer) ;
-
-                        layer_destroy (&tmplayer) ;
-
                         break ;
 
                     case TDICE_HEATSINK_MODEL_NONE :
@@ -348,14 +289,6 @@ void thermal_grid_fill
                 tgrid->SecondaryPath = stack_element->Pointer.HeatSink ;
 
                 tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
-
-                layer_init (&tmplayer) ;
-
-                material_copy (&(tmplayer.Material), &(tgrid->SecondaryPath->SinkMaterial)) ;
-
-                layer_copy (tgrid->LayersProfile + index, &tmplayer) ;
-
-                layer_destroy (&tmplayer) ;
 
                 break ;
             }
@@ -401,8 +334,6 @@ Capacity_t get_capacity
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
-        case TDICE_LAYER_SPREADER :
-        case TDICE_LAYER_SINK :
 
             return (  get_volumetric_heat_capacity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
@@ -543,29 +474,6 @@ Conductance_t get_conductance_top
                                                 dimensions)
                    ) ;
 
-        case TDICE_LAYER_SINK :
-
-
-            return (  2.0
-                    * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
-                                                row_index, column_index,
-                                                dimensions)
-                    * tgrid->HeatSink->AmbientHTC
-                    * (tgrid->HeatSink->SinkArea / get_chip_area (dimensions))
-                    * get_cell_length (dimensions, column_index)
-                    * get_cell_width  (dimensions, row_index)
-                   )
-                   /
-                   (  get_cell_height (dimensions, layer_index)
-                    * tgrid->HeatSink->AmbientHTC
-                    * (tgrid->HeatSink->SinkArea / get_chip_area (dimensions))
-                    + 2.0
-                    * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
-                                                row_index, column_index,
-                                                dimensions)
-                   ) ;
-
-        case TDICE_LAYER_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
@@ -698,8 +606,6 @@ Conductance_t get_conductance_bottom
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
-        case TDICE_LAYER_SPREADER :
-        case TDICE_LAYER_SINK :
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
@@ -873,8 +779,6 @@ Conductance_t get_conductance_north
                     / (get_cell_width (dimensions, row_index) / 2.0)
                     * (1.0 - tgrid->Channel->Porosity) ;
 
-        case TDICE_LAYER_SPREADER :
-        case TDICE_LAYER_SINK :
         case TDICE_LAYER_VWALL_PINFINS :
         case TDICE_LAYER_TOP_WALL :
         case TDICE_LAYER_BOTTOM_WALL :
@@ -969,8 +873,6 @@ Conductance_t get_conductance_south
                     / (get_cell_width (dimensions, row_index) / 2.0)
                     * (1.0 - tgrid->Channel->Porosity) ;
 
-        case TDICE_LAYER_SPREADER :
-        case TDICE_LAYER_SINK :
         case TDICE_LAYER_VWALL_PINFINS :
         case TDICE_LAYER_TOP_WALL :
         case TDICE_LAYER_BOTTOM_WALL :
@@ -1049,8 +951,6 @@ Conductance_t get_conductance_east
         case TDICE_LAYER_CHANNEL_2RM :
         case TDICE_LAYER_PINFINS_INLINE :
         case TDICE_LAYER_PINFINS_STAGGERED :
-        case TDICE_LAYER_SPREADER :
-        case TDICE_LAYER_SINK :
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
         case TDICE_LAYER_TOP_WALL :
@@ -1130,8 +1030,6 @@ Conductance_t get_conductance_west
         case TDICE_LAYER_CHANNEL_2RM :
         case TDICE_LAYER_PINFINS_INLINE :
         case TDICE_LAYER_PINFINS_STAGGERED :
-        case TDICE_LAYER_SPREADER :
-        case TDICE_LAYER_SINK :
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
         case TDICE_LAYER_TOP_WALL :
