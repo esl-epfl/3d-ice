@@ -49,6 +49,7 @@ extern "C"
 /******************************************************************************/
 
 #include "types.h"
+#include "string_t.h"
 
 #include "dimensions.h"
 #include "thermal_grid.h"

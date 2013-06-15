@@ -39,6 +39,7 @@
 %code requires
 {
     #include "types.h"
+    #include "string_t.h"
 
     #include "material.h"
     #include "die.h"
@@ -121,7 +122,6 @@
 
 %token _2RM                  "keyword 2rm"
 %token _4RM                  "keyword 4rm"
-%token AMBIENT               "keyword ambient"
 %token AVERAGE               "keyword average"
 %token BOTTOM                "keyword bottom"
 %token CAPACITY              "keyword capacity"
@@ -130,7 +130,6 @@
 %token CHIP                  "keyword chip"
 %token COEFFICIENT           "keyword coefficient"
 %token CONDUCTIVITY          "keyword conductivity"
-%token CONNECTION            "keyword connection"
 %token COOLANT               "keyword coolant"
 %token DARCY                 "keyword darcy"
 %token DIAMETER              "keyword diameter"
@@ -155,13 +154,13 @@
 %token MICROCHANNEL          "keyword microchannel"
 %token MINIMUM               "keyword minimum"
 %token OUTPUT                "keyword output"
-%token PCB                   "keyword pcb"
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
 %token PMAP                  "keyword Pmap"
 %token RATE                  "keyword rate"
 %token SIDE                  "keyword side"
+%token SINK                  "keyword sink"
 %token SLOT                  "keyword slot"
 %token SOLVER                "keyword solver"
 %token SOURCE                "keyword source"
@@ -231,8 +230,7 @@
 stack_description_file
 
   : materials_list
-    ambient_opt
-    pcb_opt
+    heatsink_opt
     microchannel_opt
     dimensions
     layers_list_opt
@@ -304,49 +302,58 @@ material
 /******************************* Heatsink *************************************/
 /******************************************************************************/
 
-ambient_opt
+heatsink_opt
 
   : // Declaring this section is not mandatory
 
-  | CONNECTION TO AMBIENT ':'
-        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
-        AMBIENT TEMPERATURE       DVALUE ';'  // $12
-    {
-        stkd->HeatSink = heat_sink_calloc () ;
+  | topsink
 
-        if (stkd->HeatSink == NULL)
-        {
-            STKERROR ("Malloc heat sink failed") ;
+  | bottomsink
 
-            YYABORT ;
-        }
+  | topsink bottomsink
 
-        stkd->HeatSink->SinkModel          = TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT ;
-        stkd->HeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
-        stkd->HeatSink->AmbientTemperature = $12 ;
-    }
   ;
 
-pcb_opt
+topsink
 
-  : // Declaring this section is not mandatory
-
-  | CONNECTION TO PCB ':'
+  : TOP HEAT SINK ':'
         HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
-        AMBIENT TEMPERATURE       DVALUE ';'  // $12
+        TEMPERATURE               DVALUE ';'  // $11
     {
-        stkd->SecondaryPath = heat_sink_calloc () ;
+        stkd->TopHeatSink = heat_sink_calloc () ;
 
-        if (stkd->SecondaryPath == NULL)
+        if (stkd->TopHeatSink == NULL)
         {
-            STKERROR ("Malloc heat sink failed") ;
+            STKERROR ("Malloc top heat sink failed") ;
 
             YYABORT ;
         }
 
-        stkd->SecondaryPath->SinkModel          = TDICE_HEATSINK_MODEL_CONNECTION_TO_PCB ;
-        stkd->SecondaryPath->AmbientHTC         = (AmbientHTC_t) $8 ;
-        stkd->SecondaryPath->AmbientTemperature = $12 ;
+        stkd->TopHeatSink->SinkModel          = TDICE_HEATSINK_TOP ;
+        stkd->TopHeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
+        stkd->TopHeatSink->AmbientTemperature = $11 ;
+    }
+
+  ;
+
+bottomsink
+
+  : BOTTOM HEAT SINK ':'
+        HEAT TRANSFER COEFFICIENT DVALUE ';'  // $8
+        TEMPERATURE               DVALUE ';'  // $11
+    {
+        stkd->BottomHeatSink = heat_sink_calloc () ;
+
+        if (stkd->BottomHeatSink == NULL)
+        {
+            STKERROR ("Malloc bottom heat sink failed") ;
+
+            YYABORT ;
+        }
+
+        stkd->BottomHeatSink->SinkModel          = TDICE_HEATSINK_TOP ;
+        stkd->BottomHeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
+        stkd->BottomHeatSink->AmbientTemperature = $11 ;
     }
   ;
 
@@ -1027,13 +1034,13 @@ stack
             YYABORT ;
         }
 
-        if (stkd->HeatSink == NULL && stkd->SecondaryPath == NULL && stkd->Channel == NULL)
+        if (stkd->TopHeatSink == NULL && stkd->BottomHeatSink == NULL && stkd->Channel == NULL)
 
             fprintf (stderr, "Warning: no dissipation has been declared\n") ;
 
-        if (stkd->HeatSink != NULL)
+        if (stkd->TopHeatSink != NULL)
         {
-            if (stkd->HeatSink->SinkModel != TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
+            if (stkd->TopHeatSink->SinkModel != TDICE_HEATSINK_TOP)
 
                 fprintf (stderr, "This is a big error ....\n") ;
 
@@ -1046,7 +1053,7 @@ stack
             string_copy_cstr (&stack_element.Id, "ConnectionToAmbient") ;
 
             stack_element.Type             = TDICE_STACK_ELEMENT_HEATSINK ;
-            stack_element.Pointer.HeatSink = stkd->HeatSink ;
+            stack_element.Pointer.HeatSink = stkd->TopHeatSink ;
             stack_element.NLayers          = 0u ;
 
             stack_element_list_insert_begin (&stkd->StackElements, &stack_element) ;
@@ -1054,9 +1061,9 @@ stack
             stack_element_destroy (&stack_element) ;
         }
 
-        if (stkd->SecondaryPath != NULL)
+        if (stkd->BottomHeatSink != NULL)
         {
-            if (stkd->SecondaryPath->SinkModel != TDICE_HEATSINK_MODEL_CONNECTION_TO_PCB)
+            if (stkd->BottomHeatSink->SinkModel != TDICE_HEATSINK_TOP)
 
                 fprintf (stderr, "This is a big error ....\n") ;
 
@@ -1069,7 +1076,7 @@ stack
             string_copy_cstr (&stack_element.Id, "ConnectionToPCB") ;
 
             stack_element.Type             = TDICE_STACK_ELEMENT_SECONDARYPATH ;
-            stack_element.Pointer.HeatSink = stkd->SecondaryPath ;
+            stack_element.Pointer.HeatSink = stkd->BottomHeatSink ;
             stack_element.NLayers          = 0u ;
 
             stack_element_list_insert_end (&stkd->StackElements, &stack_element) ;
@@ -1098,7 +1105,7 @@ stack
         tmost = stack_element_list_data (stack_element_list_begin (&stkd->StackElements)) ;
 
         if (   tmost->Type == TDICE_STACK_ELEMENT_HEATSINK
-            && stkd->HeatSink->SinkModel == TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT)
+            && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP)
 
             tmost->Offset-- ;
 
@@ -1155,7 +1162,7 @@ stack
             }
             else if (stk_el_->Type == TDICE_STACK_ELEMENT_HEATSINK)
             {
-                if (stkd->SecondaryPath->SinkModel == TDICE_HEATSINK_MODEL_NONE)
+                if (stkd->BottomHeatSink->SinkModel == TDICE_HEATSINK_NONE)
 
                     fprintf (stderr, "This is a big error ....\n") ;
             }

@@ -49,6 +49,7 @@ extern "C"
 /******************************************************************************/
 
 #include "types.h"
+#include "string_t.h"
 
 #include "analysis.h"
 #include "stack_element_list.h"

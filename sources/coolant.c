@@ -36,56 +36,8 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <string.h> // For the string function strcpy
-#include <stdlib.h> // For the memory function free
+#include "coolant.h"
 
-#include "types.h"
-
-/******************************************************************************/
-
-void string_init (String_t *string)
-{
-    *string = NULL ;
-}
-
-/******************************************************************************/
-
-void string_copy (String_t *dst, String_t *src)
-{
-    string_destroy (dst) ;
-
-    *dst = *src == NULL ? NULL : strdup (*src) ;
-}
-
-/******************************************************************************/
-
-void string_copy_cstr (String_t *dst, char *src)
-{
-    string_destroy (dst) ;
-
-    *dst = strdup (src) ;
-}
-
-/******************************************************************************/
-
-bool string_equal (String_t *string, String_t *other)
-{
-   return strcmp (*string, *other) == 0 ? true : false ;
-}
-
-/******************************************************************************/
-
-void string_destroy (String_t *string)
-{
-    if (*string != NULL)
-
-        free (*string) ;
-
-    string_init (string) ;
-}
-
-/******************************************************************************/
-/******************************************************************************/
 /******************************************************************************/
 
 void coolant_init (Coolant_t *coolant)

@@ -51,6 +51,8 @@ extern "C"
 #include <netinet/in.h>
 
 #include "types.h"
+#include "string_t.h"
+
 #include "network_message.h"
 
 /******************************************************************************/

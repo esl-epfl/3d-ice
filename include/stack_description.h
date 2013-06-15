@@ -51,6 +51,7 @@ extern "C"
 #include <stdio.h> // For the file type FILE
 
 #include "types.h"
+#include "string_t.h"
 
 #include "channel.h"
 #include "heat_sink.h"
@@ -79,11 +80,11 @@ extern "C"
 
         /*! Information about the heat dissipation throught the top surface */
 
-        HeatSink_t *HeatSink ;
+        HeatSink_t *TopHeatSink ;
 
         /*! Information about the heat dissipation throught the bottom surface */
 
-        HeatSink_t *SecondaryPath ;
+        HeatSink_t *BottomHeatSink ;
 
         /*! Information about the type of channel used in the 3d stack */
 

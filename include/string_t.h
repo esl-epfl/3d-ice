@@ -36,110 +36,90 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <math.h>   // Fo the math function sqrt
-#include <stdlib.h> // For the memory functions malloc/free
+#ifndef _3DICE_STRING_T_H_
+#define _3DICE_STRING_T_H_
 
-#include "heat_sink.h"
-#include "macros.h"
+/*! \file string_t.h */
 
-/******************************************************************************/
-
-void heat_sink_init (HeatSink_t *hsink)
+#ifdef __cplusplus
+extern "C"
 {
-    hsink->SinkModel          = TDICE_HEATSINK_NONE ;
-    hsink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
-    hsink->AmbientTemperature = (Temperature_t) 0.0 ;
-}
+#endif
+
+#include <stdbool.h>
 
 /******************************************************************************/
 
-void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
-{
-    heat_sink_destroy (dst) ;
+    /*! Definition of the primitive type String_t */
 
-    dst->SinkModel          = src->SinkModel ;
-    dst->AmbientHTC         = src->AmbientHTC ;
-    dst->AmbientTemperature = src->AmbientTemperature ;
-}
+    typedef char* String_t ;
+
+
 
 /******************************************************************************/
 
-void heat_sink_destroy (HeatSink_t *hsink)
-{
-    // Nothing to do ...
 
-    heat_sink_init (hsink) ;
-}
 
-/******************************************************************************/
+    /*! Inits the \a string structure with a default value
+     *
+     * \param string the address of the string to initalize
+     */
 
-HeatSink_t *heat_sink_calloc (void)
-{
-    HeatSink_t *hsink = (HeatSink_t *) malloc (sizeof(HeatSink_t)) ;
+    void string_init (String_t *string) ;
 
-    if (hsink != NULL)
 
-        heat_sink_init (hsink) ;
 
-    return hsink ;
-}
+    /*! Tests if two strings are equal
+     *
+     * \param string the first string
+     * \param other the second string
+     *
+     * \return \c TRUE if \a string and \a other are the same string
+     * \return \c FALSE otherwise
+     */
 
-/******************************************************************************/
+    bool string_equal (String_t *string, String_t *other) ;
 
-HeatSink_t *heat_sink_clone (HeatSink_t *hsink)
-{
-    if (hsink == NULL)
 
-        return NULL ;
 
-    HeatSink_t *newh = heat_sink_calloc ( ) ;
+    /*! Copies the string \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term string (destination)
+     * \param src the address of the right term string (source)
+     */
 
-    if (newh != NULL)
+    void string_copy (String_t *dst, String_t *src) ;
 
-        heat_sink_copy (newh, hsink) ;
 
-    return newh ;
-}
 
-/******************************************************************************/
+    /*! Copies the C string \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term string (destination)
+     * \param src the address of the right term C string (source)
+     */
 
-void heat_sink_free (HeatSink_t *hsink)
-{
-    if (hsink == NULL)
+    void string_copy_cstr (String_t *dst, char *src) ;
 
-        return ;
 
-    heat_sink_destroy (hsink) ;
 
-    free (hsink) ;
-}
+    /*! Destroys the content of the \a string
+     *
+     * The function releases the memory used by the string and
+     * resets its state calling \a string_init .
+     *
+     * \param string the address of the string to destroy
+     */
 
-/******************************************************************************/
-
-void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
-{
-    if (hsink->SinkModel == TDICE_HEATSINK_TOP)
-
-        fprintf (stream, "%stop heat sink :\n", prefix) ;
-
-    else if (hsink->SinkModel == TDICE_HEATSINK_TOP)
-
-        fprintf (stream, "%sbottom heat sink :\n", prefix) ;
-
-    else
-    {
-        fprintf (stream, "wrong heat sink model\n") ;
-
-        return ;
-    }
-
-    fprintf (stream,
-        "%s   heat transfer coefficient %.4e ;\n",
-        prefix, hsink->AmbientHTC) ;
-
-    fprintf (stream,
-        "%s   temperature               %.2f ;\n",
-        prefix, hsink->AmbientTemperature) ;
-}
+    void string_destroy (String_t *string) ;
 
 /******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _3DICE_STRING_T_H_ */

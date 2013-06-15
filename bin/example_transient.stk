@@ -6,9 +6,9 @@ material BEOL :
    thermal conductivity     2.25e-6 ;
    volumetric heat capacity 2.175e-12 ;
 
-connection to ambient :
+top heat sink :
    heat transfer coefficient 1.0e-7 ;
-   ambient temperature 300 ;
+   temperature 300 ;
 
 microchannel 2rm :
    height 100 ;

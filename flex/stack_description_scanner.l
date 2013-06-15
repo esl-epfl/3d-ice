@@ -129,7 +129,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 
 "2rm"                        return _2RM ;
 "4rm"                        return _4RM ;
-"ambient"                    return AMBIENT ;
 "average"                    return AVERAGE ;
 "bottom"                     return BOTTOM ;
 "capacity"                   return CAPACITY ;
@@ -138,7 +137,6 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "chip"                       return CHIP ;
 "coefficient"                return COEFFICIENT ;
 "conductivity"               return CONDUCTIVITY ;
-"connection"                 return CONNECTION ;
 "coolant"                    return COOLANT ;
 "darcy"                      return DARCY ;
 "diameter"                   return DIAMETER ;
@@ -163,13 +161,13 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "microchannel"               return MICROCHANNEL ;
 "minimum"                    return MINIMUM ;
 "output"                     return OUTPUT ;
-"pcb"                        return PCB ;
 "pin"                        return PIN ;
 "pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
 "Pmap"                       return PMAP ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;
+"sink"                       return SINK ;
 "slot"                       return SLOT ;
 "solver"                     return SOLVER ;
 "source"                     return SOURCE ;

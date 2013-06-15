@@ -39,6 +39,8 @@
 %code requires
 {
     #include "types.h"
+    #include "string_t.h"
+
     #include "floorplan_element.h"
     #include "ic_element.h"
     #include "powers_queue.h"

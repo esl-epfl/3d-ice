@@ -47,6 +47,8 @@ extern "C"
 #endif
 
 #include "types.h"
+#include "string_t.h"
+
 #include "floorplan.h"
 #include "dimensions.h"
 

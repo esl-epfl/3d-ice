@@ -36,110 +36,113 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include <math.h>   // Fo the math function sqrt
-#include <stdlib.h> // For the memory functions malloc/free
+#ifndef _3DICE_COOLANT_H_
+#define _3DICE_COOLANT_H_
 
-#include "heat_sink.h"
-#include "macros.h"
+/*! \file coolant.h */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#include "types.h"
 
 /******************************************************************************/
 
-void heat_sink_init (HeatSink_t *hsink)
-{
-    hsink->SinkModel          = TDICE_HEATSINK_NONE ;
-    hsink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
-    hsink->AmbientTemperature = (Temperature_t) 0.0 ;
-}
 
-/******************************************************************************/
 
-void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
-{
-    heat_sink_destroy (dst) ;
+    /*! \struct Coolant_t
+     *
+     *  \brief A collection of parameters describing the properties cooling fluid
+     */
 
-    dst->SinkModel          = src->SinkModel ;
-    dst->AmbientHTC         = src->AmbientHTC ;
-    dst->AmbientTemperature = src->AmbientTemperature ;
-}
-
-/******************************************************************************/
-
-void heat_sink_destroy (HeatSink_t *hsink)
-{
-    // Nothing to do ...
-
-    heat_sink_init (hsink) ;
-}
-
-/******************************************************************************/
-
-HeatSink_t *heat_sink_calloc (void)
-{
-    HeatSink_t *hsink = (HeatSink_t *) malloc (sizeof(HeatSink_t)) ;
-
-    if (hsink != NULL)
-
-        heat_sink_init (hsink) ;
-
-    return hsink ;
-}
-
-/******************************************************************************/
-
-HeatSink_t *heat_sink_clone (HeatSink_t *hsink)
-{
-    if (hsink == NULL)
-
-        return NULL ;
-
-    HeatSink_t *newh = heat_sink_calloc ( ) ;
-
-    if (newh != NULL)
-
-        heat_sink_copy (newh, hsink) ;
-
-    return newh ;
-}
-
-/******************************************************************************/
-
-void heat_sink_free (HeatSink_t *hsink)
-{
-    if (hsink == NULL)
-
-        return ;
-
-    heat_sink_destroy (hsink) ;
-
-    free (hsink) ;
-}
-
-/******************************************************************************/
-
-void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
-{
-    if (hsink->SinkModel == TDICE_HEATSINK_TOP)
-
-        fprintf (stream, "%stop heat sink :\n", prefix) ;
-
-    else if (hsink->SinkModel == TDICE_HEATSINK_TOP)
-
-        fprintf (stream, "%sbottom heat sink :\n", prefix) ;
-
-    else
+    struct Coolant_t
     {
-        fprintf (stream, "wrong heat sink model\n") ;
+        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
+         *  between the liquid in the channel and the walls/pins
+         */
 
-        return ;
-    }
+        CoolantHTC_t HTCSide ;
 
-    fprintf (stream,
-        "%s   heat transfer coefficient %.4e ;\n",
-        prefix, hsink->AmbientHTC) ;
+        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
+         *  between the liquid in the channel and the top wall
+         */
 
-    fprintf (stream,
-        "%s   temperature               %.2f ;\n",
-        prefix, hsink->AmbientTemperature) ;
-}
+        CoolantHTC_t HTCTop ;
+
+        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
+         *  between the liquid in the channel and the bottom wall
+         */
+
+        CoolantHTC_t HTCBottom ;
+
+        /*! The volumetric heat capacity in \f$ J / ( \mu m^3 * K ) \f$ */
+
+        CoolantVHC_t VHC ;
+
+        /*! The flow rate per channel layer of the incolimg liquid.
+         *  Specified in \f$ \frac{ml}{min} \f$ but stored in \f$ \frac{\mu m^3}{sec} \f$.
+         *  Shared by all the channels for each layer in the 3DStack.
+         */
+
+        CoolantFR_t FlowRate ;
+
+        /*! Darcy Velocity \f$ \frac{\mu m}{sec} \f$ */
+
+        DarcyVelocity_t DarcyVelocity ;
+
+        /*! The temperarute of the coolant at the channel inlet in \f$ K \f$ */
+
+        Temperature_t TIn ;
+
+    } ;
+
+    /*! Definition of the type Coolant_t */
+
+    typedef struct Coolant_t Coolant_t ;
+
+
 
 /******************************************************************************/
+
+
+
+    /*! Inits the fields of the \a coolant structure with default values
+     *
+     * \param coolant the address of the structure to initalize
+     */
+
+    void coolant_init    (Coolant_t *coolant) ;
+
+
+
+    /*! Copies the structure \a src into \a dst , as an assignement
+     *
+     * The function destroys the content of \a dst and then makes the copy
+     *
+     * \param dst the address of the left term sructure (destination)
+     * \param src the address of the right term structure (source)
+     */
+
+    void coolant_copy    (Coolant_t *dst, Coolant_t *src) ;
+
+
+
+    /*! Destroys the content of the fields of the structure \a coolant
+     *
+     * The function releases any dynamic memory used by the structure and
+     * resets its state calling \a coolant_init .
+     *
+     * \param coolant the address of the structure to destroy
+     */
+
+    void coolant_destroy (Coolant_t *coolant) ;
+
+/******************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* _3DICE_COOLANT_H_ */

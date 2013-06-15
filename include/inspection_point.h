@@ -51,6 +51,7 @@ extern "C"
 #include <stdio.h> // For the file type FILE
 
 #include "types.h"
+#include "string_t.h"
 
 #include "dimensions.h"
 #include "floorplan_element.h"

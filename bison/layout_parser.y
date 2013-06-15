@@ -39,6 +39,8 @@
 %code requires
 {
     #include "types.h"
+    #include "string_t.h"
+
     #include "material.h"
     #include "ic_element.h"
     #include "material_element.h"

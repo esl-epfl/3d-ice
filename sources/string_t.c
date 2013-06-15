@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 2.2.4 .                               *
+ * This file is part of 3D-ICE, version 2.2.2 .                               *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -36,141 +36,52 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-#include "stack_description.h"
+#include <string.h> // For the string function strcpy
+#include <stdlib.h> // For the memory function free
+
+#include "string_t.h"
 
 /******************************************************************************/
 
-void stack_description_init (StackDescription_t *stkd)
+void string_init (String_t *string)
 {
-    string_init (&stkd->FileName) ;
-
-    stkd->TopHeatSink    = NULL ;
-    stkd->BottomHeatSink = NULL ;
-    stkd->Channel        = NULL ;
-    stkd->Dimensions     = NULL ;
-
-         material_list_init (&stkd->Materials) ;
-            layer_list_init (&stkd->Layers) ;
-              die_list_init (&stkd->Dies) ;
-    stack_element_list_init (&stkd->StackElements) ;
+    *string = NULL ;
 }
 
 /******************************************************************************/
 
-void stack_description_destroy (StackDescription_t *stkd)
+void string_copy (String_t *dst, String_t *src)
 {
-    string_destroy (&stkd->FileName) ;
+    string_destroy (dst) ;
 
-    heat_sink_free  (stkd->TopHeatSink) ;
-    heat_sink_free  (stkd->BottomHeatSink) ;
-    channel_free    (stkd->Channel) ;
-    dimensions_free (stkd->Dimensions) ;
-
-         material_list_destroy (&stkd->Materials) ;
-            layer_list_destroy (&stkd->Layers) ;
-              die_list_destroy (&stkd->Dies) ;
-    stack_element_list_destroy (&stkd->StackElements) ;
-
-    stack_description_init (stkd) ;
+    *dst = *src == NULL ? NULL : strdup (*src) ;
 }
 
 /******************************************************************************/
 
-void stack_description_print
-(
-  StackDescription_t *stkd,
-  FILE               *stream,
-  String_t            prefix
-)
+void string_copy_cstr (String_t *dst, char *src)
 {
-    material_list_print (&stkd->Materials, stream, prefix) ;
+    string_destroy (dst) ;
 
-    if (stkd->TopHeatSink != NULL)
-    {
-        heat_sink_print (stkd->TopHeatSink, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    if (stkd->BottomHeatSink != NULL)
-    {
-        heat_sink_print (stkd->BottomHeatSink, stream, prefix) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    if (stkd->Channel != NULL)
-    {
-        channel_print (stkd->Channel, stream, prefix, stkd->Dimensions) ;
-
-        fprintf (stream, "%s\n", prefix) ;
-    }
-
-    layer_list_print (&stkd->Layers, stream, prefix) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    die_list_print (&stkd->Dies, stream, prefix) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    dimensions_print (stkd->Dimensions, stream, prefix) ;
-
-    fprintf (stream, "%s\n", prefix) ;
-
-    fprintf (stream, "%sstack :\n", prefix) ;
-
-    stack_element_list_print (&stkd->StackElements, stream, prefix) ;
-
-    fprintf (stream, "%s\n", prefix) ;
+    *dst = strdup (src) ;
 }
 
 /******************************************************************************/
 
-Quantity_t get_number_of_floorplan_elements
-(
-  StackDescription_t *stkd,
-  String_t            stack_element_id
-)
+bool string_equal (String_t *string, String_t *other)
 {
-    StackElement_t stkel ;
-
-    stack_element_init (&stkel) ;
-
-    string_copy (&stkel.Id, &stack_element_id) ;
-
-    StackElement_t *tmp = stack_element_list_find (&stkd->StackElements, &stkel) ;
-
-    if (tmp == NULL)
-    {
-        stack_element_destroy (&stkel) ;
-
-        return 0u ;
-    }
-
-    stack_element_destroy (&stkel) ;
-
-    return get_number_of_floorplan_elements_stack_element (tmp) ;
+   return strcmp (*string, *other) == 0 ? true : false ;
 }
 
 /******************************************************************************/
 
-Quantity_t get_total_number_of_floorplan_elements (StackDescription_t *stkd)
+void string_destroy (String_t *string)
 {
-    Quantity_t tmp = 0u ;
+    if (*string != NULL)
 
-    StackElementListNode_t *stkeln ;
+        free (*string) ;
 
-    for (stkeln  = stack_element_list_begin (&stkd->StackElements) ;
-         stkeln != NULL ;
-         stkeln  = stack_element_list_next (stkeln))
-    {
-        StackElement_t *stkel = stack_element_list_data (stkeln) ;
-
-        tmp += get_number_of_floorplan_elements_stack_element (stkel) ;
-    }
-
-    return tmp ;
+    string_init (string) ;
 }
 
 /******************************************************************************/

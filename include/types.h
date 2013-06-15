@@ -47,73 +47,10 @@ extern "C"
 #endif
 
 #include <stdint.h>
-#include <stdbool.h>
 
 /******************************************************************************/
 
-    /*! Definition of the primitive type String_t */
 
-    typedef char* String_t ;
-
-
-
-    /*! Inits the \a string structure with a default value
-     *
-     * \param string the address of the string to initalize
-     */
-
-    void string_init (String_t *string) ;
-
-
-
-    /*! Tests if two strings are equal
-     *
-     * \param string the first string
-     * \param other the second string
-     *
-     * \return \c TRUE if \a string and \a other are the same string
-     * \return \c FALSE otherwise
-     */
-
-    bool string_equal (String_t *string, String_t *other) ;
-
-
-
-    /*! Copies the string \a src into \a dst , as an assignement
-     *
-     * The function destroys the content of \a dst and then makes the copy
-     *
-     * \param dst the address of the left term string (destination)
-     * \param src the address of the right term string (source)
-     */
-
-    void string_copy (String_t *dst, String_t *src) ;
-
-
-
-    /*! Copies the C string \a src into \a dst , as an assignement
-     *
-     * The function destroys the content of \a dst and then makes the copy
-     *
-     * \param dst the address of the left term string (destination)
-     * \param src the address of the right term C string (source)
-     */
-
-    void string_copy_cstr (String_t *dst, char *src) ;
-
-
-
-    /*! Destroys the content of the \a string
-     *
-     * The function releases the memory used by the string and
-     * resets its state calling \a string_init .
-     *
-     * \param string the address of the string to destroy
-     */
-
-    void string_destroy (String_t *string) ;
-
-/******************************************************************************/
 
     /*! Definition of the type Quantity_t
      *
@@ -229,89 +166,6 @@ extern "C"
 
 
 
-    /*! \struct Coolant_t
-     *
-     *  \brief A collection of parameters describing the properties cooling fluid
-     */
-
-    struct Coolant_t
-    {
-        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
-         *  between the liquid in the channel and the walls/pins
-         */
-
-        CoolantHTC_t HTCSide ;
-
-        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
-         *  between the liquid in the channel and the top wall
-         */
-
-        CoolantHTC_t HTCTop ;
-
-        /*! The heat transfert coefficient in \f$ (W / ( \mu m^2 * K ) \f$
-         *  between the liquid in the channel and the bottom wall
-         */
-
-        CoolantHTC_t HTCBottom ;
-
-        /*! The volumetric heat capacity in \f$ J / ( \mu m^3 * K ) \f$ */
-
-        CoolantVHC_t VHC ;
-
-        /*! The flow rate per channel layer of the incolimg liquid.
-         *  Specified in \f$ \frac{ml}{min} \f$ but stored in \f$ \frac{\mu m^3}{sec} \f$.
-         *  Shared by all the channels for each layer in the 3DStack.
-         */
-
-        CoolantFR_t FlowRate ;
-
-        /*! Darcy Velocity \f$ \frac{\mu m}{sec} \f$ */
-
-        DarcyVelocity_t DarcyVelocity ;
-
-        /*! The temperarute of the coolant at the channel inlet in \f$ K \f$ */
-
-        Temperature_t TIn ;
-
-    } ;
-
-    /*! Definition of the type Coolant_t */
-
-    typedef struct Coolant_t Coolant_t ;
-
-
-
-    /*! Inits the fields of the \a coolant structure with default values
-     *
-     * \param coolant the address of the structure to initalize
-     */
-
-    void coolant_init    (Coolant_t *coolant) ;
-
-
-
-    /*! Copies the structure \a src into \a dst , as an assignement
-     *
-     * The function destroys the content of \a dst and then makes the copy
-     *
-     * \param dst the address of the left term sructure (destination)
-     * \param src the address of the right term structure (source)
-     */
-
-    void coolant_copy    (Coolant_t *dst, Coolant_t *src) ;
-
-
-
-    /*! Destroys the content of the fields of the structure \a coolant
-     *
-     * The function releases any dynamic memory used by the structure and
-     * resets its state calling \a coolant_init .
-     *
-     * \param coolant the address of the structure to destroy
-     */
-
-    void coolant_destroy (Coolant_t *coolant) ;
-
 /******************************************************************************/
 
 
@@ -354,14 +208,14 @@ extern "C"
 
     /*! \enum HeatSinkModel_t
      *
-     * Enumeration to collect the supported model of the heat sink
+     *   Enumeration to collect the supported model of the heat sink
      */
 
     enum HeatSinkModel_t
     {
-        TDICE_HEATSINK_MODEL_NONE = 0,               //!< Undefined type
-        TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT,  //!< Connection to ambient (top-most layer)
-        TDICE_HEATSINK_MODEL_CONNECTION_TO_PCB       //!< Connection to PCB (bottom-most layer)
+        TDICE_HEATSINK_NONE = 0,   //!< Undefined type
+        TDICE_HEATSINK_TOP,        //!< Top heat sink       (top-most layer)
+        TDICE_HEATSINK_BOTTOM      //!< Bottom heat sink (bottom-most layer)
     } ;
 
     /*! The definition of the type HeatSinkModel_t */

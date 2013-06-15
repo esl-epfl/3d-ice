@@ -47,6 +47,8 @@ extern "C"
 #endif
 
 #include "types.h"
+#include "string_t.h"
+
 #include "layer.h"
 #include "material_list.h"
 #include "dimensions.h"

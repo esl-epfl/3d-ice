@@ -96,13 +96,13 @@ extern "C"
 
         Channel_t  *Channel ;
 
-        /*! Pointer to the heat sink structure */
+        /*! Pointer to the top heat sink structure */
 
-        HeatSink_t *HeatSink ;
+        HeatSink_t *TopHeatSink ;
 
-        /*! Pointer to the heat sink structure for secondary path */
+        /*! Pointer to the bottom heat sink structure */
 
-        HeatSink_t *SecondaryPath ;
+        HeatSink_t *BottomHeatSink ;
 
         /*! Pointer to a vector storing the TOP thermal conductivities
          *  of the thermal cells in the topmost layer. This vector is filled

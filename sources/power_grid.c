@@ -52,8 +52,8 @@ void power_grid_init (PowerGrid_t *pgrid)
     pgrid->FloorplansProfile = NULL ;
     pgrid->Sources           = NULL ;
     pgrid->Channel           = NULL ;
-    pgrid->HeatSink          = NULL ;
-    pgrid->SecondaryPath     = NULL ;
+    pgrid->TopHeatSink       = NULL ;
+    pgrid->BottomHeatSink    = NULL ;
     pgrid->HeatSinkTopTcs    = NULL ;
     pgrid->HeatSinkBottomTcs = NULL ;
     pgrid->CellsCapacities   = NULL ;
@@ -289,13 +289,13 @@ void power_grid_fill
             }
             case TDICE_STACK_ELEMENT_HEATSINK :
             {
-                pgrid->HeatSink = stack_element->Pointer.HeatSink ;
+                pgrid->TopHeatSink = stack_element->Pointer.HeatSink ;
 
                 CellIndex_t lastLayer = (CellIndex_t) 0u ;
 
-                switch (pgrid->HeatSink->SinkModel)
+                switch (pgrid->TopHeatSink->SinkModel)
                 {
-                    case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
+                    case TDICE_HEATSINK_TOP :
 
                         if (pgrid->LayersTypeProfile [index] == TDICE_LAYER_SOLID)
 
@@ -313,7 +313,7 @@ void power_grid_fill
 
                         break ;
 
-                    case TDICE_HEATSINK_MODEL_NONE :
+                    case TDICE_HEATSINK_NONE :
 
                         fprintf (stderr, "WARNING: unset heatsink model\n") ;
 
@@ -325,7 +325,7 @@ void power_grid_fill
 
                         fprintf (stderr,
                            "WARNING: unknown heatsink model %d\n",
-                           pgrid->HeatSink->SinkModel) ;
+                           pgrid->TopHeatSink->SinkModel) ;
                 }
 
                 CellIndex_t row    = (CellIndex_t) 0u ;;
@@ -351,7 +351,7 @@ void power_grid_fill
 
             case TDICE_STACK_ELEMENT_SECONDARYPATH :
             {
-                pgrid->SecondaryPath = stack_element->Pointer.HeatSink ;
+                pgrid->BottomHeatSink = stack_element->Pointer.HeatSink ;
 
                 pgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
 
@@ -455,7 +455,7 @@ Error_t update_source_vector
                 for (index  = (CellIndex_t) 0u ;
                      index != pgrid->NCellsLayer ; index++)
 
-                        *tmpS++ += pgrid->HeatSink->AmbientTemperature * *tmpT++ ;
+                        *tmpS++ += pgrid->TopHeatSink->AmbientTemperature * *tmpT++ ;
 
                 break ;
             }
@@ -470,7 +470,7 @@ Error_t update_source_vector
                 for (index  = (CellIndex_t) 0u ;
                      index != pgrid->NCellsLayer ; index++)
 
-                        *tmpS++ += pgrid->HeatSink->AmbientTemperature * *tmpT++ ;
+                        *tmpS++ += pgrid->TopHeatSink->AmbientTemperature * *tmpT++ ;
 
                 Error_t error = fill_sources_floorplan
 
@@ -493,7 +493,7 @@ Error_t update_source_vector
                 for (index  = (CellIndex_t) 0u ;
                      index != pgrid->NCellsLayer ; index++)
 
-                        *tmpS++ += pgrid->SecondaryPath->AmbientTemperature * *tmpT++ ;
+                        *tmpS++ += pgrid->BottomHeatSink->AmbientTemperature * *tmpT++ ;
 
                 break ;
             }
@@ -508,7 +508,7 @@ Error_t update_source_vector
                 for (index  = (CellIndex_t) 0u ;
                      index != pgrid->NCellsLayer ; index++)
 
-                        *tmpS++ += pgrid->SecondaryPath->AmbientTemperature * *tmpT++ ;
+                        *tmpS++ += pgrid->BottomHeatSink->AmbientTemperature * *tmpT++ ;
 
                 Error_t error = fill_sources_floorplan
 

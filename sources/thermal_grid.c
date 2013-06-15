@@ -49,8 +49,8 @@ void thermal_grid_init (ThermalGrid_t *tgrid)
     tgrid->LayersTypeProfile = NULL ;
     tgrid->LayersProfile     = NULL ;
     tgrid->Channel           = NULL ;
-    tgrid->HeatSink          = NULL ;
-    tgrid->SecondaryPath     = NULL ;
+    tgrid->TopHeatSink       = NULL ;
+    tgrid->BottomHeatSink    = NULL ;
 }
 
 /******************************************************************************/
@@ -244,11 +244,11 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
             }
             case TDICE_STACK_ELEMENT_HEATSINK :
             {
-                tgrid->HeatSink = stack_element->Pointer.HeatSink ;
+                tgrid->TopHeatSink = stack_element->Pointer.HeatSink ;
 
-                switch (tgrid->HeatSink->SinkModel)
+                switch (tgrid->TopHeatSink->SinkModel)
                 {
-                    case TDICE_HEATSINK_MODEL_CONNECTION_TO_AMBIENT :
+                    case TDICE_HEATSINK_TOP :
 
                         if (tgrid->LayersTypeProfile [index] == TDICE_LAYER_SOLID)
 
@@ -264,7 +264,7 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
                         break ;
 
-                    case TDICE_HEATSINK_MODEL_NONE :
+                    case TDICE_HEATSINK_NONE :
 
                         fprintf (stderr, "WARNING: unset heatsink model\n") ;
 
@@ -276,7 +276,7 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
                         fprintf (stderr,
                            "WARNING: unknown heatsink model %d\n",
-                            tgrid->HeatSink->SinkModel) ;
+                            tgrid->TopHeatSink->SinkModel) ;
 
                         break ;
                 }
@@ -286,7 +286,7 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
             case TDICE_STACK_ELEMENT_SECONDARYPATH :
             {
-                tgrid->SecondaryPath = stack_element->Pointer.HeatSink ;
+                tgrid->BottomHeatSink = stack_element->Pointer.HeatSink ;
 
                 tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
 
@@ -461,13 +461,13 @@ Conductance_t get_conductance_top
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
                                                 dimensions)
-                    * tgrid->HeatSink->AmbientHTC
+                    * tgrid->TopHeatSink->AmbientHTC
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
                    /
                    (  get_cell_height (dimensions, layer_index)
-                    * tgrid->HeatSink->AmbientHTC
+                    * tgrid->TopHeatSink->AmbientHTC
                     + 2.0
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
@@ -622,13 +622,13 @@ Conductance_t get_conductance_bottom
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
                                                 dimensions)
-                    * tgrid->SecondaryPath->AmbientHTC
+                    * tgrid->BottomHeatSink->AmbientHTC
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
                    /
                    (  get_cell_height (dimensions, layer_index)
-                    * tgrid->SecondaryPath->AmbientHTC
+                    * tgrid->BottomHeatSink->AmbientHTC
                     + 2.0
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
