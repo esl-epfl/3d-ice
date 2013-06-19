@@ -24,7 +24,7 @@ die topdie :
 
 stack:
 
-   die     die2     topdie    floorplan "background.flp" ;
+   die     die2     topdie    floorplan "four_elements.flp" ;
    die     die1     bottomdie floorplan "background.flp" ;
 
 solver:
@@ -34,5 +34,5 @@ solver:
 
 output:
 
-  T ( die1, 5000, 4800, "mc4rm/transient/background_node1.txt", step );
-  T ( die2,    0,    0, "mc4rm/transient/background_node2.txt", step );
+  T ( die1, 5000, 4800, "solid/transient/node1_top.txt", step );
+  T ( die2,    0,    0, "solid/transient/node2_top.txt", step );
