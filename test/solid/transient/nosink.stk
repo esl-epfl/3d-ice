@@ -1,0 +1,34 @@
+material silicon :
+
+   thermal conductivity     1.30e-04 ;
+   volumetric heat capacity 1.63566e-12 ;
+
+dimensions :
+
+  chip length 10000 , width  10000 ;
+  cell length    50 , width    200 ;
+
+die bottomdie :
+
+   layer  48 silicon ;
+   source  2 silicon ;
+
+die topdie :
+
+   source  2 silicon ;
+   layer  48 silicon ;
+
+stack:
+
+   die     die2     topdie    floorplan "background.flp" ;
+   die     die1     bottomdie floorplan "background.flp" ;
+
+solver:
+
+  transient step 0.002, slot 0.02 ;
+  initial temperature 300.0 ;
+
+output:
+
+  T ( die1, 5000, 4800, "mc4rm/transient/background_node1.txt", step );
+  T ( die2,    0,    0, "mc4rm/transient/background_node2.txt", step );

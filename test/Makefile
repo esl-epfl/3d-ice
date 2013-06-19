@@ -62,22 +62,46 @@ CompareTemperatures: CompareTemperatures.o
 
 runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-ICE-Emulator
 	@echo "Comparison of system matrices ...."
-	@echo -n "mc4rm transient : "
+	@echo -n "solid transient no hs     : "
+	@./GenerateSystemMatrix solid/transient/nosink.stk tr_nosink.txt 2> /dev/null
+	@./CompareSystemMatrix  tr_nosink.txt solid/transient/system_matrix_nosink.txt
+	@echo -n "solid steady no hs        : "
+	@./GenerateSystemMatrix solid/steady/nosink.stk st_nosink.txt 2> /dev/null
+	@./CompareSystemMatrix  st_nosink.txt solid/steady/system_matrix_nosink.txt
+	@echo -n "solid transient top hs    : "
+	@./GenerateSystemMatrix solid/transient/topsink.stk tr_topsink.txt
+	@./CompareSystemMatrix  tr_topsink.txt solid/transient/system_matrix_topsink.txt
+	@echo -n "solid steady top hs       : "
+	@./GenerateSystemMatrix solid/steady/topsink.stk st_topsink.txt
+	@./CompareSystemMatrix  st_topsink.txt solid/steady/system_matrix_topsink.txt
+	@echo -n "solid transient bottom hs : "
+	@./GenerateSystemMatrix solid/transient/bottomsink.stk tr_bottomsink.txt
+	@./CompareSystemMatrix  tr_bottomsink.txt solid/transient/system_matrix_bottomsink.txt
+	@echo -n "solid steady bottom hs    : "
+	@./GenerateSystemMatrix solid/steady/bottomsink.stk st_bottomsink.txt
+	@./CompareSystemMatrix  st_bottomsink.txt solid/steady/system_matrix_bottomsink.txt
+	@echo -n "solid transient both hs   : "
+	@./GenerateSystemMatrix solid/transient/bothsink.stk tr_bothsink.txt
+	@./CompareSystemMatrix  tr_bothsink.txt solid/transient/system_matrix_bothsink.txt
+	@echo -n "solid steady both hs      : "
+	@./GenerateSystemMatrix solid/steady/bothsink.stk st_bothsink.txt
+	@./CompareSystemMatrix  st_bothsink.txt solid/steady/system_matrix_bothsink.txt
+	@echo -n "mc4rm transient           : "
 	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk tr_4rm.txt
 	@./CompareSystemMatrix  tr_4rm.txt mc4rm/transient/system_matrix.txt
-	@echo -n "mc4rm steady    : "
+	@echo -n "mc4rm steady              : "
 	@./GenerateSystemMatrix mc4rm/steady/2dies_four_elements.stk st_4rm.txt
 	@./CompareSystemMatrix  st_4rm.txt mc4rm/steady/system_matrix.txt
-	@echo -n "mc2rm transient : "
+	@echo -n "mc2rm transient           : "
 	@./GenerateSystemMatrix mc2rm/transient/2dies_four_elements.stk tr_2rm.txt
 	@./CompareSystemMatrix  tr_2rm.txt mc2rm/transient/system_matrix.txt
-	@echo -n "mc2rm steady    : "
+	@echo -n "mc2rm steady              : "
 	@./GenerateSystemMatrix mc2rm/steady/2dies_four_elements.stk st_2rm.txt
 	@./CompareSystemMatrix  st_2rm.txt mc2rm/steady/system_matrix.txt
-	@echo -n "pf2rm transient : "
+	@echo -n "pf2rm transient           : "
 	@./GenerateSystemMatrix pf2rm/transient/2dies_four_elements.stk tr_pf.txt
 	@./CompareSystemMatrix  tr_pf.txt pf2rm/transient/system_matrix.txt
-	@echo -n "pf2rm steady    : "
+	@echo -n "pf2rm steady              : "
 	@./GenerateSystemMatrix pf2rm/steady/2dies_four_elements.stk st_pf.txt
 	@./CompareSystemMatrix  st_pf.txt pf2rm/steady/system_matrix.txt
 	@echo ""
@@ -179,6 +203,8 @@ clean:
 	@$(RM) $(RMFLAGS) CompareTemperatures
 	@$(RM) $(RMFLAGS) CompareTemperatures.o
 	@$(RM) $(RMFLAGS) CompareTemperatures.d
+	@$(RM) $(RMFLAGS) tr_nosink.txt tr_topsink.txt tr_bottomsink.txt tr_bothsink.txt
+	@$(RM) $(RMFLAGS) st_nosink.txt st_topsink.txt st_bottomsink.txt st_bothsink.txt
 	@$(RM) $(RMFLAGS) tr_solid.txt tr_4rm.txt tr_pf.txt tr_2rm.txt
 	@$(RM) $(RMFLAGS) st_solid.txt st_4rm.txt st_pf.txt st_2rm.txt
 	@$(RM) $(RMFLAGS) solid/transient/background_node1.txt

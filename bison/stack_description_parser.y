@@ -351,7 +351,7 @@ bottomsink
             YYABORT ;
         }
 
-        stkd->BottomHeatSink->SinkModel          = TDICE_HEATSINK_TOP ;
+        stkd->BottomHeatSink->SinkModel          = TDICE_HEATSINK_BOTTOM ;
         stkd->BottomHeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
         stkd->BottomHeatSink->AmbientTemperature = $11 ;
     }
@@ -1063,7 +1063,7 @@ stack
 
         if (stkd->BottomHeatSink != NULL)
         {
-            if (stkd->BottomHeatSink->SinkModel != TDICE_HEATSINK_TOP)
+            if (stkd->BottomHeatSink->SinkModel != TDICE_HEATSINK_BOTTOM)
 
                 fprintf (stderr, "This is a big error ....\n") ;
 
@@ -1133,46 +1133,65 @@ stack
         {
             StackElement_t *stk_el_ = stack_element_list_data (stkeln) ;
 
-            if (stk_el_->Type == TDICE_STACK_ELEMENT_CHANNEL)
+            switch (stk_el_->Type)
             {
-                CellIndex_t tmp ;
+                case TDICE_STACK_ELEMENT_CHANNEL :
+                {
+                    CellIndex_t tmp ;
 
-                for (tmp = 0u ; tmp != stk_el_->Pointer.Channel->NLayers ; tmp++)
+                    for (tmp = 0u ; tmp != stk_el_->Pointer.Channel->NLayers ; tmp++)
+
+                        stkd->Dimensions->Cell.Heights [ layer_index++ ]
+
+                            = stk_el_->Pointer.Channel->Height ;
+
+                    break ;
+                }
+                case TDICE_STACK_ELEMENT_LAYER :
 
                     stkd->Dimensions->Cell.Heights [ layer_index++ ]
 
-                        = stk_el_->Pointer.Channel->Height ;
-            }
-            else if (stk_el_->Type == TDICE_STACK_ELEMENT_LAYER)
-            {
-                stkd->Dimensions->Cell.Heights [ layer_index++ ]
+                        = stk_el_->Pointer.Layer->Height ;
 
-                    = stk_el_->Pointer.Layer->Height ;
-            }
-            else if (stk_el_->Type == TDICE_STACK_ELEMENT_DIE)
-            {
-                LayerListNode_t *lnd ;
+                    break ;
 
-                for (lnd  = layer_list_end(&stk_el_->Pointer.Die->Layers) ;
-                     lnd != NULL ;
-                     lnd = layer_list_prev (lnd))
+                case TDICE_STACK_ELEMENT_DIE :
                 {
-                    stkd->Dimensions->Cell.Heights [ layer_index++ ] = layer_list_data(lnd)->Height ;
+                    LayerListNode_t *lnd ;
+
+                    for (lnd  = layer_list_end(&stk_el_->Pointer.Die->Layers) ;
+                         lnd != NULL ;
+                         lnd = layer_list_prev (lnd))
+
+                        stkd->Dimensions->Cell.Heights [ layer_index++ ] = layer_list_data(lnd)->Height ;
+
+                    break ;
                 }
-            }
-            else if (stk_el_->Type == TDICE_STACK_ELEMENT_HEATSINK)
-            {
-                if (stkd->BottomHeatSink->SinkModel == TDICE_HEATSINK_NONE)
+                case TDICE_STACK_ELEMENT_HEATSINK :
 
-                    fprintf (stderr, "This is a big error ....\n") ;
-            }
-            else
-            {
-                sprintf (error_message, "Unknown stack type %d", stk_el_->Type) ;
+                    break ;
 
-                STKERROR (error_message) ;
+                case TDICE_STACK_ELEMENT_SECONDARYPATH :
 
-                YYABORT ;
+                    break ;
+
+                case TDICE_STACK_ELEMENT_NONE :
+
+                    sprintf (error_message, "Unset stack type %d", stk_el_->Type) ;
+
+                    STKERROR (error_message) ;
+
+                    YYABORT ;
+
+                    break ;
+
+                default :
+
+                    sprintf (error_message, "Unknown stack type %d", stk_el_->Type) ;
+
+                    STKERROR (error_message) ;
+
+                    YYABORT ;
             }
         }
 
