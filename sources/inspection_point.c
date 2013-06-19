@@ -47,7 +47,7 @@ void inspection_point_init (InspectionPoint_t *ipoint)
     string_init (&ipoint->FileName) ;
 
     ipoint->Instant          = (OutputInstant_t)  TDICE_OUTPUT_INSTANT_NONE ;
-    ipoint->Type             = (OutputType_t)     TDICE_OUTPUT_TYPE_NONE ;
+    ipoint->OType            = (OutputType_t)     TDICE_OUTPUT_TYPE_NONE ;
     ipoint->Quantity         = (OutputQuantity_t) TDICE_OUTPUT_QUANTITY_NONE ;
     ipoint->Xval             = (ChipDimension_t) 0.0 ;
     ipoint->ActualXval       = (ChipDimension_t) 0.0 ;
@@ -66,7 +66,7 @@ void inspection_point_copy (InspectionPoint_t *dst, InspectionPoint_t *src)
     inspection_point_destroy (dst) ;
 
     dst->Instant          = src->Instant ;
-    dst->Type             = src->Type ;
+    dst->OType            = src->OType ;
     dst->Quantity         = src->Quantity ;
     dst->Xval             = src->Xval ;
     dst->ActualXval       = src->ActualXval ;
@@ -154,7 +154,7 @@ void inspection_point_print
     String_t           prefix
 )
 {
-    switch (ipoint->Type)
+    switch (ipoint->OType)
     {
         case TDICE_OUTPUT_TYPE_TCELL :
 
@@ -244,7 +244,7 @@ void inspection_point_print
 
         default :
 
-            fprintf (stderr, "Undefined inspection point command type %d\n", ipoint->Type) ;
+            fprintf (stderr, "Undefined inspection point command type %d\n", ipoint->OType) ;
             break ;
     }
 
@@ -314,7 +314,7 @@ bool is_inspection_point
     OutputQuantity_t   quantity
 )
 {
-    if (ipoint->Type != type)
+    if (ipoint->OType != type)
 
         return false ;
 
@@ -364,7 +364,7 @@ Error_t generate_inspection_point_header
         return TDICE_FAILURE ;
     }
 
-    switch (ipoint->Type)
+    switch (ipoint->OType)
     {
         case TDICE_OUTPUT_TYPE_TCELL :
 
@@ -561,7 +561,7 @@ Error_t generate_inspection_point_output
         return TDICE_FAILURE ;
     }
 
-    switch (ipoint->Type)
+    switch (ipoint->OType)
     {
         case TDICE_OUTPUT_TYPE_TCELL :
 
@@ -733,7 +733,7 @@ void fill_message_inspection_point
     NetworkMessage_t  *message
 )
 {
-    switch (ipoint->Type)
+    switch (ipoint->OType)
     {
         case TDICE_OUTPUT_TYPE_TCELL :
         {

@@ -51,9 +51,9 @@ void network_message_init (NetworkMessage_t *message)
 
     message->Length    = message->Memory ;
 
-    message->Type      = message->Length + 1u ;
+    message->MType     = message->Length + 1u ;
 
-    message->Content   = message->Type   + 1u ;
+    message->Content   = message->MType  + 1u ;
 }
 
 /******************************************************************************/
@@ -67,7 +67,7 @@ void network_message_destroy (NetworkMessage_t *message)
     message->Memory    = NULL ;
     message->MaxLength = 0 ;
     message->Length    = NULL ;
-    message->Type      = NULL ;
+    message->MType     = NULL ;
     message->Content   = NULL ;
 }
 
@@ -84,8 +84,8 @@ void increase_message_memory (NetworkMessage_t *message, Quantity_t new_size)
     message->Memory    = tmp ;
     message->MaxLength = new_size ;
     message->Length    = message->Memory ;
-    message->Type      = message->Length + 1u ;
-    message->Content   = message->Type   + 1u ;
+    message->MType     = message->Length + 1u ;
+    message->Content   = message->MType  + 1u ;
 }
 
 /******************************************************************************/
@@ -94,7 +94,7 @@ void build_message_head (NetworkMessage_t *message, MessageType_t type)
 {
     *message->Length = (MessageWord_t) 2u ;
 
-    *message->Type   = (MessageWord_t) type ;
+    *message->MType  = (MessageWord_t) type ;
 }
 
 /******************************************************************************/

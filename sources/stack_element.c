@@ -44,7 +44,7 @@
 
 void stack_element_init (StackElement_t *stkel)
 {
-    stkel->Type             = (StackElementType_t) TDICE_STACK_ELEMENT_NONE ;
+    stkel->SEType           = (StackElementType_t) TDICE_STACK_ELEMENT_NONE ;
     stkel->Pointer.Layer    = NULL ;
     stkel->Pointer.Die      = NULL ;
     stkel->Pointer.Channel  = NULL ;
@@ -62,17 +62,17 @@ void stack_element_copy (StackElement_t *dst, StackElement_t *src)
 {
     stack_element_destroy (dst) ;
 
-    dst->Type     = src->Type ;
+    dst->SEType   = src->SEType ;
     dst->NLayers  = src->NLayers ;
     dst->Offset   = src->Offset ;
 
     string_copy (&dst->Id, &src->Id) ;
 
-    if (src->Type == TDICE_STACK_ELEMENT_LAYER)
+    if (src->SEType == TDICE_STACK_ELEMENT_LAYER)
 
         dst->Pointer.Layer = layer_clone (src->Pointer.Layer) ;
 
-    else if (src->Type == TDICE_STACK_ELEMENT_DIE)
+    else if (src->SEType == TDICE_STACK_ELEMENT_DIE)
 
         dst->Pointer.Die = die_clone (src->Pointer.Die) ;
 
@@ -89,11 +89,11 @@ void stack_element_destroy (StackElement_t *stkel)
 {
     string_destroy (&stkel->Id) ;
 
-    if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
+    if (stkel->SEType == TDICE_STACK_ELEMENT_DIE)
 
         die_free (stkel->Pointer.Die) ;
 
-    else if (stkel->Type == TDICE_STACK_ELEMENT_LAYER)
+    else if (stkel->SEType == TDICE_STACK_ELEMENT_LAYER)
 
         layer_free (stkel->Pointer.Layer) ;
 
@@ -159,7 +159,7 @@ void stack_element_print
     String_t        prefix
 )
 {
-    switch (stkel->Type)
+    switch (stkel->SEType)
     {
         case TDICE_STACK_ELEMENT_CHANNEL :
 
@@ -203,7 +203,7 @@ void stack_element_print
 
         default :
 
-            fprintf (stderr, "Undefined stack element type %d\n", stkel->Type) ;
+            fprintf (stderr, "Undefined stack element type %d\n", stkel->SEType) ;
     }
 }
 
@@ -213,11 +213,11 @@ CellIndex_t get_source_layer_offset (StackElement_t *stkel)
 {
     CellIndex_t layer_offset = stkel->Offset ;
 
-    if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
+    if (stkel->SEType == TDICE_STACK_ELEMENT_DIE)
 
         layer_offset += stkel->Pointer.Die->SourceLayerOffset ;
 
-    else if (stkel->Type == TDICE_STACK_ELEMENT_CHANNEL)
+    else if (stkel->SEType == TDICE_STACK_ELEMENT_CHANNEL)
 
         layer_offset += stkel->Pointer.Channel->SourceLayerOffset ;
 
@@ -290,7 +290,7 @@ Quantity_t get_number_of_floorplan_elements_stack_element
     StackElement_t *stkel
 )
 {
-    if (stkel->Type == TDICE_STACK_ELEMENT_DIE)
+    if (stkel->SEType == TDICE_STACK_ELEMENT_DIE)
 
         return get_number_of_floorplan_elements_floorplan
 

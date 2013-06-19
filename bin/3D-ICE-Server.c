@@ -144,7 +144,7 @@ int main (int argc, char** argv)
 
         receive_message_from_socket (&client_socket, &request) ;
 
-        switch (*request.Type)
+        switch (*request.MType)
         {
 
         /**********************************************************************/

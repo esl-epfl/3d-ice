@@ -1027,7 +1027,7 @@ stack
         StackElement_t *bmost = stack_element_list_data (stack_element_list_end   (&stkd->StackElements)) ;
         StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (&stkd->StackElements)) ;
 
-        if (bmost->Type == TDICE_STACK_ELEMENT_CHANNEL)
+        if (bmost->SEType == TDICE_STACK_ELEMENT_CHANNEL)
         {
             STKERROR ("Error: cannot declare a channel as bottom-most stack element") ;
 
@@ -1052,7 +1052,7 @@ stack
 
             string_copy_cstr (&stack_element.Id, "ConnectionToAmbient") ;
 
-            stack_element.Type             = TDICE_STACK_ELEMENT_HEATSINK ;
+            stack_element.SEType           = TDICE_STACK_ELEMENT_HEATSINK ;
             stack_element.Pointer.HeatSink = stkd->TopHeatSink ;
             stack_element.NLayers          = 0u ;
 
@@ -1075,7 +1075,7 @@ stack
 
             string_copy_cstr (&stack_element.Id, "ConnectionToPCB") ;
 
-            stack_element.Type             = TDICE_STACK_ELEMENT_SECONDARYPATH ;
+            stack_element.SEType           = TDICE_STACK_ELEMENT_SECONDARYPATH ;
             stack_element.Pointer.HeatSink = stkd->BottomHeatSink ;
             stack_element.NLayers          = 0u ;
 
@@ -1104,7 +1104,7 @@ stack
 
         tmost = stack_element_list_data (stack_element_list_begin (&stkd->StackElements)) ;
 
-        if (   tmost->Type == TDICE_STACK_ELEMENT_HEATSINK
+        if (   tmost->SEType == TDICE_STACK_ELEMENT_HEATSINK
             && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP)
 
             tmost->Offset-- ;
@@ -1133,7 +1133,7 @@ stack
         {
             StackElement_t *stk_el_ = stack_element_list_data (stkeln) ;
 
-            switch (stk_el_->Type)
+            switch (stk_el_->SEType)
             {
                 case TDICE_STACK_ELEMENT_CHANNEL :
                 {
@@ -1177,7 +1177,7 @@ stack
 
                 case TDICE_STACK_ELEMENT_NONE :
 
-                    sprintf (error_message, "Unset stack type %d", stk_el_->Type) ;
+                    sprintf (error_message, "Unset stack type %d", stk_el_->SEType) ;
 
                     STKERROR (error_message) ;
 
@@ -1187,7 +1187,7 @@ stack
 
                 default :
 
-                    sprintf (error_message, "Unknown stack type %d", stk_el_->Type) ;
+                    sprintf (error_message, "Unknown stack type %d", stk_el_->SEType) ;
 
                     STKERROR (error_message) ;
 
@@ -1230,7 +1230,7 @@ stack_elements
     {
         if (   stkd->StackElements.Size == 0
 
-            && $1->Type == TDICE_STACK_ELEMENT_CHANNEL)
+            && $1->SEType == TDICE_STACK_ELEMENT_CHANNEL)
         {
             STKERROR ("Error: cannot declare a channel as top-most stack element") ;
 
@@ -1258,8 +1258,8 @@ stack_elements
 
             (stack_element_list_begin (&stkd->StackElements)) ;
 
-        if (   stkel->Type == TDICE_STACK_ELEMENT_CHANNEL
-            &&    $2->Type == TDICE_STACK_ELEMENT_CHANNEL)
+        if (   stkel->SEType == TDICE_STACK_ELEMENT_CHANNEL
+            &&    $2->SEType == TDICE_STACK_ELEMENT_CHANNEL)
         {
             STKERROR ("Error: cannot declare two consecutive channels") ;
 
@@ -1323,7 +1323,7 @@ stack_element
 
         layer_copy (layer, tmp) ;
 
-        stack_element->Type          = TDICE_STACK_ELEMENT_LAYER ;
+        stack_element->SEType        = TDICE_STACK_ELEMENT_LAYER ;
         stack_element->Pointer.Layer = layer ;
         stack_element->NLayers       = 1 ;
 
@@ -1357,7 +1357,7 @@ stack_element
             YYABORT ;
         }
 
-        stack_element->Type            = TDICE_STACK_ELEMENT_CHANNEL ;
+        stack_element->SEType          = TDICE_STACK_ELEMENT_CHANNEL ;
         stack_element->Pointer.Channel = stkd->Channel ; // This might be NULL !!!
         stack_element->NLayers         = stkd->Channel->NLayers ;
 
@@ -1435,7 +1435,7 @@ stack_element
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
-        stack_element->Type        = TDICE_STACK_ELEMENT_DIE ;
+        stack_element->SEType      = TDICE_STACK_ELEMENT_DIE ;
         stack_element->Pointer.Die = die ;
         stack_element->NLayers     = stack_element->Pointer.Die->NLayers ;
 
@@ -1599,7 +1599,7 @@ inspection_point
             YYABORT ;
         }
 
-        ipoint->Type          = TDICE_OUTPUT_TYPE_TCELL ;
+        ipoint->OType         = TDICE_OUTPUT_TYPE_TCELL ;
         ipoint->Instant       = $10 ;
         ipoint->StackElement  = tmp ;
 
@@ -1643,7 +1643,7 @@ inspection_point
             YYABORT ;
         }
 
-        if (tmp->Type != TDICE_STACK_ELEMENT_DIE)
+        if (tmp->SEType != TDICE_STACK_ELEMENT_DIE)
         {
             sprintf (error_message, "The stack element %s must be a die", $3) ;
 
@@ -1671,7 +1671,7 @@ inspection_point
             YYABORT ;
         }
 
-        ipoint->Type         = TDICE_OUTPUT_TYPE_TFLP ;
+        ipoint->OType        = TDICE_OUTPUT_TYPE_TFLP ;
         ipoint->Quantity     = $7 ;
         ipoint->Instant      = $8 ;
         ipoint->StackElement = tmp ;
@@ -1716,7 +1716,7 @@ inspection_point
             YYABORT ;
         }
 
-        if (tmp->Type != TDICE_STACK_ELEMENT_DIE)
+        if (tmp->SEType != TDICE_STACK_ELEMENT_DIE)
         {
             sprintf (error_message, "The stack element %s must be a die", $3) ;
 
@@ -1761,7 +1761,7 @@ inspection_point
             YYABORT ;
         }
 
-        ipoint->Type             = TDICE_OUTPUT_TYPE_TFLPEL ;
+        ipoint->OType            = TDICE_OUTPUT_TYPE_TFLPEL ;
         ipoint->FloorplanElement = flpel ;
         ipoint->Quantity         = $9 ;
         ipoint->Instant          = $10 ;
@@ -1819,7 +1819,7 @@ inspection_point
             YYABORT ;
         }
 
-        ipoint->Type         = TDICE_OUTPUT_TYPE_TMAP ;
+        ipoint->OType        = TDICE_OUTPUT_TYPE_TMAP ;
         ipoint->Instant      = $6 ;
         ipoint->StackElement = tmp ;
 
@@ -1874,7 +1874,7 @@ inspection_point
             YYABORT ;
         }
 
-        ipoint->Type         = TDICE_OUTPUT_TYPE_PMAP ;
+        ipoint->OType        = TDICE_OUTPUT_TYPE_PMAP ;
         ipoint->Instant      = $6 ;
         ipoint->StackElement = tmp ;
 
@@ -1916,7 +1916,7 @@ inspection_point
             YYABORT ;
         }
 
-        if (tmp->Type != TDICE_STACK_ELEMENT_CHANNEL)
+        if (tmp->SEType != TDICE_STACK_ELEMENT_CHANNEL)
         {
             sprintf (error_message, "The stack element %s must be a channel", $3) ;
 
@@ -1944,7 +1944,7 @@ inspection_point
             YYABORT ;
         }
 
-        ipoint->Type         = TDICE_OUTPUT_TYPE_TCOOLANT ;
+        ipoint->OType        = TDICE_OUTPUT_TYPE_TCOOLANT ;
         ipoint->Quantity     = $7 ;
         ipoint->Instant      = $8 ;
         ipoint->StackElement = tmp ;

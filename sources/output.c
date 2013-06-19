@@ -328,7 +328,7 @@ Error_t fill_output_message
     {
         InspectionPoint_t *ipoint = inspection_point_list_data (ipn) ;
 
-        if (output_type == ipoint->Type)
+        if (output_type == ipoint->OType)
 
             fill_message_inspection_point
 

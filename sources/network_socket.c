@@ -281,7 +281,7 @@ Error_t receive_message_from_socket
 
     message_length *= sizeof (MessageWord_t) ;
 
-    MessageWord_t *begin = message->Type ;
+    MessageWord_t *begin = message->MType ;
 
     while (message_length > 0)
     {

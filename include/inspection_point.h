@@ -78,7 +78,7 @@ extern "C"
 
         /*! Type of Output requested (cell, flp, flpel, tmap, pmap) */
 
-        OutputType_t Type ;
+        OutputType_t OType ;
 
         /*! The kind of quantity to be measured */
 

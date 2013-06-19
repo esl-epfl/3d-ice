@@ -98,7 +98,7 @@ extern "C"
 
         /*! The type of the stack element (Layer, Die or Channel) */
 
-        StackElementType_t Type ;
+        StackElementType_t SEType ;
 
         /*! Pointer to a data structure representing the type of a StackElement.
          *  This pointer must be casted depending on the value stored in

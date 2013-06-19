@@ -83,7 +83,7 @@ extern "C"
 
         /*! Offset to access the type of the message */
 
-        MessageWord_t *Type ;
+        MessageWord_t *MType ;
 
         /*! Offset to access the content of the message */
 

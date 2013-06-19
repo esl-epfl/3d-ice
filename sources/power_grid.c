@@ -187,7 +187,7 @@ void power_grid_fill
 
         CellIndex_t index = stack_element->Offset ;
 
-        switch (stack_element->Type)
+        switch (stack_element->SEType)
         {
             case TDICE_STACK_ELEMENT_DIE :
             {
@@ -383,7 +383,7 @@ void power_grid_fill
 
             default :
 
-                fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->Type) ;
+                fprintf (stderr, "Error! Unknown stack element type %d\n", stack_element->SEType) ;
 
         } /* switch stack_element->Type */
     }
