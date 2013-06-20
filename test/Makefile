@@ -65,101 +65,101 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-
 	@echo "Comparison of system matrices ...."
 	@echo "----------------------------------"
 	@echo -n "solid transient top hs    : "
-	@./GenerateSystemMatrix solid/transient/topsink.stk tr_topsink.txt
-	@./CompareSystemMatrix  tr_topsink.txt solid/transient/system_matrix_topsink.txt
+	@valgrind ./GenerateSystemMatrix solid/transient/topsink.stk tr_topsink.txt
+	@valgrind ./CompareSystemMatrix  tr_topsink.txt solid/transient/system_matrix_topsink.txt
 	@echo -n "solid steady top hs       : "
-	@./GenerateSystemMatrix solid/steady/topsink.stk st_topsink.txt
-	@./CompareSystemMatrix  st_topsink.txt solid/steady/system_matrix_topsink.txt
+	@valgrind ./GenerateSystemMatrix solid/steady/topsink.stk st_topsink.txt
+	@valgrind ./CompareSystemMatrix  st_topsink.txt solid/steady/system_matrix_topsink.txt
 	@echo -n "solid transient bottom hs : "
-	@./GenerateSystemMatrix solid/transient/bottomsink.stk tr_bottomsink.txt
-	@./CompareSystemMatrix  tr_bottomsink.txt solid/transient/system_matrix_bottomsink.txt
+	@valgrind ./GenerateSystemMatrix solid/transient/bottomsink.stk tr_bottomsink.txt
+	@valgrind ./CompareSystemMatrix  tr_bottomsink.txt solid/transient/system_matrix_bottomsink.txt
 	@echo -n "solid steady bottom hs    : "
-	@./GenerateSystemMatrix solid/steady/bottomsink.stk st_bottomsink.txt
-	@./CompareSystemMatrix  st_bottomsink.txt solid/steady/system_matrix_bottomsink.txt
+	@valgrind ./GenerateSystemMatrix solid/steady/bottomsink.stk st_bottomsink.txt
+	@valgrind ./CompareSystemMatrix  st_bottomsink.txt solid/steady/system_matrix_bottomsink.txt
 	@echo -n "solid transient both hs   : "
-	@./GenerateSystemMatrix solid/transient/bothsink.stk tr_bothsink.txt
-	@./CompareSystemMatrix  tr_bothsink.txt solid/transient/system_matrix_bothsink.txt
+	@valgrind ./GenerateSystemMatrix solid/transient/bothsink.stk tr_bothsink.txt
+	@valgrind ./CompareSystemMatrix  tr_bothsink.txt solid/transient/system_matrix_bothsink.txt
 	@echo -n "solid steady both hs      : "
-	@./GenerateSystemMatrix solid/steady/bothsink.stk st_bothsink.txt
-	@./CompareSystemMatrix  st_bothsink.txt solid/steady/system_matrix_bothsink.txt
+	@valgrind ./GenerateSystemMatrix solid/steady/bothsink.stk st_bothsink.txt
+	@valgrind ./CompareSystemMatrix  st_bothsink.txt solid/steady/system_matrix_bothsink.txt
 	@echo -n "mc4rm transient           : "
-	@./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk tr_4rm.txt
-	@./CompareSystemMatrix  tr_4rm.txt mc4rm/transient/system_matrix.txt
+	@valgrind ./GenerateSystemMatrix mc4rm/transient/2dies_four_elements.stk tr_4rm.txt
+	@valgrind ./CompareSystemMatrix  tr_4rm.txt mc4rm/transient/system_matrix.txt
 	@echo -n "mc4rm steady              : "
-	@./GenerateSystemMatrix mc4rm/steady/2dies_four_elements.stk st_4rm.txt
-	@./CompareSystemMatrix  st_4rm.txt mc4rm/steady/system_matrix.txt
+	@valgrind ./GenerateSystemMatrix mc4rm/steady/2dies_four_elements.stk st_4rm.txt
+	@valgrind ./CompareSystemMatrix  st_4rm.txt mc4rm/steady/system_matrix.txt
 	@echo -n "mc2rm transient           : "
-	@./GenerateSystemMatrix mc2rm/transient/2dies_four_elements.stk tr_2rm.txt
-	@./CompareSystemMatrix  tr_2rm.txt mc2rm/transient/system_matrix.txt
+	@valgrind ./GenerateSystemMatrix mc2rm/transient/2dies_four_elements.stk tr_2rm.txt
+	@valgrind ./CompareSystemMatrix  tr_2rm.txt mc2rm/transient/system_matrix.txt
 	@echo -n "mc2rm steady              : "
-	@./GenerateSystemMatrix mc2rm/steady/2dies_four_elements.stk st_2rm.txt
-	@./CompareSystemMatrix  st_2rm.txt mc2rm/steady/system_matrix.txt
+	@valgrind ./GenerateSystemMatrix mc2rm/steady/2dies_four_elements.stk st_2rm.txt
+	@valgrind ./CompareSystemMatrix  st_2rm.txt mc2rm/steady/system_matrix.txt
 	@echo -n "pf2rm transient           : "
-	@./GenerateSystemMatrix pf2rm/transient/2dies_four_elements.stk tr_pf.txt
-	@./CompareSystemMatrix  tr_pf.txt pf2rm/transient/system_matrix.txt
+	@valgrind ./GenerateSystemMatrix pf2rm/transient/2dies_four_elements.stk tr_pf.txt
+	@valgrind ./CompareSystemMatrix  tr_pf.txt pf2rm/transient/system_matrix.txt
 	@echo -n "pf2rm steady              : "
-	@./GenerateSystemMatrix pf2rm/steady/2dies_four_elements.stk st_pf.txt
-	@./CompareSystemMatrix  st_pf.txt pf2rm/steady/system_matrix.txt
+	@valgrind ./GenerateSystemMatrix pf2rm/steady/2dies_four_elements.stk st_pf.txt
+	@valgrind ./CompareSystemMatrix  st_pf.txt pf2rm/steady/system_matrix.txt
 	@echo ""
 	@echo "Comparison of transient results ...."
 	@echo "------------------------------------"
 	@echo -n "solid top    : "
-	@../bin/3D-ICE-Emulator solid/transient/topsink.stk > /dev/null
-	@./CompareTemperatures  solid/transient/node1_top.txt solid/transient/node2_top.txt solid/transient/output_top.txt
+	@valgrind ../bin/3D-ICE-Emulator solid/transient/topsink.stk > /dev/null
+	@valgrind ./CompareTemperatures  solid/transient/node1_top.txt solid/transient/node2_top.txt solid/transient/output_top.txt
 	@echo -n "solid bottom : "
-	@../bin/3D-ICE-Emulator solid/transient/bottomsink.stk > /dev/null
-	@./CompareTemperatures  solid/transient/node1_bottom.txt solid/transient/node2_bottom.txt solid/transient/output_bottom.txt
+	@valgrind ../bin/3D-ICE-Emulator solid/transient/bottomsink.stk > /dev/null
+	@valgrind ./CompareTemperatures  solid/transient/node1_bottom.txt solid/transient/node2_bottom.txt solid/transient/output_bottom.txt
 	@echo -n "solid both   : "
-	@../bin/3D-ICE-Emulator solid/transient/bothsink.stk > /dev/null
-	@./CompareTemperatures  solid/transient/node1_both.txt solid/transient/node2_both.txt solid/transient/output_both.txt
+	@valgrind ../bin/3D-ICE-Emulator solid/transient/bothsink.stk > /dev/null
+	@valgrind ./CompareTemperatures  solid/transient/node1_both.txt solid/transient/node2_both.txt solid/transient/output_both.txt
 	@echo -n "mc4rm 4e     : "
-	@../bin/3D-ICE-Emulator mc4rm/transient/2dies_four_elements.stk > /dev/null
-	@./CompareTemperatures  mc4rm/transient/four_elements_node1.txt mc4rm/transient/four_elements_node2.txt  mc4rm/transient/output_four_elements.txt
+	@valgrind ../bin/3D-ICE-Emulator mc4rm/transient/2dies_four_elements.stk > /dev/null
+	@valgrind ./CompareTemperatures  mc4rm/transient/four_elements_node1.txt mc4rm/transient/four_elements_node2.txt  mc4rm/transient/output_four_elements.txt
 	@echo -n "mc4rm bg     : "
-	@../bin/3D-ICE-Emulator mc4rm/transient/2dies_background.stk > /dev/null
-	@./CompareTemperatures  mc4rm/transient/background_node1.txt    mc4rm/transient/background_node2.txt     mc4rm/transient/output_background.txt
+	@valgrind ../bin/3D-ICE-Emulator mc4rm/transient/2dies_background.stk > /dev/null
+	@valgrind ./CompareTemperatures  mc4rm/transient/background_node1.txt    mc4rm/transient/background_node2.txt     mc4rm/transient/output_background.txt
 	@echo -n "mc2rm 4e     : "
-	@../bin/3D-ICE-Emulator mc2rm/transient/2dies_four_elements.stk > /dev/null
-	@./CompareTemperatures  mc2rm/transient/four_elements_node1.txt mc2rm/transient/four_elements_node2.txt  mc2rm/transient/output_four_elements.txt
+	@valgrind ../bin/3D-ICE-Emulator mc2rm/transient/2dies_four_elements.stk > /dev/null
+	@valgrind ./CompareTemperatures  mc2rm/transient/four_elements_node1.txt mc2rm/transient/four_elements_node2.txt  mc2rm/transient/output_four_elements.txt
 	@echo -n "mc2rm bg     : "
-	@../bin/3D-ICE-Emulator mc2rm/transient/2dies_background.stk > /dev/null
-	@./CompareTemperatures  mc2rm/transient/background_node1.txt    mc2rm/transient/background_node2.txt     mc2rm/transient/output_background.txt
+	@valgrind ../bin/3D-ICE-Emulator mc2rm/transient/2dies_background.stk > /dev/null
+	@valgrind ./CompareTemperatures  mc2rm/transient/background_node1.txt    mc2rm/transient/background_node2.txt     mc2rm/transient/output_background.txt
 	@echo -n "pf2rm 4e     : "
-	@../bin/3D-ICE-Emulator pf2rm/transient/2dies_four_elements.stk > /dev/null
-	@./CompareTemperatures  pf2rm/transient/four_elements_node1.txt pf2rm/transient/four_elements_node2.txt  pf2rm/transient/output_four_elements.txt
+	@valgrind ../bin/3D-ICE-Emulator pf2rm/transient/2dies_four_elements.stk > /dev/null
+	@valgrind ./CompareTemperatures  pf2rm/transient/four_elements_node1.txt pf2rm/transient/four_elements_node2.txt  pf2rm/transient/output_four_elements.txt
 	@echo -n "pf2rm bg     : "
-	@../bin/3D-ICE-Emulator pf2rm/transient/2dies_background.stk > /dev/null
-	@./CompareTemperatures  pf2rm/transient/background_node1.txt    pf2rm/transient/background_node2.txt     pf2rm/transient/output_background.txt
+	@valgrind ../bin/3D-ICE-Emulator pf2rm/transient/2dies_background.stk > /dev/null
+	@valgrind ./CompareTemperatures  pf2rm/transient/background_node1.txt    pf2rm/transient/background_node2.txt     pf2rm/transient/output_background.txt
 	@echo ""
 	@echo "Comparison of steady state results ...."
 	@echo "---------------------------------------"
 	@echo -n "solid top    : "
-	@../bin/3D-ICE-Emulator solid/steady/topsink.stk > /dev/null
-	@./CompareTemperatures  solid/steady/node1_top.txt solid/steady/node2_top.txt solid/steady/output_top.txt
+	@valgrind ../bin/3D-ICE-Emulator solid/steady/topsink.stk > /dev/null
+	@valgrind ./CompareTemperatures  solid/steady/node1_top.txt solid/steady/node2_top.txt solid/steady/output_top.txt
 	@echo -n "solid bottom : "
-	@../bin/3D-ICE-Emulator solid/steady/bottomsink.stk > /dev/null
-	@./CompareTemperatures  solid/steady/node1_bottom.txt solid/steady/node2_bottom.txt solid/steady/output_bottom.txt
+	@valgrind ../bin/3D-ICE-Emulator solid/steady/bottomsink.stk > /dev/null
+	@valgrind ./CompareTemperatures  solid/steady/node1_bottom.txt solid/steady/node2_bottom.txt solid/steady/output_bottom.txt
 	@echo -n "solid both   : "
-	@../bin/3D-ICE-Emulator solid/steady/bothsink.stk > /dev/null
-	@./CompareTemperatures  solid/steady/node1_both.txt solid/steady/node2_both.txt solid/steady/output_both.txt
+	@valgrind ../bin/3D-ICE-Emulator solid/steady/bothsink.stk > /dev/null
+	@valgrind ./CompareTemperatures  solid/steady/node1_both.txt solid/steady/node2_both.txt solid/steady/output_both.txt
 	@echo -n "mc4rm 4e     : "
-	@../bin/3D-ICE-Emulator mc4rm/steady/2dies_four_elements.stk > /dev/null
-	@./CompareTemperatures mc4rm/steady/four_elements_node1.txt mc4rm/steady/four_elements_node2.txt mc4rm/steady/output_four_elements.txt
+	@valgrind ../bin/3D-ICE-Emulator mc4rm/steady/2dies_four_elements.stk > /dev/null
+	@valgrind ./CompareTemperatures mc4rm/steady/four_elements_node1.txt mc4rm/steady/four_elements_node2.txt mc4rm/steady/output_four_elements.txt
 	@echo -n "mc4rm bg     : "
-	@../bin/3D-ICE-Emulator mc4rm/steady/2dies_background.stk > /dev/null
-	@./CompareTemperatures mc4rm/steady/background_node1.txt    mc4rm/steady/background_node2.txt    mc4rm/steady/output_background.txt
+	@valgrind ../bin/3D-ICE-Emulator mc4rm/steady/2dies_background.stk > /dev/null
+	@valgrind ./CompareTemperatures mc4rm/steady/background_node1.txt    mc4rm/steady/background_node2.txt    mc4rm/steady/output_background.txt
 	@echo -n "mc2rm 4e     : "
-	@../bin/3D-ICE-Emulator mc2rm/steady/2dies_four_elements.stk > /dev/null
-	@./CompareTemperatures mc2rm/steady/four_elements_node1.txt mc2rm/steady/four_elements_node2.txt mc2rm/steady/output_four_elements.txt
+	@valgrind ../bin/3D-ICE-Emulator mc2rm/steady/2dies_four_elements.stk > /dev/null
+	@valgrind ./CompareTemperatures mc2rm/steady/four_elements_node1.txt mc2rm/steady/four_elements_node2.txt mc2rm/steady/output_four_elements.txt
 	@echo -n "mc2rm bg     : "
-	@../bin/3D-ICE-Emulator mc2rm/steady/2dies_background.stk > /dev/null
-	@./CompareTemperatures mc2rm/steady/background_node1.txt    mc2rm/steady/background_node2.txt    mc2rm/steady/output_background.txt
+	@valgrind ../bin/3D-ICE-Emulator mc2rm/steady/2dies_background.stk > /dev/null
+	@valgrind ./CompareTemperatures mc2rm/steady/background_node1.txt    mc2rm/steady/background_node2.txt    mc2rm/steady/output_background.txt
 	@echo -n "pf2rm 4e     : "
-	@../bin/3D-ICE-Emulator pf2rm/steady/2dies_four_elements.stk > /dev/null
-	@./CompareTemperatures pf2rm/steady/four_elements_node1.txt pf2rm/steady/four_elements_node2.txt pf2rm/steady/output_four_elements.txt
+	@valgrind ../bin/3D-ICE-Emulator pf2rm/steady/2dies_four_elements.stk > /dev/null
+	@valgrind ./CompareTemperatures pf2rm/steady/four_elements_node1.txt pf2rm/steady/four_elements_node2.txt pf2rm/steady/output_four_elements.txt
 	@echo -n "pf2rm bg     : "
-	@../bin/3D-ICE-Emulator pf2rm/steady/2dies_background.stk > /dev/null
-	@./CompareTemperatures pf2rm/steady/background_node1.txt    pf2rm/steady/background_node2.txt    pf2rm/steady/output_background.txt
+	@valgrind ../bin/3D-ICE-Emulator pf2rm/steady/2dies_background.stk > /dev/null
+	@valgrind ./CompareTemperatures pf2rm/steady/background_node1.txt    pf2rm/steady/background_node2.txt    pf2rm/steady/output_background.txt
 
 clean:
 	@$(RM) $(RMFLAGS) GenerateSystemMatrix GenerateSystemMatrix.o GenerateSystemMatrix.d

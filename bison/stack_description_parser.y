@@ -1024,8 +1024,7 @@ stack
             YYABORT ;
         }
 
-        StackElement_t *bmost = stack_element_list_data (stack_element_list_end   (&stkd->StackElements)) ;
-        StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (&stkd->StackElements)) ;
+        StackElement_t *bmost = stack_element_list_data (stack_element_list_end (&stkd->StackElements)) ;
 
         if (bmost->SEType == TDICE_STACK_ELEMENT_CHANNEL)
         {
@@ -1034,55 +1033,28 @@ stack
             YYABORT ;
         }
 
-        if (stkd->TopHeatSink == NULL && stkd->BottomHeatSink == NULL && stkd->Channel == NULL)
+        StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (&stkd->StackElements)) ;
+
+        if (tmost->SEType == TDICE_STACK_ELEMENT_CHANNEL)
+        {
+            STKERROR ("Error: cannot declare a channel as top-most stack element") ;
+
+            YYABORT ;
+        }
+
+        if (   stkd->TopHeatSink    == NULL
+            && stkd->BottomHeatSink == NULL
+            && stkd->Channel        == NULL)
 
             fprintf (stderr, "Warning: no dissipation has been declared\n") ;
 
         if (stkd->TopHeatSink != NULL)
-        {
-            if (stkd->TopHeatSink->SinkModel != TDICE_HEATSINK_TOP)
 
-                fprintf (stderr, "This is a big error ....\n") ;
-
-            // Creates an extra stack element to be add in the 3d stack
-
-            StackElement_t stack_element ;
-
-            stack_element_init (&stack_element) ;
-
-            string_copy_cstr (&stack_element.Id, "ConnectionToAmbient") ;
-
-            stack_element.SEType           = TDICE_STACK_ELEMENT_HEATSINK ;
-            stack_element.Pointer.HeatSink = stkd->TopHeatSink ;
-            stack_element.NLayers          = 0u ;
-
-            stack_element_list_insert_begin (&stkd->StackElements, &stack_element) ;
-
-            stack_element_destroy (&stack_element) ;
-        }
+            tmost->TopSink = heat_sink_clone (stkd->TopHeatSink) ;
 
         if (stkd->BottomHeatSink != NULL)
-        {
-            if (stkd->BottomHeatSink->SinkModel != TDICE_HEATSINK_BOTTOM)
 
-                fprintf (stderr, "This is a big error ....\n") ;
-
-            // Creates an extra stack element to be add in the 3d stack
-
-            StackElement_t stack_element ;
-
-            stack_element_init (&stack_element) ;
-
-            string_copy_cstr (&stack_element.Id, "ConnectionToPCB") ;
-
-            stack_element.SEType           = TDICE_STACK_ELEMENT_SECONDARYPATH ;
-            stack_element.Pointer.HeatSink = stkd->BottomHeatSink ;
-            stack_element.NLayers          = 0u ;
-
-            stack_element_list_insert_end (&stkd->StackElements, &stack_element) ;
-
-            stack_element_destroy (&stack_element) ;
-        }
+            bmost->BottomSink = heat_sink_clone (stkd->BottomHeatSink) ;
 
         // Counts the number of layers and fix the layer offset starting from
         // the bottom most element in the stack. This operation can be done only
@@ -1101,13 +1073,6 @@ stack
             stk_el->Offset = layer_index ;
             layer_index   += stk_el->NLayers ;
         }
-
-        tmost = stack_element_list_data (stack_element_list_begin (&stkd->StackElements)) ;
-
-        if (   tmost->SEType == TDICE_STACK_ELEMENT_HEATSINK
-            && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP)
-
-            tmost->Offset-- ;
 
         stkd->Dimensions->Grid.NLayers = layer_index ;
 
@@ -1167,14 +1132,6 @@ stack
 
                     break ;
                 }
-                case TDICE_STACK_ELEMENT_HEATSINK :
-
-                    break ;
-
-                case TDICE_STACK_ELEMENT_SECONDARYPATH :
-
-                    break ;
-
                 case TDICE_STACK_ELEMENT_NONE :
 
                     sprintf (error_message, "Unset stack type %d", stk_el_->SEType) ;
@@ -1218,9 +1175,7 @@ stack
                              TDICE_CHANNEL_MODEL_NONE    :
                              stkd->Channel->ChannelModel ;
 
-        compute_number_of_connections
-
-            (stkd->Dimensions, num_channels, cm) ;
+        compute_number_of_connections (stkd->Dimensions, num_channels, cm) ;
    }
   ;
 
@@ -1228,15 +1183,6 @@ stack_elements
 
   : stack_element
     {
-        if (   stkd->StackElements.Size == 0
-
-            && $1->SEType == TDICE_STACK_ELEMENT_CHANNEL)
-        {
-            STKERROR ("Error: cannot declare a channel as top-most stack element") ;
-
-            YYABORT ;
-        }
-
         stack_element_list_insert_end (&stkd->StackElements, $1) ;
 
         stack_element_free ($1) ;

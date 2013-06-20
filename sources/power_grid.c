@@ -198,9 +198,7 @@ void power_grid_fill
                      lnd != NULL ;
                      lnd  = layer_list_prev (lnd))
                 {
-                    if (pgrid->LayersTypeProfile [index + tmp] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
-
-                        pgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOLID ;
+                    pgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOLID ;
 
                     pgrid->FloorplansProfile [index + tmp] = NULL ;
 
@@ -209,13 +207,7 @@ void power_grid_fill
 
                 tmp = stack_element->Pointer.Die->SourceLayerOffset ;
 
-                if (pgrid->LayersTypeProfile [index + tmp] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
-
-                    pgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
-
-                else
-
-                    pgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOURCE ;
+                pgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOURCE ;
 
                 pgrid->FloorplansProfile [index + tmp] = &stack_element->Pointer.Die->Floorplan ;
 
@@ -223,9 +215,7 @@ void power_grid_fill
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
-                if (pgrid->LayersTypeProfile [index] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
-
-                    pgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID ;
+                pgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID ;
 
                 pgrid->FloorplansProfile [index] = NULL ;
 
@@ -287,94 +277,6 @@ void power_grid_fill
 
                 break ;
             }
-            case TDICE_STACK_ELEMENT_HEATSINK :
-            {
-                pgrid->TopHeatSink = stack_element->Pointer.HeatSink ;
-
-                CellIndex_t lastLayer = (CellIndex_t) 0u ;
-
-                switch (pgrid->TopHeatSink->SinkModel)
-                {
-                    case TDICE_HEATSINK_TOP :
-
-                        if (pgrid->LayersTypeProfile [index] == TDICE_LAYER_SOLID)
-
-                            pgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
-
-                        else if (pgrid->LayersTypeProfile [index] == TDICE_LAYER_SOURCE)
-
-                            pgrid->LayersTypeProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
-
-                        else
-
-                            fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
-
-                        lastLayer = index ;
-
-                        break ;
-
-                    case TDICE_HEATSINK_NONE :
-
-                        fprintf (stderr, "WARNING: unset heatsink model\n") ;
-
-                        break ;
-
-                    default :
-
-                        // warning includes heat sink type "secondary path"
-
-                        fprintf (stderr,
-                           "WARNING: unknown heatsink model %d\n",
-                           pgrid->TopHeatSink->SinkModel) ;
-                }
-
-                CellIndex_t row    = (CellIndex_t) 0u ;;
-                CellIndex_t column = (CellIndex_t) 0u ;;
-
-                SolidTC_t *tmp = pgrid->HeatSinkTopTcs ;
-
-                for (row  = first_row (dimensions) ;
-                     row <= last_row  (dimensions) ; row++)
-                {
-                    for (column  = first_column (dimensions) ;
-                         column <= last_column  (dimensions) ; column++)
-                    {
-                        *tmp++ += get_conductance_top
-
-                                  (tgrid, dimensions, lastLayer, row, column) ;
-
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
-                break ;
-            }
-
-            case TDICE_STACK_ELEMENT_SECONDARYPATH :
-            {
-                pgrid->BottomHeatSink = stack_element->Pointer.HeatSink ;
-
-                pgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
-
-                CellIndex_t row    = (CellIndex_t) 0u ;
-                CellIndex_t column = (CellIndex_t) 0u ;
-
-                SolidTC_t *tmp = pgrid->HeatSinkBottomTcs ;
-
-                for (row  = first_row (dimensions) ;
-                     row <= last_row  (dimensions) ; row++)
-                {
-                    for (column  = first_column (dimensions) ;
-                         column <= last_column  (dimensions) ; column++)
-                    {
-                        *tmp++ += get_conductance_bottom
-
-                                  (tgrid, dimensions, 0, row, column) ;
-
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
-                break ;
-            }
 
             case TDICE_STACK_ELEMENT_NONE :
 
@@ -404,6 +306,74 @@ void power_grid_fill
                  column <= last_column  (dimensions) ; column++)
 
                 *tmp++ = get_capacity (tgrid, dimensions, layer, row, column) ;
+
+
+    StackElement_t *bmost = stack_element_list_data (stack_element_list_end   (list)) ;
+    StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (list)) ;
+
+    if (tmost->TopSink != NULL)
+    {
+        pgrid->TopHeatSink = tmost->TopSink ;
+
+        if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOLID)
+
+            pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+
+        else if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
+
+            pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+
+        row    = (CellIndex_t) 0u ;
+        column = (CellIndex_t) 0u ;
+        layer  = last_layer  (dimensions) ;
+
+        SolidTC_t *tmp = pgrid->HeatSinkTopTcs ;
+
+        for (row  = first_row (dimensions) ;
+             row <= last_row  (dimensions) ; row++)
+        {
+            for (column  = first_column (dimensions) ;
+                 column <= last_column  (dimensions) ; column++)
+            {
+                *tmp++ += get_conductance_top (tgrid, dimensions, layer, row, column) ;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+    }
+
+    if (bmost->BottomSink != NULL)
+    {
+        pgrid->BottomHeatSink = bmost->BottomSink ;
+
+        if (pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID)
+
+            pgrid->LayersTypeProfile [ 0 ] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
+
+        else if (pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE)
+
+            pgrid->LayersTypeProfile [ 0 ] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
+
+        else if (   pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
+                 || pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
+
+            fprintf (stderr, "Top and bottom sink on the same layer ! not handled yed\n") ;
+
+        row    = (CellIndex_t) 0u ;
+        column = (CellIndex_t) 0u ;
+
+        SolidTC_t *tmp = pgrid->HeatSinkBottomTcs ;
+
+        for (row  = first_row (dimensions) ;
+             row <= last_row  (dimensions) ; row++)
+        {
+            for (column  = first_column (dimensions) ;
+                 column <= last_column  (dimensions) ; column++)
+            {
+                *tmp++ += get_conductance_bottom (tgrid, dimensions, 0, row, column) ;
+
+            } // FOR_EVERY_COLUMN
+        } // FOR_EVERY_ROW
+   }
 }
 
 /******************************************************************************/

@@ -48,7 +48,9 @@ void stack_element_init (StackElement_t *stkel)
     stkel->Pointer.Layer    = NULL ;
     stkel->Pointer.Die      = NULL ;
     stkel->Pointer.Channel  = NULL ;
-    stkel->Pointer.HeatSink = NULL ;
+
+    stkel->TopSink    = NULL ;
+    stkel->BottomSink = NULL ;
 
     string_init (&stkel->Id) ;
 
@@ -78,9 +80,12 @@ void stack_element_copy (StackElement_t *dst, StackElement_t *src)
 
     else
 
-        // Channel or HeatSink
+        // Channel
 
         dst->Pointer = src->Pointer ;
+
+   if (src->TopSink    != NULL) dst->TopSink    = heat_sink_clone (src->TopSink) ;
+   if (src->BottomSink != NULL) dst->BottomSink = heat_sink_clone (src->BottomSink) ;
 }
 
 /******************************************************************************/
@@ -96,6 +101,9 @@ void stack_element_destroy (StackElement_t *stkel)
     else if (stkel->SEType == TDICE_STACK_ELEMENT_LAYER)
 
         layer_free (stkel->Pointer.Layer) ;
+
+    if (stkel->TopSink != NULL)     heat_sink_free (stkel->TopSink) ;
+    if (stkel->BottomSink != NULL)  heat_sink_free (stkel->BottomSink) ;
 
     stack_element_init (stkel) ;
 }
@@ -185,14 +193,6 @@ void stack_element_print
                 "%s   layer    %s %s ;\n",
                 prefix,
                 stkel->Id, stkel->Pointer.Layer->Id) ;
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_HEATSINK :
-
-            break ;
-
-        case TDICE_STACK_ELEMENT_SECONDARYPATH :
 
             break ;
 

@@ -308,9 +308,7 @@ extern "C"
         TDICE_STACK_ELEMENT_NONE = 0,     //!< Undefined type
         TDICE_STACK_ELEMENT_LAYER   ,     //!< Layer
         TDICE_STACK_ELEMENT_CHANNEL ,     //!< Channel
-        TDICE_STACK_ELEMENT_DIE     ,     //!< Die
-        TDICE_STACK_ELEMENT_HEATSINK,     //!< Heat Sink
-        TDICE_STACK_ELEMENT_SECONDARYPATH //!< Secondary Path
+        TDICE_STACK_ELEMENT_DIE           //!< Die
     } ;
 
     /*! The definition of the type StackElementType_t */

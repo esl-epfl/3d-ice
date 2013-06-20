@@ -72,7 +72,6 @@ extern "C"
         Layer_t    *Layer ;     /*!< Pointer to a Layer      */
         Die_t      *Die ;       /*!< Pointer to a Die        */
         Channel_t  *Channel ;   /*!< Pointer to the Channel  */
-        HeatSink_t *HeatSink ;  /*!< Pointer to the Heatsink */
     } ;
 
     /*! Definition of the type StackElement_p */
@@ -105,6 +104,14 @@ extern "C"
          *  StackElement::Type */
 
         StackElement_p Pointer ;
+
+        /*!  Pointer to the heat sink to dissipate through the topmost layer */
+
+        HeatSink_t *TopSink ;
+
+        /*!  Pointer to the heat sink to dissipate through the bottommost layer */
+
+        HeatSink_t *BottomSink ;
 
         /*! The number of layers composing the stack element */
 

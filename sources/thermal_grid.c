@@ -136,10 +136,7 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
                      lnd != NULL ;
                      lnd  = layer_list_prev (lnd))
                 {
-                    if (tgrid->LayersTypeProfile [index + tmp] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
-
-                        tgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOLID ;
-
+                    tgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOLID ;
 
                     layer_copy (tgrid->LayersProfile + index + tmp, layer_list_data(lnd)) ;
 
@@ -148,21 +145,13 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
                 tmp = stack_element->Pointer.Die->SourceLayerOffset ;
 
-                if (tgrid->LayersTypeProfile [index + tmp] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
-
-                    tgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
-
-                else
-
-                    tgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOURCE ;
+                tgrid->LayersTypeProfile [index + tmp] = TDICE_LAYER_SOURCE ;
 
                 break ;
             }
             case TDICE_STACK_ELEMENT_LAYER :
             {
-                if (tgrid->LayersTypeProfile [index] != TDICE_LAYER_SOLID_CONNECTED_TO_PCB)
-
-                    tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID ;
+                tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID ;
 
                 layer_copy (tgrid->LayersProfile + index, stack_element->Pointer.Layer) ;
 
@@ -242,57 +231,6 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
                 break ;
             }
-            case TDICE_STACK_ELEMENT_HEATSINK :
-            {
-                tgrid->TopHeatSink = stack_element->Pointer.HeatSink ;
-
-                switch (tgrid->TopHeatSink->SinkModel)
-                {
-                    case TDICE_HEATSINK_TOP :
-
-                        if (tgrid->LayersTypeProfile [index] == TDICE_LAYER_SOLID)
-
-                            tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
-
-                        else if (tgrid->LayersTypeProfile [index] == TDICE_LAYER_SOURCE)
-
-                            tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
-
-                        else
-
-                            fprintf (stderr, "ERROR: Wrong offset of heat sink stack element\n") ;
-
-                        break ;
-
-                    case TDICE_HEATSINK_NONE :
-
-                        fprintf (stderr, "WARNING: unset heatsink model\n") ;
-
-                        break ;
-
-                    default :
-
-                        // warning includes heat sink type "secondary path"
-
-                        fprintf (stderr,
-                           "WARNING: unknown heatsink model %d\n",
-                            tgrid->TopHeatSink->SinkModel) ;
-
-                        break ;
-                }
-
-                break ;
-            }
-
-            case TDICE_STACK_ELEMENT_SECONDARYPATH :
-            {
-                tgrid->BottomHeatSink = stack_element->Pointer.HeatSink ;
-
-                tgrid->LayersTypeProfile [index] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
-
-                break ;
-            }
-
             case TDICE_STACK_ELEMENT_NONE :
 
                 fprintf (stderr, "Error! Found stack element with unset type\n") ;
@@ -304,6 +242,40 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
         } /* switch stack_element->Type */
     }
+
+    StackElement_t *bmost = stack_element_list_data (stack_element_list_end   (list)) ;
+    StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (list)) ;
+
+    if (tmost->TopSink != NULL)
+    {
+        tgrid->TopHeatSink = tmost->TopSink ;
+
+        if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOLID)
+
+            tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+
+        else if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
+
+            tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+    }
+
+    if (bmost->BottomSink != NULL)
+    {
+        tgrid->BottomHeatSink = bmost->BottomSink ;
+
+        if (tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID)
+
+            tgrid->LayersTypeProfile [ 0 ] = TDICE_LAYER_SOLID_CONNECTED_TO_PCB ;
+
+        else if (tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE)
+
+            tgrid->LayersTypeProfile [ 0 ] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
+
+        else if (   tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
+                 || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
+
+            fprintf (stderr, "Top and bottom sink on the same layer ! not handled yed\n") ;
+   }
 }
 
 /******************************************************************************/

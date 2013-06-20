@@ -122,7 +122,7 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
 
         fprintf (stream, "%stop heat sink :\n", prefix) ;
 
-    else if (hsink->SinkModel == TDICE_HEATSINK_TOP)
+    else if (hsink->SinkModel == TDICE_HEATSINK_BOTTOM)
 
         fprintf (stream, "%sbottom heat sink :\n", prefix) ;
 
