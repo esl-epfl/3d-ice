@@ -53,6 +53,8 @@ extern "C"
 #include "types.h"
 #include "string_t.h"
 
+#include "dimensions.h"
+
 /******************************************************************************/
 
      /*! \struct HeatSink_t
@@ -159,6 +161,27 @@ extern "C"
      */
 
     void heat_sink_free (HeatSink_t *hsink) ;
+
+
+
+    /*! Returns the conductance of the heat sink in a given position
+     *
+     * \param hsink        the address of the heat sink structure
+     * \param dimensions   pointer to the structure storing the dimensions
+     * \param row_index    the index of the row
+     * \param column_index the index of the column
+     *
+     * \return the top conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
+     */
+
+    Conductance_t heat_sink_conductance
+    (
+        HeatSink_t    *hsink,
+        Dimensions_t  *dimensions,
+        CellIndex_t    row_index,
+        CellIndex_t    column_index
+    ) ;
 
 
 

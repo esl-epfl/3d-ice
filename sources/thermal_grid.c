@@ -167,9 +167,9 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
                 layer_init (&tmplayer) ;
 
-                tmplayer.Height = tgrid->Channel->Height ;
+                tmplayer.Height = stack_element->Pointer.Channel->Height ;
 
-                material_copy (&(tmplayer.Material), &(tgrid->Channel->WallMaterial)) ;
+                material_copy (&(tmplayer.Material), &(stack_element->Pointer.Channel->WallMaterial)) ;
 
                 CellIndex_t tmp ;
 
@@ -179,7 +179,7 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 
                 layer_destroy (&tmplayer) ;
 
-                switch (tgrid->Channel->ChannelModel)
+                switch (stack_element->Pointer.Channel->ChannelModel)
                 {
                     case TDICE_CHANNEL_MODEL_MC_4RM :
 
@@ -556,7 +556,7 @@ Conductance_t get_conductance_bottom
 
                 return 0.0 ;
 
-                else if (layer_index == last_layer (dimensions))
+            else if (layer_index == last_layer (dimensions))
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,

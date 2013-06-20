@@ -116,6 +116,21 @@ void heat_sink_free (HeatSink_t *hsink)
 
 /******************************************************************************/
 
+Conductance_t heat_sink_conductance
+(
+    HeatSink_t    *hsink,
+    Dimensions_t  *dimensions,
+    CellIndex_t    row_index,
+    CellIndex_t    column_index
+)
+{
+    return    hsink->AmbientHTC
+            * get_cell_length (dimensions, column_index)
+            * get_cell_width  (dimensions, row_index) ;
+}
+
+/******************************************************************************/
+
 void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
 {
     if (hsink->SinkModel == TDICE_HEATSINK_TOP)
