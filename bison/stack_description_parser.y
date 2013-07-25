@@ -140,6 +140,7 @@
 %token FIRST                 "keyword first"
 %token FLOORPLAN             "keyword floorplan"
 %token FLOW                  "keyword flow"
+%token GRADIENT              "keyword gradient"
 %token HEAT                  "keyword heat"
 %token HEIGHT                "keyword height"
 %token INCOMING              "keyword incoming"
@@ -1907,6 +1908,7 @@ maxminavg
   :  MAXIMUM { $$ =  TDICE_OUTPUT_QUANTITY_MAXIMUM ; }
   |  MINIMUM { $$ =  TDICE_OUTPUT_QUANTITY_MINIMUM ; }
   |  AVERAGE { $$ =  TDICE_OUTPUT_QUANTITY_AVERAGE ; }
+  |  GRADIENT { $$ =  TDICE_OUTPUT_QUANTITY_GRADIENT ; }
   ;
 
 when

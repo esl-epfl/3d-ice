@@ -442,3 +442,43 @@ Temperature_t *get_all_avg_temperatures_floorplan
 }
 
 /******************************************************************************/
+
+Temperature_t *get_all_gradient_temperatures_floorplan
+(
+    Floorplan_t   *floorplan,
+    Dimensions_t  *dimensions,
+    Temperature_t *temperatures,
+    Quantity_t    *n_floorplan_elements,
+    Temperature_t *gradient_temperatures
+)
+{
+    if (gradient_temperatures == NULL)
+    {
+        *n_floorplan_elements =
+
+            get_number_of_floorplan_elements_floorplan (floorplan) ;
+
+        gradient_temperatures =
+
+            (Temperature_t *) malloc (sizeof (Temperature_t) * *n_floorplan_elements) ;
+    }
+
+    Temperature_t *tmp = gradient_temperatures ;
+
+    FloorplanElementListNode_t *flpeln ;
+
+    for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
+    {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
+        *tmp++ = get_gradient_temperature_floorplan_element
+
+                     (flpel, dimensions, temperatures) ;
+    }
+
+    return gradient_temperatures ;
+}
+
+/******************************************************************************/

@@ -400,6 +400,10 @@ Error_t generate_inspection_point_header
 
                 fprintf (output_stream, "Average ");
 
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                fprintf (output_stream, "Gradient ");
+
             else
             {
                 fprintf (stderr,
@@ -444,6 +448,10 @@ Error_t generate_inspection_point_header
             else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 fprintf (output_stream, "Average ");
+
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                fprintf (output_stream, "Gradient ");
 
             else
             {
@@ -501,6 +509,10 @@ Error_t generate_inspection_point_header
             else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 fprintf (output_stream, "Average ");
+
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                fprintf (output_stream, "Gradient ");
 
             else
             {
@@ -602,12 +614,27 @@ Error_t generate_inspection_point_output
                     (&ipoint->StackElement->Pointer.Die->Floorplan,
                      dimensions, temperatures, &n_flp_el, NULL) ;
 
-            else
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 result = get_all_avg_temperatures_floorplan
 
                     (&ipoint->StackElement->Pointer.Die->Floorplan,
                      dimensions, temperatures, &n_flp_el, NULL) ;
+
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                result = get_all_gradient_temperatures_floorplan
+
+                    (&ipoint->StackElement->Pointer.Die->Floorplan,
+                     dimensions, temperatures, &n_flp_el, NULL) ;
+
+            else
+            {
+                fprintf (stderr,
+                    "Inspection Point: Error reading output quantity for Tflp\n") ;
+
+                break ;
+            }
 
             for (index = 0 ; index != n_flp_el ; index++)
 
@@ -639,11 +666,25 @@ Error_t generate_inspection_point_output
 
                     (ipoint->FloorplanElement, dimensions, temperatures) ;
 
-            else
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 temperature = get_avg_temperature_floorplan_element
 
                     (ipoint->FloorplanElement, dimensions, temperatures) ;
+
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                temperature = get_gradient_temperature_floorplan_element
+
+                    (ipoint->FloorplanElement, dimensions, temperatures) ;
+
+            else
+            {
+                fprintf (stderr,
+                    "Inspection Point: Error reading output quantity for Tflpel\n") ;
+
+                break ;
+            }
 
             fprintf (output_stream,
                 "%5.3f \t %7.3f\n", current_time, temperature) ;
@@ -692,11 +733,25 @@ Error_t generate_inspection_point_output
 
                      (ipoint->StackElement->Pointer.Channel, dimensions, temperatures) ;
 
-            else
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                  temperature = get_avg_temperature_channel_outlet
 
                      (ipoint->StackElement->Pointer.Channel, dimensions, temperatures) ;
+
+            else if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                 temperature = get_gradient_temperature_channel_outlet
+
+                     (ipoint->StackElement->Pointer.Channel, dimensions, temperatures) ;
+
+            else
+            {
+                fprintf (stderr,
+                    "Inspection Point: Error reading output quantity for Tcoolant\n") ;
+
+                break ;
+            }
 
             fprintf (output_stream,
                 "%5.3f \t %7.3f\n", current_time, temperature) ;
@@ -774,12 +829,27 @@ void fill_message_inspection_point
                     (&ipoint->StackElement->Pointer.Die->Floorplan, dimensions,
                       temperatures, &nflp, NULL) ;
 
-            else
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 tmp = get_all_avg_temperatures_floorplan
 
                     (&ipoint->StackElement->Pointer.Die->Floorplan, dimensions,
                       temperatures, &nflp, NULL) ;
+
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                tmp = get_all_gradient_temperatures_floorplan
+
+                    (&ipoint->StackElement->Pointer.Die->Floorplan, dimensions,
+                      temperatures, &nflp, NULL) ;
+
+            else
+            {
+                fprintf (stderr,
+                    "Inspection Point: Error reading output quantity for Tflp\n") ;
+
+                break ;
+            }
 
             insert_message_word (message, &nflp) ;
 
@@ -817,11 +887,25 @@ void fill_message_inspection_point
 
                     (ipoint->FloorplanElement, dimensions, temperatures) ;
 
-            else
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 temperature = get_avg_temperature_floorplan_element
 
                     (ipoint->FloorplanElement, dimensions, temperatures) ;
+
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                temperature = get_gradient_temperature_floorplan_element
+
+                    (ipoint->FloorplanElement, dimensions, temperatures) ;
+
+            else
+            {
+                fprintf (stderr,
+                    "Inspection Point: Error reading output quantity for Tflpel\n") ;
+
+                break ;
+            }
 
             insert_message_word (message, &temperature) ;
 
@@ -917,12 +1001,27 @@ void fill_message_inspection_point
                     (ipoint->StackElement->Pointer.Channel,
                      dimensions, temperatures) ;
 
-            else
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_AVERAGE)
 
                 temperature = get_avg_temperature_channel_outlet
 
                     (ipoint->StackElement->Pointer.Channel,
                      dimensions, temperatures) ;
+
+            else if (output_quantity == TDICE_OUTPUT_QUANTITY_GRADIENT)
+
+                temperature = get_gradient_temperature_channel_outlet
+
+                    (ipoint->StackElement->Pointer.Channel,
+                     dimensions, temperatures) ;
+
+            else
+            {
+                fprintf (stderr,
+                    "Inspection Point: Error reading output quantity for Tcoolant\n") ;
+
+                break ;
+            }
 
             insert_message_word (message, &temperature) ;
 

@@ -147,6 +147,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
 "flow"                       return FLOW ;
+"gradient"                   return GRADIENT ;
 "heat"                       return HEAT ;
 "height"                     return HEIGHT ;
 "incoming"                   return INCOMING ;

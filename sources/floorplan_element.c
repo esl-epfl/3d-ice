@@ -39,6 +39,7 @@
 #include <stdlib.h> // For the memory functions malloc/free
 
 #include "floorplan_element.h"
+#include "macros.h"
 
 /******************************************************************************/
 
@@ -286,6 +287,47 @@ Temperature_t get_avg_temperature_floorplan_element
     }
 
     return avg / (Temperature_t) flpel->NICElements ;
+}
+
+/******************************************************************************/
+
+Temperature_t get_gradient_temperature_floorplan_element
+(
+    FloorplanElement_t *flpel,
+    Dimensions_t       *dimensions,
+    Temperature_t      *temperatures
+)
+{
+    Temperature_t tmpi, tmpa, min = 0.0, max = 0.0 ;
+
+    ICElement_t         *icel ;
+    ICElementListNode_t *iceln = ic_element_list_begin (&flpel->ICElements) ;
+
+    if (iceln != NULL)
+    {
+        icel = ic_element_list_data (iceln) ;
+
+        min = get_min_temperature_ic_element (icel, dimensions, temperatures) ;
+        max = get_max_temperature_ic_element (icel, dimensions, temperatures) ;
+    }
+    else
+
+        return min ;
+
+    for (iceln  = ic_element_list_next (iceln) ;
+         iceln != NULL ;
+         iceln = ic_element_list_next (iceln))
+    {
+        icel = ic_element_list_data (iceln) ;
+
+        tmpi = get_min_temperature_ic_element (icel, dimensions, temperatures) ;
+        tmpa = get_max_temperature_ic_element (icel, dimensions, temperatures) ;
+
+        min = MIN (min, tmpi) ;
+        max = MAX (max, tmpa) ;
+    }
+
+    return max - min ;
 }
 
 /******************************************************************************/

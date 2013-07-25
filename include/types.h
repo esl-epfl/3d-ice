@@ -460,7 +460,8 @@ extern "C"
         TDICE_OUTPUT_QUANTITY_NONE = 0,  //!< Undefined type
         TDICE_OUTPUT_QUANTITY_AVERAGE,   //!< Average temperature
         TDICE_OUTPUT_QUANTITY_MAXIMUM,   //!< Maximum temperature
-        TDICE_OUTPUT_QUANTITY_MINIMUM    //!< Minimum temperature
+        TDICE_OUTPUT_QUANTITY_MINIMUM,   //!< Minimum temperature
+        TDICE_OUTPUT_QUANTITY_GRADIENT   //!< Maximum - Minimum temperature
     } ;
 
 

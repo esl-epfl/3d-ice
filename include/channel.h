@@ -292,6 +292,25 @@ extern "C"
         Temperature_t *temperatures
     ) ;
 
+
+
+    /*! Returns the gradient temperature at the outlet of the channel
+     *
+     *  \param channel       pointer to the channel
+     *  \param dimensions    pointer to the structure storing the dimensions
+     *  \param temperatures  pointer to the temperature of the first thermal
+     *                       cell in the layer where \a channel is placed
+     *
+     *  \return The gradient temperature at the outlet of the channel
+     */
+
+    Temperature_t get_gradient_temperature_channel_outlet
+    (
+        Channel_t     *channel,
+        Dimensions_t  *dimensions,
+        Temperature_t *temperatures
+    ) ;
+
 /******************************************************************************/
 
 #ifdef __cplusplus

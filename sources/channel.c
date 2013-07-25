@@ -367,3 +367,35 @@ Temperature_t get_avg_temperature_channel_outlet
 }
 
 /******************************************************************************/
+
+Temperature_t get_gradient_temperature_channel_outlet
+(
+    Channel_t     *channel,
+    Dimensions_t  *dimensions,
+    Temperature_t *temperatures
+)
+{
+    temperatures += get_cell_offset_in_layer
+
+        (dimensions, last_row(dimensions), first_column (dimensions)) ;
+
+    Temperature_t max = *temperatures ;
+    Temperature_t min = *temperatures ;
+
+    CellIndex_t column ;
+
+    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+    {
+        if (IS_CHANNEL_COLUMN(channel->ChannelModel, column) == true)
+        {
+            min = MIN (min, *temperatures) ;
+            max = MAX (max, *temperatures) ;
+        }
+
+        temperatures++ ;
+    }
+
+    return max ;
+}
+
+/******************************************************************************/

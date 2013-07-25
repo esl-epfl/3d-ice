@@ -307,7 +307,7 @@ extern "C"
      *                      cell in the layer where \a floorplan is placed
      *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
      *  \param min_temperatures (\c IN/OUT) addres to the memory where
-s     *                      temperatures will be written into.
+     *                      temperatures will be written into.
      *
      *  \return the same address as \a min_temperatures if \a min_temperatures
      *          is not \c NULL.
@@ -350,6 +350,34 @@ s     *                      temperatures will be written into.
         Temperature_t *temperatures,
         Quantity_t    *n_floorplan_elements,
         Temperature_t *avg_temperatures
+    ) ;
+
+
+
+    /*! Returns the gradient temperature of each floorplan element
+     *  in the given floorplan
+     *
+     *  \param floorplan pointer to the floorplan
+     *  \param dimensions pointer to the structure storing the dimensions
+     *  \param temperatures pointer to the temperature of the first thermal
+     *                      cell in the layer where \a floorplan is placed
+     *  \param n_floorplan_elements (\c OUT) the number of floorplan elements
+     *  \param gradient_temperatures (\c IN/OUT) addres to the memory where
+     *                      temperatures will be written into.
+     *
+     *  \return the same address as \a gradient_temperatures if \a gradient_temperatures
+     *          is not \c NULL.
+     *  \return the address of a memory containing \a n_floorplan_elements
+     *          temperatures if \a gradient_temperatures is \c NULL
+     */
+
+    Temperature_t *get_all_gradient_temperatures_floorplan
+    (
+        Floorplan_t   *floorplan,
+        Dimensions_t  *dimensions,
+        Temperature_t *temperatures,
+        Quantity_t    *n_floorplan_elements,
+        Temperature_t *gradient_temperatures
     ) ;
 
 /******************************************************************************/

@@ -272,6 +272,27 @@ extern "C"
 
 
 
+    /*! Returns the gradient temperature of the floorplan element
+     *
+     *  \param flpel        pointer to the floorplan element
+     *  \param dimensions   pointer to the structure storing the dimensions
+     *  \param temperatures pointer to the temperature of the first thermal
+     *                      cell in the layer where \a flpel
+     *                      is placed
+     *
+     *  \return the gradient temperature among the thermal cells on the stack
+     *          layer where \a flpel is placed
+     */
+
+    Temperature_t get_gradient_temperature_floorplan_element
+    (
+        FloorplanElement_t *flpel,
+        Dimensions_t       *dimensions,
+        Temperature_t      *temperatures
+    ) ;
+
+
+
     /*! Moves one power value from \a pvalues into \a flpel
      *
      *  The queue \a pvalues must contain at least one power value
