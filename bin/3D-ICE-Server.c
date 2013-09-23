@@ -68,14 +68,19 @@ int main (int argc, char** argv)
 
     /* Checks if all arguments are there **************************************/
 
-    if (argc != 3)
+#define NARGC        3
+#define EXE_NAME     argv[0]
+#define STK_FILE     argv[1]
+#define SERVER_PORT  argv[2]
+
+    if (argc != NARGC)
     {
-        fprintf (stderr, "Usage: \"%s file.stk server_port\n", argv[0]) ;
+        fprintf (stderr, "Usage: \"%s file.stk server_port\n", EXE_NAME) ;
 
         return EXIT_FAILURE ;
     }
 
-    server_port = atoi (argv[2]) ;
+    server_port = atoi (SERVER_PORT) ;
 
     /* Parses stack file (fills stack descrition and analysis) ****************/
 
@@ -85,7 +90,7 @@ int main (int argc, char** argv)
     analysis_init          (&analysis) ;
     output_init            (&output) ;
 
-    error = parse_stack_description_file (argv[1], &stkd, &analysis, &output) ;
+    error = parse_stack_description_file (STK_FILE, &stkd, &analysis, &output) ;
 
     if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 

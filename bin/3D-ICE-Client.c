@@ -99,25 +99,31 @@ int main (int argc, char** argv)
 
     /* Checks if all arguments are there **************************************/
 
-    if (argc != 4)
+#define NARGC        4
+#define EXE_NAME     argv[0]
+#define NSLOTS       argv[1]
+#define SERVER_IP    argv[2]
+#define SERVER_PORT  argv[3]
+
+    if (argc != NARGC)
     {
-        fprintf (stderr, "Usage: \"%s nslots server_ip server_port\n", argv[0]) ;
+        fprintf (stderr, "Usage: \"%s nslots server_ip server_port\n", EXE_NAME) ;
 
         return EXIT_FAILURE ;
     }
 
-    nslots = atoi (argv[1]) ;
+    nslots = atoi (NSLOTS) ;
 
-    if (strlen (argv[2]) > MAX_SERVER_IP - 1)
+    if (strlen (SERVER_IP) > MAX_SERVER_IP - 1)
     {
-        fprintf (stderr, "Server ip %s too long !!!\n", argv[2]) ;
+        fprintf (stderr, "Server ip %s too long !!!\n", SERVER_IP) ;
 
         return EXIT_FAILURE ;
     }
 
-    strcpy (server_ip, argv[2]) ;
+    strcpy (server_ip, SERVER_IP) ;
 
-    server_port = atoi (argv[3]) ;
+    server_port = atoi (SERVER_PORT) ;
 
     /* Creates socket *********************************************************/
 
