@@ -106,7 +106,12 @@
                   $(3DICE_SOURCES)/thermal_data.c             \
                   $(3DICE_SOURCES)/thermal_grid.c
 
+ifeq ($(SYSTEMC_WRAPPER),y)
+3DICE_SOURCES_CPP = $(3DICE_SOURCES)/IceWrapper.cpp
+endif
+
 3DICE_SOURCES_O = $(3DICE_SOURCES_C:.c=.o)
+3DICE_SOURCES_O += $(3DICE_SOURCES_CPP:.cpp=.o)
 3DICE_SOURCES_D = $(3DICE_SOURCES_C:.c=.d)
 
 3DICE_LIB_A     = $(3DICE_LIB)/lib$(3DICE_RELEASE).a
@@ -118,11 +123,23 @@
  ##############################################################################
 
 SLU_VERSION = 4.3
-SLU_MAIN    = $(HOME)/Libs/SuperLU_$(SLU_VERSION)
+SLU_MAIN    = $(HOME)/3dice/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 #SLU_LIBS   = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
 SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib -lblas
+
+ #
+ # SystemC variables
+ ##############################################################################
+
+SYSTEMC_VERSION = 2.3.1
+SYSTEMC_ARCH    = linux
+#SYSTEMC_ARCH    = linux64
+SYSTEMC_MAIN    = $(HOME)/Libs/systemc-$(SYSTEMC_VERSION)
+SYSTEMC_INCLUDE = $(SYSTEMC_MAIN)/include
+SYSTEMC_LIB     = $(SYSTEMC_MAIN)/lib-$(SYSTEMC_ARCH)
+SYSTEMC_LIBS    = -L$(SYSTEMC_LIB) -lsystemc
 
  #
  # Commands and flags
@@ -147,6 +164,10 @@ RMFLAGS   = -vf
 DOXYGEN   = doxygen
 DOXYFILE  = Doxyfile
 
+CXX       = g++
+CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
+INC_DIRS  = $(CINCLUDES) -I$(SYSTEMC_INCLUDE)
+
  #
  # Pattern rules
  ##############################################################################
@@ -166,4 +187,7 @@ DOXYFILE  = Doxyfile
 	     -e '/^$$/ d'       \
              -e 's/$$/ :/' < $*.dd >> $*.d
 	@rm -f $*.dd
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(INC_DIRS) -c $< -o $@
 
