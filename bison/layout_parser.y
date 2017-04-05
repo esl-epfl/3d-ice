@@ -44,6 +44,12 @@
     #include "material.h"
     #include "ic_element.h"
     #include "material_element.h"
+    #include "layer.h"
+    #include "material_list.h"
+
+    //TODO: this definition seem to have disappeared, find a better fix
+    //https://lists.gnu.org/archive/html/bug-bison/2012-10/msg00004.html
+    typedef void* yyscan_t;
 }
 
 %union

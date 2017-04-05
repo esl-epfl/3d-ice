@@ -44,6 +44,11 @@
     #include "floorplan_element.h"
     #include "ic_element.h"
     #include "powers_queue.h"
+    #include "floorplan.h"
+
+    //TODO: this definition seem to have disappeared, find a better fix
+    //https://lists.gnu.org/archive/html/bug-bison/2012-10/msg00004.html
+    typedef void* yyscan_t;
 }
 
 %union

@@ -45,6 +45,13 @@
     #include "die.h"
     #include "stack_element.h"
     #include "inspection_point.h"
+    #include "stack_description.h"
+    #include "analysis.h"
+    #include "output.h"
+
+    //TODO: this definition seem to have disappeared, find a better fix
+    //https://lists.gnu.org/archive/html/bug-bison/2012-10/msg00004.html
+    typedef void* yyscan_t;
 }
 
 // The YYSTYPE union used to collect the types of tokens and rules
