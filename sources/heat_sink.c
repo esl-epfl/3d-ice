@@ -38,6 +38,7 @@
 
 #include <math.h>   // Fo the math function sqrt
 #include <stdlib.h> // For the memory functions malloc/free
+#include <string.h>
 #include <assert.h>
 
 #include "heat_sink.h"
@@ -64,6 +65,23 @@ void heat_sink_init (HeatSink_t *hsink)
     hsink->NColumns           = 0;
     hsink->NumRowsBorder      = 0;
     hsink->NumColumnsBorder   = 0;
+    
+    hsink->CurrentTemperatures= NULL;
+    hsink->PreviousTemperatures=NULL;
+    hsink->CurrentHeatFlow    = NULL;
+    hsink->PluggableHeatsink  = NULL;
+}
+
+/******************************************************************************/
+
+void *array_alloc_copy(const void *src, size_t size)
+{
+    void *result=malloc(size);
+    // TODO: It would be better to report the error in a better way, but
+    // heat_sink_copy returns void and not an error code
+    assert(result != NULL);
+    memcpy(result,src,size);
+    return result;
 }
 
 /******************************************************************************/
@@ -89,16 +107,24 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     dst->NColumns           = src->NColumns;
     dst->NumRowsBorder      = src->NumRowsBorder;
     dst->NumColumnsBorder   = src->NumColumnsBorder;
+    
+    size_t size = src->NColumns * src->NRows * sizeof(double);
+    dst->CurrentTemperatures  = (double *) array_alloc_copy(src->CurrentTemperatures,  size);
+    dst->PreviousTemperatures = (double *) array_alloc_copy(src->PreviousTemperatures, size);
+    dst->CurrentHeatFlow      = (double *) array_alloc_copy(src->CurrentHeatFlow,      size);
+    dst->PluggableHeatsink  = src->PluggableHeatsink;
 }
 
 /******************************************************************************/
 
 void heat_sink_destroy (HeatSink_t *hsink)
-{
-    // Nothing to do ...
-    
+{    
     material_destroy (&hsink->SpreaderMaterial);
     string_destroy (&hsink->Plugin);
+    
+    free(hsink->CurrentTemperatures);
+    free(hsink->PreviousTemperatures);
+    free(hsink->CurrentHeatFlow);
     
     heat_sink_init (hsink) ;
 }
@@ -245,6 +271,24 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
     }
 }
 
+// temporary code -- begin
+static bool fixme(double *heatflow, double *temperatures, unsigned int rows, unsigned int columns, unsigned int size, double timestep)
+{
+    (void)rows;
+    (void)columns;
+    (void)timestep;
+    unsigned int i;
+    double sum=0.0;
+    for(i=0;i<size;i++)
+    {
+        temperatures[i]=300.0;
+        sum+=heatflow[i];
+    }
+    printf("sum of heat flow %f\n",sum);
+    return true;
+}
+// temporary code -- end
+
 Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
 {
     if(hsink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE)
@@ -284,9 +328,22 @@ Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
     
     hsink->NRows = 2 * hsink->NumRowsBorder + get_number_of_rows(chip);
     
-#if 0
-    printf("Spreader size is %d x %d cells\n", hsink->NColumns, hsink->NRows);
-#endif
+    
+    hsink->CurrentTemperatures  = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    hsink->PreviousTemperatures = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    hsink->CurrentHeatFlow      = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    if(  hsink->CurrentTemperatures == NULL
+      || hsink->PreviousTemperatures == NULL
+      || hsink->CurrentHeatFlow == NULL)
+    {
+        fprintf (stderr, "ERROR: could not allocate memory for pluggable heat sink\n") ;
+        return TDICE_FAILURE;
+    }
+    
+    // temporary code -- begin
+    hsink->PluggableHeatsink=fixme;
+    // temporary code -- end
+    
     return TDICE_SUCCESS;
 }
 

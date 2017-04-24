@@ -173,7 +173,7 @@ int main(int argc, char** argv)
                              TDICE_OUTPUT_INSTANT_SLOT) ;
         }
 
-    } while (sim_result != TDICE_END_OF_SIMULATION) ;
+    } while (sim_result != TDICE_END_OF_SIMULATION && sim_result != TDICE_SOLVER_ERROR) ;
 
     generate_output (&output, stkd.Dimensions,
                      tdata.Temperatures, tdata.PowerGrid.Sources,

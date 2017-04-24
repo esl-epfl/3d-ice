@@ -119,6 +119,23 @@ extern "C"
             only for pluggable heatsink */
         
         CellIndex_t NumColumnsBorder;
+        
+        /*! Current temperature returned from the pluggable heatsink callback */
+        
+        double *CurrentTemperatures;
+        
+        /*! Previous temperature returned from the pluggable heatsink callback */
+        
+        double *PreviousTemperatures;
+        
+        /*! Current heat flow passed to the pluggable heatsink callback */
+        
+        double *CurrentHeatFlow;
+        
+        /*! The pluggable heatsink callback */
+        bool (*PluggableHeatsink)(double *heatflow, double *temperatures,
+                                  unsigned int rows, unsigned int columns,
+                                  unsigned int size, double timestep);
      };
 
     /*! Definition of the type HeatSink_t */

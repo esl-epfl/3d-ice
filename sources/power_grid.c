@@ -427,6 +427,7 @@ Error_t update_source_vector
         switch (pgrid->LayersTypeProfile [layer])
         {
             case TDICE_LAYER_SOURCE :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
             {
                 Error_t error = fill_sources_floorplan
 
@@ -546,6 +547,7 @@ Error_t update_source_vector
             }
 
             case TDICE_LAYER_SOLID :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :
             case TDICE_LAYER_TOP_WALL :
@@ -617,8 +619,10 @@ void update_channel_sources (PowerGrid_t *pgrid, Dimensions_t *dimensions)
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :
@@ -656,6 +660,7 @@ Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues)
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
             {
                 Error_t result = insert_power_values_floorplan
 
@@ -674,6 +679,7 @@ Error_t insert_power_values (PowerGrid_t *pgrid, PowersQueue_t *pvalues)
             case TDICE_LAYER_PINFINS_STAGGERED :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
             case TDICE_LAYER_SOLID :
             case TDICE_LAYER_VWALL_CHANNEL :
             case TDICE_LAYER_VWALL_PINFINS :

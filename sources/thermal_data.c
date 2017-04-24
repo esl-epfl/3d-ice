@@ -170,6 +170,16 @@ Error_t thermal_data_build
 
         return TDICE_FAILURE ;
     }
+    
+    /* Set the pluggable heatsing temperatures to initial thermal state */
+    
+    HeatSink_t *sink = tdata->ThermalGrid.TopHeatSink;
+    if(sink && sink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+        unsigned int size = sink->NColumns * sink->NRows;
+        init_data(sink->CurrentTemperatures,  size, analysis->InitialTemperature);
+        init_data(sink->PreviousTemperatures, size, analysis->InitialTemperature);
+    }
 
     return TDICE_SUCCESS ;
 }
@@ -202,6 +212,7 @@ void reset_thermal_state (ThermalData_t *tdata, Analysis_t *analysis)
 static void fill_system_vector
 (
     Dimensions_t  *dimensions,
+    HeatSink_t    *topSink,
     double        *vector,
     Source_t      *sources,
     Capacity_t    *capacities,
@@ -243,6 +254,32 @@ static void fill_system_vector
             } // FOR_EVERY_COLUMN
         } // FOR_EVERY_ROW
     } // FOR_EVERY_LAYER
+    
+    // Copy the rest of the vector
+    if(topSink && topSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+        for(row = 0; row < topSink->NRows; row++)
+        {
+            for(column = 0; column < topSink->NColumns; column++)
+            {
+#ifdef PRINT_SYSTEM_VECTOR
+                old = *temperatures ;
+#endif
+
+                *vector++ = *sources++
+                            + (*capacities++ / step_time)
+                              * *temperatures++ ;
+
+#ifdef PRINT_SYSTEM_VECTOR
+                fprintf (stderr,
+                    "      r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
+                    row, column,
+                    get_spreader_cell_offset (dimensions, topSink, row, column),
+                    *(vector-1), *(sources-1), *(capacities-1), old) ;
+#endif
+            }
+        }
+    }
 }
 
 /******************************************************************************/
@@ -279,6 +316,67 @@ static void fill_system_vector_steady
   } // FOR_EVERY_LAYER
 }
 
+Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
+        Analysis_t *analysis)
+{
+    // In this function we compute the heat flow using the heatsink temperatures
+    // at the previous time step, then we compute the current temperatures.
+    // If the previous temperatures differ too much from the current ones,
+    // the simulation may provide incorrect results
+    const double threshold = 1.0;
+    
+    // We have something to do only if the we're using the pluggable heatsink model
+    HeatSink_t *sink = tdata->ThermalGrid.TopHeatSink;
+    if(sink == NULL || sink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE)
+            return TDICE_SUCCESS;
+    
+    // Compute heat flow from spreader to sink
+    double *temp = sink->CurrentTemperatures;
+    double *flow = sink->CurrentHeatFlow;
+    Conductance_t conductance = get_spreader_conductance(sink);
+    CellIndex_t row, col;
+    for(row = 0; row < sink->NRows; row++)
+        for(col = 0; col < sink->NColumns; col++)
+            *flow++= (tdata->Temperatures[
+                get_spreader_cell_offset(dimensions,sink,row,col)] - *temp++)
+                * conductance;
+    
+    // Call the pluggable heat sink function to compute the temperatures
+    // at the interface between the spreader and sink
+    unsigned int size = sink->NColumns * sink->NRows;
+    if(sink->PluggableHeatsink(
+        sink->CurrentHeatFlow,
+        sink->CurrentTemperatures,
+        sink->NRows,
+        sink->NColumns,
+        size,
+        analysis->StepTime) == false)
+    {
+        fprintf(stderr, "Error: pluggable heatsink callback failed\n");
+        return TDICE_FAILURE;
+    }
+    
+    // Compare the computed temperatures against the previous ones
+    unsigned int i;
+    for(i = 0; i < size; i++)
+    {
+        if(abs(sink->CurrentTemperatures[i] - sink->PreviousTemperatures[i]) <= threshold)
+            continue;
+        fprintf(stderr, "Warning: the integration time step may be too small\n");
+        break;
+    }
+    
+    // Update the previous temperatures
+    memcpy(sink->PreviousTemperatures, sink->CurrentTemperatures, size * sizeof(double));
+    
+    // Update the sources vector using the temperatures at the heatsink interface
+    Source_t *sources = tdata->PowerGrid.Sources;
+    sources += get_spreader_cell_offset(dimensions,sink,0,0);
+    for(i = 0; i < size; i++) sources[i] = conductance * sink->CurrentTemperatures[i];
+    
+    return TDICE_SUCCESS;
+}
+
 /******************************************************************************/
 
 SimResult_t emulate_step
@@ -300,10 +398,13 @@ SimResult_t emulate_step
 
             return TDICE_END_OF_SIMULATION ;
     }
+    
+    if(pluggable_heatsink(tdata, dimensions, analysis) == TDICE_FAILURE)
+        return TDICE_SOLVER_ERROR ;
 
     fill_system_vector
 
-        (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources,
+        (dimensions, tdata->ThermalGrid.TopHeatSink, tdata->Temperatures, tdata->PowerGrid.Sources,
          tdata->PowerGrid.CellsCapacities, tdata->Temperatures, analysis->StepTime) ;
 
     Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
