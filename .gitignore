@@ -1,0 +1,12 @@
+*.o
+*.d
+*.a
+*.so
+bison/*.c
+bison/*.h
+flex/*.c
+flex/*.h
+bin/3D-ICE-Client
+bin/3D-ICE-Emulator
+bin/3D-ICE-Server
+
