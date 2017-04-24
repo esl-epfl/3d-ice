@@ -38,6 +38,7 @@
 
 #include <stdlib.h> // For the memory functions malloc/free
 #include <string.h> // For the memory function memcpy
+#include <assert.h>
 
 #include "dimensions.h"
 #include "heat_sink.h"
@@ -699,3 +700,78 @@ ChipDimension_t get_chip_area (Dimensions_t *dimensions)
 }
 
 /******************************************************************************/
+
+CellIndex_t get_spreader_cell_offset
+(
+    Dimensions_t *dimensions,
+    HeatSink_t   *hsink,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index
+)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
+    return (   get_number_of_layers (dimensions)
+              * get_number_of_rows (dimensions)
+              * get_number_of_columns (dimensions))
+            + row_index * hsink->NColumns + column_index;
+}
+
+/******************************************************************************/
+
+CellIndex_t get_spreader_cell_offset_from_layer_coordinates
+(
+    Dimensions_t *dimensions,
+    HeatSink_t   *hsink,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index
+)
+{
+    return get_spreader_cell_offset(
+                dimensions,
+                hsink,
+                row_index + hsink->NumRowsBorder,
+                column_index + hsink->NumColumnsBorder);
+}
+
+/******************************************************************************/
+
+bool has_layer_underneath
+(
+    Dimensions_t *dimensions,
+    HeatSink_t   *hsink,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index
+)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
+    if(    row_index    >= hsink->NumRowsBorder
+        && row_index    <  hsink->NumRowsBorder    + get_number_of_rows (dimensions)
+        && column_index >= hsink->NumColumnsBorder
+        && column_index <  hsink->NumColumnsBorder + get_number_of_columns (dimensions))
+        return true;
+    else
+        return false;
+}
+
+CellIndex_t get_layer_cell_offset_from_spreader_coordinates
+(
+    Dimensions_t *dimensions,
+    HeatSink_t   *hsink,
+    CellIndex_t   layer_index,
+    CellIndex_t   row_index,
+    CellIndex_t   column_index
+)
+{
+    assert(has_layer_underneath(dimensions, hsink, row_index, column_index));
+    
+    return get_cell_offset_in_stack(
+                dimensions,
+                layer_index,
+                row_index    - hsink->NumRowsBorder,
+                column_index - hsink->NumColumnsBorder);
+}
+
+/******************************************************************************/
+

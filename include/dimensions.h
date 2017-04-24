@@ -775,6 +775,103 @@ struct HeatSink_t; //Forward decalration
      */
 
     ChipDimension_t get_chip_area (Dimensions_t *dimensions) ;
+    
+    /*! Returns the index of a thermal cell of the heat spreader
+     *
+     * The heat spreader is not considered a layer as its length and width
+     * can be larger than the layers in the 3D stack.
+     * Its cells are stored after all of the cells of the 3D stack
+     *
+     * \param dimensions the address of the dimension structure
+     * \param hsink the heatsink
+     * \param row_index row in the heat spreader coordinates
+     * \param column_index column in the heat spreader coordinates
+     *
+     * \return the index of a thermal cell \f$ (r, c) \f$ of the heat spreader
+     */
+    CellIndex_t get_spreader_cell_offset
+    (
+        Dimensions_t *dimensions,
+        HeatSink_t   *hsink,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index
+    );
+    
+    /*!
+     * A cell in the 3D layer is indexed using its own row, column and layer.
+     * A cell in the heat spreader is indexed using its own row and column,
+     * which are not the same as the row and column of the 3D layer stack.
+     * This is because the 3D layers are in the center of the heatsink, or
+     * equivalently there is a border around the 3D layers
+     * 
+     * This function allows to access a cell of the heat spreader, using the
+     * coordinates of the 3D layer stack, which is always possible since the
+     * spreader is larger or equal in size.
+     * 
+     * \param dimensions pointer to dimensions
+     * \param hsink pointer to heatsink
+     * \param row_index row in the 3D layer stack coordinates
+     * \param column_index column in the 3D layer stack coordinates
+     * \return the index of a thermal cell
+     */
+    CellIndex_t get_spreader_cell_offset_from_layer_coordinates
+    (
+        Dimensions_t *dimensions,
+        HeatSink_t   *hsink,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index
+    );
+    
+    /*!
+     * A cell in the 3D layer is indexed using its own row, column and layer.
+     * A cell in the heat spreader is indexed using its own row and column,
+     * which are not the same as the row and column of the 3D layer stack.
+     * This is because the 3D layers are in the center of the heatsink, or
+     * equivalently there is a border around the 3D layers
+     * 
+     * This answers the question "is there a cell of the 3D layer stack
+     * underneath this spreader cell?"
+     * 
+     * \param dimensions pointer to dimensions
+     * \param hsink pointer to heatsink
+     * \param row_index row in the heat spreader coordinates
+     * \param column_index column in the heat spreader coordinates
+     * \return true if there is a cell underneath
+     */
+    bool has_layer_underneath
+    (
+        Dimensions_t *dimensions,
+        HeatSink_t   *hsink,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index
+    );
+    
+    /*!
+     * A cell in the 3D layer is indexed using its own row, column and layer.
+     * A cell in the heat spreader is indexed using its own row and column,
+     * which are not the same as the row and column of the 3D layer stack.
+     * This is because the 3D layers are in the center of the heatsink, or
+     * equivalently there is a border around the 3D layers
+     * 
+     * This function allows to access a cell of the 3D layer stack, using the
+     * coordinates of the heat spreader. Note that there may be no cell
+     * underneath, so you have to call has_layer_underneath() before
+     * 
+     * \param dimensions pointer to dimensions
+     * \param hsink pointer to heatsink
+     * \param layer_index which layer of the 3D stack?
+     * \param row_index row in the heat spreader coordinates
+     * \param column_index column in the heat spreader coordinates
+     * \return the index of a thermal cell
+     */
+    CellIndex_t get_layer_cell_offset_from_spreader_coordinates
+    (
+        Dimensions_t *dimensions,
+        HeatSink_t   *hsink,
+        CellIndex_t   layer_index,
+        CellIndex_t   row_index,
+        CellIndex_t   column_index
+    );
 
 /******************************************************************************/
 
