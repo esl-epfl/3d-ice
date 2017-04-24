@@ -52,6 +52,8 @@ extern "C"
 
 #include "types.h"
 #include "string_t.h"
+    
+struct HeatSink_t; //Forward decalration
 
 /******************************************************************************/
 
@@ -441,7 +443,8 @@ extern "C"
     (
         Dimensions_t   *dimensions,
         Quantity_t      num_channels,
-        ChannelModel_t  channel_model
+        ChannelModel_t  channel_model,
+        HeatSink_t      *topSink
     ) ;
 
 

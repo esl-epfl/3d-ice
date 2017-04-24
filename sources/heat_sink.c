@@ -38,6 +38,7 @@
 
 #include <math.h>   // Fo the math function sqrt
 #include <stdlib.h> // For the memory functions malloc/free
+#include <assert.h>
 
 #include "heat_sink.h"
 #include "macros.h"
@@ -56,6 +57,11 @@ void heat_sink_init (HeatSink_t *hsink)
     
     material_init(&hsink->SpreaderMaterial);
     string_init(&hsink->Plugin);
+    
+    hsink->NRows              = 0;
+    hsink->NColumns           = 0;
+    hsink->NumRowsBorder      = 0;
+    hsink->NumColumnsBorder   = 0;
 }
 
 /******************************************************************************/
@@ -74,6 +80,11 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     
     material_copy(&dst->SpreaderMaterial,&src->SpreaderMaterial);
     string_copy(&dst->Plugin,&src->Plugin);
+    
+    dst->NRows              = src->NRows;
+    dst->NColumns           = src->NColumns;
+    dst->NumRowsBorder      = src->NumRowsBorder;
+    dst->NumColumnsBorder   = src->NumColumnsBorder;
 }
 
 /******************************************************************************/
@@ -141,6 +152,8 @@ Conductance_t heat_sink_conductance
     CellIndex_t    column_index
 )
 {
+    assert(hsink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE);
+    
     return    hsink->AmbientHTC
             * get_cell_length (dimensions, column_index)
             * get_cell_width  (dimensions, row_index) ;
@@ -202,6 +215,51 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
             "%s   plugin                  %s ;\n",
             prefix, hsink->Plugin) ;
     }
+}
+
+Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
+{
+    if(hsink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE)
+        return TDICE_SUCCESS;
+        
+    // If the spreader dimensions are not within 0.1 of the cell size print a warning
+    const double maxSlack = 0.1;
+    
+    double borderLength = (hsink->SpreaderLength - chip->Chip.Length) / 2.0;
+    double cellLength = chip->Chip.Length / get_number_of_columns(chip);
+    
+    double numColumnsBorderDouble = borderLength / cellLength;
+    if(numColumnsBorderDouble<0.0)
+    {
+        fprintf (stderr, "ERROR: spreader length is smaller than the chip\n") ;
+        return TDICE_FAILURE;
+    }
+    hsink->NumColumnsBorder = numColumnsBorderDouble;
+    if(numColumnsBorderDouble - hsink->NumColumnsBorder > maxSlack)
+        fprintf (stderr, "WARNING: spreader length not a multiple of cell length\n") ;
+    
+    hsink->NColumns = 2 * hsink->NumColumnsBorder + get_number_of_columns(chip);
+    
+    
+    double borderWidth  = (hsink->SpreaderWidth  - chip->Chip.Width)  / 2.0;
+    double cellWidth = chip->Chip.Width / get_number_of_rows(chip);
+    
+    double numRowsBorderDouble = borderWidth / cellWidth;
+    if(numRowsBorderDouble<0.0)
+    {
+        fprintf (stderr, "ERROR: spreader width is smaller than the chip\n") ;
+        return TDICE_FAILURE;
+    }
+    hsink->NumRowsBorder = numRowsBorderDouble;
+    if(numRowsBorderDouble - hsink->NumRowsBorder > maxSlack)
+        fprintf (stderr, "WARNING: spreader length not a multiple of cell length\n") ;
+    
+    hsink->NRows = 2 * hsink->NumRowsBorder + get_number_of_rows(chip);
+    
+#if 0
+    printf("Spreader size is %d x %d cells\n", hsink->NColumns, hsink->NRows);
+#endif
+    return TDICE_SUCCESS;
 }
 
 /******************************************************************************/

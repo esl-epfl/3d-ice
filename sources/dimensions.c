@@ -40,6 +40,7 @@
 #include <string.h> // For the memory function memcpy
 
 #include "dimensions.h"
+#include "heat_sink.h"
 
 /******************************************************************************/
 
@@ -305,7 +306,8 @@ void compute_number_of_connections
 (
     Dimensions_t   *dimensions,
     Quantity_t      num_channels,
-    ChannelModel_t  channel_model
+    ChannelModel_t  channel_model,
+    HeatSink_t     *topSink
 )
 {
     CellIndex_t nlayers  = dimensions->Grid.NLayers ;
@@ -384,6 +386,31 @@ void compute_number_of_connections
         default :
 
             fprintf (stderr, "Error: unknown channel model %d\n", channel_model) ;
+    }
+    
+    if(topSink && topSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+        int aa=dimensions->Grid.NConnections;
+        // Add the heat spreader, which has a different size and is thus not
+        // counted among the layers
+        dimensions->Grid.NConnections +=
+
+                // number of coefficients in the diagonal
+                topSink->NRows * topSink->NColumns
+                +
+                // Number of coefficients North <-> South
+                2 * (topSink->NRows - 1) * topSink->NColumns
+                +
+                // Number of coefficients East <-> West
+                2 * topSink->NRows * (topSink->NColumns - 1) ;
+        
+        
+        //Then add the connections between the last layer of the stack and
+        //the middle of the spreader
+        dimensions->Grid.NConnections +=
+
+                // number of coefficients bottom <-> top
+                2 * nrows * ncolumns ;
     }
 }
 

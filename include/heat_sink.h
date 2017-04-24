@@ -91,8 +91,27 @@ extern "C"
         /*! Plugin file name, only for pluggable heatsink */
         
         String_t Plugin;
+        
+        /*! The number of rows of cells of the spreader, only for pluggable heatsink */
 
-     } ;
+        CellIndex_t NRows;
+
+        /*! The number of columns of cells of the spreader, only for pluggable heatsink */
+
+        CellIndex_t NColumns;
+        
+        /*! The number of rows of cells of the spreader border, which is the
+            part of the spreader not in contact with the chip,
+            only for pluggable heatsink */
+        
+        CellIndex_t NumRowsBorder;
+        
+        /*! The number of columns of cells of the spreader border, which is the
+            part of the spreader not in contact with the chip,
+            only for pluggable heatsink */
+        
+        CellIndex_t NumColumnsBorder;
+     };
 
     /*! Definition of the type HeatSink_t */
 
@@ -208,6 +227,13 @@ extern "C"
      */
 
     void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix) ;
+    
+    /*! Computes the spreader number of cells based on the chip dimensions
+     *
+     * \param hsink the heatsink
+     * \param chip the chip dimensions
+     */
+    Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip);
 
 /******************************************************************************/
 

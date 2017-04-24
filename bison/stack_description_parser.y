@@ -1219,6 +1219,16 @@ stack
                           * (uint64_t) get_number_of_rows (stkd->Dimensions)
                           * (uint64_t) get_number_of_columns (stkd->Dimensions) ;
 
+        // When using the pluggable heatsink add the cells for the heat spreader
+        if(stkd->TopHeatSink && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+        {
+            if(compute_spreader_dimensions(stkd->TopHeatSink, stkd->Dimensions)!=TDICE_SUCCESS)
+                YYABORT ;
+
+            ncells +=   (uint64_t) stkd->TopHeatSink->NRows
+                      * (uint64_t) stkd->TopHeatSink->NColumns;
+        }
+
         if (ncells > INT32_MAX)
         {
             sprintf (error_message,
@@ -1236,7 +1246,7 @@ stack
                              TDICE_CHANNEL_MODEL_NONE    :
                              stkd->Channel->ChannelModel ;
 
-        compute_number_of_connections (stkd->Dimensions, num_channels, cm) ;
+        compute_number_of_connections (stkd->Dimensions, num_channels, cm, stkd->TopHeatSink) ;
    }
   ;
 
