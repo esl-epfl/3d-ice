@@ -165,6 +165,8 @@
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
+%token PLATE                 "keyword plate"
+%token PLUGGABLE             "keyword pluggable"
 %token PMAP                  "keyword Pmap"
 %token RATE                  "keyword rate"
 %token SIDE                  "keyword side"
@@ -320,6 +322,10 @@ heatsink_opt
 
   | topsink bottomsink
 
+  | topsink_pluggable
+
+  | topsink_pluggable bottomsink
+
   ;
 
 topsink
@@ -362,6 +368,51 @@ bottomsink
         stkd->BottomHeatSink->SinkModel          = TDICE_HEATSINK_BOTTOM ;
         stkd->BottomHeatSink->AmbientHTC         = (AmbientHTC_t) $8 ;
         stkd->BottomHeatSink->AmbientTemperature = $11 ;
+    }
+  ;
+
+topsink_pluggable
+
+  : TOP PLUGGABLE HEAT SINK ':'
+        PLATE LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
+        CELL  LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' //$18 $21 $24
+        MATERIAL IDENTIFIER ';'                                    //$27
+    {
+        stkd->TopHeatSink = heat_sink_calloc () ;
+
+        if (stkd->TopHeatSink == NULL)
+        {
+            STKERROR ("Malloc top heat sink failed") ;
+
+            YYABORT ;
+        }
+
+        stkd->TopHeatSink->SinkModel          = TDICE_HEATSINK_TOP_PLUGGABLE ;
+        stkd->TopHeatSink->PlateLength        = $8 ;
+        stkd->TopHeatSink->PlateWidth         = $11 ;
+        stkd->TopHeatSink->PlateHeight        = $14 ;
+        stkd->TopHeatSink->CellLength         = $18 ;
+        stkd->TopHeatSink->CellWidth          = $21 ;
+        stkd->TopHeatSink->CellHeight         = $24 ;
+        
+        string_copy (&stkd->TopHeatSink->Material.Id, &$27) ;
+
+        Material_t *tmp = material_list_find (&stkd->Materials, &stkd->TopHeatSink->Material) ;
+
+        if (tmp == NULL)
+        {
+            sprintf (error_message, "Unknown material %s", $27) ;
+
+            STKERROR (error_message) ;
+
+            string_destroy (&$27) ;
+
+            YYABORT ;
+        }
+
+        material_copy (&stkd->TopHeatSink->Material, tmp) ;
+
+        string_destroy (&$27) ;
     }
   ;
 

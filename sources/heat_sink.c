@@ -49,6 +49,15 @@ void heat_sink_init (HeatSink_t *hsink)
     hsink->SinkModel          = TDICE_HEATSINK_NONE ;
     hsink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
     hsink->AmbientTemperature = (Temperature_t) 0.0 ;
+    
+    material_init(&hsink->Material);
+    
+    hsink->PlateLength        = 0.0;
+    hsink->PlateWidth         = 0.0;
+    hsink->PlateHeight        = 0.0;
+    hsink->CellLength         = 0.0;
+    hsink->CellWidth          = 0.0;
+    hsink->CellHeight         = 0.0;
 }
 
 /******************************************************************************/
@@ -60,6 +69,15 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     dst->SinkModel          = src->SinkModel ;
     dst->AmbientHTC         = src->AmbientHTC ;
     dst->AmbientTemperature = src->AmbientTemperature ;
+    
+    material_copy(&dst->Material,&src->Material);
+    
+    dst->PlateLength        = src->PlateLength;
+    dst->PlateWidth         = src->PlateWidth;
+    dst->PlateHeight        = src->PlateHeight;
+    dst->CellLength         = src->CellLength;
+    dst->CellWidth          = src->CellWidth;
+    dst->CellHeight         = src->CellHeight;
 }
 
 /******************************************************************************/
@@ -133,6 +151,8 @@ Conductance_t heat_sink_conductance
 
 void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
 {
+    int format=0;
+    
     if (hsink->SinkModel == TDICE_HEATSINK_TOP)
 
         fprintf (stream, "%stop heat sink :\n", prefix) ;
@@ -140,7 +160,12 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
     else if (hsink->SinkModel == TDICE_HEATSINK_BOTTOM)
 
         fprintf (stream, "%sbottom heat sink :\n", prefix) ;
-
+    
+    else if (hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+        fprintf (stream, "%stop pluggable heat sink :\n", prefix) ;
+        format=1;
+    }
     else
     {
         fprintf (stream, "wrong heat sink model\n") ;
@@ -148,13 +173,44 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
         return ;
     }
 
-    fprintf (stream,
-        "%s   heat transfer coefficient %.4e ;\n",
-        prefix, hsink->AmbientHTC) ;
+    if(format==0)
+    {
+        fprintf (stream,
+            "%s   heat transfer coefficient %.4e ;\n",
+            prefix, hsink->AmbientHTC) ;
 
-    fprintf (stream,
-        "%s   temperature               %.2f ;\n",
-        prefix, hsink->AmbientTemperature) ;
+        fprintf (stream,
+            "%s   temperature               %.2f ;\n",
+            prefix, hsink->AmbientTemperature) ;
+    }
+    else
+    {
+        fprintf (stream,
+            "%s   plate length             %.0f ;\n",
+            prefix, hsink->PlateLength) ;
+
+        fprintf (stream,
+            "%s   plate width              %.0f ;\n",
+            prefix, hsink->PlateWidth) ;
+        
+        fprintf (stream,
+            "%s   plate height             %.0f ;\n",
+            prefix, hsink->PlateHeight) ;
+
+        fprintf (stream,
+            "%s   cell length              %.0f ;\n",
+            prefix, hsink->CellLength) ;
+        
+        fprintf (stream,
+            "%s   cell width               %.0f ;\n",
+            prefix, hsink->CellWidth) ;
+
+        fprintf (stream,
+            "%s   cell height              %.0f ;\n",
+            prefix, hsink->CellHeight) ;
+        
+        material_print(&hsink->Material, stream, prefix);
+    }
 }
 
 /******************************************************************************/

@@ -54,6 +54,7 @@ extern "C"
 #include "string_t.h"
 
 #include "dimensions.h"
+#include "material.h"
 
 /******************************************************************************/
 
@@ -76,7 +77,19 @@ extern "C"
 
         /*! The temperarute of the environment in \f$ K \f$ */
 
-       Temperature_t AmbientTemperature ;
+        Temperature_t AmbientTemperature ;
+
+        /*! Plate material, only for pluggable heatsink */
+
+        Material_t Material;
+
+        /*! Plate dimensions, only for pluggable heatsink */
+
+        PlateDimension_t PlateLength, PlateWidth, PlateHeight;
+
+        /*! Plate cell dimensions, only for pluggable heatsink */
+
+        CellDimension_t CellLength, CellWidth, CellHeight;
 
      } ;
 

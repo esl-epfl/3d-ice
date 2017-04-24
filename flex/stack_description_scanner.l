@@ -165,6 +165,8 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "pin"                        return PIN ;
 "pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
+"plate"                      return PLATE ;
+"pluggable"                  return PLUGGABLE ;
 "Pmap"                       return PMAP ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;

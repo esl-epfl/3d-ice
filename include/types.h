@@ -178,13 +178,22 @@ extern "C"
 
 
 
-    /*! Definitio of the type ChipDimension_t
+    /*! Definition of the type ChipDimension_t
      *
      * For chip length and with and coordinates to a point on its surface.
      * Also for floorplan elments dimensions ...
      */
 
     typedef double ChipDimension_t ;
+
+
+
+    /*! Definition of the type PlateDimension_t
+     *
+     * For pluggable heatsink plate length, height, width
+     */
+
+    typedef double PlateDimension_t ;
 
 
 
@@ -213,9 +222,10 @@ extern "C"
 
     enum HeatSinkModel_t
     {
-        TDICE_HEATSINK_NONE = 0,   //!< Undefined type
-        TDICE_HEATSINK_TOP,        //!< Top heat sink       (top-most layer)
-        TDICE_HEATSINK_BOTTOM      //!< Bottom heat sink (bottom-most layer)
+        TDICE_HEATSINK_NONE = 0,     //!< Undefined type
+        TDICE_HEATSINK_TOP,          //!< Top heat sink       (top-most layer)
+        TDICE_HEATSINK_BOTTOM,       //!< Bottom heat sink (bottom-most layer)
+        TDICE_HEATSINK_TOP_PLUGGABLE //!< Top pluggable heat sink
     } ;
 
     /*! The definition of the type HeatSinkModel_t */
