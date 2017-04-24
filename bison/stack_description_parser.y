@@ -1078,6 +1078,14 @@ stack
   : STACK ':'
         stack_elements
     {
+        // Put here because it needs to be after Dimensions is filled,
+        // but before the first time the heatsink is copied, which happens here
+        if(stkd->TopHeatSink && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+        {
+            if(compute_spreader_dimensions(stkd->TopHeatSink, stkd->Dimensions)!=TDICE_SUCCESS)
+                YYABORT ;
+        }
+
         if (num_dies == 0u)
         {
             STKERROR ("Error: stack must contain at least one die") ;
@@ -1222,9 +1230,6 @@ stack
         // When using the pluggable heatsink add the cells for the heat spreader
         if(stkd->TopHeatSink && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
         {
-            if(compute_spreader_dimensions(stkd->TopHeatSink, stkd->Dimensions)!=TDICE_SUCCESS)
-                YYABORT ;
-
             ncells +=   (uint64_t) stkd->TopHeatSink->NRows
                       * (uint64_t) stkd->TopHeatSink->NColumns;
         }
