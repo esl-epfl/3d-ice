@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include <stdlib.h> // For the memory functions calloc/free
+#include <assert.h>
 
 #include "thermal_grid.h"
 #include "macros.h"
@@ -289,7 +290,9 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
             tgrid->LayersTypeProfile [ 0 ] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
 
         else if (   tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
-                 || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
+                 || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT
+                 || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER
+                 || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER)
 
             fprintf (stderr, "Top and bottom sink on the same layer ! not handled yed\n") ;
    }
@@ -321,6 +324,8 @@ Capacity_t get_capacity
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
@@ -462,6 +467,22 @@ Conductance_t get_conductance_top
                                                 row_index, column_index,
                                                 dimensions)
                    ) ;
+            
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER:
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER:
+            
+            assert(layer_index == last_layer (dimensions));
+            
+            //NOTE: contrary to ambient connection which includes the conductance
+            //to ambient, here we only have the conductance till the face of the cell
+            return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
+                                                    row_index, column_index,
+                                                    dimensions)
+                        * get_cell_length (dimensions, column_index)
+                        * get_cell_width  (dimensions, row_index)
+                       )
+                        / (get_cell_height (dimensions, layer_index) / 2.0) ;
+            
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
@@ -595,6 +616,8 @@ Conductance_t get_conductance_bottom
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
@@ -720,6 +743,8 @@ Conductance_t get_conductance_north
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
@@ -814,6 +839,8 @@ Conductance_t get_conductance_south
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
@@ -908,6 +935,8 @@ Conductance_t get_conductance_east
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
@@ -987,6 +1016,8 @@ Conductance_t get_conductance_west
         case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 

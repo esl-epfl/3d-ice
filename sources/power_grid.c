@@ -296,6 +296,7 @@ void power_grid_fill
 
     Capacity_t *tmp = pgrid->CellsCapacities ;
 
+    // NOTE: if the top heatsink is pluggable, there are more elements to fill
     for (layer  = first_layer (dimensions) ;
          layer <= last_layer  (dimensions) ; layer++)
 
@@ -306,7 +307,6 @@ void power_grid_fill
                  column <= last_column  (dimensions) ; column++)
 
                 *tmp++ = get_capacity (tgrid, dimensions, layer, row, column) ;
-
 
     StackElement_t *bmost = stack_element_list_data (stack_element_list_end   (list)) ;
     StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (list)) ;
@@ -351,6 +351,11 @@ void power_grid_fill
             else if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
 
                 pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER ;
+            
+            // Add the missing capacities to pgrid->CellsCapacities
+            for(row = 0; row < tmost->TopSink->NRows; row++)
+                for(column = 0; column < tmost->TopSink->NColumns; column++)
+                    *tmp++ = get_spreader_capacity(tmost->TopSink);
         }
         else
         {
@@ -371,7 +376,9 @@ void power_grid_fill
             pgrid->LayersTypeProfile [ 0 ] = TDICE_LAYER_SOURCE_CONNECTED_TO_PCB ;
 
         else if (   pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
-                 || pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
+                 || pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT
+                 || pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER
+                 || pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER)
 
             fprintf (stderr, "Top and bottom sink on the same layer ! not handled yed\n") ;
 
