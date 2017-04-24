@@ -165,8 +165,8 @@
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
 %token PITCH                 "keyword pitch"
-%token PLATE                 "keyword plate"
 %token PLUGGABLE             "keyword pluggable"
+%token PLUGIN                "keyword plugin"
 %token PMAP                  "keyword Pmap"
 %token RATE                  "keyword rate"
 %token SIDE                  "keyword side"
@@ -174,6 +174,7 @@
 %token SLOT                  "keyword slot"
 %token SOLVER                "keyword solver"
 %token SOURCE                "keyword source"
+%token SPREADER              "keyword spreader"
 %token STACK                 "keyword stack"
 %token STAGGERED             "keyword staggered"
 %token STATE                 "keyword state"
@@ -374,9 +375,9 @@ bottomsink
 topsink_pluggable
 
   : TOP PLUGGABLE HEAT SINK ':'
-        PLATE LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
-        CELL  LENGTH DVALUE ',' WIDTH DVALUE ';'                   //$18 $21
-        MATERIAL IDENTIFIER ';'                                    //$24
+        SPREADER LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
+        MATERIAL IDENTIFIER ';'                                       //$17
+        PLUGIN PATH ';'                                               //$20
     {
         stkd->TopHeatSink = heat_sink_calloc () ;
 
@@ -388,30 +389,32 @@ topsink_pluggable
         }
 
         stkd->TopHeatSink->SinkModel          = TDICE_HEATSINK_TOP_PLUGGABLE ;
-        stkd->TopHeatSink->PlateLength        = $8 ;
-        stkd->TopHeatSink->PlateWidth         = $11 ;
-        stkd->TopHeatSink->PlateHeight        = $14 ;
-        stkd->TopHeatSink->CellLength         = $18 ;
-        stkd->TopHeatSink->CellWidth          = $21 ;
+        stkd->TopHeatSink->SpreaderLength     = $8 ;
+        stkd->TopHeatSink->SpreaderWidth      = $11 ;
+        stkd->TopHeatSink->SpreaderHeight     = $14 ;
         
-        string_copy (&stkd->TopHeatSink->Material.Id, &$24) ;
+        string_copy (&stkd->TopHeatSink->SpreaderMaterial.Id, &$17) ;
 
-        Material_t *tmp = material_list_find (&stkd->Materials, &stkd->TopHeatSink->Material) ;
+        Material_t *tmp = material_list_find (&stkd->Materials, &stkd->TopHeatSink->SpreaderMaterial) ;
 
         if (tmp == NULL)
         {
-            sprintf (error_message, "Unknown material %s", $24) ;
+            sprintf (error_message, "Unknown material %s", $17) ;
 
             STKERROR (error_message) ;
 
-            string_destroy (&$24) ;
+            string_destroy (&$17) ;
 
             YYABORT ;
         }
 
-        material_copy (&stkd->TopHeatSink->Material, tmp) ;
+        material_copy (&stkd->TopHeatSink->SpreaderMaterial, tmp) ;
 
-        string_destroy (&$24) ;
+        string_destroy (&$17) ;
+
+        string_copy (&stkd->TopHeatSink->Plugin, &$20) ;
+
+        string_destroy (&$20) ;
     }
   ;
 

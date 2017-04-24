@@ -50,13 +50,12 @@ void heat_sink_init (HeatSink_t *hsink)
     hsink->AmbientHTC         = (AmbientHTC_t) 0.0 ;
     hsink->AmbientTemperature = (Temperature_t) 0.0 ;
     
-    material_init(&hsink->Material);
+    hsink->SpreaderLength     = 0.0;
+    hsink->SpreaderWidth      = 0.0;
+    hsink->SpreaderHeight     = 0.0;
     
-    hsink->PlateLength        = 0.0;
-    hsink->PlateWidth         = 0.0;
-    hsink->PlateHeight        = 0.0;
-    hsink->CellLength         = 0.0;
-    hsink->CellWidth          = 0.0;
+    material_init(&hsink->SpreaderMaterial);
+    string_init(&hsink->Plugin);
 }
 
 /******************************************************************************/
@@ -69,13 +68,12 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     dst->AmbientHTC         = src->AmbientHTC ;
     dst->AmbientTemperature = src->AmbientTemperature ;
     
-    material_copy(&dst->Material,&src->Material);
+    dst->SpreaderLength     = src->SpreaderLength;
+    dst->SpreaderWidth      = src->SpreaderWidth;
+    dst->SpreaderHeight     = src->SpreaderHeight;
     
-    dst->PlateLength        = src->PlateLength;
-    dst->PlateWidth         = src->PlateWidth;
-    dst->PlateHeight        = src->PlateHeight;
-    dst->CellLength         = src->CellLength;
-    dst->CellWidth          = src->CellWidth;
+    material_copy(&dst->SpreaderMaterial,&src->SpreaderMaterial);
+    string_copy(&dst->Plugin,&src->Plugin);
 }
 
 /******************************************************************************/
@@ -83,7 +81,10 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
 void heat_sink_destroy (HeatSink_t *hsink)
 {
     // Nothing to do ...
-
+    
+    material_destroy (&hsink->SpreaderMaterial);
+    string_destroy (&hsink->Plugin);
+    
     heat_sink_init (hsink) ;
 }
 
@@ -184,26 +185,22 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
     else
     {
         fprintf (stream,
-            "%s   plate length             %.0f ;\n",
-            prefix, hsink->PlateLength) ;
+            "%s   spreader length          %.0f ;\n",
+            prefix, hsink->SpreaderLength) ;
 
         fprintf (stream,
-            "%s   plate width              %.0f ;\n",
-            prefix, hsink->PlateWidth) ;
+            "%s   spreader width           %.0f ;\n",
+            prefix, hsink->SpreaderWidth) ;
         
         fprintf (stream,
-            "%s   plate height             %.0f ;\n",
-            prefix, hsink->PlateHeight) ;
-
-        fprintf (stream,
-            "%s   cell length              %.0f ;\n",
-            prefix, hsink->CellLength) ;
+            "%s   spreader height          %.0f ;\n",
+            prefix, hsink->SpreaderHeight) ;
+        
+        material_print(&hsink->SpreaderMaterial, stream, prefix);
         
         fprintf (stream,
-            "%s   cell width               %.0f ;\n",
-            prefix, hsink->CellWidth) ;
-        
-        material_print(&hsink->Material, stream, prefix);
+            "%s   plugin                  %s ;\n",
+            prefix, hsink->Plugin) ;
     }
 }
 

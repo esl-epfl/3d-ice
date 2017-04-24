@@ -71,25 +71,26 @@ extern "C"
         HeatSinkModel_t SinkModel ;
 
         /*! The heat transfert coefficient (from 3d stack to the environment).
-            Used for both connection to enviroment and spreader+sink */
+            ignored by pluggable heatsink */
 
         AmbientHTC_t AmbientHTC ;
 
-        /*! The temperarute of the environment in \f$ K \f$ */
+        /*! The temperarute of the environment in \f$ K \f$,
+            ignored by pluggable heatsink */
 
         Temperature_t AmbientTemperature ;
 
-        /*! Plate material, only for pluggable heatsink */
+        /*! Spreader dimensions, only for pluggable heatsink */
 
-        Material_t Material;
+        SpreaderDimension_t SpreaderLength, SpreaderWidth, SpreaderHeight;
+        
+        /*! Spreader material, only for pluggable heatsink */
 
-        /*! Plate dimensions, only for pluggable heatsink */
+        Material_t SpreaderMaterial;
 
-        PlateDimension_t PlateLength, PlateWidth, PlateHeight;
-
-        /*! Plate cell dimensions, only for pluggable heatsink */
-
-        CellDimension_t CellLength, CellWidth;
+        /*! Plugin file name, only for pluggable heatsink */
+        
+        String_t Plugin;
 
      } ;
 

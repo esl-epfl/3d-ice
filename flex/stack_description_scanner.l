@@ -165,8 +165,8 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "pin"                        return PIN ;
 "pinfin"                     return PINFIN ;
 "pitch"                      return PITCH ;
-"plate"                      return PLATE ;
 "pluggable"                  return PLUGGABLE ;
+"plugin"                     return PLUGIN ;
 "Pmap"                       return PMAP ;
 "rate"                       return RATE ;
 "side"                       return SIDE ;
@@ -174,6 +174,7 @@ path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
 "slot"                       return SLOT ;
 "solver"                     return SOLVER ;
 "source"                     return SOURCE ;
+"spreader"                   return SPREADER ;
 "stack"                      return STACK ;
 "staggered"                  return STAGGERED ;
 "state"                      return STATE ;

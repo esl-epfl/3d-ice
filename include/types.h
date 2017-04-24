@@ -188,12 +188,12 @@ extern "C"
 
 
 
-    /*! Definition of the type PlateDimension_t
+    /*! Definition of the type SpreaderDimension_t
      *
-     * For pluggable heatsink plate length, height, width
+     * For pluggable heatsink, heat spreader length, height, width
      */
 
-    typedef double PlateDimension_t ;
+    typedef double SpreaderDimension_t ;
 
 
 
