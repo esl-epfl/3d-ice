@@ -48,17 +48,17 @@ CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
 -include GenerateSystemMatrix.d
 
 GenerateSystemMatrix: GenerateSystemMatrix.o
-	$(CC) $< $(CLIBS) -o $@
+	$(CC) $(CFLAGS) $< $(CLIBS) -o $@
 
 -include CompareSystemMatrix.d
 
 CompareSystemMatrix: CompareSystemMatrix.o
-	$(CC) $< $(CLIBS) -o $@
+	$(CC) $(CFLAGS) $< $(CLIBS) -o $@
 
 -include CompareTemperatures.d
 
 CompareTemperatures: CompareTemperatures.o
-	$(CC) $< $(CLIBS) -o $@
+	$(CC) $(CFLAGS) $< $(CLIBS) -o $@
 
 runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-ICE-Emulator
 	@echo ""
