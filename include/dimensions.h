@@ -444,7 +444,7 @@ struct HeatSink_t; //Forward decalration
         Dimensions_t   *dimensions,
         Quantity_t      num_channels,
         ChannelModel_t  channel_model,
-        HeatSink_t      *topSink
+        struct HeatSink_t      *topSink
     ) ;
 
 
@@ -792,7 +792,7 @@ struct HeatSink_t; //Forward decalration
     CellIndex_t get_spreader_cell_offset
     (
         Dimensions_t *dimensions,
-        HeatSink_t   *hsink,
+        struct HeatSink_t   *hsink,
         CellIndex_t   row_index,
         CellIndex_t   column_index
     );
@@ -817,7 +817,7 @@ struct HeatSink_t; //Forward decalration
     CellIndex_t get_spreader_cell_offset_from_layer_coordinates
     (
         Dimensions_t *dimensions,
-        HeatSink_t   *hsink,
+        struct HeatSink_t   *hsink,
         CellIndex_t   row_index,
         CellIndex_t   column_index
     );
@@ -841,7 +841,7 @@ struct HeatSink_t; //Forward decalration
     bool has_layer_underneath
     (
         Dimensions_t *dimensions,
-        HeatSink_t   *hsink,
+        struct HeatSink_t   *hsink,
         CellIndex_t   row_index,
         CellIndex_t   column_index
     );
@@ -867,7 +867,7 @@ struct HeatSink_t; //Forward decalration
     CellIndex_t get_layer_cell_offset_from_spreader_coordinates
     (
         Dimensions_t *dimensions,
-        HeatSink_t   *hsink,
+        struct HeatSink_t   *hsink,
         CellIndex_t   layer_index,
         CellIndex_t   row_index,
         CellIndex_t   column_index
