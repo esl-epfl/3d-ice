@@ -401,18 +401,19 @@ skip_west :
 
     if (   thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT
         || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT)
-
+    {
         *sysmatrix.Values += get_conductance_top
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
-
+    }
     else if (   thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB
              || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_PCB)
-
+    {
         *sysmatrix.Values += get_conductance_bottom
 
             (thermal_grid, dimensions, layer_index, row_index, column_index) ;
-
+    }
+    
     diagonal_pointer = sysmatrix.Values++ ;
 
     (*sysmatrix.ColumnPointers)++ ;
@@ -522,6 +523,32 @@ skip_north :
 #endif
 
 skip_top :
+
+    // Connection between the layer submatrix and the spreader submatrix
+    if (    thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER
+         || thermal_grid->LayersTypeProfile [layer_index] == TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER)
+    {
+        *sysmatrix.RowIndices++ = get_spreader_cell_offset_from_layer_coordinates
+            (dimensions, thermal_grid->TopHeatSink, row_index, column_index) ;
+        
+        g_top = get_conductance_top(thermal_grid, dimensions, layer_index, row_index, column_index) ;
+        
+        g_bottom = get_spreader_conductance(thermal_grid->TopHeatSink);
+        
+        conductance = PARALLEL (g_bottom, g_top) ;
+        
+        *sysmatrix.Values++  = -conductance ;
+        diagonal_value +=  conductance ;
+
+        (*sysmatrix.ColumnPointers)++ ;
+        
+        #ifdef PRINT_SYSTEM_MATRIX
+            fprintf (stderr,
+                "  top     \t%d\t% .4e = % .4e (T) || % .4e (B)\n",
+                *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1),
+                g_top, g_bottom) ;
+        #endif
+    }
 
     /************************** DIAGONAL ELEMENT ******************************/
 
@@ -1404,6 +1431,209 @@ static SystemMatrix_t add_virtual_wall_column_2rm
     return sysmatrix ;
 }
 
+static SystemMatrix_t add_spreader_column
+(
+    SystemMatrix_t  sysmatrix,
+    ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions,
+    CellIndex_t     row_index,
+    CellIndex_t     column_index
+)
+{
+    HeatSink_t *sink = thermal_grid->TopHeatSink;
+    Conductance_t conductance = 0.0 ;
+    SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    SystemMatrixCoeff_t *diagonal_pointer = NULL ;
+
+    Conductance_t g_bottom, g_top, g_north, g_south, g_east, g_west ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fpos_t diag_fposition, last_fpos ;
+
+    fprintf (stderr,
+        "add_spreader_column        r %4d c %4d [%7d]\n",
+        row_index, column_index,
+        get_spreader_cell_offset (dimensions, sink, row_index, column_index)) ;
+#endif
+
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
+
+    /********************************* BOTTOM *********************************/
+
+    if (has_layer_underneath(dimensions, sink, row_index, column_index) ==  false)
+
+        goto skip_bottom ;
+
+    // Connection between the layer submatrix and the spreader submatrix
+    *sysmatrix.RowIndices++ = get_layer_cell_offset_from_spreader_coordinates
+        (dimensions, sink, last_layer(dimensions), row_index, column_index) ;
+
+    g_bottom = get_spreader_conductance(sink);
+
+    g_top = get_conductance_top
+        (thermal_grid, dimensions, last_layer(dimensions),
+         row_index - sink->NumRowsBorder, column_index - sink->NumColumnsBorder) ;
+
+    conductance = PARALLEL (g_bottom, g_top) ;
+
+    *sysmatrix.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*sysmatrix.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  bottom  \t%d\t% .4e = % .4e (B) || % .4e (T)\n",
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_bottom, g_top) ;
+#endif
+
+skip_bottom :
+
+    /********************************* SOUTH **********************************/
+
+    if (row_index == 0)    goto skip_south ;
+
+    *sysmatrix.RowIndices++ = get_spreader_cell_offset
+        (dimensions, sink, row_index - 1, column_index) ;
+
+    g_south = g_north = get_spreader_conductance(sink);
+
+    conductance = PARALLEL (g_south, g_north) ;
+
+    *sysmatrix.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*sysmatrix.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  south   \t%d\t% .4e = % .4e (S) || % .4e (N)\n",
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_south, g_north) ;
+#endif
+
+skip_south :
+
+    /********************************* WEST ***********************************/
+
+    if (column_index == 0)    goto skip_west ;
+
+    *sysmatrix.RowIndices++ = get_spreader_cell_offset
+        (dimensions, sink, row_index, column_index - 1) ;
+
+    g_west = g_east = get_spreader_conductance(sink);
+
+    conductance = PARALLEL (g_west, g_east) ;
+
+    *sysmatrix.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*sysmatrix.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  west    \t%d\t% .4e = % .4e (W) || % .4e (E)\n",
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_west, g_east) ;
+#endif
+
+skip_west :
+
+    /********************************* DIAGONAL *******************************/
+
+    *sysmatrix.RowIndices++ = get_spreader_cell_offset
+        (dimensions, sink, row_index, column_index) ;
+
+    *sysmatrix.Values = 0.0 ;
+
+    if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+    {
+        *sysmatrix.Values = get_spreader_capacity(sink) / analysis->StepTime;
+    }
+    
+    diagonal_pointer = sysmatrix.Values++ ;
+
+    (*sysmatrix.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr, "  diagonal\t%d\t", *(sysmatrix.RowIndices-1)) ;
+    fgetpos (stderr, &diag_fposition) ;
+    fprintf (stderr, "            ( + % .4e [capacity] )\n", *(sysmatrix.Values-1)) ;
+#endif
+
+    /********************************* EAST ***********************************/
+
+    if (column_index == sink->NColumns - 1)    goto skip_east ;
+
+    *sysmatrix.RowIndices++ = get_spreader_cell_offset
+        (dimensions, sink, row_index, column_index + 1) ;
+
+    g_east = g_west = get_spreader_conductance(sink);
+
+    conductance = PARALLEL (g_east, g_west) ;
+
+    *sysmatrix.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*sysmatrix.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  east    \t%d\t% .4e = % .4e (E) || % .4e (W)\n",
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_east, g_west) ;
+#endif
+
+skip_east :
+
+    /********************************* NORTH **********************************/
+
+    if (row_index == sink->NRows - 1)    goto skip_north ;
+
+    *sysmatrix.RowIndices++ = get_spreader_cell_offset
+        (dimensions, sink, row_index + 1, column_index) ;
+
+    g_north = g_south = get_spreader_conductance(sink);
+
+    conductance = PARALLEL (g_north, g_south) ;
+
+    *sysmatrix.Values++  = -conductance ;
+    diagonal_value +=  conductance ;
+
+    (*sysmatrix.ColumnPointers)++ ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr,
+        "  north   \t%d\t% .4e = % .4e (N) || % .4e (S)\n",
+        *(sysmatrix.RowIndices-1), *(sysmatrix.Values-1), g_north, g_south) ;
+#endif
+
+skip_north :
+
+    /********************************* TOP ************************************/
+
+    // The top of the spreader is connected with the pluggable heat sink,
+    // whose state variables are not part of the system matrix.
+    // Thus, no other nonzero element appears in the sysyem matrix, but
+    // a conductance term is summed to the diagonal element
+    diagonal_value +=  get_spreader_conductance(sink);
+
+    /************************** DIAGONAL ELEMENT ******************************/
+
+    *diagonal_pointer += diagonal_value ;
+
+#ifdef PRINT_SYSTEM_MATRIX
+    fgetpos (stderr, &last_fpos) ;
+    fsetpos (stderr, &diag_fposition) ;
+    fprintf (stderr, "% .4e", *diagonal_pointer) ;
+    fsetpos (stderr, &last_fpos) ;
+
+    fprintf (stderr, "  %d\n", *sysmatrix.ColumnPointers) ;
+#endif
+
+    sysmatrix.ColumnPointers++ ;
+
+    return sysmatrix ;
+}
+
 /******************************************************************************/
 
 void fill_system_matrix
@@ -1445,6 +1675,8 @@ void fill_system_matrix
             case TDICE_LAYER_SOURCE :
             case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             {
@@ -1586,6 +1818,17 @@ void fill_system_matrix
                 fprintf (stderr, "ERROR: unknown layer type %d\n", thermal_grid->LayersTypeProfile [lindex]) ;
         }
 
+    }
+    
+    if(thermal_grid->TopHeatSink && thermal_grid->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+        CellIndex_t row ;
+        CellIndex_t column ;
+        for(row = 0; row < thermal_grid->TopHeatSink->NRows; row++)
+            for(column = 0; column < thermal_grid->TopHeatSink->NColumns; column++)
+                tmp_matrix = add_spreader_column
+                            (tmp_matrix, thermal_grid, analysis, dimensions,
+                             row, column);
     }
 }
 
