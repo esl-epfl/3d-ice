@@ -390,7 +390,6 @@ void compute_number_of_connections
     
     if(topSink && topSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
     {
-        int aa=dimensions->Grid.NConnections;
         // Add the heat spreader, which has a different size and is thus not
         // counted among the layers
         dimensions->Grid.NConnections +=

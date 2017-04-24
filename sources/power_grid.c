@@ -315,30 +315,47 @@ void power_grid_fill
     {
         pgrid->TopHeatSink = tmost->TopSink ;
 
-        if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOLID)
-
-            pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
-
-        else if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
-
-            pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
-
-        row    = (CellIndex_t) 0u ;
-        column = (CellIndex_t) 0u ;
-        layer  = last_layer  (dimensions) ;
-
-        SolidTC_t *tmp = pgrid->HeatSinkTopTcs ;
-
-        for (row  = first_row (dimensions) ;
-             row <= last_row  (dimensions) ; row++)
+        if(tmost->TopSink->SinkModel == TDICE_HEATSINK_TOP)
         {
-            for (column  = first_column (dimensions) ;
-                 column <= last_column  (dimensions) ; column++)
-            {
-                *tmp++ += get_conductance_top (tgrid, dimensions, layer, row, column) ;
+            if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOLID)
 
-            } // FOR_EVERY_COLUMN
-        } // FOR_EVERY_ROW
+                pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+
+            else if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
+
+                pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+
+            row    = (CellIndex_t) 0u ;
+            column = (CellIndex_t) 0u ;
+            layer  = last_layer  (dimensions) ;
+
+            SolidTC_t *tmp = pgrid->HeatSinkTopTcs ;
+
+            for (row  = first_row (dimensions) ;
+                 row <= last_row  (dimensions) ; row++)
+            {
+                for (column  = first_column (dimensions) ;
+                     column <= last_column  (dimensions) ; column++)
+                {
+                    *tmp++ += get_conductance_top (tgrid, dimensions, layer, row, column) ;
+
+                } // FOR_EVERY_COLUMN
+            } // FOR_EVERY_ROW
+        }
+        else if(tmost->TopSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+        {
+            if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOLID)
+
+                pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER ;
+
+            else if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
+
+                pgrid->LayersTypeProfile [pgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER ;
+        }
+        else
+        {
+            fprintf (stderr, "Unknown top heatsink model\n") ;
+        }
     }
 
     if (bmost->BottomSink != NULL)

@@ -250,13 +250,30 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
     {
         tgrid->TopHeatSink = tmost->TopSink ;
 
-        if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOLID)
+        if(tmost->TopSink->SinkModel == TDICE_HEATSINK_TOP)
+        {
+            if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOLID)
 
-            tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
+                tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT ;
 
-        else if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
+            else if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
 
-            tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+                tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT ;
+        }
+        else if(tmost->TopSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+        {
+            if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOLID)
+
+                tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER ;
+
+            else if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOURCE)
+
+                tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER ;
+        }
+        else
+        {
+            fprintf (stderr, "Unknown top heatsink model\n") ;
+        }
     }
 
     if (bmost->BottomSink != NULL)

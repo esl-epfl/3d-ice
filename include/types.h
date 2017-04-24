@@ -256,6 +256,10 @@ extern "C"
         /*! Solid layer (passive) connected to the environment to dissipate heat */
 
         TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT,
+        
+        /*! Solid layer (passive) connected to heat spreader to dissipate heat */
+
+        TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER,
 
         /*! Solid layer (passive) connected to the pcb to dissipate heat */
 
@@ -264,6 +268,10 @@ extern "C"
         /*! Solid layer (active) connected to the environment to dissipate heat */
 
         TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT,
+        
+        /*! Solid layer (active) connected to heat spreader to dissipate heat */
+
+        TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER,
 
         /*! Solid layer (active) connected to the pcb to dissipate heat */
 
