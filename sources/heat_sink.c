@@ -289,7 +289,7 @@ static bool fixme(double *heatflow, double *temperatures, unsigned int rows, uns
 }
 // temporary code -- end
 
-Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
+Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
 {
     if(hsink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE)
         return TDICE_SUCCESS;

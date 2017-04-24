@@ -1082,7 +1082,7 @@ stack
         // but before the first time the heatsink is copied, which happens here
         if(stkd->TopHeatSink && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
         {
-            if(compute_spreader_dimensions(stkd->TopHeatSink, stkd->Dimensions)!=TDICE_SUCCESS)
+            if(initialize_heat_spreader(stkd->TopHeatSink, stkd->Dimensions)!=TDICE_SUCCESS)
                 YYABORT ;
         }
 

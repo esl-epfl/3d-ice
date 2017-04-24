@@ -258,7 +258,7 @@ extern "C"
      * \param hsink the heatsink
      * \param chip the chip dimensions
      */
-    Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip);
+    Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip);
 
     /*! Computes the thermal capacity of a cell in the heat spreader */
     Capacity_t get_spreader_capacity(HeatSink_t *hsink);
