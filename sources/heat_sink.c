@@ -58,6 +58,8 @@ void heat_sink_init (HeatSink_t *hsink)
     material_init(&hsink->SpreaderMaterial);
     string_init(&hsink->Plugin);
     
+    hsink->CellLength         = 0.0;
+    hsink->CellWidth          = 0.0;
     hsink->NRows              = 0;
     hsink->NColumns           = 0;
     hsink->NumRowsBorder      = 0;
@@ -81,6 +83,8 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     material_copy(&dst->SpreaderMaterial,&src->SpreaderMaterial);
     string_copy(&dst->Plugin,&src->Plugin);
     
+    dst->CellLength         = src->CellLength;
+    dst->CellWidth          = src->CellWidth;
     dst->NRows              = src->NRows;
     dst->NColumns           = src->NColumns;
     dst->NumRowsBorder      = src->NumRowsBorder;
@@ -214,6 +218,30 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
         fprintf (stream,
             "%s   plugin                  %s ;\n",
             prefix, hsink->Plugin) ;
+        
+        fprintf (stream,
+            "%s   cell     length          %.0f ;\n",
+            prefix, hsink->CellLength) ;
+
+        fprintf (stream,
+            "%s   cell     width           %.0f ;\n",
+            prefix, hsink->CellWidth) ;
+        
+        fprintf (stream,
+            "%s   num rows                 %d ;\n",
+            prefix, hsink->NRows) ;
+        
+        fprintf (stream,
+            "%s   num columns              %d ;\n",
+            prefix, hsink->NColumns) ;
+        
+        fprintf (stream,
+            "%s   num rows border          %d ;\n",
+            prefix, hsink->NumRowsBorder) ;
+        
+        fprintf (stream,
+            "%s   num columns border       %d ;\n",
+            prefix, hsink->NumColumnsBorder) ;
     }
 }
 
@@ -226,9 +254,9 @@ Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
     const double maxSlack = 0.1;
     
     double borderLength = (hsink->SpreaderLength - chip->Chip.Length) / 2.0;
-    double cellLength = chip->Chip.Length / get_number_of_columns(chip);
+    hsink->CellLength = chip->Chip.Length / get_number_of_columns(chip);
     
-    double numColumnsBorderDouble = borderLength / cellLength;
+    double numColumnsBorderDouble = borderLength / hsink->CellLength;
     if(numColumnsBorderDouble<0.0)
     {
         fprintf (stderr, "ERROR: spreader length is smaller than the chip\n") ;
@@ -242,9 +270,9 @@ Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
     
     
     double borderWidth  = (hsink->SpreaderWidth  - chip->Chip.Width)  / 2.0;
-    double cellWidth = chip->Chip.Width / get_number_of_rows(chip);
+    hsink->CellWidth = chip->Chip.Width / get_number_of_rows(chip);
     
-    double numRowsBorderDouble = borderWidth / cellWidth;
+    double numRowsBorderDouble = borderWidth / hsink->CellWidth;
     if(numRowsBorderDouble<0.0)
     {
         fprintf (stderr, "ERROR: spreader width is smaller than the chip\n") ;
@@ -261,5 +289,32 @@ Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip)
 #endif
     return TDICE_SUCCESS;
 }
+
+Capacity_t get_spreader_capacity(HeatSink_t *hsink)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
+    return   hsink->SpreaderMaterial.VolumetricHeatCapacity
+            * hsink->CellLength
+            * hsink->CellWidth
+            * hsink->SpreaderHeight;
+}
+
+Conductance_t get_spreader_conductance(HeatSink_t *hsink)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
+    /*
+     * FIXME: when using the 4RM microchannel model, the chip layers have
+     * different lengths, but since we want a uniform grid for the spreader,
+     * for now we ignore this mismstch, as using microchannels and heatsink
+     * is not an expected use case.
+     */
+    return (  hsink->SpreaderMaterial.ThermalConductivity
+             * hsink->CellLength
+             * hsink->CellWidth) / (hsink->SpreaderHeight / 2.0);
+}
+
+
 
 /******************************************************************************/

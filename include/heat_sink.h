@@ -92,6 +92,14 @@ extern "C"
         
         String_t Plugin;
         
+        /*! The length of a spreader cell, only for pluggable heatsink */
+        
+        CellDimension_t CellLength;
+        
+        /*! The width of a spreader cell, only for pluggable heatsink */
+        
+        CellDimension_t CellWidth;
+        
         /*! The number of rows of cells of the spreader, only for pluggable heatsink */
 
         CellIndex_t NRows;
@@ -234,6 +242,12 @@ extern "C"
      * \param chip the chip dimensions
      */
     Error_t compute_spreader_dimensions(HeatSink_t *hsink, Dimensions_t *chip);
+
+    /*! Computes the thermal capacity of a cell in the heat spreader */
+    Capacity_t get_spreader_capacity(HeatSink_t *hsink);
+    
+    /*! Computes the thermal conductance of a cell in the heat spreader */
+    Conductance_t get_spreader_conductance(HeatSink_t *hsink);
 
 /******************************************************************************/
 
