@@ -472,7 +472,7 @@ void layout_parser_error
     material_list_destroy   (&local_materials) ;
 
     fprintf (stderr, "%s:%d: %s\n",
-        layer->LayoutFileName, floorplan_parser_get_lineno(yyscanner), msg) ;
+        layer->LayoutFileName, layout_parser_get_lineno(yyscanner), msg) ;
 }
 
 /******************************************************************************/
