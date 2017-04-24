@@ -23,6 +23,7 @@
  *          Giseong Bak                                                       *
  *          Thomas Brunschwiler                                               *
  *          Martino Ruggiero                                                  *
+ *          Federico Terraneo                                                 *
  *          David Atienza                                                     *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
