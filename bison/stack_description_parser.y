@@ -375,8 +375,8 @@ topsink_pluggable
 
   : TOP PLUGGABLE HEAT SINK ':'
         PLATE LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
-        CELL  LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' //$18 $21 $24
-        MATERIAL IDENTIFIER ';'                                    //$27
+        CELL  LENGTH DVALUE ',' WIDTH DVALUE ';'                   //$18 $21
+        MATERIAL IDENTIFIER ';'                                    //$24
     {
         stkd->TopHeatSink = heat_sink_calloc () ;
 
@@ -393,26 +393,25 @@ topsink_pluggable
         stkd->TopHeatSink->PlateHeight        = $14 ;
         stkd->TopHeatSink->CellLength         = $18 ;
         stkd->TopHeatSink->CellWidth          = $21 ;
-        stkd->TopHeatSink->CellHeight         = $24 ;
         
-        string_copy (&stkd->TopHeatSink->Material.Id, &$27) ;
+        string_copy (&stkd->TopHeatSink->Material.Id, &$24) ;
 
         Material_t *tmp = material_list_find (&stkd->Materials, &stkd->TopHeatSink->Material) ;
 
         if (tmp == NULL)
         {
-            sprintf (error_message, "Unknown material %s", $27) ;
+            sprintf (error_message, "Unknown material %s", $24) ;
 
             STKERROR (error_message) ;
 
-            string_destroy (&$27) ;
+            string_destroy (&$24) ;
 
             YYABORT ;
         }
 
         material_copy (&stkd->TopHeatSink->Material, tmp) ;
 
-        string_destroy (&$27) ;
+        string_destroy (&$24) ;
     }
   ;
 

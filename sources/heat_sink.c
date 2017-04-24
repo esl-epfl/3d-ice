@@ -57,7 +57,6 @@ void heat_sink_init (HeatSink_t *hsink)
     hsink->PlateHeight        = 0.0;
     hsink->CellLength         = 0.0;
     hsink->CellWidth          = 0.0;
-    hsink->CellHeight         = 0.0;
 }
 
 /******************************************************************************/
@@ -77,7 +76,6 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     dst->PlateHeight        = src->PlateHeight;
     dst->CellLength         = src->CellLength;
     dst->CellWidth          = src->CellWidth;
-    dst->CellHeight         = src->CellHeight;
 }
 
 /******************************************************************************/
@@ -204,10 +202,6 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
         fprintf (stream,
             "%s   cell width               %.0f ;\n",
             prefix, hsink->CellWidth) ;
-
-        fprintf (stream,
-            "%s   cell height              %.0f ;\n",
-            prefix, hsink->CellHeight) ;
         
         material_print(&hsink->Material, stream, prefix);
     }

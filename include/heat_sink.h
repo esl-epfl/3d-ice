@@ -89,7 +89,7 @@ extern "C"
 
         /*! Plate cell dimensions, only for pluggable heatsink */
 
-        CellDimension_t CellLength, CellWidth, CellHeight;
+        CellDimension_t CellLength, CellWidth;
 
      } ;
 
