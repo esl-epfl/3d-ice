@@ -261,11 +261,17 @@ extern "C"
      */
     Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip);
 
-    /*! Computes the thermal capacity of a cell in the heat spreader */
+    /*! \return the thermal capacity of a cell in the heat spreader */
     Capacity_t get_spreader_capacity(HeatSink_t *hsink);
     
-    /*! Computes the thermal conductance of a cell in the heat spreader */
-    Conductance_t get_spreader_conductance(HeatSink_t *hsink);
+    /*! \return the thermal conductance along the x axis of a heat spreader cell */
+    Conductance_t get_spreader_conductance_east_west(HeatSink_t *hsink);
+    
+    /*! \return the thermal conductance along the y axis of a heat spreader cell */
+    Conductance_t get_spreader_conductance_north_south(HeatSink_t *hsink);
+    
+    /*! \return the thermal conductance along the z axis of a heat spreader cell */
+    Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink);
 
 /******************************************************************************/
 

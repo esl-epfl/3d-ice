@@ -534,7 +534,7 @@ skip_top :
         
         g_top = get_conductance_top(thermal_grid, dimensions, layer_index, row_index, column_index) ;
         
-        g_bottom = get_spreader_conductance(thermal_grid->TopHeatSink);
+        g_bottom = get_spreader_conductance_top_bottom(thermal_grid->TopHeatSink);
         
         conductance = PARALLEL (g_bottom, g_top) ;
         
@@ -1470,7 +1470,7 @@ static SystemMatrix_t add_spreader_column
     *sysmatrix.RowIndices++ = get_layer_cell_offset_from_spreader_coordinates
         (dimensions, sink, last_layer(dimensions), row_index, column_index) ;
 
-    g_bottom = get_spreader_conductance(sink);
+    g_bottom = get_spreader_conductance_top_bottom(sink);
 
     g_top = get_conductance_top
         (thermal_grid, dimensions, last_layer(dimensions),
@@ -1498,7 +1498,7 @@ skip_bottom :
     *sysmatrix.RowIndices++ = get_spreader_cell_offset
         (dimensions, sink, row_index - 1, column_index) ;
 
-    g_south = g_north = get_spreader_conductance(sink);
+    g_south = g_north = get_spreader_conductance_north_south(sink);
 
     conductance = PARALLEL (g_south, g_north) ;
 
@@ -1522,7 +1522,7 @@ skip_south :
     *sysmatrix.RowIndices++ = get_spreader_cell_offset
         (dimensions, sink, row_index, column_index - 1) ;
 
-    g_west = g_east = get_spreader_conductance(sink);
+    g_west = g_east = get_spreader_conductance_east_west(sink);
 
     conductance = PARALLEL (g_west, g_east) ;
 
@@ -1568,7 +1568,7 @@ skip_west :
     *sysmatrix.RowIndices++ = get_spreader_cell_offset
         (dimensions, sink, row_index, column_index + 1) ;
 
-    g_east = g_west = get_spreader_conductance(sink);
+    g_east = g_west = get_spreader_conductance_east_west(sink);
 
     conductance = PARALLEL (g_east, g_west) ;
 
@@ -1592,7 +1592,7 @@ skip_east :
     *sysmatrix.RowIndices++ = get_spreader_cell_offset
         (dimensions, sink, row_index + 1, column_index) ;
 
-    g_north = g_south = get_spreader_conductance(sink);
+    g_north = g_south = get_spreader_conductance_north_south(sink);
 
     conductance = PARALLEL (g_north, g_south) ;
 
@@ -1615,7 +1615,7 @@ skip_north :
     // whose state variables are not part of the system matrix.
     // Thus, no other nonzero element appears in the sysyem matrix, but
     // a conductance term is summed to the diagonal element
-    diagonal_value +=  get_spreader_conductance(sink);
+    diagonal_value +=  get_spreader_conductance_top_bottom(sink);
 
     /************************** DIAGONAL ELEMENT ******************************/
 

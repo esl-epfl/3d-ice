@@ -358,21 +358,31 @@ Capacity_t get_spreader_capacity(HeatSink_t *hsink)
             * hsink->SpreaderHeight;
 }
 
-Conductance_t get_spreader_conductance(HeatSink_t *hsink)
+Conductance_t get_spreader_conductance_east_west(HeatSink_t *hsink)
 {
     assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
     
-    /*
-     * FIXME: when using the 4RM microchannel model, the chip layers have
-     * different lengths, but since we want a uniform grid for the spreader,
-     * for now we ignore this mismstch, as using microchannels and heatsink
-     * is not an expected use case.
-     */
+    return (  hsink->SpreaderMaterial.ThermalConductivity
+             * hsink->SpreaderHeight
+             * hsink->CellWidth) / (hsink->CellLength / 2.0);
+}
+
+Conductance_t get_spreader_conductance_north_south(HeatSink_t *hsink)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
+    return (  hsink->SpreaderMaterial.ThermalConductivity
+             * hsink->CellLength
+             * hsink->SpreaderHeight) / (hsink->CellWidth / 2.0);
+}
+
+Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
     return (  hsink->SpreaderMaterial.ThermalConductivity
              * hsink->CellLength
              * hsink->CellWidth) / (hsink->SpreaderHeight / 2.0);
 }
-
-
 
 /******************************************************************************/
