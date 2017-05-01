@@ -1542,6 +1542,13 @@ solver
         }
 
         analysis->SlotLength   = (Quantity_t) sl_int / (Quantity_t) st_int ;
+
+        // Cannot be done before as we need the step time and initial temperature
+        if(stkd->TopHeatSink && stkd->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+        {
+            if(initialize_pluggable_heatsink(stkd->TopHeatSink, analysis)!=TDICE_SUCCESS)
+                YYABORT ;
+        }
     }
   ;
 

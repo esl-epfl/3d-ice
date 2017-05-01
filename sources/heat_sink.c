@@ -273,11 +273,8 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
 }
 
 // temporary code -- begin
-static bool fixme(double *heatflow, double *temperatures, unsigned int rows, unsigned int columns, unsigned int size, double timestep)
+static bool fixme(double *heatflow, double *temperatures, unsigned int size)
 {
-    (void)rows;
-    (void)columns;
-    (void)timestep;
     unsigned int i;
     double sum=0.0;
     for(i=0;i<size;i++)
@@ -286,6 +283,21 @@ static bool fixme(double *heatflow, double *temperatures, unsigned int rows, uns
         sum+=heatflow[i];
     }
     printf("sum of heat flow %f\n",sum);
+    return true;
+}
+
+static bool fixme2(unsigned int nrows, unsigned int ncols,
+                                  double cellwidth, double celllength,
+                                  double initialtemperature, double timestep)
+{
+#define PII(x) printf("%s: %d\n",#x,x)
+#define PD(x) printf("%s: %f\n",#x,x)
+    PII(nrows);
+    PII(ncols);
+    PD(cellwidth);
+    PD(celllength);
+    PD(initialtemperature);
+    PD(timestep);
     return true;
 }
 // temporary code -- end
@@ -342,9 +354,21 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     }
     
     // temporary code -- begin
+    hsink->PluggableHeatsinkInit=fixme2;
     hsink->PluggableHeatsink=fixme;
     // temporary code -- end
     
+    return TDICE_SUCCESS;
+}
+
+Error_t initialize_pluggable_heatsink(HeatSink_t *hsink, Analysis_t *analysis)
+{
+    if(hsink->PluggableHeatsinkInit(
+        hsink->NRows,     hsink->NColumns,
+        hsink->CellWidth, hsink->CellLength,
+        analysis->InitialTemperature,
+        analysis->StepTime) == false)
+        return TDICE_FAILURE;
     return TDICE_SUCCESS;
 }
 

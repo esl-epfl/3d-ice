@@ -326,8 +326,7 @@ static void fill_system_vector_steady
   } // FOR_EVERY_LAYER
 }
 
-Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
-        Analysis_t *analysis)
+Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
 {
     // In this function we compute the heat flow using the heatsink temperatures
     // at the previous time step, then we compute the current temperatures.
@@ -357,10 +356,7 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
     if(sink->PluggableHeatsink(
         sink->CurrentHeatFlow,
         sink->CurrentTemperatures,
-        sink->NRows,
-        sink->NColumns,
-        size,
-        analysis->StepTime) == false)
+        size) == false)
     {
         fprintf(stderr, "Error: pluggable heatsink callback failed\n");
         return TDICE_FAILURE;
@@ -409,7 +405,7 @@ SimResult_t emulate_step
             return TDICE_END_OF_SIMULATION ;
     }
     
-    if(pluggable_heatsink(tdata, dimensions, analysis) == TDICE_FAILURE)
+    if(pluggable_heatsink(tdata, dimensions) == TDICE_FAILURE)
         return TDICE_SOLVER_ERROR ;
 
     fill_system_vector

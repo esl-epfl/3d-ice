@@ -56,6 +56,7 @@ extern "C"
 
 #include "dimensions.h"
 #include "material.h"
+#include "analysis.h"
 
 /******************************************************************************/
 
@@ -133,10 +134,14 @@ extern "C"
         
         double *CurrentHeatFlow;
         
+        /*! The pluggable heatsink initialization callback */
+        bool (*PluggableHeatsinkInit)(unsigned int nrows, unsigned int ncols,
+                                  double cellwidth, double celllength,
+                                  double initialtemperature, double timestep);
+        
         /*! The pluggable heatsink callback */
         bool (*PluggableHeatsink)(double *heatflow, double *temperatures,
-                                  unsigned int rows, unsigned int columns,
-                                  unsigned int size, double timestep);
+                                  unsigned int size);
      };
 
     /*! Definition of the type HeatSink_t */
@@ -260,6 +265,13 @@ extern "C"
      * \param chip the chip dimensions
      */
     Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip);
+    
+    /*! Initializies the pluggable heatsink
+     *
+     * \param hsink the heatsink
+     * \param analysis the analysis
+     */
+    Error_t initialize_pluggable_heatsink(HeatSink_t *hsink, Analysis_t *analysis);
 
     /*! \return the thermal capacity of a cell in the heat spreader */
     Capacity_t get_spreader_capacity(HeatSink_t *hsink);
