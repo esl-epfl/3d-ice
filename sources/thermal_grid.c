@@ -115,9 +115,10 @@ void thermal_grid_destroy (ThermalGrid_t *tgrid)
 
 /******************************************************************************/
 
-void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
+Error_t thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 {
     StackElementListNode_t *stkeln ;
+    bool has_4RM_layers = false;
 
     for (stkeln  = stack_element_list_end (list) ;
          stkeln != NULL ;
@@ -186,6 +187,7 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
                     case TDICE_CHANNEL_MODEL_MC_4RM :
 
                         tgrid->LayersTypeProfile [index] = TDICE_LAYER_CHANNEL_4RM ;
+                        has_4RM_layers = true;
 
                         break ;
 
@@ -264,6 +266,18 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
         }
         else if(tmost->TopSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
         {
+            if(has_4RM_layers)
+            {
+                // The pluggable heat sink assumes an uniform grid size, and the
+                // 4RM model has cells with different lengths to adapt to the
+                // size of the microchannels
+                fprintf (stderr, "Error: 4RM layers and top pluggable heat sink"
+                                 " are not supported together, use the 2RM model"
+                                 " instead\n") ;
+                
+                return TDICE_FAILURE;
+            }
+            
             if (tgrid->LayersTypeProfile [tgrid->NLayers - 1] == TDICE_LAYER_SOLID)
 
                 tgrid->LayersTypeProfile [tgrid->NLayers - 1] = TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER ;
@@ -294,9 +308,14 @@ void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
                  || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT
                  || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER
                  || tgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER)
-
+        {
             fprintf (stderr, "Top and bottom sink on the same layer ! not handled yed\n") ;
+            
+            return TDICE_FAILURE;
+        }
    }
+   
+    return TDICE_SUCCESS;
 }
 
 /******************************************************************************/

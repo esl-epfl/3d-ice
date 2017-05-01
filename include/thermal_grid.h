@@ -140,9 +140,10 @@ extern "C"
      *
      *  \param tgrid pointer to the thermal grid
      *  \param list pointer to the list of stack elements
+     *  \return \c TDICE_SUCCESS otherwise
      */
 
-    void thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list) ;
+    Error_t thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list) ;
 
 
 

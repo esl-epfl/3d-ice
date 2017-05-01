@@ -116,7 +116,16 @@ Error_t thermal_data_build
         return TDICE_FAILURE ;
     }
 
-    thermal_grid_fill (&tdata->ThermalGrid, stack_elements_list) ;
+    result = thermal_grid_fill (&tdata->ThermalGrid, stack_elements_list) ;
+    
+    if (result == TDICE_FAILURE)
+    {
+        Destroy_SuperMatrix_Store (&tdata->SLUMatrix_B) ;
+
+        free (tdata->Temperatures) ;
+
+        return TDICE_FAILURE ;
+    }
 
     /* Alloc and fill the power grid */
 
