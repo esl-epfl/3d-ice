@@ -43,7 +43,7 @@ include $(3DICE_MAIN)/makefile.def
 all: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures runtest
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
-CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
+CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm -ldl
 
 -include GenerateSystemMatrix.d
 

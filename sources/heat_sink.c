@@ -41,6 +41,8 @@
 #include <stdlib.h> // For the memory functions malloc/free
 #include <string.h>
 #include <assert.h>
+#include <unistd.h>
+#include <dlfcn.h>
 
 #include "heat_sink.h"
 #include "macros.h"
@@ -272,35 +274,13 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
     }
 }
 
-// temporary code -- begin
-static bool fixme(double *heatflow, double *temperatures, unsigned int size)
-{
-    unsigned int i;
-    double sum=0.0;
-    for(i=0;i<size;i++)
-    {
-        temperatures[i]=300.0;
-        sum+=heatflow[i];
-    }
-    printf("sum of heat flow %f\n",sum);
-    return true;
-}
+// Need a static variable because atexit doesn't allow parameters
+static void *so = NULL;
 
-static bool fixme2(unsigned int nrows, unsigned int ncols,
-                                  double cellwidth, double celllength,
-                                  double initialtemperature, double timestep)
+void close_shared_object()
 {
-#define PII(x) printf("%s: %d\n",#x,x)
-#define PD(x) printf("%s: %f\n",#x,x)
-    PII(nrows);
-    PII(ncols);
-    PD(cellwidth);
-    PD(celllength);
-    PD(initialtemperature);
-    PD(timestep);
-    return true;
+    if(so) dlclose(so);
 }
-// temporary code -- end
 
 Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
 {
@@ -353,10 +333,36 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
         return TDICE_FAILURE;
     }
     
-    // temporary code -- begin
-    hsink->PluggableHeatsinkInit=fixme2;
-    hsink->PluggableHeatsink=fixme;
-    // temporary code -- end
+    char path[2048];
+    memset(path,0,sizeof(path));
+    getcwd(path,sizeof(path)-1);
+    strncat(path,"/",sizeof(path)-1);
+    strncat(path,hsink->Plugin,sizeof(path)-1);
+    so = dlopen(path, RTLD_NOW | RTLD_GLOBAL);
+    if(so == NULL)
+    {
+        fprintf (stderr, "ERROR: could not load heatsink plugin %s\n", hsink->Plugin) ;
+        return TDICE_FAILURE;
+    }
+    atexit(close_shared_object);
+    
+    hsink->PluggableHeatsinkInit = 
+    (bool (*)(unsigned int, unsigned int, double, double, double, double))
+            dlsym(so, "heatsink_init");
+    if(hsink->PluggableHeatsinkInit == NULL)
+    {
+        fprintf (stderr, "ERROR: heatsink plugin reported %s\n", dlerror()) ;
+        return TDICE_FAILURE;
+    }
+    
+    hsink->PluggableHeatsink =
+    (bool (*)(const double*, double*, unsigned int))
+            dlsym(so, "heatsink_simulate_step");
+    if(hsink->PluggableHeatsink == NULL)
+    {
+        fprintf (stderr, "ERROR: heatsink plugin reported %s\n", dlerror()) ;
+        return TDICE_FAILURE;
+    }
     
     return TDICE_SUCCESS;
 }

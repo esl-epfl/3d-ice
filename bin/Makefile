@@ -50,7 +50,7 @@ all: $(TARGETS)
 CFLAGS := $(CFLAGS) -Wall -Wextra -Werror
 
 CINCLUDES := $(CINCLUDES) -I$(SLU_INCLUDE)
-CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm
+CLIBS = $(3DICE_LIB_A) $(SLU_LIBS) -lm -ldl
 
 -include 3D-ICE-Emulator.d
 

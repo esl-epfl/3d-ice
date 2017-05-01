@@ -140,7 +140,7 @@ extern "C"
                                   double initialtemperature, double timestep);
         
         /*! The pluggable heatsink callback */
-        bool (*PluggableHeatsink)(double *heatflow, double *temperatures,
+        bool (*PluggableHeatsink)(const double *heatflow, double *temperatures,
                                   unsigned int size);
      };
 
