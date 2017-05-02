@@ -12,7 +12,7 @@ top pluggable heat sink :
 
 	spreader length 20000 , width 20000 , height 1000 ;
 	material COPPER ;
-	plugin "heatsink.so" ;
+	plugin "heatsink_plugin.so" ;
 
 dimensions :
 
