@@ -9,7 +9,7 @@ extern "C" {
 bool heatsink_init(unsigned int nrows, unsigned int ncols,
                    double cellwidth, double celllength,
                    double initialtemperature, double timestep);
-bool heatsink_simulate_step(const double *heatflow, double *temperatures,
+bool heatsink_simulate_step(const double *heatflows, double *temperatures,
                             unsigned int size);
 }
 

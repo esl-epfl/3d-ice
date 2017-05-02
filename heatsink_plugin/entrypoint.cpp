@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "heatsink.h"
+#include "entrypoint.h"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ bool heatsink_init(unsigned int nrows, unsigned int ncols,
     return true; //True means success
 }
 
-bool heatsink_simulate_step(const double *heatflow, double *temperatures,
+bool heatsink_simulate_step(const double *heatflows, double *temperatures,
                             unsigned int size)
 {
     // This example function simulates a "brick wall" heatsink
@@ -39,7 +39,7 @@ bool heatsink_simulate_step(const double *heatflow, double *temperatures,
     for(unsigned int i=0;i<size;i++)
     {
         temperatures[i]=ambientTemperature;
-        sum+=heatflow[i];
+        sum+=heatflows[i];
     }
     cout<<"sum of heat flow "<<sum<<endl;
     return true; //True means success

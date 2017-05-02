@@ -1,6 +1,6 @@
 
 BIN = heatsink.so
-OBJ = heatsink.o
+OBJ = entrypoint.o
 
 CXX      = g++
 CXXFLAGS = -fPIC -O2 -Wall -std=c++11

@@ -341,7 +341,7 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
     
     // Compute heat flow from spreader to sink
     double *temp = sink->CurrentTemperatures;
-    double *flow = sink->CurrentHeatFlow;
+    double *flow = sink->CurrentHeatFlows;
     Conductance_t conductance = get_spreader_conductance_top_bottom(sink);
     CellIndex_t row, col;
     for(row = 0; row < sink->NRows; row++)
@@ -354,7 +354,7 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
     // at the interface between the spreader and sink
     unsigned int size = sink->NColumns * sink->NRows;
     if(sink->PluggableHeatsink(
-        sink->CurrentHeatFlow,
+        sink->CurrentHeatFlows,
         sink->CurrentTemperatures,
         size) == false)
     {

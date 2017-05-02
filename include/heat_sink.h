@@ -132,7 +132,7 @@ extern "C"
         
         /*! Current heat flow passed to the pluggable heatsink callback */
         
-        double *CurrentHeatFlow;
+        double *CurrentHeatFlows;
         
         /*! The pluggable heatsink initialization callback */
         bool (*PluggableHeatsinkInit)(unsigned int nrows, unsigned int ncols,
@@ -140,7 +140,7 @@ extern "C"
                                   double initialtemperature, double timestep);
         
         /*! The pluggable heatsink callback */
-        bool (*PluggableHeatsink)(const double *heatflow, double *temperatures,
+        bool (*PluggableHeatsink)(const double *heatflows, double *temperatures,
                                   unsigned int size);
      };
 

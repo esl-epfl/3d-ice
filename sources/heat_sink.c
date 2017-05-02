@@ -71,7 +71,7 @@ void heat_sink_init (HeatSink_t *hsink)
     
     hsink->CurrentTemperatures= NULL;
     hsink->PreviousTemperatures=NULL;
-    hsink->CurrentHeatFlow    = NULL;
+    hsink->CurrentHeatFlows   = NULL;
     hsink->PluggableHeatsink  = NULL;
 }
 
@@ -114,7 +114,7 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     size_t size = src->NColumns * src->NRows * sizeof(double);
     dst->CurrentTemperatures  = (double *) array_alloc_copy(src->CurrentTemperatures,  size);
     dst->PreviousTemperatures = (double *) array_alloc_copy(src->PreviousTemperatures, size);
-    dst->CurrentHeatFlow      = (double *) array_alloc_copy(src->CurrentHeatFlow,      size);
+    dst->CurrentHeatFlows     = (double *) array_alloc_copy(src->CurrentHeatFlows,     size);
     dst->PluggableHeatsink  = src->PluggableHeatsink;
 }
 
@@ -127,7 +127,7 @@ void heat_sink_destroy (HeatSink_t *hsink)
     
     free(hsink->CurrentTemperatures);
     free(hsink->PreviousTemperatures);
-    free(hsink->CurrentHeatFlow);
+    free(hsink->CurrentHeatFlows);
     
     heat_sink_init (hsink) ;
 }
@@ -324,10 +324,10 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     
     hsink->CurrentTemperatures  = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
     hsink->PreviousTemperatures = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
-    hsink->CurrentHeatFlow      = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    hsink->CurrentHeatFlows     = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
     if(  hsink->CurrentTemperatures == NULL
       || hsink->PreviousTemperatures == NULL
-      || hsink->CurrentHeatFlow == NULL)
+      || hsink->CurrentHeatFlows == NULL)
     {
         fprintf (stderr, "ERROR: could not allocate memory for pluggable heat sink\n") ;
         return TDICE_FAILURE;
