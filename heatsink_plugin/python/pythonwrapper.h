@@ -20,7 +20,8 @@ public:
 
 private:
     PyObject *check(PyObject *object);
-
+    
+    void *so;
     PyObject *init, *simulateStep;
 };
 

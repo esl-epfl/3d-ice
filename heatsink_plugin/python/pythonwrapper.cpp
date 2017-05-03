@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <cstring>
+#include <dlfcn.h>
 
 using namespace std;
 
@@ -15,6 +16,8 @@ using namespace std;
 PythonWrapper::PythonWrapper()
 {
     setenv("PYTHONPATH",".",1);
+    //https://mail.python.org/pipermail/new-bugs-announce/2008-November/003322.html
+    so=dlopen("libpython3.5m.so", RTLD_LAZY | RTLD_GLOBAL);
     Py_Initialize();
     auto heatsink = check(PyImport_ImportModule("heatsink"));
     init          = check(PyObject_GetAttrString(heatsink,"heatsinkInit"));
@@ -65,6 +68,7 @@ void PythonWrapper::heatsinkSimulateStep(const double *heatFlows, double *temper
 PythonWrapper::~PythonWrapper()
 {
     Py_Finalize();
+    dlclose(so);
 }
 
 PyObject *PythonWrapper::check(PyObject *object)
