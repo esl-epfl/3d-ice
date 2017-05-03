@@ -335,10 +335,14 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     
     char path[2048];
     memset(path,0,sizeof(path));
-    getcwd(path,sizeof(path)-1);
+    if(getcwd(path,sizeof(path)-1)==NULL)
+    {
+        fprintf (stderr, "ERROR: getcwd() failed\n") ;
+        return TDICE_FAILURE;
+    }
     strncat(path,"/",sizeof(path)-1);
     strncat(path,hsink->Plugin,sizeof(path)-1);
-    so = dlopen(path, RTLD_NOW | RTLD_GLOBAL);
+    so = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
     if(so == NULL)
     {
         fprintf (stderr, "ERROR: could not load heatsink plugin %s\n", hsink->Plugin) ;
