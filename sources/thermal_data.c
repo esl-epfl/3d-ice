@@ -187,8 +187,8 @@ Error_t thermal_data_build
     if(sink && sink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
     {
         unsigned int size = sink->NColumns * sink->NRows;
-        init_data(sink->CurrentTemperatures,  size, analysis->InitialTemperature);
-        init_data(sink->PreviousTemperatures, size, analysis->InitialTemperature);
+        init_data(sink->CurrentSinkTemperatures,  size, analysis->InitialTemperature);
+        init_data(sink->PreviousSinkTemperatures, size, analysis->InitialTemperature);
     }
 
     return TDICE_SUCCESS ;
@@ -328,57 +328,58 @@ static void fill_system_vector_steady
 
 Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
 {
-    // In this function we compute the heat flow using the heatsink temperatures
-    // at the previous time step, then we compute the current temperatures.
     // If the previous temperatures differ too much from the current ones,
     // the simulation may provide incorrect results
     const double threshold = 1.0;
     
-    // We have something to do only if the we're using the pluggable heatsink model
+    // We have something to do only if we're using the pluggable heatsink model
     HeatSink_t *sink = tdata->ThermalGrid.TopHeatSink;
     if(sink == NULL || sink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE)
             return TDICE_SUCCESS;
     
-    // Compute heat flow from spreader to sink
-    double *temp = sink->CurrentTemperatures;
-    double *flow = sink->CurrentHeatFlows;
-    Conductance_t conductance = get_spreader_conductance_top_bottom(sink);
-    CellIndex_t row, col;
-    for(row = 0; row < sink->NRows; row++)
-        for(col = 0; col < sink->NColumns; col++)
-            *flow++= (tdata->Temperatures[
-                get_spreader_cell_offset(dimensions,sink,row,col)] - *temp++)
-                * conductance;
+    //Get a pointer to the spreader temperatures
+    double *SpreaderTemperatures = tdata->Temperatures;
+    SpreaderTemperatures += get_spreader_cell_offset(dimensions,sink,0,0);
     
     // Call the pluggable heat sink function to compute the temperatures
-    // at the interface between the spreader and sink
+    // of the heatsink
     unsigned int size = sink->NColumns * sink->NRows;
-    if(sink->PluggableHeatsink(
-        sink->CurrentHeatFlows,
-        sink->CurrentTemperatures,
-        size) == false)
+    switch(sink->PluggableHeatsink(
+        SpreaderTemperatures,
+        sink->CurrentSinkTemperatures,
+        sink->SpreaderSinkConductances))
     {
-        fprintf(stderr, "Error: pluggable heatsink callback failed\n");
-        return TDICE_FAILURE;
+        case 0:
+            //Everything ok
+            break;
+        case 1:
+            //FIXME: update conductances
+            fprintf(stderr, "FIXME: update conductances\n");
+            return TDICE_FAILURE;
+            break;
+        default:
+            fprintf(stderr, "Error: pluggable heatsink callback failed\n");
+            return TDICE_FAILURE;
     }
     
     // Compare the computed temperatures against the previous ones
     unsigned int i;
     for(i = 0; i < size; i++)
     {
-        if(abs(sink->CurrentTemperatures[i] - sink->PreviousTemperatures[i]) <= threshold)
+        if(abs(sink->CurrentSinkTemperatures[i] - sink->PreviousSinkTemperatures[i]) <= threshold)
             continue;
         fprintf(stderr, "Warning: the integration time step may be too small\n");
         break;
     }
     
     // Update the previous temperatures
-    memcpy(sink->PreviousTemperatures, sink->CurrentTemperatures, size * sizeof(double));
+    memcpy(sink->PreviousSinkTemperatures, sink->CurrentSinkTemperatures, size * sizeof(double));
     
     // Update the sources vector using the temperatures at the heatsink interface
     Source_t *sources = tdata->PowerGrid.Sources;
     sources += get_spreader_cell_offset(dimensions,sink,0,0);
-    for(i = 0; i < size; i++) sources[i] = conductance * sink->CurrentTemperatures[i];
+    for(i = 0; i < size; i++)
+        sources[i] = sink->SpreaderSinkConductances[i] * sink->CurrentSinkTemperatures[i];
     
     return TDICE_SUCCESS;
 }

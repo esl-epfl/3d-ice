@@ -69,10 +69,10 @@ void heat_sink_init (HeatSink_t *hsink)
     hsink->NumRowsBorder      = 0;
     hsink->NumColumnsBorder   = 0;
     
-    hsink->CurrentTemperatures= NULL;
-    hsink->PreviousTemperatures=NULL;
-    hsink->CurrentHeatFlows   = NULL;
-    hsink->PluggableHeatsink  = NULL;
+    hsink->CurrentSinkTemperatures  = NULL;
+    hsink->PreviousSinkTemperatures = NULL;
+    hsink->SpreaderSinkConductances = NULL;
+    hsink->PluggableHeatsink        = NULL;
 }
 
 /******************************************************************************/
@@ -112,9 +112,9 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     dst->NumColumnsBorder   = src->NumColumnsBorder;
     
     size_t size = src->NColumns * src->NRows * sizeof(double);
-    dst->CurrentTemperatures  = (double *) array_alloc_copy(src->CurrentTemperatures,  size);
-    dst->PreviousTemperatures = (double *) array_alloc_copy(src->PreviousTemperatures, size);
-    dst->CurrentHeatFlows     = (double *) array_alloc_copy(src->CurrentHeatFlows,     size);
+    dst->CurrentSinkTemperatures  = (double *) array_alloc_copy(src->CurrentSinkTemperatures,  size);
+    dst->PreviousSinkTemperatures = (double *) array_alloc_copy(src->PreviousSinkTemperatures, size);
+    dst->SpreaderSinkConductances = (double *) array_alloc_copy(src->SpreaderSinkConductances, size);
     dst->PluggableHeatsink  = src->PluggableHeatsink;
 }
 
@@ -125,9 +125,9 @@ void heat_sink_destroy (HeatSink_t *hsink)
     material_destroy (&hsink->SpreaderMaterial);
     string_destroy (&hsink->Plugin);
     
-    free(hsink->CurrentTemperatures);
-    free(hsink->PreviousTemperatures);
-    free(hsink->CurrentHeatFlows);
+    free(hsink->CurrentSinkTemperatures);
+    free(hsink->PreviousSinkTemperatures);
+    free(hsink->SpreaderSinkConductances);
     
     heat_sink_init (hsink) ;
 }
@@ -322,16 +322,21 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     hsink->NRows = 2 * hsink->NumRowsBorder + get_number_of_rows(chip);
     
     
-    hsink->CurrentTemperatures  = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
-    hsink->PreviousTemperatures = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
-    hsink->CurrentHeatFlows     = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
-    if(  hsink->CurrentTemperatures == NULL
-      || hsink->PreviousTemperatures == NULL
-      || hsink->CurrentHeatFlows == NULL)
+    hsink->CurrentSinkTemperatures  = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    hsink->PreviousSinkTemperatures = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    hsink->SpreaderSinkConductances = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
+    if(  hsink->CurrentSinkTemperatures == NULL
+      || hsink->PreviousSinkTemperatures == NULL
+      || hsink->SpreaderSinkConductances == NULL)
     {
         fprintf (stderr, "ERROR: could not allocate memory for pluggable heat sink\n") ;
         return TDICE_FAILURE;
     }
+    
+    double defaultConductance = get_spreader_conductance_top_bottom(hsink);
+    unsigned int i;
+    for(i=0; i<hsink->NColumns * hsink->NRows; i++)
+        hsink->SpreaderSinkConductances[i] = defaultConductance;
     
     char path[2048];
     memset(path,0,sizeof(path));
@@ -351,7 +356,7 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     atexit(close_shared_object);
     
     hsink->PluggableHeatsinkInit = 
-    (bool (*)(unsigned int, unsigned int, double, double, double, double))
+    (int (*)(unsigned int, unsigned int, double, double, double, double, double))
             dlsym(so, "heatsink_init");
     if(hsink->PluggableHeatsinkInit == NULL)
     {
@@ -360,7 +365,7 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     }
     
     hsink->PluggableHeatsink =
-    (bool (*)(const double*, double*, unsigned int))
+    (int (*)(const double*, double*, double*))
             dlsym(so, "heatsink_simulate_step");
     if(hsink->PluggableHeatsink == NULL)
     {
@@ -373,11 +378,13 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
 
 Error_t initialize_pluggable_heatsink(HeatSink_t *hsink, Analysis_t *analysis)
 {
+    double spreaderConductance = get_spreader_conductance_top_bottom(hsink);
     if(hsink->PluggableHeatsinkInit(
         hsink->NRows,     hsink->NColumns,
         hsink->CellWidth, hsink->CellLength,
         analysis->InitialTemperature,
-        analysis->StepTime) == false)
+        spreaderConductance,
+        analysis->StepTime) != 0)
         return TDICE_FAILURE;
     return TDICE_SUCCESS;
 }

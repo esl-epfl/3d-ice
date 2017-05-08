@@ -124,24 +124,27 @@ extern "C"
         
         /*! Current temperature returned from the pluggable heatsink callback */
         
-        double *CurrentTemperatures;
+        double *CurrentSinkTemperatures;
         
         /*! Previous temperature returned from the pluggable heatsink callback */
         
-        double *PreviousTemperatures;
+        double *PreviousSinkTemperatures;
         
-        /*! Current heat flow passed to the pluggable heatsink callback */
+        /*! Spreader to sink conductances passed to/returned from the pluggable heatsink callback */
         
-        double *CurrentHeatFlows;
+        double *SpreaderSinkConductances;
         
         /*! The pluggable heatsink initialization callback */
-        bool (*PluggableHeatsinkInit)(unsigned int nrows, unsigned int ncols,
-                                  double cellwidth, double celllength,
-                                  double initialtemperature, double timestep);
+        int (*PluggableHeatsinkInit)(unsigned int nrows, unsigned int ncols,
+                                     double cellwidth,    double celllength,
+                                     double initialtemperature,
+                                     double spreaderconductance,
+                                     double timestep);
         
         /*! The pluggable heatsink callback */
-        bool (*PluggableHeatsink)(const double *heatflows, double *temperatures,
-                                  unsigned int size);
+        int (*PluggableHeatsink)(const double *spreadertemperatures,
+                                        double *sinktemperatures,
+                                        double *conductances);
      };
 
     /*! Definition of the type HeatSink_t */
