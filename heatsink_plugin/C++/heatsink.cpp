@@ -53,8 +53,8 @@ Conductances HeatSink::simulateStep(const CellMatrix spreaderTemperatures,
      * thermalConductances are the thermal conductances in W/K between each
      * cell of the spreader and the one of the sink directly above. You have to
      * compute those at least once the first time this function is called.
-     * The way to compute them is by paralleling the conductance passed in
-     * heatsinkInit() (which is the conductance from the center of the spreader
+     * The way to compute them is by paralleling the conductance passed to the
+     * constructor (which is the conductance from the center of the spreader
      * cell to its top face) with a conductance that you have to compute, which
      * is the conductance from the bottom face of the sink to the center of the
      * sink cell. Although the spreader conductances coming from 3D-ICE are
@@ -69,30 +69,31 @@ Conductances HeatSink::simulateStep(const CellMatrix spreaderTemperatures,
      * throwing a C++ exception.
      */
     
-    // This example function simulates a "brick wall" heatsink whose
-    // temperature remains constant regardless of the applied power
+    // This example function simulates the absence of a heatsink, where
+    // the spreader exchanges heat convectively to the ambient
     Conductances result;
     if(firstCall)
     {
-        firstCall=false;
         //First time called, compute the thermal conductances
+        firstCall=false;
+        
+        double ambientConductance=1; //total ambient conductance in W/K, arbitrary value
+        
+        //Divide the ambient conductance evenly among the cells
+        ambientConductance/=thermalConductances.rows()*thermalConductances.cols();
+        double conductance=parallel(spreaderConductance,ambientConductance);
+        
         for(unsigned int r=0;r<thermalConductances.rows();r++)
-        {
             for(unsigned int c=0;c<thermalConductances.cols();c++)
-            {
-                thermalConductances.at(r,c)=spreaderConductance;
-            }
-        }
+                thermalConductances.at(r,c)=conductance;
         result=Conductances::CHANGED;
     } else result=Conductances::NOT_CHANGED;
     
+    //In the absence of a heatsink, the cell above the spreader is the ambient
     for(unsigned int r=0;r<sinkTemperatures.rows();r++)
-    {
         for(unsigned int c=0;c<sinkTemperatures.cols();c++)
-        {
             sinkTemperatures.at(r,c)=ambientTemperature;
-        }
-    }
+
     return result;
 }
 

@@ -10,6 +10,11 @@ enum class Conductances
     NOT_CHANGED
 };
 
+inline double parallel(double x, double y)
+{
+    return x*y/(x+y);
+}
+
 class HeatSink
 {
 public:
