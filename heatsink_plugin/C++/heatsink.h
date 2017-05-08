@@ -4,21 +4,31 @@
 
 #include "entrypoint.h"
 
+enum class Conductances
+{
+    CHANGED,
+    NOT_CHANGED
+};
+
 class HeatSink
 {
 public:
-    HeatSink();
+    HeatSink(unsigned int nRows, unsigned int nCols,
+             double cellWidth,   double cellLength,
+             double initialTemperature,
+             double spreaderConductance,
+             double timeStep);
 
-    void heatsinkInit(unsigned int nRows, unsigned int nCols,
-                      double cellWidth, double cellLength,
-                      double initialTemperature, double timeStep);
-
-    void heatsinkSimulateStep(const CellMatrix heatFlows, CellMatrix temperatures);
+    Conductances simulateStep(const CellMatrix spreaderTemperatures,
+                                    CellMatrix sinkTemperatures,
+                                    CellMatrix thermalConductances);
 
     ~HeatSink();
 
 private:
     double ambientTemperature;
+    double spreaderConductance;
+    bool firstCall=true;
 };
 
 #endif //HEATSINK_H

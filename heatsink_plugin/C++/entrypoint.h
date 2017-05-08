@@ -9,14 +9,17 @@
 // implement. Functions need to have C linkage to be callable
 // from 3D-ICE
 extern "C" {
-bool heatsink_init(unsigned int nrows, unsigned int ncols,
-                   double cellwidth, double celllength,
-                   double initialtemperature, double timestep);
-bool heatsink_simulate_step(const double *heatflows, double *temperatures,
-                            unsigned int size);
+int heatsink_init(unsigned int nrows, unsigned int ncols,
+                  double cellwidth,   double celllength,
+                  double initialtemperature,
+                  double spreaderconductance,
+                  double timestep);
+int heatsink_simulate_step(const double *spreadertemperatures,
+                                 double *sinktemperatures,
+                                 double *conductances);
 }
 
-// Cooment out to disable bound checking in CellMatrix
+// Comment out to disable bound checking in CellMatrix
 // #define CELLMATRIX_BOUND_CHECK
 
 /**
