@@ -464,6 +464,11 @@ SimResult_t emulate_steady
 
         return TDICE_WRONG_CONFIG ;
 
+    if(tdata->ThermalGrid.TopHeatSink &&
+       tdata->ThermalGrid.TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+
+        return TDICE_SOLVER_ERROR ; //TODO: support steady state pluggable sink
+
     Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
