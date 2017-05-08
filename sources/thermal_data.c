@@ -326,7 +326,8 @@ static void fill_system_vector_steady
   } // FOR_EVERY_LAYER
 }
 
-Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
+Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
+                           Analysis_t *analysis)
 {
     // If the previous temperatures differ too much from the current ones,
     // the simulation may provide incorrect results
@@ -353,10 +354,18 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
             //Everything ok
             break;
         case 1:
-            //FIXME: update conductances
-            fprintf(stderr, "FIXME: update conductances\n");
-            return TDICE_FAILURE;
+        {
+            //Thermal conductances between spreader and sink have changed
+            //TODO: optimize? However update_coolant_flow_rate does the same...
+            fill_system_matrix
+                (&tdata->SM_A, &tdata->ThermalGrid, analysis, dimensions) ;
+            if (do_factorization (&tdata->SM_A) == TDICE_FAILURE)
+            {
+                fprintf(stderr, "Error: failed updating spreader-sink conductances\n");
+                return TDICE_FAILURE ;
+            }
             break;
+        }
         default:
             fprintf(stderr, "Error: pluggable heatsink callback failed\n");
             return TDICE_FAILURE;
@@ -406,7 +415,7 @@ SimResult_t emulate_step
             return TDICE_END_OF_SIMULATION ;
     }
     
-    if(pluggable_heatsink(tdata, dimensions) == TDICE_FAILURE)
+    if(pluggable_heatsink(tdata, dimensions, analysis) == TDICE_FAILURE)
         return TDICE_SOLVER_ERROR ;
 
     fill_system_vector

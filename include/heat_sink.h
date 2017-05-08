@@ -287,6 +287,17 @@ extern "C"
     
     /*! \return the thermal conductance along the z axis of a heat spreader cell */
     Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink);
+    
+     /*!
+      * \return the thermal conductance between a cell of the spreader and a
+      * cell of the heatsink
+      */
+    Conductance_t get_spreader_sink_conductance
+    (
+        HeatSink_t  *hsink,
+        CellIndex_t  row_index,
+        CellIndex_t  column_index
+    );
 
 /******************************************************************************/
 

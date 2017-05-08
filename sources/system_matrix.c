@@ -1615,7 +1615,8 @@ skip_north :
     // whose state variables are not part of the system matrix.
     // Thus, no other nonzero element appears in the sysyem matrix, but
     // a conductance term is summed to the diagonal element
-    diagonal_value +=  get_spreader_conductance_top_bottom(sink);
+
+    diagonal_value += get_spreader_sink_conductance(sink, row_index, column_index);
 
     /************************** DIAGONAL ELEMENT ******************************/
 

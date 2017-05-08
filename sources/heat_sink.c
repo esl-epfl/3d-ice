@@ -426,4 +426,14 @@ Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink)
              * hsink->CellWidth) / (hsink->SpreaderHeight / 2.0);
 }
 
+Conductance_t get_spreader_sink_conductance
+(
+    HeatSink_t  *hsink,
+    CellIndex_t  row_index,
+    CellIndex_t  column_index
+)
+{
+    return hsink->SpreaderSinkConductances[row_index * hsink->NColumns + column_index];
+}
+
 /******************************************************************************/
