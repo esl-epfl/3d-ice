@@ -2,42 +2,44 @@
 #include "pythonwrapper.h"
 #include "entrypoint.h"
 #include <iostream>
-#include <stdexcept>
+#include <memory>
 
 using namespace std;
 using namespace std::chrono;
 
 static unsigned int nRows, nCols;
-static PythonWrapper wrapper;
+static unique_ptr<PythonWrapper> wrapper;
 static Profiler profiler;
 
-bool heatsink_init(unsigned int nrows, unsigned int ncols,
-                   double cellwidth, double celllength,
-                   double initialtemperature, double timestep)
+int heatsink_init(unsigned int nrows, unsigned int ncols,
+                  double cellwidth,   double celllength,
+                  double initialtemperature,
+                  double spreaderconductance,
+                  double timestep)
 {
     ProfileFunction pf(profiler);
     nRows=nrows;
     nCols=ncols;
     try {
-        wrapper.heatsinkInit(nrows,ncols,cellwidth,celllength,initialtemperature,timestep);
-        return true;
+        wrapper=unique_ptr<PythonWrapper>(new PythonWrapper(nrows,ncols,cellwidth,celllength,
+                                          initialtemperature,spreaderconductance,timestep));
+        return 0;
     } catch(exception& e) {
         cerr<<"exception thrown: "<<e.what()<<endl;
-        return false;
+        return -1;
     }
 }
 
-bool heatsink_simulate_step(const double *heatflows, double *temperatures,
-                            unsigned int size)
+int heatsink_simulate_step(const double *spreadertemperatures,
+                                 double *sinktemperatures,
+                                 double *conductances)
 {
     ProfileFunction pf(profiler);
-    if(size!=nRows*nCols) return false;
     try {
-        wrapper.heatsinkSimulateStep(heatflows,temperatures,size);
-        return true;
+        return wrapper->simulateStep(spreadertemperatures,sinktemperatures,conductances);
     } catch(exception& e) {
         cerr<<"exception thrown: "<<e.what()<<endl;
-        return false;
+        return -1;
     }
 }
 

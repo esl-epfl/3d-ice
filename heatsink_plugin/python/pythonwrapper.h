@@ -7,22 +7,25 @@
 class PythonWrapper
 {
 public:
-    PythonWrapper();
+    PythonWrapper(unsigned int nRows, unsigned int nCols,
+                  double cellWidth,   double cellLength,
+                  double initialTemperature,
+                  double spreaderConductance,
+                  double timeStep);
 
-    void heatsinkInit(unsigned int nRows, unsigned int nCols,
-                      double cellWidth, double cellLength,
-                      double initialTemperature, double timeStep);
-
-    void heatsinkSimulateStep(const double *heatFlows, double *temperatures,
-                              unsigned int size);
+    int simulateStep(const double *spreaderTemperatures,
+                           double *sinkTemperatures,
+                           double *thermalConductances);
 
     ~PythonWrapper();
 
 private:
     PyObject *check(PyObject *object);
-    
+
+    unsigned int size;
     void *so;
-    PyObject *init, *simulateStep;
+    PyObject *hSimulateStep;
+    PyObject *cachedConductances=nullptr;
 };
 
 #endif //PYTHONWRAPPER_H
