@@ -1,0 +1,61 @@
+Features :
+
+* Fist/Last wall in 2rm model (channels or pins)
+
+* Dissipation through the vertical sides or through the bottom wall
+
+* Interface to SLU library
+
+* Regular expression for power traces
+
+* Unity of measure (um an nm) ???
+
+* Coolant flow in different directions
+
+* Documentation only in Doxygen
+
+* Makefile to build using SLU in repository
+
+* Use LU libraries for electronics in ubuntu repository
+
+* make install
+
+* More Instruction points for gradient, tmax in map, etc...
+
+Code enhancements:
+
+* Partition of source vector into sections (reduces memory occupancy): floorplan sources, inlet sources, heat sink
+
+* Interface to system matrix
+
+* unique sparse matrix
+
+* Fix fill_system_matrix
+
+* Implement stack constraints as grammar rules instead of warnings
+
+* Counting of NConnections during parsing ...
+
+* Identifiers for layers in dies
+
+* Test of unicity for IDS ...
+
+* New Ipoint list organization as layers per die (what ???)
+
+* Iterators
+
+* Error object
+
+* Memory manager
+
+* unique rectangle element for both floorplan and material
+
+TEST
+
+* Test and fix print functions. Expecially print stk, flp, mlt
+
+* MaterialLayout in layer .... or an object by itself ?
+
+* Test print slot, step, final for power & temp
+
+* Split ThermalGrid and PowerGrid and ThermalData
