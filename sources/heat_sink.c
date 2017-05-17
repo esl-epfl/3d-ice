@@ -277,7 +277,7 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
 // Need a static variable because atexit doesn't allow parameters
 static void *so = NULL;
 
-void close_shared_object()
+static void close_shared_object()
 {
     if(so) dlclose(so);
 }

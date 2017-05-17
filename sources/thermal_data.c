@@ -331,7 +331,7 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
 {
     // If the previous temperatures differ too much from the current ones,
     // the simulation may provide incorrect results
-    const double threshold = 1.0;
+    const double threshold = 2.0;
     
     // We have something to do only if we're using the pluggable heatsink model
     HeatSink_t *sink = tdata->ThermalGrid.TopHeatSink;
@@ -344,7 +344,6 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
     
     // Call the pluggable heat sink function to compute the temperatures
     // of the heatsink
-    unsigned int size = sink->NColumns * sink->NRows;
     switch(sink->PluggableHeatsink(
         SpreaderTemperatures,
         sink->CurrentSinkTemperatures,
@@ -371,13 +370,15 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
             return TDICE_FAILURE;
     }
     
+    unsigned int size = sink->NColumns * sink->NRows;
+    
     // Compare the computed temperatures against the previous ones
     unsigned int i;
     for(i = 0; i < size; i++)
     {
         if(abs(sink->CurrentSinkTemperatures[i] - sink->PreviousSinkTemperatures[i]) <= threshold)
             continue;
-        fprintf(stderr, "Warning: the integration time step may be too small\n");
+        fprintf(stderr, "Warning: the integration time step may be too large\n");
         break;
     }
     
