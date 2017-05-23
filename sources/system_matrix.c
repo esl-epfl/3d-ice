@@ -1616,7 +1616,11 @@ skip_north :
     // Thus, no other nonzero element appears in the sysyem matrix, but
     // a conductance term is summed to the diagonal element
 
-    diagonal_value += get_spreader_sink_conductance(sink, row_index, column_index);
+    g_top = get_spreader_sink_conductance(sink, row_index, column_index);
+    diagonal_value += g_top;
+#ifdef PRINT_SYSTEM_MATRIX
+    fprintf (stderr, "  top (to sink) % .4e\n", g_top);
+#endif
 
     /************************** DIAGONAL ELEMENT ******************************/
 
