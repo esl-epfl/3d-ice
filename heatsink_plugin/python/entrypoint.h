@@ -68,8 +68,8 @@ int heatsink_simulate_step(const double *spreadertemperatures,
 class CellMatrix
 {
 public:
-    CellMatrix(double *data, unsigned int nRows, unsigned int nCols)
-        : data(data), nRows(nRows), nCols(nCols) {}
+    CellMatrix(double *dataPtr, unsigned int nRows, unsigned int nCols)
+        : dataPtr(dataPtr), nRows(nRows), nCols(nCols) {}
     
     double& at(unsigned int row, unsigned int col)
     {
@@ -77,7 +77,7 @@ public:
         if(row>nRows || col>nCols)
             throw std::range_error("CellMatrix out of bounds");
         #endif //CELLMATRIX_BOUND_CHECK
-        return data[row*nCols+col];
+        return dataPtr[row*nCols+col];
     }
     
     double at(unsigned int row, unsigned int col) const
@@ -86,15 +86,19 @@ public:
         if(row>nRows || col>nCols)
             throw std::range_error("CellMatrix out of bounds");
         #endif //CELLMATRIX_BOUND_CHECK
-        return data[row*nCols+col];
+        return dataPtr[row*nCols+col];
     }
+    
+    double *data() { return dataPtr; }
+    
+    const double *data() const { return dataPtr; }
     
     unsigned int rows() const { return nRows; }
     
     unsigned int cols() const { return nCols; }
     
 private:
-    double *data; // Non-owning pointer
+    double *dataPtr; // Non-owning pointer
     unsigned int nRows, nCols;
 };
 
