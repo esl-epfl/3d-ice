@@ -347,6 +347,7 @@ void compute_number_of_connections
         case TDICE_CHANNEL_MODEL_MC_2RM :
 
             tmp += 2 ;
+	    break ;
 
         case TDICE_CHANNEL_MODEL_PF_INLINE :
         case TDICE_CHANNEL_MODEL_PF_STAGGERED :
