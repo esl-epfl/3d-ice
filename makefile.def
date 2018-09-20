@@ -41,7 +41,7 @@
  ##############################################################################
 
 3DICE_LIBNAME   = threed-ice
-3DICE_VERSION   = 2.2.4
+3DICE_VERSION   = 2.2.7
 3DICE_RELEASE   = $(3DICE_LIBNAME)-$(3DICE_VERSION)
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include
@@ -123,11 +123,11 @@ endif
  ##############################################################################
 
 SLU_VERSION = 4.3
-SLU_MAIN    = $(HOME)/3dice/SuperLU_$(SLU_VERSION)
+SLU_MAIN    = $(HOME)/3D-ICE/SuperLU_$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
 #SLU_LIBS   = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
-SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib -lblas
+SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib/x86_64-linux-gnu -lblas
 
  #
  # SystemC variables

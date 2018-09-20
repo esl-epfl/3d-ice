@@ -9,4 +9,5 @@ flex/*.h
 bin/3D-ICE-Client
 bin/3D-ICE-Emulator
 bin/3D-ICE-Server
+SuperLU_4.3
 
