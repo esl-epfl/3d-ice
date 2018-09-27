@@ -321,76 +321,66 @@ void compute_number_of_connections
 
     CellIndex_t tmp = 2u ;
 
-    switch (channel_model)
-    {
-        case TDICE_CHANNEL_MODEL_NONE :
-        case TDICE_CHANNEL_MODEL_MC_4RM :
-        {
-            dimensions->Grid.NConnections =
+	if(channel_model == TDICE_CHANNEL_MODEL_NONE || channel_model == TDICE_CHANNEL_MODEL_MC_4RM){
+		dimensions->Grid.NConnections =
 
-                // All Normal Cells
+       		// All Normal Cells
 
-                // number of coefficients in the diagonal
-                nlayers * nrows * ncolumns
-                +
-                // number of coefficients bottom <-> top
-                2 * (nlayers - 1) * nrows * ncolumns
-                +
-                // Number of coefficients North <-> South
-                2 * nlayers * (nrows - 1) * ncolumns
-                +
-                // Number of coefficients East <-> West
-                2 * nlayers * nrows * (ncolumns - 1) ;
+		    // number of coefficients in the diagonal
+		    nlayers * nrows * ncolumns
+		    +
+		    // number of coefficients bottom <-> top
+		    2 * (nlayers - 1) * nrows * ncolumns
+		    +
+		    // Number of coefficients North <-> South
+		    2 * nlayers * (nrows - 1) * ncolumns
+		    +
+		    // Number of coefficients East <-> West
+		    2 * nlayers * nrows * (ncolumns - 1) ;
+	}
+	else{ 
+		if(channel_model == TDICE_CHANNEL_MODEL_MC_2RM || channel_model == TDICE_CHANNEL_MODEL_PF_INLINE || channel_model == TDICE_CHANNEL_MODEL_PF_STAGGERED){
+			if(channel_model == TDICE_CHANNEL_MODEL_MC_2RM){
+				tmp += 2 ;
+			}
+			
+			dimensions->Grid.NConnections =
 
-            break ;
-        }
-        case TDICE_CHANNEL_MODEL_MC_2RM :
+		        // For Normal Cells
 
-            tmp += 2 ;
-	    break ;
+		        // Number of coefficients in the diagonal
+		        nlayers_except_channel * nrows * ncolumns
+		        +
+		        // Number of coefficients Bottom <-> Top
+		        2 * nlayers_except_channel * nrows * ncolumns
+		        +
+		        // Number of coefficients North <-> South
+		        2 * nlayers_except_channel * (nrows - 1) * ncolumns
+		        +
+		        // Number of coefficients East <-> West
+		        2 * nlayers_except_channel * nrows * (ncolumns - 1)
+		        +
 
-        case TDICE_CHANNEL_MODEL_PF_INLINE :
-        case TDICE_CHANNEL_MODEL_PF_STAGGERED :
-        {
-            dimensions->Grid.NConnections =
+		        // For Channel Cells
 
-                // For Normal Cells
+		        // Number of coefficients in the diagonal
+		        nlayers_for_channel * nrows * ncolumns
+		        +
+		        // Number of coefficients Bottom <-> Top
+		        2 * (nlayers_for_channel + num_channels) * nrows * ncolumns
+		        +
+		        // Number of coefficients North <-> South
+		        tmp * num_channels * (nrows - 1) * ncolumns
+		        +
+		        // Number of coefficients East <-> West
+		        0
+		        ;
+		}
+		else{
+			fprintf (stderr, "Error: unknown channel model %d\n", channel_model) ;
+		}
+	}    
 
-                // Number of coefficients in the diagonal
-                nlayers_except_channel * nrows * ncolumns
-                +
-                // Number of coefficients Bottom <-> Top
-                2 * nlayers_except_channel * nrows * ncolumns
-                +
-                // Number of coefficients North <-> South
-                2 * nlayers_except_channel * (nrows - 1) * ncolumns
-                +
-                // Number of coefficients East <-> West
-                2 * nlayers_except_channel * nrows * (ncolumns - 1)
-                +
-
-                // For Channel Cells
-
-                // Number of coefficients in the diagonal
-                nlayers_for_channel * nrows * ncolumns
-                +
-                // Number of coefficients Bottom <-> Top
-                2 * (nlayers_for_channel + num_channels) * nrows * ncolumns
-                +
-                // Number of coefficients North <-> South
-                tmp * num_channels * (nrows - 1) * ncolumns
-                +
-                // Number of coefficients East <-> West
-                0
-                ;
-
-            break ;
-        }
-        default :
-
-            fprintf (stderr, "Error: unknown channel model %d\n", channel_model) ;
-    }
-    
     if(topSink && topSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
     {
         // Add the heat spreader, which has a different size and is thus not
