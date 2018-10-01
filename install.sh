@@ -8,18 +8,12 @@ rm -rf superlu_4.3.tar.gz
 cd SuperLU_4.3/
 cp MAKE_INC/make.linux make.inc
 
-sed -i -e '24 s/$(HOME)\/Codes\/SuperLU_4.3/../' make.inc
-
-##Use blas provided by SuperLU
-#sed -i -e '27 s/#//' make.inc
-#sed -i -e '27 s/$(SuperLUroot)\/lib\/libblas.a/..\/lib\/blas$(PLAT).a/' make.inc
-#sed -i -e '34,35 s/^/#/' make.inc
-#make blaslib
+sed -i -e '/^SuperLUroot/ s/$(HOME)\/Codes\/SuperLU_4.3/../' SuperLU_4.3/make.inc
 
 ##Use vendor blas
 echo "Install blas and lapack"
 apt-get install libblas-dev liblapack-dev
-sed -i -e '35 s/-L\/usr\/lib/-L\/usr\/lib\/x86_64-linux-gnu/' make.inc
+sed -i -e '/^BLASLIB/ s/-L\/usr\/lib/-L\/usr\/lib\/x86_64-linux-gnu/' SuperLU_4.3/make.inc
 
 
 echo "Install flex"
