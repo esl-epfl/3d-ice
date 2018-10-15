@@ -149,7 +149,9 @@ AR        = ar
 ARFLAGS   = rsv
 
 CC        = gcc
+# CC        = g++
 CFLAGS    = -MD -O3
+# CFLAGS    = -MD -g -O0 -fsanitize=address
 CINCLUDES = -I$(3DICE_INCLUDE)
 
 YACC      = bison
@@ -166,6 +168,7 @@ DOXYFILE  = Doxyfile
 
 CXX       = g++
 CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
+# CXXFLAGS  = -std=c++11 -g -O0 -fsanitize=address -Wall -Wextra -Werror
 INC_DIRS  = $(CINCLUDES) -I$(SYSTEMC_INCLUDE)
 
  #
