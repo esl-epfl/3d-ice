@@ -35,15 +35,17 @@ using namespace std;
 using namespace pugi;
 
 FmiInterface::FmiInterface(const string& modelName, LogLevel logLevel,
-                           fmi2Type type) : logLevel(logLevel)
+                           fmi2Type type)
+    : logLevel(logLevel),
+      callbacks{
+          &FmiInterface::logfunc,  //logger
+          calloc,                  //allocateMemory
+          free,                    //freenMemory
+          &FmiInterface::stepfunc, //stepFinished
+          this                     //componentEnvironment
+      }
 {
     collectInformationFromXml(modelName);
-    
-    callbacks.componentEnvironment = this;
-    callbacks.allocateMemory       = calloc;
-    callbacks.freeMemory           = free;
-    callbacks.logger               = &FmiInterface::logfunc;
-    callbacks.stepFinished         = &FmiInterface::stepfunc;
     
     string resourceLocation=string("file:./")+modelName+"/resources";
     
