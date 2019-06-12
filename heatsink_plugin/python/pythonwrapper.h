@@ -51,9 +51,8 @@ public:
                   double spreaderConductance,
                   double timeStep);
 
-    int simulateStep(const double *spreaderTemperatures,
-                           double *sinkTemperatures,
-                           double *thermalConductances);
+    void simulateStep(const double *spreaderTemperatures,
+                            double *heatFlow);
 
     ~PythonWrapper();
 
@@ -63,7 +62,6 @@ private:
     unsigned int size;
     void *so;
     PyObject *hSimulateStep;
-    PyObject *cachedConductances=nullptr;
 };
 
 #endif //PYTHONWRAPPER_H

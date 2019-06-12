@@ -53,8 +53,7 @@ int heatsink_init(unsigned int nrows, unsigned int ncols,
                   double spreaderconductance,
                   double timestep);
 int heatsink_simulate_step(const double *spreadertemperatures,
-                                 double *sinktemperatures,
-                                 double *conductances);
+                                 double *heatflow);
 }
 
 // Comment out to disable bound checking in CellMatrix

@@ -69,12 +69,12 @@ int heatsink_init(unsigned int nrows, unsigned int ncols,
 }
 
 int heatsink_simulate_step(const double *spreadertemperatures,
-                                 double *sinktemperatures,
-                                 double *conductances)
+                                 double *heatflow)
 {
     ProfileFunction pf(profiler);
     try {
-        return wrapper->simulateStep(spreadertemperatures,sinktemperatures,conductances);
+        wrapper->simulateStep(spreadertemperatures,heatflow);
+        return 0;
     } catch(exception& e) {
         cerr<<"exception thrown: "<<e.what()<<endl;
         return -1;

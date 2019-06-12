@@ -1613,14 +1613,7 @@ skip_north :
 
     // The top of the spreader is connected with the pluggable heat sink,
     // whose state variables are not part of the system matrix.
-    // Thus, no other nonzero element appears in the sysyem matrix, but
-    // a conductance term is summed to the diagonal element
-
-    g_top = get_spreader_sink_conductance(sink, row_index, column_index);
-    diagonal_value += g_top;
-#ifdef PRINT_SYSTEM_MATRIX
-    fprintf (stderr, "  top (to sink) % .4e\n", g_top);
-#endif
+    // Thus, no other nonzero element appears in the system matrix.
 
     /************************** DIAGONAL ELEMENT ******************************/
 

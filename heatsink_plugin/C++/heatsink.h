@@ -42,12 +42,6 @@
 
 #include "entrypoint.h"
 
-enum class Conductances
-{
-    CHANGED,
-    NOT_CHANGED
-};
-
 inline double parallel(double x, double y)
 {
     return x*y/(x+y);
@@ -62,16 +56,14 @@ public:
              double spreaderConductance,
              double timeStep);
 
-    Conductances simulateStep(const CellMatrix spreaderTemperatures,
-                                    CellMatrix sinkTemperatures,
-                                    CellMatrix thermalConductances);
+    void simulateStep(const CellMatrix spreaderTemperatures,
+                            CellMatrix heatFlow);
 
     ~HeatSink();
 
 private:
     double ambientTemperature;
-    double spreaderConductance;
-    bool firstCall=true;
+    double conductance;
 };
 
 #endif //HEATSINK_H

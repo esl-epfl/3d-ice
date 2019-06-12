@@ -124,15 +124,7 @@ extern "C"
         
         /*! Current temperature returned from the pluggable heatsink callback */
         
-        double *CurrentSinkTemperatures;
-        
-        /*! Previous temperature returned from the pluggable heatsink callback */
-        
-        double *PreviousSinkTemperatures;
-        
-        /*! Spreader to sink conductances passed to/returned from the pluggable heatsink callback */
-        
-        double *SpreaderSinkConductances;
+        double *CurrentSinkHeatFlows;
         
         /*! The pluggable heatsink initialization callback */
         int (*PluggableHeatsinkInit)(unsigned int nrows, unsigned int ncols,
@@ -143,8 +135,7 @@ extern "C"
         
         /*! The pluggable heatsink callback */
         int (*PluggableHeatsink)(const double *spreadertemperatures,
-                                        double *sinktemperatures,
-                                        double *conductances);
+                                       double *sinkheatflows);
      };
 
     /*! Definition of the type HeatSink_t */
@@ -287,17 +278,6 @@ extern "C"
     
     /*! \return the thermal conductance along the z axis of a heat spreader cell */
     Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink);
-    
-     /*!
-      * \return the thermal conductance between a cell of the spreader and a
-      * cell of the heatsink
-      */
-    Conductance_t get_spreader_sink_conductance
-    (
-        HeatSink_t  *hsink,
-        CellIndex_t  row_index,
-        CellIndex_t  column_index
-    );
 
 /******************************************************************************/
 

@@ -56,11 +56,23 @@ HeatSink::HeatSink(unsigned int nRows, unsigned int nCols,
                    double spreaderConductance,
                    double timeStep)
 {
-    // This example function simply prints the given parameters
+    /*
+     * - nRows, nCols are the number of rows/columns of thermal cells of the
+     *   spreader, while cellWidth and cellLength are their dimensions.
+     *
+     * - initialTemperature is the initial spreader temperature.
+     *
+     * - spreaderConductance is the conductance between the center of the
+     *   spreader cell to its top face. NOTE: in most simulation cases you have
+     *   to add the conductance between the top face of the spreader and the
+     *   center of the bottommost cell of the heat sink.
+     *
+     * - timeStep is the simuation time step.
+     */
+    
     cout.setf(ios::fixed);
     cout.precision(3);
     cout<<endl;
-
     #define P(x) cout<<#x<<": "<<x<<endl
     P(nRows);
     P(nCols);
@@ -70,69 +82,39 @@ HeatSink::HeatSink(unsigned int nRows, unsigned int nCols,
     P(spreaderConductance);
     P(timeStep);
     #undef P
-
+    
+    //Total ambient conductance in W/K, arbitrary value
+    const double totalConductance=1;
+        
+    //Divide the ambient conductance evenly among the cells
+    const double ambientConductance=totalConductance/nRows*nCols;
+    
+    this->conductance=parallel(spreaderConductance,ambientConductance);
     this->ambientTemperature=initialTemperature;
-    this->spreaderConductance=spreaderConductance;
 }
 
-Conductances HeatSink::simulateStep(const CellMatrix spreaderTemperatures,
-                                          CellMatrix sinkTemperatures,
-                                          CellMatrix thermalConductances)
+void HeatSink::simulateStep(const CellMatrix spreaderTemperatures,
+                                  CellMatrix heatFlow)
 {
     /*
-     * spreaderTemperatures are the temperatures in K of the layer of cells of
-     * the spreader computed by 3D-ICE. This is a readonly parameter.
+     * spreaderTemperatures are the temperatures in Kelvin of the layer of cells
+     * of the spreader computed by 3D-ICE.
+     *
+     * heatFlow is the heat flow in Watt between each cell of the heatsink that
+     * are in direct contact with those of the spreader. You have to compute
+     * those.
      * 
-     * sinkTemperatures are the temperatures in K of the layer of cells of the
-     * heatsink that are in direct contact with those of the spreader.
-     * You have to compute those. This is an inout parameter, as the previous
-     * values are preserved across function calls.
-     * 
-     * thermalConductances are the thermal conductances in W/K between each
-     * cell of the spreader and the one of the sink directly above. You have to
-     * compute those at least once the first time this function is called.
-     * The way to compute them is by paralleling the conductance passed to the
-     * constructor (which is the conductance from the center of the spreader
-     * cell to its top face) with a conductance that you have to compute, which
-     * is the conductance from the bottom face of the sink to the center of the
-     * sink cell. Although the spreader conductances coming from 3D-ICE are
-     * uniform, the sink can have different conductances for each cell, that's
-     * why it's a matrix. Also, you can update the conductances values during
-     * the simulation to simulate e.g: two phase materials. Just remeber, every
-     * time you update the conductances (including the first one!), you have
-     * to return Conductances::CHANGED from this function! This is an inout
-     * parameter, as the previous values are preserved across function calls.
-     * 
-     * Last, but not least, if you encounter an error, you can signal it by
-     * throwing a C++ exception.
+     * Last, but not least, if you encounter an error, you can signal it to
+     * 3D-ICE by throwing a C++ exception.
      */
     
     // This example function simulates the absence of a heatsink, where
     // the spreader exchanges heat convectively to the ambient
-    Conductances result;
-    if(firstCall)
-    {
-        //First time called, compute the thermal conductances
-        firstCall=false;
-        
-        double ambientConductance=1; //total ambient conductance in W/K, arbitrary value
-        
-        //Divide the ambient conductance evenly among the cells
-        ambientConductance/=thermalConductances.rows()*thermalConductances.cols();
-        double conductance=parallel(spreaderConductance,ambientConductance);
-        
-        for(unsigned int r=0;r<thermalConductances.rows();r++)
-            for(unsigned int c=0;c<thermalConductances.cols();c++)
-                thermalConductances.at(r,c)=conductance;
-        result=Conductances::CHANGED;
-    } else result=Conductances::NOT_CHANGED;
-    
-    //In the absence of a heatsink, the cell above the spreader is the ambient
-    for(unsigned int r=0;r<sinkTemperatures.rows();r++)
-        for(unsigned int c=0;c<sinkTemperatures.cols();c++)
-            sinkTemperatures.at(r,c)=ambientTemperature;
-
-    return result;
+    // In the absence of a heatsink, the cell above the spreader is the ambient
+    for(unsigned int r=0;r<spreaderTemperatures.rows();r++)
+        for(unsigned int c=0;c<spreaderTemperatures.cols();c++)
+            heatFlow.at(r,c)=
+                conductance*(spreaderTemperatures.at(r,c)-ambientTemperature);
 }
 
 HeatSink::~HeatSink() {}

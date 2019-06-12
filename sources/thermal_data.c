@@ -187,8 +187,7 @@ Error_t thermal_data_build
     if(sink && sink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
     {
         unsigned int size = sink->NColumns * sink->NRows;
-        init_data(sink->CurrentSinkTemperatures,  size, analysis->InitialTemperature);
-        init_data(sink->PreviousSinkTemperatures, size, analysis->InitialTemperature);
+        init_data(sink->CurrentSinkHeatFlows, size, 0.0);
     }
 
     return TDICE_SUCCESS ;
@@ -326,13 +325,8 @@ static void fill_system_vector_steady
   } // FOR_EVERY_LAYER
 }
 
-Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
-                           Analysis_t *analysis)
+Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
 {
-    // If the previous temperatures differ too much from the current ones,
-    // the simulation may provide incorrect results
-    const double threshold = 2.0;
-    
     // We have something to do only if we're using the pluggable heatsink model
     HeatSink_t *sink = tdata->ThermalGrid.TopHeatSink;
     if(sink == NULL || sink->SinkModel != TDICE_HEATSINK_TOP_PLUGGABLE)
@@ -342,55 +336,22 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions,
     double *SpreaderTemperatures = tdata->Temperatures;
     SpreaderTemperatures += get_spreader_cell_offset(dimensions,sink,0,0);
     
-    // Call the pluggable heat sink function to compute the temperatures
-    // of the heatsink
-    switch(sink->PluggableHeatsink(
-        SpreaderTemperatures,
-        sink->CurrentSinkTemperatures,
-        sink->SpreaderSinkConductances))
+    // Call the pluggable heat sink function to compute the heat flows to
+    // the heatsink
+    if(sink->PluggableHeatsink(SpreaderTemperatures,sink->CurrentSinkHeatFlows))
     {
-        case 0:
-            //Everything ok
-            break;
-        case 1:
-        {
-            //Thermal conductances between spreader and sink have changed
-            //TODO: optimize? However update_coolant_flow_rate does the same...
-            fill_system_matrix
-                (&tdata->SM_A, &tdata->ThermalGrid, analysis, dimensions) ;
-            if (do_factorization (&tdata->SM_A) == TDICE_FAILURE)
-            {
-                fprintf(stderr, "Error: failed updating spreader-sink conductances\n");
-                return TDICE_FAILURE ;
-            }
-            break;
-        }
-        default:
-            fprintf(stderr, "Error: pluggable heatsink callback failed\n");
-            return TDICE_FAILURE;
+        fprintf(stderr, "Error: pluggable heatsink callback failed\n");
+        return TDICE_FAILURE;
     }
-    
-    unsigned int size = sink->NColumns * sink->NRows;
-    
-    // Compare the computed temperatures against the previous ones
-    unsigned int i;
-    for(i = 0; i < size; i++)
-    {
-        if(abs(sink->CurrentSinkTemperatures[i] - sink->PreviousSinkTemperatures[i]) <= threshold)
-            continue;
-        fprintf(stderr, "Warning: the integration time step may be too large\n");
-        break;
-    }
-    
-    // Update the previous temperatures
-    memcpy(sink->PreviousSinkTemperatures, sink->CurrentSinkTemperatures, size * sizeof(double));
     
     // Update the sources vector using the temperatures at the heatsink interface
     Source_t *sources = tdata->PowerGrid.Sources;
     sources += get_spreader_cell_offset(dimensions,sink,0,0);
+    unsigned int size = sink->NColumns * sink->NRows;
+    unsigned int i;
     for(i = 0; i < size; i++)
-        sources[i] = sink->SpreaderSinkConductances[i] * sink->CurrentSinkTemperatures[i];
-    
+        sources[i] = sink->CurrentSinkHeatFlows[i];
+
     return TDICE_SUCCESS;
 }
 
@@ -416,7 +377,7 @@ SimResult_t emulate_step
             return TDICE_END_OF_SIMULATION ;
     }
     
-    if(pluggable_heatsink(tdata, dimensions, analysis) == TDICE_FAILURE)
+    if(pluggable_heatsink(tdata, dimensions) == TDICE_FAILURE)
         return TDICE_SOLVER_ERROR ;
 
     fill_system_vector

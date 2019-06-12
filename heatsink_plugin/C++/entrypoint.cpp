@@ -69,21 +69,13 @@ int heatsink_init(unsigned int nrows, unsigned int ncols,
 }
 
 int heatsink_simulate_step(const double *spreadertemperatures,
-                                 double *sinktemperatures,
-                                 double *conductances)
+                                 double *heatflow)
 {
     ProfileFunction pf(profiler);
     try {
-        const CellMatrix spt(const_cast<double*>(spreadertemperatures),nRows,nCols);
-        CellMatrix sit(sinktemperatures,nRows,nCols);
-        CellMatrix tc(conductances,nRows,nCols);
-        switch(heatsink->simulateStep(spt,sit,tc))
-        {
-            case Conductances::NOT_CHANGED:
-                return 0;
-            case Conductances::CHANGED:
-                return 1;
-        }
+        const CellMatrix t(const_cast<double*>(spreadertemperatures),nRows,nCols);
+        CellMatrix q(heatflow,nRows,nCols);
+        heatsink->simulateStep(t,q);
         return 0;
     } catch(exception& e) {
         cerr<<"exception thrown: "<<e.what()<<endl;

@@ -61,7 +61,7 @@ PythonWrapper::PythonWrapper(unsigned int nRows, unsigned int nCols,
 
     setenv("PYTHONPATH",".",1);
     //https://mail.python.org/pipermail/new-bugs-announce/2008-November/003322.html
-    so=dlopen("libpython3.5m.so", RTLD_LAZY | RTLD_GLOBAL);
+    so=dlopen("libpython3.6m.so", RTLD_LAZY | RTLD_GLOBAL);
     Py_Initialize();
     auto heatsink = check(PyImport_ImportModule("heatsink"));
     auto init     = check(PyObject_GetAttrString(heatsink,"heatsinkInit"));
@@ -80,9 +80,8 @@ PythonWrapper::PythonWrapper(unsigned int nRows, unsigned int nCols,
     Py_DECREF(args);
 }
 
-int PythonWrapper::simulateStep(const double *spreaderTemperatures,
-                                      double *sinkTemperatures,
-                                      double *thermalConductances)
+void PythonWrapper::simulateStep(const double *spreaderTemperatures,
+                                       double *heatFlow)
 {
 //FIXME: using numpy arrays should be more performant, but all I got was segfaults
 // long int sizes[1];
@@ -94,48 +93,21 @@ int PythonWrapper::simulateStep(const double *spreaderTemperatures,
     for(unsigned int i=0;i<size;i++)
         PyList_SET_ITEM(list,i,PyFloat_FromDouble(spreaderTemperatures[i]));
 
-    //Thermal conductances are cached, and the list is only made once
-    if(cachedConductances==nullptr)
-    {
-        cachedConductances=check(PyList_New(size));
-        for(unsigned int i=0;i<size;i++)
-            PyList_SET_ITEM(cachedConductances,i,PyFloat_FromDouble(thermalConductances[i]));
-    }
-
-    auto args = check(PyTuple_New(2));
+    auto args = check(PyTuple_New(1));
     PyTuple_SetItem(args,0,list);
-    Py_INCREF(cachedConductances); //when the tuple is destroyed, refcount is decremented
-    PyTuple_SetItem(args,1,cachedConductances);
 
     // If function throws a python exception, check fails and a C++ exception is thrown
     auto retVal=check(PyObject_CallObject(hSimulateStep,args));
     Py_DECREF(args);
 
-    if(PyTuple_Check(retVal)==false || PyTuple_GET_SIZE(retVal)!=2)
-        throw runtime_error("heatsinkSimulateStep should return a tuple of 2 items");
-
-    auto sinkTemp            = PyTuple_GetItem(retVal,0);
-    auto conductancesChanged = PyTuple_GetItem(retVal,1);
-
-    if(PyList_Check(sinkTemp)==false)
-        throw runtime_error("heatsinkSimulateStep did not return temperatures list");
-    if(PyList_GET_SIZE(sinkTemp)!=size)
-        throw runtime_error("heatsinkSimulateStep returned temperatures wrong size");
+    if(PyList_Check(retVal)==false)
+        throw runtime_error("heatsinkSimulateStep did not return heat flow list");
+    if(PyList_GET_SIZE(retVal)!=size)
+        throw runtime_error("heatsinkSimulateStep returned heat flow wrong size");
     for(unsigned int i=0;i<size;i++)
-        sinkTemperatures[i]=PyFloat_AsDouble(PyList_GetItem(sinkTemp,i));
-
-    int result=0;
-    if(PyBool_Check(conductancesChanged)==false)
-        throw runtime_error("heatsinkSimulateStep did not return bool");
-    if(conductancesChanged==Py_True)
-    {
-        for(unsigned int i=0;i<size;i++)
-            thermalConductances[i]=PyFloat_AsDouble(PyList_GetItem(cachedConductances,i));
-        result=1; //Signal 3D-ICE that conductances were updated
-    }
+        heatFlow[i]=PyFloat_AsDouble(PyList_GetItem(retVal,i));
     
     Py_DECREF(retVal);
-    return result;
 }
 
 PythonWrapper::~PythonWrapper()
