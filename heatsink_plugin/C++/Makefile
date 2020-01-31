@@ -1,5 +1,5 @@
 
-BIN = heatsink_plugin.so
+BIN = heatsink_plugin_cpp.so
 OBJ = entrypoint.o heatsink.o
 
 CXX      = g++

@@ -1,5 +1,5 @@
 
-BIN = heatsink_plugin.so
+BIN = heatsink_plugin_python.so
 OBJ = entrypoint.o pythonwrapper.o
 
 CXX      = g++

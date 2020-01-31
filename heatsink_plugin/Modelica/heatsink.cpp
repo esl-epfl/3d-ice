@@ -37,9 +37,6 @@
  * 1015 Lausanne, Switzerland           Url  : http://esl.epfl.ch/3d-ice.html *
  ******************************************************************************/
 
-// This is just a template, write your heatsink code here
-// by implementing the HeatSink class
-
 #include <stdexcept>
 #include <iostream>
 #include "heatsink.h"

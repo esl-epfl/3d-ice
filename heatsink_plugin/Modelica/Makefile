@@ -1,5 +1,5 @@
 
-BIN = heatsink_plugin.so
+BIN = fmi_loader.so
 OBJ = entrypoint.o heatsink.o
 
 CXX      = g++
