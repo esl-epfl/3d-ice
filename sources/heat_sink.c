@@ -325,12 +325,18 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     
     char path[2048];
     memset(path,0,sizeof(path));
-    if(getcwd(path,sizeof(path)-1)==NULL)
+    
+    if(strlen(hsink->Plugin)>0 && hsink->Plugin[0]!='/')
     {
-        fprintf (stderr, "ERROR: getcwd() failed\n") ;
-        return TDICE_FAILURE;
+        // Plugin has relative path, add <pwd>/ to path
+        if(getcwd(path,sizeof(path)-1)==NULL)
+        {
+            fprintf (stderr, "ERROR: getcwd() failed\n") ;
+            return TDICE_FAILURE;
+        }
+        strncat(path,"/",sizeof(path)-1);
     }
-    strncat(path,"/",sizeof(path)-1);
+        
     strncat(path,hsink->Plugin,sizeof(path)-1);
     so = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
     if(so == NULL)
