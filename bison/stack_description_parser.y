@@ -378,7 +378,7 @@ topsink_pluggable
   : TOP PLUGGABLE HEAT SINK ':'
         SPREADER LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
         MATERIAL IDENTIFIER ';'                                       //$17
-        PLUGIN PATH ';'                                               //$20
+        PLUGIN PATH ',' PATH ';'                                      //$20 $22
     {
         stkd->TopHeatSink = heat_sink_calloc () ;
 
@@ -414,8 +414,10 @@ topsink_pluggable
         string_destroy (&$17) ;
 
         string_copy (&stkd->TopHeatSink->Plugin, &$20) ;
+        string_copy (&stkd->TopHeatSink->Args,   &$22) ;
 
         string_destroy (&$20) ;
+        string_destroy (&$22) ;
     }
   ;
 

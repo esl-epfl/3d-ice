@@ -94,6 +94,10 @@ extern "C"
         
         String_t Plugin;
         
+        /*! Plugin args, only for pluggable heatsink */
+        
+        String_t Args;
+        
         /*! The length of a spreader cell, only for pluggable heatsink */
         
         CellDimension_t CellLength;

@@ -61,6 +61,7 @@ void heat_sink_init (HeatSink_t *hsink)
     
     material_init(&hsink->SpreaderMaterial);
     string_init(&hsink->Plugin);
+    string_init(&hsink->Args);
     
     hsink->CellLength         = 0.0;
     hsink->CellWidth          = 0.0;
@@ -101,6 +102,7 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     
     material_copy(&dst->SpreaderMaterial,&src->SpreaderMaterial);
     string_copy(&dst->Plugin,&src->Plugin);
+    string_copy(&dst->Args,  &src->Args);
     
     dst->CellLength         = src->CellLength;
     dst->CellWidth          = src->CellWidth;
@@ -120,6 +122,7 @@ void heat_sink_destroy (HeatSink_t *hsink)
 {    
     material_destroy (&hsink->SpreaderMaterial);
     string_destroy (&hsink->Plugin);
+    string_destroy (&hsink->Args);
     
     free(hsink->CurrentSinkHeatFlows);
     
@@ -241,6 +244,10 @@ void heat_sink_print (HeatSink_t *hsink, FILE *stream, String_t prefix)
         fprintf (stream,
             "%s   plugin                  %s ;\n",
             prefix, hsink->Plugin) ;
+        
+        fprintf (stream,
+            "%s   plugin args             %s ;\n",
+            prefix, hsink->Args) ;
         
         fprintf (stream,
             "%s   cell     length          %.0f ;\n",
@@ -376,7 +383,7 @@ Error_t initialize_pluggable_heatsink(HeatSink_t *hsink, Analysis_t *analysis)
         analysis->InitialTemperature,
         spreaderConductance,
         analysis->StepTime,
-        "FIXME") != 0)
+        hsink->Args) != 0)
         return TDICE_FAILURE;
     return TDICE_SUCCESS;
 }
