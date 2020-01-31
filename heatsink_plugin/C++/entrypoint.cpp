@@ -53,14 +53,15 @@ int heatsink_init(unsigned int nrows, unsigned int ncols,
                   double cellwidth,   double celllength,
                   double initialtemperature,
                   double spreaderconductance,
-                  double timestep)
+                  double timestep,
+                  const char *args)
 {
     ProfileFunction pf(profiler);
     nRows=nrows;
     nCols=ncols;
     try {
         heatsink=unique_ptr<HeatSink>(new HeatSink(nrows,ncols,cellwidth,celllength,
-                                      initialtemperature,spreaderconductance,timestep));
+                                      initialtemperature,spreaderconductance,timestep,args));
         return 0;
     } catch(exception& e) {
         cerr<<"exception thrown: "<<e.what()<<endl;

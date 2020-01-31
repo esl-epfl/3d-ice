@@ -49,7 +49,8 @@ public:
                   double cellWidth,   double cellLength,
                   double initialTemperature,
                   double spreaderConductance,
-                  double timeStep);
+                  double timeStep,
+                  const char *args);
 
     void simulateStep(const double *spreaderTemperatures,
                             double *heatFlow);

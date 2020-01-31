@@ -46,7 +46,7 @@ conductance=0;
 def parallel(x,y):
     return x*y/(x+y)
 
-def heatsinkInit(nRows,nCols,cellWidth,cellLength,initialTemperature,spreaderConductance,timeStep):
+def heatsinkInit(nRows,nCols,cellWidth,cellLength,initialTemperature,spreaderConductance,timeStep,args):
     print(nRows)
     print(nCols)
     print(cellWidth)
@@ -54,6 +54,7 @@ def heatsinkInit(nRows,nCols,cellWidth,cellLength,initialTemperature,spreaderCon
     print(initialTemperature)
     print(spreaderConductance)
     print(timeStep)
+    print(args)
     totalConductance=1
     ambientConductance=1/(nRows*nCols)
     global ambientTemperature

@@ -54,7 +54,8 @@ HeatSink::HeatSink(unsigned int nRows, unsigned int nCols,
                    double cellWidth,   double cellLength,
                    double initialTemperature,
                    double spreaderConductance,
-                   double timeStep)
+                   double timeStep,
+                   const string& args)
 {
     /*
      * - nRows, nCols are the number of rows/columns of thermal cells of the
@@ -81,6 +82,7 @@ HeatSink::HeatSink(unsigned int nRows, unsigned int nCols,
     P(initialTemperature);
     P(spreaderConductance);
     P(timeStep);
+    P(args);
     #undef P
     
     //Total ambient conductance in W/K, arbitrary value

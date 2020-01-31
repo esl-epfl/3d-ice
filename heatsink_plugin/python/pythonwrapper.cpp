@@ -55,7 +55,8 @@ PythonWrapper::PythonWrapper(unsigned int nRows, unsigned int nCols,
                              double cellWidth,   double cellLength,
                              double initialTemperature,
                              double spreaderConductance,
-                             double timeStep)
+                             double timeStep,
+                             const char *args)
 {
     size=nRows*nCols;
 
@@ -67,17 +68,18 @@ PythonWrapper::PythonWrapper(unsigned int nRows, unsigned int nCols,
     auto init     = check(PyObject_GetAttrString(heatsink,"heatsinkInit"));
     hSimulateStep = check(PyObject_GetAttrString(heatsink,"heatsinkSimulateStep"));
 
-    auto args     = check(PyTuple_New(7));
-    PyTuple_SetItem(args,0,check(PyLong_FromLong(nRows)));
-    PyTuple_SetItem(args,1,check(PyLong_FromLong(nCols)));
-    PyTuple_SetItem(args,2,check(PyFloat_FromDouble(cellWidth)));
-    PyTuple_SetItem(args,3,check(PyFloat_FromDouble(cellLength)));
-    PyTuple_SetItem(args,4,check(PyFloat_FromDouble(initialTemperature)));
-    PyTuple_SetItem(args,5,check(PyFloat_FromDouble(spreaderConductance)));
-    PyTuple_SetItem(args,6,check(PyFloat_FromDouble(timeStep)));
+    auto pyargs   = check(PyTuple_New(8));
+    PyTuple_SetItem(pyargs,0,check(PyLong_FromLong(nRows)));
+    PyTuple_SetItem(pyargs,1,check(PyLong_FromLong(nCols)));
+    PyTuple_SetItem(pyargs,2,check(PyFloat_FromDouble(cellWidth)));
+    PyTuple_SetItem(pyargs,3,check(PyFloat_FromDouble(cellLength)));
+    PyTuple_SetItem(pyargs,4,check(PyFloat_FromDouble(initialTemperature)));
+    PyTuple_SetItem(pyargs,5,check(PyFloat_FromDouble(spreaderConductance)));
+    PyTuple_SetItem(pyargs,6,check(PyFloat_FromDouble(timeStep)));
+    PyTuple_SetItem(pyargs,7,check(PyUnicode_FromString(args)));
     // If function throws a python exception, check fails and a C++ exception is thrown
-    Py_DECREF(check(PyObject_CallObject(init,args)));
-    Py_DECREF(args);
+    Py_DECREF(check(PyObject_CallObject(init,pyargs)));
+    Py_DECREF(pyargs);
 }
 
 void PythonWrapper::simulateStep(const double *spreaderTemperatures,
@@ -86,19 +88,19 @@ void PythonWrapper::simulateStep(const double *spreaderTemperatures,
 //FIXME: using numpy arrays should be more performant, but all I got was segfaults
 // long int sizes[1];
 // sizes[0]=size;
-// auto args=check(PyArray_SimpleNewFromData(1,sizes,NPY_DOUBLE,(void*)heatFlow));
+// auto pyargs=check(PyArray_SimpleNewFromData(1,sizes,NPY_DOUBLE,(void*)heatFlow));
 
     //The list of spreader temperatures is made every time
     auto list=check(PyList_New(size));
     for(unsigned int i=0;i<size;i++)
         PyList_SET_ITEM(list,i,PyFloat_FromDouble(spreaderTemperatures[i]));
 
-    auto args = check(PyTuple_New(1));
-    PyTuple_SetItem(args,0,list);
+    auto pyargs = check(PyTuple_New(1));
+    PyTuple_SetItem(pyargs,0,list);
 
     // If function throws a python exception, check fails and a C++ exception is thrown
-    auto retVal=check(PyObject_CallObject(hSimulateStep,args));
-    Py_DECREF(args);
+    auto retVal=check(PyObject_CallObject(hSimulateStep,pyargs));
+    Py_DECREF(pyargs);
 
     if(PyList_Check(retVal)==false)
         throw runtime_error("heatsinkSimulateStep did not return heat flow list");

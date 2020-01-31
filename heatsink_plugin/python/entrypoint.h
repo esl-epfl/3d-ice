@@ -51,7 +51,8 @@ int heatsink_init(unsigned int nrows, unsigned int ncols,
                   double cellwidth,   double celllength,
                   double initialtemperature,
                   double spreaderconductance,
-                  double timestep);
+                  double timestep,
+                  const char *args);
 int heatsink_simulate_step(const double *spreadertemperatures,
                                  double *heatflow);
 }

@@ -40,6 +40,7 @@
 #ifndef HEATSINK_H
 #define HEATSINK_H
 
+#include <string>
 #include "entrypoint.h"
 
 inline double parallel(double x, double y)
@@ -54,7 +55,8 @@ public:
              double cellWidth,   double cellLength,
              double initialTemperature,
              double spreaderConductance,
-             double timeStep);
+             double timeStep,
+             const std::string& args);
 
     void simulateStep(const CellMatrix spreaderTemperatures,
                             CellMatrix heatFlow);
