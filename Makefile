@@ -40,7 +40,7 @@
 
 include $(3DICE_MAIN)/makefile.def
 
-.PHONY: all lib bin test doc clean
+.PHONY: all lib bin plugin test doc clean
 
 all: lib bin
 
@@ -52,6 +52,9 @@ lib:
 
 bin: lib
 	cd $(3DICE_BIN) ; make ;
+
+plugin: lib bin
+	cd $(HEATSINK_PLUGIN)	; make ;
 
 test: lib bin
 	cd $(3DICE_TEST) ; make ;
