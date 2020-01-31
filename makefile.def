@@ -142,6 +142,11 @@ SYSTEMC_LIB     = $(SYSTEMC_MAIN)/lib-$(SYSTEMC_ARCH)
 SYSTEMC_LIBS    = -L$(SYSTEMC_LIB) -lsystemc
 
  #
+ # Heatsink plugin variables
+ ###############################################################################
+HEATSINK_PLUGIN = $(3DICE_MAIN)/heatsink_plugin
+
+ #
  # Commands and flags
  ##############################################################################
 

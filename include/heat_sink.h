@@ -131,7 +131,8 @@ extern "C"
                                      double cellwidth,    double celllength,
                                      double initialtemperature,
                                      double spreaderconductance,
-                                     double timestep);
+                                     double timestep,
+                                     const char *args);
         
         /*! The pluggable heatsink callback */
         int (*PluggableHeatsink)(const double *spreadertemperatures,

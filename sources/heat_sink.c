@@ -335,14 +335,14 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     so = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
     if(so == NULL)
     {
-        fprintf (stderr, "ERROR: could not load heatsink plugin %s\n", hsink->Plugin) ;
+        fprintf (stderr, "ERROR: could not load heatsink plugin %s\n", path) ;
         return TDICE_FAILURE;
     }
     atexit(close_shared_object);
     
     hsink->PluggableHeatsinkInit = 
-    (int (*)(unsigned int, unsigned int, double, double, double, double, double))
-            dlsym(so, "heatsink_init");
+    (int (*)(unsigned int, unsigned int, double, double, double, double, double, const char*))
+           dlsym(so, "heatsink_init");
     if(hsink->PluggableHeatsinkInit == NULL)
     {
         fprintf (stderr, "ERROR: heatsink plugin reported %s\n", dlerror()) ;
@@ -351,7 +351,7 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
     
     hsink->PluggableHeatsink =
     (int (*)(const double*, double*))
-            dlsym(so, "heatsink_simulate_step");
+           dlsym(so, "heatsink_simulate_step");
     if(hsink->PluggableHeatsink == NULL)
     {
         fprintf (stderr, "ERROR: heatsink plugin reported %s\n", dlerror()) ;
@@ -369,7 +369,8 @@ Error_t initialize_pluggable_heatsink(HeatSink_t *hsink, Analysis_t *analysis)
         hsink->CellWidth, hsink->CellLength,
         analysis->InitialTemperature,
         spreaderConductance,
-        analysis->StepTime) != 0)
+        analysis->StepTime,
+        "FIXME") != 0)
         return TDICE_FAILURE;
     return TDICE_SUCCESS;
 }
