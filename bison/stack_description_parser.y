@@ -378,6 +378,50 @@ topsink_pluggable
   : TOP PLUGGABLE HEAT SINK ':'
         SPREADER LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
         MATERIAL IDENTIFIER ';'                                       //$17
+        PLUGIN PATH ';'                                               //$20
+    {
+        stkd->TopHeatSink = heat_sink_calloc () ;
+
+        if (stkd->TopHeatSink == NULL)
+        {
+            STKERROR ("Malloc top heat sink failed") ;
+
+            YYABORT ;
+        }
+
+        stkd->TopHeatSink->SinkModel          = TDICE_HEATSINK_TOP_PLUGGABLE ;
+        stkd->TopHeatSink->SpreaderLength     = $8 ;
+        stkd->TopHeatSink->SpreaderWidth      = $11 ;
+        stkd->TopHeatSink->SpreaderHeight     = $14 ;
+        
+        string_copy (&stkd->TopHeatSink->SpreaderMaterial.Id, &$17) ;
+
+        Material_t *tmp = material_list_find (&stkd->Materials, &stkd->TopHeatSink->SpreaderMaterial) ;
+
+        if (tmp == NULL)
+        {
+            sprintf (error_message, "Unknown material %s", $17) ;
+
+            STKERROR (error_message) ;
+
+            string_destroy (&$17) ;
+
+            YYABORT ;
+        }
+
+        material_copy (&stkd->TopHeatSink->SpreaderMaterial, tmp) ;
+
+        string_destroy (&$17) ;
+
+        string_copy (&stkd->TopHeatSink->Plugin, &$20) ;
+        string_copy_cstr (&stkd->TopHeatSink->Args, "") ;
+
+        string_destroy (&$20) ;
+    }
+
+  | TOP PLUGGABLE HEAT SINK ':'
+        SPREADER LENGTH DVALUE ',' WIDTH DVALUE ',' HEIGHT DVALUE ';' // $8 $11 $14
+        MATERIAL IDENTIFIER ';'                                       //$17
         PLUGIN PATH ',' PATH ';'                                      //$20 $22
     {
         stkd->TopHeatSink = heat_sink_calloc () ;
