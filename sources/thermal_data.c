@@ -180,15 +180,6 @@ Error_t thermal_data_build
 
         return TDICE_FAILURE ;
     }
-    
-    /* Set the pluggable heatsing temperatures to initial thermal state */
-    
-    HeatSink_t *sink = tdata->ThermalGrid.TopHeatSink;
-    if(sink && sink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
-    {
-        unsigned int size = sink->NColumns * sink->NRows;
-        init_data(sink->CurrentSinkHeatFlows, size, 0.0);
-    }
 
     return TDICE_SUCCESS ;
 }
@@ -336,21 +327,22 @@ Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
     double *SpreaderTemperatures = tdata->Temperatures;
     SpreaderTemperatures += get_spreader_cell_offset(dimensions,sink,0,0);
     
+    Source_t *sources = tdata->PowerGrid.Sources;
+    sources += get_spreader_cell_offset(dimensions,sink,0,0);
+    
     // Call the pluggable heat sink function to compute the heat flows to
     // the heatsink
-    if(sink->PluggableHeatsink(SpreaderTemperatures,sink->CurrentSinkHeatFlows))
+    if(sink->PluggableHeatsink(SpreaderTemperatures,sources))
     {
         fprintf(stderr, "Error: pluggable heatsink callback failed\n");
         return TDICE_FAILURE;
     }
     
-    // Update the sources vector using the temperatures at the heatsink interface
-    Source_t *sources = tdata->PowerGrid.Sources;
-    sources += get_spreader_cell_offset(dimensions,sink,0,0);
+    // Both 3D-ICE and plugin use passive sign convention
     unsigned int size = sink->NColumns * sink->NRows;
     unsigned int i;
     for(i = 0; i < size; i++)
-        sources[i] = sink->CurrentSinkHeatFlows[i];
+        sources[i] = - sources[i];
 
     return TDICE_SUCCESS;
 }

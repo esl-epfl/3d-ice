@@ -126,10 +126,6 @@ extern "C"
         
         CellIndex_t NumColumnsBorder;
         
-        /*! Current temperature returned from the pluggable heatsink callback */
-        
-        double *CurrentSinkHeatFlows;
-        
         /*! The pluggable heatsink initialization callback */
         int (*PluggableHeatsinkInit)(unsigned int nrows, unsigned int ncols,
                                      double cellwidth,    double celllength,

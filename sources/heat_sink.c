@@ -70,7 +70,6 @@ void heat_sink_init (HeatSink_t *hsink)
     hsink->NumRowsBorder      = 0;
     hsink->NumColumnsBorder   = 0;
     
-    hsink->CurrentSinkHeatFlows     = NULL;
     hsink->PluggableHeatsink        = NULL;
 }
 
@@ -111,8 +110,6 @@ void heat_sink_copy (HeatSink_t *dst, HeatSink_t *src)
     dst->NumRowsBorder      = src->NumRowsBorder;
     dst->NumColumnsBorder   = src->NumColumnsBorder;
     
-    size_t size = src->NColumns * src->NRows * sizeof(double);
-    dst->CurrentSinkHeatFlows  = (double *) array_alloc_copy(src->CurrentSinkHeatFlows,  size);
     dst->PluggableHeatsink  = src->PluggableHeatsink;
 }
 
@@ -123,8 +120,6 @@ void heat_sink_destroy (HeatSink_t *hsink)
     material_destroy (&hsink->SpreaderMaterial);
     string_destroy (&hsink->Plugin);
     string_destroy (&hsink->Args);
-    
-    free(hsink->CurrentSinkHeatFlows);
     
     heat_sink_init (hsink) ;
 }
@@ -321,14 +316,6 @@ Error_t initialize_heat_spreader(HeatSink_t *hsink, Dimensions_t *chip)
         fprintf (stderr, "WARNING: spreader length not a multiple of cell length\n") ;
     
     hsink->NRows = 2 * hsink->NumRowsBorder + get_number_of_rows(chip);
-    
-    
-    hsink->CurrentSinkHeatFlows  = (double*) calloc(hsink->NColumns * hsink->NRows, sizeof(double));
-    if(hsink->CurrentSinkHeatFlows == NULL)
-    {
-        fprintf (stderr, "ERROR: could not allocate memory for pluggable heat sink\n") ;
-        return TDICE_FAILURE;
-    }
     
     char path[2048];
     memset(path,0,sizeof(path));
