@@ -56,7 +56,7 @@ def heatsinkInit(nRows,nCols,cellWidth,cellLength,initialTemperature,spreaderCon
     print(timeStep)
     print(args)
     totalConductance=1
-    ambientConductance=1/(nRows*nCols)
+    ambientConductance=totalConductance/(nRows*nCols)
     global ambientTemperature
     global conductance
     conductance=parallel(spreaderConductance,ambientConductance)

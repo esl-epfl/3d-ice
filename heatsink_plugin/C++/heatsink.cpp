@@ -89,7 +89,7 @@ HeatSink::HeatSink(unsigned int nRows, unsigned int nCols,
     const double totalConductance=1;
         
     //Divide the ambient conductance evenly among the cells
-    const double ambientConductance=totalConductance/nRows*nCols;
+    const double ambientConductance=totalConductance/(nRows*nCols);
     
     this->conductance=parallel(spreaderConductance,ambientConductance);
     this->ambientTemperature=initialTemperature;
