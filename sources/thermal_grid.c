@@ -493,14 +493,25 @@ Conductance_t get_conductance_top
             
             assert(layer_index == last_layer (dimensions));
             
-            //NOTE: contrary to ambient connection which includes the conductance
-            //to ambient, here we only have the conductance till the face of the cell
-            return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
+            // Corner case: when we have a single layer, the last layer is also the first layer
+            if (layer_index == first_layer (dimensions))
+
+                return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
                                                     dimensions)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
+                        / get_cell_height (dimensions, layer_index) ;
+
+            else
+            
+                return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
+                                                    row_index, column_index,
+                                                    dimensions)
+                        * get_cell_length (dimensions, column_index)
+                        * get_cell_width  (dimensions, row_index)
+                        )
                         / (get_cell_height (dimensions, layer_index) / 2.0) ;
             
 
