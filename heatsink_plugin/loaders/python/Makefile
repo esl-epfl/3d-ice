@@ -1,5 +1,5 @@
 
-BIN = heatsink_plugin_python.so
+BIN = py_loader.so
 OBJ = entrypoint.o pythonwrapper.o
 
 CXX      = g++
@@ -10,7 +10,7 @@ LDLIBS   = -lpython3.6m
 all: $(BIN)
 
 clean:
-	rm -rf $(BIN) $(OBJ) heatsink.pyc __pycache__
+	rm -rf $(BIN) $(OBJ)
 
 $(BIN): $(OBJ)
 	$(CXX) $(LDFLAGS) -o $(BIN) $(OBJ) $(LDLIBS)

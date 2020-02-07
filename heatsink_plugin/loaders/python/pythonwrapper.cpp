@@ -59,12 +59,16 @@ PythonWrapper::PythonWrapper(unsigned int nRows, unsigned int nCols,
                              const char *args)
 {
     size=nRows*nCols;
+    
+    string arg=args;
+    string filename=arg.substr(0,arg.find_first_of(" "));
+    string filenameNoExt=filename.substr(0,filename.find_last_of("."));
 
     setenv("PYTHONPATH",".",1);
     //https://mail.python.org/pipermail/new-bugs-announce/2008-November/003322.html
     so=dlopen("libpython3.6m.so", RTLD_LAZY | RTLD_GLOBAL);
     Py_Initialize();
-    auto heatsink = check(PyImport_ImportModule("heatsink"));
+    auto heatsink = check(PyImport_ImportModule(filenameNoExt.c_str()));
     auto init     = check(PyObject_GetAttrString(heatsink,"heatsinkInit"));
     hSimulateStep = check(PyObject_GetAttrString(heatsink,"heatsinkSimulateStep"));
 
