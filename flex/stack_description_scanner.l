@@ -99,8 +99,7 @@ signed_integer          [+-]?[[:digit:]]+
 exponent                [eE]{signed_integer}
 double                  {signed_integer}((\.{unsigned_integer})?{exponent}?)?
 identifier              [[:alpha:]](\_|[[:alnum:]])*
-path_begin              (\.{1,2}\/|\/)?
-path                    \"{path_begin}{identifier}(\/|\.{1,2}|{identifier})*\"
+path                    \"[^"]*\"
 
 /* exclusive start conditions to exclude C/C++ like comments in */
 /* the scanned file.                                            */
