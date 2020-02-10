@@ -7,7 +7,9 @@ DOT = .
 UNDERSCORE = _
 OBJ_UNDERSCORE = $(subst $(DOT),$(UNDERSCORE),$(OBJ))
 
-all: $(SRC)
+all: $(OBJ)
+
+$(OBJ): $(SRC)
 	# Making an FMI from OpenModelica requires to use its own
 	# build system scripting language
 	omc buildfmi.mos
