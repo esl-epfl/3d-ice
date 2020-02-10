@@ -42,6 +42,7 @@
 
 #include <string>
 #include "entrypoint.h"
+#include "fmi-interface/fmi_interface.h"
 
 class FmiWrapper
 {
@@ -57,8 +58,14 @@ public:
                             CellMatrix heatFlow);
 
 private:
-    double ambientTemperature;
-    double conductance;
+    static std::string getName(const std::string& args);
+    static std::string getPath(const std::string& args);
+    
+    FmiInterface fmi;
+    const double timeStep;
+    double time = 0.0;
+    unsigned int temperatureIndices;
+    unsigned int heatFlowIndices;
 };
 
 #endif //FMIWRAPPER_H

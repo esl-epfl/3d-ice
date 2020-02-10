@@ -53,59 +53,41 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
                        double spreaderConductance,
                        double timeStep,
                        const string& args)
+   : fmi(getName(args),getPath(args),LogLevel::Normal), timeStep(timeStep)
 {
-    /*
-     * - nRows, nCols are the number of rows/columns of thermal cells of the
-     *   spreader, while cellWidth and cellLength are their dimensions.
-     *
-     * - initialTemperature is the initial spreader temperature.
-     *
-     * - spreaderConductance is the conductance between the center of the
-     *   spreader cell to its top face. NOTE: in most simulation cases you have
-     *   to add the conductance between the top face of the spreader and the
-     *   center of the bottommost cell of the heat sink.
-     *
-     * - timeStep is the simuation time step.
-     */
+    fmi.setScalarDouble(fmi.variableIndex("initialTemperature"),initialTemperature);
+    fmi.setScalarDouble(fmi.variableIndex("spreaderConductance"),spreaderConductance);
+    fmi.setScalarString(fmi.variableIndex("args"),args);
     
-    cout.setf(ios::fixed);
-    cout.precision(3);
-    cout<<endl;
-    #define P(x) cout<<#x<<": "<<x<<endl
-    P(nRows);
-    P(nCols);
-    P(cellWidth);
-    P(cellLength);
-    P(initialTemperature);
-    P(spreaderConductance);
-    P(timeStep);
-    P(args);
-    #undef P
+    temperatureIndices=fmi.variableIndex("port.T");
+    heatFlowIndices=fmi.variableIndex("port.Q_flow");
     
-    this->conductance=1;
-    this->ambientTemperature=initialTemperature;
+    fmi.startSimulation();
 }
 
 void FmiWrapper::simulateStep(const CellMatrix spreaderTemperatures,
                                     CellMatrix heatFlow)
 {
-    /*
-     * spreaderTemperatures are the temperatures in Kelvin of the layer of cells
-     * of the spreader computed by 3D-ICE.
-     *
-     * heatFlow is the heat flow in Watt between each cell of the heatsink that
-     * are in direct contact with those of the spreader. You have to compute
-     * those.
-     * 
-     * Last, but not least, if you encounter an error, you can signal it to
-     * 3D-ICE by throwing a C++ exception.
-     */
+    if(spreaderTemperatures.rows()!=1 || spreaderTemperatures.cols()!=1) throw runtime_error("TODO: extend");
     
-    // This example function simulates the absence of a heatsink, where
-    // the spreader exchanges heat convectively to the ambient
-    // In the absence of a heatsink, the cell above the spreader is the ambient
-    for(unsigned int r=0;r<spreaderTemperatures.rows();r++)
-        for(unsigned int c=0;c<spreaderTemperatures.cols();c++)
-            heatFlow.at(r,c)=
-                conductance*(spreaderTemperatures.at(r,c)-ambientTemperature);
+    
+    
+    fmi.doStep(time,timeStep);
+    time+=timeStep;
+}
+
+string FmiWrapper::getName(const string& args)
+{
+    string pathModel=args.substr(0,args.find_first_of(" "));
+    auto modelBegin=args.find_last_of("/");
+    if(modelBegin==string::npos) return pathModel;
+    else return pathModel.substr(modelBegin+1);
+}
+
+string FmiWrapper::getPath(const string& args)
+{
+    string pathModel=args.substr(0,args.find_first_of(" "));
+    auto modelBegin=args.find_last_of("/");
+    if(modelBegin==string::npos) return "";
+    else return pathModel.substr(0,modelBegin);
 }
