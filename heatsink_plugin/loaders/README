@@ -1,0 +1,12 @@
+
+This directory contains the loader plugins. The 3D-ICE plugin interface exposes a C API that is directly accessible by C/C++ programs without a loader. Loaders are used to support co-simulation with higher level programming languages.
+
+Two loaders are currently supported:
+
+FMI
+===
+Allows to load plugins that conform to the FMI, or Functional Mockup Interface (https://fmi-standard.org/). This loader is targeted mainly at Modelica models. This is the only loader that performs grid pitch mapping between the finite volume grid used by 3D-ICE and the plugin, as doing this part in C++ is much faster than doing it in Modelica.
+
+Python
+======
+Allows to load a python file as a plugin.

@@ -45,10 +45,14 @@ include $(3DICE_MAIN)/makefile.def
 
 all:
 	@echo "\e[31mBuilding plugins\e[0m"
+	cd loaders/FMI		; make ;
 	cd loaders/python	; make ;
+	cd templates/Modelica	; make ;
 	cd templates/C++	; make ;
 
 clean:
 	@echo "\e[31mCleaning plugins\e[0m"
+	cd loaders/FMI		; make clean ;
 	cd loaders/python	; make clean ;
+	cd templates/Modelica	; make clean ;
 	cd templates/C++	; make clean ;

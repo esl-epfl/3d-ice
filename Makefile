@@ -63,11 +63,11 @@ doc:
 	cd $(3DICE_DOC) ; make doc ;
 
 clean:
-	cd $(3DICE_FLEX)    ; make clean ;
-	cd $(3DICE_BISON)   ; make clean ;
-	cd $(3DICE_SOURCES) ; make clean ;
-	cd $(3DICE_LIB)     ; make clean ;
-	cd $(3DICE_BIN)     ; make clean ;
-	cd $(3DICE_TEST)    ; make clean ;
-	cd $(3DICE_DOC)     ; make clean ;
-
+	cd $(3DICE_FLEX)	; make clean ;
+	cd $(3DICE_BISON)	; make clean ;
+	cd $(3DICE_SOURCES)	; make clean ;
+	cd $(3DICE_LIB)		; make clean ;
+	cd $(3DICE_BIN)		; make clean ;
+	cd $(3DICE_TEST)	; make clean ;
+	cd $(3DICE_DOC)		; make clean ;
+	cd $(HEATSINK_PLUGIN)	; make clean ;
