@@ -1,10 +1,10 @@
 
 BIN = fmi_loader.so
-OBJ = entrypoint.o fmiwrapper.o
+OBJ = entrypoint.o fmiwrapper.o fmi-interface/fmi_interface.o
 
 CXX      = g++
 CXXFLAGS = -fPIC -O2 -Wall -std=c++11
-LDFLAGS  = -shared -Wl,-soname,$(BIN)
+LDFLAGS  = -fPIC -shared -Wl,-soname,$(BIN)
 LDLIBS   = -lpugixml
 
 all: $(BIN)

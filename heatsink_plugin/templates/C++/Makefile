@@ -4,7 +4,7 @@ OBJ = entrypoint.o heatsink.o
 
 CXX      = g++
 CXXFLAGS = -fPIC -O2 -Wall -std=c++11
-LDFLAGS  = -shared -Wl,-soname,$(BIN)
+LDFLAGS  = -fPIC -shared -Wl,-soname,$(BIN)
 LDLIBS   =
 
 all: $(BIN)
