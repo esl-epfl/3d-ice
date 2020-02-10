@@ -49,7 +49,11 @@ struct FmiFunctions
     fmi2ExitInitializationModeTYPE  *fmi2ExitInitializationMode;
     fmi2DoStepTYPE                  *fmi2DoStep;
     fmi2GetRealTYPE                 *fmi2GetReal;
+    fmi2GetIntegerTYPE              *fmi2GetInteger;
+    fmi2GetStringTYPE               *fmi2GetString;
     fmi2SetRealTYPE                 *fmi2SetReal;
+    fmi2SetIntegerTYPE              *fmi2SetInteger;
+    fmi2SetStringTYPE               *fmi2SetString;
     fmi2TerminateTYPE               *fmi2Terminate;
     fmi2FreeInstanceTYPE            *fmi2FreeInstance;
 };
@@ -116,6 +120,30 @@ public:
      * \param value variable value
      */
     void setScalarDouble(unsigned int variableIndex, double value);
+    
+    /**
+     * \param variableIndex variable indec obtained through variableIndex()
+     * \return variable value
+     */
+    int getScalarInteger(unsigned int variableIndex) const;
+    
+    /**
+     * \param variableIndex variable indec obtained through variableIndex()
+     * \param value variable value
+     */
+    void setScalarInteger(unsigned int variableIndex, int value);
+    
+    /**
+     * \param variableIndex variable indec obtained through variableIndex()
+     * \return variable value
+     */
+    std::string getScalarString(unsigned int variableIndex) const;
+    
+    /**
+     * \param variableIndex variable indec obtained through variableIndex()
+     * \param value variable value
+     */
+    void setScalarString(unsigned int variableIndex, const std::string& value);
     
     /**
      * \return the fmi2Component pointer

@@ -48,7 +48,7 @@ FmiInterface::FmiInterface(const string& modelName,
           this                     //componentEnvironment
       }, logLevel(logLevel)
 {
-    string modelBase=modelPath+"/"+modelName;
+    string modelBase=(modelPath.empty() ? modelName : modelPath+"/"+modelName);
     collectInformationFromXml(modelBase);
     
     string soName=modelName;
@@ -128,6 +128,39 @@ void FmiInterface::setScalarDouble(unsigned int variableIndex, double value)
         throw runtime_error("FMI: failed fmi2SetReal");
 }
 
+int FmiInterface::getScalarInteger(unsigned int variableIndex) const
+{
+    unsigned int vr[1]={variableIndex};
+    int result;
+    if(functions.fmi2GetInteger(model,vr,1,&result)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2GetInteger");
+    return result;
+}
+
+void FmiInterface::setScalarInteger(unsigned int variableIndex, int value)
+{
+    unsigned int vr[1]={variableIndex};
+    if(functions.fmi2SetInteger(model,vr,1,&value)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2SetInteger");
+}
+
+string FmiInterface::getScalarString(unsigned int variableIndex) const
+{
+    unsigned int vr[1]={variableIndex};
+    const char *result;
+    if(functions.fmi2GetString(model,vr,1,&result)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2GetString");
+    return result;
+}
+
+void FmiInterface::setScalarString(unsigned int variableIndex, const string& value)
+{
+    unsigned int vr[1]={variableIndex};
+    const char *str=value.c_str();
+    if(functions.fmi2SetString(model,vr,1,&str)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2SetString");
+}
+
 FmiInterface::~FmiInterface()
 {
     if(simulationStarted)
@@ -137,7 +170,7 @@ FmiInterface::~FmiInterface()
         if(result!=fmi2OK && logLevel!=LogLevel::Off)
             printf("FMI: failed fmi2Terminate\n");
     }
-    functions.fmi2FreeInstance(model);
+    if(model) functions.fmi2FreeInstance(model);
     if(so) dlclose(so);
 }
 
@@ -180,7 +213,11 @@ void FmiInterface::loadSharedObject(const std::string& fullSoName)
     RESOLVE(fmi2ExitInitializationMode);
     RESOLVE(fmi2DoStep);
     RESOLVE(fmi2GetReal);
+    RESOLVE(fmi2GetInteger);
+    RESOLVE(fmi2GetString);
     RESOLVE(fmi2SetReal);
+    RESOLVE(fmi2SetInteger);
+    RESOLVE(fmi2SetString);
     RESOLVE(fmi2Terminate);
     RESOLVE(fmi2FreeInstance);
     #undef RESOLVE
