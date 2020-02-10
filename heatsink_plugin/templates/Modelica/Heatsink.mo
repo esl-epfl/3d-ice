@@ -12,6 +12,12 @@ package Heatsink
       Placement(visible = true, transformation(origin = {-10, 0}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
     Modelica.Thermal.HeatTransfer.Sources.FixedTemperature Ambient(T = initialTemperature)  annotation(
       Placement(visible = true, transformation(origin = {42, 0}, extent = {{10, -10}, {-10, 10}}, rotation = 0))); 
+  initial algorithm
+    Modelica.Utilities.Streams.print("");
+    Modelica.Utilities.Streams.print("initialTemperature = "+String(initialTemperature));
+    Modelica.Utilities.Streams.print("spreaderConductance = "+String(spreaderConductance));
+    Modelica.Utilities.Streams.print("args = "+args);
+    Modelica.Utilities.Streams.print("fullConductance = "+String(fullConductance));
   equation
     connect(Ambient.port, Conductance.port_a) annotation(
       Line(points = {{32, 0}, {0, 0}, {0, 0}, {0, 0}}, color = {191, 0, 0}));
