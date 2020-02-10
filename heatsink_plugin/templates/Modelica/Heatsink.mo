@@ -7,8 +7,8 @@ package Heatsink
       Placement(visible = true, transformation(origin = {-58, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-58, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
     
     parameter Modelica.SIunits.ThermalConductance ambientConductance = 1 "[W/K]";
-    parameter Modelica.SIunits.ThermalConductance fullConductance = ambientConductance * spreaderConductance / (ambientConductance + spreaderConductance);
-    Modelica.Thermal.HeatTransfer.Components.ThermalConductor Conductance(G = fullConductance)  annotation(
+    parameter Modelica.SIunits.ThermalConductance totalConductance = ambientConductance * spreaderConductance / (ambientConductance + spreaderConductance);
+    Modelica.Thermal.HeatTransfer.Components.ThermalConductor Conductance(G = totalConductance)  annotation(
       Placement(visible = true, transformation(origin = {-10, 0}, extent = {{10, -10}, {-10, 10}}, rotation = 0)));
     Modelica.Thermal.HeatTransfer.Sources.FixedTemperature Ambient(T = initialTemperature)  annotation(
       Placement(visible = true, transformation(origin = {42, 0}, extent = {{10, -10}, {-10, 10}}, rotation = 0))); 
@@ -17,7 +17,7 @@ package Heatsink
     Modelica.Utilities.Streams.print("initialTemperature = "+String(initialTemperature));
     Modelica.Utilities.Streams.print("spreaderConductance = "+String(spreaderConductance));
     Modelica.Utilities.Streams.print("args = "+args);
-    Modelica.Utilities.Streams.print("fullConductance = "+String(fullConductance));
+    Modelica.Utilities.Streams.print("totalConductance = "+String(totalConductance));
   equation
     connect(Ambient.port, Conductance.port_a) annotation(
       Line(points = {{32, 0}, {0, 0}, {0, 0}, {0, 0}}, color = {191, 0, 0}));

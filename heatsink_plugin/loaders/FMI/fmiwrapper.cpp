@@ -63,6 +63,8 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
     heatFlowIndices=fmi.variableIndex("port.Q_flow");
     
     fmi.startSimulation();
+    
+    totalConductance=fmi.getScalarDouble(fmi.variableIndex("totalConductance"));
 }
 
 void FmiWrapper::simulateStep(const CellMatrix spreaderTemperatures,
@@ -70,7 +72,8 @@ void FmiWrapper::simulateStep(const CellMatrix spreaderTemperatures,
 {
     if(spreaderTemperatures.rows()!=1 || spreaderTemperatures.cols()!=1) throw runtime_error("TODO: extend");
     
-    
+    heatFlow.at(0,0)=totalConductance*(spreaderTemperatures.at(0,0)-fmi.getScalarDouble(temperatureIndices));
+    fmi.setScalarDouble(heatFlowIndices,heatFlow.at(0,0));
     
     fmi.doStep(time,timeStep);
     time+=timeStep;

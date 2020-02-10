@@ -66,6 +66,7 @@ private:
     double time = 0.0;
     unsigned int temperatureIndices;
     unsigned int heatFlowIndices;
+    double totalConductance;
 };
 
 #endif //FMIWRAPPER_H
