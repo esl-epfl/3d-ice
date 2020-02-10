@@ -12,7 +12,7 @@ top pluggable heat sink :
 
 	spreader length 20000 , width 20000 , height 1000 ;
 	material COPPER ;
-	plugin "../../loaders/python/fmi_loader.so", "Heatsink.Heatsink" ;
+	plugin "../../loaders/FMI/fmi_loader.so", "Heatsink.Heatsink" ;
 
 dimensions :
 
