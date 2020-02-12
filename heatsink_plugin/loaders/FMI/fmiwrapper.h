@@ -41,8 +41,15 @@
 #define FMIWRAPPER_H
 
 #include <string>
+#include <vector>
 #include "entrypoint.h"
-#include "fmi-interface/fmi_interface.h"
+#include "libraries/fmi-interface/fmi_interface.h"
+#include "libraries/gridmapper/gridmapper.h"
+
+inline double parallel(double x, double y)
+{
+    return x*y/(x+y);
+}
 
 class FmiWrapper
 {
@@ -64,9 +71,12 @@ private:
     FmiInterface fmi;
     const double timeStep;
     double time = 0.0;
-    unsigned int temperatureIndices;
-    unsigned int heatFlowIndices;
-    double totalConductance;
+    FragmentGrid spreaderMapping;
+    FragmentGrid sinkMapping;
+    Matrix<double> sinkTemperatures;
+    Matrix<double> sinkHeatFlows;
+    std::vector<unsigned int> sinkTemperatureIndices;
+    std::vector<unsigned int> sinkHeatFlowIndices;
 };
 
 #endif //FMIWRAPPER_H
