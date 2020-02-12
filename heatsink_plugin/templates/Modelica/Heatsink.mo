@@ -9,8 +9,8 @@ package Heatsink
     // These parameters are read by 3D-ICE before the simulation starts.
     // Note that the plugin interface assumes that the thermal conductance between the center and bottom of the sink cells connected to the spreader is uniform for each cell and constant throughout the simulation.
     parameter Modelica.SIunits.ThermalConductance sinkCellBottomConductance = 1 "Thermal conductance between the center and bottom of the sink cells connected to the spreader [W/K]";
-    parameter Modelica.SIunits.Length sinkLength = 0.01 "Length of the heatsink (in the X axis) [m]";
-    parameter Modelica.SIunits.Length sinkWidth  = 0.01 "Width of the heatsink (in the Y axis) [m]";
+    parameter Modelica.SIunits.Length sinkLength = 0.02 "Length of the heatsink (in the X axis) [m]";
+    parameter Modelica.SIunits.Length sinkWidth  = 0.02 "Width of the heatsink (in the Y axis) [m]";
     parameter Modelica.SIunits.Length spreaderX0 = 0    "X axis distance between bottom left corner of sink and spreader [m]";
     parameter Modelica.SIunits.Length spreaderY0 = 0    "Y axis distance between bottom left corner of sink and spreader [m]";
     parameter Integer sinkRows = 1    "Number of rows of cells in which the sink width is divided (the whole width, not just the one overlapping with the spreader) [m]";
