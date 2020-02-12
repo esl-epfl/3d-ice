@@ -77,7 +77,7 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
     
     // Compute the per unit area total conductance by paralleling the spreader and sink conductances
     double spreaderConductancePerUnitArea=spreaderConductance/(cellLength*cellWidth);
-    double sinkConductancePerUnitArea=sinkConductance/((sinkLength/sinkColumns)*(sinkWidth*sinkRows));
+    double sinkConductancePerUnitArea=sinkConductance/((sinkLength/sinkColumns)*(sinkWidth/sinkRows));
     double conductancePerUnitArea=parallel(spreaderConductancePerUnitArea,sinkConductancePerUnitArea);
     
     // Precompute the grid mapping data structures for faster simulation
@@ -98,18 +98,18 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
         nCols       //Nc
     );
     spreaderMapping=std::move(mapGrids(spreaderGrid,sinkGrid,conductancePerUnitArea));
-    sinkMapping=std::move(mapGrids(sinkGrid,spreaderGrid,conductancePerUnitArea));
+    sinkMapping    =std::move(mapGrids(sinkGrid,spreaderGrid,conductancePerUnitArea));
     cout<<"\nspreaderMapping:\n"<<spreaderMapping<<"\nsinkMapping:\n"<<sinkMapping<<"\n";
     
     // Precompute the FMI port variable indices for faster simulation
     sinkTemperatures=std::move(Matrix<double>(sinkRows,sinkColumns));
-    sinkHeatFlows=std::move(Matrix<double>(sinkRows,sinkColumns));
-    // Note: the order of insertion in the vectors must be row major, as is the indexing inside the Matrix class
+    sinkHeatFlows   =std::move(Matrix<double>(sinkRows,sinkColumns));
+    // Note: the order of insertion in the vectors must be row major, to match the indexing inside the Matrix class
     sinkTemperatureIndices.reserve(sinkRows*sinkColumns);
     sinkHeatFlowIndices.reserve(sinkRows*sinkColumns);
-    for(int i=1;i<=sinkRows;i++)
+    for(int i=1;i<=sinkRows;i++) // Modelica arrays are 1-based
     {
-        for(int j=1;j<=sinkColumns;j++)
+        for(int j=1;j<=sinkColumns;j++) // Modelica arrays are 1-based
         {
             sinkTemperatureIndices.push_back(fmi.variableIndex(
                 string("port[")+to_string(i)+","+to_string(j)+"].T"));
