@@ -97,8 +97,8 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
         nRows,      //Nr
         nCols       //Nc
     );
-    spreaderMapping=std::move(mapGrids(spreaderGrid,sinkGrid,conductancePerUnitArea));
-    sinkMapping    =std::move(mapGrids(sinkGrid,spreaderGrid,conductancePerUnitArea));
+    spreaderMapping=std::move(mapGrids(spreaderGrid,sinkGrid,conductancePerUnitArea,true));
+    sinkMapping    =std::move(mapGrids(sinkGrid,spreaderGrid,conductancePerUnitArea,true));
     cout<<"\nspreaderMapping:\n"<<spreaderMapping<<"\nsinkMapping:\n"<<sinkMapping<<"\n";
     
     // Precompute the FMI port variable indices for faster simulation
