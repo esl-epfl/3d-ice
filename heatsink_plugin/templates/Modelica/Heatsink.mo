@@ -17,6 +17,7 @@ package Heatsink
     parameter Integer sinkColumns = 1 "Number of columns of cells in which the sink length is divided (the whole length, not just the one overlapping with the spreader) [m]";
 
     // This is the heat port of the bottom of the sink (the whole bottom, not just the one overlapping with the spreader)
+    // A note on geometry, the port variable follows the 3D-ICE convention, so port[1,1] is the bottom left cell (x=0,y=0). Thus rows are swapped compared to a matrix.
     Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_b port[sinkRows,sinkColumns] "Bottom face of the heat sink (the overlapping part is connected to 3D-ICE)" annotation(
       Placement(visible = true, transformation(origin = {-58, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-90, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
     

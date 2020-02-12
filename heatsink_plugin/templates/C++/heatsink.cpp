@@ -108,6 +108,10 @@ void HeatSink::simulateStep(const CellMatrix spreaderTemperatures,
      * 
      * Last, but not least, if you encounter an error, you can signal it to
      * 3D-ICE by throwing a C++ exception.
+     *
+     * A note on geometry, the spreaderTemperatures and heatFlow variables
+     * follow the 3D-ICE convention, so spreaderTemperatures.at(0,0) is the
+     * bottom left cell (x=0,y=0). Thus rows are swapped compared to a matrix.
      */
     
     // This example function simulates the absence of a heatsink, where
