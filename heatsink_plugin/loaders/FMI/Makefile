@@ -1,6 +1,8 @@
 
 BIN = fmi_loader.so
-OBJ = entrypoint.o fmiwrapper.o fmi-interface/fmi_interface.o
+OBJ = entrypoint.o fmiwrapper.o \
+      libraries/fmi-interface/fmi_interface.o \
+      libraries/gridmapper/gridmapper.o
 
 CXX      = g++
 CXXFLAGS = -fPIC -O2 -Wall -std=c++11
