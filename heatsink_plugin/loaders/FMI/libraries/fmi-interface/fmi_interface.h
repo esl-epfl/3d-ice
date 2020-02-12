@@ -50,9 +50,11 @@ struct FmiFunctions
     fmi2DoStepTYPE                  *fmi2DoStep;
     fmi2GetRealTYPE                 *fmi2GetReal;
     fmi2GetIntegerTYPE              *fmi2GetInteger;
+    fmi2GetBooleanTYPE              *fmi2GetBoolean;
     fmi2GetStringTYPE               *fmi2GetString;
     fmi2SetRealTYPE                 *fmi2SetReal;
     fmi2SetIntegerTYPE              *fmi2SetInteger;
+    fmi2SetBooleanTYPE              *fmi2SetBoolean;
     fmi2SetStringTYPE               *fmi2SetString;
     fmi2TerminateTYPE               *fmi2Terminate;
     fmi2FreeInstanceTYPE            *fmi2FreeInstance;
@@ -110,40 +112,67 @@ public:
     unsigned int variableIndex(const std::string& name) const;
     
     /**
-     * \param variableIndex variable indec obtained through variableIndex()
+     * \param variableIndex variable index obtained through variableIndex()
      * \return variable value
      */
     double getScalarDouble(unsigned int variableIndex) const;
     
     /**
-     * \param variableIndex variable indec obtained through variableIndex()
+     * \param variableIndex variable index obtained through variableIndex()
      * \param value variable value
      */
     void setScalarDouble(unsigned int variableIndex, double value);
     
     /**
-     * \param variableIndex variable indec obtained through variableIndex()
+     * \param variableIndex variable index obtained through variableIndex()
      * \return variable value
      */
     int getScalarInteger(unsigned int variableIndex) const;
     
     /**
-     * \param variableIndex variable indec obtained through variableIndex()
+     * \param variableIndex variable index obtained through variableIndex()
      * \param value variable value
      */
     void setScalarInteger(unsigned int variableIndex, int value);
     
     /**
-     * \param variableIndex variable indec obtained through variableIndex()
+     * \param variableIndex variable index obtained through variableIndex()
+     * \return variable value
+     */
+    bool getScalarBoolean(unsigned int variableIndex) const;
+    
+    /**
+     * \param variableIndex variable index obtained through variableIndex()
+     * \param value variable value
+     */
+    void setScalarBoolean(unsigned int variableIndex, bool value);
+    
+    /**
+     * \param variableIndex variable index obtained through variableIndex()
      * \return variable value
      */
     std::string getScalarString(unsigned int variableIndex) const;
     
     /**
-     * \param variableIndex variable indec obtained through variableIndex()
+     * \param variableIndex variable index obtained through variableIndex()
      * \param value variable value
      */
     void setScalarString(unsigned int variableIndex, const std::string& value);
+    
+    /**
+     * \param indices pointer to the first index array element
+     * \param variables pointer to an array where variable values will be read from the FMI
+     * \param numVariables number of variables to read (must be the size of both arrays)
+     * 
+     */
+    void getVectorDouble(const unsigned int *indices, double *variables, int numVariables) const;
+    
+    /**
+     * \param indices pointer to the first index array element
+     * \param variables pointer to an array with variable values that will be written in the FMI
+     * \param numVariables number of variables to read (must be the size of both arrays)
+     */
+    void setVectorDouble(const unsigned int *indices, const double *variables, int numVariables);
     
     /**
      * \return the fmi2Component pointer

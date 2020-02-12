@@ -144,6 +144,23 @@ void FmiInterface::setScalarInteger(unsigned int variableIndex, int value)
         throw runtime_error("FMI: failed fmi2SetInteger");
 }
 
+bool FmiInterface::getScalarBoolean(unsigned int variableIndex) const
+{
+    unsigned int vr[1]={variableIndex};
+    int result;
+    if(functions.fmi2GetBoolean(model,vr,1,&result)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2GetBoolean");
+    return static_cast<bool>(result);
+}
+
+void FmiInterface::setScalarBoolean(unsigned int variableIndex, bool value)
+{
+    unsigned int vr[1]={variableIndex};
+    int v=static_cast<int>(value);
+    if(functions.fmi2SetBoolean(model,vr,1,&v)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2SetBoolean");
+}
+
 string FmiInterface::getScalarString(unsigned int variableIndex) const
 {
     unsigned int vr[1]={variableIndex};
@@ -159,6 +176,18 @@ void FmiInterface::setScalarString(unsigned int variableIndex, const string& val
     const char *str=value.c_str();
     if(functions.fmi2SetString(model,vr,1,&str)!=fmi2OK)
         throw runtime_error("FMI: failed fmi2SetString");
+}
+
+void FmiInterface::getVectorDouble(const unsigned int *indices, double *variables, int numVariables) const
+{
+    if(functions.fmi2GetReal(model,indices,numVariables,variables)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2GetReal");
+}
+    
+void FmiInterface::setVectorDouble(const unsigned int *indices, const double *variables, int numVariables)
+{
+    if(functions.fmi2SetReal(model,indices,numVariables,variables)!=fmi2OK)
+        throw runtime_error("FMI: failed fmi2SetReal");
 }
 
 FmiInterface::~FmiInterface()
