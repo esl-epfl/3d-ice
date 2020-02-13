@@ -3,8 +3,8 @@ package Heatsink
     // 3D-ICE interface -- begin
   
     // These parameters are assignd by 3D-ICE before the simulation starts. DO NOT SET VALUES, THEY WILL BE OVERWRITTEN.
-    parameter String args(fixed=false) "Plugin args (value coming from 3D-ICE)";
-    parameter Modelica.SIunits.Temperature initialTemperature(fixed=false) "Initial simulation temperature [K] (value coming from 3D-ICE)";
+    parameter String args "Plugin args (value coming from 3D-ICE)";
+    parameter Modelica.SIunits.Temperature initialTemperature "Initial simulation temperature [K] (value coming from 3D-ICE)";
     
     // These parameters are read by 3D-ICE before the simulation starts.
     // Note that the plugin interface assumes that the thermal conductance between the center and bottom of the sink cells connected to the spreader is uniform for each cell and constant throughout the simulation.
