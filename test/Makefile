@@ -60,7 +60,10 @@ CompareSystemMatrix: CompareSystemMatrix.o
 CompareTemperatures: CompareTemperatures.o
 	$(CC) $(CFLAGS) $< $(CLIBS) -o $@
 
-runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-ICE-Emulator
+plugintest:
+	cd plugin; make
+
+runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures plugintest ../bin/3D-ICE-Emulator
 	@echo ""
 	@echo "Comparison of system matrices ...."
 	@echo "----------------------------------"
@@ -160,6 +163,15 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures ../bin/3D-
 	@echo -n "pf2rm bg     : "
 	@../bin/3D-ICE-Emulator pf2rm/steady/2dies_background.stk > /dev/null
 	@./CompareTemperatures pf2rm/steady/background_node1.txt    pf2rm/steady/background_node2.txt    pf2rm/steady/output_background.txt
+	@echo ""
+	@echo "Comparison of plugin results ...."
+	@echo "------------------------------"
+	@echo -n "aligned     : "
+	@cd plugin; ../../bin/3D-ICE-Emulator test_aligned.stk > /dev/null; cd ..
+	@./CompareTemperatures plugin/test_aligned_top.txt plugin/test_aligned_bottom.txt plugin/test_reference.txt
+	@echo -n "unaligned   : "
+	@cd plugin; ../../bin/3D-ICE-Emulator test_unaligned.stk > /dev/null; cd ..
+	@./CompareTemperatures plugin/test_unaligned_top.txt plugin/test_unaligned_bottom.txt plugin/test_reference.txt
 
 clean:
 	@$(RM) $(RMFLAGS) GenerateSystemMatrix GenerateSystemMatrix.o GenerateSystemMatrix.d
@@ -187,5 +199,6 @@ clean:
 	@$(RM) $(RMFLAGS) mc2rm/steady/background_node2.txt       mc2rm/steady/four_elements_node2.txt
 	@$(RM) $(RMFLAGS) pf2rm/steady/background_node1.txt       pf2rm/steady/four_elements_node1.txt
 	@$(RM) $(RMFLAGS) pf2rm/steady/background_node2.txt       pf2rm/steady/four_elements_node2.txt
-
-
+	@$(RM) $(RMFLAGS) plugin/test_aligned_top.txt             plugin/test_aligned_bottom.txt
+	@$(RM) $(RMFLAGS) plugin/test_unaligned_top.txt           plugin/test_unaligned_bottom.txt
+	cd plugin; make clean

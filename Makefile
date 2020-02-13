@@ -56,7 +56,7 @@ bin: lib
 plugin: lib bin
 	cd $(HEATSINK_PLUGIN)	; make ;
 
-test: lib bin
+test: lib bin plugin
 	cd $(3DICE_TEST) ; make ;
 
 doc:

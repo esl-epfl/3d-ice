@@ -1,0 +1,10 @@
+
+setCommandLineOptions("-d=initialization");
+getErrorString();
+
+loadFile("Test.mo");
+getErrorString();
+
+// https://build.openmodelica.org/Documentation/OpenModelica.Scripting.translateModelFMU.html
+translateModelFMU(Test.Heatsink, version="2.0", fmuType="cs");
+getErrorString();

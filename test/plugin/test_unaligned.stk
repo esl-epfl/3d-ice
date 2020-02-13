@@ -1,0 +1,32 @@
+
+material SILICON :
+	thermal conductivity     1.30e-04 ;
+	volumetric heat capacity 1.628e-12 ;
+
+material COPPER :
+	thermal conductivity     4.01e-04 ;
+	volumetric heat capacity 3.37e-12 ;
+
+top pluggable heat sink :
+	spreader length 10000 , width 20000 , height 1000 ;
+	material COPPER ;
+	plugin "../../heatsink_plugin/loaders/FMI/fmi_loader.so", "Test.Heatsink 0.0025 0.0" ;
+
+dimensions :
+	chip length 10000 , width  20000 ;
+	cell length 10000 , width  10000 ;
+
+die TOPDIE :
+	source 1000 SILICON ;
+
+stack:
+	die     DIE     TOPDIE    floorplan "test.flp" ;
+
+solver:
+	transient step 0.001, slot 1 ;
+	initial temperature 300.0 ;
+
+output:
+	T    ( DIE, 5000,  5000, "test_unaligned_bottom.txt", step );
+	T    ( DIE, 5000, 15000, "test_unaligned_top.txt",    step );
+	
