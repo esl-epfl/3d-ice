@@ -112,9 +112,9 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
         for(int j=1;j<=sinkColumns;j++) // Modelica arrays are 1-based
         {
             sinkTemperatureIndices.push_back(fmi.variableIndex(
-                string("port[")+to_string(i)+","+to_string(j)+"].T"));
+                string("T[")+to_string(i)+","+to_string(j)+"]"));
             sinkHeatFlowIndices.push_back(fmi.variableIndex(
-                string("port[")+to_string(i)+","+to_string(j)+"].Q_flow"));
+                string("Q_flow[")+to_string(i)+","+to_string(j)+"]"));
         }
     }
     fmi.printVariables();

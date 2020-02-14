@@ -1,6 +1,6 @@
 
 SRC = Test.mo
-OBJ = Test.Heatsink
+OBJ = Test.Interface3DICE
 
 # OpenModelica produces temporary files with a name where . is replaced with _
 DOT = .

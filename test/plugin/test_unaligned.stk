@@ -10,7 +10,7 @@ material COPPER :
 top pluggable heat sink :
 	spreader length 10000 , width 20000 , height 1000 ;
 	material COPPER ;
-	plugin "../../heatsink_plugin/loaders/FMI/fmi_loader.so", "Test.Heatsink 0.0025 0.0" ;
+	plugin "../../heatsink_plugin/loaders/FMI/fmi_loader.so", "Test.Interface3DICE 0.0025 0.0" ;
 
 dimensions :
 	chip length 10000 , width  20000 ;
