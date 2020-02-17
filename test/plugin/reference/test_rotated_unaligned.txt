@@ -1,0 +1,8 @@
+source[0,0]=2.83075*target[0,0]+0.943584*target[1,0]+2.83075*target[0,1]+0.943584*target[1,1]
+source[0,1]=2.83075*target[0,1]+0.943584*target[1,1]+2.83075*target[0,2]+0.943584*target[1,2]
+source[0,0]=2.83075*target[0,0]
+source[0,1]=2.83075*target[0,0]+2.83075*target[0,1]
+source[0,2]=2.83075*target[0,1]
+source[1,0]=0.943584*target[0,0]
+source[1,1]=0.943584*target[0,0]+0.943584*target[0,1]
+source[1,2]=0.943584*target[0,1]

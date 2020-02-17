@@ -166,12 +166,22 @@ runtest: GenerateSystemMatrix CompareSystemMatrix CompareTemperatures plugintest
 	@echo ""
 	@echo "Comparison of plugin results ...."
 	@echo "------------------------------"
-	@echo -n "aligned     : "
-	@cd plugin; ../../bin/3D-ICE-Emulator test_aligned.stk > /dev/null; cd ..
-	@./CompareTemperatures plugin/test_aligned_top.txt plugin/test_aligned_bottom.txt plugin/test_reference.txt
-	@echo -n "unaligned   : "
-	@cd plugin; ../../bin/3D-ICE-Emulator test_unaligned.stk > /dev/null; cd ..
-	@./CompareTemperatures plugin/test_unaligned_top.txt plugin/test_unaligned_bottom.txt plugin/test_reference.txt
+	@echo -n "aligned           : "
+	@cd plugin; ../../bin/3D-ICE-Emulator test_aligned.stk | grep '^source' > test_aligned.txt; cd ..
+	@./CompareTemperatures plugin/test_aligned_top.txt plugin/test_aligned_bottom.txt plugin/reference/test.txt
+	@cmp plugin/test_aligned.txt plugin/reference/test_aligned.txt || echo "FAILED mapping"
+	@echo -n "unaligned         : "
+	@cd plugin; ../../bin/3D-ICE-Emulator test_unaligned.stk | grep '^source' > test_unaligned.txt; cd ..
+	@./CompareTemperatures plugin/test_unaligned_top.txt plugin/test_unaligned_bottom.txt plugin/reference/test.txt
+	@cmp plugin/test_unaligned.txt plugin/reference/test_unaligned.txt || echo "FAILED mapping"
+	@echo -n "rotated aligned   : "
+	@cd plugin; ../../bin/3D-ICE-Emulator test_rotated_aligned.stk | grep '^source' > test_rotated_aligned.txt; cd ..
+	@./CompareTemperatures plugin/test_rotated_aligned_right.txt plugin/test_rotated_aligned_left.txt plugin/reference/test.txt
+	@cmp plugin/test_rotated_aligned.txt plugin/reference/test_rotated_aligned.txt || echo "FAILED mapping"
+	@echo -n "rotated unaligned : "
+	@cd plugin; ../../bin/3D-ICE-Emulator test_rotated_unaligned.stk | grep '^source' > test_rotated_unaligned.txt; cd ..
+	@./CompareTemperatures plugin/test_rotated_unaligned_right.txt plugin/test_rotated_unaligned_left.txt plugin/reference/test.txt
+	@cmp plugin/test_rotated_unaligned.txt plugin/reference/test_rotated_unaligned.txt || echo "FAILED mapping"
 
 clean:
 	@$(RM) $(RMFLAGS) GenerateSystemMatrix GenerateSystemMatrix.o GenerateSystemMatrix.d
@@ -201,4 +211,8 @@ clean:
 	@$(RM) $(RMFLAGS) pf2rm/steady/background_node2.txt       pf2rm/steady/four_elements_node2.txt
 	@$(RM) $(RMFLAGS) plugin/test_aligned_top.txt             plugin/test_aligned_bottom.txt
 	@$(RM) $(RMFLAGS) plugin/test_unaligned_top.txt           plugin/test_unaligned_bottom.txt
+	@$(RM) $(RMFLAGS) plugin/test_rotated_aligned_left.txt    plugin/test_rotated_aligned_right.txt
+	@$(RM) $(RMFLAGS) plugin/test_rotated_unaligned_left.txt  plugin/test_rotated_unaligned_right.txt
+	@$(RM) $(RMFLAGS) plugin/test_aligned.txt                 plugin/test_unaligned.txt
+	@$(RM) $(RMFLAGS) plugin/test_rotated_aligned.txt         plugin/test_rotated_unaligned.txt
 	cd plugin; make clean
