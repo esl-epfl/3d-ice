@@ -1,7 +1,7 @@
 package Heatsink
   model Heatsink
     parameter Modelica.SIunits.Temperature ambientTemperature(fixed=false) "Ambient temperature [K]";
-    parameter Modelica.SIunits.ThermalConductance cellBottomConductance=1 "Thermal conductance between the center and bottom of one sink cell connected to the spreader [W/K]";
+    parameter Modelica.SIunits.ThermalConductance cellBottomConductance=1/(bottomRows*bottomColumns) "Thermal conductance between the center and bottom of one sink cell connected to the spreader [W/K]";
     parameter Modelica.SIunits.Length bottomLength=0.02 "Length of the heatsink (in the X axis) [m]";
     parameter Modelica.SIunits.Length bottomWidth=0.02 "Width of the heatsink  (in the Y axis) [m]";
     parameter Integer                 bottomRows=1 "Number of rows of cells in which the sink width is divided";
@@ -52,6 +52,7 @@ package Heatsink
     
   initial algorithm
     sink.ambientTemperature := initialTemperature;
+    // Assign the position of the spreader underneath the heatsink. Incidentally, this shows how you can pass parameters to Modelica from the 3D-ICE stk file.
     (spreaderX0,spreaderY0) := Parse(args);
     Modelica.Utilities.Streams.print("args = " + args);
     Modelica.Utilities.Streams.print("initialTemperature = " + String(initialTemperature));
