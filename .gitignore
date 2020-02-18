@@ -11,6 +11,4 @@ bin/3D-ICE-Emulator
 bin/3D-ICE-Server
 bin/*.txt
 SuperLU_4.3/
-Dockerfile
-
-
+heatsink_plugin/templates/Modelica/Heatsink.Interface3DICE/
