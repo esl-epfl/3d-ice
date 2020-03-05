@@ -118,7 +118,7 @@ FmiWrapper::FmiWrapper(unsigned int nRows, unsigned int nCols,
                 string("Q_flow[")+to_string(i)+","+to_string(j)+"]"));
         }
     }
-    fmi.printVariables();
+    //fmi.printVariables();
 }
 
 void FmiWrapper::simulateStep(const CellMatrix spreaderTemperatures,
