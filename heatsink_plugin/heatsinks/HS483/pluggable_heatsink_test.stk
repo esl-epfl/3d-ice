@@ -1,0 +1,40 @@
+material SILICON :
+
+	thermal conductivity     1.30e-04 ;
+	volumetric heat capacity 1.63566e-12 ;
+
+material COPPER :
+
+	thermal conductivity     4.01e-04 ;
+	volumetric heat capacity 3.44605e-12 ;
+
+top pluggable heat sink :
+
+	spreader length 20000 , width 20000 , height 1000 ;
+	material COPPER ;
+	// Heatsink side is 0.06 metres, spreader side 0.02 metres, so the offset
+	// needed to center the chip underneath the heatsink is (0.06 - 0.02) / 2 = 0.02
+	plugin "../../loaders/FMI/fmi_loader.so", "HS483.Specializations.HS483_NaturalConvection_Interface3DICE 0.02 0.02" ;
+
+dimensions :
+
+	chip length 10000 , width  10000 ;
+	cell length  5000 , width   5000 ;
+
+die TOPDIE :
+
+	source 100 SILICON ;
+
+stack:
+
+	die     DIE     TOPDIE    floorplan "simple_floorplan.flp" ;
+
+solver:
+
+	transient step 0.01, slot 2000 ;
+	initial temperature 293.15 ;
+
+output:
+
+	T    ( DIE, 5000, 5000, "outspot.txt", step );
+//	Tmap ( DIE,             "outmap.txt",  step );
