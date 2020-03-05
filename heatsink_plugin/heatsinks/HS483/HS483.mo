@@ -67,8 +67,28 @@ package HS483
 
     model HS483_P14752_ForcedConvection_Interface3DICE
     extends HeatsinkBlocks.PartialModels.Interface3DICE(redeclare HS483_P14752_ForcedConvection sink);
+    
+      function ParseFanSpeed
+        input String args;
+        output Real fanSpeed;
+      protected
+        Integer nextIndex;
+        Real unused;
+      algorithm
+        nextIndex := Modelica.Utilities.Strings.find(args, " ");                       // Skip past the plugin name
+        (unused, nextIndex)   := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader x0
+        (unused, nextIndex)   := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
+        (fanSpeed, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Get the fan speed
+      end ParseFanSpeed;
+    
+      parameter Real constantFanSpeed(fixed = false);
+    
+    initial algorithm
+      constantFanSpeed := ParseFanSpeed(args); // Get fan speed form 3D-ICE
+      Modelica.Utilities.Streams.print("fanSpeed = " + String(constantFanSpeed));
+    
 equation
-      sink.fanSpeed = 2700 / 9.55;
+      sink.fanSpeed = constantFanSpeed / 9.55; //9.55 is the conversion factor from RPM to rad/s
     end HS483_P14752_ForcedConvection_Interface3DICE;
 
     model HS483_NaturalConvection_Interface3DICE
@@ -94,7 +114,7 @@ extends HeatsinkBlocks.PartialModels.Interface3DICE(redeclare HS483_NaturalConve
   HS483_P14752_ForcedConvection sink(ambientTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
     equation
-      sink.fanSpeed = 2700 / 9.55;
+      sink.fanSpeed = 2700 / 9.55; //9.55 is the conversion factor from RPM to rad/s
       for i in 1:sink.bottomRows loop
         for j in 1:sink.bottomCols loop
           connect(sink.bottom[i, j], heatSource.port);
@@ -113,7 +133,7 @@ extends HeatsinkBlocks.PartialModels.Interface3DICE(redeclare HS483_NaturalConve
       HS483_P14752_ForcedConvection sink(ambientTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
     equation
-      sink.fanSpeed = fanSpeedTable.y[1] / 9.55;
+      sink.fanSpeed = fanSpeedTable.y[1] / 9.55; //9.55 is the conversion factor from RPM to rad/s
       for i in 1:sink.bottomRows loop
         for j in 1:sink.bottomCols loop
           connect(sink.bottom[i, j], heatSource.port);
