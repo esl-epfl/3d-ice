@@ -1,6 +1,6 @@
 
-SRC = Test.mo
-OBJ = Test.Interface3DICE
+SRC = ../../heatsink_plugin/common/libraries/ThermalBlocks.mo ../../heatsink_plugin/common/HeatsinkBlocks.mo Test.mo
+OBJ = Test.TestHeatsink_Interface3DICE
 
 # OpenModelica produces temporary files with a name where . is replaced with _
 DOT = .

@@ -2,9 +2,13 @@
 setCommandLineOptions("-d=initialization");
 getErrorString();
 
+loadFile("../../heatsink_plugin/common/libraries/ThermalBlocks.mo");
+getErrorString();
+loadFile("../../heatsink_plugin/common/HeatsinkBlocks.mo");
+getErrorString();
 loadFile("Test.mo");
 getErrorString();
 
 // https://build.openmodelica.org/Documentation/OpenModelica.Scripting.translateModelFMU.html
-translateModelFMU(Test.Interface3DICE, version="2.0", fmuType="cs");
+translateModelFMU(Test.TestHeatsink_Interface3DICE, version="2.0", fmuType="cs");
 getErrorString();
