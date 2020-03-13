@@ -70,60 +70,80 @@ package HeatsinkBlocks
         bottom.port[i].Q_flow = 2 * gx * (bottom.port[i].T - T[i, 1]);
       end for;
       
-      c * der(T[1, 1]) = gx * (T[1, 2] - T[1, 1])
-                      + gy * (T[2, 1] - T[1, 1])
-                      + gf * (inletFluidTemperature - T[1, 1])
-                      + bottom.port[1].Q_flow;
-      
-      if cols > 1 then
-        c * der(T[1, cols]) = gx * (T[1, cols - 1] - T[1, cols])
-                            + gy * (T[2, cols] - T[1, cols])
+      if rows > 1 and cols > 1 then
+        c * der(T[1, 1]) = gx * (T[1, 2] - T[1, 1]) 
+                         + gy * (T[2, 1] - T[1, 1])
+                         + gf * (inletFluidTemperature - T[1, 1])
+                         + bottom.port[1].Q_flow;
+        
+        c * der(T[1, cols]) = gx * (T[1, cols - 1] - T[1, cols]) 
+                            + gy * (T[2, cols] - T[1, cols]) 
                             + gf * (inletFluidTemperature - T[1, cols]);
-      end if;
-      
-      if rows > 1 then
+        
         c * der(T[rows, 1]) = gx * (T[rows, 2] - T[rows, 1])
                             + gy * (T[rows - 1, 1] - T[rows, 1])
                             + gf * (inletFluidTemperature - T[rows, 1])
                             + bottom.port[rows].Q_flow;
+      
+        c * der(T[rows, cols]) = gx * (T[rows, cols - 1] - T[rows, cols])
+                               + gy * (T[rows - 1, cols] - T[rows, cols])
+                               + gf * (inletFluidTemperature - T[rows, cols]);
+      elseif rows > 1 /*and cols == 1*/ then
+        c * der(T[1, 1]) = gy * (T[2, 1] - T[1, 1])
+                         + gf * (inletFluidTemperature - T[1, 1])
+                         + bottom.port[1].Q_flow;
+      
+        c * der(T[rows, 1]) = gy * (T[rows - 1, 1] - T[rows, 1])
+                            + gf * (inletFluidTemperature - T[rows, 1])
+                            + bottom.port[rows].Q_flow;
+      elseif cols > 1 /*and rows == 1*/ then
+        c * der(T[1, 1]) = gx * (T[1, 2] - T[1, 1]) 
+                         + gf * (inletFluidTemperature - T[1, 1])
+                         + bottom.port[1].Q_flow;
+                         
+        c * der(T[1, cols]) = gx * (T[1, cols - 1] - T[1, cols]) 
+                            + gf * (inletFluidTemperature - T[1, cols]);
+      else /* cols == 1 and rows == 1 */
+        c * der(T[1, 1]) = + gf * (inletFluidTemperature - T[1, 1])
+                           + bottom.port[1].Q_flow;
       end if;
       
-      if rows > 1 and cols > 1 then
-        c * der(T[rows, cols]) = gx * (T[rows, cols - 1] - T[rows, cols])
-                              + gy * (T[rows - 1, cols] - T[rows, cols])
-                              + gf * (inletFluidTemperature - T[rows, cols]);
-      end if;
-    
       for i in 2:rows - 1 loop
-        c * der(T[i, 1]) = gx * (T[i, 2] - T[i, 1])
-                        + gy * (T[i - 1, 1] + T[i + 1, 1] - 2 * T[i, 1])
-                        + gf * (inletFluidTemperature - T[i, 1])
-                        + bottom.port[i].Q_flow;
-        
         if cols > 1 then
+          c * der(T[i, 1]) = gx * (T[i, 2] - T[i, 1])
+                           + gy * (T[i - 1, 1] + T[i + 1, 1] - 2 * T[i, 1])
+                           + gf * (inletFluidTemperature - T[i, 1])
+                           + bottom.port[i].Q_flow;
+                         
           c * der(T[i, cols]) = gx * (T[i, cols - 1] - T[i, cols])
                               + gy * (T[i - 1, cols] + T[i + 1, cols] - 2 * T[i, cols])
                               + gf * (inletFluidTemperature - T[i, cols]);
+        else /* cols == 1 */
+          c * der(T[i, 1]) = gy * (T[i - 1, 1] + T[i + 1, 1] - 2 * T[i, 1])
+                           + gf * (inletFluidTemperature - T[i, 1])
+                           + bottom.port[i].Q_flow;
         end if;
       end for;
       
       for j in 2:cols - 1 loop
-        c * der(T[1, j]) = gx * (T[1, j - 1] + T[1, j + 1] - 2 * T[1, j])
-                        + gy * (T[2, j] - T[1, j])
-                        + gf * (inletFluidTemperature - T[1, j]);
-        
         if rows > 1 then
+          c * der(T[1, j]) = gx * (T[1, j - 1] + T[1, j + 1] - 2 * T[1, j])
+                           + gy * (T[2, j] - T[1, j])
+                           + gf * (inletFluidTemperature - T[1, j]);
           c * der(T[rows, j]) = gx * (T[rows, j - 1] + T[rows, j + 1] - 2 * T[rows, j])
                               + gy * (T[rows - 1, j] - T[rows, j])
                               + gf * (inletFluidTemperature - T[rows, j]);
+        else /* rows == 1 */
+          c * der(T[1, j]) = gx * (T[1, j - 1] + T[1, j + 1] - 2 * T[1, j])
+                           + gf * (inletFluidTemperature - T[1, j]);
         end if;
       end for;
       
       for i in 2:rows - 1 loop
         for j in 2:cols - 1 loop
           c * der(T[i, j]) = gx * (T[i, j - 1] + T[i, j + 1] - 2 * T[i, j])
-                          + gy * (T[i - 1, j] + T[i + 1, j] - 2 * T[i, j])
-                          + gf * (inletFluidTemperature - T[i, j]);
+                           + gy * (T[i - 1, j] + T[i + 1, j] - 2 * T[i, j])
+                           + gf * (inletFluidTemperature - T[i, j]);
         end for;
       end for;
     end Fin;
@@ -233,57 +253,78 @@ package HeatsinkBlocks
       end for;
     end for;
     
-    c * der(T[1, 1]) = gx * (T[1, 2] - T[1, 1]) 
-                     + gy * (T[2, 1] - T[1, 1])
-                     + top.port[1, 1].Q_flow
-                     + pGen.port[1, 1].Q_flow;
-                           
-    if cols > 1 then
+    if rows > 1 and cols > 1 then
+      c * der(T[1, 1]) = gx * (T[1, 2] - T[1, 1]) 
+                       + gy * (T[2, 1] - T[1, 1])
+                       + top.port[1, 1].Q_flow
+                       + pGen.port[1, 1].Q_flow;
+      
       c * der(T[1, cols]) = gx * (T[1, cols - 1] - T[1, cols]) 
                           + gy * (T[2, cols] - T[1, cols]) 
                           + top.port[1, cols].Q_flow 
                           + pGen.port[1, cols].Q_flow;
-    end if;
-    
-    if rows > 1 then
+      
       c * der(T[rows, 1]) = gx * (T[rows, 2] - T[rows, 1])
                           + gy * (T[rows - 1, 1] - T[rows, 1])
                           + top.port[rows, 1].Q_flow
                           + pGen.port[rows, 1].Q_flow;
-    end if;
     
-    if rows > 1 and cols > 1 then
       c * der(T[rows, cols]) = gx * (T[rows, cols - 1] - T[rows, cols])
                              + gy * (T[rows - 1, cols] - T[rows, cols])
                              + top.port[rows, cols].Q_flow
                              + pGen.port[rows, cols].Q_flow;
+    elseif rows > 1 /*and cols == 1*/ then
+      c * der(T[1, 1]) = gy * (T[2, 1] - T[1, 1])
+                       + top.port[1, 1].Q_flow
+                       + pGen.port[1, 1].Q_flow;
+    
+      c * der(T[rows, 1]) = gy * (T[rows - 1, 1] - T[rows, 1])
+                          + top.port[rows, 1].Q_flow
+                          + pGen.port[rows, 1].Q_flow;
+    elseif cols > 1 /*and rows == 1*/ then
+      c * der(T[1, 1]) = gx * (T[1, 2] - T[1, 1]) 
+                       + top.port[1, 1].Q_flow
+                       + pGen.port[1, 1].Q_flow;
+                       
+      c * der(T[1, cols]) = gx * (T[1, cols - 1] - T[1, cols]) 
+                          + top.port[1, cols].Q_flow 
+                          + pGen.port[1, cols].Q_flow;
+    else /* cols == 1 and rows == 1 */
+      c * der(T[1, 1]) = pGen.port[1, 1].Q_flow;
     end if;
     
     for i in 2:rows - 1 loop
-      c * der(T[i, 1]) = gx * (T[i, 2] - T[i, 1])
-                       + gy * (T[i - 1, 1] + T[i + 1, 1] - 2 * T[i, 1])
-                       + top.port[i, 1].Q_flow
-                       + pGen.port[i, 1].Q_flow;
-      
       if cols > 1 then
+        c * der(T[i, 1]) = gx * (T[i, 2] - T[i, 1])
+                         + gy * (T[i - 1, 1] + T[i + 1, 1] - 2 * T[i, 1])
+                         + top.port[i, 1].Q_flow
+                         + pGen.port[i, 1].Q_flow;
+                       
         c * der(T[i, cols]) = gx * (T[i, cols - 1] - T[i, cols])
                             + gy * (T[i - 1, cols] + T[i + 1, cols] - 2 * T[i, cols])
                             + top.port[i, cols].Q_flow
                             + pGen.port[i, cols].Q_flow;
+      else /* cols == 1 */
+        c * der(T[i, 1]) = gy * (T[i - 1, 1] + T[i + 1, 1] - 2 * T[i, 1])
+                         + top.port[i, 1].Q_flow
+                         + pGen.port[i, 1].Q_flow;
       end if;
     end for;
     
     for j in 2:cols - 1 loop
-      c * der(T[1, j])    = gx * (T[1, j - 1] + T[1, j + 1] - 2 * T[1, j])
-                          + gy * (T[2, j] - T[1, j])
-                          + top.port[1, j].Q_flow
-                          + pGen.port[1, j].Q_flow;
-      
       if rows > 1 then
+        c * der(T[1, j]) = gx * (T[1, j - 1] + T[1, j + 1] - 2 * T[1, j])
+                         + gy * (T[2, j] - T[1, j])
+                         + top.port[1, j].Q_flow
+                         + pGen.port[1, j].Q_flow;
         c * der(T[rows, j]) = gx * (T[rows, j - 1] + T[rows, j + 1] - 2 * T[rows, j])
                             + gy * (T[rows - 1, j] - T[rows, j])
                             + top.port[rows, j].Q_flow
                             + pGen.port[rows, j].Q_flow;
+      else /* rows == 1 */
+        c * der(T[1, j]) = gx * (T[1, j - 1] + T[1, j + 1] - 2 * T[1, j])
+                         + top.port[1, j].Q_flow
+                         + pGen.port[1, j].Q_flow;
       end if;
     end for;
     

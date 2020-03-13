@@ -19,7 +19,7 @@ package HS483
       parameter Modelica.SIunits.Length finThickness = 0.0005 "HS483 dimensions";
       parameter Integer baseRows = 23 "discretization of sink base in the y direction";
       parameter Integer baseCols = 23 "discretization of sink base in the x direction, also number of fins";
-      parameter Integer finZelements = 2/*1*/ "discretization of fin elements in the z direction";
+      parameter Integer finZelements = 1 "discretization of fin elements in the z direction";
     
     equation
       for i in 1:baseRows loop
