@@ -339,7 +339,7 @@ package HeatsinkBlocks
   end LayerOptimized;
 
   block Fan
-    input Modelica.SIunits.AngularVelocity fanSpeed(displayUnit = "RPM") "Fan speed [rad/s] (divide RPM by 9.55 to get rad/s)";
+    input Modelica.SIunits.AngularVelocity fanSpeed "Fan speed [rad/s] (divide RPM by 9.55 to get rad/s)";
     output Modelica.SIunits.VolumeFlowRate airFlowRate "Air volumetric flow rate [m^3/s]";
     output Modelica.SIunits.Velocity airVelocity "Air velocity [m/s]";
   
@@ -352,6 +352,12 @@ package HeatsinkBlocks
     airVelocity = airFlowRate / area "Air velocity is linearly proportional to volumetric flow rate";
   end Fan;
 
+  function RPMtoRads
+    input Real speedRPM;
+    output Modelica.SIunits.AngularVelocity speedRads;
+  algorithm
+    speedRads := speedRPM / 9.55; //9.55 is the conversion factor from RPM to rad/s
+  end RPMtoRads;
   annotation(
     uses(Modelica(version = "3.2.3")));
 end HeatsinkBlocks;

@@ -1,7 +1,7 @@
 
 SRC = ../../common/libraries/ThermalBlocks.mo ../../common/HeatsinkBlocks.mo HS483.mo
-OBJ = HS483.Specializations.HS483_NaturalConvection_Interface3DICE       \
-      HS483.Specializations.HS483_P14752_ForcedConvection_Interface3DICE
+OBJ = HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE \
+      HS483.HS483_P14752_VariableFanSpeed_Interface3DICE
 DUMMY = .dummy
 
 # OpenModelica produces temporary files with a name where . is replaced with _

@@ -11,7 +11,7 @@ getErrorString();
 
 
 // https://build.openmodelica.org/Documentation/OpenModelica.Scripting.translateModelFMU.html
-translateModelFMU(HS483.Specializations.HS483_NaturalConvection_Interface3DICE, version="2.0", fmuType="cs");
+translateModelFMU(HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE, version="2.0", fmuType="cs");
 getErrorString();
-translateModelFMU(HS483.Specializations.HS483_P14752_ForcedConvection_Interface3DICE, version="2.0", fmuType="cs");
+translateModelFMU(HS483.HS483_P14752_VariableFanSpeed_Interface3DICE, version="2.0", fmuType="cs");
 getErrorString();

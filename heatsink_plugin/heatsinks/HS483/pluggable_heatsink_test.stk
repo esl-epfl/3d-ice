@@ -14,7 +14,10 @@ top pluggable heat sink :
 	material COPPER ;
 	// Heatsink side is 0.06 metres, spreader side 0.02 metres, so the offset
 	// needed to center the chip underneath the heatsink is (0.06 - 0.02) / 2 = 0.02
-	plugin "../../loaders/FMI/fmi_loader.so", "HS483.Specializations.HS483_NaturalConvection_Interface3DICE 0.02 0.02" ;
+	// Constant fan speed model, last parameter is the fan speed in RPM (0 for natural convection)
+	plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE 0.02 0.02 2500" ;
+	// Variable fan speed model, last parameter is the fan speed table file name
+	//plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_VariableFanSpeed_Interface3DICE 0.02 0.02 fan_speed.txt" ;
 
 dimensions :
 
@@ -31,7 +34,7 @@ stack:
 
 solver:
 
-	transient step 0.01, slot 2000 ;
+	transient step 0.01, slot 200 ;
 	initial temperature 293.15 ;
 
 output:
