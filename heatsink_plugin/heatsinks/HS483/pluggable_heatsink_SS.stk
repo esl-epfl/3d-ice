@@ -1,0 +1,37 @@
+material SILICON :
+	thermal conductivity 1.30e-04 ;
+	volumetric heat capacity 1.63566e-12 ;
+
+material SILICONE :
+	thermal conductivity 6.25e-5 ;
+	volumetric heat capacity 2.2175e-10 ;
+
+top pluggable heat sink :
+
+	spreader length 27000 , width 27000 , height 500 ;
+	material SILICONE ;
+	//plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE 0.0165 0.0165" ;
+	plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_VariableFanSpeed_Interface3DICE 0.0165 0.0165 fan_speed.txt" ;
+dimensions :
+
+	chip length 10240 , width  10240 ;
+	cell length  2560 , width   2560 ;
+
+die TOPDIE :
+
+	layer 400 SILICON ;
+	source 100 SILICON ;
+
+stack:
+
+	die     DIE     TOPDIE    floorplan "ttc_floorplanSS.flp" ;
+
+solver:
+
+	transient step 0.01, slot 4000 ;
+	initial temperature 297.85 ;
+
+output:
+
+	T ( DIE,  5120, 5120,           "outmap.txt",step );
+	Tmap ( DIE,   "outmapMap.txt",slot );
