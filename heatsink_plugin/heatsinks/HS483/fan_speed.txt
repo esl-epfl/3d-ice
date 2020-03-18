@@ -3,5 +3,5 @@
 # Make sure the first time point is 0, and the last is greater than the desired simulation time.
 double fanSpeed(3, 2)
     0    0
-  100 2500
-99999 2500
+100	 0
+99999	 0
