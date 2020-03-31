@@ -3,11 +3,15 @@ package HS483
     model ConstantPowerNaturalConvection
       HS483_P14752_Heatsink sink(ambientTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 10);
+    protected
+      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
     equation
       sink.fanSpeed = 0; // Natural convection
       for i in 1:sink.bottomRows loop
         for j in 1:sink.bottomCols loop
-          connect(sink.bottom[i, j], heatSource.port);
+          // No grid pitch mapping needed, so do a one-to-one mapping
+          connect(sink.bottom[i, j], bottomConductances[i, j].port_a);
+          connect(bottomConductances[i, j].port_b, heatSource.port);
         end for;
       end for;
       annotation(
@@ -17,11 +21,15 @@ package HS483
     model ConstantPowerForcedConvection
       HS483_P14752_Heatsink sink(ambientTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
+    protected
+       Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
     equation
       sink.fanSpeed = HeatsinkBlocks.RPMtoRads(2700);
       for i in 1:sink.bottomRows loop
         for j in 1:sink.bottomCols loop
-          connect(sink.bottom[i, j], heatSource.port);
+          // No grid pitch mapping needed, so do a one-to-one mapping
+          connect(sink.bottom[i, j], bottomConductances[i, j].port_a);
+          connect(bottomConductances[i, j].port_b, heatSource.port);
         end for;
       end for;
       annotation(
@@ -37,11 +45,15 @@ package HS483
                  1000, 2500]);
       HS483_P14752_Heatsink sink(ambientTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
+    protected
+      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
     equation
       sink.fanSpeed = HeatsinkBlocks.RPMtoRads(fanSpeedTable.y[1]);
       for i in 1:sink.bottomRows loop
         for j in 1:sink.bottomCols loop
-          connect(sink.bottom[i, j], heatSource.port);
+          // No grid pitch mapping needed, so do a one-to-one mapping
+          connect(sink.bottom[i, j], bottomConductances[i, j].port_a);
+          connect(bottomConductances[i, j].port_b, heatSource.port);
         end for;
       end for;
       annotation(
@@ -54,7 +66,7 @@ package HS483
     // Thermal model of one fin of the copper heatsink model number HS483-ND
 
     redeclare function extends convectionCorrelation
-        input Modelica.SIunits.Velocity airVelocity;
+        input Modelica.SIunits.Velocity fluidVelocity;
         output Modelica.SIunits.CoefficientOfHeatTransfer htc;
 
       protected
@@ -66,11 +78,11 @@ package HS483
         parameter Real c2 = -1.09;
 
       algorithm
-        assert(airVelocity == 0 or airVelocity >= 1 and airVelocity <= 4.1, "Assertion failed: HTC correlation outside fitting range");
-        if airVelocity == 0 then
+        assert(fluidVelocity == 0 or fluidVelocity >= 1 and fluidVelocity <= 4.1, "Assertion failed: HTC correlation outside fitting range");
+        if fluidVelocity == 0 then
           htc := 2.62 "HS483-ND natural convection heat transfer coefficient, from datasheet";
         else
-          htc := c0 + c1 * airVelocity + c2 * airVelocity ^ 2;
+          htc := c0 + c1 * fluidVelocity + c2 * fluidVelocity ^ 2;
         end if;
     end convectionCorrelation;
   end HS483_Fin;

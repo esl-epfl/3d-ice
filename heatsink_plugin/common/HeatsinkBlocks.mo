@@ -52,10 +52,10 @@ package HeatsinkBlocks
         Placement(transformation(extent = {{-100, -100}, {-80, -80}}, rotation = 0)));
     
       input Modelica.SIunits.Velocity fluidVelocity "Fluid velocity [m/s]";
-      parameter Modelica.SIunits.Temperature inletFluidTemperature "Inlet fluid temperature [K]";
+      input Modelica.SIunits.Temperature inletFluidTemperature "Inlet fluid temperature [K]";
       
       replaceable partial function convectionCorrelation
-        input Modelica.SIunits.Velocity airVelocity;
+        input Modelica.SIunits.Velocity fluidVelocity;
         output Modelica.SIunits.CoefficientOfHeatTransfer htc;
       end convectionCorrelation;
       
@@ -156,7 +156,7 @@ package HeatsinkBlocks
       parameter Integer                 bottomRows=1 "Number of rows of cells in which the sink bottom width is divided";
       parameter Integer                 bottomCols=1 "Number of columns of cells in which the sink bottom length is divided";
     
-      Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a bottom[bottomRows, bottomCols] "This is the heat port at the bottom of the sink" annotation(
+      Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a bottom[bottomRows, bottomCols] "This is the heat port at the bottom of the sink. Note that these heat ports map to the center of the bottom cells of the sink, without including the bottom conductance (cellBottomConductance). This has been done to allow grid pitch adaptation." annotation(
         Placement(visible = true, transformation(origin = {1, -91}, extent = {{-17, -17}, {17, 17}}, rotation = 0), iconTransformation(origin = {1, -91}, extent = {{-17, -17}, {17, 17}}, rotation = 0)));
       
       annotation(
@@ -358,6 +358,13 @@ package HeatsinkBlocks
   algorithm
     speedRads := speedRPM / 9.55; //9.55 is the conversion factor from RPM to rad/s
   end RPMtoRads;
+  
+  function LPMtoM3s
+    input Real flowRateLPM;
+    output Modelica.SIunits.VolumeFlowRate flowRateM3s;
+  algorithm
+    flowRateM3s := flowRateLPM / 6e4; //6e4 is the conversion factor from liters per minute to cubic meters per second
+  end LPMtoM3s;
   annotation(
     uses(Modelica(version = "3.2.3")));
 end HeatsinkBlocks;
