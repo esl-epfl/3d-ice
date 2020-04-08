@@ -11,4 +11,10 @@ bin/3D-ICE-Emulator
 bin/3D-ICE-Server
 bin/*.txt
 SuperLU_4.3/
-heatsink_plugin/templates/Modelica/Heatsink.Interface3DICE/
+heatsink_plugin/templates/Modelica/Heatsink.TestHeatsink_Interface3DICE/
+heatsink_plugin/heatsinks/HS483/.dummy
+heatsink_plugin/heatsinks/HS483/HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE/
+heatsink_plugin/heatsinks/HS483/HS483.HS483_P14752_VariableFanSpeed_Interface3DICE/
+heatsink_plugin/heatsinks/cuplex_kryos_21606/.dummy
+heatsink_plugin/heatsinks/cuplex_kryos_21606/Cuplex.Cuplex21606_ConstantFlowRate_Interface3DICE/
+heatsink_plugin/heatsinks/cuplex_kryos_21606/Cuplex.Cuplex21606_VariableFlowRate_Interface3DICE/

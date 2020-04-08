@@ -1,0 +1,17 @@
+
+setCommandLineOptions("-d=initialization");
+getErrorString();
+
+loadFile("../../common/libraries/ThermalBlocks.mo");
+getErrorString();
+loadFile("../../common/HeatsinkBlocks.mo");
+getErrorString();
+loadFile("Cuplex.mo");
+getErrorString();
+
+
+// https://build.openmodelica.org/Documentation/OpenModelica.Scripting.translateModelFMU.html
+translateModelFMU(Cuplex.Cuplex21606_ConstantFlowRate_Interface3DICE, version="2.0", fmuType="cs");
+getErrorString();
+translateModelFMU(Cuplex.Cuplex21606_VariableFlowRate_Interface3DICE, version="2.0", fmuType="cs");
+getErrorString();

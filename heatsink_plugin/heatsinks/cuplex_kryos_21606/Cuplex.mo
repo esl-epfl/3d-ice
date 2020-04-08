@@ -179,10 +179,9 @@ extends HeatsinkBlocks.PartialModels.Interface3DICE(redeclare Cuplex21606_Heatsi
     // Make sure the first time point is 0, and the last is greater than the desired simulation time.
     // The water flow rate in the table file is in liters per minute, while the inlet temperature in K.
   
-    function ParseWaterData
+    function ParseWaterTemperature
       input String args;
       output Real temperature;
-      output String flowRateFilename;
     protected
       Integer length;
       Integer nextIndex;
@@ -193,6 +192,21 @@ extends HeatsinkBlocks.PartialModels.Interface3DICE(redeclare Cuplex21606_Heatsi
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader x0
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
       (temperature, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Get the temperature
+    end ParseWaterTemperature;
+  
+    function ParseWaterData
+      input String args;
+      output String flowRateFilename;
+    protected
+      Integer length;
+      Integer nextIndex;
+      Real unused;
+    algorithm
+      length := Modelica.Utilities.Strings.length(args);
+      nextIndex := Modelica.Utilities.Strings.find(args, " "); // Skip past the plugin name
+      (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader x0
+      (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
+      (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the temperature
       flowRateFilename := Modelica.Utilities.Strings.substring(args, nextIndex+1, length); // Get the flow rate filename
     end ParseWaterData;
   
@@ -201,7 +215,8 @@ extends HeatsinkBlocks.PartialModels.Interface3DICE(redeclare Cuplex21606_Heatsi
     Modelica.Blocks.Sources.CombiTimeTable flowRateTable(tableOnFile = true, fileName = flowRateFilename, tableName = "flowRate", smoothness = Modelica.Blocks.Types.Smoothness.ConstantSegments);
     
   initial algorithm
-    (constantWaterTemperature, flowRateFilename) := ParseWaterData(args);
+    constantWaterTemperature := ParseWaterTemperature(args);
+    flowRateFilename := ParseWaterData(args);
     Modelica.Utilities.Streams.print("water temperature = " + String(constantWaterTemperature));
     Modelica.Utilities.Streams.print("flow rate file name = " + flowRateFilename);
     

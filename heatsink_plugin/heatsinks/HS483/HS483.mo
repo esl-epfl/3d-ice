@@ -194,10 +194,9 @@ package HS483
     //
     // The fan can be turned off during the simulation by setting the fan speed to 0 to simulate natural convection.
 
-    function ParseFanSpeedFilename
+    function ParseAirTemperature
       input String args;
       output Real temperature;
-      output String fanSpeedFilename;
     protected
       Integer length;
       Integer nextIndex;
@@ -208,6 +207,21 @@ package HS483
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader x0
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
       (temperature, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Get the temperature
+    end ParseAirTemperature;
+  
+    function ParseFanSpeedFilename
+      input String args;
+      output String fanSpeedFilename;
+    protected
+      Integer length;
+      Integer nextIndex;
+      Real unused;
+    algorithm
+      length := Modelica.Utilities.Strings.length(args);
+      nextIndex := Modelica.Utilities.Strings.find(args, " "); // Skip past the plugin name
+      (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader x0
+      (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
+      (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the temperature
       fanSpeedFilename := Modelica.Utilities.Strings.substring(args, nextIndex+1, length); // Get the fan speed filename
     end ParseFanSpeedFilename;
 
@@ -216,7 +230,8 @@ package HS483
     Modelica.Blocks.Sources.CombiTimeTable fanSpeedTable(tableOnFile = true, fileName = fanSpeedFilename, tableName = "fanSpeed", smoothness = Modelica.Blocks.Types.Smoothness.ConstantSegments);
     
   initial algorithm
-    (constantAirTemperature, fanSpeedFilename) := ParseFanSpeedFilename(args);
+    constantAirTemperature := ParseAirTemperature(args);
+    fanSpeedFilename := ParseFanSpeedFilename(args);
     Modelica.Utilities.Streams.print("air temperature = " + String(constantAirTemperature));
     Modelica.Utilities.Streams.print("fanSpeedFileName = " + fanSpeedFilename);
     

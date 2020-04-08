@@ -45,14 +45,18 @@ include $(3DICE_MAIN)/makefile.def
 
 all:
 	@echo "\e[31mBuilding plugins\e[0m"
-	cd loaders/FMI		; make ;
-	cd loaders/python	; make ;
-	cd templates/Modelica	; make ;
-	cd templates/C++	; make ;
+	cd loaders/FMI			; make ;
+	cd loaders/python		; make ;
+	cd templates/Modelica		; make ;
+	cd templates/C++		; make ;
+	cd heatsinks/HS483		; make ;
+	cd heatsinks/cuplex_kryos_21606	; make ;
 
 clean:
 	@echo "\e[31mCleaning plugins\e[0m"
-	cd loaders/FMI		; make clean ;
-	cd loaders/python	; make clean ;
-	cd templates/Modelica	; make clean ;
-	cd templates/C++	; make clean ;
+	cd loaders/FMI			; make clean ;
+	cd loaders/python		; make clean ;
+	cd templates/Modelica		; make clean ;
+	cd templates/C++		; make clean ;
+	cd heatsinks/HS483		; make clean ;
+	cd heatsinks/cuplex_kryos_21606	; make clean ;
