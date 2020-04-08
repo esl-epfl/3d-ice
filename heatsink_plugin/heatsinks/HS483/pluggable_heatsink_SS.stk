@@ -10,8 +10,8 @@ top pluggable heat sink :
 
 	spreader length 27000 , width 27000 , height 500 ;
 	material SILICONE ;
-	//plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE 0.0165 0.0165" ;
-	plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_VariableFanSpeed_Interface3DICE 0.0165 0.0165 fan_speed.txt" ;
+	//plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_ConstantFanSpeed_Interface3DICE 0.0165 0.0165 293.15 0" ;
+	plugin "../../loaders/FMI/fmi_loader.so", "HS483.HS483_P14752_VariableFanSpeed_Interface3DICE 0.0165 0.0165 293.15 fan_speed.txt" ;
 dimensions :
 
 	chip length 10240 , width  10240 ;

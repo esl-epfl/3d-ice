@@ -2,7 +2,7 @@ package Cuplex
   package Tests
 
     model ConstantPowerConstantFlowRate
-      Cuplex21606_Heatsink sink(ambientTemperature = 20 + 273.15, waterTemperature = 20 + 273.15);
+      Cuplex21606_Heatsink sink(initialTemperature = 20 + 273.15, waterTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
     protected
        Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
@@ -25,7 +25,7 @@ package Cuplex
                   300,  0.06;
                   600,  0.12;
                  1000,  0.12]);
-      Cuplex21606_Heatsink sink(ambientTemperature = 20 + 273.15, waterTemperature = 20 + 273.15);
+      Cuplex21606_Heatsink sink(initialTemperature = 20 + 273.15, waterTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
     protected
        Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
@@ -66,10 +66,10 @@ package Cuplex
     //
     // The fins are oriented in the y (width) direction.
     
-    HeatsinkBlocks.LayerOptimized base(cp = cp, rho = rho, k = k, alpha = alpha, length = baseLength, width = baseWidth, height = baseHeight, rows = baseRows, cols = baseCols, Tstart = ambientTemperature) annotation(
+    HeatsinkBlocks.LayerOptimized base(cp = cp, rho = rho, k = k, alpha = alpha, length = baseLength, width = baseWidth, height = baseHeight, rows = baseRows, cols = baseCols, Tstart = initialTemperature) annotation(
       Placement(visible = true, transformation(origin = {-10, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
     
-    Cuplex21606_Fin fins[finXelements](each cp = cp, each rho = rho, each k = k, each alpha = alpha, each length = numFinsPerGroup * finHeight, each width = finWidth, each height = finThickness, each rows = finYelements, each cols = finZelements, each Tstart = ambientTemperature) annotation(
+    Cuplex21606_Fin fins[finXelements](each cp = cp, each rho = rho, each k = k, each alpha = alpha, each length = numFinsPerGroup * finHeight, each width = finWidth, each height = finThickness, each rows = finYelements, each cols = finZelements, each Tstart = initialTemperature) annotation(
       Placement(visible = true, transformation(origin = {-10, 10}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
   
     input Modelica.SIunits.Temperature waterTemperature "Water temperature in [K]";
