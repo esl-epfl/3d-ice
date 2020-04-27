@@ -4,7 +4,7 @@ package HS483
       HS483_P14752_Heatsink sink(initialTemperature = 20 + 273.15, airTemperature = 20 + 273.15);
       Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 10);
     protected
-      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
+      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows, sink.bottomCols](each G = sink.cellBottomConductance);
     equation
       sink.fanSpeed = 0; // Natural convection
       for i in 1:sink.bottomRows loop
@@ -20,9 +20,9 @@ package HS483
 
     model ConstantPowerForcedConvection
       HS483_P14752_Heatsink sink(initialTemperature = 20 + 273.15, airTemperature = 20 + 273.15);
-      Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
+      Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 35);
     protected
-       Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
+      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows, sink.bottomCols](each G = sink.cellBottomConductance);
     equation
       sink.fanSpeed = HeatsinkBlocks.RPMtoRads(2700);
       for i in 1:sink.bottomRows loop
@@ -44,9 +44,9 @@ package HS483
                   600, 2500;
                  1000, 2500]);
       HS483_P14752_Heatsink sink(initialTemperature = 20 + 273.15, airTemperature = 20 + 273.15);
-      Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 75);
+      Modelica.Thermal.HeatTransfer.Sources.FixedHeatFlow heatSource(Q_flow = 35);
     protected
-      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows,sink.bottomCols](each G = sink.cellBottomConductance);
+      Modelica.Thermal.HeatTransfer.Components.ThermalConductor bottomConductances[sink.bottomRows, sink.bottomCols](each G = sink.cellBottomConductance);
     equation
       sink.fanSpeed = HeatsinkBlocks.RPMtoRads(fanSpeedTable.y[1]);
       for i in 1:sink.bottomRows loop
@@ -80,9 +80,9 @@ package HS483
       algorithm
         assert(fluidVelocity == 0 or fluidVelocity >= 1 and fluidVelocity <= 4.1, "Assertion failed: HTC correlation outside fitting range");
         if fluidVelocity == 0 then
-          htc := 2.62 "HS483-ND natural convection heat transfer coefficient, from datasheet";
+          htc := 2.8 "HS483-ND natural convection heat transfer coefficient, from datasheet";
         else
-          htc := c0 + c1 * fluidVelocity + c2 * fluidVelocity ^ 2;
+          htc := 0.8793 * (c0 + c1 * fluidVelocity + c2 * fluidVelocity ^ 2);
         end if;
     end convectionCorrelation;
   end HS483_Fin;
@@ -95,18 +95,32 @@ package HS483
     // To simulate natural convection set fanSpeed to 0. This can be done
     // also in the middle of a simulation to simulate turning off the fan.
     //
-    // Fan and heatsink have been fitted in the range 900 to 3500RPM
-    // and tested experimentally in range 1500 to 2700RPM (157 to 283rad/s).
+    // Fan speed should be limited in the range from 1500 to 6000RPM (or 0, for natural convection).
+    // Power to be dissipated should be limited to less than 40W.
     // DO NOT exceed the fitting range.
     //
     // The silicone thermal pad at the bottom of the heatsink is not simulated
     // in Modelica, but in 3D-ICE as the heat spreader layer.
+    // The thermal conductivity of the thermal pad changes from dataset to
+    // dataset due to variations every time the heatsink is removed and reapplied
+    // on top of a chip.
     //
-    // The fins are oriented in the y (width) direction.
+    // Heat transfer coefficient has been obtained from the heatsink datasheet and
+    // fine tuned to fit the eperimental data. The datasheet reports data for air
+    // speeds from 1 to 4.1m/s, limiting the fan speed to the 1500 to 6000RPM range.
+    // Air flow across the heat sink fins is laminar, and under the operating conditions
+    // for which enough data was available for validation, the hot air film thickness
+    // is less than half the spacing between the fins, therefore having a stream of
+    // ambient temperature air flowing between fins.
+    // At powers higher than 40W the air film approaches the fin half spacing,
+    // causing a transition to a different operating condition for which not enough
+    // data was available for validation, limiting the range of power to less than 40W.
+    //
+    // The heatsink fins are oriented in the y (width) direction.
     
     HeatsinkBlocks.LayerOptimized base(cp = cp, rho = rho, k = k, alpha = alpha, length = baseLength, width = baseWidth, height = baseHeight, rows = baseRows, cols = baseCols, Tstart = initialTemperature) annotation(
       Placement(visible = true, transformation(origin = {-10, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
-    
+      
     HS483_Fin fins[baseCols](each cp = cp, each rho = rho, each k = k, each alpha = alpha, each length = finHeight, each width = baseWidth, each height = finThickness, each rows = baseRows, each cols = finZelements, each Tstart = initialTemperature) annotation(
       Placement(visible = true, transformation(origin = {-10, 10}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
     
@@ -115,7 +129,7 @@ package HS483
     
     input Modelica.SIunits.Temperature airTemperature "Air temperature in [K]";
     input Modelica.SIunits.AngularVelocity fanSpeed "Fan speed in rad/s";
-    
+
   protected
     parameter Modelica.SIunits.SpecificHeatCapacity cp = 384.6 "copper properties";
     parameter Modelica.SIunits.Density rho = 8960 "copper properties";
@@ -131,8 +145,8 @@ package HS483
     parameter Integer finZelements = 1 "discretization of fin elements in the z direction";
     parameter Real fanFlowRateCoefficient = 5.98e-5 "P14752 parameter, fitted from datasheet";
     parameter Real operatingPoint = 0.9 "P14752 - HS483 interaction, fitted from experimental data";
-    parameter Modelica.SIunits.Area fanArea = 4.82e-3 "P14752 parameter, fitted from experimental data starting from datasheet";
-  
+    parameter Modelica.SIunits.Area fanArea = 8.31e-3 "P14752 parameter, fitted from experimental data starting from datasheet";
+
   equation
     for i in 1:baseRows loop
       for j in 1:baseCols loop
@@ -172,12 +186,12 @@ package HS483
 
     parameter Real constantAirTemperature(fixed = false);
     parameter Real constantFanSpeed(fixed = false);
-    
+
   initial algorithm
     (constantAirTemperature, constantFanSpeed) := ParseFanSpeed(args);
     Modelica.Utilities.Streams.print("air temperature = " + String(constantAirTemperature));
     Modelica.Utilities.Streams.print("fanSpeed = " + String(constantFanSpeed));
-    
+
   equation
     sink.airTemperature = constantAirTemperature;
     sink.fanSpeed = HeatsinkBlocks.RPMtoRads(constantFanSpeed);
@@ -208,7 +222,7 @@ package HS483
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
       (temperature, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Get the temperature
     end ParseAirTemperature;
-  
+
     function ParseFanSpeedFilename
       input String args;
       output String fanSpeedFilename;
@@ -222,19 +236,19 @@ package HS483
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader x0
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the spreader y0
       (unused, nextIndex) := Modelica.Utilities.Strings.scanReal(args, nextIndex); // Skip past the temperature
-      fanSpeedFilename := Modelica.Utilities.Strings.substring(args, nextIndex+1, length); // Get the fan speed filename
+      fanSpeedFilename := Modelica.Utilities.Strings.substring(args, nextIndex + 1, length); // Get the fan speed filename
     end ParseFanSpeedFilename;
 
     parameter Real constantAirTemperature(fixed = false);
     parameter String fanSpeedFilename(fixed = false);
     Modelica.Blocks.Sources.CombiTimeTable fanSpeedTable(tableOnFile = true, fileName = fanSpeedFilename, tableName = "fanSpeed", smoothness = Modelica.Blocks.Types.Smoothness.ConstantSegments);
-    
+
   initial algorithm
     constantAirTemperature := ParseAirTemperature(args);
     fanSpeedFilename := ParseFanSpeedFilename(args);
     Modelica.Utilities.Streams.print("air temperature = " + String(constantAirTemperature));
     Modelica.Utilities.Streams.print("fanSpeedFileName = " + fanSpeedFilename);
-    
+
   equation
     sink.airTemperature = constantAirTemperature;
     sink.fanSpeed = HeatsinkBlocks.RPMtoRads(fanSpeedTable.y[1]);

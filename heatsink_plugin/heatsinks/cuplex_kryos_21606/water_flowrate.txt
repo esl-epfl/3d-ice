@@ -1,0 +1,7 @@
+#1
+# First column is time [s], second column is water flow rate [l/min]
+# Make sure the first time point is 0, and the last is greater than the desired simulation time.
+double flowRate(3, 2)
+    0  0.06
+   20  0.12
+99999  0.12

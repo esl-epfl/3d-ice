@@ -1,0 +1,38 @@
+// Example stack file for simulating the cuplex heatsink
+
+material SILICON :
+	thermal conductivity 8.8e-5 ;
+	volumetric heat capacity 1.63566e-12 ;
+
+material THERMALCOMPOUND :
+	thermal conductivity 0.9e-5 ;
+	volumetric heat capacity 2.7e-12 ;
+
+top pluggable heat sink :
+	spreader length 10240 , width 10240 , height 200 ;
+	material THERMALCOMPOUND ;
+
+	// Plugin parameters are: spreaderX0 spreaderY0 airTemperature waterFlorRateFilename
+	// Modelica uses SI units, so spreaderX0 and spreaderY0 are in metres.
+	// Heatsink side is 0.0528 (x axis) x 0.059 (y axis) metres, spreader side 0.01024 metres, from which the offsets
+	// needed to center the chip underneath the heatsink are computed
+	plugin "../../loaders/FMI/fmi_loader.so", "Cuplex.Cuplex21606_VariableFlowRate_Interface3DICE 0.02128 0.02438 300 water_flowrate.txt" ;
+
+dimensions :
+	chip length 10240 , width  10240 ;
+	cell length   512 , width    512 ;
+
+die TTC :
+	layer 610 SILICON ;
+	source 15 SILICON ;
+
+stack:
+	die  D1  TTC  floorplan "example.flp" ;
+
+solver:
+	transient step 0.0005, slot 10 ;
+	initial temperature 300;
+
+output:
+	// Print the temperature at the center of the die
+	T ( D1, 5120, 5120, "trace.txt", step );
