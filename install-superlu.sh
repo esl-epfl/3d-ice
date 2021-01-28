@@ -2,7 +2,7 @@
 # Install SuperLU
 
 echo "Install SuperLU"
-wget https://crd.lbl.gov/~xiaoye/SuperLU/superlu_4.3.tar.gz -O superlu_4.3.tar.gz
+wget https://portal.nersc.gov/project/sparse/superlu/superlu_4.3.tar.gz -O superlu_4.3.tar.gz || exit 1
 tar xvfz superlu_4.3.tar.gz
 rm -rf superlu_4.3.tar.gz
 cd SuperLU_4.3/
