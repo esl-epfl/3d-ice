@@ -2,10 +2,13 @@
 BIN = py_loader.so
 OBJ = entrypoint.o pythonwrapper.o
 
+PYINCLUDE= `pkg-config --cflags python3-embed`
+PYLIBS   = `pkg-config --libs python3-embed`
+
 CXX      = g++
-CXXFLAGS = -fPIC -O2 -Wall -std=c++11 -I/usr/include/python3.6m -I/usr/include/numpy
+CXXFLAGS = -fPIC -O2 -Wall -std=c++11 $(PYINCLUDE) -I/usr/include/numpy
 LDFLAGS  = -fPIC -shared -Wl,-soname,$(BIN)
-LDLIBS   = -lpython3.6m
+LDLIBS   = $(PYLIBS)
 
 all: $(BIN)
 
