@@ -1,0 +1,14 @@
+
+setCommandLineOptions("-d=initialization");
+getErrorString();
+
+loadFile("../../common/libraries/ThermalBlocks.mo");
+getErrorString();
+loadFile("../../common/HeatsinkBlocks.mo");
+getErrorString();
+loadFile("NonlinearExample.mo");
+getErrorString();
+
+// https://build.openmodelica.org/Documentation/OpenModelica.Scripting.translateModelFMU.html
+translateModelFMU(NonlinearExample.NonlinearHeatsink_Interface3DICE, version="2.0", fmuType="cs");
+getErrorString();
