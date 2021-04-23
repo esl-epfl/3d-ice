@@ -127,6 +127,8 @@
 %type <output_instant_v>   when
 %type <output_quantity_v>  maxminavg
 %type <string_p>           optional_layout
+%type <double_v>           optional_nonuniform
+
 
 %token _2RM                  "keyword 2rm"
 %token _4RM                  "keyword 4rm"
@@ -144,6 +146,7 @@
 %token DIE                   "keyword die"
 %token DIMENSIONS            "keyword dimensions"
 %token DISTRIBUTION          "keyword distribution"
+%token DICRETIZATION  "keyword discretization"
 %token FINAL                 "keyword final"
 %token FIRST                 "keyword first"
 %token FLOORPLAN             "keyword floorplan"
@@ -162,6 +165,7 @@
 %token MAXIMUM               "keyword maximum"
 %token MICROCHANNEL          "keyword microchannel"
 %token MINIMUM               "keyword minimum"
+%token NONUNIFORM            "keyword non-uniform"
 %token OUTPUT                "keyword output"
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
@@ -1043,6 +1047,7 @@ dimensions
   : DIMENSIONS ':'
         CHIP LENGTH DVALUE ',' WIDTH DVALUE ';'    // $5  $8
         CELL LENGTH DVALUE ',' WIDTH DVALUE ';'    // $12 $15
+        optional_nonuniform                           // $17
     {
         stkd->Dimensions = dimensions_calloc () ;
 
@@ -1065,7 +1070,7 @@ dimensions
 
         stkd->Dimensions->Grid.NRows    = ($8 / $15) ;
         stkd->Dimensions->Grid.NColumns = ($5 / $12) ;
-
+        stkd->Dimensions->NonUniform = $17 ;
 
         if (stkd->Channel != NULL)
         {
@@ -1114,6 +1119,22 @@ dimensions
             }
         }
     }
+    ;
+
+optional_nonuniform
+
+  : /* empty */
+
+    {
+        $$ = 0 ;
+    }
+
+  | NONUNIFORM DVALUE ';' // $2
+
+    {
+        $$ = $2 ;
+    }
+
   ;
 
 /******************************************************************************/
@@ -1503,6 +1524,92 @@ stack_element
 
             YYABORT ; // CHECKME error messages printed in this case ....
         }
+
+        die->Dis_X = stkd->Dimensions->Grid.NRows;
+        die->Dis_Y = stkd->Dimensions->Grid.NColumns;
+
+        stack_element->SEType      = TDICE_STACK_ELEMENT_DIE ;
+        stack_element->Pointer.Die = die ;
+        stack_element->NLayers     = stack_element->Pointer.Die->NLayers ;
+
+        string_copy (&stack_element->Id, &$2) ;
+
+        string_destroy (&$2) ;
+        string_destroy (&$3) ;
+        string_destroy (&$5) ;
+    }
+
+  | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH DICRETIZATION DVALUE DVALUE ';'  // $2 Identifier for the stack element
+                                                  // $3 Identifier of the die
+                                                  // $5 Path of the floorplan file
+    {
+        num_dies++ ;
+
+        StackElement_t *stack_element = $$ = stack_element_calloc () ;
+
+        if (stack_element == NULL)
+        {
+            STKERROR ("Malloc stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+
+            YYABORT ;
+        }
+
+        Die_t *die = die_calloc ( ) ;
+
+        if (die == NULL)
+        {
+            STKERROR ("Malloc die for stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+
+            stack_element_free (stack_element) ;
+
+            YYABORT ;
+        }
+
+        string_copy (&die->Id, &$3) ;
+
+        Die_t *tmp = die_list_find (&stkd->Dies, die) ;
+
+        if (tmp == NULL)
+        {
+            sprintf (error_message, "Unknown die %s", $3) ;
+
+            STKERROR (error_message) ;
+
+            die_free (die) ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+
+            stack_element_free (stack_element) ;
+
+            YYABORT ;
+        }
+
+        die_copy (die, tmp) ;
+
+        if (   fill_floorplan (&die->Floorplan, stkd->Dimensions, $5)
+            == TDICE_FAILURE)
+        {
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+            string_destroy (&$5) ;
+
+            stack_description_destroy (stkd) ;
+
+            YYABORT ; // CHECKME error messages printed in this case ....
+        }
+
+        die->Dis_X = $7;
+        die->Dis_Y = $8;
 
         stack_element->SEType      = TDICE_STACK_ELEMENT_DIE ;
         stack_element->Pointer.Die = die ;

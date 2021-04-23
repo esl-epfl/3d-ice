@@ -49,6 +49,8 @@ void ic_element_init (ICElement_t *icel)
     icel->SW_Y      = (ChipDimension_t) 0.0 ;
     icel->Length    = (ChipDimension_t) 0.0 ;
     icel->Width     = (ChipDimension_t) 0.0 ;
+    icel->Dis_X     = (ChipDimension_t) 0.0 ;
+    icel->Dis_Y     = (ChipDimension_t) 0.0 ;
     icel->SW_Row    = (CellIndex_t) 0u ;
     icel->SW_Column = (CellIndex_t) 0u ;
     icel->NE_Row    = (CellIndex_t) 0u ;
@@ -65,6 +67,8 @@ void ic_element_copy (ICElement_t *dst, ICElement_t *src)
     dst->SW_Y      = src->SW_Y ;
     dst->Length    = src->Length ;
     dst->Width     = src->Width ;
+    dst->Dis_X     = src->Dis_X ;
+    dst->Dis_Y     = src->Dis_Y ;
     dst->SW_Row    = src->SW_Row ;
     dst->SW_Column = src->SW_Column ;
     dst->NE_Row    = src->NE_Row ;

@@ -320,6 +320,8 @@ struct HeatSink_t; //Forward decalration
 
         ChipDimensions_t Chip ;
 
+        uint8_t NonUniform ;
+
     } ;
 
     /*! Definition of the type Dimensions_t */

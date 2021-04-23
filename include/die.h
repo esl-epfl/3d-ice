@@ -92,6 +92,15 @@ extern "C"
         /*! The floorplan used on the source layer */
 
         Floorplan_t Floorplan ;
+        
+        /*! Die discretization level at the south-west X coordinate */
+
+        CellIndex_t Dis_X ;
+
+        /*! Die discretization level at the south-west Y coordinate */
+
+        CellIndex_t Dis_Y ;
+
     } ;
 
     /*! Definition of the type Die_t */

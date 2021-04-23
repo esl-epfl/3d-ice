@@ -80,6 +80,14 @@ extern "C"
 
         ChipDimension_t Width ;
 
+        /*! Discretization level at the south-west X coordinate */
+
+        ChipDimension_t Dis_X ;
+
+        /*! Discretization level at the south-west Y coordinate */
+
+        ChipDimension_t Dis_Y ;
+
         /*! The index of the row of the thermal cell where the south-west
          *  corner of the ic element is placed */
 

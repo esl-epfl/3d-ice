@@ -89,6 +89,7 @@
 %destructor { powers_queue_free ($$) ; } <p_powers_queue>
 
 %token DIMENSION  "keyword dimension"
+%token DICRETIZATION  "keyword discretization"
 %token POSITION   "keyword position"
 %token POWER      "keyword power"
 %token RECTANGLE  "keywork rectangle"
@@ -284,6 +285,8 @@ ic_elements
         icelement.SW_Y   = $4 ;
         icelement.Length = $7 ;
         icelement.Width  = $9 ;
+        // icelement.Dis_X  = floorplan->Dis_X ;
+        // icelement.Dis_Y  = floorplan->Dis_Y ;
 
         align_to_grid (&icelement, dimensions) ;
 
@@ -299,6 +302,35 @@ ic_elements
         ic_element_list_insert_end (&ic_element_list, &icelement) ;
     }
 
+  | POSITION  DVALUE ',' DVALUE ';'  // $2 $4
+    DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
+    DICRETIZATION DVALUE ',' DVALUE ';' // $12 $14
+  {
+        ICElement_t icelement ;
+
+        ic_element_init (&icelement) ;
+
+        icelement.SW_X   = $2 ;
+        icelement.SW_Y   = $4 ;
+        icelement.Length = $7 ;
+        icelement.Width  = $9 ;
+        icelement.Dis_X  = $12 ;
+        icelement.Dis_Y  = $14 ;
+
+        align_to_grid (&icelement, dimensions) ;
+
+        if (check_location (&icelement, dimensions) == true)
+        {
+            sprintf (error_message, "Floorplan element is outside of the IC") ;
+
+            floorplan_parser_error (floorplan, dimensions, scanner, error_message) ;
+
+            local_abort = true ;
+        }
+
+        ic_element_list_insert_end (&ic_element_list, &icelement) ;
+  }
+  
   | ic_elements_list
 
   ;

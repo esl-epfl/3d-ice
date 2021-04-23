@@ -75,6 +75,36 @@ Error_t thermal_data_build
 )
 {
     Error_t result ;
+    
+    // TODO_Darong: re-evaluate the thermal grids, interconect when enable non-uniform thermal grids
+    // if (dimensions->NonUniform == 1)
+    // {
+    //     // First re-evaluate the thermal grids for each elements
+    //     StackElementListNode_t *stkeln ;
+    //     for (stkeln  = stack_element_list_begin (stack_elements_list) ;
+    //         stkeln != NULL ;
+    //         stkeln  = stack_element_list_next (stkeln))
+    //     {
+    //         StackElement_t *stkel = stack_element_list_data (stkeln) ;
+    //         printf("%s\n", stkel->Id);
+    //         int dis_x_die = stkel->Pointer.Die->Dis_X;
+    //         int dis_y_die = stkel->Pointer.Die->Dis_Y;
+    //         printf("%d\n", dis_x_die);
+    //         printf("%d\n", dis_y_die);
+
+    //         FloorplanElementListNode_t *ele_flp ;
+
+    //         for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
+    //             ele_flp != NULL ;
+    //             ele_flp  = ele_flp->Next)
+    //         {
+    //             FloorplanElement_t *ele_flpi = &ele_flp->Data ;
+    //             printf("%s\n", ele_flpi->Id);
+
+    //         }
+    //     }
+
+    // }
 
     tdata->Size = get_number_of_cells (dimensions) ;
 

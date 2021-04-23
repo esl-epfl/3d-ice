@@ -132,7 +132,7 @@ identifier     [[:alpha:]](\_|[[:alnum:]])*
 "power"               return POWER ;
 "rectangle"           return RECTANGLE ;
 "values"              return VALUES ;
-
+"discretization"      return DICRETIZATION ;
 {identifier}          {
                         string_init      (&yylval->identifier) ;
                         string_copy_cstr (&yylval->identifier, yytext) ;

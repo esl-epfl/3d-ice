@@ -143,6 +143,7 @@ path                    \"[^"]*\"
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
 "distribution"               return DISTRIBUTION ;
+"discretization"             return DICRETIZATION ;
 "final"                      return FINAL ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;
@@ -161,6 +162,7 @@ path                    \"[^"]*\"
 "maximum"                    return MAXIMUM ;
 "microchannel"               return MICROCHANNEL ;
 "minimum"                    return MINIMUM ;
+"non-uniform"                return NONUNIFORM ;
 "output"                     return OUTPUT ;
 "pin"                        return PIN ;
 "pinfin"                     return PINFIN ;
