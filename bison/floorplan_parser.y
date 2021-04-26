@@ -89,7 +89,7 @@
 %destructor { powers_queue_free ($$) ; } <p_powers_queue>
 
 %token DIMENSION  "keyword dimension"
-%token DICRETIZATION  "keyword discretization"
+%token DISCRETIZATION  "keyword discretization"
 %token POSITION   "keyword position"
 %token POWER      "keyword power"
 %token RECTANGLE  "keywork rectangle"
@@ -304,7 +304,7 @@ ic_elements
 
   | POSITION  DVALUE ',' DVALUE ';'  // $2 $4
     DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
-    DICRETIZATION DVALUE ',' DVALUE ';' // $12 $14
+    DISCRETIZATION DVALUE ',' DVALUE ';' // $12 $14
   {
         ICElement_t icelement ;
 

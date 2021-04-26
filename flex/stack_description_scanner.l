@@ -143,7 +143,7 @@ path                    \"[^"]*\"
 "die"                        return DIE ;
 "dimensions"                 return DIMENSIONS ;
 "distribution"               return DISTRIBUTION ;
-"discretization"             return DICRETIZATION ;
+"discretization"             return DISCRETIZATION ;
 "final"                      return FINAL ;
 "first"                      return FIRST ;
 "floorplan"                  return FLOORPLAN ;

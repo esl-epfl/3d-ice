@@ -146,7 +146,7 @@
 %token DIE                   "keyword die"
 %token DIMENSIONS            "keyword dimensions"
 %token DISTRIBUTION          "keyword distribution"
-%token DICRETIZATION  "keyword discretization"
+%token DISCRETIZATION  "keyword discretization"
 %token FINAL                 "keyword final"
 %token FIRST                 "keyword first"
 %token FLOORPLAN             "keyword floorplan"
@@ -1539,7 +1539,7 @@ stack_element
         string_destroy (&$5) ;
     }
 
-  | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH DICRETIZATION DVALUE DVALUE ';'  // $2 Identifier for the stack element
+  | DIE IDENTIFIER IDENTIFIER FLOORPLAN PATH DISCRETIZATION DVALUE DVALUE ';'  // $2 Identifier for the stack element
                                                   // $3 Identifier of the die
                                                   // $5 Path of the floorplan file
     {
