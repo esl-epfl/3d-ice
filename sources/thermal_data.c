@@ -64,6 +64,48 @@ void thermal_data_init (ThermalData_t *tdata)
     tdata->SLUMatrix_B.Store = NULL ;
 }
 
+void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack_elements_list)
+{
+    int cell_num_non_uniform = 0;
+    int cell_num_die;
+    int dis_x_element = 0;
+    int dis_y_element = 0;
+    // enumerate all the stack elements (dies)
+    StackElementListNode_t *stkeln ;
+    for (stkeln  = stack_elements_list->First ;
+        stkeln != NULL ;
+        stkeln  = stkeln->Next)
+    {
+        StackElement_t *stkel = &stkeln->Data ;
+        int dis_x_die = stkel->Pointer.Die->Dis_X;
+        int dis_y_die = stkel->Pointer.Die->Dis_Y;
+
+        // enumerate all the floorplan elements
+        FloorplanElementListNode_t *ele_flp ;
+        cell_num_die = 0;
+        for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
+            ele_flp != NULL ;
+            ele_flp  = ele_flp->Next)
+        {
+            FloorplanElement_t *ele_flpi = &ele_flp->Data ;
+            dis_x_element = ele_flpi->ICElements.First->Data.Dis_X;
+            dis_y_element = ele_flpi->ICElements.First->Data.Dis_Y;
+            if (dis_x_element != 0 && dis_y_element != 0)
+            {
+                cell_num_die += dis_x_element*dis_y_element;
+            }
+            else
+            {
+                cell_num_die += dis_x_die*dis_y_die;
+            }
+        }
+        // Total cell number in all the layers the die has
+        cell_num_die = cell_num_die*stkel->NLayers;
+        cell_num_non_uniform += cell_num_die;
+    }
+    dimensions->Grid.NCells = cell_num_non_uniform;
+}
+
 /******************************************************************************/
 
 Error_t thermal_data_build
@@ -77,34 +119,11 @@ Error_t thermal_data_build
     Error_t result ;
     
     // TODO_Darong: re-evaluate the thermal grids, interconect when enable non-uniform thermal grids
-    // if (dimensions->NonUniform == 1)
-    // {
-    //     // First re-evaluate the thermal grids for each elements
-    //     StackElementListNode_t *stkeln ;
-    //     for (stkeln  = stack_element_list_begin (stack_elements_list) ;
-    //         stkeln != NULL ;
-    //         stkeln  = stack_element_list_next (stkeln))
-    //     {
-    //         StackElement_t *stkel = stack_element_list_data (stkeln) ;
-    //         printf("%s\n", stkel->Id);
-    //         int dis_x_die = stkel->Pointer.Die->Dis_X;
-    //         int dis_y_die = stkel->Pointer.Die->Dis_Y;
-    //         printf("%d\n", dis_x_die);
-    //         printf("%d\n", dis_y_die);
-
-    //         FloorplanElementListNode_t *ele_flp ;
-
-    //         for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
-    //             ele_flp != NULL ;
-    //             ele_flp  = ele_flp->Next)
-    //         {
-    //             FloorplanElement_t *ele_flpi = &ele_flp->Data ;
-    //             printf("%s\n", ele_flpi->Id);
-
-    //         }
-    //     }
-
-    // }
+    if (dimensions->NonUniform == 1)
+    {
+        // First re-evaluate the thermal grids for each elements
+        update_number_of_cells (dimensions, stack_elements_list);
+    }
 
     tdata->Size = get_number_of_cells (dimensions) ;
 
