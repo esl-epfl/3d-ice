@@ -11,7 +11,7 @@ top heat sink :
    temperature               300 ;
 
 dimensions :
-   chip length 10000, width 10000 ;
+   chip length 6000, width 6000 ;
    cell length   1000, width   1000 ;
    non-uniform 1;
 
@@ -21,11 +21,11 @@ die BOTTOM_IC :
    layer  50 SILICON ;
 
 stack:
-   die     CORE_DIE       BOTTOM_IC floorplan "./core.flp" discretization 10 20 ;
-   die     CORE2_DIE       BOTTOM_IC floorplan "./core.flp" ;
+   die     CORE_DIE       BOTTOM_IC floorplan "./core1.flp" discretization 2 1 ;
+   die     CORE_DIE2       BOTTOM_IC floorplan "./core2.flp" discretization 3 2 ;
 solver:
    steady ;
    initial temperature 300.0 ;
 
 output:
-   Tflpel   (   CORE_DIE.Core0,        "output_tmp_core1.txt", average,    final ) ;
+   Tflpel   (   CORE_DIE.Core1_0,        "output_tmp_core1.txt", average,    final ) ;
