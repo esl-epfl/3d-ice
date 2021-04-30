@@ -69,10 +69,10 @@ void thermal_data_init (ThermalData_t *tdata)
 // update the numver of cells in non-uniform grid scenario
 void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack_elements_list)
 {
-    int cell_num_non_uniform = 0;
-    int cell_num_die;
-    int discr_x_element = 0;
-    int discr_y_element = 0;
+    CellIndex_t cell_num_non_uniform = 0;
+    CellIndex_t cell_num_die;
+    CellIndex_t discr_x_element = 0;
+    CellIndex_t discr_y_element = 0;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
     for (stkeln  = stack_elements_list->First ;
@@ -80,8 +80,12 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
         stkeln  = stkeln->Next)
     {
         StackElement_t *stkel = &stkeln->Data ;
-        int discr_x_die = stkel->Pointer.Die->Discr_X;
-        int discr_y_die = stkel->Pointer.Die->Discr_Y;
+        if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
+        {
+            continue;
+        }
+        CellIndex_t discr_x_die = stkel->Pointer.Die->Discr_X;
+        CellIndex_t discr_y_die = stkel->Pointer.Die->Discr_Y;
 
         // enumerate all the floorplan elements
         FloorplanElementListNode_t *ele_flp ;
@@ -111,13 +115,13 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
 
 /******************************************************************************/
 // get cell position for each cell and sace info to arrays position_info and layer_cell_record
-void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
+void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
 {
-    int current_layer = 0;
-    int cell_num_non_uniform = 0;
-    int cell_num_layer;
-    int discr_x_element = 0;
-    int discr_y_element = 0;
+    CellIndex_t current_layer = 0;
+    CellIndex_t cell_num_non_uniform = 0;
+    CellIndex_t cell_num_layer;
+    CellIndex_t discr_x_element = 0;
+    CellIndex_t discr_y_element = 0;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
     for (stkeln  = stack_elements_list->First ;
@@ -126,8 +130,12 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
     {
         StackElement_t *stkel = &stkeln->Data ;
         // default discretization level for the die
-        int discr_x_die = stkel->Pointer.Die->Discr_X;
-        int discr_y_die = stkel->Pointer.Die->Discr_Y;
+        if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
+        {
+            continue;
+        }
+        CellIndex_t discr_x_die = stkel->Pointer.Die->Discr_X;
+        CellIndex_t discr_y_die = stkel->Pointer.Die->Discr_Y;
         // enumerate all the layers in the die
         CellIndex_t total_layer_number_die = stkel->Pointer.Die->NLayers;
         for (CellIndex_t layer_index = 0; layer_index< total_layer_number_die; layer_index++)
@@ -155,10 +163,10 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
                 ChipDimension_t ori_element_y = ele_flpi->ICElements.First->Data.SW_Y;
                 ChipDimension_t ori_element_length = ele_flpi->ICElements.First->Data.Length;
                 ChipDimension_t ori_element_width = ele_flpi->ICElements.First->Data.Width;
-                int position_info_index;
-                int discr_x_position;
-                int discr_y_position;
-                for (int sub_element = 0; sub_element < cell_num_layer; sub_element++)
+                CellIndex_t position_info_index;
+                CellIndex_t discr_x_position;
+                CellIndex_t discr_y_position;
+                for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
                 {
                     position_info_index = sub_element+cell_num_non_uniform;
                     discr_x_position = sub_element % discr_x_element;
@@ -190,7 +198,7 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
 
 /******************************************************************************/
 // Get the Minkowski difference between two cells
-void get_minkowski_difference(int *minkowski_diff, float (*position_info)[4], int i_x, int i_y)
+void get_minkowski_difference(ChipDimension_t *minkowski_diff, ChipDimension_t (*position_info)[4], int i_x, int i_y)
 {
     minkowski_diff[0] = position_info[i_x][0] - position_info[i_y][2];
     minkowski_diff[1] = position_info[i_x][1] - position_info[i_y][3];
@@ -203,21 +211,20 @@ void get_minkowski_difference(int *minkowski_diff, float (*position_info)[4], in
 void get_connections_in_layer
 (
     ConnectionList_t* connections_list, 
-    // Connection_t* new_connection, 
-    int* layer_cell_record, 
-    float (*position_info_ptr)[4], 
+    CellIndex_t* layer_cell_record, 
+    ChipDimension_t (*position_info_ptr)[4], 
     Dimensions_t* dimensions
 )
 {
-    int layer_start_index = 0;
-    int minkowski_diff[4];
-    int layer_end_index;
+    CellIndex_t layer_start_index = 0;
+    ChipDimension_t minkowski_diff[4];
+    CellIndex_t layer_end_index;
     for (CellIndex_t layer_index = 0; layer_index < dimensions->Grid.NLayers; layer_index++)
     {
         layer_end_index = layer_cell_record[layer_index];
-        for (int i_x = layer_start_index; i_x < layer_end_index; i_x++)
+        for (CellIndex_t i_x = layer_start_index; i_x < layer_end_index; i_x++)
         {
-            for (int i_y = i_x+1; i_y < layer_end_index; i_y++)
+            for (CellIndex_t i_y = i_x+1; i_y < layer_end_index; i_y++)
             {
                 // a simplified GJK algorithm to detect interconnect cells in a single layer
                 // first compute the Minkowski difference
@@ -248,18 +255,17 @@ void get_connections_in_layer
 void get_connections_between_layer
 (
     ConnectionList_t* connections_list, 
-    // Connection_t* new_connection, 
-    int* layer_cell_record, 
-    float (*position_info_ptr)[4], 
+    CellIndex_t* layer_cell_record, 
+    ChipDimension_t (*position_info_ptr)[4], 
     Dimensions_t* dimensions
 )
 {
     // First define the information between the bottom layer and its upper layer
-    int botom_layer_start_index = 0;
-    int minkowski_diff[4];
-    int botom_layer_end_index;
-    int top_layer_start_index;
-    int top_layer_end_index;
+    CellIndex_t botom_layer_start_index = 0;
+    ChipDimension_t minkowski_diff[4];
+    CellIndex_t botom_layer_end_index;
+    CellIndex_t top_layer_start_index;
+    CellIndex_t top_layer_end_index;
     // enumerate all the layers
     for (CellIndex_t layer_index = 1; layer_index < dimensions->Grid.NLayers; layer_index++)
     {
@@ -268,10 +274,10 @@ void get_connections_between_layer
         top_layer_end_index = layer_cell_record[layer_index];
         
         // enumerate all the elements in a bottom layer
-        for (int i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+        for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
         {
             // enumerate all the elements in an upper layer
-            for (int i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+            for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
             {
                 // first compute Minkowski difference
                 get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
@@ -309,9 +315,9 @@ Error_t thermal_data_build
     {
         update_number_of_cells (dimensions, stack_elements_list);
         
-        float position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
-        float (*position_info_ptr)[4] = position_info;
-        int layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
+        ChipDimension_t position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
+        ChipDimension_t (*position_info_ptr)[4] = position_info;
+        CellIndex_t layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
         // get cell position for each cell and sace info to arrays position_info and layer_cell_record
         get_cell_position(position_info_ptr, layer_cell_record, stack_elements_list, dimensions);
 
