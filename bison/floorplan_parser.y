@@ -285,8 +285,8 @@ ic_elements
         icelement.SW_Y   = $4 ;
         icelement.Length = $7 ;
         icelement.Width  = $9 ;
-        // icelement.Dis_X  = floorplan->Dis_X ;
-        // icelement.Dis_Y  = floorplan->Dis_Y ;
+        // icelement.Discr_X  = floorplan->Discr_X ;
+        // icelement.Discr_Y  = floorplan->Discr_Y ;
 
         align_to_grid (&icelement, dimensions) ;
 
@@ -314,8 +314,8 @@ ic_elements
         icelement.SW_Y   = $4 ;
         icelement.Length = $7 ;
         icelement.Width  = $9 ;
-        icelement.Dis_X  = $12 ;
-        icelement.Dis_Y  = $14 ;
+        icelement.Discr_X  = $12 ;
+        icelement.Discr_Y  = $14 ;
 
         align_to_grid (&icelement, dimensions) ;
 

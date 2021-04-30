@@ -53,8 +53,8 @@ void die_init (Die_t *die)
 
     floorplan_init (&die->Floorplan) ;
 
-    die->Dis_X           = (CellIndex_t) 0u ;
-    die->Dis_Y           = (CellIndex_t) 0u ;
+    die->Discr_X           = (CellIndex_t) 0u ;
+    die->Discr_Y           = (CellIndex_t) 0u ;
 }
 
 /******************************************************************************/
@@ -72,8 +72,8 @@ void die_copy (Die_t *dst, Die_t *src)
 
     floorplan_copy (&dst->Floorplan, &src->Floorplan) ;
     
-    dst->Dis_X           = src->Dis_X ;
-    dst->Dis_Y           = src->Dis_Y ;
+    dst->Discr_X           = src->Discr_X ;
+    dst->Discr_Y           = src->Discr_Y ;
 }
 
 /******************************************************************************/

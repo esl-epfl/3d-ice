@@ -1525,8 +1525,8 @@ stack_element
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
-        die->Dis_X = stkd->Dimensions->Grid.NRows;
-        die->Dis_Y = stkd->Dimensions->Grid.NColumns;
+        die->Discr_X = stkd->Dimensions->Grid.NRows;
+        die->Discr_Y = stkd->Dimensions->Grid.NColumns;
 
         stack_element->SEType      = TDICE_STACK_ELEMENT_DIE ;
         stack_element->Pointer.Die = die ;
@@ -1608,8 +1608,8 @@ stack_element
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
-        die->Dis_X = $7;
-        die->Dis_Y = $8;
+        die->Discr_X = $7;
+        die->Discr_Y = $8;
 
         stack_element->SEType      = TDICE_STACK_ELEMENT_DIE ;
         stack_element->Pointer.Die = die ;

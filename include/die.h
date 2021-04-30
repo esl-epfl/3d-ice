@@ -95,11 +95,11 @@ extern "C"
         
         /*! Die discretization level at the south-west X coordinate */
 
-        CellIndex_t Dis_X ;
+        CellIndex_t Discr_X ;
 
         /*! Die discretization level at the south-west Y coordinate */
 
-        CellIndex_t Dis_Y ;
+        CellIndex_t Discr_Y ;
 
     } ;
 

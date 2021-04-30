@@ -104,7 +104,9 @@
                   $(3DICE_SOURCES)/system_matrix.c            \
                   $(3DICE_SOURCES)/string_t.c                 \
                   $(3DICE_SOURCES)/thermal_data.c             \
-                  $(3DICE_SOURCES)/thermal_grid.c
+                  $(3DICE_SOURCES)/thermal_grid.c             \
+                  $(3DICE_SOURCES)/connection.c               \
+                  $(3DICE_SOURCES)/connection_list.c
 
 ifeq ($(SYSTEMC_WRAPPER),y)
 3DICE_SOURCES_CPP = $(3DICE_SOURCES)/IceWrapper.cpp
@@ -155,15 +157,16 @@ ARFLAGS   = rsv
 
 CC        = gcc
 # CC        = g++
-CFLAGS    = -MD -O3
+# CFLAGS    = -MD -O3
 # CFLAGS    = -MD -g -O0 -fsanitize=address
+CFLAGS    = -MD -g -O0
 CINCLUDES = -I$(3DICE_INCLUDE)
 
 YACC      = bison
-YFLAGS    = -d
+YFLAGS    = -d --debug
 
 LEX       = flex
-LFLAGS    =
+LFLAGS    = --debug
 
 RM        = rm
 RMFLAGS   = -vf
@@ -172,8 +175,9 @@ DOXYGEN   = doxygen
 DOXYFILE  = Doxyfile
 
 CXX       = g++
-CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
+# CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
 # CXXFLAGS  = -std=c++11 -g -O0 -fsanitize=address -Wall -Wextra -Werror
+CXXFLAGS  = -std=c++11 -g -O0 -Wall -Wextra -Werror
 INC_DIRS  = $(CINCLUDES) -I$(SYSTEMC_INCLUDE)
 
  #

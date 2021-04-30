@@ -57,6 +57,7 @@ extern "C"
 #include "thermal_grid.h"
 #include "power_grid.h"
 #include "dimensions.h"
+#include "connection_list.h"
 
 #include "slu_ddefs.h"
 
@@ -115,10 +116,74 @@ extern "C"
      *
      * \param tdata the address of the structure to initalize
      */
-
     void thermal_data_init (ThermalData_t *tdata) ;
 
+    /******************************************************************************/
 
+    // typedef struct Connections_List Connections_List;
+    // struct Connections_List{
+    //     int node1;
+    //     int node2;
+    //     Connections_List* next_connection;
+    // };
+    // typedef struct conections_info{
+    //     int num_connections;
+    //     Connections_List* next_connection;
+    // } Conections_Info;
+
+
+
+    /*! Update the number of cells in the non-uniform grid scenario
+     *
+     * \param dimensions the dimensions of the IC
+     * \param stack_elements_list the list of stack element (bottom first)
+     */
+
+    void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack_elements_list);
+    
+    /*! Get cell position for each cell and sace info to arrays position_info and layer_cell_record
+     * \param position_info position info contains "left_x, left_y, right_x, right_y" for each thermal cell
+     * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param stack_elements_list the list of stack element (bottom first)
+     */
+    void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackElementList_t *stack_elements_list);
+
+    /*! Get the Minkowski difference between two cells
+     * \param minkowski_diff the vector contains the minkowski difference information
+     * \param position_info position info contains "left_x, left_y, right_x, right_y" for each thermal cell
+     * \param i_x the index of the one cell
+     * \param i_y the index of the other cell
+     */
+    void get_minkowski_difference(int *minkowski_diff, float (*position_info)[4], int i_x, int i_y);
+
+    /*! get connections of each grid in the same layer
+     * \param connections_var_ptr the address of the list contains connections informarion
+     * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
+     * \param dimensions the dimensions of the IC
+     */
+    void get_connections_in_layer
+    (
+        ConnectionList_t* connections_list,
+        int* layer_cell_record, 
+        float (*position_info_ptr)[4],
+        Dimensions_t* dimensions
+        
+    );
+
+    /*! Get connections between layers (from bottom to top)
+     * \param connections_var_ptr the address of the list contains connections informarion
+     * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
+     * \param dimensions the dimensions of the IC
+     */
+    void get_connections_between_layer
+    (
+        ConnectionList_t* connections_list, 
+        int* layer_cell_record, 
+        float (*position_info_ptr)[4], 
+        Dimensions_t* dimensions
+    );
 
     /*! Allocs and initialize memory and prepares the LU factorization
      *

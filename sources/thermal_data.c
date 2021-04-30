@@ -41,19 +41,8 @@
 
 #include "thermal_data.h"
 #include "macros.h"
-
-/******************************************************************************/
-typedef struct Connections_List Connections_List;
-struct Connections_List{
-    int node1;
-    int node2;
-    Connections_List* next_connection;
-};
-typedef struct conections_info{
-    int num_connections;
-    Connections_List* next_connection;
-} Conections_Info;
-
+#include "connection_list.h"
+#include "connection.h"
 /******************************************************************************/
 
 static void init_data (double* data, uint32_t size, double init_value)
@@ -76,12 +65,14 @@ void thermal_data_init (ThermalData_t *tdata)
     tdata->SLUMatrix_B.Store = NULL ;
 }
 
+/******************************************************************************/
+// update the numver of cells in non-uniform grid scenario
 void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack_elements_list)
 {
     int cell_num_non_uniform = 0;
     int cell_num_die;
-    int dis_x_element = 0;
-    int dis_y_element = 0;
+    int discr_x_element = 0;
+    int discr_y_element = 0;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
     for (stkeln  = stack_elements_list->First ;
@@ -89,8 +80,8 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
         stkeln  = stkeln->Next)
     {
         StackElement_t *stkel = &stkeln->Data ;
-        int dis_x_die = stkel->Pointer.Die->Dis_X;
-        int dis_y_die = stkel->Pointer.Die->Dis_Y;
+        int discr_x_die = stkel->Pointer.Die->Discr_X;
+        int discr_y_die = stkel->Pointer.Die->Discr_Y;
 
         // enumerate all the floorplan elements
         FloorplanElementListNode_t *ele_flp ;
@@ -100,15 +91,15 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
             ele_flp  = ele_flp->Next)
         {
             FloorplanElement_t *ele_flpi = &ele_flp->Data ;
-            dis_x_element = ele_flpi->ICElements.First->Data.Dis_X;
-            dis_y_element = ele_flpi->ICElements.First->Data.Dis_Y;
-            if (dis_x_element != 0 && dis_y_element != 0)
+            discr_x_element = ele_flpi->ICElements.First->Data.Discr_X;
+            discr_y_element = ele_flpi->ICElements.First->Data.Discr_Y;
+            if (discr_x_element != 0 && discr_y_element != 0)
             {
-                cell_num_die += dis_x_element*dis_y_element;
+                cell_num_die += discr_x_element*discr_y_element;
             }
             else
             {
-                cell_num_die += dis_x_die*dis_y_die;
+                cell_num_die += discr_x_die*discr_y_die;
             }
         }
         // Total cell number in all the layers the die has
@@ -125,8 +116,8 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
     int current_layer = 0;
     int cell_num_non_uniform = 0;
     int cell_num_layer;
-    int dis_x_element = 0;
-    int dis_y_element = 0;
+    int discr_x_element = 0;
+    int discr_y_element = 0;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
     for (stkeln  = stack_elements_list->First ;
@@ -135,8 +126,8 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
     {
         StackElement_t *stkel = &stkeln->Data ;
         // default discretization level for the die
-        int dis_x_die = stkel->Pointer.Die->Dis_X;
-        int dis_y_die = stkel->Pointer.Die->Dis_Y;
+        int discr_x_die = stkel->Pointer.Die->Discr_X;
+        int discr_y_die = stkel->Pointer.Die->Discr_Y;
         // enumerate all the layers in the die
         CellIndex_t total_layer_number_die = stkel->Pointer.Die->NLayers;
         for (CellIndex_t layer_index = 0; layer_index< total_layer_number_die; layer_index++)
@@ -148,15 +139,15 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
                 ele_flp  = ele_flp->Next)
             {
                 FloorplanElement_t *ele_flpi = &ele_flp->Data ;
-                dis_x_element = ele_flpi->ICElements.First->Data.Dis_X;
-                dis_y_element = ele_flpi->ICElements.First->Data.Dis_Y;
+                discr_x_element = ele_flpi->ICElements.First->Data.Discr_X;
+                discr_y_element = ele_flpi->ICElements.First->Data.Discr_Y;
                 // take default discretization level if the floorplan unit does not define the disretization level
-                if (dis_x_element == 0 || dis_y_element == 0)
+                if (discr_x_element == 0 || discr_y_element == 0)
                 {
-                    dis_x_element = dis_x_die;
-                    dis_y_element = dis_y_die;
+                    discr_x_element = discr_x_die;
+                    discr_y_element = discr_y_die;
                 }
-                cell_num_layer = dis_x_element*dis_y_element;
+                cell_num_layer = discr_x_element*discr_y_element;
 
                 // fill position info
                 // generate the thermal grid first from left to right (x->), bottom to up (y->) for each floorplan element
@@ -165,17 +156,19 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
                 ChipDimension_t ori_element_length = ele_flpi->ICElements.First->Data.Length;
                 ChipDimension_t ori_element_width = ele_flpi->ICElements.First->Data.Width;
                 int position_info_index;
-                int dis_y_position;
+                int discr_x_position;
+                int discr_y_position;
                 for (int sub_element = 0; sub_element < cell_num_layer; sub_element++)
                 {
                     position_info_index = sub_element+cell_num_non_uniform;
-                    dis_y_position = (sub_element - (sub_element % dis_x_element))/dis_x_element;
+                    discr_x_position = sub_element % discr_x_element;
+                    discr_y_position = sub_element / discr_x_element;
                     // left corner coordinate (left_x, left_y)
-                    position_info[position_info_index][0] = ori_element_x + (ori_element_length/dis_x_element)*(sub_element % dis_x_element);
-                    position_info[position_info_index][1] = ori_element_y + (ori_element_width/dis_y_element)*dis_y_position;
+                    position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x_element)*discr_x_position;
+                    position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y_element)*discr_y_position;
                     // right corner coordinate (right_x, right_y)
-                    position_info[position_info_index][2] = ori_element_x + (ori_element_length/dis_x_element)*(sub_element % dis_x_element + 1);
-                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/dis_y_element)*(dis_y_position + 1);              
+                    position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x_element)*(discr_x_position + 1);
+                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y_element)*(discr_y_position + 1);              
                 }
                 cell_num_non_uniform += cell_num_layer;
             }
@@ -188,7 +181,7 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
 
 
 /******************************************************************************/
-
+// Get the Minkowski difference between two cells
 void get_minkowski_difference(int *minkowski_diff, float (*position_info)[4], int i_x, int i_y)
 {
     minkowski_diff[0] = position_info[i_x][0] - position_info[i_y][2];
@@ -199,7 +192,14 @@ void get_minkowski_difference(int *minkowski_diff, float (*position_info)[4], in
 
 /******************************************************************************/
 // get connections of each grid in the same layer
-void get_connections_in_layer(Conections_Info* connections_var_ptr, Connections_List* current_connection_node, int* layer_cell_record, float (*position_info_ptr)[4], Dimensions_t* dimensions)
+void get_connections_in_layer
+(
+    ConnectionList_t* connections_list, 
+    // Connection_t* new_connection, 
+    int* layer_cell_record, 
+    float (*position_info_ptr)[4], 
+    Dimensions_t* dimensions
+)
 {
     int layer_start_index = 0;
     int minkowski_diff[4];
@@ -221,13 +221,30 @@ void get_connections_in_layer(Conections_Info* connections_var_ptr, Connections_
                     if (minkowski_diff[0] * minkowski_diff[2] + minkowski_diff[1] * minkowski_diff[3] < 0)
                     {
                         // add the connection information to the connections variable
-                        current_connection_node->node1 = i_x;
-                        current_connection_node->node2 = i_y;
-                        Connections_List next_connection_node;
-                        current_connection_node->next_connection = &next_connection_node;
-                        current_connection_node = current_connection_node->next_connection;
-                        connections_var_ptr->num_connections++;
-                        printf("%d, %d, %d\n", i_x, i_y,  connections_var_ptr->num_connections);
+                        Connection_t new_connection;
+                        connection_init(&new_connection);
+                        new_connection.node1 = i_x;
+                        new_connection.node2 = i_y;
+                        // Connections_List next_connection_node;
+                        // new_connection->next_connection = &next_connection_node;
+                        // new_connection = new_connection->next_connection;
+                        connection_list_insert_begin(connections_list, &new_connection);
+                        // connection_free (&new_connection) ;
+                        // connections_list->num_connections++;
+                        // printf("%d, %d, %d\n", i_x, i_y,  connections_list->num_connections);
+
+                        // Connection_t* new_connection = (Connection_t *) malloc(sizeof(Connection_t));
+                        // connection_init(new_connection);
+                        // new_connection->node1 = i_x;
+                        // new_connection->node2 = i_y;
+                        // // Connections_List next_connection_node;
+                        // // new_connection->next_connection = &next_connection_node;
+                        // // new_connection = new_connection->next_connection;
+                        // connection_list_insert_begin(connections_list, new_connection);
+                        // // connection_free (&new_connection) ;
+                        // // connections_list->num_connections++;
+                        // // printf("%d, %d, %d\n", i_x, i_y,  connections_list->num_connections);
+                        
                     }
                 }
             }
@@ -238,7 +255,14 @@ void get_connections_in_layer(Conections_Info* connections_var_ptr, Connections_
 
 /******************************************************************************/
 // get connections between layers (bottom->top)
-void get_connections_between_layer(Conections_Info* connections_var_ptr, Connections_List* current_connection_node, int* layer_cell_record, float (*position_info_ptr)[4], Dimensions_t* dimensions)
+void get_connections_between_layer
+(
+    ConnectionList_t* connections_list, 
+    // Connection_t* new_connection, 
+    int* layer_cell_record, 
+    float (*position_info_ptr)[4], 
+    Dimensions_t* dimensions
+)
 {
     // First define the information between the bottom layer and its upper layer
     int botom_layer_start_index = 0;
@@ -265,13 +289,16 @@ void get_connections_between_layer(Conections_Info* connections_var_ptr, Connect
                 if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
                 {
                     // add the connection information to the connections variable
-                    current_connection_node->node1 = i_x;
-                    current_connection_node->node2 = i_y;
-                    Connections_List next_connection_node;    
-                    current_connection_node->next_connection = &next_connection_node;
-                    current_connection_node = current_connection_node->next_connection;
-                    connections_var_ptr->num_connections++;
-                    printf("%d, %d, %d\n", i_x, i_y,  connections_var_ptr->num_connections);
+                    Connection_t new_connection;
+                    connection_init(&new_connection);
+                    new_connection.node1 = i_x;
+                    new_connection.node2 = i_y;
+                    // Connections_List next_connection_node;    
+                    // new_connection->next_connection = &next_connection_node;
+                    // new_connection = new_connection->next_connection;
+                    connection_list_insert_end(connections_list, &new_connection);
+                    // connections_list->num_connections++;
+                    // printf("%d, %d, %d\n", i_x, i_y,  connections_list->num_connections);
                 }
             }
         }
@@ -373,27 +400,29 @@ Error_t thermal_data_build
     // update number of connections in non-uniform grid scenario
     if (dimensions->NonUniform == 1)
     {
-        float position_info[dimensions->Grid.NCells][4]; // (position info contains "left_x, left_y, right_x, right_y" for each thermal cell)
+        float position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
         float (*position_info_ptr)[4] = position_info;
         int layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
         // get cell position for each cell and sace info to arrays position_info and layer_cell_record
         get_cell_position(position_info_ptr, layer_cell_record, stack_elements_list);
 
         // initalize connections variable to store connections info
-        Conections_Info connections_var;
-        connections_var.num_connections = 0;
-        Conections_Info* connections_var_ptr = &connections_var;
-        Connections_List* current_connection_node = (Connections_List *) malloc (sizeof(Connections_List));
-        current_connection_node->next_connection = ((void*)0);
-        connections_var_ptr->next_connection = current_connection_node;
+        ConnectionList_t connections_list;
+        connection_list_init(&connections_list);
+        // connections_list.num_connections = 0;
+        // Conections_Info* connections_list = &connections_list;
+
+        // Connections_List* new_connection = (Connections_List *) malloc (sizeof(Connections_List));
+        // new_connection->next_connection = ((void*)0);
+        // connections_list->next_connection = new_connection;
         
         // get connections of each grid in the same layer
         printf("\n Node1 Node2 Number \n");
-        get_connections_in_layer(connections_var_ptr, current_connection_node, layer_cell_record, position_info_ptr, dimensions);
+        get_connections_in_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
         // get connections between layers (bottom->top)
-        get_connections_between_layer(connections_var_ptr, current_connection_node, layer_cell_record, position_info_ptr, dimensions);
+        get_connections_between_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
         // update number of connections
-        dimensions->Grid.NConnections =  2*(connections_var_ptr->num_connections)+dimensions->Grid.NCells;
+        // dimensions->Grid.NConnections =  2*(connections_list->num_connections)+dimensions->Grid.NCells;
     }
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
