@@ -146,7 +146,7 @@ extern "C"
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
      * \param stack_elements_list the list of stack element (bottom first)
      */
-    void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackElementList_t *stack_elements_list);
+    void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions);
 
     /*! Get the Minkowski difference between two cells
      * \param minkowski_diff the vector contains the minkowski difference information

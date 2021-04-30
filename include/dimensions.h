@@ -53,6 +53,7 @@ extern "C"
 
 #include "types.h"
 #include "string_t.h"
+#include "non_uniform_cell_list.h"
     
 struct HeatSink_t; //Forward decalration
 
@@ -320,7 +321,12 @@ struct HeatSink_t; //Forward decalration
 
         ChipDimensions_t Chip ;
 
+        /*! Non-uniform grid flag */
+
         uint8_t NonUniform ;
+
+        /*! Non-uniform thermal cell list */
+        Non_uniform_cellList_t Cell_list;
 
     } ;
 

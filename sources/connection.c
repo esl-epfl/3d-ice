@@ -11,23 +11,16 @@ void connection_init (Connection_t *connection)
 
 void connection_destroy (Connection_t *connection)
 {
-  connection_init (connection) ;
-}
-
-void connection_free (Connection_t *connection)
-{
     if (connection == NULL)
 
         return ;
-
-    connection_destroy (connection) ;
 
     free (connection) ;
 }
 
 void connection_copy (Connection_t *dst, Connection_t *src)
 {
-  connection_destroy (dst) ;
+  connection_init (dst) ;
 
   dst->node1 = src->node1;
   dst->node2 = src->node2;

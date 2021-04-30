@@ -106,7 +106,10 @@
                   $(3DICE_SOURCES)/thermal_data.c             \
                   $(3DICE_SOURCES)/thermal_grid.c             \
                   $(3DICE_SOURCES)/connection.c               \
-                  $(3DICE_SOURCES)/connection_list.c
+                  $(3DICE_SOURCES)/connection_list.c          \
+                  $(3DICE_SOURCES)/non_uniform_cell.c         \
+                  $(3DICE_SOURCES)/non_uniform_cell_list.c
+                  
 
 ifeq ($(SYSTEMC_WRAPPER),y)
 3DICE_SOURCES_CPP = $(3DICE_SOURCES)/IceWrapper.cpp

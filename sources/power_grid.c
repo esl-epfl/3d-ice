@@ -298,16 +298,26 @@ void power_grid_fill
     Capacity_t *tmp = pgrid->CellsCapacities ;
 
     // NOTE: if the top heatsink is pluggable, there are more elements to fill
-    for (layer  = first_layer (dimensions) ;
-         layer <= last_layer  (dimensions) ; layer++)
+    if (dimensions->NonUniform == 1)
+    {
+        for(Non_uniform_cellListNode_t* i_cell = dimensions->Cell_list.First;
+            i_cell != NULL;
+            i_cell = i_cell->Next)
+                *tmp++ = get_capacity_non_uniform (tgrid, dimensions, i_cell) ;
+    }
+    else{
+        for (layer  = first_layer (dimensions) ;
+            layer <= last_layer  (dimensions) ; layer++)
 
-        for (row  = first_row (dimensions) ;
-             row <= last_row  (dimensions) ; row++)
+            for (row  = first_row (dimensions) ;
+                row <= last_row  (dimensions) ; row++)
 
-            for (column  = first_column (dimensions) ;
-                 column <= last_column  (dimensions) ; column++)
+                for (column  = first_column (dimensions) ;
+                    column <= last_column  (dimensions) ; column++)
 
-                *tmp++ = get_capacity (tgrid, dimensions, layer, row, column) ;
+                    *tmp++ = get_capacity (tgrid, dimensions, layer, row, column) ;
+    }
+
 
     StackElement_t *bmost = stack_element_list_data (stack_element_list_end   (list)) ;
     StackElement_t *tmost = stack_element_list_data (stack_element_list_begin (list)) ;

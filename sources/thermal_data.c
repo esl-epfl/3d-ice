@@ -42,7 +42,7 @@
 #include "thermal_data.h"
 #include "macros.h"
 #include "connection_list.h"
-#include "connection.h"
+
 /******************************************************************************/
 
 static void init_data (double* data, uint32_t size, double init_value)
@@ -111,7 +111,7 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
 
 /******************************************************************************/
 // get cell position for each cell and sace info to arrays position_info and layer_cell_record
-void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackElementList_t *stack_elements_list)
+void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
 {
     int current_layer = 0;
     int cell_num_non_uniform = 0;
@@ -168,7 +168,15 @@ void get_cell_position(float (*position_info)[4], int *layer_cell_record, StackE
                     position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y_element)*discr_y_position;
                     // right corner coordinate (right_x, right_y)
                     position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x_element)*(discr_x_position + 1);
-                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y_element)*(discr_y_position + 1);              
+                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y_element)*(discr_y_position + 1);
+                    Non_uniform_cell_t new_cell;
+                    non_uniform_cell_init(&new_cell);
+                    new_cell.layer_info =  current_layer;
+                    new_cell.left_x = position_info[position_info_index][0] ;
+                    new_cell.left_y = position_info[position_info_index][1] ;
+                    new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
+                    new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                    non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
                 }
                 cell_num_non_uniform += cell_num_layer;
             }
@@ -225,25 +233,7 @@ void get_connections_in_layer
                         connection_init(&new_connection);
                         new_connection.node1 = i_x;
                         new_connection.node2 = i_y;
-                        // Connections_List next_connection_node;
-                        // new_connection->next_connection = &next_connection_node;
-                        // new_connection = new_connection->next_connection;
-                        connection_list_insert_begin(connections_list, &new_connection);
-                        // connection_free (&new_connection) ;
-                        // connections_list->num_connections++;
-                        // printf("%d, %d, %d\n", i_x, i_y,  connections_list->num_connections);
-
-                        // Connection_t* new_connection = (Connection_t *) malloc(sizeof(Connection_t));
-                        // connection_init(new_connection);
-                        // new_connection->node1 = i_x;
-                        // new_connection->node2 = i_y;
-                        // // Connections_List next_connection_node;
-                        // // new_connection->next_connection = &next_connection_node;
-                        // // new_connection = new_connection->next_connection;
-                        // connection_list_insert_begin(connections_list, new_connection);
-                        // // connection_free (&new_connection) ;
-                        // // connections_list->num_connections++;
-                        // // printf("%d, %d, %d\n", i_x, i_y,  connections_list->num_connections);
+                        connection_list_insert_end(connections_list, &new_connection);
                         
                     }
                 }
@@ -293,12 +283,7 @@ void get_connections_between_layer
                     connection_init(&new_connection);
                     new_connection.node1 = i_x;
                     new_connection.node2 = i_y;
-                    // Connections_List next_connection_node;    
-                    // new_connection->next_connection = &next_connection_node;
-                    // new_connection = new_connection->next_connection;
                     connection_list_insert_end(connections_list, &new_connection);
-                    // connections_list->num_connections++;
-                    // printf("%d, %d, %d\n", i_x, i_y,  connections_list->num_connections);
                 }
             }
         }
@@ -319,9 +304,28 @@ Error_t thermal_data_build
     Error_t result ;
     
     // re-evaluate the number of thermal grids
+    // update number of connections in non-uniform grid scenario
     if (dimensions->NonUniform == 1)
     {
         update_number_of_cells (dimensions, stack_elements_list);
+        
+        float position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
+        float (*position_info_ptr)[4] = position_info;
+        int layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
+        // get cell position for each cell and sace info to arrays position_info and layer_cell_record
+        get_cell_position(position_info_ptr, layer_cell_record, stack_elements_list, dimensions);
+
+        // initalize connections variable to store connections info
+        ConnectionList_t connections_list;
+        connection_list_init(&connections_list);
+        
+        // get connections of each grid in the same layer
+        printf("\n Node1 Node2 Number \n");
+        get_connections_in_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
+        // get connections between layers (bottom->top)
+        get_connections_between_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
+        // update number of connections
+        dimensions->Grid.NConnections =  2*(connections_list.Size)+dimensions->Grid.NCells;
     }
 
     tdata->Size = get_number_of_cells (dimensions) ;
@@ -396,34 +400,6 @@ Error_t thermal_data_build
 
         (&tdata->PowerGrid, &tdata->ThermalGrid, stack_elements_list, dimensions) ;
 
-    // Darong_TODO: Verification for more test stk and flp
-    // update number of connections in non-uniform grid scenario
-    if (dimensions->NonUniform == 1)
-    {
-        float position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
-        float (*position_info_ptr)[4] = position_info;
-        int layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
-        // get cell position for each cell and sace info to arrays position_info and layer_cell_record
-        get_cell_position(position_info_ptr, layer_cell_record, stack_elements_list);
-
-        // initalize connections variable to store connections info
-        ConnectionList_t connections_list;
-        connection_list_init(&connections_list);
-        // connections_list.num_connections = 0;
-        // Conections_Info* connections_list = &connections_list;
-
-        // Connections_List* new_connection = (Connections_List *) malloc (sizeof(Connections_List));
-        // new_connection->next_connection = ((void*)0);
-        // connections_list->next_connection = new_connection;
-        
-        // get connections of each grid in the same layer
-        printf("\n Node1 Node2 Number \n");
-        get_connections_in_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
-        // get connections between layers (bottom->top)
-        get_connections_between_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
-        // update number of connections
-        // dimensions->Grid.NConnections =  2*(connections_list->num_connections)+dimensions->Grid.NCells;
-    }
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
     result = system_matrix_build

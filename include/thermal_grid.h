@@ -145,7 +145,22 @@ extern "C"
 
     Error_t thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list) ;
 
-
+    /*! Return the capacity of a thermal cell at a given position
+     *
+     * The function prints a message on stderr in case of error
+     *
+     * \param tgrid         pointer to the thermal grid structure
+     * \param dimensions    pointer to the structure storing the dimensions
+     * \param i_cell        pointer to the cell
+     *
+     * \return the capacity of the thermal cell in Non-uniform grid scenario.
+     */
+    Capacity_t get_capacity_non_uniform
+    (
+        ThermalGrid_t *tgrid,
+        Dimensions_t  *dimensions,
+        Non_uniform_cellListNode_t* i_cell
+    );
 
     /*! Return the capacity of a thermal cell at a given position
      *

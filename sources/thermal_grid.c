@@ -321,6 +321,53 @@ Error_t thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
 /******************************************************************************/
 
 
+Capacity_t get_capacity_non_uniform
+(
+    ThermalGrid_t *tgrid,
+    Dimensions_t  *dimensions,
+    Non_uniform_cellListNode_t* i_cell
+)
+{
+    CellIndex_t layer_index = i_cell->Data.layer_info;
+    if (layer_index > tgrid->NLayers)
+    {
+        fprintf (stderr,
+            "ERROR: layer index %d is out of range\n", layer_index) ;
+
+        return 0.0 ;
+    }
+
+    switch (tgrid->LayersTypeProfile [layer_index])
+    {
+        case TDICE_LAYER_SOLID :
+        case TDICE_LAYER_SOURCE :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+
+            return (  get_volumetric_heat_capacity (tgrid->LayersProfile + layer_index,
+                                                    0, 0,
+                                                    dimensions)
+                    * i_cell->Data.length
+                    * i_cell->Data.width
+                    * get_cell_height (dimensions, layer_index)
+                   ) ;
+        default :
+
+            fprintf (stderr, "ERROR: Not supported layer type in Non-uniform grid scenario %d\n",
+                tgrid->LayersTypeProfile [layer_index]) ;
+
+            return 0.0 ;
+
+    }
+}
+
+/******************************************************************************/
+
+
 Capacity_t get_capacity
 (
     ThermalGrid_t *tgrid,
