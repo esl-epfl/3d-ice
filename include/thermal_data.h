@@ -157,14 +157,12 @@ extern "C"
     void get_minkowski_difference(ChipDimension_t *minkowski_diff, ChipDimension_t (*position_info)[4], int i_x, int i_y);
 
     /*! get connections of each grid in the same layer
-     * \param connections_var_ptr the address of the list contains connections informarion
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
      * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param dimensions the dimensions of the IC
      */
     void get_connections_in_layer
     (
-        ConnectionList_t* connections_list,
         CellIndex_t* layer_cell_record, 
         ChipDimension_t (*position_info_ptr)[4],
         Dimensions_t* dimensions
@@ -172,14 +170,12 @@ extern "C"
     );
 
     /*! Get connections between layers (from bottom to top)
-     * \param connections_var_ptr the address of the list contains connections informarion
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
      * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param dimensions the dimensions of the IC
      */
     void get_connections_between_layer
     (
-        ConnectionList_t* connections_list, 
         CellIndex_t* layer_cell_record, 
         ChipDimension_t (*position_info_ptr)[4], 
         Dimensions_t* dimensions

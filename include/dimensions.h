@@ -54,6 +54,7 @@ extern "C"
 #include "types.h"
 #include "string_t.h"
 #include "non_uniform_cell_list.h"
+#include "connection_list.h"
     
 struct HeatSink_t; //Forward decalration
 
@@ -327,6 +328,9 @@ struct HeatSink_t; //Forward decalration
 
         /*! Non-uniform thermal cell list */
         Non_uniform_cellList_t Cell_list;
+
+        /*! Connection list for non-uniform thermal cells */
+        ConnectionList_t connections_list;
 
     } ;
 

@@ -17,8 +17,12 @@ extern "C"
   
 struct Connection_t
 {
-    int node1;
-    int node2;
+    CellIndex_t node1;
+    CellIndex_t node1_layer;
+    CellIndex_t node2;
+    CellIndex_t node2_layer;
+    CellIndex_t direction; // connection direction in z (=0), x (=1), or y (=2);
+    ChipDimension_t  value; // connection value, it is intercoonect length if two nodes in the same layer, otherwise, it is the area
 };
 
 typedef struct Connection_t Connection_t;

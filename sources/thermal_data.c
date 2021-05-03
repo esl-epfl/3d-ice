@@ -210,12 +210,12 @@ void get_minkowski_difference(ChipDimension_t *minkowski_diff, ChipDimension_t (
 // get connections of each grid in the same layer
 void get_connections_in_layer
 (
-    ConnectionList_t* connections_list, 
     CellIndex_t* layer_cell_record, 
     ChipDimension_t (*position_info_ptr)[4], 
     Dimensions_t* dimensions
 )
 {
+    ConnectionList_t* connections_list = &dimensions->connections_list;
     CellIndex_t layer_start_index = 0;
     ChipDimension_t minkowski_diff[4];
     CellIndex_t layer_end_index;
@@ -235,11 +235,29 @@ void get_connections_in_layer
                     // furthermore, it should cross the origin point
                     if (minkowski_diff[0] * minkowski_diff[2] + minkowski_diff[1] * minkowski_diff[3] < 0)
                     {
-                        // add the connection information to the connections variable
                         Connection_t new_connection;
                         connection_init(&new_connection);
                         new_connection.node1 = i_x;
                         new_connection.node2 = i_y;
+                        new_connection.node1_layer = layer_index;
+                        new_connection.node2_layer = layer_index;
+                        // Find the interconnect length
+                        if (minkowski_diff[0] * minkowski_diff[2] == 0)
+                        {
+                            new_connection.value = (fabs(minkowski_diff[1])<=fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
+                            new_connection.direction = 1; //two nodes interconect in direction x
+                        }
+                        else if (minkowski_diff[1] * minkowski_diff[3] == 0)
+                        {
+                            new_connection.value = (fabs(minkowski_diff[0])<=fabs(minkowski_diff[2])) ? fabs(minkowski_diff[0]) : fabs(minkowski_diff[2]);
+                            new_connection.direction = 2; //two nodes interconect in direction y
+                        }
+                        else
+                            fprintf (stderr, "Cannot determine interconnect length\n") ;
+                        
+                        printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                        printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                        // add the connection information to the connections variable
                         connection_list_insert_end(connections_list, &new_connection);
                         
                     }
@@ -254,12 +272,12 @@ void get_connections_in_layer
 // get connections between layers (bottom->top)
 void get_connections_between_layer
 (
-    ConnectionList_t* connections_list, 
     CellIndex_t* layer_cell_record, 
     ChipDimension_t (*position_info_ptr)[4], 
     Dimensions_t* dimensions
 )
 {
+    ConnectionList_t* connections_list = &dimensions->connections_list;
     // First define the information between the bottom layer and its upper layer
     CellIndex_t botom_layer_start_index = 0;
     ChipDimension_t minkowski_diff[4];
@@ -289,6 +307,22 @@ void get_connections_between_layer
                     connection_init(&new_connection);
                     new_connection.node1 = i_x;
                     new_connection.node2 = i_y;
+                    new_connection.node1_layer = layer_index-1;
+                    new_connection.node2_layer = layer_index;
+
+                    // overlap area is the minum area
+                    ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
+                    ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
+                    ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
+                    ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
+                    new_connection.value = (area1 <= area2) ? area1 : area2;
+                    new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
+                    new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+
+                    new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                    printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                    printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                    // add the connection information to the connections variable
                     connection_list_insert_end(connections_list, &new_connection);
                 }
             }
@@ -321,17 +355,17 @@ Error_t thermal_data_build
         // get cell position for each cell and sace info to arrays position_info and layer_cell_record
         get_cell_position(position_info_ptr, layer_cell_record, stack_elements_list, dimensions);
 
-        // initalize connections variable to store connections info
-        ConnectionList_t connections_list;
-        connection_list_init(&connections_list);
+        // // initalize connections variable to store connections info
+        // ConnectionList_t connections_list;
+        // connection_list_init(&connections_list);
         
         // get connections of each grid in the same layer
         printf("\n Node1 Node2 Number \n");
-        get_connections_in_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
+        get_connections_in_layer(layer_cell_record, position_info_ptr, dimensions);
         // get connections between layers (bottom->top)
-        get_connections_between_layer(&connections_list, layer_cell_record, position_info_ptr, dimensions);
+        get_connections_between_layer(layer_cell_record, position_info_ptr, dimensions);
         // update number of connections
-        dimensions->Grid.NConnections =  2*(connections_list.Size)+dimensions->Grid.NCells;
+        dimensions->Grid.NConnections =  2*(dimensions->connections_list.Size)+dimensions->Grid.NCells;
     }
 
     tdata->Size = get_number_of_cells (dimensions) ;
