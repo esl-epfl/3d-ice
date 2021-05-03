@@ -176,6 +176,11 @@ void dimensions_init (Dimensions_t *dimensions)
     cell_dimensions_init (&dimensions->Cell) ;
     grid_dimensions_init (&dimensions->Grid) ;
     chip_dimensions_init (&dimensions->Chip) ;
+
+    dimensions->NonUniform = 0;
+
+    non_uniform_cell_list_init(&dimensions->Cell_list);
+    connection_list_init(&dimensions->connections_list);
 }
 
 /******************************************************************************/
