@@ -340,6 +340,7 @@ void power_grid_fill
             column = (CellIndex_t) 0u ;
             layer  = last_layer  (dimensions) ;
 
+            //TODO_Darong: add non-unifrom grid scenario for HeatSinkTopTcs
             SolidTC_t *tmp = pgrid->HeatSinkTopTcs ;
 
             for (row  = first_row (dimensions) ;

@@ -466,7 +466,75 @@ Capacity_t get_capacity
             return 0.0 ;
     }
 }
+/******************************************************************************/
 
+Conductance_t get_conductance_non_uniform
+(
+    ThermalGrid_t *tgrid,
+    Dimensions_t  *dimensions,
+    ConnectionListNode_t* i_cell,
+    CellIndex_t    node1_index,
+    CellIndex_t    node2_index
+)
+{
+    Non_uniform_cellListNode_t* node1 = dimensions->Cell_list.First;
+    Non_uniform_cellListNode_t* node2 = dimensions->Cell_list.First;
+
+    for (CellIndex_t i = 0; i<node1_index; i++)
+        node1 = node1->Next;
+
+    for (CellIndex_t i = 0; i<node2_index; i++)
+        node2 = node2->Next;
+
+    Conductance_t g1;
+    Conductance_t g2;
+    if(i_cell->Data.direction == 0)
+    {
+        g1 = (get_thermal_conductivity (tgrid->LayersProfile + node1->Data.layer_info,0,0,dimensions)
+            * i_cell->Data.value
+            )
+            / (get_cell_height (dimensions, node1->Data.layer_info) / 2.0) ;
+        g2 = (get_thermal_conductivity (tgrid->LayersProfile + node2->Data.layer_info,0,0,dimensions)
+            * i_cell->Data.value
+            )
+            / (get_cell_height (dimensions, node2->Data.layer_info) / 2.0) ;
+        return -PARALLEL(g1,g2);
+    }
+    else if(i_cell->Data.direction == 1)
+    {
+        g1 = (get_thermal_conductivity (tgrid->LayersProfile + node1->Data.layer_info,0,0,dimensions)
+            * i_cell->Data.value
+            * get_cell_height (dimensions, node1->Data.layer_info)
+            )
+            / ( node1->Data.length / 2.0) ;
+        g2 = (get_thermal_conductivity (tgrid->LayersProfile + node2->Data.layer_info,0,0,dimensions)
+            * i_cell->Data.value
+            * get_cell_height (dimensions, node2->Data.layer_info)
+            )
+            / ( node2->Data.length / 2.0) ;
+        return -PARALLEL(g1,g2);
+    }
+    else if(i_cell->Data.direction == 2)
+    {
+        g1 = (get_thermal_conductivity (tgrid->LayersProfile + node1->Data.layer_info,0,0,dimensions)
+            * i_cell->Data.value
+            * get_cell_height (dimensions, node1->Data.layer_info)
+            )
+            / ( node1->Data.width / 2.0) ;
+        g2 = (get_thermal_conductivity (tgrid->LayersProfile + node2->Data.layer_info,0,0,dimensions)
+            * i_cell->Data.value
+            * get_cell_height (dimensions, node2->Data.layer_info)
+            )
+            / ( node2->Data.width / 2.0) ;
+        return -PARALLEL(g1,g2);
+    }
+    else
+    {
+        fprintf (stderr, "ERROR: direction of coonection is out of range\n") ;
+
+        return 0.0 ;
+    }
+}
 /******************************************************************************/
 
 Conductance_t get_conductance_top

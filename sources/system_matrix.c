@@ -254,6 +254,83 @@ void system_matrix_destroy (SystemMatrix_t *sysmatrix)
 
 /******************************************************************************/
 
+static int compare(const void* p1, const void* p2) {
+    const ChipDimension_t (*a)[3] = p1;
+    const ChipDimension_t (*b)[3] = p2;
+
+    if ( (*a)[1] < (*b)[1] )
+        return -1;
+    else if ((*a)[1] > (*b)[1])
+        return 1;
+    else
+    {
+        if ( (*a)[0] >= (*b)[0] ) return 1;
+        return -1;
+    }
+    
+}
+
+/******************************************************************************/
+
+static SystemMatrix_t add_solid_column_non_uniform
+(
+    SystemMatrix_t  sysmatrix,
+    ThermalGrid_t  *thermal_grid,
+    Analysis_t     *analysis,
+    Dimensions_t   *dimensions
+)
+{
+    // Conductance_t conductance = 0.0 ;
+    // SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
+    // SystemMatrixCoeff_t *diagonal_pointer = NULL ;
+
+    // Conductance_t g_bottom, g_top, g_north, g_south, g_east, g_west ;
+
+    // *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
+    ChipDimension_t matrix_tmp[dimensions->Grid.NConnections][3];
+    memset(matrix_tmp, 0, sizeof matrix_tmp);
+    CellIndex_t matrix_tmp_index = 0;
+    ConnectionListNode_t* i_cell;
+
+    for(i_cell = dimensions->connections_list.First; i_cell!=NULL; i_cell=i_cell->Next)
+    {
+        matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node2; //r
+        matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node1; //c
+        matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->Data.node2, i_cell->Data.node1);  //v
+        matrix_tmp_index++;
+        matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node1; //r
+        matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node2; //c
+        matrix_tmp[matrix_tmp_index][2] = matrix_tmp[matrix_tmp_index-1][2];  //v
+        matrix_tmp_index++;
+    }
+
+    // fill diagnal value
+    CellIndex_t matrix_tmp_index_2 = matrix_tmp_index;
+    CellIndex_t matrix_tmp_index_3 = matrix_tmp_index_2;
+    for(; matrix_tmp_index_3 < dimensions->Grid.NConnections; matrix_tmp_index_3++)
+    {
+        matrix_tmp[matrix_tmp_index_3][0] = matrix_tmp_index_3-matrix_tmp_index_2;
+        matrix_tmp[matrix_tmp_index_3][1] = matrix_tmp_index_3-matrix_tmp_index_2;
+    }
+
+    matrix_tmp_index_3 = matrix_tmp_index_2;
+    for(; matrix_tmp_index>0; matrix_tmp_index--)
+    {
+        matrix_tmp_index_3 = matrix_tmp_index_2+matrix_tmp[matrix_tmp_index-1][1];
+        matrix_tmp[matrix_tmp_index_3][2] += -matrix_tmp[matrix_tmp_index-1][2];
+    }
+
+    qsort(matrix_tmp, dimensions->Grid.NConnections, sizeof matrix_tmp[0],compare);
+
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) + thermal_grid->NLayers+analysis->InitialTemperature+dimensions->NonUniform;
+
+    sysmatrix.ColumnPointers++ ;
+
+    return sysmatrix ;
+}
+
+/******************************************************************************/
+
 static SystemMatrix_t add_solid_column
 (
     SystemMatrix_t  sysmatrix,
@@ -1679,22 +1756,27 @@ void fill_system_matrix
             case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
             case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             {
-
-                CellIndex_t row ;
-                CellIndex_t column ;
-
-                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                if(dimensions->NonUniform==1)
                 {
-                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    tmp_matrix = add_solid_column_non_uniform(tmp_matrix, thermal_grid, analysis, dimensions) ;
+                }
+                else
+                {
+                    CellIndex_t row ;
+                    CellIndex_t column ;
+
+                    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                     {
-                        tmp_matrix = add_solid_column
+                        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                        {
+                            tmp_matrix = add_solid_column
 
-                            (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row, column) ;
+                                (tmp_matrix, thermal_grid, analysis, dimensions,
+                                lindex, row, column) ;
 
-                    } // FOR_EVERY_COLUMN
-                } // FOR_EVERY_ROW
-
+                        } // FOR_EVERY_COLUMN
+                    } // FOR_EVERY_ROW
+                }
 
                 break ;
             }

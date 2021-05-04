@@ -186,6 +186,28 @@ extern "C"
     ) ;
 
 
+    /*! Return the top conductance of a thermal cell at a given position
+     *
+     * The function prints a message on stderr in case of error
+     *
+     * \param tgrid         pointer to the thermal grid structure
+     * \param dimensions   pointer to the structure storing the dimensions
+     * \param i_cell        pointer to the connection cell
+     * \param node1_index  the index of the node 1
+     * \param node2_index  the index of the node 2
+     *
+     * \return the top conductance of the thermal cell in position
+     *         (\a layer_index , \a row_index , \a column_index ).
+     */
+
+    Conductance_t get_conductance_non_uniform
+    (
+        ThermalGrid_t *tgrid,
+        Dimensions_t  *dimensions,
+        ConnectionListNode_t* i_cell,
+        CellIndex_t    node1_index,
+        CellIndex_t    node2_index
+    ) ;
 
     /*! Return the top conductance of a thermal cell at a given position
      *
