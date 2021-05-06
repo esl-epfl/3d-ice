@@ -307,10 +307,54 @@ static SystemMatrix_t add_solid_column_non_uniform
     // fill diagnal value
     CellIndex_t matrix_tmp_index_2 = matrix_tmp_index;
     CellIndex_t matrix_tmp_index_3 = matrix_tmp_index_2;
+    //Darong_TODO: Can be optimized
     for(; matrix_tmp_index_3 < dimensions->Grid.NConnections; matrix_tmp_index_3++)
     {
+        // fill the index
         matrix_tmp[matrix_tmp_index_3][0] = matrix_tmp_index_3-matrix_tmp_index_2;
         matrix_tmp[matrix_tmp_index_3][1] = matrix_tmp_index_3-matrix_tmp_index_2;
+
+        // fill the value
+        Non_uniform_cellListNode_t* node = dimensions->Cell_list.First;
+        CellIndex_t node_index = matrix_tmp_index_3-matrix_tmp_index_2;
+        for (CellIndex_t i = 0; i<node_index; i++)
+            node = node->Next;
+        
+        if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
+        {
+            matrix_tmp[matrix_tmp_index_3][2] = get_capacity_non_uniform (thermal_grid, dimensions, node);
+
+            matrix_tmp[matrix_tmp_index_3][2] /= analysis->StepTime ;
+        }
+
+        CellIndex_t layer_index = node->Data.layer_info;
+        switch (thermal_grid->LayersTypeProfile [layer_index])
+        {
+            // Darong_TODO: Support more layers
+            case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+
+                matrix_tmp[matrix_tmp_index_3][2] += (  2.0
+                        * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
+                                                    0, 0,
+                                                    dimensions)
+                        * thermal_grid->TopHeatSink->AmbientHTC
+                        * node->Data.length
+                        * node->Data.width
+                    )
+                    /
+                    (  get_cell_height (dimensions, layer_index)
+                        * thermal_grid->TopHeatSink->AmbientHTC
+                        + 2.0
+                        * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
+                                                    0, 0,
+                                                    dimensions)
+                    ) ;
+                    break;
+
+            default:
+                matrix_tmp[matrix_tmp_index_3][2] += 0.0; 
+        }
     }
 
     matrix_tmp_index_3 = matrix_tmp_index_2;
@@ -321,10 +365,28 @@ static SystemMatrix_t add_solid_column_non_uniform
     }
 
     qsort(matrix_tmp, dimensions->Grid.NConnections, sizeof matrix_tmp[0],compare);
+    
 
-    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) + thermal_grid->NLayers+analysis->InitialTemperature+dimensions->NonUniform;
+    // fill the system matrix
+    *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
+    CellIndex_t layer_tmp = matrix_tmp[0][1];
+    for (CellIndex_t i = 0; i<dimensions->Grid.NConnections; i++)
+    {
+        
+        *sysmatrix.RowIndices++ = matrix_tmp[i][0];
+        *sysmatrix.Values++  = matrix_tmp[i][2];
 
-    sysmatrix.ColumnPointers++ ;
+        if (layer_tmp != (CellIndex_t) matrix_tmp[i][1])
+        {
+            sysmatrix.ColumnPointers++ ;
+            *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
+            layer_tmp = (CellIndex_t) matrix_tmp[i][1];
+        }
+        (*sysmatrix.ColumnPointers)++ ;
+        printf("r:%d, c:%d, v:%f\n",*(sysmatrix.RowIndices-1),*(sysmatrix.ColumnPointers-1),*(sysmatrix.Values-1));
+
+    }
+
 
     return sysmatrix ;
 }
@@ -342,6 +404,7 @@ static SystemMatrix_t add_solid_column
     CellIndex_t     column_index
 )
 {
+    #define PRINT_SYSTEM_MATRIX 1
     Conductance_t conductance = 0.0 ;
     SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
     SystemMatrixCoeff_t *diagonal_pointer = NULL ;
@@ -1720,6 +1783,7 @@ void fill_system_matrix
     Dimensions_t   *dimensions
 )
 {
+#define PRINT_SYSTEM_MATRIX 1
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "fill_system_matrix ( l %d r %d c %d )\n",
@@ -1741,26 +1805,26 @@ void fill_system_matrix
 
     tmp_matrix.ColumnPointers++ ;
 
-    CellIndex_t lindex ;
-
-    for (lindex = 0u ; lindex != thermal_grid->NLayers ; lindex++)
+    if(dimensions->NonUniform==1)
     {
-        switch (thermal_grid->LayersTypeProfile [lindex])
+        tmp_matrix = add_solid_column_non_uniform(tmp_matrix, thermal_grid, analysis, dimensions) ;
+    }
+    else
+    {
+        CellIndex_t lindex ;
+
+        for (lindex = 0u ; lindex != thermal_grid->NLayers ; lindex++)
         {
-            case TDICE_LAYER_SOLID :
-            case TDICE_LAYER_SOURCE :
-            case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
-            case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
-            case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
-            case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
-            case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+            switch (thermal_grid->LayersTypeProfile [lindex])
             {
-                if(dimensions->NonUniform==1)
-                {
-                    tmp_matrix = add_solid_column_non_uniform(tmp_matrix, thermal_grid, analysis, dimensions) ;
-                }
-                else
+                case TDICE_LAYER_SOLID :
+                case TDICE_LAYER_SOURCE :
+                case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+                case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+                case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+                case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
+                case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+                case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
                 {
                     CellIndex_t row ;
                     CellIndex_t column ;
@@ -1776,129 +1840,129 @@ void fill_system_matrix
 
                         } // FOR_EVERY_COLUMN
                     } // FOR_EVERY_ROW
+
+                    break ;
                 }
-
-                break ;
-            }
-            case TDICE_LAYER_CHANNEL_4RM :
-            {
-                CellIndex_t row ;
-                CellIndex_t column ;
-
-                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                case TDICE_LAYER_CHANNEL_4RM :
                 {
-                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
-                    {
-                        if (IS_CHANNEL_COLUMN (thermal_grid->Channel->ChannelModel, column) == true)
+                    CellIndex_t row ;
+                    CellIndex_t column ;
 
-                            tmp_matrix = add_liquid_column_4rm
+                    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                    {
+                        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                        {
+                            if (IS_CHANNEL_COLUMN (thermal_grid->Channel->ChannelModel, column) == true)
+
+                                tmp_matrix = add_liquid_column_4rm
+
+                                    (tmp_matrix, thermal_grid, analysis, dimensions,
+                                    lindex, row, column) ;
+
+                            else
+
+                                tmp_matrix = add_solid_column
+
+                                    (tmp_matrix, thermal_grid, analysis, dimensions,
+                                    lindex, row, column) ;
+
+                        } // FOR_EVERY_COLUMN
+                    }  // FOR_EVERY_ROW
+
+                    break ;
+                }
+                case TDICE_LAYER_CHANNEL_2RM :
+                case TDICE_LAYER_PINFINS_INLINE :
+                case TDICE_LAYER_PINFINS_STAGGERED :
+                {
+                    CellIndex_t row ;
+                    CellIndex_t column ;
+
+                    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                    {
+                        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                        {
+                            tmp_matrix = add_liquid_column_2rm
 
                                 (tmp_matrix, thermal_grid, analysis, dimensions,
-                                 lindex, row, column) ;
+                                lindex, row, column) ;
 
-                        else
+                        } // FOR_EVERY_COLUMN
+                    }  // FOR_EVERY_ROW
 
-                            tmp_matrix = add_solid_column
+                    break ;
+                }
+                case TDICE_LAYER_VWALL_CHANNEL :
+                case TDICE_LAYER_VWALL_PINFINS :
+                {
+                    CellIndex_t row ;
+                    CellIndex_t column ;
+
+                    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                    {
+                        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                        {
+                            tmp_matrix = add_virtual_wall_column_2rm
 
                                 (tmp_matrix, thermal_grid, analysis, dimensions,
-                                 lindex, row, column) ;
+                                thermal_grid->Channel->ChannelModel,
+                                lindex, row, column) ;
 
-                    } // FOR_EVERY_COLUMN
-                }  // FOR_EVERY_ROW
+                        } // FOR_EVERY_COLUMN
+                    }  // FOR_EVERY_ROW
 
-                break ;
-            }
-            case TDICE_LAYER_CHANNEL_2RM :
-            case TDICE_LAYER_PINFINS_INLINE :
-            case TDICE_LAYER_PINFINS_STAGGERED :
-            {
-                CellIndex_t row ;
-                CellIndex_t column ;
-
-                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                    break ;
+                }
+                case TDICE_LAYER_TOP_WALL :
                 {
-                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    CellIndex_t row ;
+                    CellIndex_t column ;
+
+                    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                     {
-                        tmp_matrix = add_liquid_column_2rm
+                        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                        {
+                            tmp_matrix = add_top_wall_column_2rm
 
-                            (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row, column) ;
+                                (tmp_matrix, thermal_grid, analysis, dimensions,
+                                lindex, row, column) ;
 
-                    } // FOR_EVERY_COLUMN
-                }  // FOR_EVERY_ROW
+                        } // FOR_EVERY_COLUMN
+                    }  // FOR_EVERY_ROW
 
-                break ;
-            }
-            case TDICE_LAYER_VWALL_CHANNEL :
-            case TDICE_LAYER_VWALL_PINFINS :
-            {
-                CellIndex_t row ;
-                CellIndex_t column ;
-
-                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                    break ;
+                }
+                case TDICE_LAYER_BOTTOM_WALL :
                 {
-                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    CellIndex_t row ;
+                    CellIndex_t column ;
+
+                    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
                     {
-                        tmp_matrix = add_virtual_wall_column_2rm
+                        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                        {
+                            tmp_matrix = add_bottom_wall_column_2rm
 
-                            (tmp_matrix, thermal_grid, analysis, dimensions,
-                             thermal_grid->Channel->ChannelModel,
-                             lindex, row, column) ;
+                                (tmp_matrix, thermal_grid, analysis, dimensions,
+                                lindex, row, column) ;
 
-                    } // FOR_EVERY_COLUMN
-                }  // FOR_EVERY_ROW
+                        } // FOR_EVERY_COLUMN
+                    }  // FOR_EVERY_ROW
+                    break ;
 
-                break ;
-            }
-            case TDICE_LAYER_TOP_WALL :
-            {
-                CellIndex_t row ;
-                CellIndex_t column ;
-
-                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                }
+                case TDICE_LAYER_NONE :
                 {
-                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
-                    {
-                        tmp_matrix = add_top_wall_column_2rm
+                    fprintf (stderr, "ERROR: unset layer type\n") ;
 
-                            (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row, column) ;
+                    break ;
+                }
+                default :
 
-                    } // FOR_EVERY_COLUMN
-                }  // FOR_EVERY_ROW
-
-                break ;
+                    fprintf (stderr, "ERROR: unknown layer type %d\n", thermal_grid->LayersTypeProfile [lindex]) ;
             }
-            case TDICE_LAYER_BOTTOM_WALL :
-            {
-                CellIndex_t row ;
-                CellIndex_t column ;
 
-                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
-                {
-                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
-                    {
-                        tmp_matrix = add_bottom_wall_column_2rm
-
-                            (tmp_matrix, thermal_grid, analysis, dimensions,
-                             lindex, row, column) ;
-
-                    } // FOR_EVERY_COLUMN
-                }  // FOR_EVERY_ROW
-                break ;
-
-            }
-            case TDICE_LAYER_NONE :
-            {
-                fprintf (stderr, "ERROR: unset layer type\n") ;
-
-                break ;
-            }
-            default :
-
-                fprintf (stderr, "ERROR: unknown layer type %d\n", thermal_grid->LayersTypeProfile [lindex]) ;
         }
-
     }
     
     if(thermal_grid->TopHeatSink && thermal_grid->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)

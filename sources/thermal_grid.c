@@ -490,14 +490,21 @@ Conductance_t get_conductance_non_uniform
     Conductance_t g2;
     if(i_cell->Data.direction == 0)
     {
+        ChipDimension_t cell_height = get_cell_height (dimensions, node1->Data.layer_info);
+        if (node1->Data.layer_info != 0)
+            cell_height = cell_height/2;
         g1 = (get_thermal_conductivity (tgrid->LayersProfile + node1->Data.layer_info,0,0,dimensions)
             * i_cell->Data.value
             )
-            / (get_cell_height (dimensions, node1->Data.layer_info) / 2.0) ;
+            /  cell_height ;
+
+        cell_height = get_cell_height (dimensions, node2->Data.layer_info);
+        if (node2->Data.layer_info != 0)
+            cell_height = cell_height/2;
         g2 = (get_thermal_conductivity (tgrid->LayersProfile + node2->Data.layer_info,0,0,dimensions)
             * i_cell->Data.value
             )
-            / (get_cell_height (dimensions, node2->Data.layer_info) / 2.0) ;
+            / cell_height ;
         return -PARALLEL(g1,g2);
     }
     else if(i_cell->Data.direction == 1)
