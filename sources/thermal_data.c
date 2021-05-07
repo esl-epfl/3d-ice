@@ -104,6 +104,8 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
             else
             {
                 cell_num_die += discr_x_die*discr_y_die;
+                ele_flpi->ICElements.First->Data.Discr_X = discr_x_die;
+                ele_flpi->ICElements.First->Data.Discr_Y = discr_y_die;
             }
         }
         // Total cell number in all the layers the die has
