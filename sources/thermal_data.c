@@ -126,11 +126,12 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
     CellIndex_t discr_y_element = 0;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
-    for (stkeln  = stack_elements_list->First ;
+    for (stkeln  = stack_elements_list->Last ;
         stkeln != NULL ;
-        stkeln  = stkeln->Next)
+        stkeln  = stkeln->Prev)
     {
         StackElement_t *stkel = &stkeln->Data ;
+        // Darong_TODO: support more layer types
         // default discretization level for the die
         if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
         {
