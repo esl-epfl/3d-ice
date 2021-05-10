@@ -1,14 +1,14 @@
-Core1_0 :
+Core1_2_0 :
 
   position       0,    0 ;
   dimension   6000, 3000 ;
   discretization   2, 1 ;
 
-  power values 1 ;
+  power values 3 ;
 
-Core1_1 :
+Core1_2_1 :
 
   position    0,    3000 ;
   dimension   6000, 3000 ;
 
-  power values 2 ;
+  power values 4 ;

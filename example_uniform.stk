@@ -17,15 +17,20 @@ dimensions :
 
 die BOTTOM_IC :
    layer  10 BEOL ;
-   source  2 SILICON ;
    layer  50 SILICON ;
+   source  2 SILICON ;
+
+die TOP_IC :
+   layer  20 BEOL ;
+   source  4 SILICON ;
+   layer  100 SILICON ;
 
 stack:
-   die     CORE_DIE       BOTTOM_IC floorplan "./core1.flp" discretization 2 1 ;
-   die     CORE_DIE2       BOTTOM_IC floorplan "./core1.flp" discretization 2 1 ;
+   die     CORE_DIE2       TOP_IC floorplan "./core1.flp" discretization 2 1 ;
+   die     CORE_DIE1       BOTTOM_IC floorplan "./core1_2.flp" discretization 2 1 ;
 solver:
    steady ;
    initial temperature 300.0 ;
 
 output:
-   Tflpel   (   CORE_DIE.Core1_0,        "output_tmp_core1.txt", average,    final ) ;
+   Tflpel   (   CORE_DIE2.Core1_0,        "output_tmp_core1.txt", average,    final ) ;

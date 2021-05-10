@@ -3,7 +3,7 @@ Core2_0 :
   position       0,    0 ;
   dimension   6000, 4000 ;
 
-  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+  power values 3 ;
 
 Core2_1 :
 
@@ -11,4 +11,4 @@ Core2_1 :
   dimension   6000, 2000 ;
   discretization   3, 1 ;
 
-  power values 12.5, 14.0, 10.5, 13.5, 12.5 ;
+  power values 4 ;
