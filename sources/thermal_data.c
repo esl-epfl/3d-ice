@@ -590,25 +590,34 @@ static void fill_system_vector_steady
     CellIndex_t row ;
     CellIndex_t column ;
 
-    for (layer = first_layer (dimensions) ; layer <= last_layer (dimensions) ; layer++)
+    if (dimensions->NonUniform == 1)
     {
-        for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+        for (CellIndex_t i = 0; i<dimensions->Cell_list.Size; i++)
+            *vector++ =   *sources++ ;
+    }
+    else
+    {
+        for (layer = first_layer (dimensions) ; layer <= last_layer (dimensions) ; layer++)
         {
-            for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+            for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
             {
-                *vector++ =   *sources++ ;
+                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                {
+                    *vector++ =   *sources++ ;
 
-#ifdef PRINT_SYSTEM_VECTOR
-                fprintf (stderr,
-                    " l %2d r %4d c %4d [%7d] | %e [b] = %e [s]\n",
-                    layer, row, column,
-                    get_cell_offset_in_stack (dimensions, layer, row, column),
-                    *(vector-1), *(sources-1)) ;
-#endif
+                    #ifdef PRINT_SYSTEM_VECTOR
+                                    fprintf (stderr,
+                                        " l %2d r %4d c %4d [%7d] | %e [b] = %e [s]\n",
+                                        layer, row, column,
+                                        get_cell_offset_in_stack (dimensions, layer, row, column),
+                                        *(vector-1), *(sources-1)) ;
+                    #endif
 
-            } // FOR_EVERY_COLUMN
-        } // FOR_EVERY_ROW
-  } // FOR_EVERY_LAYER
+                } // FOR_EVERY_COLUMN
+            } // FOR_EVERY_ROW
+        } // FOR_EVERY_LAYER
+    }
+
 }
 
 Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
