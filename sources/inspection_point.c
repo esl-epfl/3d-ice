@@ -647,12 +647,35 @@ Error_t generate_inspection_point_output
             break ;
 
         case TDICE_OUTPUT_TYPE_TFLPEL :
+            
+            if (dimensions->NonUniform != 1)
+            {
+                // CellIndex_t counter = 0;
+                // CellIndex_t source_layer_offset = get_source_layer_offset(ipoint->StackElement);
+                // for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First;
+                // cell_i != NULL ;
+                // cell_i = cell_i->Next)
+                // {
+                //     if (cell_i->Data.layer_info != source_layer_offset)
+                //     {
+                //         counter++;
+                //     }
+                //     else
+                //     {
+                //         break;
+                //     }
+                        
+                // }
+                // temperatures += counter;
+            // }
+            // else{
+                temperatures += get_cell_offset_in_stack
 
-            temperatures += get_cell_offset_in_stack
+                    (dimensions,
+                    get_source_layer_offset(ipoint->StackElement),
+                    first_row (dimensions), first_column (dimensions)) ;
+            }
 
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
 
             if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
 

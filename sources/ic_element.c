@@ -266,23 +266,41 @@ Temperature_t get_max_temperature_ic_element
 {
     CellIndex_t row    = icel->SW_Row ;
     CellIndex_t column = icel->SW_Column ;
+    Temperature_t max_temperature;
 
-    Temperature_t max_temperature =
-
-        *(temperatures + get_cell_offset_in_layer(dimensions, row, column)) ;
-
-    for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+    if (dimensions->NonUniform == 1)
     {
-        for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
+        max_temperature =
+
+            *(temperatures + icel->NE_Row) ;
+        for (CellIndex_t i = icel->NE_Row; i<= icel->NE_Column; i++)
         {
             max_temperature = MAX
             (
                 max_temperature,
-                *(temperatures + get_cell_offset_in_layer (dimensions, row, column))
+                *(temperatures + i)
             ) ;
+        }
+    }
+    else
+    {
+        max_temperature =
 
-        } // FOR_EVERY_IC_ELEMENT_COLUMN
-    } // FOR_EVERY_IC_ELEMENT_ROW
+            *(temperatures + get_cell_offset_in_layer(dimensions, row, column)) ;
+
+        for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+        {
+            for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
+            {
+                max_temperature = MAX
+                (
+                    max_temperature,
+                    *(temperatures + get_cell_offset_in_layer (dimensions, row, column))
+                ) ;
+
+            } // FOR_EVERY_IC_ELEMENT_COLUMN
+        } // FOR_EVERY_IC_ELEMENT_ROW
+    }
 
     return max_temperature ;
 }
@@ -298,23 +316,43 @@ Temperature_t get_min_temperature_ic_element
 {
     CellIndex_t row    = icel->SW_Row ;
     CellIndex_t column = icel->SW_Column ;
+    Temperature_t min_temperature;
 
-    Temperature_t min_temperature =
-
-        *(temperatures + get_cell_offset_in_layer(dimensions, row, column)) ;
-
-    for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+    if (dimensions->NonUniform == 1)
     {
-        for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
+        min_temperature =
+
+            *(temperatures + icel->NE_Row) ;
+        for (CellIndex_t i = icel->NE_Row; i<= icel->NE_Column; i++)
         {
             min_temperature = MIN
             (
                 min_temperature,
-                *(temperatures + get_cell_offset_in_layer (dimensions, row, column))
+                *(temperatures + i)
             ) ;
+        }
+    }
+    else
+    {
+        min_temperature =
 
-        } // FOR_EVERY_IC_ELEMENT_COLUMN
-    } // FOR_EVERY_IC_ELEMENT_ROW
+            *(temperatures + get_cell_offset_in_layer(dimensions, row, column)) ;
+
+        for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+        {
+            for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
+            {
+                min_temperature = MIN
+                (
+                    min_temperature,
+                    *(temperatures + get_cell_offset_in_layer (dimensions, row, column))
+                ) ;
+
+            } // FOR_EVERY_IC_ELEMENT_COLUMN
+        } // FOR_EVERY_IC_ELEMENT_ROW
+    }
+
+
 
     return min_temperature ;
 }
@@ -334,19 +372,29 @@ Temperature_t get_avg_temperature_ic_element
 
     Temperature_t avg_temperature = 0.0 ;
 
-    for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+    if (dimensions->NonUniform == 1)
     {
-        for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
+        for (CellIndex_t i = icel->NE_Row; i<= icel->NE_Column; i++)
         {
-            avg_temperature +=
-
-                *(temperatures + get_cell_offset_in_layer (dimensions, row, column)) ;
-
+            avg_temperature +=  *(temperatures + i) ;
             counter++ ;
+        }
+    }
+    else
+    {
+        for (row = icel->SW_Row ; row <= icel->NE_Row ; row++)
+        {
+            for (column = icel->SW_Column ; column <= icel->NE_Column ; column++)
+            {
+                avg_temperature +=
 
-        } // FOR_EVERY_IC_ELEMENT_COLUMN
-    } // FOR_EVERY_IC_ELEMENT_ROW
+                    *(temperatures + get_cell_offset_in_layer (dimensions, row, column)) ;
 
+                counter++ ;
+
+            } // FOR_EVERY_IC_ELEMENT_COLUMN
+        } // FOR_EVERY_IC_ELEMENT_ROW
+    }
     return avg_temperature / (Temperature_t) counter ;
 }
 
