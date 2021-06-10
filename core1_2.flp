@@ -4,11 +4,11 @@ Core1_2_0 :
   dimension   6000, 3000 ;
   discretization   2, 1 ;
 
-  power values 3 ;
+  power values 18 ;
 
 Core1_2_1 :
 
   position    0,    3000 ;
   dimension   6000, 3000 ;
 
-  power values 4 ;
+  power values 18 ;

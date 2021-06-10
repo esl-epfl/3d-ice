@@ -13,12 +13,12 @@ top heat sink :
 dimensions :
    chip length 6000, width 6000 ;
    cell length   3000, width   3000 ;
-   non-uniform 1;
+   non-uniform 0;
 
 die BOTTOM_IC :
    layer  10 BEOL ;
-   layer  50 SILICON ;
    source  2 SILICON ;
+   layer  50 SILICON ;
 
 die TOP_IC :
    layer  20 BEOL ;
@@ -26,7 +26,7 @@ die TOP_IC :
    layer  100 SILICON ;
 
 stack:
-   die     CORE_DIE2       TOP_IC floorplan "./core1.flp" discretization 2 1 ;
+   die     CORE_DIE2       BOTTOM_IC floorplan "./core1.flp" discretization 2 1 ;
    die     CORE_DIE1       BOTTOM_IC floorplan "./core1_2.flp" discretization 2 1 ;
 solver:
    steady ;
