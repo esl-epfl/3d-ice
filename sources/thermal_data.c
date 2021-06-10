@@ -189,10 +189,15 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                     new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
                     non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
                 }
-                // In the non-uniform scenario, NE_Row and NE_Column are used to record start and end index of the element
-                ele_flpi->ICElements.First->Data.NE_Row = cell_num_non_uniform;
+
                 cell_num_non_uniform += cell_num_layer;
-                ele_flpi->ICElements.First->Data.NE_Column = cell_num_non_uniform-1;
+
+                // In the non-uniform scenario, NE_Row and NE_Column are used to record start and end index of the element
+                if (layer_index == stkel->Pointer.Die->SourceLayerOffset)
+                {
+                    ele_flpi->ICElements.First->Data.NE_Row = cell_num_non_uniform-cell_num_layer;
+                    ele_flpi->ICElements.First->Data.NE_Column = cell_num_non_uniform-1;
+                }
             }
             // record the end index of cell number in the layer
             layer_cell_record[current_layer] = cell_num_non_uniform;
