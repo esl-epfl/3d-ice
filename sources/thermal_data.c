@@ -518,60 +518,69 @@ static void fill_system_vector
 #ifdef PRINT_SYSTEM_VECTOR
     Temperature_t old ;
 #endif
-
-    CellIndex_t layer ;
-    CellIndex_t row ;
-    CellIndex_t column ;
-
-    for (layer = first_layer (dimensions) ; layer <= last_layer (dimensions) ; layer++)
+    if (dimensions->NonUniform == 1)
     {
-        for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+        for (CellIndex_t i = 0; i<dimensions->Cell_list.Size; i++)
+            *vector++ =   *sources++
+                          + (*capacities++ / step_time)
+                          * *temperatures++ ;
+    }
+    else
+    {
+        CellIndex_t layer ;
+        CellIndex_t row ;
+        CellIndex_t column ;
+
+        for (layer = first_layer (dimensions) ; layer <= last_layer (dimensions) ; layer++)
         {
-            for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+            for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
             {
+                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                {
 
-#ifdef PRINT_SYSTEM_VECTOR
-                old = *temperatures ;
-#endif
+    #ifdef PRINT_SYSTEM_VECTOR
+                    old = *temperatures ;
+    #endif
 
-                *vector++ = *sources++
-                            + (*capacities++ / step_time)
-                              * *temperatures++ ;
+                    *vector++ = *sources++
+                                + (*capacities++ / step_time)
+                                * *temperatures++ ;
 
-#ifdef PRINT_SYSTEM_VECTOR
-                fprintf (stderr,
-                    " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
-                    layer, row, column,
-                    get_cell_offset_in_stack (dimensions, layer, row, column),
-                    *(vector-1), *(sources-1), *(capacities-1), old) ;
-#endif
+    #ifdef PRINT_SYSTEM_VECTOR
+                    fprintf (stderr,
+                        " l %2d r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
+                        layer, row, column,
+                        get_cell_offset_in_stack (dimensions, layer, row, column),
+                        *(vector-1), *(sources-1), *(capacities-1), old) ;
+    #endif
 
-            } // FOR_EVERY_COLUMN
-        } // FOR_EVERY_ROW
-    } // FOR_EVERY_LAYER
+                } // FOR_EVERY_COLUMN
+            } // FOR_EVERY_ROW
+        } // FOR_EVERY_LAYER
     
-    // Copy the rest of the vector
-    if(topSink && topSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
-    {
-        for(row = 0; row < topSink->NRows; row++)
+        // Copy the rest of the vector
+        if(topSink && topSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
         {
-            for(column = 0; column < topSink->NColumns; column++)
+            for(row = 0; row < topSink->NRows; row++)
             {
-#ifdef PRINT_SYSTEM_VECTOR
-                old = *temperatures ;
-#endif
+                for(column = 0; column < topSink->NColumns; column++)
+                {
+    #ifdef PRINT_SYSTEM_VECTOR
+                    old = *temperatures ;
+    #endif
 
-                *vector++ = *sources++
-                            + (*capacities++ / step_time)
-                              * *temperatures++ ;
+                    *vector++ = *sources++
+                                + (*capacities++ / step_time)
+                                * *temperatures++ ;
 
-#ifdef PRINT_SYSTEM_VECTOR
-                fprintf (stderr,
-                    "      r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
-                    row, column,
-                    get_spreader_cell_offset (dimensions, topSink, row, column),
-                    *(vector-1), *(sources-1), *(capacities-1), old) ;
-#endif
+    #ifdef PRINT_SYSTEM_VECTOR
+                    fprintf (stderr,
+                        "      r %4d c %4d [%7d] | %e [b] = %e [s] + %e [c] * %e [t]\n",
+                        row, column,
+                        get_spreader_cell_offset (dimensions, topSink, row, column),
+                        *(vector-1), *(sources-1), *(capacities-1), old) ;
+    #endif
+                }
             }
         }
     }

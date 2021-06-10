@@ -1,0 +1,31 @@
+material SILICON :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material BEOL :
+   thermal conductivity     2.25e-6 ;
+   volumetric heat capacity 2.175e-12 ;
+
+top heat sink :
+   heat transfer coefficient 1.0e-7 ;
+   temperature               300 ;
+
+dimensions :
+   chip length 6000, width 6000 ;
+   cell length   1000, width   1000 ;
+   non-uniform 1;
+
+die BOTTOM_IC :
+   layer  10 BEOL ;
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+stack:
+   die     CORE_DIE       BOTTOM_IC floorplan "./core1.flp" discretization 2 1 ;
+   die     CORE_DIE2       BOTTOM_IC floorplan "./core2.flp" discretization 3 2 ;
+solver:
+   transient step 0.02, slot 0.2 ;
+   initial temperature 300.0 ;
+
+output:
+   Tflpel   (   CORE_DIE.Core1_0,        "output_tmp_core1.txt", average,    final ) ;
