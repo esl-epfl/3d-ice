@@ -621,13 +621,16 @@ Error_t generate_inspection_point_output
         case TDICE_OUTPUT_TYPE_TFLP :
 
             fprintf (output_stream, "%5.3f \t ", current_time) ;
+            
+            if (dimensions->NonUniform != 1)
+            {
+                temperatures += get_cell_offset_in_stack
 
-            temperatures += get_cell_offset_in_stack
-
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
-
+                    (dimensions,
+                    get_source_layer_offset(ipoint->StackElement),
+                    first_row (dimensions), first_column (dimensions)) ;
+            }
+            
             result = NULL ;
 
             if (ipoint->Quantity == TDICE_OUTPUT_QUANTITY_MAXIMUM)
