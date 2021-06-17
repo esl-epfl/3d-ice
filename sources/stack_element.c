@@ -234,9 +234,10 @@ void stack_element_print_thermal_map
     FILE            *stream
 )
 {
-    // output all of the cells' temperature in the layer for non-uniform scenario
+    
     if (dimensions->NonUniform == 1)
     {
+        // output all of the cells' temperature in the layer for non-uniform scenario
         CellIndex_t counter = 0;
         CellIndex_t layer_offset = get_source_layer_offset(stkel) ;
         for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
@@ -282,22 +283,41 @@ void stack_element_print_power_map
     FILE            *stream
 )
 {
-    sources += get_cell_offset_in_stack
-
-        (dimensions, get_source_layer_offset (stkel),
-         first_row (dimensions), first_column (dimensions)) ;
-
-    CellIndex_t row ;
-    CellIndex_t column ;
-
-    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+    
+    if (dimensions->NonUniform == 1)
     {
-        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+        // output all of the cells' power in the layer for non-uniform scenario
+        CellIndex_t counter = 0;
+        CellIndex_t layer_offset = get_source_layer_offset(stkel) ;
+        for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
         {
-            fprintf (stream, "%7.3f  ", *sources++) ;
+            if (cell_i->Data.layer_info == layer_offset)
+            {
+                fprintf (stream, "%7.3f  ", *(sources+counter)) ;
+            }
+            counter++;
         }
-
         fprintf (stream, "\n") ;
+    }
+    else
+    {
+        sources += get_cell_offset_in_stack
+
+            (dimensions, get_source_layer_offset (stkel),
+            first_row (dimensions), first_column (dimensions)) ;
+
+        CellIndex_t row ;
+        CellIndex_t column ;
+
+        for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+        {
+            for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+            {
+                fprintf (stream, "%7.3f  ", *sources++) ;
+            }
+
+            fprintf (stream, "\n") ;
+        }
     }
 }
 
