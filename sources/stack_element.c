@@ -234,23 +234,41 @@ void stack_element_print_thermal_map
     FILE            *stream
 )
 {
-    temperatures += get_cell_offset_in_stack
-
-        (dimensions, get_source_layer_offset (stkel),
-         first_row (dimensions), first_column (dimensions)) ;
-
-
-    CellIndex_t row ;
-    CellIndex_t column ;
-
-    for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+    // output all of the cells' temperature in the layer for non-uniform scenario
+    if (dimensions->NonUniform == 1)
     {
-        for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+        CellIndex_t counter = 0;
+        CellIndex_t layer_offset = get_source_layer_offset(stkel) ;
+        for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
         {
-            fprintf (stream, "%7.3f  ", *temperatures++) ;
+            if (cell_i->Data.layer_info == layer_offset)
+            {
+                fprintf (stream, "%7.3f  ", *(temperatures+counter)) ;
+            }
+            counter++;
         }
-
         fprintf (stream, "\n") ;
+    }
+    else
+    {
+        temperatures += get_cell_offset_in_stack
+
+            (dimensions, get_source_layer_offset (stkel),
+            first_row (dimensions), first_column (dimensions)) ;
+
+
+        CellIndex_t row ;
+        CellIndex_t column ;
+
+        for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+        {
+            for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+            {
+                fprintf (stream, "%7.3f  ", *temperatures++) ;
+            }
+
+            fprintf (stream, "\n") ;
+        } 
     }
 }
 

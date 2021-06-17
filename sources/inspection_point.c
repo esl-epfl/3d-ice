@@ -579,6 +579,7 @@ Error_t generate_inspection_point_output
 
             if (dimensions->NonUniform == 1)
             {
+                // find the thermal cell in the nou-uniform grid scenario
                 CellIndex_t counter = 0;
                 ChipDimension_t x = ipoint->Xval;
                 ChipDimension_t y = ipoint->Yval;
@@ -677,27 +678,10 @@ Error_t generate_inspection_point_output
 
         case TDICE_OUTPUT_TYPE_TFLPEL :
             
+            // offset the temperature pointer in unifrom grid scenario, while it doesn't need to
+            // offset the temperature pointer in non-uniform grid scenario.
             if (dimensions->NonUniform != 1)
             {
-                // CellIndex_t counter = 0;
-                // CellIndex_t source_layer_offset = get_source_layer_offset(ipoint->StackElement);
-                // for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First;
-                // cell_i != NULL ;
-                // cell_i = cell_i->Next)
-                // {
-                //     if (cell_i->Data.layer_info != source_layer_offset)
-                //     {
-                //         counter++;
-                //     }
-                //     else
-                //     {
-                //         break;
-                //     }
-                        
-                // }
-                // temperatures += counter;
-            // }
-            // else{
                 temperatures += get_cell_offset_in_stack
 
                     (dimensions,
