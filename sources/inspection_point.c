@@ -577,11 +577,40 @@ Error_t generate_inspection_point_output
     {
         case TDICE_OUTPUT_TYPE_TCELL :
 
-            index = get_cell_offset_in_stack
+            if (dimensions->NonUniform == 1)
+            {
+                CellIndex_t counter = 0;
+                ChipDimension_t x = ipoint->Xval;
+                ChipDimension_t y = ipoint->Yval;
+                CellIndex_t layer_offset = get_source_layer_offset(ipoint->StackElement) ;
+                for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
+                {
+                    if (cell_i->Data.layer_info == layer_offset)
+                    {
+                        if (
+                            x >= cell_i->Data.left_x && 
+                            x <= cell_i->Data.left_x + cell_i->Data.length &&
+                            y >= cell_i->Data.left_y && 
+                            y <= cell_i->Data.left_y + cell_i->Data.width
+                        )
+                        {
+                            index = counter;
+                            break;
+                        }
+                    }
+                    counter++;
+                }
+            }
+            else
+            {
+                index = get_cell_offset_in_stack
 
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 ipoint->RowIndex, ipoint->ColumnIndex) ;
+                    (dimensions,
+                    get_source_layer_offset(ipoint->StackElement),
+                    ipoint->RowIndex, ipoint->ColumnIndex) ;
+            }
+
+
 
             fprintf (output_stream,
                 "%5.3f \t %7.3f\n", current_time, *(temperatures + index)) ;
