@@ -170,7 +170,7 @@ void FmiWrapper::simulateStep(const CellMatrix spreaderTemperatures,
 string FmiWrapper::getName(const string& args)
 {
     string pathModel=args.substr(0,args.find_first_of(" "));
-    auto modelBegin=args.find_last_of("/");
+    auto modelBegin=pathModel.find_last_of("/");
     if(modelBegin==string::npos) return pathModel;
     else return pathModel.substr(modelBegin+1);
 }
@@ -178,7 +178,7 @@ string FmiWrapper::getName(const string& args)
 string FmiWrapper::getPath(const string& args)
 {
     string pathModel=args.substr(0,args.find_first_of(" "));
-    auto modelBegin=args.find_last_of("/");
+    auto modelBegin=pathModel.find_last_of("/");
     if(modelBegin==string::npos) return "";
     else return pathModel.substr(0,modelBegin);
 }

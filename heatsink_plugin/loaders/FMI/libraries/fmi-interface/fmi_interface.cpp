@@ -252,7 +252,7 @@ void FmiInterface::loadSharedObject(const std::string& fullSoName)
     #undef RESOLVE
 }
 
-void FmiInterface::stepfunc(fmi2ComponentEnvironment ptr, fmi2Status s)
+void FmiInterface::stepfunc(fmi2ComponentEnvironment /*ptr*/, fmi2Status /*s*/)
 {
 //     auto obj=reinterpret_cast<FmiInterface*>(ptr);
     throw runtime_error("FMI model called stepFinished callback. This was not expected");
