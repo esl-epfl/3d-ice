@@ -780,11 +780,11 @@ Error_t update_source_vector
         }
     }
 
-    for (ccounter  = 0u,            sources = pgrid->Sources ;
-         ccounter != pgrid->NCells ;
-         ccounter++,                sources++)
+    // for (ccounter  = 0u,            sources = pgrid->Sources ;
+    //      ccounter != pgrid->NCells ;
+    //      ccounter++,                sources++)
 
-        printf("%d: %f\n", ccounter, *sources) ;
+        // printf("%d: %f\n", ccounter, *sources) ;
     return TDICE_SUCCESS ;
 }
 

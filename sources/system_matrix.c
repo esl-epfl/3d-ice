@@ -383,7 +383,7 @@ static SystemMatrix_t add_solid_column_non_uniform
             layer_tmp = (CellIndex_t) matrix_tmp[i][1];
         }
         (*sysmatrix.ColumnPointers)++ ;
-        printf("r:%d, c:%d, v:%f\n",*(sysmatrix.RowIndices-1),*(sysmatrix.ColumnPointers-1),*(sysmatrix.Values-1));
+        // printf("r:%d, c:%d, v:%f\n",*(sysmatrix.RowIndices-1),*(sysmatrix.ColumnPointers-1),*(sysmatrix.Values-1));
 
     }
 
@@ -404,7 +404,7 @@ static SystemMatrix_t add_solid_column
     CellIndex_t     column_index
 )
 {
-    #define PRINT_SYSTEM_MATRIX 1
+    // #define PRINT_SYSTEM_MATRIX 1
     Conductance_t conductance = 0.0 ;
     SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
     SystemMatrixCoeff_t *diagonal_pointer = NULL ;
@@ -1783,7 +1783,7 @@ void fill_system_matrix
     Dimensions_t   *dimensions
 )
 {
-#define PRINT_SYSTEM_MATRIX 1
+// #define PRINT_SYSTEM_MATRIX 1
 #ifdef PRINT_SYSTEM_MATRIX
     fprintf (stderr,
         "fill_system_matrix ( l %d r %d c %d )\n",

@@ -266,8 +266,8 @@ void get_connections_in_layer
                         else
                             fprintf (stderr, "Cannot determine interconnect length\n") ;
                         
-                        printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                        printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
                         // add the connection information to the connections variable
                         connection_list_insert_end(connections_list, &new_connection);
                         
@@ -331,8 +331,8 @@ void get_connections_between_layer
                     new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
 
                     new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                    printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                    printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                    // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                    // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
                     // add the connection information to the connections variable
                     connection_list_insert_end(connections_list, &new_connection);
                 }
@@ -371,7 +371,7 @@ Error_t thermal_data_build
         // connection_list_init(&connections_list);
         
         // get connections of each grid in the same layer
-        printf("\n Node1 Node2 Number \n");
+        // printf("\n Node1 Node2 Number \n");
         get_connections_in_layer(layer_cell_record, position_info_ptr, dimensions);
         // get connections between layers (bottom->top)
         get_connections_between_layer(layer_cell_record, position_info_ptr, dimensions);
