@@ -151,11 +151,32 @@ int main(int argc, char** argv)
     {
         sim_result = emulate (&tdata, stkd.Dimensions, &analysis) ;
 
+        // printf("Temperature grid info:\n");
+        // for(CellIndex_t i = 0; i < stkd.Dimensions->Grid.NCells; i++)
+        //     printf("%d:\t%f\n", i, *(tdata.Temperatures+i));
+
+        // New output part 1/2
+        int bar_len = 30;
+        char s1[31] = "------------------------------";
+        char s2[31] = "                              ";
+        int time_cur;
+        int slot_cur;
+        float scale_factor = (float) bar_len / (float) analysis.SlotLength;;
+
         if (sim_result == TDICE_STEP_DONE || sim_result == TDICE_SLOT_DONE)
         {
-            fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
+            // New output part 2/2
+            time_cur = (analysis.CurrentTime % analysis.SlotLength)*scale_factor;
+            if (analysis.CurrentTime % analysis.SlotLength == 0)
+                 time_cur = bar_len;
+            slot_cur = (analysis.CurrentTime-1) / analysis.SlotLength + 1;
+            fprintf(stderr, "Time slot %d: |%.*s>%.*s| %.3fs\r", slot_cur, time_cur, s1, bar_len-time_cur, s2, analysis.CurrentTime*analysis.StepTime);
+            fflush(stderr);  //< Flush the output (just in case)
 
-            fflush (stdout) ;
+            // Original ouput
+            // fprintf (stdout, "%.3f ", get_simulated_time (&analysis)) ;
+
+            // fflush (stdout) ;
 
             generate_output (&output, stkd.Dimensions,
                              tdata.Temperatures, tdata.PowerGrid.Sources,
