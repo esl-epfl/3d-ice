@@ -173,6 +173,8 @@ Error_t thermal_grid_fill (ThermalGrid_t *tgrid, StackElementList_t *list)
                 tmplayer.Height = stack_element->Pointer.Channel->Height ;
 
                 material_copy (&(tmplayer.Material), &(stack_element->Pointer.Channel->WallMaterial)) ;
+                // Add the element id
+                tmplayer.Id = stack_element->Id;
 
                 CellIndex_t tmp ;
 
