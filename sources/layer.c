@@ -53,6 +53,8 @@ void layer_init (Layer_t *layer)
     material_init (&layer->Material) ;
 
     material_element_list_init (&layer->MaterialLayout) ;
+    layer->Discr_X = (CellIndex_t) 0u ;
+    layer->Discr_Y = (CellIndex_t) 0u ;
 }
 
 /******************************************************************************/
@@ -69,6 +71,8 @@ void layer_copy (Layer_t *dst, Layer_t *src)
     material_copy (&dst->Material, &src->Material) ;
 
     material_element_list_copy (&dst->MaterialLayout, &src->MaterialLayout) ;
+    dst->Discr_X           = src->Discr_X ;
+    dst->Discr_Y           = src->Discr_Y ;
 }
 
 /******************************************************************************/

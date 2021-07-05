@@ -80,37 +80,67 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
         stkeln  = stkeln->Next)
     {
         StackElement_t *stkel = &stkeln->Data ;
-        if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
+        switch (stkel->SEType)
         {
-            continue;
-        }
-        CellIndex_t discr_x_die = stkel->Pointer.Die->Discr_X;
-        CellIndex_t discr_y_die = stkel->Pointer.Die->Discr_Y;
+            case TDICE_STACK_ELEMENT_DIE:
+            {
+                CellIndex_t discr_x_die = stkel->Pointer.Die->Discr_X;
+                CellIndex_t discr_y_die = stkel->Pointer.Die->Discr_Y;
 
-        // enumerate all the floorplan elements
-        FloorplanElementListNode_t *ele_flp ;
-        cell_num_die = 0;
-        for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
-            ele_flp != NULL ;
-            ele_flp  = ele_flp->Next)
-        {
-            FloorplanElement_t *ele_flpi = &ele_flp->Data ;
-            discr_x_element = ele_flpi->ICElements.First->Data.Discr_X;
-            discr_y_element = ele_flpi->ICElements.First->Data.Discr_Y;
-            if (discr_x_element != 0 && discr_y_element != 0)
-            {
-                cell_num_die += discr_x_element*discr_y_element;
+                // enumerate all the floorplan elements
+                FloorplanElementListNode_t *ele_flp ;
+                cell_num_die = 0;
+                for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
+                    ele_flp != NULL ;
+                    ele_flp  = ele_flp->Next)
+                {
+                    FloorplanElement_t *ele_flpi = &ele_flp->Data ;
+                    discr_x_element = ele_flpi->ICElements.First->Data.Discr_X;
+                    discr_y_element = ele_flpi->ICElements.First->Data.Discr_Y;
+                    if (discr_x_element != 0 && discr_y_element != 0)
+                    {
+                        cell_num_die += discr_x_element*discr_y_element;
+                    }
+                    else
+                    {
+                        cell_num_die += discr_x_die*discr_y_die;
+                        ele_flpi->ICElements.First->Data.Discr_X = discr_x_die;
+                        ele_flpi->ICElements.First->Data.Discr_Y = discr_y_die;
+                    }
+                }
+                cell_num_die = cell_num_die*stkel->NLayers;
+                cell_num_non_uniform += cell_num_die;
+                break ;
             }
-            else
+            case TDICE_STACK_ELEMENT_LAYER:
             {
-                cell_num_die += discr_x_die*discr_y_die;
-                ele_flpi->ICElements.First->Data.Discr_X = discr_x_die;
-                ele_flpi->ICElements.First->Data.Discr_Y = discr_y_die;
+                CellIndex_t discr_x = stkel->Pointer.Layer->Discr_X;
+                CellIndex_t discr_y = stkel->Pointer.Layer->Discr_Y;
+                cell_num_non_uniform += discr_x*discr_y;
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_CHANNEL:
+            {
+                cell_num_non_uniform += dimensions->Grid.NRows * dimensions->Grid.NColumns;
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_NONE :
+            {
+                fprintf (stderr, "Unsupported stack element type\n") ;
+                break ;
+            }
+            default :
+            {
+                fprintf (stderr, "Unsupported stack element type\n") ;
+                break ;
             }
         }
+        // if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
+        // {
+        //     continue;
+        // }
+
         // Total cell number in all the layers the die has
-        cell_num_die = cell_num_die*stkel->NLayers;
-        cell_num_non_uniform += cell_num_die;
     }
     dimensions->Grid.NCells = cell_num_non_uniform;
 }
@@ -122,8 +152,6 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
     CellIndex_t current_layer = 0;
     CellIndex_t cell_num_non_uniform = 0;
     CellIndex_t cell_num_layer;
-    CellIndex_t discr_x_element = 0;
-    CellIndex_t discr_y_element = 0;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
     for (stkeln  = stack_elements_list->Last ;
@@ -133,53 +161,105 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
         StackElement_t *stkel = &stkeln->Data ;
         // Darong_TODO: support more layer types
         // default discretization level for the die
-        if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
+        switch (stkel->SEType)
         {
-            continue;
-        }
-        CellIndex_t discr_x_die = stkel->Pointer.Die->Discr_X;
-        CellIndex_t discr_y_die = stkel->Pointer.Die->Discr_Y;
-        // enumerate all the layers in the die
-        CellIndex_t total_layer_number_die = stkel->Pointer.Die->NLayers;
-        for (CellIndex_t layer_index = 0; layer_index< total_layer_number_die; layer_index++)
-        {
-            // enumerate all the floorplan elements
-            FloorplanElementListNode_t *ele_flp ;
-            for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
-                ele_flp != NULL ;
-                ele_flp  = ele_flp->Next)
+            case TDICE_STACK_ELEMENT_DIE:
             {
-                FloorplanElement_t *ele_flpi = &ele_flp->Data ;
-                discr_x_element = ele_flpi->ICElements.First->Data.Discr_X;
-                discr_y_element = ele_flpi->ICElements.First->Data.Discr_Y;
-                // take default discretization level if the floorplan unit does not define the disretization level
-                if (discr_x_element == 0 || discr_y_element == 0)
+                CellIndex_t discr_x_element = 0;
+                CellIndex_t discr_y_element = 0;
+                CellIndex_t discr_x_die = stkel->Pointer.Die->Discr_X;
+                CellIndex_t discr_y_die = stkel->Pointer.Die->Discr_Y;
+                // enumerate all the layers in the die
+                CellIndex_t total_layer_number_die = stkel->Pointer.Die->NLayers;
+                for (CellIndex_t layer_index = 0; layer_index< total_layer_number_die; layer_index++)
                 {
-                    discr_x_element = discr_x_die;
-                    discr_y_element = discr_y_die;
-                }
-                cell_num_layer = discr_x_element*discr_y_element;
+                    // enumerate all the floorplan elements
+                    FloorplanElementListNode_t *ele_flp ;
+                    for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
+                        ele_flp != NULL ;
+                        ele_flp  = ele_flp->Next)
+                    {
+                        FloorplanElement_t *ele_flpi = &ele_flp->Data ;
+                        discr_x_element = ele_flpi->ICElements.First->Data.Discr_X;
+                        discr_y_element = ele_flpi->ICElements.First->Data.Discr_Y;
+                        // take default discretization level if the floorplan unit does not define the disretization level
+                        if (discr_x_element == 0 || discr_y_element == 0)
+                        {
+                            discr_x_element = discr_x_die;
+                            discr_y_element = discr_y_die;
+                        }
+                        cell_num_layer = discr_x_element*discr_y_element;
 
-                // fill position info
-                // generate the thermal grid first from left to right (x->), bottom to up (y->) for each floorplan element
-                ChipDimension_t ori_element_x = ele_flpi->ICElements.First->Data.SW_X;
-                ChipDimension_t ori_element_y = ele_flpi->ICElements.First->Data.SW_Y;
-                ChipDimension_t ori_element_length = ele_flpi->ICElements.First->Data.Length;
-                ChipDimension_t ori_element_width = ele_flpi->ICElements.First->Data.Width;
+                        // fill position info
+                        // generate the thermal grid first from left to right (x->), bottom to up (y->) for each floorplan element
+                        ChipDimension_t ori_element_x = ele_flpi->ICElements.First->Data.SW_X;
+                        ChipDimension_t ori_element_y = ele_flpi->ICElements.First->Data.SW_Y;
+                        ChipDimension_t ori_element_length = ele_flpi->ICElements.First->Data.Length;
+                        ChipDimension_t ori_element_width = ele_flpi->ICElements.First->Data.Width;
+                        CellIndex_t position_info_index;
+                        CellIndex_t discr_x_position;
+                        CellIndex_t discr_y_position;
+                        for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
+                        {
+                            position_info_index = sub_element+cell_num_non_uniform;
+                            discr_x_position = sub_element % discr_x_element;
+                            discr_y_position = sub_element / discr_x_element;
+                            // left corner coordinate (left_x, left_y)
+                            position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x_element)*discr_x_position;
+                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y_element)*discr_y_position;
+                            // right corner coordinate (right_x, right_y)
+                            position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x_element)*(discr_x_position + 1);
+                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y_element)*(discr_y_position + 1);
+                            Non_uniform_cell_t new_cell;
+                            non_uniform_cell_init(&new_cell);
+                            new_cell.layer_info =  current_layer;
+                            new_cell.left_x = position_info[position_info_index][0] ;
+                            new_cell.left_y = position_info[position_info_index][1] ;
+                            new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
+                            new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                        }
+
+                        cell_num_non_uniform += cell_num_layer;
+
+                        // In the non-uniform scenario, NE_Row and NE_Column are used to record start and end index of the element
+                        if (layer_index == stkel->Pointer.Die->SourceLayerOffset)
+                        {
+                            ele_flpi->ICElements.First->Data.NE_Row = cell_num_non_uniform-cell_num_layer;
+                            ele_flpi->ICElements.First->Data.NE_Column = cell_num_non_uniform-1;
+                        }
+                    }
+                    // record the end index of cell number in the layer
+                    layer_cell_record[current_layer] = cell_num_non_uniform;
+                    current_layer++;
+                }
+
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_LAYER:
+            {
+                CellIndex_t discr_x = stkel->Pointer.Layer->Discr_X;
+                CellIndex_t discr_y = stkel->Pointer.Layer->Discr_Y;
+                cell_num_layer = discr_x*discr_y;
+
                 CellIndex_t position_info_index;
                 CellIndex_t discr_x_position;
                 CellIndex_t discr_y_position;
+                ChipDimension_t ori_element_x = 0.0;
+                ChipDimension_t ori_element_y = 0.0;
+                ChipDimension_t ori_element_length = dimensions->Chip.Length;
+                ChipDimension_t ori_element_width = dimensions->Chip.Width;
                 for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
                 {
                     position_info_index = sub_element+cell_num_non_uniform;
-                    discr_x_position = sub_element % discr_x_element;
-                    discr_y_position = sub_element / discr_x_element;
+                    discr_x_position = sub_element % discr_x;
+                    discr_y_position = sub_element / discr_x;
                     // left corner coordinate (left_x, left_y)
-                    position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x_element)*discr_x_position;
-                    position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y_element)*discr_y_position;
+                    position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
+                    position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
                     // right corner coordinate (right_x, right_y)
-                    position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x_element)*(discr_x_position + 1);
-                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y_element)*(discr_y_position + 1);
+                    position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
+                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
                     Non_uniform_cell_t new_cell;
                     non_uniform_cell_init(&new_cell);
                     new_cell.layer_info =  current_layer;
@@ -191,18 +271,101 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                 }
 
                 cell_num_non_uniform += cell_num_layer;
-
-                // In the non-uniform scenario, NE_Row and NE_Column are used to record start and end index of the element
-                if (layer_index == stkel->Pointer.Die->SourceLayerOffset)
-                {
-                    ele_flpi->ICElements.First->Data.NE_Row = cell_num_non_uniform-cell_num_layer;
-                    ele_flpi->ICElements.First->Data.NE_Column = cell_num_non_uniform-1;
-                }
+                layer_cell_record[current_layer] = cell_num_non_uniform;
+                current_layer++;
+                break ;
             }
-            // record the end index of cell number in the layer
-            layer_cell_record[current_layer] = cell_num_non_uniform;
-            current_layer++;
+            case TDICE_STACK_ELEMENT_CHANNEL:
+            {
+                CellIndex_t discr_x = dimensions->Grid.NRows;
+                CellIndex_t discr_y = dimensions->Grid.NColumns;
+                cell_num_layer = discr_x*discr_y;
+                
+                CellIndex_t position_info_index;
+                CellIndex_t discr_x_position;
+                CellIndex_t discr_y_position;
+                ChipDimension_t ori_element_x = 0.0;
+                // ChipDimension_t ori_element_y = 0.0;
+                ChipDimension_t ori_element_length = dimensions->Chip.Length;
+                // ChipDimension_t ori_element_width = dimensions->Chip.Width;
+                for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
+                {
+                    position_info_index = sub_element+cell_num_non_uniform;
+                    discr_x_position = sub_element % discr_x;
+                    discr_y_position = sub_element / discr_x;
+                    if (discr_y_position == 0) //first column
+                    {
+                        // left corner coordinate (left_x, left_y)
+                        position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
+                        position_info[position_info_index][1] = 0.0;
+                        // right corner coordinate (right_x, right_y)
+                        position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
+                        position_info[position_info_index][3] = dimensions->Cell.FirstWallLength;
+                    }
+                    else if (discr_y_position == discr_y-1)
+                    {
+                        // left corner coordinate (left_x, left_y)
+                        position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
+                        position_info[position_info_index][1] = dimensions->Chip.Length-dimensions->Cell.LastWallLength;
+                        // right corner coordinate (right_x, right_y)
+                        position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
+                        position_info[position_info_index][3] = dimensions->Chip.Length;
+                    }
+                    else
+                    {
+                        if (discr_y_position % 2 != 0)  //channel
+                        {
+                            // left corner coordinate (left_x, left_y)
+                            position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
+                            CellIndex_t index_channel = (discr_y_position-1)/2;
+                            position_info[position_info_index][1] = dimensions->Cell.FirstWallLength + index_channel*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                            // right corner coordinate (right_x, right_y)
+                            position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
+                            position_info[position_info_index][3] = position_info[position_info_index][1] + dimensions->Cell.ChannelLength;
+                        }
+                        else                        //wall
+                        {
+                            // left corner coordinate (left_x, left_y)
+                            position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
+                            CellIndex_t index_wall = (discr_y_position-2)/2;
+                            position_info[position_info_index][1] = (dimensions->Cell.FirstWallLength + dimensions->Cell.ChannelLength) + index_wall*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                            // right corner coordinate (right_x, right_y)
+                            position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
+                            position_info[position_info_index][3] = position_info[position_info_index][1] + dimensions->Cell.WallLength;;
+                        }
+
+                    }
+
+                    Non_uniform_cell_t new_cell;
+                    non_uniform_cell_init(&new_cell);
+                    new_cell.layer_info =  current_layer;
+                    new_cell.left_x = position_info[position_info_index][0] ;
+                    new_cell.left_y = position_info[position_info_index][1] ;
+                    new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
+                    new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                    non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                }
+
+                cell_num_non_uniform += cell_num_layer;
+                layer_cell_record[current_layer] = cell_num_non_uniform;
+                current_layer++;
+                break ;
+            }
+            case TDICE_STACK_ELEMENT_NONE :
+            {
+                fprintf (stderr, "Unsupported stack element type\n") ;
+                break ;
+            }
+            default :
+            {
+                fprintf (stderr, "Unsupported stack element type\n") ;
+                break ;
+            }
         }
+        // if(stkel->SEType!=TDICE_STACK_ELEMENT_DIE)
+        // {
+        //     continue;
+        // }
     }
 }
 

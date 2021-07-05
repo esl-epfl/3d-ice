@@ -89,6 +89,14 @@ extern "C"
         /*! The list of the material layout */
 
         MaterialElementList_t MaterialLayout ;
+
+        /*! Layer discretization level at the south-west X coordinate */
+
+        CellIndex_t Discr_X ;
+
+        /*! Layer discretization level at the south-west Y coordinate */
+
+        CellIndex_t Discr_Y ;
     } ;
 
     /*! Definition of the type Layer_t */
