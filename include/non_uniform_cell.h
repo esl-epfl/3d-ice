@@ -22,6 +22,7 @@ struct Non_uniform_cell_t
     ChipDimension_t left_y;
     ChipDimension_t length;
     ChipDimension_t width;
+    CellIndex_t isChannel;
 };
 
 typedef struct Non_uniform_cell_t Non_uniform_cell_t;

@@ -277,61 +277,67 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
             }
             case TDICE_STACK_ELEMENT_CHANNEL:
             {
-                CellIndex_t discr_x = dimensions->Grid.NRows;
-                CellIndex_t discr_y = dimensions->Grid.NColumns;
+                CellIndex_t discr_x = dimensions->Grid.NColumns;
+                CellIndex_t discr_y = dimensions->Grid.NRows;
                 cell_num_layer = discr_x*discr_y;
                 
+                CellIndex_t isChannel = 0;
                 CellIndex_t position_info_index;
                 CellIndex_t discr_x_position;
                 CellIndex_t discr_y_position;
-                ChipDimension_t ori_element_x = 0.0;
-                // ChipDimension_t ori_element_y = 0.0;
-                ChipDimension_t ori_element_length = dimensions->Chip.Length;
-                // ChipDimension_t ori_element_width = dimensions->Chip.Width;
+                // ChipDimension_t ori_element_x = 0.0;
+                ChipDimension_t ori_element_y = 0.0;
+                // ChipDimension_t ori_element_length = dimensions->Chip.Length;
+                ChipDimension_t ori_element_width = dimensions->Chip.Width;
                 for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
                 {
                     position_info_index = sub_element+cell_num_non_uniform;
                     discr_x_position = sub_element % discr_x;
                     discr_y_position = sub_element / discr_x;
-                    if (discr_y_position == 0) //first column
+                    if (discr_x_position == 0) //first column (wall)
                     {
+                        isChannel = 0; //first wall
                         // left corner coordinate (left_x, left_y)
-                        position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
-                        position_info[position_info_index][1] = 0.0;
+                        position_info[position_info_index][0] = 0.0;
+                        position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
                         // right corner coordinate (right_x, right_y)
-                        position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
-                        position_info[position_info_index][3] = dimensions->Cell.FirstWallLength;
+                        position_info[position_info_index][2] = dimensions->Cell.FirstWallLength;
+                        position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
                     }
-                    else if (discr_y_position == discr_y-1)
+                    else if (discr_x_position == discr_x-1) //last column (wall)
                     {
+                        isChannel = 0; //last wall
                         // left corner coordinate (left_x, left_y)
-                        position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
-                        position_info[position_info_index][1] = dimensions->Chip.Length-dimensions->Cell.LastWallLength;
+                        position_info[position_info_index][0] = dimensions->Chip.Length - dimensions->Cell.LastWallLength;
+                        position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
                         // right corner coordinate (right_x, right_y)
-                        position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
-                        position_info[position_info_index][3] = dimensions->Chip.Length;
+                        position_info[position_info_index][2] = dimensions->Chip.Length;
+                        position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
                     }
                     else
                     {
-                        if (discr_y_position % 2 != 0)  //channel
+                        if (discr_x_position % 2 != 0)  //channel
                         {
+                            isChannel = 1;
                             // left corner coordinate (left_x, left_y)
-                            position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
-                            CellIndex_t index_channel = (discr_y_position-1)/2;
-                            position_info[position_info_index][1] = dimensions->Cell.FirstWallLength + index_channel*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                            CellIndex_t index_channel = (discr_x_position-1)/2;
+                            position_info[position_info_index][0] = dimensions->Cell.FirstWallLength + index_channel*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
                             // right corner coordinate (right_x, right_y)
-                            position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
-                            position_info[position_info_index][3] = position_info[position_info_index][1] + dimensions->Cell.ChannelLength;
+                            position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.ChannelLength;;
+                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+
                         }
                         else                        //wall
                         {
+                            isChannel = 0;
                             // left corner coordinate (left_x, left_y)
-                            position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
-                            CellIndex_t index_wall = (discr_y_position-2)/2;
-                            position_info[position_info_index][1] = (dimensions->Cell.FirstWallLength + dimensions->Cell.ChannelLength) + index_wall*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                            CellIndex_t index_wall = (discr_x_position-2)/2;
+                            position_info[position_info_index][0] = (dimensions->Cell.FirstWallLength + dimensions->Cell.ChannelLength) + index_wall*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
                             // right corner coordinate (right_x, right_y)
-                            position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
-                            position_info[position_info_index][3] = position_info[position_info_index][1] + dimensions->Cell.WallLength;;
+                            position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.WallLength;
+                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
                         }
 
                     }
@@ -343,6 +349,8 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                     new_cell.left_y = position_info[position_info_index][1] ;
                     new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
                     new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                    if (isChannel)
+                        new_cell.isChannel = 1;
                     non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
                 }
 

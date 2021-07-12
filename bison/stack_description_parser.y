@@ -1070,6 +1070,9 @@ dimensions
 
         stkd->Dimensions->Grid.NRows    = ($8 / $15) ;
         stkd->Dimensions->Grid.NColumns = ($5 / $12) ;
+        //default discretization level for the stack elements
+        stkd->Dimensions->Discr_Y = ($8 / $15) ;
+        stkd->Dimensions->Discr_X = ($5 / $12) ;
         stkd->Dimensions->NonUniform = $17 ;
 
         if (stkd->Channel != NULL)
@@ -1413,6 +1416,9 @@ stack_element
 
         layer_copy (layer, tmp) ;
 
+        layer->Discr_X = stkd->Dimensions->Discr_X;
+        layer->Discr_Y = stkd->Dimensions->Discr_Y;
+
         stack_element->SEType        = TDICE_STACK_ELEMENT_LAYER ;
         stack_element->Pointer.Layer = layer ;
         stack_element->NLayers       = 1 ;
@@ -1422,6 +1428,69 @@ stack_element
         string_destroy (&$2) ;
         string_destroy (&$3) ;
     }
+
+  | LAYER IDENTIFIER IDENTIFIER DISCRETIZATION DVALUE DVALUE ';'    // $2 Identifier for the stack element
+                                       // $3 Identifier of the layer
+    {
+        StackElement_t *stack_element = $$ = stack_element_calloc () ;
+
+        if (stack_element == NULL)
+        {
+            STKERROR ("Malloc stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+
+            YYABORT ;
+        }
+
+        Layer_t *layer = layer_calloc ( ) ;
+
+        if (layer == NULL)
+        {
+            STKERROR ("Malloc layer for stack element failed") ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+
+            YYABORT ;
+        }
+
+        string_copy (&layer->Id, &$3) ;
+
+        Layer_t *tmp = layer_list_find (&stkd->Layers, layer) ;
+
+        if (tmp == NULL)
+        {
+            sprintf (error_message, "Unknown layer %s", $3) ;
+
+            STKERROR (error_message) ;
+
+            layer_free (layer) ;
+
+            string_destroy (&$2) ;
+            string_destroy (&$3) ;
+
+            stack_element_free (stack_element) ;
+
+            YYABORT ;
+        }
+
+        layer_copy (layer, tmp) ;
+        
+        layer->Discr_X = $5;
+        layer->Discr_Y = $6;
+
+        stack_element->SEType        = TDICE_STACK_ELEMENT_LAYER ;
+        stack_element->Pointer.Layer = layer ;
+        stack_element->NLayers       = 1 ;
+
+        string_copy (&stack_element->Id, &$2) ;
+
+        string_destroy (&$2) ;
+        string_destroy (&$3) ;
+    }
+
 
   | CHANNEL IDENTIFIER ';'  // $2 Identifier for the stack element
     {
@@ -1525,8 +1594,8 @@ stack_element
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
-        die->Discr_X = stkd->Dimensions->Grid.NRows;
-        die->Discr_Y = stkd->Dimensions->Grid.NColumns;
+        die->Discr_X = stkd->Dimensions->Discr_X;
+        die->Discr_Y = stkd->Dimensions->Discr_Y;
 
         stack_element->SEType      = TDICE_STACK_ELEMENT_DIE ;
         stack_element->Pointer.Die = die ;

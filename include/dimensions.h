@@ -326,6 +326,14 @@ struct HeatSink_t; //Forward decalration
 
         uint8_t NonUniform ;
 
+        /*! discretization level at the south-west X coordinate */
+
+        CellIndex_t Discr_X ;
+
+        /*! discretization level at the south-west Y coordinate */
+
+        CellIndex_t Discr_Y ;
+
         /*! Non-uniform thermal cell list */
         Non_uniform_cellList_t Cell_list;
 

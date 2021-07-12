@@ -178,6 +178,8 @@ void dimensions_init (Dimensions_t *dimensions)
     chip_dimensions_init (&dimensions->Chip) ;
 
     dimensions->NonUniform = 0;
+    dimensions->Discr_X = 0;
+    dimensions->Discr_Y = 0;
 
     non_uniform_cell_list_init(&dimensions->Cell_list);
     connection_list_init(&dimensions->connections_list);
@@ -188,10 +190,15 @@ void dimensions_init (Dimensions_t *dimensions)
 void dimensions_copy (Dimensions_t *dst, Dimensions_t *src)
 {
     dimensions_destroy (dst) ;
-
+    dst->NonUniform = src->NonUniform;
+    dst->Discr_X = src->Discr_X;
+    dst->Discr_Y = src->Discr_Y;
     cell_dimensions_copy (&dst->Cell, &src->Cell) ;
     grid_dimensions_copy (&dst->Grid, &src->Grid) ;
     chip_dimensions_copy (&dst->Chip, &src->Chip) ;
+
+    non_uniform_cell_list_copy(&dst->Cell_list, &src->Cell_list) ;
+    connection_list_copy(&dst->connections_list, &src->connections_list) ;
 }
 
 /******************************************************************************/
@@ -202,6 +209,9 @@ void dimensions_destroy (Dimensions_t *dimensions)
     grid_dimensions_destroy (&dimensions->Grid) ;
     chip_dimensions_destroy (&dimensions->Chip) ;
 
+    non_uniform_cell_list_destroy(&dimensions->Cell_list);
+    connection_list_destroy(&dimensions->connections_list);
+    
     dimensions_init (dimensions) ;
 }
 

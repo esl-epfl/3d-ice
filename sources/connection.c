@@ -15,9 +15,16 @@ void connection_init (Connection_t *connection)
 
 void connection_destroy (Connection_t *connection)
 {
+    connection_init(connection) ;
+}
+
+void connection_free (Connection_t *connection)
+{
     if (connection == NULL)
 
         return ;
+
+    connection_destroy (connection) ;
 
     free (connection) ;
 }
