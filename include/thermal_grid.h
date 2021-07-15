@@ -213,7 +213,7 @@ extern "C"
      *
      * \param tgrid         pointer to the thermal grid structure
      * \param dimensions    pointer to the structure storing the dimensions
-     * \param i_cell        pointer to the connection cell
+     * \param value         interconnect value
      * \param node          the node
      * \param direction_note          coolant direction node
      *
@@ -224,7 +224,7 @@ extern "C"
     (
         ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
-        ConnectionListNode_t* i_cell,
+        ChipDimension_t value,
         Non_uniform_cellListNode_t* node,
         Conductance_t direction_note
     );

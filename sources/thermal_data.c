@@ -926,7 +926,9 @@ SimResult_t emulate_steady
         return TDICE_SOLVER_ERROR ; //TODO: support steady state pluggable sink
 
     Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
-
+    printf("sources info:\n");
+    for(CellIndex_t i = 0; i < dimensions->Grid.NCells; i++)
+        printf("%d:\t%f\n", i, *(tdata->PowerGrid.Sources+i));
     if (result == TDICE_FAILURE)
     {
         fprintf (stderr,
@@ -937,7 +939,9 @@ SimResult_t emulate_steady
     }
 
     fill_system_vector_steady (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources) ;
-
+    printf("system matrix info:\n");
+    for(CellIndex_t i = 0; i < dimensions->Grid.NConnections; i++)
+        printf("%d:\t%f\n", i, *(tdata->SM_A.Values+i));
     Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
 
     if (res != TDICE_SUCCESS)

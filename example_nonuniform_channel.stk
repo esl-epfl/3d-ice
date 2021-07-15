@@ -1,0 +1,62 @@
+material SILICON :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material BEOL :
+   thermal conductivity     2.25e-6 ;
+   volumetric heat capacity 2.175e-12 ;
+
+top heat sink :
+   heat transfer coefficient 1.0e-7 ;
+   temperature               300 ;
+
+microchannel 4rm :
+   height 100 ;
+   channel    length 1200 ;
+   wall       length 1200 ;
+   first wall length 1200 ;
+   last wall  length 1200 ;
+   wall material SILICON ;
+   coolant flow rate 42 ;
+   coolant heat transfer coefficient side 2.7132e-8 ,
+                                      top 5.7132e-8 ,
+                                   bottom 4.7132e-8 ;
+   coolant volumetric heat capacity 4.172e-12 ;
+   coolant incoming temperature 300.0 ;
+
+
+dimensions :
+   chip length 6000, width 6000 ;
+   cell length   1200, width  6000 ;
+   non-uniform 1;
+
+layer PCB :
+   height 10 ;
+   material BEOL ;
+
+die BOTTOM_IC :
+   layer  10 BEOL ;
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+die TOP_IC :
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+stack:
+   die     MEMORY_DIE     TOP_IC    floorplan "./core3.flp";
+   channel TOP_CHANNEL    ;
+   die     CORE_DIE       BOTTOM_IC floorplan "./core4.flp" discretization 3 2;
+   channel BOTTOM_CHANNEL ;
+   layer   CONN_TO_PCB    PCB;
+
+solver:
+   steady ;
+   initial temperature 300.0 ;
+
+output:
+   //T        (  MEMORY_DIE, 5000, 3000, "output1.txt",             final ) ;
+   //Tmap     (    CORE_DIE,             "output2.txt",             final ) ;
+   //Tflp     (  MEMORY_DIE,             "output3.txt", minimum,    final ) ;
+   Tflpel   (   CORE_DIE.Core2_0,        "output4.txt", average,    final ) ;
+   //Tcoolant ( TOP_CHANNEL,             "output5.txt", maximum,    final ) ;

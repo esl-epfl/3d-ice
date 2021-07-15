@@ -304,7 +304,7 @@ static SystemMatrix_t add_solid_column_non_uniform
         matrix_tmp_index++;
     }
 
-    // fill diagnal value
+    // fill diagnal value with boundary condition
     CellIndex_t matrix_tmp_index_2 = matrix_tmp_index;
     CellIndex_t matrix_tmp_index_3 = matrix_tmp_index_2;
     //Darong_TODO: Can be optimized
@@ -352,16 +352,26 @@ static SystemMatrix_t add_solid_column_non_uniform
                     ) ;
                     break;
 
+            case TDICE_LAYER_CHANNEL_4RM :
+                if (node->Data.isChannel == 1)
+                {
+                    if (node->Data.left_y == 0 || node->Data.left_y+node->Data.width == dimensions->Chip.Width)
+                        matrix_tmp[matrix_tmp_index_3][2] += get_conductance_non_uniform_y(thermal_grid, dimensions, 0, node, 1) ;
+                }
+
+                break;
+
             default:
                 matrix_tmp[matrix_tmp_index_3][2] += 0.0; 
         }
     }
 
+    // sum
     matrix_tmp_index_3 = matrix_tmp_index_2;
-    for(; matrix_tmp_index>0; matrix_tmp_index--)
+    for(; matrix_tmp_index>0; matrix_tmp_index--) // go back and add all the conductance to the diagnal one
     {
-        matrix_tmp_index_3 = matrix_tmp_index_2+matrix_tmp[matrix_tmp_index-1][1];
-        matrix_tmp[matrix_tmp_index_3][2] += -matrix_tmp[matrix_tmp_index-1][2];
+        matrix_tmp_index_3 = matrix_tmp_index_2+matrix_tmp[matrix_tmp_index-1][1]; // find the diagnal index
+        matrix_tmp[matrix_tmp_index_3][2] += -matrix_tmp[matrix_tmp_index-1][2]; // add the conduactance
     }
 
     qsort(matrix_tmp, dimensions->Grid.NConnections, sizeof matrix_tmp[0],compare);
@@ -404,7 +414,7 @@ static SystemMatrix_t add_solid_column
     CellIndex_t     column_index
 )
 {
-    // #define PRINT_SYSTEM_MATRIX 1
+    #define PRINT_SYSTEM_MATRIX 1
     Conductance_t conductance = 0.0 ;
     SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
     SystemMatrixCoeff_t *diagonal_pointer = NULL ;

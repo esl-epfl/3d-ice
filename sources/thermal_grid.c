@@ -621,7 +621,7 @@ Conductance_t get_conductance_non_uniform_y
 (
     ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
-    ConnectionListNode_t* i_cell,
+    ChipDimension_t value,
     Non_uniform_cellListNode_t* node,
     Conductance_t direction_note
 )
@@ -638,7 +638,7 @@ Conductance_t get_conductance_non_uniform_y
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             return ( get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
-            * i_cell->Data.value
+            * value
             * get_cell_height (dimensions, layer_index) )
             / ( node->Data.width / 2.0) ;
 
@@ -655,7 +655,7 @@ Conductance_t get_conductance_non_uniform_y
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
                                                     dimensions)
-                        * i_cell->Data.value
+                        * value
                         * get_cell_height (dimensions, layer_index)
                        )
                         / (node->Data.width / 2.0) ;
@@ -678,10 +678,10 @@ Conductance_t get_conductance_non_uniform_y
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
                                                     dimensions)
-                    * i_cell->Data.value
+                    * value
                     * get_cell_height (dimensions, layer_index)
                    )
-                    / (i_cell->Data.value / 2.0)
+                    / (value / 2.0)
                     * (1.0 - tgrid->Channel->Porosity) ;
 
         case TDICE_LAYER_VWALL_PINFINS :
@@ -840,8 +840,8 @@ Conductance_t get_conductance_non_uniform
         {
             direction_note = -1; //opposite didrection for coolant and convectance
         }
-        g1 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell, node1, direction_note);
-        g2 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell, node2, -direction_note);
+        g1 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node1, direction_note);
+        g2 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node2, -direction_note);
         return -PARALLEL(g1,g2);
     }
     else
