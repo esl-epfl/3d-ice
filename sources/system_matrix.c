@@ -291,16 +291,17 @@ static SystemMatrix_t add_solid_column_non_uniform
     memset(matrix_tmp, 0, sizeof matrix_tmp);
     CellIndex_t matrix_tmp_index = 0;
     ConnectionListNode_t* i_cell;
-
+    Conductance_t sign_note;
     for(i_cell = dimensions->connections_list.First; i_cell!=NULL; i_cell=i_cell->Next)
     {
         matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node2; //r
         matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node1; //c
-        matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->Data.node2, i_cell->Data.node1);  //v
+        matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->Data.node2, i_cell->Data.node1, &sign_note);  //v
+        //printf("r:%d, c:%d, v:%f\n",i_cell->Data.node2,i_cell->Data.node1,matrix_tmp[matrix_tmp_index][2]);
         matrix_tmp_index++;
         matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node1; //r
         matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node2; //c
-        matrix_tmp[matrix_tmp_index][2] = matrix_tmp[matrix_tmp_index-1][2];  //v
+        matrix_tmp[matrix_tmp_index][2] = sign_note*matrix_tmp[matrix_tmp_index-1][2];  //v
         matrix_tmp_index++;
     }
 
@@ -355,8 +356,8 @@ static SystemMatrix_t add_solid_column_non_uniform
             case TDICE_LAYER_CHANNEL_4RM :
                 if (node->Data.isChannel == 1)
                 {
-                    if (node->Data.left_y == 0 || node->Data.left_y+node->Data.width == dimensions->Chip.Width)
-                        matrix_tmp[matrix_tmp_index_3][2] += get_conductance_non_uniform_y(thermal_grid, dimensions, 0, node, 1) ;
+                    if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
+                        matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, 0, node, 1) ;
                 }
 
                 break;

@@ -793,9 +793,11 @@ Conductance_t get_conductance_non_uniform
     Dimensions_t  *dimensions,
     ConnectionListNode_t* i_cell,
     CellIndex_t    node1_index,
-    CellIndex_t    node2_index
+    CellIndex_t    node2_index,
+    Conductance_t* sign_note
 )
 {
+    *sign_note = 1.0; // default value
     Non_uniform_cellListNode_t* node1 = dimensions->Cell_list.First;
     Non_uniform_cellListNode_t* node2 = dimensions->Cell_list.First;
 
@@ -840,9 +842,19 @@ Conductance_t get_conductance_non_uniform
         {
             direction_note = -1; //opposite didrection for coolant and convectance
         }
-        g1 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node1, direction_note);
-        g2 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node2, -direction_note);
-        return -PARALLEL(g1,g2);
+
+        if (node2->Data.isChannel == 1)
+        {
+            *sign_note = -1;
+            return get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node2, direction_note);
+        }
+        else
+        {
+            g1 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node1, direction_note);
+            g2 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node2, -direction_note);
+            return -PARALLEL(g1,g2);
+        }
+        
     }
     else
     {

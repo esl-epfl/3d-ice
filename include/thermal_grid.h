@@ -269,7 +269,8 @@ extern "C"
         Dimensions_t  *dimensions,
         ConnectionListNode_t* i_cell,
         CellIndex_t    node1_index,
-        CellIndex_t    node2_index
+        CellIndex_t    node2_index,
+        Conductance_t* sign_note
     ) ;
 
     /*! Return the top conductance of a thermal cell at a given position
