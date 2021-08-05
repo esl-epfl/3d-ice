@@ -357,7 +357,19 @@ static SystemMatrix_t add_solid_column_non_uniform
                 if (node->Data.isChannel == 1)
                 {
                     if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
+                    {
                         matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, 0, node, 1) ;
+                    }
+                }
+
+                break;
+            case TDICE_LAYER_CHANNEL_2RM :
+                if (node->Data.isChannel == 1)
+                {
+                    if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
+                    {
+                        matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, node->Data.length, node, 1) ;
+                    }
                 }
 
                 break;

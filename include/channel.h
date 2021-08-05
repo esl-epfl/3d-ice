@@ -235,6 +235,24 @@ extern "C"
         CellIndex_t   column_index
     ) ;
 
+    /*! Returns the convective C term, depending on the type of channel and
+     *  the length of the thermal cell
+     *
+     *  \param channel         pointer to the channel
+     *  \param dimensions   pointer to the structure storing the dimensions
+     *  \param layer_index  the index of the layer
+     *  \param cell_length    the cell length
+     *
+     *  \return \c C , the convective term
+     */
+
+    Cconv_t get_convective_term_nonuniform
+    (
+        Channel_t    *channel,
+        Dimensions_t *dimensions,
+        CellIndex_t   layer_index,
+        ChipDimension_t   cell_length
+    ) ;
 
 
     /*! Returns the maximum temperature at the outlet of the channel

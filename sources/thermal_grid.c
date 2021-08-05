@@ -536,6 +536,10 @@ Conductance_t get_conductance_non_uniform_z
     ChipDimension_t cell_height;
     switch (tgrid->LayersTypeProfile [layer_index])
     {
+        //We have different method compared with uniform 3D-ICE, we first know there is a connection, then we caculate the conductance.
+        //As for the conductance with the temperature, heatsink, we caculate it later.
+        //Therefore, in the following cases, the layer is actually connected to the bottom/top layer.
+
         case TDICE_LAYER_SOLID :
         case TDICE_LAYER_SOURCE :
             cell_height = get_cell_height (dimensions, layer_index);
@@ -544,8 +548,19 @@ Conductance_t get_conductance_non_uniform_z
             return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
                 * i_cell->Data.value) /  cell_height ;
 
-        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER : 
         case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
+            assert(layer_index == last_layer (dimensions));
+            if (layer_index == first_layer (dimensions))
+
+                return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)) ;
+            else
+
+                return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+
+
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
@@ -570,9 +585,11 @@ Conductance_t get_conductance_non_uniform_z
                         / (get_cell_height (dimensions, layer_index) / 2.0) ;
 
         case TDICE_LAYER_CHANNEL_2RM :
-
-            return tgrid->Channel->Coolant.HTCTop
-                    * i_cell->Data.value ;
+            
+            if (direction_note == 1)
+                return tgrid->Channel->Coolant.HTCTop * i_cell->Data.value ;
+            else
+                return tgrid->Channel->Coolant.HTCBottom * i_cell->Data.value ;
 
         case TDICE_LAYER_PINFINS_INLINE :
 
@@ -621,7 +638,7 @@ Conductance_t get_conductance_non_uniform_y
 (
     ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
-    ChipDimension_t value,
+    ChipDimension_t length_value,
     Non_uniform_cellListNode_t* node,
     Conductance_t direction_note
 )
@@ -638,7 +655,7 @@ Conductance_t get_conductance_non_uniform_y
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
             return ( get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
-            * value
+            * length_value
             * get_cell_height (dimensions, layer_index) )
             / ( node->Data.width / 2.0) ;
 
@@ -655,7 +672,7 @@ Conductance_t get_conductance_non_uniform_y
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
                                                     dimensions)
-                        * value
+                        * length_value
                         * get_cell_height (dimensions, layer_index)
                        )
                         / (node->Data.width / 2.0) ;
@@ -665,23 +682,23 @@ Conductance_t get_conductance_non_uniform_y
         case TDICE_LAYER_PINFINS_STAGGERED :
 
         // Darong_TODO
-            fprintf (stderr, "ERROR: unknown layer type %d\n",
-                tgrid->LayersTypeProfile [layer_index]) ;
+            // fprintf (stderr, "ERROR: unknown layer type %d\n",
+            //     tgrid->LayersTypeProfile [layer_index]) ;
 
-            return 0.0 ;
-            // return direction_note * get_convective_term
+            // return 0.0 ;
+            return direction_note * get_convective_term_nonuniform
 
-            //         (tgrid->Channel, dimensions, layer_index, row_index, column_index) ;
+                    (tgrid->Channel, dimensions, layer_index, length_value) ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
                                                     dimensions)
-                    * value
+                    * length_value
                     * get_cell_height (dimensions, layer_index)
                    )
-                    / (value / 2.0)
+                    / (length_value / 2.0)
                     * (1.0 - tgrid->Channel->Porosity) ;
 
         case TDICE_LAYER_VWALL_PINFINS :
@@ -823,7 +840,13 @@ Conductance_t get_conductance_non_uniform
         }
         g1 = get_conductance_non_uniform_z(tgrid, dimensions, i_cell, node1, direction_note);
         g2 = get_conductance_non_uniform_z(tgrid, dimensions, i_cell, node2, -direction_note);
-        return -PARALLEL(g1,g2);
+
+        if(g1 == 0)
+            return -g2;
+        else if(g2 == 0)
+            return -g1;
+        else
+            return -PARALLEL(g1,g2);
     }
     else if(i_cell->Data.direction == 1) //West East
     {
@@ -836,11 +859,11 @@ Conductance_t get_conductance_non_uniform
         Conductance_t direction_note;
         if (node1->Data.left_y < node2->Data.left_y)
         {
-            direction_note = 1; //same didrection for coolant and convectance
+            direction_note = 1; //same didrection for coolant and conductance
         }
         else
         {
-            direction_note = -1; //opposite didrection for coolant and convectance
+            direction_note = -1; //opposite didrection for coolant and conductance
         }
 
         if (node2->Data.isChannel == 1)

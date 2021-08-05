@@ -146,7 +146,7 @@ extern "C"
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
      * \param stack_elements_list the list of stack element (bottom first)
      */
-    void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions);
+    void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions);
 
     /*! Get the Minkowski difference between two cells
      * \param minkowski_diff the vector contains the minkowski difference information
@@ -164,6 +164,7 @@ extern "C"
     void get_connections_in_layer
     (
         CellIndex_t* layer_cell_record, 
+        CellIndex_t* layer_type_record,
         ChipDimension_t (*position_info_ptr)[4],
         Dimensions_t* dimensions
         
@@ -177,6 +178,7 @@ extern "C"
     void get_connections_between_layer
     (
         CellIndex_t* layer_cell_record, 
+        CellIndex_t* layer_type_record,
         ChipDimension_t (*position_info_ptr)[4], 
         Dimensions_t* dimensions
     );

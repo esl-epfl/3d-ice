@@ -121,7 +121,7 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
             }
             case TDICE_STACK_ELEMENT_CHANNEL:
             {
-                cell_num_non_uniform += dimensions->Grid.NRows * dimensions->Grid.NColumns;
+                cell_num_non_uniform += stkel->NLayers * dimensions->Grid.NRows * dimensions->Grid.NColumns;
                 break ;
             }
             case TDICE_STACK_ELEMENT_NONE :
@@ -147,7 +147,7 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
 
 /******************************************************************************/
 // get cell position for each cell and sace info to arrays position_info and layer_cell_record
-void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
+void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
 {
     CellIndex_t current_layer = 0;
     CellIndex_t cell_num_non_uniform = 0;
@@ -231,6 +231,7 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                     }
                     // record the end index of cell number in the layer
                     layer_cell_record[current_layer] = cell_num_non_uniform;
+                    layer_type_record[current_layer] = 0;
                     current_layer++;
                 }
 
@@ -272,92 +273,192 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
 
                 cell_num_non_uniform += cell_num_layer;
                 layer_cell_record[current_layer] = cell_num_non_uniform;
+                layer_type_record[current_layer] = 0;
                 current_layer++;
                 break ;
             }
             case TDICE_STACK_ELEMENT_CHANNEL:
             {
-                CellIndex_t discr_x = dimensions->Grid.NColumns;
-                CellIndex_t discr_y = dimensions->Grid.NRows;
-                cell_num_layer = discr_x*discr_y;
-                
-                CellIndex_t isChannel = 0;
-                CellIndex_t position_info_index;
-                CellIndex_t discr_x_position;
-                CellIndex_t discr_y_position;
-                // ChipDimension_t ori_element_x = 0.0;
-                ChipDimension_t ori_element_y = 0.0;
-                // ChipDimension_t ori_element_length = dimensions->Chip.Length;
-                ChipDimension_t ori_element_width = dimensions->Chip.Width;
-                for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
+                if (stkel->Pointer.Channel->ChannelModel == TDICE_CHANNEL_MODEL_MC_2RM)
                 {
-                    position_info_index = sub_element+cell_num_non_uniform;
-                    discr_x_position = sub_element % discr_x;
-                    discr_y_position = sub_element / discr_x;
-                    if (discr_x_position == 0) //first column (wall)
+                    CellIndex_t discr_x = dimensions->Grid.NColumns;
+                    CellIndex_t discr_y = dimensions->Grid.NRows;
+                    cell_num_layer = discr_x*discr_y;
+                    
+                    CellIndex_t isChannel = 0;
+                    CellIndex_t position_info_index;
+                    CellIndex_t discr_x_position;
+                    CellIndex_t discr_y_position;
+                    // ChipDimension_t ori_element_x = 0.0;
+                    ChipDimension_t ori_element_y = 0.0;
+                    // ChipDimension_t ori_element_length = dimensions->Chip.Length;
+                    ChipDimension_t ori_element_width = dimensions->Chip.Width;
+                    for (CellIndex_t layer_i = 0; layer_i < stkel->Pointer.Channel->NLayers; layer_i++)
                     {
-                        isChannel = 0; //first wall
-                        // left corner coordinate (left_x, left_y)
-                        position_info[position_info_index][0] = 0.0;
-                        position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
-                        // right corner coordinate (right_x, right_y)
-                        position_info[position_info_index][2] = dimensions->Cell.FirstWallLength;
-                        position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
-                    }
-                    else if (discr_x_position == discr_x-1) //last column (wall)
-                    {
-                        isChannel = 0; //last wall
-                        // left corner coordinate (left_x, left_y)
-                        position_info[position_info_index][0] = dimensions->Chip.Length - dimensions->Cell.LastWallLength;
-                        position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
-                        // right corner coordinate (right_x, right_y)
-                        position_info[position_info_index][2] = dimensions->Chip.Length;
-                        position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
-                    }
-                    else
-                    {
-                        if (discr_x_position % 2 != 0)  //channel
-                        {
+                        if (layer_i == 2)
                             isChannel = 1;
-                            // left corner coordinate (left_x, left_y)
-                            CellIndex_t index_channel = (discr_x_position-1)/2;
-                            position_info[position_info_index][0] = dimensions->Cell.FirstWallLength + index_channel*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
-                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
-                            // right corner coordinate (right_x, right_y)
-                            position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.ChannelLength;;
-                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
-
-                        }
-                        else                        //wall
-                        {
+                        else
                             isChannel = 0;
-                            // left corner coordinate (left_x, left_y)
-                            CellIndex_t index_wall = (discr_x_position-2)/2;
-                            position_info[position_info_index][0] = (dimensions->Cell.FirstWallLength + dimensions->Cell.ChannelLength) + index_wall*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
-                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
-                            // right corner coordinate (right_x, right_y)
-                            position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.WallLength;
-                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+
+                        for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
+                        {
+
+                            position_info_index = sub_element+cell_num_non_uniform;
+                            discr_x_position = sub_element % discr_x;
+                            discr_y_position = sub_element / discr_x;
+                            if (discr_x_position == 0) //first column (wall)
+                            {
+                                // left corner coordinate (left_x, left_y)
+                                position_info[position_info_index][0] = 0.0;
+                                position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                                // right corner coordinate (right_x, right_y)
+                                position_info[position_info_index][2] = dimensions->Cell.FirstWallLength;
+                                position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+                            }
+                            else if (discr_x_position == discr_x-1) //last column (wall)
+                            {
+                                // left corner coordinate (left_x, left_y)
+                                position_info[position_info_index][0] = dimensions->Chip.Length - dimensions->Cell.LastWallLength;
+                                position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                                // right corner coordinate (right_x, right_y)
+                                position_info[position_info_index][2] = dimensions->Chip.Length;
+                                position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+                            }
+                            else
+                            {
+                                if (discr_x_position % 2 != 0)  //channel position
+                                {
+                                    // left corner coordinate (left_x, left_y)
+                                    CellIndex_t index_channel = (discr_x_position-1)/2;
+                                    position_info[position_info_index][0] = dimensions->Cell.FirstWallLength + index_channel*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                                    position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                                    // right corner coordinate (right_x, right_y)
+                                    position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.ChannelLength;;
+                                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+
+                                }
+                                else                        //wall
+                                {
+                                    // left corner coordinate (left_x, left_y)
+                                    CellIndex_t index_wall = (discr_x_position-2)/2;
+                                    position_info[position_info_index][0] = (dimensions->Cell.FirstWallLength + dimensions->Cell.ChannelLength) + index_wall*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                                    position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                                    // right corner coordinate (right_x, right_y)
+                                    position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.WallLength;
+                                    position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+                                }
+
+                            }
+
+                            Non_uniform_cell_t new_cell;
+                            non_uniform_cell_init(&new_cell);
+                            new_cell.layer_info =  current_layer;
+                            new_cell.left_x = position_info[position_info_index][0] ;
+                            new_cell.left_y = position_info[position_info_index][1] ;
+                            new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
+                            new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                            if (isChannel)
+                                new_cell.isChannel = 1;
+                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
                         }
 
+                        cell_num_non_uniform += cell_num_layer;
+                        layer_cell_record[current_layer] = cell_num_non_uniform;
+                        if (layer_i == 0 || layer_i == 3)
+                            layer_type_record[current_layer] = 1;
+                        else
+                            layer_type_record[current_layer] = 2;
+                        current_layer++;
                     }
 
-                    Non_uniform_cell_t new_cell;
-                    non_uniform_cell_init(&new_cell);
-                    new_cell.layer_info =  current_layer;
-                    new_cell.left_x = position_info[position_info_index][0] ;
-                    new_cell.left_y = position_info[position_info_index][1] ;
-                    new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
-                    new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
-                    if (isChannel)
-                        new_cell.isChannel = 1;
-                    non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                    break ;
+                }
+                else
+                {
+                    CellIndex_t discr_x = dimensions->Grid.NColumns;
+                    CellIndex_t discr_y = dimensions->Grid.NRows;
+                    cell_num_layer = discr_x*discr_y;
+                    
+                    CellIndex_t isChannel = 0;
+                    CellIndex_t position_info_index;
+                    CellIndex_t discr_x_position;
+                    CellIndex_t discr_y_position;
+                    // ChipDimension_t ori_element_x = 0.0;
+                    ChipDimension_t ori_element_y = 0.0;
+                    // ChipDimension_t ori_element_length = dimensions->Chip.Length;
+                    ChipDimension_t ori_element_width = dimensions->Chip.Width;
+                    for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
+                    {
+                        position_info_index = sub_element+cell_num_non_uniform;
+                        discr_x_position = sub_element % discr_x;
+                        discr_y_position = sub_element / discr_x;
+                        if (discr_x_position == 0) //first column (wall)
+                        {
+                            isChannel = 0; //first wall
+                            // left corner coordinate (left_x, left_y)
+                            position_info[position_info_index][0] = 0.0;
+                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                            // right corner coordinate (right_x, right_y)
+                            position_info[position_info_index][2] = dimensions->Cell.FirstWallLength;
+                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+                        }
+                        else if (discr_x_position == discr_x-1) //last column (wall)
+                        {
+                            isChannel = 0; //last wall
+                            // left corner coordinate (left_x, left_y)
+                            position_info[position_info_index][0] = dimensions->Chip.Length - dimensions->Cell.LastWallLength;
+                            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                            // right corner coordinate (right_x, right_y)
+                            position_info[position_info_index][2] = dimensions->Chip.Length;
+                            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+                        }
+                        else
+                        {
+                            if (discr_x_position % 2 != 0)  //channel
+                            {
+                                isChannel = 1;
+                                // left corner coordinate (left_x, left_y)
+                                CellIndex_t index_channel = (discr_x_position-1)/2;
+                                position_info[position_info_index][0] = dimensions->Cell.FirstWallLength + index_channel*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                                position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                                // right corner coordinate (right_x, right_y)
+                                position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.ChannelLength;;
+                                position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+
+                            }
+                            else                        //wall
+                            {
+                                isChannel = 0;
+                                // left corner coordinate (left_x, left_y)
+                                CellIndex_t index_wall = (discr_x_position-2)/2;
+                                position_info[position_info_index][0] = (dimensions->Cell.FirstWallLength + dimensions->Cell.ChannelLength) + index_wall*(dimensions->Cell.WallLength+dimensions->Cell.ChannelLength);
+                                position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+                                // right corner coordinate (right_x, right_y)
+                                position_info[position_info_index][2] = position_info[position_info_index][0] + dimensions->Cell.WallLength;
+                                position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+                            }
+
+                        }
+
+                        Non_uniform_cell_t new_cell;
+                        non_uniform_cell_init(&new_cell);
+                        new_cell.layer_info =  current_layer;
+                        new_cell.left_x = position_info[position_info_index][0] ;
+                        new_cell.left_y = position_info[position_info_index][1] ;
+                        new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
+                        new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                        if (isChannel)
+                            new_cell.isChannel = 1;
+                        non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                    }
+
+                    cell_num_non_uniform += cell_num_layer;
+                    layer_cell_record[current_layer] = cell_num_non_uniform;
+                    layer_type_record[current_layer] = 0;
+                    current_layer++;
+                    break ;
                 }
 
-                cell_num_non_uniform += cell_num_layer;
-                layer_cell_record[current_layer] = cell_num_non_uniform;
-                current_layer++;
-                break ;
             }
             case TDICE_STACK_ELEMENT_NONE :
             {
@@ -392,7 +493,8 @@ void get_minkowski_difference(ChipDimension_t *minkowski_diff, ChipDimension_t (
 // get connections of each grid in the same layer
 void get_connections_in_layer
 (
-    CellIndex_t* layer_cell_record, 
+    CellIndex_t* layer_cell_record,
+    CellIndex_t* layer_type_record,
     ChipDimension_t (*position_info_ptr)[4], 
     Dimensions_t* dimensions
 )
@@ -401,9 +503,11 @@ void get_connections_in_layer
     CellIndex_t layer_start_index = 0;
     ChipDimension_t minkowski_diff[4];
     CellIndex_t layer_end_index;
+    CellIndex_t layer_type;
     for (CellIndex_t layer_index = 0; layer_index < dimensions->Grid.NLayers; layer_index++)
     {
         layer_end_index = layer_cell_record[layer_index];
+        layer_type =  layer_type_record[layer_index];
         for (CellIndex_t i_x = layer_start_index; i_x < layer_end_index; i_x++)
         {
             for (CellIndex_t i_y = i_x+1; i_y < layer_end_index; i_y++)
@@ -426,11 +530,15 @@ void get_connections_in_layer
                         // Find the interconnect length
                         if (minkowski_diff[0] * minkowski_diff[2] == 0)
                         {
+                            if (layer_type == 1 || layer_type == 2)
+                                continue;
                             new_connection.value = (fabs(minkowski_diff[1])<=fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
                             new_connection.direction = 1; //two nodes interconect in direction x
                         }
                         else if (minkowski_diff[1] * minkowski_diff[3] == 0)
                         {
+                            if (layer_type == 1)
+                                continue;
                             new_connection.value = (fabs(minkowski_diff[0])<=fabs(minkowski_diff[2])) ? fabs(minkowski_diff[0]) : fabs(minkowski_diff[2]);
                             new_connection.direction = 2; //two nodes interconect in direction y
                         }
@@ -455,6 +563,7 @@ void get_connections_in_layer
 void get_connections_between_layer
 (
     CellIndex_t* layer_cell_record, 
+    CellIndex_t* layer_type_record,
     ChipDimension_t (*position_info_ptr)[4], 
     Dimensions_t* dimensions
 )
@@ -466,50 +575,145 @@ void get_connections_between_layer
     CellIndex_t botom_layer_end_index;
     CellIndex_t top_layer_start_index;
     CellIndex_t top_layer_end_index;
+    CellIndex_t bottom_layer_type;
+    CellIndex_t top_layer_type;
     // enumerate all the layers
     for (CellIndex_t layer_index = 1; layer_index < dimensions->Grid.NLayers; layer_index++)
     {
-        botom_layer_end_index = layer_cell_record[layer_index-1];
-        top_layer_start_index = layer_cell_record[layer_index-1];
-        top_layer_end_index = layer_cell_record[layer_index];
-        
-        // enumerate all the elements in a bottom layer
-        for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+        bottom_layer_type = layer_type_record[layer_index-1];
+        top_layer_type = layer_type_record[layer_index];
+        if (bottom_layer_type == 2 && top_layer_type == 2)
         {
-            // enumerate all the elements in an upper layer
-            for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+            botom_layer_start_index = layer_cell_record[layer_index-3];
+            botom_layer_end_index = layer_cell_record[layer_index-2];
+            top_layer_start_index = layer_cell_record[layer_index-1];
+            top_layer_end_index = layer_cell_record[layer_index];
+            
+            // enumerate all the elements in a bottom layer
+            for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
             {
-                // first compute Minkowski difference
-                get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                // enumerate all the elements in an upper layer
+                for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
                 {
-                    // add the connection information to the connections variable
-                    Connection_t new_connection;
-                    connection_init(&new_connection);
-                    new_connection.node1 = i_x;
-                    new_connection.node2 = i_y;
-                    new_connection.node1_layer = layer_index-1;
-                    new_connection.node2_layer = layer_index;
+                    // first compute Minkowski difference
+                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                    // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
+                    if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                    {
+                        // add the connection information to the connections variable
+                        Connection_t new_connection;
+                        connection_init(&new_connection);
+                        new_connection.node1 = i_x;
+                        new_connection.node2 = i_y;
+                        new_connection.node1_layer = layer_index-1;
+                        new_connection.node2_layer = layer_index;
 
-                    // overlap area is the minum area
-                    ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
-                    ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
-                    ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
-                    ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
-                    new_connection.value = (area1 <= area2) ? area1 : area2;
-                    new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
-                    new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+                        // overlap area is the minum area
+                        ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
+                        ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
+                        ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
+                        ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
+                        new_connection.value = (area1 <= area2) ? area1 : area2;
+                        new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
+                        new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
 
-                    new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                    // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                    // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                    // add the connection information to the connections variable
-                    connection_list_insert_end(connections_list, &new_connection);
+                        new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                        // add the connection information to the connections variable
+                        connection_list_insert_end(connections_list, &new_connection);
+                    }
                 }
             }
+
+            botom_layer_start_index = layer_cell_record[layer_index-2];
+            botom_layer_end_index = layer_cell_record[layer_index-1];
+            top_layer_start_index = layer_cell_record[layer_index];
+            top_layer_end_index = layer_cell_record[layer_index+1];
+            
+            // enumerate all the elements in a bottom layer
+            for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+            {
+                // enumerate all the elements in an upper layer
+                for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                {
+                    // first compute Minkowski difference
+                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                    // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
+                    if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                    {
+                        // add the connection information to the connections variable
+                        Connection_t new_connection;
+                        connection_init(&new_connection);
+                        new_connection.node1 = i_x;
+                        new_connection.node2 = i_y;
+                        new_connection.node1_layer = layer_index-1;
+                        new_connection.node2_layer = layer_index;
+
+                        // overlap area is the minum area
+                        ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
+                        ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
+                        ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
+                        ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
+                        new_connection.value = (area1 <= area2) ? area1 : area2;
+                        new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
+                        new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+
+                        new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                        // add the connection information to the connections variable
+                        connection_list_insert_end(connections_list, &new_connection);
+                    }
+                }
+            }
+            botom_layer_start_index = botom_layer_end_index;
         }
-        botom_layer_start_index = top_layer_start_index;
+        else
+        {
+            botom_layer_end_index = layer_cell_record[layer_index-1];
+            top_layer_start_index = layer_cell_record[layer_index-1];
+            top_layer_end_index = layer_cell_record[layer_index];
+            
+            // enumerate all the elements in a bottom layer
+            for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+            {
+                // enumerate all the elements in an upper layer
+                for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                {
+                    // first compute Minkowski difference
+                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                    // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
+                    if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                    {
+                        // add the connection information to the connections variable
+                        Connection_t new_connection;
+                        connection_init(&new_connection);
+                        new_connection.node1 = i_x;
+                        new_connection.node2 = i_y;
+                        new_connection.node1_layer = layer_index-1;
+                        new_connection.node2_layer = layer_index;
+
+                        // overlap area is the minum area
+                        ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
+                        ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
+                        ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
+                        ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
+                        new_connection.value = (area1 <= area2) ? area1 : area2;
+                        new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
+                        new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+
+                        new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                        // add the connection information to the connections variable
+                        connection_list_insert_end(connections_list, &new_connection);
+                    }
+                }
+            }
+            botom_layer_start_index = top_layer_start_index;
+        }    
+
     }
 }
 
@@ -534,8 +738,9 @@ Error_t thermal_data_build
         ChipDimension_t position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
         ChipDimension_t (*position_info_ptr)[4] = position_info;
         CellIndex_t layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
+        CellIndex_t layer_type_record[dimensions->Grid.NLayers];
         // get cell position for each cell and sace info to arrays position_info and layer_cell_record
-        get_cell_position(position_info_ptr, layer_cell_record, stack_elements_list, dimensions);
+        get_cell_position(position_info_ptr, layer_cell_record, layer_type_record, stack_elements_list, dimensions);
 
         // // initalize connections variable to store connections info
         // ConnectionList_t connections_list;
@@ -543,9 +748,9 @@ Error_t thermal_data_build
         
         // get connections of each grid in the same layer
         // printf("\n Node1 Node2 Number \n");
-        get_connections_in_layer(layer_cell_record, position_info_ptr, dimensions);
+        get_connections_in_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
         // get connections between layers (bottom->top)
-        get_connections_between_layer(layer_cell_record, position_info_ptr, dimensions);
+        get_connections_between_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
         // update number of connections
         dimensions->Grid.NConnections =  2*(dimensions->connections_list.Size)+dimensions->Grid.NCells;
     }

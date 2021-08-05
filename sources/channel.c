@@ -281,6 +281,66 @@ Cconv_t get_convective_term
 
 /******************************************************************************/
 
+Cconv_t get_convective_term_nonuniform
+(
+    Channel_t    *channel,
+    Dimensions_t *dimensions,
+    CellIndex_t   layer_index,
+    ChipDimension_t   cell_length
+)
+{
+    Cconv_t C = (Cconv_t) 0.0 ;
+
+    switch (channel->ChannelModel)
+    {
+        case TDICE_CHANNEL_MODEL_MC_4RM :
+
+            C = CCONV_MC_4RM
+
+                (channel->NChannels, channel->Coolant.VHC,
+                 channel->Coolant.FlowRate);
+
+            break ;
+
+        case TDICE_CHANNEL_MODEL_MC_2RM :
+
+            C = CCONV_MC_2RM
+
+                (channel->NChannels,        channel->Coolant.VHC,
+                 channel->Coolant.FlowRate, channel->Porosity,
+                 cell_length,
+                 channel->Length) ;
+
+            break ;
+
+        case TDICE_CHANNEL_MODEL_PF_INLINE :
+        case TDICE_CHANNEL_MODEL_PF_STAGGERED :
+
+            C = CCONV_PF
+
+                (channel->Coolant.VHC, channel->Coolant.DarcyVelocity,
+                 cell_length,
+                 get_cell_height (dimensions, layer_index));
+
+            break ;
+
+        case TDICE_CHANNEL_MODEL_NONE :
+
+            fprintf (stderr, "WARNING: unsert channel model\n") ;
+
+            break ;
+
+        default :
+
+            fprintf (stderr, "ERROR: unknown channel model %d\n",
+                channel->ChannelModel) ;
+    }
+
+    return C ;
+}
+
+/******************************************************************************/
+
 Temperature_t get_max_temperature_channel_outlet
 (
     Channel_t     *channel,

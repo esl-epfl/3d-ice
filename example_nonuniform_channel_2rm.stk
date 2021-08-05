@@ -10,19 +10,17 @@ top heat sink :
    heat transfer coefficient 1.0e-7 ;
    temperature               300 ;
 
-microchannel 4rm :
+microchannel 2rm :
+
    height 100 ;
-   channel    length 1200 ;
-   wall       length 1200 ;
-   first wall length 1200 ;
-   last wall  length 1200 ;
+   channel length   1200 ;
+   wall    length   1200 ;
    wall material SILICON ;
-   coolant flow rate 42 ;
-   coolant heat transfer coefficient side 2.7132e-8 ,
-                                      top 5.7132e-8 ,
-                                   bottom 4.7132e-8 ;
-   coolant volumetric heat capacity 4.172e-12 ;
-   coolant incoming temperature 300.0 ;
+   coolant flow rate                        48.0 ;
+   coolant heat transfer coefficient top    4.7132e-8 ,
+                                     bottom 5.7132e-8 ;
+   coolant volumetric heat capacity         4.172638e-12 ;
+   coolant incoming temperature             300.0 ;
 
 
 dimensions :
