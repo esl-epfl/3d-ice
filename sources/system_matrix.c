@@ -364,6 +364,8 @@ static SystemMatrix_t add_solid_column_non_uniform
 
                 break;
             case TDICE_LAYER_CHANNEL_2RM :
+            case TDICE_LAYER_PINFINS_INLINE :
+            case TDICE_LAYER_PINFINS_STAGGERED :
                 if (node->Data.isChannel == 1)
                 {
                     if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)

@@ -1,0 +1,59 @@
+material SILICON :
+   thermal conductivity     1.30e-4 ;
+   volumetric heat capacity 1.628e-12 ;
+
+material BEOL :
+   thermal conductivity     2.25e-6 ;
+   volumetric heat capacity 2.175e-12 ;
+
+top heat sink :
+   heat transfer coefficient 1.0e-7 ;
+   temperature               300 ;
+
+pinfin :
+
+   height 100 ;
+   pin diameter   50 ;
+   pin pitch     100 ;
+   pin distribution staggered ;
+   pin material SILICON ;
+   darcy velocity                           1.1066e+06 ;
+   coolant volumetric heat capacity         4.172638e-12 ;
+   coolant incoming temperature             300.0 ;
+
+
+dimensions :
+   chip length 6000, width 6000 ;
+   cell length   1200, width  1200 ;
+   non-uniform 0;
+
+layer PCB :
+   height 10 ;
+   material BEOL ;
+
+die BOTTOM_IC :
+   layer  10 BEOL ;
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+die TOP_IC :
+   source  2 SILICON ;
+   layer  50 SILICON ;
+
+stack:
+   die     MEMORY_DIE     TOP_IC    floorplan "./core3.flp";
+   channel TOP_CHANNEL    ;
+   die     CORE_DIE       BOTTOM_IC floorplan "./core4.flp" discretization 5 5 ;
+   channel BOTTOM_CHANNEL ;
+   layer   CONN_TO_PCB    PCB;
+
+solver:
+   transient step 0.02, slot 0.2 ;
+   initial temperature 300.0 ;
+
+output:
+   //T        (  MEMORY_DIE, 5000, 3000, "output1.txt",             final ) ;
+   //Tmap     (    CORE_DIE,             "output2.txt",             final ) ;
+   //Tflp     (  MEMORY_DIE,             "output3.txt", minimum,    final ) ;
+   Tflpel   (   CORE_DIE.Core2_0,        "output4.txt", average,    final ) ;
+   //Tcoolant ( BOTTOM_CHANNEL,             "output5.txt", maximum,    final ) ;
