@@ -349,10 +349,15 @@ void power_grid_fill
     // NOTE: if the top heatsink is pluggable, there are more elements to fill
     if (dimensions->NonUniform == 1)
     {
-        for(Non_uniform_cellListNode_t* i_cell = dimensions->Cell_list.First;
-            i_cell != NULL;
-            i_cell = i_cell->Next)
-                *tmp++ = get_capacity_non_uniform (tgrid, dimensions, i_cell) ;
+        for( Non_uniform_cellListNode_t* i_cell = dimensions->Cell_list.First; i_cell != NULL; i_cell = i_cell->Next)
+        {
+            if (i_cell->Data.layer_info >= dimensions->Grid.NLayers)
+            {
+                break; //don't fill for spreder layer
+            }
+            *tmp++ = get_capacity_non_uniform (tgrid, dimensions, i_cell) ;
+        }
+                
     }
     else{
         for (layer  = first_layer (dimensions) ;

@@ -329,55 +329,58 @@ static SystemMatrix_t add_solid_column_non_uniform
         }
 
         CellIndex_t layer_index = node->Data.layer_info;
-        switch (thermal_grid->LayersTypeProfile [layer_index])
+        if (layer_index < dimensions->Grid.NLayers)
         {
-            // Darong_TODO: Support more layers
-            case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-            case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+            switch (thermal_grid->LayersTypeProfile [layer_index])
+            {
+                // Darong_TODO: Support more layers
+                case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
+                case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
-                matrix_tmp[matrix_tmp_index_3][2] += (  2.0
-                        * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
-                                                    0, 0,
-                                                    dimensions)
-                        * thermal_grid->TopHeatSink->AmbientHTC
-                        * node->Data.length
-                        * node->Data.width
-                    )
-                    /
-                    (  get_cell_height (dimensions, layer_index)
-                        * thermal_grid->TopHeatSink->AmbientHTC
-                        + 2.0
-                        * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
-                                                    0, 0,
-                                                    dimensions)
-                    ) ;
+                    matrix_tmp[matrix_tmp_index_3][2] += (  2.0
+                            * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
+                                                        0, 0,
+                                                        dimensions)
+                            * thermal_grid->TopHeatSink->AmbientHTC
+                            * node->Data.length
+                            * node->Data.width
+                        )
+                        /
+                        (  get_cell_height (dimensions, layer_index)
+                            * thermal_grid->TopHeatSink->AmbientHTC
+                            + 2.0
+                            * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
+                                                        0, 0,
+                                                        dimensions)
+                        ) ;
+                        break;
+
+                case TDICE_LAYER_CHANNEL_4RM :
+                    if (node->Data.isChannel == 1)
+                    {
+                        if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
+                        {
+                            matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, 0, node, 1) ;
+                        }
+                    }
+
+                    break;
+                case TDICE_LAYER_CHANNEL_2RM :
+                case TDICE_LAYER_PINFINS_INLINE :
+                case TDICE_LAYER_PINFINS_STAGGERED :
+                    if (node->Data.isChannel == 1)
+                    {
+                        if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
+                        {
+                            matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, node->Data.length, node, 1) ;
+                        }
+                    }
+
                     break;
 
-            case TDICE_LAYER_CHANNEL_4RM :
-                if (node->Data.isChannel == 1)
-                {
-                    if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
-                    {
-                        matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, 0, node, 1) ;
-                    }
-                }
-
-                break;
-            case TDICE_LAYER_CHANNEL_2RM :
-            case TDICE_LAYER_PINFINS_INLINE :
-            case TDICE_LAYER_PINFINS_STAGGERED :
-                if (node->Data.isChannel == 1)
-                {
-                    if (node->Data.left_y+node->Data.width == dimensions->Chip.Width)
-                    {
-                        matrix_tmp[matrix_tmp_index_3][2] += 2*get_conductance_non_uniform_y(thermal_grid, dimensions, node->Data.length, node, 1) ;
-                    }
-                }
-
-                break;
-
-            default:
-                matrix_tmp[matrix_tmp_index_3][2] += 0.0; 
+                default:
+                    matrix_tmp[matrix_tmp_index_3][2] += 0.0; 
+            }
         }
     }
 
@@ -429,7 +432,7 @@ static SystemMatrix_t add_solid_column
     CellIndex_t     column_index
 )
 {
-    #define PRINT_SYSTEM_MATRIX 1
+    // #define PRINT_SYSTEM_MATRIX 1
     Conductance_t conductance = 0.0 ;
     SystemMatrixCoeff_t  diagonal_value   = 0.0 ;
     SystemMatrixCoeff_t *diagonal_pointer = NULL ;
@@ -1988,18 +1991,20 @@ void fill_system_matrix
             }
 
         }
+
+        if(thermal_grid->TopHeatSink && thermal_grid->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+        {
+            CellIndex_t row ;
+            CellIndex_t column ;
+            for(row = 0; row < thermal_grid->TopHeatSink->NRows; row++)
+                for(column = 0; column < thermal_grid->TopHeatSink->NColumns; column++)
+                    tmp_matrix = add_spreader_column
+                                (tmp_matrix, thermal_grid, analysis, dimensions,
+                                row, column);
+        }
     }
     
-    if(thermal_grid->TopHeatSink && thermal_grid->TopHeatSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
-    {
-        CellIndex_t row ;
-        CellIndex_t column ;
-        for(row = 0; row < thermal_grid->TopHeatSink->NRows; row++)
-            for(column = 0; column < thermal_grid->TopHeatSink->NColumns; column++)
-                tmp_matrix = add_spreader_column
-                            (tmp_matrix, thermal_grid, analysis, dimensions,
-                             row, column);
-    }
+
 }
 
 /******************************************************************************/

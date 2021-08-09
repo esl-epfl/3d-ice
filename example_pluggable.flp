@@ -1,0 +1,7 @@
+
+// Example floorplan file for simulating the HS483 heatsink
+
+HEATER:
+	position 0, 0 ;
+	dimension 10240, 10240 ;
+	power values 8,16,16,16,16,16;

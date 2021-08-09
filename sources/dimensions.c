@@ -728,10 +728,18 @@ CellIndex_t get_spreader_cell_offset
 {
     assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
     
-    return (   get_number_of_layers (dimensions)
-              * get_number_of_rows (dimensions)
-              * get_number_of_columns (dimensions))
-            + row_index * hsink->NColumns + column_index;
+    if(dimensions->NonUniform == 1) //recaculate spreder offset in the non-uniform scenario
+    {
+        return dimensions->Grid.NCells - hsink->NColumns*hsink->NRows;
+    }
+    else
+    {
+        return (   get_number_of_layers (dimensions)
+                * get_number_of_rows (dimensions)
+                * get_number_of_columns (dimensions))
+                + row_index * hsink->NColumns + column_index;
+    }
+
 }
 
 /******************************************************************************/

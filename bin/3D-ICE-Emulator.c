@@ -151,9 +151,9 @@ int main(int argc, char** argv)
     {
         sim_result = emulate (&tdata, stkd.Dimensions, &analysis) ;
 
-        printf("Temperature grid info:\n");
-        for(CellIndex_t i = 0; i < stkd.Dimensions->Grid.NCells; i++)
-            printf("%d:\t%f\n", i, *(tdata.Temperatures+i));
+        // printf("Temperature grid info:\n");
+        // for(CellIndex_t i = 0; i < stkd.Dimensions->Grid.NCells; i++)
+        //     printf("%d:\t%f\n", i, *(tdata.Temperatures+i));
 
         // New output part 1/2
         int bar_len = 30;

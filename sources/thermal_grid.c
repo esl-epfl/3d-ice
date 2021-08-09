@@ -331,12 +331,11 @@ Capacity_t get_capacity_non_uniform
 )
 {
     CellIndex_t layer_index = i_cell->Data.layer_info;
-    if (layer_index > tgrid->NLayers)
+    if (layer_index >= tgrid->NLayers)
     {
-        fprintf (stderr,
-            "ERROR: layer index %d is out of range\n", layer_index) ;
-
-        return 0.0 ;
+        //spreder layer
+        HeatSink_t *sink = tgrid->TopHeatSink;
+        return get_spreader_capacity(sink) ;
     }
 
     switch (tgrid->LayersTypeProfile [layer_index])
@@ -534,6 +533,11 @@ Conductance_t get_conductance_non_uniform_z
 {
     CellIndex_t layer_index = node->Data.layer_info;
     ChipDimension_t cell_height;
+    if (layer_index>=dimensions->Grid.NLayers) //spreder layer
+    {
+        HeatSink_t *sink = tgrid->TopHeatSink;
+        return get_spreader_conductance_top_bottom(sink);
+    }
     switch (tgrid->LayersTypeProfile [layer_index])
     {
         //We have different method compared with uniform 3D-ICE, we first know there is a connection, then we caculate the conductance.
@@ -644,6 +648,11 @@ Conductance_t get_conductance_non_uniform_y
 )
 {
     CellIndex_t layer_index = node->Data.layer_info;
+    if (layer_index>=dimensions->Grid.NLayers) //spreder layer
+    {
+        HeatSink_t *sink = tgrid->TopHeatSink;
+        return get_spreader_conductance_north_south(sink);
+    }
     switch (tgrid->LayersTypeProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
@@ -733,14 +742,18 @@ Conductance_t get_conductance_non_uniform_x
 )
 {
     CellIndex_t layer_index = node->Data.layer_info;
-    if (layer_index > tgrid->NLayers)
+    // if (layer_index > tgrid->NLayers)
+    // {
+    //     fprintf (stderr,
+    //         "ERROR: layer index %d is out of range\n", layer_index) ;
+
+    //     return 0.0 ;
+    // }
+    if (layer_index>=dimensions->Grid.NLayers) //spreder layer
     {
-        fprintf (stderr,
-            "ERROR: layer index %d is out of range\n", layer_index) ;
-
-        return 0.0 ;
+        HeatSink_t *sink = tgrid->TopHeatSink;
+        return get_spreader_conductance_east_west(sink);
     }
-
     switch (tgrid->LayersTypeProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :

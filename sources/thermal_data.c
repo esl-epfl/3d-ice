@@ -142,11 +142,16 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
 
         // Total cell number in all the layers the die has
     }
+
+    if(stack_elements_list->First->Data.TopSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+            cell_num_non_uniform += dimensions->Grid.NRows * dimensions->Grid.NColumns;
+    }
     dimensions->Grid.NCells = cell_num_non_uniform;
 }
 
 /******************************************************************************/
-// get cell position for each cell and sace info to arrays position_info and layer_cell_record
+// get cell position for each cell and save info to arrays position_info and layer_cell_record
 void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
 {
     CellIndex_t current_layer = 0;
@@ -578,6 +583,45 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
         //     continue;
         // }
     }
+    if(stack_elements_list->First->Data.TopSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
+    {
+        CellIndex_t discr_x = dimensions->Grid.NColumns;
+        CellIndex_t discr_y = dimensions->Grid.NRows;
+        cell_num_layer = discr_x*discr_y;
+
+        CellIndex_t position_info_index;
+        CellIndex_t discr_x_position;
+        CellIndex_t discr_y_position;
+        ChipDimension_t ori_element_x = 0.0;
+        ChipDimension_t ori_element_y = 0.0;
+        ChipDimension_t ori_element_length = dimensions->Chip.Length;
+        ChipDimension_t ori_element_width = dimensions->Chip.Width;
+        for (CellIndex_t sub_element = 0; sub_element < cell_num_layer; sub_element++)
+        {
+            position_info_index = sub_element+cell_num_non_uniform;
+            discr_x_position = sub_element % discr_x;
+            discr_y_position = sub_element / discr_x;
+            // left corner coordinate (left_x, left_y)
+            position_info[position_info_index][0] = ori_element_x + (ori_element_length/discr_x)*discr_x_position;
+            position_info[position_info_index][1] = ori_element_y + (ori_element_width/discr_y)*discr_y_position;
+            // right corner coordinate (right_x, right_y)
+            position_info[position_info_index][2] = ori_element_x + (ori_element_length/discr_x)*(discr_x_position + 1);
+            position_info[position_info_index][3] = ori_element_y + (ori_element_width/discr_y)*(discr_y_position + 1);
+            Non_uniform_cell_t new_cell;
+            non_uniform_cell_init(&new_cell);
+            new_cell.layer_info =  current_layer;
+            new_cell.left_x = position_info[position_info_index][0] ;
+            new_cell.left_y = position_info[position_info_index][1] ;
+            new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
+            new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+        }
+
+        cell_num_non_uniform += cell_num_layer;
+        layer_cell_record[current_layer] = cell_num_non_uniform;
+        layer_type_record[current_layer] = 4;
+        current_layer++;
+    }
 }
 
 
@@ -606,10 +650,14 @@ void get_connections_in_layer
     ChipDimension_t minkowski_diff[4];
     CellIndex_t layer_end_index;
     CellIndex_t layer_type;
-    for (CellIndex_t layer_index = 0; layer_index < dimensions->Grid.NLayers; layer_index++)
+    for (CellIndex_t layer_index = 0; layer_index < dimensions->Grid.NLayers+1; layer_index++)
     {
+        
         layer_end_index = layer_cell_record[layer_index];
         layer_type =  layer_type_record[layer_index];
+        if(layer_index == dimensions->Grid.NLayers && layer_type != 4)
+            continue;
+
         for (CellIndex_t i_x = layer_start_index; i_x < layer_end_index; i_x++)
         {
             for (CellIndex_t i_y = i_x+1; i_y < layer_end_index; i_y++)
@@ -680,10 +728,12 @@ void get_connections_between_layer
     CellIndex_t bottom_layer_type;
     CellIndex_t top_layer_type;
     // enumerate all the layers
-    for (CellIndex_t layer_index = 1; layer_index < dimensions->Grid.NLayers; layer_index++)
+    for (CellIndex_t layer_index = 1; layer_index < dimensions->Grid.NLayers + 1; layer_index++)
     {
         bottom_layer_type = layer_type_record[layer_index-1];
         top_layer_type = layer_type_record[layer_index];
+        if(layer_index == dimensions->Grid.NLayers && top_layer_type != 4)
+            continue;
         if ( (bottom_layer_type == 2 && top_layer_type == 2) || (bottom_layer_type == 3 && top_layer_type == 2))
         {
             botom_layer_start_index = layer_cell_record[layer_index-3];
@@ -839,14 +889,15 @@ Error_t thermal_data_build
         
         ChipDimension_t position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
         ChipDimension_t (*position_info_ptr)[4] = position_info;
-        CellIndex_t layer_cell_record[dimensions->Grid.NLayers]; // record the end index of each layer in the position_info
-
+        CellIndex_t layer_cell_record[dimensions->Grid.NLayers+1]; // record the end index of each layer in the position_info
+        memset(layer_cell_record, 0, sizeof layer_cell_record);
         // 0: caculate surroding
         // 1: TDICE_LAYER_BOTTOM_WALL, TDICE_LAYER_TOP_WALL, : they don't have connections in x and y directions
         // 2: TDICE_LAYER_VWALL_CHANNEL (2RM), TDICE_LAYER_CHANNEL_2RM: they don't have connections in the x direction
         // 3: TDICE_LAYER_VWALL_CHANNEL (pin) : it doesn't have connections in x and y directions
-        CellIndex_t layer_type_record[dimensions->Grid.NLayers];
-
+        // 4: spreader
+        CellIndex_t layer_type_record[dimensions->Grid.NLayers+1];
+        memset(layer_type_record, 0, sizeof layer_type_record);
         // get cell position for each cell and sace info to arrays position_info and layer_cell_record
         get_cell_position(position_info_ptr, layer_cell_record, layer_type_record, stack_elements_list, dimensions);
 
@@ -1239,9 +1290,11 @@ SimResult_t emulate_steady
         return TDICE_SOLVER_ERROR ; //TODO: support steady state pluggable sink
 
     Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
-    printf("sources info:\n");
-    for(CellIndex_t i = 0; i < dimensions->Grid.NCells; i++)
-        printf("%d:\t%f\n", i, *(tdata->PowerGrid.Sources+i));
+
+    // printf("sources info:\n");
+    // for(CellIndex_t i = 0; i < dimensions->Grid.NCells; i++)
+    //     printf("%d:\t%f\n", i, *(tdata->PowerGrid.Sources+i));
+    
     if (result == TDICE_FAILURE)
     {
         fprintf (stderr,
@@ -1252,9 +1305,11 @@ SimResult_t emulate_steady
     }
 
     fill_system_vector_steady (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources) ;
-    printf("system matrix info:\n");
-    for(CellIndex_t i = 0; i < dimensions->Grid.NConnections; i++)
-        printf("%d:\t%f\n", i, *(tdata->SM_A.Values+i));
+
+    // printf("system matrix info:\n");
+    // for(CellIndex_t i = 0; i < dimensions->Grid.NConnections; i++)
+    //     printf("%d:\t%f\n", i, *(tdata->SM_A.Values+i));
+
     Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
 
     if (res != TDICE_SUCCESS)

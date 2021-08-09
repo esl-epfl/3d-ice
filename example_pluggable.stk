@@ -1,0 +1,41 @@
+// Example stack file for simulating the HS483 heatsink
+
+material SILICON :
+	thermal conductivity 8.8e-5 ;
+	volumetric heat capacity 1.63566e-12 ;
+
+material SILICONE :
+	thermal conductivity 2e-5 ;
+	volumetric heat capacity 1e-11 ;
+
+top pluggable heat sink :
+	spreader length 10240 , width 10240 , height 500 ;
+	material SILICONE ;
+
+	// Plugin parameters are: spreaderX0 spreaderY0 airTemperature fanSpeedFilename
+	// Modelica uses SI units, so spreaderX0 and spreaderY0 are in metres.
+	// Heatsink side is 0.06 metres, spreader side 0.01024 metres, so the offset
+	// needed to center the chip underneath the heatsink is
+	// (0.06 - 0.01024) / 2 = 0.02488
+	plugin "heatsink_plugin/loaders/FMI/fmi_loader.so", "heatsink_plugin/heatsinks/HS483/HS483.HS483_P14752_VariableFanSpeed_Interface3DICE 0.02488 0.02488 300 fan_speed.txt" ;
+
+dimensions :
+	chip length 10240 , width  10240 ;
+	cell length  5120 , width   5120 ;
+	non-uniform 1;
+
+die TTC :
+	layer 610 SILICON ;
+	source 15 SILICON ;
+
+stack:
+	//die  D2  TTC  floorplan "example_pluggable.flp" ;
+	die  D1  TTC  floorplan "example_pluggable.flp" discretization 2 3;
+
+solver:
+	transient step 0.01, slot 1 ;
+	initial temperature 300 ;
+
+output:
+	// Print the temperature at the center of the die
+	T ( D1, 5120, 5120, "trace.txt", step );
