@@ -536,7 +536,7 @@ Conductance_t get_conductance_non_uniform_z
     if (layer_index>=dimensions->Grid.NLayers) //spreder layer
     {
         HeatSink_t *sink = tgrid->TopHeatSink;
-        return get_spreader_conductance_top_bottom(sink);
+        return get_spreader_conductance_top_bottom_nonuniform(sink, i_cell->Data.value);
     }
     switch (tgrid->LayersTypeProfile [layer_index])
     {

@@ -280,6 +280,9 @@ extern "C"
     /*! \return the thermal conductance along the z axis of a heat spreader cell */
     Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink);
 
+    /*! \return the thermal conductance along the z axis of a heat spreader cell in the non-uniform scenario */
+    Conductance_t get_spreader_conductance_top_bottom_nonuniform(HeatSink_t *hsink, ChipDimension_t area);
+
 /******************************************************************************/
 
 #ifdef __cplusplus

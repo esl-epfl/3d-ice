@@ -412,4 +412,13 @@ Conductance_t get_spreader_conductance_top_bottom(HeatSink_t *hsink)
              * hsink->CellWidth) / (hsink->SpreaderHeight / 2.0);
 }
 
+
+Conductance_t get_spreader_conductance_top_bottom_nonuniform(HeatSink_t *hsink, ChipDimension_t area)
+{
+    assert(hsink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE);
+    
+    return (  hsink->SpreaderMaterial.ThermalConductivity
+             * area ) / (hsink->SpreaderHeight / 2.0);
+}
+
 /******************************************************************************/
