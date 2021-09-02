@@ -559,7 +559,8 @@ Error_t generate_inspection_point_output
     Time_t             current_time
 )
 {
-    Quantity_t index, n_flp_el ;
+    Quantity_t index = 0;
+    Quantity_t n_flp_el;
     Temperature_t temperature, *result ;
 
     FILE *output_stream = fopen (ipoint->FileName, "a") ;

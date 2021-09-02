@@ -93,11 +93,11 @@ extern "C"
 
         Floorplan_t Floorplan ;
         
-        /*! Die discretization level at the south-west X coordinate */
+        /*! Die discretization level at the west-east X coordinate */
 
         CellIndex_t Discr_X ;
 
-        /*! Die discretization level at the south-west Y coordinate */
+        /*! Die discretization level at the north-south Y coordinate */
 
         CellIndex_t Discr_Y ;
 

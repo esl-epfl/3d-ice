@@ -227,11 +227,11 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
 
                         cell_num_non_uniform += cell_num_layer;
 
-                        // In the non-uniform scenario, NE_Row and NE_Column are used to record start and end index of the element
+                        // In the non-uniform scenario, record start and end index of the element in thermal cells
                         if (layer_index == stkel->Pointer.Die->SourceLayerOffset)
                         {
-                            ele_flpi->ICElements.First->Data.NE_Row = cell_num_non_uniform-cell_num_layer;
-                            ele_flpi->ICElements.First->Data.NE_Column = cell_num_non_uniform-1;
+                            ele_flpi->ICElements.First->Data.Index_start = cell_num_non_uniform-cell_num_layer;
+                            ele_flpi->ICElements.First->Data.Index_end = cell_num_non_uniform-1;
                         }
                     }
                     // record the end index of cell number in the layer
@@ -1219,6 +1219,11 @@ SimResult_t emulate_step
     if (slot_completed (analysis) == true)
     {
         Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
+        #ifdef PRINT_DEBUG_INFO
+            printf("sources info:\n");
+            for(CellIndex_t i = 0; i < dimensions->Grid.NCells; i++)
+                printf("%d:\t%f\n", i, *(tdata->PowerGrid.Sources+i));
+        #endif
 
         if (result == TDICE_FAILURE)
 

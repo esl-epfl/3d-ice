@@ -21,7 +21,7 @@ struct Connection_t
     CellIndex_t node1_layer;
     CellIndex_t node2;
     CellIndex_t node2_layer;
-    CellIndex_t direction; // connection direction in z (=0), x (=1), or y (=2);
+    CellIndex_t direction; // connection direction in z (top bottom =0), x (west, east =1), or y (north south=2);
     ChipDimension_t  value; // connection value, it is intercoonect length if two nodes in the same layer, otherwise, it is the area
 };
 

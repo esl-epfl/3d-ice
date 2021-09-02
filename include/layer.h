@@ -90,11 +90,11 @@ extern "C"
 
         MaterialElementList_t MaterialLayout ;
 
-        /*! Layer discretization level at the south-west X coordinate */
+        /*! Layer discretization level at the west-east X coordinate */
 
         CellIndex_t Discr_X ;
 
-        /*! Layer discretization level at the south-west Y coordinate */
+        /*! Layer discretization level at the north-south Y coordinate */
 
         CellIndex_t Discr_Y ;
     } ;

@@ -80,11 +80,11 @@ extern "C"
 
         ChipDimension_t Width ;
 
-        /*! Discretization level at the south-west X coordinate */
+        /*! Discretization level at the west-east X coordinate */
 
         ChipDimension_t Discr_X ;
 
-        /*! Discretization level at the south-west Y coordinate */
+        /*! Discretization level at the north-south Y coordinate */
 
         ChipDimension_t Discr_Y ;
 
@@ -107,6 +107,14 @@ extern "C"
          *  corner of the ic element is placed */
 
         CellIndex_t NE_Column ;
+
+        /*! (Non-uniform scenario) The start index of the of the thermal cell in the non-uniform thermal cell list */
+
+        CellIndex_t Index_start ;
+
+        /*! (Non-uniform scenario) The end index of the of the thermal cell in the non-uniform thermal cell list */
+
+        CellIndex_t Index_end ;
     } ;
 
     /*! Definition of the type ICElement_t */

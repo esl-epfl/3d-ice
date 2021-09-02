@@ -253,7 +253,8 @@ void system_matrix_destroy (SystemMatrix_t *sysmatrix)
 }
 
 /******************************************************************************/
-
+// implemented for qsort, find the small index 
+// by comparing both the column and row index
 static int compare(const void* p1, const void* p2) {
     const ChipDimension_t (*a)[3] = p1;
     const ChipDimension_t (*b)[3] = p2;
@@ -2003,7 +2004,12 @@ void fill_system_matrix
                                 row, column);
         }
     }
-    
+
+#ifdef PRINT_DEBUG_INFO
+    printf("system matrix info:\n");
+    for(CellIndex_t i = 0; i < dimensions->Grid.NConnections; i++)
+        printf("%d:\t%f\n", i, *(sysmatrix->Values+i));
+#endif
 
 }
 

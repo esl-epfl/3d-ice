@@ -55,6 +55,8 @@ void ic_element_init (ICElement_t *icel)
     icel->SW_Column = (CellIndex_t) 0u ;
     icel->NE_Row    = (CellIndex_t) 0u ;
     icel->NE_Column = (CellIndex_t) 0u ;
+    icel->Index_start = (CellIndex_t) 0u ;
+    icel->Index_end = (CellIndex_t) 0u ;
 }
 
 /******************************************************************************/
@@ -73,6 +75,8 @@ void ic_element_copy (ICElement_t *dst, ICElement_t *src)
     dst->SW_Column = src->SW_Column ;
     dst->NE_Row    = src->NE_Row ;
     dst->NE_Column = src->NE_Column ;
+    dst->Index_start    = src->Index_start ;
+    dst->Index_end = src->Index_end ;
 }
 
 /******************************************************************************/
@@ -270,10 +274,8 @@ Temperature_t get_max_temperature_ic_element
 
     if (dimensions->NonUniform == 1)
     {
-        max_temperature =
-
-            *(temperatures + icel->NE_Row) ;
-        for (CellIndex_t i = icel->NE_Row; i<= icel->NE_Column; i++)
+        max_temperature = *(temperatures + icel->Index_start) ;
+        for (CellIndex_t i = icel->Index_start; i<= icel->Index_end; i++)
         {
             max_temperature = MAX
             (
@@ -322,8 +324,8 @@ Temperature_t get_min_temperature_ic_element
     {
         min_temperature =
 
-            *(temperatures + icel->NE_Row) ;
-        for (CellIndex_t i = icel->NE_Row; i<= icel->NE_Column; i++)
+            *(temperatures + icel->Index_start) ;
+        for (CellIndex_t i = icel->Index_start; i<= icel->Index_end; i++)
         {
             min_temperature = MIN
             (
@@ -374,7 +376,7 @@ Temperature_t get_avg_temperature_ic_element
 
     if (dimensions->NonUniform == 1)
     {
-        for (CellIndex_t i = icel->NE_Row; i<= icel->NE_Column; i++)
+        for (CellIndex_t i = icel->Index_start; i<= icel->Index_end; i++)
         {
             avg_temperature +=  *(temperatures + i) ;
             counter++ ;

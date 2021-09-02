@@ -146,7 +146,7 @@
 %token DIE                   "keyword die"
 %token DIMENSIONS            "keyword dimensions"
 %token DISTRIBUTION          "keyword distribution"
-%token DISCRETIZATION  "keyword discretization"
+%token DISCRETIZATION        "keyword discretization"
 %token FINAL                 "keyword final"
 %token FIRST                 "keyword first"
 %token FLOORPLAN             "keyword floorplan"
@@ -1416,6 +1416,7 @@ stack_element
 
         layer_copy (layer, tmp) ;
 
+        //set layer's default discretization level
         layer->Discr_X = stkd->Dimensions->Discr_X;
         layer->Discr_Y = stkd->Dimensions->Discr_Y;
 
@@ -1594,6 +1595,7 @@ stack_element
             YYABORT ; // CHECKME error messages printed in this case ....
         }
 
+        //set die's default discretization
         die->Discr_X = stkd->Dimensions->Discr_X;
         die->Discr_Y = stkd->Dimensions->Discr_Y;
 

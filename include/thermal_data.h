@@ -116,22 +116,8 @@ extern "C"
      *
      * \param tdata the address of the structure to initalize
      */
+
     void thermal_data_init (ThermalData_t *tdata) ;
-
-    /******************************************************************************/
-
-    // typedef struct Connections_List Connections_List;
-    // struct Connections_List{
-    //     int node1;
-    //     int node2;
-    //     Connections_List* next_connection;
-    // };
-    // typedef struct conections_info{
-    //     int num_connections;
-    //     Connections_List* next_connection;
-    // } Conections_Info;
-
-
 
     /*! Update the number of cells in the non-uniform grid scenario
      *
@@ -144,7 +130,9 @@ extern "C"
     /*! Get cell position for each cell and sace info to arrays position_info and layer_cell_record
      * \param position_info position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param layer_type_record the vector contains the layer type information of each layer in the position_info
      * \param stack_elements_list the list of stack element (bottom first)
+     * \param dimensions the dimensions of the IC
      */
     void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions);
 
@@ -158,6 +146,7 @@ extern "C"
 
     /*! get connections of each grid in the same layer
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param layer_type_record the vector contains the layer type information of each layer in the position_info
      * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param dimensions the dimensions of the IC
      */
@@ -172,6 +161,7 @@ extern "C"
 
     /*! Get connections between layers (from bottom to top)
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param layer_type_record the vector contains the layer type information of each layer in the position_info
      * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param dimensions the dimensions of the IC
      */
