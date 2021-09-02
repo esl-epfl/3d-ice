@@ -399,28 +399,31 @@ void power_grid_fill
             if (dimensions->NonUniform == 1)
             {
                 // top heatsink grids are aligned with the top layer
-                Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.Last;
-                for( CellIndex_t layer_info = cell_tmp->Data.layer_info;
-                cell_tmp != NULL && layer_info == cell_tmp->Data.layer_info;
-                cell_tmp=cell_tmp->Prev)
+                CellIndex_t last_layer_index = dimensions->Cell_list.Last->Data.layer_info;
+                for( Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
+                cell_tmp != NULL;
+                cell_tmp=cell_tmp->Next)
                 {
-                    *tmp += (  2.0
-                            * get_thermal_conductivity (tgrid->LayersProfile + layer_info,
-                                                        0, 0,
-                                                        dimensions)
-                            * tgrid->TopHeatSink->AmbientHTC
-                            * cell_tmp->Data.length
-                            * cell_tmp->Data.width
-                        )
-                        /
-                        (  get_cell_height (dimensions, layer_info)
-                            * tgrid->TopHeatSink->AmbientHTC
-                            + 2.0
-                            * get_thermal_conductivity (tgrid->LayersProfile + layer_info,
-                                                        0, 0,
-                                                        dimensions)
-                        ) ;
-                    tmp++;
+                    if (cell_tmp->Data.layer_info == last_layer_index)
+                    {
+                        *tmp += (  2.0
+                                * get_thermal_conductivity (tgrid->LayersProfile + last_layer_index,
+                                                            0, 0,
+                                                            dimensions)
+                                * tgrid->TopHeatSink->AmbientHTC
+                                * cell_tmp->Data.length
+                                * cell_tmp->Data.width
+                            )
+                            /
+                            (  get_cell_height (dimensions, last_layer_index)
+                                * tgrid->TopHeatSink->AmbientHTC
+                                + 2.0
+                                * get_thermal_conductivity (tgrid->LayersProfile + last_layer_index,
+                                                            0, 0,
+                                                            dimensions)
+                            ) ;
+                        tmp++;
+                    }
                 }
             }
             else
