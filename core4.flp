@@ -1,6 +1,0 @@
-Core2_0 :
-
-  position       0,    0 ;
-  dimension   6000, 6000 ;
-
-  power values 10;
