@@ -475,22 +475,39 @@ Error_t generate_inspection_point_header
             break ;
 
         case TDICE_OUTPUT_TYPE_TMAP :
+            if (dimensions->NonUniform == 1)
+            {
+                fprintf (output_stream,
+                    "%sThermal map for layer %s (please find axis information in \"xyaxis_[stack id].txt\")\n",
+                    prefix, ipoint->StackElement->Id);
+            }
+            else
+            {
+                fprintf (output_stream,
+                    "%sThermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
+                    prefix, ipoint->StackElement->Id);
 
-            fprintf (output_stream,
-                "%sThermal map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
-                prefix, ipoint->StackElement->Id);
-
-            print_axes (dimensions) ;
+                print_axes (dimensions) ;
+            }
 
             break ;
 
         case TDICE_OUTPUT_TYPE_PMAP :
+            if (dimensions->NonUniform == 1)
+            {
+                fprintf (output_stream,
+                    "%sPower map for layer %s (please find axis information in \"xyaxis_[stack id].txt\")\n",
+                    prefix, ipoint->StackElement->Id);
+            }
+            else
+            {
+                fprintf (output_stream,
+                    "%sPower map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
+                    prefix, ipoint->StackElement->Id);
 
-            fprintf (output_stream,
-                "%sPower map for layer %s (please find axis information in \"xaxis.txt\" and \"yaxis.txt\")\n",
-                prefix, ipoint->StackElement->Id);
+                print_axes (dimensions) ;
 
-            print_axes (dimensions) ;
+            }
 
             break ;
 

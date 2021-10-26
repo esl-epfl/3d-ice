@@ -298,7 +298,9 @@ static SystemMatrix_t add_solid_column_non_uniform
         matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node2; //r
         matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node1; //c
         matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->Data.node2, i_cell->Data.node1, &sign_note);  //v
-        //printf("r:%d, c:%d, v:%f\n",i_cell->Data.node2,i_cell->Data.node1,matrix_tmp[matrix_tmp_index][2]);
+        #ifdef PRINT_DEBUG_INFO
+            printf("r:%d, c:%d, v:%f\n",i_cell->Data.node2,i_cell->Data.node1,matrix_tmp[matrix_tmp_index][2]);
+        #endif
         matrix_tmp_index++;
         matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node1; //r
         matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node2; //c

@@ -37,7 +37,7 @@
  ******************************************************************************/
 
 #include <stdlib.h> // For the memory functions malloc/free
-
+#include <string.h>
 #include "stack_element.h"
 
 /******************************************************************************/
@@ -237,6 +237,16 @@ void stack_element_print_thermal_map
     
     if (dimensions->NonUniform == 1)
     {
+        // write the xyaxis file in the non-uniform scenario
+        char name[50] = "xyaxis_";
+        strcat(name,stkel->Id);
+        strcat(name,".txt");
+        FILE *filexy = fopen (name, "w") ;
+        if (filexy == NULL)
+        {
+            fprintf (stderr, "Cannot create text file for x axis in the non-uniform scenario\n") ;
+            return ;
+        }
         // output all of the cells' temperature in the layer for non-uniform scenario
         CellIndex_t counter = 0;
         CellIndex_t layer_offset = get_source_layer_offset(stkel) ;
@@ -245,10 +255,12 @@ void stack_element_print_thermal_map
             if (cell_i->Data.layer_info == layer_offset)
             {
                 fprintf (stream, "%7.3f  ", *(temperatures+counter)) ;
+                fprintf (filexy, "%5.2f\t%5.2f\t%5.2f\t%5.2f\n", cell_i->Data.left_x, cell_i->Data.left_y, cell_i->Data.length,cell_i->Data.width) ;
             }
             counter++;
         }
         fprintf (stream, "\n") ;
+        fclose (filexy) ;
     }
     else
     {
@@ -286,6 +298,16 @@ void stack_element_print_power_map
     
     if (dimensions->NonUniform == 1)
     {
+        // write the xyaxis file in the non-uniform scenario
+        char name[50] = "xyaxis_";
+        strcat(name,stkel->Id);
+        strcat(name,".txt");
+        FILE *filexy = fopen (name, "w") ;
+        if (filexy == NULL)
+        {
+            fprintf (stderr, "Cannot create text file for x axis in the non-uniform scenario\n") ;
+            return ;
+        }
         // output all of the cells' power in the layer for non-uniform scenario
         CellIndex_t counter = 0;
         CellIndex_t layer_offset = get_source_layer_offset(stkel) ;
@@ -294,10 +316,12 @@ void stack_element_print_power_map
             if (cell_i->Data.layer_info == layer_offset)
             {
                 fprintf (stream, "%7.3f  ", *(sources+counter)) ;
+                fprintf (filexy, "%5.2f\t%5.2f\t%5.2f\t%5.2f\n", cell_i->Data.left_x, cell_i->Data.left_y, cell_i->Data.length,cell_i->Data.width) ;
             }
             counter++;
         }
         fprintf (stream, "\n") ;
+        fclose (filexy) ;
     }
     else
     {

@@ -636,6 +636,27 @@ void get_minkowski_difference(ChipDimension_t *minkowski_diff, ChipDimension_t (
 }
 
 /******************************************************************************/
+// Get the overlap area between two cells
+ChipDimension_t get_overlap_area(ChipDimension_t *minkowski_diff, ChipDimension_t (*position_info_ptr)[4], int i_x, int i_y)
+{
+    ChipDimension_t length = (fabs(minkowski_diff[0]) <= fabs(minkowski_diff[2])) ? fabs(minkowski_diff[0]) : fabs(minkowski_diff[2]);
+    ChipDimension_t width = (fabs(minkowski_diff[1]) <= fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
+    ChipDimension_t node1_length = position_info_ptr[i_x][2]-position_info_ptr[i_x][0];
+    ChipDimension_t node1_width = position_info_ptr[i_x][3]-position_info_ptr[i_x][1];
+    ChipDimension_t node2_length = position_info_ptr[i_y][2]-position_info_ptr[i_y][0];
+    ChipDimension_t node2_width = position_info_ptr[i_y][3]-position_info_ptr[i_y][1];
+    
+    ChipDimension_t node_length = (node1_length <= node2_length) ? node1_length : node2_length;
+    ChipDimension_t node_width = (node1_width <= node2_width) ? node1_width : node2_width;
+    
+
+    length = (length <= node_length) ? length : node_length;
+    width = (width <= node_width) ? width : node_width;
+    return length*width;
+
+}
+
+/******************************************************************************/
 // get connections of each grid in the same layer
 void get_connections_in_layer
 (
@@ -761,13 +782,7 @@ void get_connections_between_layer
                         new_connection.node2_layer = layer_index;
 
                         // overlap area is the minum area
-                        ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
-                        ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
-                        ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
-                        ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
-                        new_connection.value = (area1 <= area2) ? area1 : area2;
-                        new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
-                        new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+                        new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
 
                         new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
                         // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
@@ -803,13 +818,7 @@ void get_connections_between_layer
                         new_connection.node2_layer = layer_index;
 
                         // overlap area is the minum area
-                        ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
-                        ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
-                        ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
-                        ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
-                        new_connection.value = (area1 <= area2) ? area1 : area2;
-                        new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
-                        new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+                        new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
 
                         new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
                         // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
@@ -847,13 +856,7 @@ void get_connections_between_layer
                         new_connection.node2_layer = layer_index;
 
                         // overlap area is the minum area
-                        ChipDimension_t area1 = minkowski_diff[0] * minkowski_diff[1];
-                        ChipDimension_t area2 = minkowski_diff[2] * minkowski_diff[3];
-                        ChipDimension_t area3 = fabs(minkowski_diff[0] * minkowski_diff[3]);
-                        ChipDimension_t area4 = fabs(minkowski_diff[1] * minkowski_diff[2]);
-                        new_connection.value = (area1 <= area2) ? area1 : area2;
-                        new_connection.value = (area3 < new_connection.value) ? area3 : new_connection.value;
-                        new_connection.value = (area4 < new_connection.value) ? area4 : new_connection.value;
+                       new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
 
                         new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
                         // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
@@ -1295,11 +1298,11 @@ SimResult_t emulate_steady
         return TDICE_SOLVER_ERROR ; //TODO: support steady state pluggable sink
 
     Error_t result = update_source_vector (&tdata->PowerGrid, dimensions) ;
-
-    // printf("sources info:\n");
-    // for(CellIndex_t i = 0; i < dimensions->Grid.NCells; i++)
-    //     printf("%d:\t%f\n", i, *(tdata->PowerGrid.Sources+i));
-    
+    #ifdef PRINT_DEBUG_INFO
+        printf("sources info:\n");
+        for(CellIndex_t i = 0; i < dimensions->Grid.NCells; i++)
+            printf("%d:\t%f\n", i, *(tdata->PowerGrid.Sources+i));
+    #endif
     if (result == TDICE_FAILURE)
     {
         fprintf (stderr,
