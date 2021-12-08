@@ -7,7 +7,7 @@ LOG_FILE="log.txt"
 BANNER_FILE="banner.txt"
 
 ROOT_FOLDER="../"
-UPDATED_EXTENSIONS=".h .c .cpp"
+UPDATED_EXTENSIONS=".h .c .cpp .l .y"
 
 
 # Removes the previous header from a file.
@@ -26,7 +26,7 @@ function removeHeader {
 
 
     # remove banner
-    sed -ri '0,/^\s+\*+\/$/d' $fileName
+    sed -ri '0,/^\s+\*{2,}\/$/d' $fileName
     echo -e "\t[OK] <$fileName>: banner removed" >> $LOG_FILE
 }
 
