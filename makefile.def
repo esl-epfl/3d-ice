@@ -41,7 +41,7 @@
  ##############################################################################
 
 3DICE_LIBNAME   = threed-ice
-3DICE_VERSION   = 3.0.0
+3DICE_VERSION   = 3.1.0
 3DICE_RELEASE   = $(3DICE_LIBNAME)-$(3DICE_VERSION)
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include
@@ -160,16 +160,18 @@ ARFLAGS   = rsv
 
 CC        = gcc
 # CC        = g++
-# CFLAGS    = -MD -O3
+CFLAGS    = -MD -O3
 # CFLAGS    = -MD -g -O0 -fsanitize=address
-CFLAGS    = -MD -g -O0
+# CFLAGS    = -MD -g -O0
 CINCLUDES = -I$(3DICE_INCLUDE)
 
 YACC      = bison
-YFLAGS    = -d --debug
+YFLAGS    = -d
+# YFLAGS    = -d --debug
 
 LEX       = flex
-LFLAGS    = --debug
+LFLAGS    =
+# LFLAGS    = --debug
 
 RM        = rm
 RMFLAGS   = -vf
@@ -178,9 +180,9 @@ DOXYGEN   = doxygen
 DOXYFILE  = Doxyfile
 
 CXX       = g++
-# CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
+CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
 # CXXFLAGS  = -std=c++11 -g -O0 -fsanitize=address -Wall -Wextra -Werror
-CXXFLAGS  = -std=c++11 -g -O0 -Wall -Wextra -Werror
+# CXXFLAGS  = -std=c++11 -g -O0 -Wall -Wextra -Werror
 INC_DIRS  = $(CINCLUDES) -I$(SYSTEMC_INCLUDE)
 
  #
