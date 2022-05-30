@@ -608,9 +608,9 @@ Error_t generate_inspection_point_output
                     {
                         if (
                             x >= cell_i->Data.left_x && 
-                            x <= cell_i->Data.left_x + cell_i->Data.length &&
+                            x < cell_i->Data.left_x + cell_i->Data.length &&
                             y >= cell_i->Data.left_y && 
-                            y <= cell_i->Data.left_y + cell_i->Data.width
+                            y < cell_i->Data.left_y + cell_i->Data.width
                         )
                         {
                             index = counter;
