@@ -287,8 +287,9 @@ static SystemMatrix_t add_solid_column_non_uniform
     // Conductance_t g_bottom, g_top, g_north, g_south, g_east, g_west ;
 
     // *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
-    ChipDimension_t matrix_tmp[dimensions->Grid.NConnections][3];
-    memset(matrix_tmp, 0, sizeof matrix_tmp);
+    // ChipDimension_t matrix_tmp[dimensions->Grid.NConnections][3];
+    ChipDimension_t (*matrix_tmp)[3] = malloc(dimensions->Grid.NConnections * sizeof(ChipDimension_t[3]));
+    memset(matrix_tmp, 0, dimensions->Grid.NConnections * sizeof(ChipDimension_t[3]));
     CellIndex_t matrix_tmp_index = 0;
     ConnectionListNode_t* i_cell;
     Conductance_t sign_note;
@@ -381,7 +382,7 @@ static SystemMatrix_t add_solid_column_non_uniform
                     break;
 
                 default:
-                    matrix_tmp[matrix_tmp_index_3][2] += 0.0; 
+                    break; 
             }
         }
     }
@@ -417,7 +418,7 @@ static SystemMatrix_t add_solid_column_non_uniform
 
     }
 
-
+    free(matrix_tmp);
     return sysmatrix ;
 }
 

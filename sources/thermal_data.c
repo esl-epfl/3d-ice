@@ -889,8 +889,7 @@ Error_t thermal_data_build
     {
         update_number_of_cells (dimensions, stack_elements_list);
         
-        ChipDimension_t position_info[dimensions->Grid.NCells][4]; // position info contains "left_x, left_y, right_x, right_y" for each thermal cell
-        ChipDimension_t (*position_info_ptr)[4] = position_info;
+        ChipDimension_t (*position_info_ptr)[4] = malloc(dimensions->Grid.NCells * sizeof(ChipDimension_t[4]));
         CellIndex_t layer_cell_record[dimensions->Grid.NLayers+1]; // record the end index of each layer in the position_info
         memset(layer_cell_record, 0, sizeof layer_cell_record);
         // 0: caculate surroding
@@ -914,6 +913,7 @@ Error_t thermal_data_build
         get_connections_between_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
         // update number of connections
         dimensions->Grid.NConnections =  2*(dimensions->connections_list.Size)+dimensions->Grid.NCells;
+        free(position_info_ptr);
     }
 
     tdata->Size = get_number_of_cells (dimensions) ;
