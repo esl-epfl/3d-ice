@@ -13,7 +13,7 @@ top heat sink :
 dimensions :
    chip length 10000, width 10000 ;
    cell length  1000, width  1000 ;
-   non-uniform 1;
+   non-uniform false;
 
 layer PCB :
    height 10 ;

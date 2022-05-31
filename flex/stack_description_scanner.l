@@ -196,6 +196,8 @@ path                    \"[^"]*\"
 "volumetric"                 return VOLUMETRIC ;
 "wall"                       return WALL ;
 "width"                      return WIDTH ;
+"true"                       return TRUE_FLAG ;
+"false"                      return FALSE_FLAG ;
 
 {double}           {
                      yylval->double_v = atof(yytext) ;

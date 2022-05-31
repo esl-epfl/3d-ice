@@ -199,6 +199,8 @@
 %token VOLUMETRIC            "keywork volumetric"
 %token WALL                  "keyword wall"
 %token WIDTH                 "keyword width"
+%token TRUE_FLAG             "keyword true"
+%token FALSE_FLAG            "keyword false"
 
 %token <double_v> DVALUE     "double value"
 %token <string>   IDENTIFIER "identifier"
@@ -1131,10 +1133,16 @@ optional_nonuniform
         $$ = 0 ;
     }
 
-  | NONUNIFORM DVALUE ';' // $2
+  | NONUNIFORM TRUE_FLAG ';' // $2
 
     {
-        $$ = $2 ;
+        $$ = 1 ;
+    }
+
+  | NONUNIFORM FALSE_FLAG ';' // $2
+
+    {
+        $$ = 0 ;
     }
 
   ;
