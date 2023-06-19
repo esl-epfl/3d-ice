@@ -38,7 +38,7 @@
 
 #ifndef _3DICE_MACROS_H_
 #define _3DICE_MACROS_H_
-
+#define EPSILON 1e-6
 /*! \file macros.h */
 
 #ifdef __cplusplus

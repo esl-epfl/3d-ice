@@ -686,7 +686,7 @@ void get_connections_in_layer
                 // first compute the Minkowski difference
                 get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
                 // if two rectangles interconnect with each other, Minkowski difference should contain the origin point (0, 0)
-                if (minkowski_diff[0] == 0 || minkowski_diff[1] == 0 || minkowski_diff[2] == 0 || minkowski_diff[3] == 0)
+                if (fabs(minkowski_diff[0]) < EPSILON || fabs(minkowski_diff[1]) < EPSILON || fabs(minkowski_diff[2]) < EPSILON || fabs(minkowski_diff[3]) < EPSILON)
                 {
                     // furthermore, it should cross the origin point
                     if (minkowski_diff[0] * minkowski_diff[2] + minkowski_diff[1] * minkowski_diff[3] < 0)
@@ -698,14 +698,14 @@ void get_connections_in_layer
                         new_connection.node1_layer = layer_index;
                         new_connection.node2_layer = layer_index;
                         // Find the interconnect length
-                        if (minkowski_diff[0] * minkowski_diff[2] == 0)
+                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) < EPSILON)
                         {
                             if (layer_type == 1 || layer_type == 2 || layer_type == 3)
                                 continue;
                             new_connection.value = (fabs(minkowski_diff[1])<=fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
                             new_connection.direction = 1; //two nodes interconect in direction x
                         }
-                        else if (minkowski_diff[1] * minkowski_diff[3] == 0)
+                        else if (fabs(minkowski_diff[1] * minkowski_diff[3]) < EPSILON)
                         {
                             if (layer_type == 1 || layer_type == 3)
                                 continue;
@@ -770,24 +770,26 @@ void get_connections_between_layer
                     // first compute Minkowski difference
                     get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
                     // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                    if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
-                    {
-                        // add the connection information to the connections variable
-                        Connection_t new_connection;
-                        connection_init(&new_connection);
-                        new_connection.node1 = i_x;
-                        new_connection.node2 = i_y;
-                        new_connection.node1_layer = layer_index-1;
-                        new_connection.node2_layer = layer_index;
+                    if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
+                        if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                        {
+                            // add the connection information to the connections variable
+                            Connection_t new_connection;
+                            connection_init(&new_connection);
+                            new_connection.node1 = i_x;
+                            new_connection.node2 = i_y;
+                            new_connection.node1_layer = layer_index-1;
+                            new_connection.node2_layer = layer_index;
 
-                        // overlap area is the minum area
-                        new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                            // overlap area is the minum area
+                            new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
 
-                        new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                        // add the connection information to the connections variable
-                        connection_list_insert_end(connections_list, &new_connection);
+                            new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                            // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                            // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                            // add the connection information to the connections variable
+                            connection_list_insert_end(connections_list, &new_connection);
+                        }
                     }
                 }
             }
@@ -806,24 +808,26 @@ void get_connections_between_layer
                     // first compute Minkowski difference
                     get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
                     // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                    if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
-                    {
-                        // add the connection information to the connections variable
-                        Connection_t new_connection;
-                        connection_init(&new_connection);
-                        new_connection.node1 = i_x;
-                        new_connection.node2 = i_y;
-                        new_connection.node1_layer = layer_index-1;
-                        new_connection.node2_layer = layer_index;
+                    if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
+                        if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                        {
+                            // add the connection information to the connections variable
+                            Connection_t new_connection;
+                            connection_init(&new_connection);
+                            new_connection.node1 = i_x;
+                            new_connection.node2 = i_y;
+                            new_connection.node1_layer = layer_index-1;
+                            new_connection.node2_layer = layer_index;
 
-                        // overlap area is the minum area
-                        new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                            // overlap area is the minum area
+                            new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
 
-                        new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                        // add the connection information to the connections variable
-                        connection_list_insert_end(connections_list, &new_connection);
+                            new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                            // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                            // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                            // add the connection information to the connections variable
+                            connection_list_insert_end(connections_list, &new_connection);
+                        }
                     }
                 }
             }
@@ -844,24 +848,26 @@ void get_connections_between_layer
                     // first compute Minkowski difference
                     get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
                     // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                    if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
-                    {
-                        // add the connection information to the connections variable
-                        Connection_t new_connection;
-                        connection_init(&new_connection);
-                        new_connection.node1 = i_x;
-                        new_connection.node2 = i_y;
-                        new_connection.node1_layer = layer_index-1;
-                        new_connection.node2_layer = layer_index;
+                    if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
+                        if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
+                        {
+                            // add the connection information to the connections variable
+                            Connection_t new_connection;
+                            connection_init(&new_connection);
+                            new_connection.node1 = i_x;
+                            new_connection.node2 = i_y;
+                            new_connection.node1_layer = layer_index-1;
+                            new_connection.node2_layer = layer_index;
 
-                        // overlap area is the minum area
-                       new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                            // overlap area is the minum area
+                            new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
 
-                        new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                        // add the connection information to the connections variable
-                        connection_list_insert_end(connections_list, &new_connection);
+                            new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                            // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
+                            // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
+                            // add the connection information to the connections variable
+                            connection_list_insert_end(connections_list, &new_connection);
+                        }
                     }
                 }
             }

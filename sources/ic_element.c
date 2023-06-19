@@ -182,22 +182,35 @@ bool check_intersection
     if (icelement_a == icelement_b)
 
         return false ;
+    ChipDimension_t minkowski_x1 = icelement_a->SW_X - icelement_b->SW_X - icelement_b->Length ;
+    ChipDimension_t minkowski_y1 = icelement_a->SW_Y - icelement_b->SW_Y - icelement_b->Width ;
+    ChipDimension_t minkowski_x2 = icelement_a->SW_X + icelement_a->Length - icelement_b->SW_X ;
+    ChipDimension_t minkowski_y2 = icelement_a->SW_Y + icelement_a->Width - icelement_b->SW_Y ;
+    if (fabs(minkowski_x1 * minkowski_x2) > EPSILON && fabs(minkowski_y1 * minkowski_y2) > EPSILON )
+    {
+        if (minkowski_x1 * minkowski_x2 < 0 && minkowski_y1 * minkowski_y2 < 0)
+            return true ;
+    }
 
-    if (   (icelement_a->SW_X + icelement_a->Length)
-           <= icelement_b->SW_X
-        || icelement_a->SW_X
-           >= (icelement_b->SW_X + icelement_b->Length))
+    return false ;
+        
 
-        return false ;
+    // if (   (icelement_a->SW_X + icelement_a->Length)
+    //        <= icelement_b->SW_X
+    //     || icelement_a->SW_X
+    //        >= (icelement_b->SW_X + icelement_b->Length))
 
-    if (   (icelement_a->SW_Y + icelement_a->Width)
-           <= icelement_b->SW_Y
-        || icelement_a->SW_Y
-           >= (icelement_b->SW_Y + icelement_b->Width))
+    //     return false ;
 
-        return false ;
+    // if (   (icelement_a->SW_Y + icelement_a->Width)
+    //        <= icelement_b->SW_Y
+    //     || icelement_a->SW_Y
+    //        >= (icelement_b->SW_Y + icelement_b->Width))
 
-    return true ;
+    //     return false ;
+
+    // return true ;
+
 }
 
 /******************************************************************************/
