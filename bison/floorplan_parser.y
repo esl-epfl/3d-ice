@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -90,6 +90,7 @@
 
 %token DIMENSION  "keyword dimension"
 %token DISCRETIZATION  "keyword discretization"
+%token MATERIAL        "keyword material"
 %token POSITION   "keyword position"
 %token POWER      "keyword power"
 %token RECTANGLE  "keywork rectangle"
@@ -151,7 +152,7 @@ floorplan_element_list
     }
   | floorplan_element_list floorplan_element
     {
-        if (floorplan_element_list_find(&floorplan->ElementsList, $2) != NULL)
+        /*if (floorplan_element_list_find(&floorplan->ElementsList, $2) != NULL)
         {
             sprintf (error_message, "Floorplan element id %s already declared", $2->Id) ;
 
@@ -159,6 +160,7 @@ floorplan_element_list
 
             local_abort = true ;
         }
+        */
 
         floorplan_element_list_insert_end (&floorplan->ElementsList, $2) ;
 
@@ -195,11 +197,21 @@ floorplan_element
         floorplan_element->PowerValues  = $4 ;
 
         ic_element_list_copy (&floorplan_element->ICElements, &ic_element_list) ;
-
         ic_element_list_destroy (&ic_element_list) ;
         ic_element_list_init    (&ic_element_list) ;
-
+                
         ICElementListNode_t *iceln1 ;
+
+        for (iceln1  = ic_element_list_begin (&floorplan_element->ICElements) ;
+             iceln1 != NULL ;
+             iceln1  = ic_element_list_next (iceln1))
+        {
+            ICElement_t *icel1 = ic_element_list_data (iceln1) ;
+
+            floorplan_element->Area += icel1->Length * icel1->Width ;
+        }
+
+        /*ICElementListNode_t *iceln1 ;
 
         for (iceln1  = ic_element_list_begin (&floorplan_element->ICElements) ;
              iceln1 != NULL ;
@@ -267,6 +279,7 @@ floorplan_element
                 }
             }
         }
+        */
 
         string_destroy (&$1) ;
     }
@@ -305,7 +318,7 @@ ic_elements
   | POSITION  DVALUE ',' DVALUE ';'  // $2 $4
     DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
     DISCRETIZATION DVALUE ',' DVALUE ';' // $12 $14
-  {
+    {
         ICElement_t icelement ;
 
         ic_element_init (&icelement) ;
@@ -329,8 +342,72 @@ ic_elements
         }
 
         ic_element_list_insert_end (&ic_element_list, &icelement) ;
-  }
-  
+    }
+
+  | POSITION  DVALUE ',' DVALUE ';'  // $2 $4
+    DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
+    MATERIAL IDENTIFIER ';' // $12
+    {
+        ICElement_t icelement ;
+
+        ic_element_init (&icelement) ;
+
+        icelement.SW_X   = $2 ;
+        icelement.SW_Y   = $4 ;
+        icelement.Length = $7 ;
+        icelement.Width  = $9 ;
+        
+        string_copy (&icelement.Material.Id, &$12) ;
+        string_destroy (&$12) ;
+        align_to_grid (&icelement, dimensions) ;
+
+        if (check_location (&icelement, dimensions) == true)
+        {
+            sprintf (error_message, "Floorplan element is outside of the IC") ;
+
+            floorplan_parser_error (floorplan, dimensions, scanner, error_message) ;
+
+            local_abort = true ;
+        }
+
+        ic_element_list_insert_end (&ic_element_list, &icelement) ;
+        material_destroy(&icelement.Material);
+    }
+
+  | POSITION  DVALUE ',' DVALUE ';'  // $2 $4
+    DIMENSION DVALUE ',' DVALUE ';'  // $7 $9
+    MATERIAL IDENTIFIER ';' // $12
+    DISCRETIZATION DVALUE ',' DVALUE ';' // $15 $17
+    {
+        ICElement_t icelement ;
+
+        ic_element_init (&icelement) ;
+
+        icelement.SW_X   = $2 ;
+        icelement.SW_Y   = $4 ;
+        icelement.Length = $7 ;
+        icelement.Width  = $9 ;
+        icelement.Discr_X  = $15 ;
+        icelement.Discr_Y  = $17 ;
+        
+        string_copy (&icelement.Material.Id, &$12) ;
+        string_destroy (&$12) ;
+    
+        align_to_grid (&icelement, dimensions) ;
+
+        if (check_location (&icelement, dimensions) == true)
+        {
+            sprintf (error_message, "Floorplan element is outside of the IC") ;
+
+            floorplan_parser_error (floorplan, dimensions, scanner, error_message) ;
+
+            local_abort = true ;
+        }
+
+        ic_element_list_insert_end (&ic_element_list, &icelement) ;
+        material_destroy(&icelement.Material);
+    }
+
   | ic_elements_list
 
   ;

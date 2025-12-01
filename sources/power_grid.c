@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -399,33 +399,62 @@ void power_grid_fill
             {
                 // top heatsink grids are aligned with the top layer
                 CellIndex_t last_layer_index = dimensions->Cell_list.Last->Data.layer_info;
-                for( Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
-                cell_tmp != NULL;
-                cell_tmp=cell_tmp->Next)
+                //no source layer
+                if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT)
                 {
-                    if (cell_tmp->Data.layer_info == last_layer_index)
+                    for( Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
+                         cell_tmp != NULL;
+                         cell_tmp=cell_tmp->Next)
                     {
-                        *tmp += (  2.0
-                                * get_thermal_conductivity (tgrid->LayersProfile + last_layer_index,
-                                                            0, 0,
-                                                            dimensions)
-                                * tgrid->TopHeatSink->AmbientHTC
-                                * cell_tmp->Data.length
-                                * cell_tmp->Data.width
-                            )
-                            /
-                            (  get_cell_height (dimensions, last_layer_index)
-                                * tgrid->TopHeatSink->AmbientHTC
-                                + 2.0
-                                * get_thermal_conductivity (tgrid->LayersProfile + last_layer_index,
-                                                            0, 0,
-                                                            dimensions)
-                            ) ;
-                        tmp++;
+                        if (cell_tmp->Data.layer_info == last_layer_index)
+                        {   
+                             *tmp += (  2.0
+                                       * get_thermal_conductivity (tgrid->LayersProfile + last_layer_index,
+                                                                  0, 0,
+                                                                  dimensions, 2)
+                                       * tgrid->TopHeatSink->AmbientHTC
+                                       * cell_tmp->Data.length
+                                       * cell_tmp->Data.width
+                                     )
+                                     /
+                                     (  get_cell_height (dimensions, last_layer_index)
+                                       * tgrid->TopHeatSink->AmbientHTC
+                                       + 2.0
+                                       * get_thermal_conductivity (tgrid->LayersProfile + last_layer_index,
+                                                                   0, 0,
+                                                                   dimensions, 2)
+                                     ) ;
+                             tmp++;
+                        }
                     }
                 }
+                else if (pgrid->LayersTypeProfile [pgrid->NLayers - 1] == TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT) //source layer
+                {
+                    for( Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
+                         cell_tmp != NULL;
+                         cell_tmp=cell_tmp->Next)
+                    {
+                        if (cell_tmp->Data.layer_info == last_layer_index)
+                        {   
+                             *tmp += (  2.0
+                                       * get_thermal_conductivity_non_uniform (cell_tmp, 2)
+                                       * tgrid->TopHeatSink->AmbientHTC
+                                       * cell_tmp->Data.length
+                                       * cell_tmp->Data.width
+                                     )
+                                     /
+                                     (  get_cell_height (dimensions, last_layer_index)
+                                       * tgrid->TopHeatSink->AmbientHTC
+                                       + 2.0
+                                       * get_thermal_conductivity_non_uniform (cell_tmp, 2)
+                                     ) ;
+                             tmp++;
+                        }
+                    }
+                }
+                
             }
-            else
+            else   //uniform
             {
                 for (row  = first_row (dimensions) ;
                     row <= last_row  (dimensions) ; row++)
@@ -486,25 +515,43 @@ void power_grid_fill
 
         if (dimensions->NonUniform == 1)
         {
-                // bottom heatsink grids are aligned with the bottom layer
-                Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
+            // bottom heatsink grids are aligned with the bottom layer
+            Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
+            if (pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB)  // no source layer
+            {
                 for( CellIndex_t layer_info = cell_tmp->Data.layer_info;
-                cell_tmp != NULL && layer_info == cell_tmp->Data.layer_info;
-                cell_tmp=cell_tmp->Next)
+                     cell_tmp != NULL && layer_info == cell_tmp->Data.layer_info;
+                     cell_tmp=cell_tmp->Next)
                 {
-                    // Darong_TODO.Question: Check why it is different from the way to compute thermal
-                    // conductivity for the top heatsink [reference functions, get_conductance_top, get_conductance_bottom]
-                    *tmp += (  get_thermal_conductivity (tgrid->LayersProfile + layer_info,
-                                                        0, 0,
-                                                        dimensions)
-                            * cell_tmp->Data.length
-                            * cell_tmp->Data.width
+                    
+                    *tmp += ( get_thermal_conductivity (tgrid->LayersProfile + layer_info,
+                                                         0, 0,
+                                                         dimensions, 2)
+                              * cell_tmp->Data.length
+                              * cell_tmp->Data.width
                             )
-                            / (get_cell_height (dimensions, layer_info) / 2.0) ;
+                              / (get_cell_height (dimensions, layer_info) / 2.0) ;
                     tmp++;
                 }
+            }
+            else if (pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_PCB)  //source layer
+            {
+                for( CellIndex_t layer_info = cell_tmp->Data.layer_info;
+                     cell_tmp != NULL && layer_info == cell_tmp->Data.layer_info;
+                     cell_tmp=cell_tmp->Next)
+                {
+                    
+                    *tmp += (  get_thermal_conductivity_non_uniform (cell_tmp, 2)
+                             * cell_tmp->Data.length
+                             * cell_tmp->Data.width
+                            )
+                             / (get_cell_height (dimensions, layer_info) / 2.0) ;
+                    tmp++;
+                }
+            }
+                
         }
-        else
+        else  //uniform
         {
             for (row  = first_row (dimensions) ;
                 row <= last_row  (dimensions) ; row++)
@@ -519,7 +566,7 @@ void power_grid_fill
         }
 
 
-   }
+    }
 }
 
 /******************************************************************************/
@@ -612,18 +659,16 @@ Error_t update_source_vector
                     {
                         Source_t  *tmpS = sources ;
                         SolidTC_t *tmpT = pgrid->HeatSinkTopTcs ;
-
                         Non_uniform_cellListNode_t* cell_node_tmp;
                         for (cell_node_tmp =  cell_node;
                             cell_node_tmp != NULL; cell_node_tmp = cell_node_tmp->Next)
-
-                                *tmpS++ += pgrid->TopHeatSink->AmbientTemperature * *tmpT++ ;
-
+                        {
+                            *tmpS++ += pgrid->TopHeatSink->AmbientTemperature * *tmpT++ ; 
+                            //fprintf (stdout, "%d\n", cell_node_tmp->Data.layer_info) ; fflush (stdout) ;
+                        }
                         Floorplan_t *floorplan = pgrid->FloorplansProfile [layer];
                         Source_t *sources_temp = sources;
-
                         Quantity_t index = 0u ;
-
                         FloorplanElementListNode_t *flpeln ;
 
                         for (flpeln  = floorplan_element_list_begin (&floorplan->ElementsList) ;
@@ -657,10 +702,11 @@ Error_t update_source_vector
 
                         Non_uniform_cellListNode_t* cell_node_tmp;
                         for (cell_node_tmp =  cell_node;
-                            cell_node_tmp != NULL; cell_node_tmp = cell_node_tmp->Next)
-
-                                *tmpS++ += pgrid->BottomHeatSink->AmbientTemperature * *tmpT++ ;
-
+                            cell_node_tmp != NULL && cell_node_tmp ->Data.layer_info == layer; cell_node_tmp = cell_node_tmp->Next)
+                        {
+                            *tmpS++ += pgrid->BottomHeatSink->AmbientTemperature * *tmpT++ ;
+                            //fprintf (stdout, "%d\n", cell_node_tmp->Data.layer_info) ; fflush (stdout) ;
+                        }
                         break ;
                     }
 
@@ -671,7 +717,7 @@ Error_t update_source_vector
 
                         Non_uniform_cellListNode_t* cell_node_tmp;
                         for (cell_node_tmp =  cell_node;
-                            cell_node_tmp != NULL; cell_node_tmp = cell_node_tmp->Next)
+                            cell_node_tmp != NULL && cell_node_tmp ->Data.layer_info == layer; cell_node_tmp = cell_node_tmp->Next)
 
                                 *tmpS++ += pgrid->BottomHeatSink->AmbientTemperature * *tmpT++ ;
 
@@ -915,11 +961,11 @@ Error_t update_source_vector
         }
     }
 
-    // for (ccounter  = 0u,            sources = pgrid->Sources ;
-    //      ccounter != pgrid->NCells ;
-    //      ccounter++,                sources++)
-
-    //     printf("%d: %f\n", ccounter, *sources) ;
+/*    for (ccounter  = 0u,            sources = pgrid->Sources ;
+    ccounter != pgrid->NCells ;
+    ccounter++,                sources++)
+        printf("%d: %f\n", ccounter, *sources) ;
+*/
     return TDICE_SUCCESS ;
 }
 

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -132,6 +132,7 @@
 #define TTT_list_insert_end   CNT(ListName, _list_insert_end)
 #define TTT_list_find         CNT(ListName, _list_find)
 #define TTT_list_print        CNT(ListName, _list_print)
+#define TTT_list_merge        CNT(ListName, _list_merge)
 
 /******************************************************************************/
 
@@ -278,6 +279,17 @@ FPROTO2 (
 FPROTO2 (
 
     void, TTT_list_insert_end, TTTList_t *list, TTT_t *data) ;
+
+
+    /*! merge the second list into the first list
+     *
+     * \param list1  the address of the first list
+     * \param list2  the address of the second list
+     */
+
+FPROTO2 (
+
+    void, TTT_list_merge, TTTList_t *list1, TTTList_t *list2) ;
 
 
 

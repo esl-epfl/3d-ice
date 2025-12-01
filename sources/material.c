@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -47,7 +47,9 @@ void material_init (Material_t *material)
     string_init (&material->Id) ;
 
     material->VolumetricHeatCapacity = (SolidVHC_t) 0.0 ;
-    material->ThermalConductivity    = (SolidTC_t) 0.0 ;
+    material->ThermalConductivity[0] = (SolidTC_t) 0.0 ;
+    material->ThermalConductivity[1] = (SolidTC_t) 0.0 ;
+    material->ThermalConductivity[2] = (SolidTC_t) 0.0 ;
 }
 
 /******************************************************************************/
@@ -55,11 +57,12 @@ void material_init (Material_t *material)
 void material_copy (Material_t *dst, Material_t *src)
 {
     material_destroy (dst) ;
-
     string_copy (&dst->Id, &src->Id) ;
 
     dst->VolumetricHeatCapacity = src->VolumetricHeatCapacity ;
-    dst->ThermalConductivity    = src->ThermalConductivity ;
+    dst->ThermalConductivity[0] = src->ThermalConductivity[0] ;
+    dst->ThermalConductivity[1] = src->ThermalConductivity[1] ;
+    dst->ThermalConductivity[2] = src->ThermalConductivity[2] ;
 }
 
 /******************************************************************************/
@@ -130,8 +133,8 @@ void material_print (Material_t *material, FILE *stream, String_t prefix)
              prefix, material->Id) ;
 
     fprintf (stream,
-             "%s   thermal conductivity     %.4e ;\n",
-             prefix, material->ThermalConductivity) ;
+             "%s   thermal conductivity     %.4e     %.4e     %.4e ;\n",
+             prefix, material->ThermalConductivity[0], material->ThermalConductivity[1], material->ThermalConductivity[2]) ;
 
     fprintf (stream,
              "%s   volumetric heat capacity %.4e ;\n",

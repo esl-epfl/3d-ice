@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -179,6 +179,7 @@ void dimensions_init (Dimensions_t *dimensions)
     dimensions->NonUniform = 0;
     dimensions->Discr_X = 0;
     dimensions->Discr_Y = 0;
+    dimensions->Cell_pointer = NULL;
 
     non_uniform_cell_list_init(&dimensions->Cell_list);
     connection_list_init(&dimensions->connections_list);
@@ -192,6 +193,7 @@ void dimensions_copy (Dimensions_t *dst, Dimensions_t *src)
     dst->NonUniform = src->NonUniform;
     dst->Discr_X = src->Discr_X;
     dst->Discr_Y = src->Discr_Y;
+    dst->Cell_pointer = src->Cell_pointer;
     cell_dimensions_copy (&dst->Cell, &src->Cell) ;
     grid_dimensions_copy (&dst->Grid, &src->Grid) ;
     chip_dimensions_copy (&dst->Chip, &src->Chip) ;
@@ -208,6 +210,7 @@ void dimensions_destroy (Dimensions_t *dimensions)
     grid_dimensions_destroy (&dimensions->Grid) ;
     chip_dimensions_destroy (&dimensions->Chip) ;
 
+    if (dimensions->Cell_pointer != NULL)            free (dimensions->Cell_pointer) ;
     non_uniform_cell_list_destroy(&dimensions->Cell_list);
     connection_list_destroy(&dimensions->connections_list);
     

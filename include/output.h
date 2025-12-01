@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -197,6 +197,8 @@ extern "C"
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
      * \param current_time the time instant at which the output is printed
+     * \param timestep_index the index of current time step
+     * \param slotlength     slot time divided by step time
      * \param output_instant the instant of the output (slot, step, final)
      *
      * \return \c TDICE_SUCCESS if the operation terminates with success
@@ -210,6 +212,8 @@ extern "C"
         Temperature_t   *temperatures,
         Source_t        *sources,
         Time_t           current_time,
+        Quantity_t       timestep_index,
+        Quantity_t       slotlength,
         OutputInstant_t  output_instant
     ) ;
 

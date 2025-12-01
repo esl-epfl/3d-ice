@@ -1,5 +1,5 @@
  ##############################################################################
- # This file is part of 3D-ICE, version 3.1.0 .                               #
+ # This file is part of 3D-ICE, version 4.0 .                                 #
  #                                                                            #
  # 3D-ICE is free software: you can  redistribute it and/or  modify it  under #
  # the terms of the  GNU General  Public  License as  published by  the  Free #
@@ -22,8 +22,8 @@
  #          Giseong Bak                 Martino Ruggiero                      #
  #          Thomas Brunschwiler         Eder Zulian                           #
  #          Federico Terraneo           Darong Huang                          #
- #          Luis Costero                Marina Zapater                        #
- #          David Atienza                                                     #
+ #          Kai Zhu						Luis Costero                          #
+ #			Marina Zapater              David Atienza                         #
  #                                                                            #
  # For any comment, suggestion or request  about 3D-ICE, please  register and #
  # write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) #
@@ -127,12 +127,11 @@ endif
  # SuperLU variables
  ##############################################################################
 
-SLU_VERSION = 4.3
-SLU_MAIN    = $(3DICE_MAIN)/SuperLU_$(SLU_VERSION)
+SLU_VERSION = 4.0.0
+SLU_MAIN    = $(3DICE_MAIN)/superlu_mt-$(SLU_VERSION)
 SLU_INCLUDE = $(SLU_MAIN)/SRC
 SLU_LIB     = $(SLU_MAIN)/lib
-#SLU_LIBS   = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -lblas
-SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_$(SLU_VERSION) -L/usr/lib/x86_64-linux-gnu -lblas
+SLU_LIBS    = -L$(SLU_LIB) -lsuperlu_mt_OPENMP$(PLAT) -L/lib/x86_64-linux-gnu -lopenblas
 
  #
  # SystemC variables
@@ -160,9 +159,9 @@ ARFLAGS   = rsv
 
 CC        = gcc
 # CC        = g++
-CFLAGS    = -MD -O3
-# CFLAGS    = -MD -g -O0 -fsanitize=address
-# CFLAGS    = -MD -g -O0
+CFLAGS    = -MD -O3 -fopenmp
+# CFLAGS    = -MD -g -O0 -fsanitize=address -fopenmp
+# CFLAGS    = -MD -g -O0 -fopenmp
 CINCLUDES = -I$(3DICE_INCLUDE)
 
 YACC      = bison
@@ -180,9 +179,9 @@ DOXYGEN   = doxygen
 DOXYFILE  = Doxyfile
 
 CXX       = g++
-CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror
-# CXXFLAGS  = -std=c++11 -g -O0 -fsanitize=address -Wall -Wextra -Werror
-# CXXFLAGS  = -std=c++11 -g -O0 -Wall -Wextra -Werror
+CXXFLAGS  = -std=c++11 -O2 -Wall -Wextra -Werror -fopenmp
+#CXXFLAGS  = -std=c++11 -g -O0 -fsanitize=address -Wall -Wextra -Werror -fopenmp
+
 INC_DIRS  = $(CINCLUDES) -I$(SYSTEMC_INCLUDE)
 
  #

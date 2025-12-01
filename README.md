@@ -3,20 +3,22 @@
 [![3D-ICE](https://www.epfl.ch/labs/esl/wp-content/uploads/2018/12/3d_ice.bmp)](https://esl.epfl.ch/3d-ice)
 
 
-3D-ICE stands for 3D Interlayer Cooling Emulator. It is a Linux-based Thermal Emulator Library written in C, which can perform transient thermal analyses of vertically stacked 3D integrated circuits with inter-tier Microchannel Liquid Cooling. The latest version, namely 3D-ICE 3.1, supports fully customized non-uniform thermal modeling and different heat sink models.
+3D-ICE stands for 3D Interlayer Cooling Emulator. It is a Linux-based Thermal Emulator Library written in C, which can perform transient thermal analyses of vertically stacked 3D integrated circuits with inter-tier Microchannel Liquid Cooling. The latest version, namely 3D-ICE 4.0, adds support for heterogeneous and anisotropic floorplans (including GDS layouts), customizable non-uniform thermal modeling, different heat sink models, and parallel acceleration.
 
 To get more information about 3D-ICE, and how to use and install it, please refer to the [3D-ICE_User_Guide](doc/3D-ICE-User_Guide.pdf) in the doc folder. It helps you get started with 3D-ICE and serves as a quick reference later on. Click [here](https://www.epfl.ch/labs/esl/research/open-source-tools/3d-ice/3d-ice-documentation/) if you want to know more about the modeling theory aspects of 3D-ICE.
 
 We are constantly looking for your feedback and comments in our strive to improve 3D-ICE. Please send your emails to 3d-ice@listes.epfl.ch. You must subscribe to this mailing list in order to be able to communicate with us and also receive notifications about new releases and updates on new patches, bugs, etc. Notifications will be kept as limited and as brief as possible and THERE WILL BE NO SPAMMING of your mailbox. In addition, this mailing list will serve as a forum where you can interact with other users of 3D-ICE.
 
 ## Citation
-> ***IMPORTANT INFORMATION:*** Any usage of 3D-ICE for research, commercial or other purposes should be properly acknowledged in the resulting products or publications. Specifically, publications 1, 2, and 3 below should be appropriately cited.
+> ***IMPORTANT INFORMATION:*** Any usage of 3D-ICE for research, commercial or other purposes should be properly acknowledged in the resulting products or publications. Specifically, publications 1, 2, 3, and 4 below should be appropriately cited.
 
-1. F. Terraneo, A. Leva, W. Fornaciari, M. Zapater, D. Atienza, 3D-ICE 3.0: efficient nonlinear MPSoC thermal simulation with pluggable heat sink models, Transactions on Computer-Aided Design of Integrated Circuits and Systems Volume 40 pp. 1-14, 2021-04-19
+1. K. Zhu, D. Huang, L. Costero and D. Atienza, 3D-ICE 4.0: Accurate and efficient thermal modeling for 2.5D/3D heterogeneous chiplet systems, 2026 Design, Automation and Test in Europe Conference (DATE), Verona, Italy, 2026.
 
-2. A. Sridhar, A. Vincenzi, D. Atienza and T. Brunschwiler, 3D-ICE: A Compact Thermal Model for Early-Stage Design of Liquid-Cooled ICs, IEEE Transactions on Computers, vol. 63, no. 10, pp. 2576-2589, Oct. 2014, doi: 10.1109/TC.2013.127
+2. F. Terraneo, A. Leva, W. Fornaciari, M. Zapater, D. Atienza, 3D-ICE 3.0: efficient nonlinear MPSoC thermal simulation with pluggable heat sink models, Transactions on Computer-Aided Design of Integrated Circuits and Systems Volume 40 pp. 1-14, 2021-04-19
 
-3. A. Sridhar, A. Vincenzi, M. Ruggiero, T. Brunschwiler and D. Atienza, 3D-ICE: Fast compact transient thermal modeling for 3D ICs with inter-tier liquid cooling, 2010 IEEE/ACM International Conference on Computer-Aided Design (ICCAD), San Jose, CA, 2010, pp. 463-470, doi: 10.1109/ICCAD.2010.5653749
+3. A. Sridhar, A. Vincenzi, D. Atienza and T. Brunschwiler, 3D-ICE: A Compact Thermal Model for Early-Stage Design of Liquid-Cooled ICs, IEEE Transactions on Computers, vol. 63, no. 10, pp. 2576-2589, Oct. 2014, doi: 10.1109/TC.2013.127
+
+4. A. Sridhar, A. Vincenzi, M. Ruggiero, T. Brunschwiler and D. Atienza, 3D-ICE: Fast compact transient thermal modeling for 3D ICs with inter-tier liquid cooling, 2010 IEEE/ACM International Conference on Computer-Aided Design (ICCAD), San Jose, CA, 2010, pp. 463-470, doi: 10.1109/ICCAD.2010.5653749
 
 ## License and copyright                         
                                                                              
@@ -34,8 +36,8 @@ You should have received a copy of the GNU General Public License along with 3D-
                 Giseong Bak                 Martino Ruggiero                      
                 Thomas Brunschwiler         Eder Zulian                           
                 Federico Terraneo           Darong Huang                          
-                Luis Costero                Marina Zapater                        
-                David Atienza                                                     
+                Kai Zhu                     Luis Costero               
+                Marina Zapater              David Atienza                                                     
                                                                              
     For any comment, suggestion or request  about 3D-ICE, please  register and 
     write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) 
@@ -52,8 +54,8 @@ You should have received a copy of the GNU General Public License along with 3D-
 
 
 ## Release history:
-
-    January 13, 2022    Version 3.1
+    November 19, 2025   Version 4.0
+    January  13, 2022   Version 3.1
     February 10, 2021   Version 3.0
     June 1, 2019        Version 2.2.8
     October 25, 2018    Version 2.2.7

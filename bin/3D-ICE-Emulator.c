@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -45,6 +45,9 @@
 #include "output.h"
 #include "analysis.h"
 
+#include <sys/resource.h>
+#include <sys/time.h>
+
 int main(int argc, char** argv)
 {
     StackDescription_t stkd ;
@@ -53,6 +56,7 @@ int main(int argc, char** argv)
     ThermalData_t      tdata ;
 
     SimResult_t (*emulate) (ThermalData_t*, Dimensions_t*, Analysis_t*) ;
+    ///  Pointer to function
 
     Error_t error ;
 
@@ -71,8 +75,13 @@ int main(int argc, char** argv)
 
     // Init StackDescription and parse the input file
     ////////////////////////////////////////////////////////////////////////////
-
+    clock_t Time_0 = clock() ;
     fprintf (stdout, "Preparing stk data ... ") ; fflush (stdout) ;
+    
+    // test for time
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
 
     stack_description_init (&stkd) ;
     analysis_init          (&analysis) ;
@@ -100,8 +109,10 @@ int main(int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    fprintf (stdout, "done !\n") ;
+    //fprintf (stdout, "done !\n") ;
 
+    fprintf (stdout, "\nRead in configuration files took %.3f sec\n",
+        ( (double)clock() - Time_0 ) / CLOCKS_PER_SEC ) ;
     // Generate output files
     ////////////////////////////////////////////////////////////////////////////
 
@@ -122,13 +133,14 @@ int main(int argc, char** argv)
     // Init thermal data and fill it using the StackDescription
     ////////////////////////////////////////////////////////////////////////////
 
-    fprintf (stdout, "Preparing thermal data ... ") ; fflush (stdout) ;
+    fprintf (stdout, "\nPreparing thermal data ... ") ; fflush (stdout) ;
 
     thermal_data_init (&tdata) ;
 
     error = thermal_data_build
 
-        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis) ;
+        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis, &stkd.Materials) ;
+
 
     if (error != TDICE_SUCCESS)
     {
@@ -138,12 +150,8 @@ int main(int argc, char** argv)
         return EXIT_FAILURE ;
     }
 
-    fprintf (stdout, "done !\n") ;
-
     // Run the simulation and print the output
     ////////////////////////////////////////////////////////////////////////////
-
-    clock_t Time = clock() ;
 
     SimResult_t sim_result ;
 
@@ -181,6 +189,8 @@ int main(int argc, char** argv)
             generate_output (&output, stkd.Dimensions,
                              tdata.Temperatures, tdata.PowerGrid.Sources,
                              get_simulated_time (&analysis),
+                             analysis.CurrentTime,
+                             analysis.SlotLength,
                              TDICE_OUTPUT_INSTANT_STEP) ;
         }
 
@@ -191,6 +201,8 @@ int main(int argc, char** argv)
             generate_output (&output, stkd.Dimensions,
                              tdata.Temperatures, tdata.PowerGrid.Sources,
                              get_simulated_time (&analysis),
+                             analysis.CurrentTime,
+                             analysis.SlotLength,
                              TDICE_OUTPUT_INSTANT_SLOT) ;
         }
 
@@ -199,11 +211,30 @@ int main(int argc, char** argv)
     generate_output (&output, stkd.Dimensions,
                      tdata.Temperatures, tdata.PowerGrid.Sources,
                      get_simulated_time (&analysis),
+                     analysis.CurrentTime,
+                     analysis.SlotLength,
                      TDICE_OUTPUT_INSTANT_FINAL) ;
 
-    fprintf (stdout, "emulation took %.3f sec\n",
-        ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+    /// Present time consumption for test
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    fprintf (stdout, "\nEmulation took %.3f sec\n",
+        (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9 ) ;
 
+    // Output the maximum memory usage
+    struct rusage usage;
+    if (getrusage(RUSAGE_SELF, &usage) == 0) {
+        // ru_maxrss is in kilobytes on Linux
+        long usage_kb = usage.ru_maxrss;
+        if (usage_kb < 1024) {
+            printf("Peak memory usage: %ld KB\n", usage_kb);
+        } else if (usage_kb < 1024 * 1024) {
+            printf("Peak memory usage: %.2f MB\n", usage_kb / 1024.0);
+        } else {
+            printf("Peak memory usage: %.2f GB\n", usage_kb / (1024.0 * 1024.0));
+        }
+    } else {
+        perror("getrusage failed");
+    }
     // free all data
     ////////////////////////////////////////////////////////////////////////////
 

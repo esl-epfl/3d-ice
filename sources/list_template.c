@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -198,6 +198,47 @@ void, TTT_list_insert_begin, TTTList_t *list, TTT_t *data),
     list->Size++ ;
 )
 
+
+/******************************************************************************/
+
+FIMP( FPROTO2 (
+
+void, TTT_list_merge, TTTList_t *list1, TTTList_t *list2),
+
+    // If either list is NULL, nothing to merge
+    if (list1 == NULL || list2 == NULL) return;
+
+    // If list1 is empty, simply copy the contents of list2 to list1
+    if (list1->First == NULL) 
+    {
+        list1->First = list2->First;
+        list1->Last = list2->Last;
+        list1->Size = list2->Size;
+
+        TTT_list_init(list2);
+        return;
+    }
+
+    // If list2 is empty, no need to do anything
+    if (list2->First == NULL) 
+    {
+        return;
+    }
+
+    // Link the last node of list1 to the first node of list2
+    list1->Last->Next = list2->First;
+    list2->First->Prev = list1->Last;
+
+    // Update the last pointer of list1
+    list1->Last = list2->Last;
+
+    // Update the size of the merged list
+    list1->Size += list2->Size;
+
+    // After merging, initialize list2 (making it empty)
+    TTT_list_init(list2);
+
+)
 /******************************************************************************/
 
 FIMP( FPROTO2 (

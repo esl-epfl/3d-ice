@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -49,6 +49,7 @@ extern "C"
 #include <stdio.h> // For the file type FILE
 #include "types.h"
 #include "string_t.h"
+#include "material.h"
 
 /******************************************************************************/
   
@@ -57,9 +58,14 @@ struct Non_uniform_cell_t
     CellIndex_t layer_info;
     ChipDimension_t left_x;
     ChipDimension_t left_y;
+    ChipDimension_t left_z;
     ChipDimension_t length;
     ChipDimension_t width;
+    ChipDimension_t height;
     CellIndex_t isChannel;
+    /*! The material composing the cell */
+    Material_t Material ;
+
 };
 
 typedef struct Non_uniform_cell_t Non_uniform_cell_t;

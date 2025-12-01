@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -241,6 +241,8 @@ Error_t generate_output
     Temperature_t   *temperatures,
     Source_t        *sources,
     Time_t           current_time,
+    Quantity_t       timestep_index,
+    Quantity_t       slotlength,
     OutputInstant_t  output_instant
 )
 {
@@ -275,13 +277,18 @@ Error_t generate_output
 
         Error_t error = generate_inspection_point_output
 
-            (ipoint, dimensions, temperatures, sources, current_time) ;
+            (ipoint, dimensions, temperatures, sources, current_time, timestep_index, slotlength) ;
 
         if (error != TDICE_SUCCESS)
 
             return TDICE_FAILURE ;
     }
 
+ /*   if (output_instant == TDICE_OUTPUT_INSTANT_FINAL && dimensions->NonUniform == 1)
+    {
+        print_thermal_map_3D (dimensions, temperatures);
+    }
+*/
    return TDICE_SUCCESS ;
 }
 

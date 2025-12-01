@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -50,6 +50,7 @@ void analysis_init (Analysis_t *analysis)
     analysis->SlotLength         = (Quantity_t) 0u ;
     analysis->CurrentTime        = (Quantity_t) 0u ;
     analysis->InitialTemperature = (Temperature_t) 0.0 ;
+    analysis->NumOfCores = (Quantity_t) 0u ;
 }
 
 /******************************************************************************/
@@ -64,6 +65,7 @@ void analysis_copy (Analysis_t *dst, Analysis_t *src)
     dst->SlotLength         = src->SlotLength ;
     dst->CurrentTime        = src->CurrentTime ;
     dst->InitialTemperature = src->InitialTemperature ;
+    dst->NumOfCores         = src->NumOfCores ;
 }
 
 /******************************************************************************/
@@ -135,6 +137,9 @@ void analysis_print (Analysis_t *analysis, FILE *stream, String_t prefix)
 
     fprintf (stream, "%s  initial temperature  %.2f ;\n",
         prefix, analysis->InitialTemperature) ;
+    
+    fprintf (stream, "  number of cores %d ;\n",
+            analysis->NumOfCores) ;
 
     fprintf (stream, "%s\n", prefix) ;
 }

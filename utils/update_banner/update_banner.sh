@@ -5,7 +5,7 @@ set -u
 
 LOG_FILE="log.txt"
 
-ROOT_FOLDER="../"
+ROOT_FOLDER="../../"
 
 BANNER_FILE="banner.txt"
 BANNER_FILE_MAKEFILE="banner_makefiles.txt"

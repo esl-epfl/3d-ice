@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -188,7 +188,8 @@ SolidTC_t get_thermal_conductivity
     Layer_t      *layer,
     CellIndex_t   row_index,
     CellIndex_t   column_index,
-    Dimensions_t *dimensions
+    Dimensions_t *dimensions,
+    CellIndex_t   direction
 )
 {
     Material_t *tmp = NULL ;
@@ -203,10 +204,43 @@ SolidTC_t get_thermal_conductivity
 
         tmp = get_material_at_location (melement, row_index, column_index, dimensions) ;
 
-        if (tmp != NULL)    return tmp->ThermalConductivity ;
+        if (tmp != NULL)    
+        {
+            if (direction <= 2)
+                return tmp->ThermalConductivity[direction] ;
+            else
+            {
+                fprintf (stderr, "error in get_thermal_conductivity \n ");
+                return -1;
+            }    
+        }
     }
 
-    return layer->Material.ThermalConductivity ;
+    if (direction <= 2)
+        return layer->Material.ThermalConductivity[direction] ;
+    else
+    {
+        fprintf (stderr, "error in get_thermal_conductivity \n ");
+        return -1;
+    }    
+}
+
+/******************************************************************************/
+//get thermal conductivity from non-uniform cell
+//only used in source layer
+SolidTC_t get_thermal_conductivity_non_uniform
+(
+    Non_uniform_cellListNode_t* i_cell,
+    CellIndex_t   direction
+)
+{
+    if (direction <= 2)
+        return i_cell->Data.Material.ThermalConductivity[direction] ;
+    else
+    {
+        fprintf (stderr, "error in get_thermal_conductivity \n ");
+        return -1;
+    }    
 }
 
 /******************************************************************************/
@@ -238,3 +272,13 @@ SolidTC_t get_volumetric_heat_capacity
 }
 
 /******************************************************************************/
+//get volumetric_heat_capacity from non-uniform cell
+//only used in source layer
+
+SolidTC_t get_volumetric_heat_capacity_non_uniform
+(
+    Non_uniform_cellListNode_t* i_cell
+)
+{
+    return i_cell->Data.Material.VolumetricHeatCapacity ;
+}

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -55,7 +55,7 @@ extern "C"
 #include "thermal_grid.h"
 #include "analysis.h"
 
-#include "slu_ddefs.h"
+#include "slu_mt_ddefs.h"
 
 /******************************************************************************/
 
@@ -76,12 +76,12 @@ extern "C"
          *  If the matrix is nxn, then n+1 column pointers are needed.
          */
 
-        CellIndex_t *ColumnPointers ;
+        LUIndex_t *ColumnPointers ;
 
         /*! Pointer to the array storing the row indexes
          *  If the matrix has nnz elements, then nnz row indexes are needed */
 
-        CellIndex_t *RowIndices ;
+        LUIndex_t *RowIndices ;
 
         /*! Pointer to the array storing the non zeroes coefficient */
 
@@ -89,11 +89,11 @@ extern "C"
 
         /*! The dimension n of the squared matrix nxn */
 
-        CellIndex_t Size ;
+        LUIndex_t Size ;
 
         /*! The number of nonzeroes coefficients */
 
-        CellIndex_t NNz ;
+        LUIndex_t NNz ;
 
         /*! SuperLU matrix A (wrapper arount our SystemMatrix SM_A )*/
 
@@ -107,33 +107,38 @@ extern "C"
 
         SuperMatrix SLUMatrix_L ;
 
+        SystemMatrixCoeff_t *Nzval_L ;
+        LUIndex_t *Nzval_colbeg ;
+        LUIndex_t *Nzval_colend ;
+        LUIndex_t *Rowind_L ;
+        LUIndex_t *Rowind_colbeg ;
+        LUIndex_t *Rowind_colend ;
+        LUIndex_t *Col_to_sup ;
+        LUIndex_t *Sup_to_colbeg ;
+        LUIndex_t *Sup_to_colend ;
+
+
         /*! SuperLU matrix U after the A=LU factorization */
 
         SuperMatrix SLUMatrix_U ;
 
+        SystemMatrixCoeff_t *Nzval_U ;
+        LUIndex_t *Rowind_U ;
+        LUIndex_t *Colbeg ;
+        LUIndex_t *Colend ;
+
         /*! SuperLU structure for statistics */
 
-        SuperLUStat_t SLU_Stat ;
+        Gstat_t SLU_MT_Gstat ;
 
         /*! SuperLU structure for factorization options */
 
-        superlu_options_t SLU_Options ;
+        superlumt_options_t SLU_Options ;
 
         /*! SuperLU integer to code the result of the SLU routines */
 
-        int  SLU_Info ;
+        int_t  SLU_Info ;
 
-        /*! SuperLU matrix R for permutation RAC = LU. */
-
-        int* SLU_PermutationMatrixR ;
-
-        /*! SuperLU matrix C for permutation RAC = LU. */
-
-        int* SLU_PermutationMatrixC ;
-
-        /*! SuperLU elimination tree */
-
-        int* SLU_Etree ;
     } ;
 
     /*! Definition of the type SystemMatrix_t */
@@ -160,6 +165,7 @@ extern "C"
      * \param sysmatrix the address of the system matrix
      * \param size the dimension of the (square) matrix
      * \param nnz  the number of nonzeroes coeffcients
+     * \param threads the number of threads
      *
      * \return \c TDICE_SUCCESS if the memory allocation succeded
      * \return \c TDICE_FAILURE if the memory allocation fails
@@ -167,7 +173,36 @@ extern "C"
 
     Error_t system_matrix_build
 
-        (SystemMatrix_t *sysmatrix, CellIndex_t size, CellIndex_t nnz) ;
+        (SystemMatrix_t *sysmatrix, CellIndex_t size, CellIndex_t nnz, CellIndex_t threads) ;
+
+
+
+
+    /*! Allocates memory to store L matrix of a SystemMatrix
+     *
+     * \param sysmatrix the address of the system matrix
+     *
+     * \return \c TDICE_SUCCESS if the memory allocation succeded
+     * \return \c TDICE_FAILURE if the memory allocation fails
+     */
+
+    Error_t allocate_L_Matrix
+
+        (SystemMatrix_t *sysmatrix);
+
+
+
+    /*! Allocates memory to store U matrix of a SystemMatrix
+     *
+     * \param sysmatrix the address of the system matrix
+     *
+     * \return \c TDICE_SUCCESS if the memory allocation succeded
+     * \return \c TDICE_FAILURE if the memory allocation fails
+     */
+
+    Error_t allocate_U_Matrix
+
+        (SystemMatrix_t *sysmatrix);
 
 
 
@@ -242,6 +277,17 @@ extern "C"
      */
 
     void system_matrix_print (SystemMatrix_t sysmatrix, String_t file_name) ;
+
+    /*! Generates a text file storing the vector b
+     *
+     * \param vector    array structure
+     * \param len       length of the array
+     * \param file_name the name of the file to create
+     */
+
+    void Vector_b_print (double *vector, LUIndex_t len, String_t file_name) ;
+/******************************************************************************/
+
 
 /******************************************************************************/
 

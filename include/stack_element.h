@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -263,7 +263,26 @@ extern "C"
         FILE            *stream
     ) ;
 
+    /*! Prints the stk file as the thermal map of all stack elements
+     *
+     * 
+     * \param dimensions      pointer to the structure storing the dimensions
+     * \param temperatures    pointer to the first element of the temparature array
+     * \param timestep_index  the time of simulation
+     * \param slotlength      slot time divided by step time
+     * \param filename        name of file
+     * \param instant         step/slot/final
+     */
 
+    void print_thermal_map_3D
+    (
+        Dimensions_t    *dimensions,
+        Temperature_t   *temperatures,
+        Quantity_t      timestep_index,
+        Quantity_t      slotlength,
+        String_t        filename,
+        OutputInstant_t instant 
+    );
 
     /*! Prints a matrix of source values as the power map of the stack element
      *

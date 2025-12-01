@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -127,6 +127,7 @@
 %type <output_quantity_v>  maxminavg
 %type <string_p>           optional_layout
 %type <double_v>           optional_nonuniform
+%type <double_v>           optional_numofcores
 
 
 %token _2RM                  "keyword 2rm"
@@ -165,6 +166,7 @@
 %token MICROCHANNEL          "keyword microchannel"
 %token MINIMUM               "keyword minimum"
 %token NONUNIFORM            "keyword non-uniform"
+%token NUMOFCORES            "keyword numofcores"
 %token OUTPUT                "keyword output"
 %token PIN                   "keyword pin"
 %token PINFIN                "keyword pinfin"
@@ -191,6 +193,7 @@
 %token TFLPEL                "keyword Tflpel"
 %token THERMAL               "keyword thermal"
 %token TMAP                  "keyword Tmap"
+%token T3D                   "keyword T3d"
 %token TO                    "keyword to"
 %token TOP                   "keyword top"
 %token TRANSFER              "keyword transfer"
@@ -305,12 +308,33 @@ material
 
             YYABORT ;
         }
-
         string_copy (&material->Id, &$2) ;
+        material->ThermalConductivity[0] = (SolidTC_t)  $6 ;
+        material->ThermalConductivity[1] = (SolidTC_t)  $6 ;
+        material->ThermalConductivity[2] = (SolidTC_t)  $6 ;
+        material->VolumetricHeatCapacity = (SolidVHC_t) $11;
+        string_destroy (&$2) ;
+    }
 
-        material->ThermalConductivity    = (SolidTC_t) $6 ;
-        material->VolumetricHeatCapacity = (SolidVHC_t) $11 ;
+  | MATERIAL IDENTIFIER ':'                     // $2
+        THERMAL CONDUCTIVITY     DVALUE ',' DVALUE ',' DVALUE ';'     // $6 $8 $10
+        VOLUMETRIC HEAT CAPACITY DVALUE ';'     // $15
+    {
+        Material_t *material = $$ = material_calloc () ;
 
+        if (material == NULL)
+        {
+            STKERROR ("Malloc material failed") ;
+
+            string_destroy (&$2) ;
+
+            YYABORT ;
+        }
+        string_copy (&material->Id, &$2) ;
+        material->ThermalConductivity[0] = (SolidTC_t)  $6 ;
+        material->ThermalConductivity[1] = (SolidTC_t)  $8 ;
+        material->ThermalConductivity[2] = (SolidTC_t)  $10;
+        material->VolumetricHeatCapacity = (SolidVHC_t) $15;
         string_destroy (&$2) ;
     }
   ;
@@ -1710,6 +1734,7 @@ solver
   : SOLVER ':'
         STEADY ';'
         INITIAL_ TEMPERATURE DVALUE ';' // $7
+        optional_numofcores             // $9
 
     {
         // StepTime is set to 1 to avoid division by zero when computing
@@ -1720,13 +1745,15 @@ solver
         analysis->SlotTime     = (Time_t) 0.0 ;
         analysis->SlotLength   = 1u ; // CHECKME
 
-        analysis->InitialTemperature = (Temperature_t) $7;
+        analysis->InitialTemperature = (Temperature_t) $7 ;
+        analysis->NumOfCores = (Quantity_t) $9;
     }
 
   | SOLVER ':'
         TRANSIENT STEP DVALUE ',' SLOT DVALUE ';'  // $5 StepTime
                                                    // $8 SlotTime
         INITIAL_ TEMPERATURE DVALUE ';'            // $12 Initial temperature
+        optional_numofcores                        // $14 number of cores
     {
         if ($8 < $5)
         {
@@ -1753,6 +1780,7 @@ solver
         analysis->StepTime           = (Time_t) $5 ;
         analysis->SlotTime           = (Time_t) $8 ;
         analysis->InitialTemperature = (Temperature_t) $12 ;
+        analysis->NumOfCores         = (Quantity_t) $14;
 
         // Execute correct division Slot / Step avoiding floating point issues
         // i.e. both slot and step are mutiplied by 10 until the decimal part
@@ -1781,6 +1809,27 @@ solver
                 YYABORT ;
         }
     }
+  ;
+
+optional_numofcores
+  
+  : /* empty */
+
+    {
+        $$ = 1 ;  //default one core
+    }
+  
+  | NUMOFCORES DVALUE ';' // $2
+
+    {
+        if ($2 <= 0)
+        {
+            STKERROR("Number of cores must be a positive value");
+            YYABORT;
+        }
+        $$ = $2 ;
+    }
+
   ;
 
 /******************************************************************************/
@@ -2089,6 +2138,32 @@ inspection_point
         string_destroy (&$3) ;
         string_destroy (&$5) ;
      }
+
+  |  T3D '(' PATH when ')' ';'
+
+     // $3 Path of the output file
+     // $4 when to generate output for this observation
+
+    {
+
+        InspectionPoint_t *ipoint = $$ = inspection_point_calloc () ;
+
+        if (ipoint == NULL)
+        {
+            STKERROR ("Malloc inspection point failed") ;
+
+            string_destroy (&$3) ;
+            YYABORT ;
+        }
+
+        ipoint->OType        = TDICE_OUTPUT_TYPE_T3D ;
+        ipoint->Instant      = $4 ;
+
+        string_copy (&ipoint->FileName, &$3) ;
+
+        string_destroy (&$3) ;
+
+    }
 
   |  PMAP '(' IDENTIFIER ',' PATH when ')' ';'
 

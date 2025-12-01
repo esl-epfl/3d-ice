@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -283,6 +283,130 @@ void stack_element_print_thermal_map
             fprintf (stream, "\n") ;
         } 
     }
+}
+
+/******************************************************************************/
+
+void print_thermal_map_3D
+(
+    Dimensions_t    *dimensions,
+    Temperature_t   *temperatures,
+    Quantity_t      timestep_index,
+    Quantity_t      slotlength,
+    String_t        filename,
+    OutputInstant_t instant 
+)
+{
+       
+    if (dimensions->NonUniform == 1)
+    {
+        // write the tmap vtk file in the non-uniform scenario
+        char newname[50];
+        strcpy(newname, filename);
+
+        if (instant == TDICE_OUTPUT_INSTANT_SLOT)
+        {
+            timestep_index /= slotlength;
+        }
+
+        if (instant != TDICE_OUTPUT_INSTANT_FINAL)
+        {
+            // Determine the length of the string
+            Quantity_t len = strlen(newname);
+            // Remove the origin ".vtk"
+            for (Quantity_t i = 0; i < len; i++)
+            {
+                if (newname[i] == '.')
+                {
+                    newname[i] = '\0';
+                }
+            }
+
+            char index [10];
+            // Convert the uint32_t to a string
+            sprintf(index, "%u", timestep_index);
+
+            strcat(newname, index);
+            strcat(newname, ".vtk");
+        }
+       
+
+        FILE *filevtk = fopen (newname, "w") ;
+        if (filevtk == NULL)
+        {
+            fprintf (stderr, "Cannot create vtk file in the non-uniform scenario\n") ;
+        }
+        //output head information for vtk
+        fprintf (filevtk, "# vtk DataFile Version 3.0\n");
+        fprintf (filevtk, "3D Temperature Map\n");
+        fprintf (filevtk, "ASCII\n");
+        fprintf (filevtk, "DATASET UNSTRUCTURED_GRID\n");
+
+        // Number of points (8 points per hexahedron)
+        fprintf (filevtk, "POINTS %d float\n", dimensions->Grid.NCells * 8);
+
+        CellIndex_t counter = 0;
+        CellIndex_t num_elements = dimensions->Grid.NCells;
+
+        for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
+        {
+            // 8 corners of the hexahedron
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y, cell_i->Data.left_z);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y, cell_i->Data.left_z);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y, cell_i->Data.left_z + cell_i->Data.height);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y, cell_i->Data.left_z + cell_i->Data.height);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z + cell_i->Data.height);
+            fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z + cell_i->Data.height);       
+        }
+
+        // Write the hexahedron elements (8 points per hexahedron)
+        fprintf(filevtk, "CELLS %d %d\n", num_elements, num_elements * 9);
+        for (CellIndex_t i = 0; i < num_elements; i++) 
+        {
+            fprintf(filevtk, "8 %d %d %d %d %d %d %d %d\n", 
+                i * 8, i * 8 + 1, i * 8 + 2, i * 8 + 3,
+                i * 8 + 4, i * 8 + 5, i * 8 + 6, i * 8 + 7);
+        }
+
+        // Cell types (12 corresponds to VTK_HEXAHEDRON)
+        fprintf(filevtk, "CELL_TYPES %d\n", num_elements);
+        for (CellIndex_t i = 0; i < num_elements; i++) 
+        {
+            fprintf(filevtk, "12\n");
+        }
+
+        // Temperature data (assigning values to each hexahedron)
+        fprintf(filevtk, "CELL_DATA %d\n", num_elements);
+        fprintf(filevtk, "SCALARS Temperature float 1\n");
+        fprintf(filevtk, "LOOKUP_TABLE default\n");
+        for (CellIndex_t i = 0; i < num_elements; i++) 
+        {
+            fprintf(filevtk, "%7.3f\n", *(temperatures+counter));
+            counter++;
+        }
+
+         // Add labels based on material
+        fprintf(filevtk, "SCALARS Labels int 1\n");
+        fprintf(filevtk, "LOOKUP_TABLE default\n");
+        for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
+        {
+            String_t temp = "UNDERFILL";
+            String_t temp1 = "AIR";
+            if (cell_i->Data.Material.Id != NULL && (strcmp(cell_i->Data.Material.Id, temp) == 0 || strcmp(cell_i->Data.Material.Id, temp1) == 0))
+            {
+                fprintf(filevtk, "1\n");
+            }            
+            else
+            {
+                fprintf(filevtk, "0\n");
+            }
+        }
+        fprintf (filevtk, "\n") ;
+        fclose (filevtk) ;
+    }
+
 }
 
 /******************************************************************************/

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -236,7 +236,10 @@ extern "C"
      * \param column_index the index of the column of the thermal cell
      * \param dimensions   pointer to the structure storing the dimensions
      *                     of the stack
-     *
+     * \param direction    0 represents x (west to east) direction
+     *                     1 represents y (south to north) direction
+     *                     2 represents z (bottom to top) direction
+     * 
      * \return The thermal conductivity of the cell in location
      *         (\a row_index, \a column_index )
      */
@@ -244,8 +247,21 @@ extern "C"
     SolidTC_t get_thermal_conductivity (Layer_t      *layer,
                                         CellIndex_t   row_index,
                                         CellIndex_t   column_index,
-                                        Dimensions_t *dimensions) ;
+                                        Dimensions_t *dimensions,
+                                        CellIndex_t   direction) ;
 
+    /*! Returns the thermal conductivity of a non-uniform cell in a given location
+     * \param i_cell       the non-uniform cell
+     * \param direction    0 represents x (west to east) direction
+     *                     1 represents y (south to north) direction
+     *                     2 represents z (bottom to top) direction
+     * 
+     * \return The thermal conductivity of the cell 
+     *   
+     */
+
+    SolidTC_t get_thermal_conductivity_non_uniform (Non_uniform_cellListNode_t* i_cell,
+                                                    CellIndex_t   direction) ;
 
 
     /*! Returns the volumetric heat capacity of a cell in a given location
@@ -265,6 +281,15 @@ extern "C"
                                              CellIndex_t   column_index,
                                              Dimensions_t *dimensions) ;
 
+    
+        /*! Returns the volumetric heat capacity of a non-uniform cell
+     *
+     * \param i_cell       the non-uniform cell
+
+     * \return The volumetric heat capacity of the cell
+     */
+
+    SolidVHC_t get_volumetric_heat_capacity_non_uniform (Non_uniform_cellListNode_t *i_cell) ;
 /******************************************************************************/
 
 #ifdef __cplusplus

@@ -13,7 +13,7 @@ top heat sink :
 dimensions :
    chip length 10000, width 10000 ;
    cell length  1000, width  1000 ;
-   non-uniform false;
+   non-uniform true;
 
 layer PCB :
    height 10 ;
@@ -33,6 +33,7 @@ layer   CONN_TO_PCB     PCB                                    discretization 2 
 solver:
    transient step 0.02, slot 0.2 ;
    initial temperature 300.0 ;
+   numofcores 1 ;
 
 output:
    Tflpel(  TOP_DIE.Hotspot1,   "output_hotspot1.txt", average,    slot);

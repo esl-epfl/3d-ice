@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -37,11 +37,12 @@
  ******************************************************************************/
 
 #include <stdio.h> // For the file type FILE
-
+#include <omp.h>
 #include "thermal_data.h"
 #include "macros.h"
 #include "connection_list.h"
-
+#include "time.h"
+#include <cblas.h> 
 /******************************************************************************/
 
 static void init_data (double* data, uint32_t size, double init_value)
@@ -105,7 +106,7 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
                         cell_num_die += discr_x_die*discr_y_die;
                         ele_flpi->ICElements.First->Data.Discr_X = discr_x_die;
                         ele_flpi->ICElements.First->Data.Discr_Y = discr_y_die;
-                    }
+                    } 
                 }
                 cell_num_die = cell_num_die*stkel->NLayers;
                 cell_num_non_uniform += cell_num_die;
@@ -151,17 +152,21 @@ void update_number_of_cells (Dimensions_t *dimensions, StackElementList_t *stack
 
 /******************************************************************************/
 // get cell position for each cell and save info to arrays position_info and layer_cell_record
-void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions)
+void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions, MaterialList_t* materials)
 {
     CellIndex_t current_layer = 0;
     CellIndex_t cell_num_non_uniform = 0;
     CellIndex_t cell_num_layer;
     // enumerate all the stack elements (dies)
     StackElementListNode_t *stkeln ;
+
+    ChipDimension_t current_height = 0;
+    CellDimension_t *height_tmp = dimensions->Cell.Heights;
+
     for (stkeln  = stack_elements_list->Last ;
         stkeln != NULL ;
         stkeln  = stkeln->Prev)
-    {
+    { 
         StackElement_t *stkel = &stkeln->Data ;
         // Darong_TODO: support more layer types
         // default discretization level for the die
@@ -177,6 +182,11 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                 CellIndex_t total_layer_number_die = stkel->Pointer.Die->NLayers;
                 for (CellIndex_t layer_index = 0; layer_index< total_layer_number_die; layer_index++)
                 {
+
+                    LayerListNode_t *lnd = layer_list_end(&stkel->Pointer.Die->Layers);
+                    for (CellIndex_t i = 0; i < layer_index ; i++ )
+                        lnd = layer_list_prev (lnd);
+
                     // enumerate all the floorplan elements
                     FloorplanElementListNode_t *ele_flp ;
                     for (ele_flp  = stkel->Pointer.Die->Floorplan.ElementsList.First ;
@@ -219,9 +229,41 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                             new_cell.layer_info =  current_layer;
                             new_cell.left_x = position_info[position_info_index][0] ;
                             new_cell.left_y = position_info[position_info_index][1] ;
+                            new_cell.left_z = current_height;
                             new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
                             new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
-                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                            new_cell.height = *height_tmp;
+                            ////copy material struct to cell
+                            if (layer_index == stkel->Pointer.Die->SourceLayerOffset)
+                            {
+                                if (ele_flpi->ICElements.First->Data.Material.Id != NULL)
+                                {
+                                    //Material defined in the floorplan element
+                                    Material_t *tmp = material_list_find(materials, &ele_flpi->ICElements.First->Data.Material) ;
+                                    if (tmp == NULL)      
+                                        fprintf (stderr, "Unsupported material defined in the floorplan element\n") ;
+                                    else
+                                    {
+                                        material_copy (&new_cell.Material, tmp) ;
+                                        //fprintf (stdout, "Material defined in floorplanelement: %s\n", new_cell.Material.Id) ;
+                                    }
+                                        
+                                }
+                                else   //Adopt default Material defined in this layer
+                                {
+                                    material_copy (&new_cell.Material, &layer_list_data(lnd)->Material) ;
+                                    //fprintf (stdout, "Material defined in layer: %s\n", new_cell.Material.Id) ;
+                                }
+                            }
+                            else  //can be commented, copy material for no source layer
+                            {       
+                                material_copy (&new_cell.Material, &layer_list_data(lnd)->Material) ;
+                                //fprintf (stdout, "Material defined in layer: %s\n", new_cell.Material.Id) ;
+                            }
+
+                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);
+                            material_destroy(&new_cell.Material);
+                            dimensions->Cell_pointer[cell_num_non_uniform + sub_element] = dimensions->Cell_list.Last;    
                         }
 
                         cell_num_non_uniform += cell_num_layer;
@@ -237,6 +279,9 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                     layer_cell_record[current_layer] = cell_num_non_uniform;
                     layer_type_record[current_layer] = 0;
                     current_layer++;
+                    //update the height information for cell
+                    current_height += *height_tmp;
+                    height_tmp ++;
                 }
 
                 break ;
@@ -270,15 +315,23 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                     new_cell.layer_info =  current_layer;
                     new_cell.left_x = position_info[position_info_index][0] ;
                     new_cell.left_y = position_info[position_info_index][1] ;
+                    new_cell.left_z = current_height;
                     new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
                     new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
-                    non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                    new_cell.height = *height_tmp;
+                    non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);
+                    dimensions->Cell_pointer[cell_num_non_uniform + sub_element] = dimensions->Cell_list.Last;     
                 }
 
                 cell_num_non_uniform += cell_num_layer;
                 layer_cell_record[current_layer] = cell_num_non_uniform;
                 layer_type_record[current_layer] = 0;
                 current_layer++;
+
+                //update height for cell
+                current_height += *height_tmp;
+                height_tmp ++;
+
                 break ;
             }
             case TDICE_STACK_ELEMENT_CHANNEL:
@@ -359,11 +412,14 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                             new_cell.layer_info =  current_layer;
                             new_cell.left_x = position_info[position_info_index][0] ;
                             new_cell.left_y = position_info[position_info_index][1] ;
+                            new_cell.left_z = current_height;
                             new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
                             new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                            new_cell.height = *height_tmp;
                             if (isChannel)
                                 new_cell.isChannel = 1;
-                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);
+                            dimensions->Cell_pointer[cell_num_non_uniform + sub_element] = dimensions->Cell_list.Last;     
                         }
 
                         cell_num_non_uniform += cell_num_layer;
@@ -373,6 +429,10 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                         else
                             layer_type_record[current_layer] = 2;
                         current_layer++;
+
+                        //update height for cell
+                        current_height += *height_tmp;
+                        height_tmp ++;
                     }
 
                     break ;
@@ -453,11 +513,14 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                             new_cell.layer_info =  current_layer;
                             new_cell.left_x = position_info[position_info_index][0] ;
                             new_cell.left_y = position_info[position_info_index][1] ;
+                            new_cell.left_z = current_height;
                             new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
                             new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                            new_cell.height = *height_tmp;
                             if (isChannel)
                                 new_cell.isChannel = 1;
-                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);
+                            dimensions->Cell_pointer[cell_num_non_uniform + sub_element] = dimensions->Cell_list.Last;   
                         }
 
                         cell_num_non_uniform += cell_num_layer;
@@ -475,6 +538,10 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                             layer_type_record[current_layer] = 2;
                         }
                         current_layer++;
+
+                        //update height for cell
+                        current_height += *height_tmp;
+                        height_tmp ++;
                     }
 
                     break ;
@@ -551,17 +618,24 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
                         new_cell.layer_info =  current_layer;
                         new_cell.left_x = position_info[position_info_index][0] ;
                         new_cell.left_y = position_info[position_info_index][1] ;
+                        new_cell.left_z = current_height;
                         new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
                         new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
+                        new_cell.height = *height_tmp;
                         if (isChannel)
                             new_cell.isChannel = 1;
-                        non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+                        non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);
+                        dimensions->Cell_pointer[cell_num_non_uniform + sub_element] = dimensions->Cell_list.Last;     
                     }
 
                     cell_num_non_uniform += cell_num_layer;
                     layer_cell_record[current_layer] = cell_num_non_uniform;
                     layer_type_record[current_layer] = 0;
                     current_layer++;
+
+                    //update height for cell
+                    current_height += *height_tmp;
+                    height_tmp ++;
                     break ;
                 }
 
@@ -582,6 +656,12 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
         //     continue;
         // }
     }
+    //print material list of each layer within die
+    //print_die_cell_material_non_uniform(layer_cell_record, stack_elements_list, dimensions);
+
+    // print conductance for each cell and total z-conductance for each layer
+    print_conductance_map_non_uniform(layer_cell_record, stack_elements_list, dimensions);
+    
     if(stack_elements_list->First->Data.TopSink->SinkModel == TDICE_HEATSINK_TOP_PLUGGABLE)
     {
         CellIndex_t discr_x = dimensions->Grid.NColumns;
@@ -611,15 +691,20 @@ void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_c
             new_cell.layer_info =  current_layer;
             new_cell.left_x = position_info[position_info_index][0] ;
             new_cell.left_y = position_info[position_info_index][1] ;
+            new_cell.left_z = current_height;
             new_cell.length = position_info[position_info_index][2] - position_info[position_info_index][0];
             new_cell.width = position_info[position_info_index][3] - position_info[position_info_index][1];
-            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell);    
+            new_cell.height = *height_tmp;
+            non_uniform_cell_list_insert_end(&dimensions->Cell_list, &new_cell); 
+            dimensions->Cell_pointer[cell_num_non_uniform + sub_element] = dimensions->Cell_list.Last;     
         }
 
         cell_num_non_uniform += cell_num_layer;
         layer_cell_record[current_layer] = cell_num_non_uniform;
         layer_type_record[current_layer] = 4;
         current_layer++;
+
+        //no need to the update height, the last layer
     }
 }
 
@@ -651,6 +736,10 @@ ChipDimension_t get_overlap_area(ChipDimension_t *minkowski_diff, ChipDimension_
 
     length = (length <= node_length) ? length : node_length;
     width = (width <= node_width) ? width : node_width;
+    if (fabs(length) < EPSILON||fabs(width) < EPSILON)
+    {
+        printf("Connection length/width of cells between layers < EPSILON");
+    }
     return length*width;
 
 }
@@ -667,65 +756,89 @@ void get_connections_in_layer
 {
     ConnectionList_t* connections_list = &dimensions->connections_list;
     CellIndex_t layer_start_index = 0;
-    ChipDimension_t minkowski_diff[4];
+
     CellIndex_t layer_end_index;
     CellIndex_t layer_type;
+
+    // Get the start time
+    //double start_time = omp_get_wtime();
+    //clock_t Time_start = clock() ;
+
     for (CellIndex_t layer_index = 0; layer_index < dimensions->Grid.NLayers+1; layer_index++)
     {
-        
         layer_end_index = layer_cell_record[layer_index];
         layer_type =  layer_type_record[layer_index];
         if(layer_index == dimensions->Grid.NLayers && layer_type != 4)
             continue;
 
-        for (CellIndex_t i_x = layer_start_index; i_x < layer_end_index; i_x++)
+        #pragma omp parallel
         {
-            for (CellIndex_t i_y = i_x+1; i_y < layer_end_index; i_y++)
+            ConnectionList_t local_list;
+            connection_list_init(&local_list);
+
+            #pragma omp for schedule(dynamic, 100)
+            for (CellIndex_t i_x = layer_start_index; i_x < layer_end_index; i_x++)
             {
-                // a simplified GJK algorithm to detect interconnect cells in a single layer
-                // first compute the Minkowski difference
-                get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                // if two rectangles interconnect with each other, Minkowski difference should contain the origin point (0, 0)
-                if (fabs(minkowski_diff[0]) < EPSILON || fabs(minkowski_diff[1]) < EPSILON || fabs(minkowski_diff[2]) < EPSILON || fabs(minkowski_diff[3]) < EPSILON)
+                for (CellIndex_t i_y = i_x+1; i_y < layer_end_index; i_y++)
                 {
-                    // furthermore, it should cross the origin point
-                    if (minkowski_diff[0] * minkowski_diff[2] + minkowski_diff[1] * minkowski_diff[3] < 0)
+                    // a simplified GJK algorithm to detect interconnect cells in a single layer
+                    ChipDimension_t minkowski_diff[4];
+                    // first compute the Minkowski difference
+                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+
+                    // if two rectangles interconnect with each other, Minkowski difference should contain the origin point (0, 0)
+                    if (fabs(minkowski_diff[0]) < EPSILON || fabs(minkowski_diff[1]) < EPSILON || fabs(minkowski_diff[2]) < EPSILON || fabs(minkowski_diff[3]) < EPSILON)
                     {
-                        Connection_t new_connection;
-                        connection_init(&new_connection);
-                        new_connection.node1 = i_x;
-                        new_connection.node2 = i_y;
-                        new_connection.node1_layer = layer_index;
-                        new_connection.node2_layer = layer_index;
-                        // Find the interconnect length
-                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) < EPSILON)
+                        // furthermore, it should cross the origin point
+                        if (minkowski_diff[0] * minkowski_diff[2] + minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
                         {
-                            if (layer_type == 1 || layer_type == 2 || layer_type == 3)
-                                continue;
-                            new_connection.value = (fabs(minkowski_diff[1])<=fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
-                            new_connection.direction = 1; //two nodes interconect in direction x
+                            Connection_t new_connection;
+                            connection_init(&new_connection);
+                            new_connection.node1 = i_x;
+                            new_connection.node2 = i_y;
+                            new_connection.node1_layer = layer_index;
+                            new_connection.node2_layer = layer_index;
+
+                            // Find the interconnect length
+                            if (fabs(minkowski_diff[0] * minkowski_diff[2]) < EPSILON)
+                            {
+                                if (layer_type == 1 || layer_type == 2 || layer_type == 3)
+                                    continue;
+                                new_connection.value = (fabs(minkowski_diff[1])<=fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
+                                new_connection.direction = 1; //two nodes interconect in direction x
+                            }
+                            else if (fabs(minkowski_diff[1] * minkowski_diff[3]) < EPSILON)
+                            {
+                                if (layer_type == 1 || layer_type == 3)
+                                    continue;
+                                new_connection.value = (fabs(minkowski_diff[0])<=fabs(minkowski_diff[2])) ? fabs(minkowski_diff[0]) : fabs(minkowski_diff[2]);
+                                new_connection.direction = 2; //two nodes interconect in direction y
+                            }
+                            else
+                                fprintf (stderr, "Cannot determine interconnect length\n") ;
+
+                            connection_list_insert_end(&local_list, &new_connection);
                         }
-                        else if (fabs(minkowski_diff[1] * minkowski_diff[3]) < EPSILON)
-                        {
-                            if (layer_type == 1 || layer_type == 3)
-                                continue;
-                            new_connection.value = (fabs(minkowski_diff[0])<=fabs(minkowski_diff[2])) ? fabs(minkowski_diff[0]) : fabs(minkowski_diff[2]);
-                            new_connection.direction = 2; //two nodes interconect in direction y
-                        }
-                        else
-                            fprintf (stderr, "Cannot determine interconnect length\n") ;
-                        
-                        // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                        // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                        // add the connection information to the connections variable
-                        connection_list_insert_end(connections_list, &new_connection);
-                        
                     }
                 }
             }
+            #pragma omp critical
+            {
+                // add to the global connection list
+                connection_list_merge(connections_list, &local_list);
+            }   
         }
         layer_start_index = layer_end_index;
     }
+
+    // double end_time = omp_get_wtime();
+    // // Calculate and print the total time taken
+    // double time_taken = end_time - start_time;
+    
+    // fprintf (stdout, "  (1.2) build connections in the same layer took %.5f sec\n", time_taken) ;
+    //fprintf (stdout, "Time function took %.5f sec\n",
+    //( (double)clock() - Time_start ) / CLOCKS_PER_SEC ) ;
+
 }
 
 /******************************************************************************/
@@ -741,12 +854,16 @@ void get_connections_between_layer
     ConnectionList_t* connections_list = &dimensions->connections_list;
     // First define the information between the bottom layer and its upper layer
     CellIndex_t botom_layer_start_index = 0;
-    ChipDimension_t minkowski_diff[4];
+
     CellIndex_t botom_layer_end_index;
     CellIndex_t top_layer_start_index;
     CellIndex_t top_layer_end_index;
     CellIndex_t bottom_layer_type;
     CellIndex_t top_layer_type;
+
+    // Get the start time
+    // double start_time = omp_get_wtime();
+
     // enumerate all the layers
     for (CellIndex_t layer_index = 1; layer_index < dimensions->Grid.NLayers + 1; layer_index++)
     {
@@ -761,76 +878,95 @@ void get_connections_between_layer
             top_layer_start_index = layer_cell_record[layer_index-1];
             top_layer_end_index = layer_cell_record[layer_index];
             
-            // enumerate all the elements in a bottom layer
-            for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+            #pragma omp parallel
             {
-                // enumerate all the elements in an upper layer
-                for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                ConnectionList_t local_list;
+                connection_list_init(&local_list);
+
+                #pragma omp for schedule(static)
+                // enumerate all the elements in a bottom layer
+                for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
                 {
-                    // first compute Minkowski difference
-                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                    // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                    if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
-                        if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
-                        {
-                            // add the connection information to the connections variable
-                            Connection_t new_connection;
-                            connection_init(&new_connection);
-                            new_connection.node1 = i_x;
-                            new_connection.node2 = i_y;
-                            new_connection.node1_layer = layer_index-1;
-                            new_connection.node2_layer = layer_index;
+                    // enumerate all the elements in an upper layer
+                    for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                    {
+                        ChipDimension_t minkowski_diff[4];
+                        // first compute Minkowski difference
+                        get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                        // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
+                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
+                            if (minkowski_diff[0] * minkowski_diff[2] < -EPSILON && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
+                            {
+                                // add the connection information to the connections variable
+                                Connection_t new_connection;
+                                connection_init(&new_connection);
+                                new_connection.node1 = i_x;
+                                new_connection.node2 = i_y;
+                                new_connection.node1_layer = layer_index-1;
+                                new_connection.node2_layer = layer_index;
 
-                            // overlap area is the minum area
-                            new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                                // overlap area is the minum area
+                                new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                                new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
 
-                            new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                            // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                            // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                            // add the connection information to the connections variable
-                            connection_list_insert_end(connections_list, &new_connection);
+                                connection_list_insert_end(&local_list, &new_connection);
+                            }
                         }
                     }
                 }
+                #pragma omp critical
+                {
+                    connection_list_merge(connections_list, &local_list);
+                }
             }
-
+            
             botom_layer_start_index = layer_cell_record[layer_index-2];
             botom_layer_end_index = layer_cell_record[layer_index-1];
             top_layer_start_index = layer_cell_record[layer_index];
             top_layer_end_index = layer_cell_record[layer_index+1];
             
-            // enumerate all the elements in a bottom layer
-            for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+            #pragma omp parallel
             {
-                // enumerate all the elements in an upper layer
-                for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                ConnectionList_t local_list;
+                connection_list_init(&local_list);
+
+                #pragma omp for schedule(static)
+                // enumerate all the elements in a bottom layer
+                for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
                 {
-                    // first compute Minkowski difference
-                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                    // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                    if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
-                        if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
-                        {
-                            // add the connection information to the connections variable
-                            Connection_t new_connection;
-                            connection_init(&new_connection);
-                            new_connection.node1 = i_x;
-                            new_connection.node2 = i_y;
-                            new_connection.node1_layer = layer_index-1;
-                            new_connection.node2_layer = layer_index;
+                    // enumerate all the elements in an upper layer
+                    for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                    {
+                        ChipDimension_t minkowski_diff[4];
+                        // first compute Minkowski difference
+                        get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                        // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
+                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
+                            if (minkowski_diff[0] * minkowski_diff[2] < -EPSILON && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
+                            {
+                                // add the connection information to the connections variable
+                                Connection_t new_connection;
+                                connection_init(&new_connection);
+                                new_connection.node1 = i_x;
+                                new_connection.node2 = i_y;
+                                new_connection.node1_layer = layer_index-1;
+                                new_connection.node2_layer = layer_index;
 
-                            // overlap area is the minum area
-                            new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                                // overlap area is the minum area
+                                new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                                new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
 
-                            new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                            // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                            // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                            // add the connection information to the connections variable
-                            connection_list_insert_end(connections_list, &new_connection);
+                                connection_list_insert_end(&local_list, &new_connection);
+                            }
                         }
                     }
                 }
+                #pragma omp critical
+                {
+                    connection_list_merge(connections_list, &local_list);
+                }
             }
+            
             botom_layer_start_index = botom_layer_end_index;
         }
         else
@@ -839,42 +975,57 @@ void get_connections_between_layer
             top_layer_start_index = layer_cell_record[layer_index-1];
             top_layer_end_index = layer_cell_record[layer_index];
             
-            // enumerate all the elements in a bottom layer
-            for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+            #pragma omp parallel
             {
-                // enumerate all the elements in an upper layer
-                for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                ConnectionList_t local_list;
+                connection_list_init(&local_list);
+
+                #pragma omp for schedule(static)
+                // enumerate all the elements in a bottom layer
+                for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
                 {
-                    // first compute Minkowski difference
-                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                    // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                    if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
-                        if (minkowski_diff[0] * minkowski_diff[2] < 0 && minkowski_diff[1] * minkowski_diff[3] < 0)
-                        {
-                            // add the connection information to the connections variable
-                            Connection_t new_connection;
-                            connection_init(&new_connection);
-                            new_connection.node1 = i_x;
-                            new_connection.node2 = i_y;
-                            new_connection.node1_layer = layer_index-1;
-                            new_connection.node2_layer = layer_index;
+                    // enumerate all the elements in an upper layer
+                    for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                    {
+                        ChipDimension_t minkowski_diff[4];
+                        // first compute Minkowski difference
+                        get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                        // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
+                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
+                            if (minkowski_diff[0] * minkowski_diff[2] < -EPSILON && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
+                            {
+                                // add the connection information to the connections variable
+                                Connection_t new_connection;
+                                connection_init(&new_connection);
+                                new_connection.node1 = i_x;
+                                new_connection.node2 = i_y;
+                                new_connection.node1_layer = layer_index-1;
+                                new_connection.node2_layer = layer_index;
 
-                            // overlap area is the minum area
-                            new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
-
-                            new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                            // printf("Node%d in layer %d <-> Node%d in layer %d\n", new_connection.node1, new_connection.node1_layer, new_connection.node2, new_connection.node2_layer) ;
-                            // printf("Direction %d, Value %f\n", new_connection.direction, new_connection.value) ;
-                            // add the connection information to the connections variable
-                            connection_list_insert_end(connections_list, &new_connection);
+                                // overlap area is the minum area
+                                new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
+                                new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
+                                connection_list_insert_end(&local_list, &new_connection);
+                            }
                         }
                     }
+                }
+
+                #pragma omp critical
+                {
+                    connection_list_merge(connections_list, &local_list);
                 }
             }
             botom_layer_start_index = top_layer_start_index;
         }    
 
     }
+
+    // double end_time = omp_get_wtime();
+    // // Calculate and print the total time taken
+    // double time_taken = end_time - start_time;
+    // /// Present time consumption for test
+    // fprintf (stdout, "  (1.3) build connections between layers took %.5f sec\n", time_taken) ;
 }
 
 /******************************************************************************/
@@ -884,19 +1035,35 @@ Error_t thermal_data_build
     ThermalData_t      *tdata,
     StackElementList_t *stack_elements_list,
     Dimensions_t       *dimensions,
-    Analysis_t         *analysis
+    Analysis_t         *analysis,
+    MaterialList_t     *materials
 )
 {
     Error_t result ;
-    
+
+    /// Present time consumption
+    struct timespec start, node1, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    set_parallel_cores(analysis->NumOfCores);
+
     // re-evaluate the number of thermal grids
     // update number of connections in non-uniform grid scenario
     if (dimensions->NonUniform == 1)
     {
+
         update_number_of_cells (dimensions, stack_elements_list);
         
         ChipDimension_t (*position_info_ptr)[4] = malloc(dimensions->Grid.NCells * sizeof(ChipDimension_t[4]));
         CellIndex_t layer_cell_record[dimensions->Grid.NLayers+1]; // record the end index of each layer in the position_info
+        dimensions->Cell_pointer = ( Non_uniform_cellListNode_t **)malloc(dimensions->Grid.NCells * sizeof ( Non_uniform_cellListNode_t *));
+
+        if (dimensions->Cell_pointer == NULL)
+        {
+            free (dimensions->Cell_pointer) ;
+            return TDICE_FAILURE ;
+        }
+
         memset(layer_cell_record, 0, sizeof layer_cell_record);
         // 0: caculate surroding
         // 1: TDICE_LAYER_BOTTOM_WALL, TDICE_LAYER_TOP_WALL, : they don't have connections in x and y directions
@@ -906,19 +1073,25 @@ Error_t thermal_data_build
         CellIndex_t layer_type_record[dimensions->Grid.NLayers+1];
         memset(layer_type_record, 0, sizeof layer_type_record);
         // get cell position for each cell and sace info to arrays position_info and layer_cell_record
-        get_cell_position(position_info_ptr, layer_cell_record, layer_type_record, stack_elements_list, dimensions);
 
-        // // initalize connections variable to store connections info
-        // ConnectionList_t connections_list;
-        // connection_list_init(&connections_list);
+        get_cell_position(position_info_ptr, layer_cell_record, layer_type_record, stack_elements_list, dimensions, materials);
         
+        // /// Present time consumption for test
+        // fprintf (stdout, "\n  (1.1) generate non-uniform cell took %.5f sec\n",
+        // ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+
         // get connections of each grid in the same layer
-        // printf("\n Node1 Node2 Number \n");
         get_connections_in_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
+
         // get connections between layers (bottom->top)
         get_connections_between_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
+
+        // test connection relationship
+        //print_connections_non_uniform(dimensions);
+
         // update number of connections
         dimensions->Grid.NConnections =  2*(dimensions->connections_list.Size)+dimensions->Grid.NCells;
+
         free(position_info_ptr);
     }
 
@@ -947,8 +1120,11 @@ Error_t thermal_data_build
          tdata->Temperatures, tdata->Size,
          SLU_DN, SLU_D, SLU_GE) ;
 
-    /* Alloc and fill the thermal grid */
+    //test for time
+    //clock_t Time1 = clock() ;
 
+    /* Alloc and fill the thermal grid */
+    
     result = thermal_grid_build (&tdata->ThermalGrid, dimensions) ;
 
     if (result == TDICE_FAILURE)
@@ -994,11 +1170,16 @@ Error_t thermal_data_build
 
         (&tdata->PowerGrid, &tdata->ThermalGrid, stack_elements_list, dimensions) ;
 
+    /// Present time consumption for test
+    //fprintf (stdout, "  (1.4) thermal_grid_fill + power_grid_fill took %.5f sec\n",
+    //    ( (double)clock() - Time1 ) / CLOCKS_PER_SEC ) ;
+    //test for time
+    // clock_t Time2 = clock() ;
 
     /* Alloc and fill the system matrix and builds the SLU wrapper */
     result = system_matrix_build
 
-        (&tdata->SM_A, tdata->Size, get_number_of_connections (dimensions)) ;
+        (&tdata->SM_A, tdata->Size, get_number_of_connections (dimensions), analysis->NumOfCores) ;
 
     if (result == TDICE_FAILURE)
     {
@@ -1018,6 +1199,20 @@ Error_t thermal_data_build
 
         (&tdata->SM_A, &tdata->ThermalGrid, analysis, dimensions) ;
 
+    //String_t temp = "Matrix_A.txt" ;
+    //system_matrix_print (tdata->SM_A, temp) ;
+
+    // /// Present time consumption for test
+    // fprintf (stdout, "fill system_matrix (in total) took %.5f sec\n",
+    //     ( (double)clock() - Time2 ) / CLOCKS_PER_SEC ) ;
+
+    clock_gettime(CLOCK_MONOTONIC, &node1);
+    fprintf (stdout, "\nPreparing thermal data took %.5f sec\n\n",
+        (node1.tv_sec - start.tv_sec) + (node1.tv_nsec - start.tv_nsec) / 1e9 ) ;
+    
+    //numofthreads = 50;
+    //omp_set_num_threads(numofthreads);
+
     result = do_factorization (&tdata->SM_A) ;
 
     if (result == TDICE_FAILURE)
@@ -1027,6 +1222,28 @@ Error_t thermal_data_build
         return TDICE_FAILURE ;
     }
 
+    /// Present time consumption for test
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    fprintf (stdout, "Factorization took %.5f sec\n",
+        (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9 ) ;
+
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t set_parallel_cores (Quantity_t num)
+{
+    // get the configured OpenMP threads
+    Quantity_t max_threads = omp_get_max_threads();
+    if (num > max_threads) {
+        fprintf(stdout, "\nWarning: Requested number of thread (%d) exceeds the maximum available (%d), set to %d\n", num, max_threads, max_threads);
+        omp_set_num_threads (max_threads) ;
+        return TDICE_SUCCESS ;
+    }
+
+    omp_set_num_threads(num);
+    fprintf(stdout, "\nUsed threads (%d) / maximum available for OpenMP (%d)", num, max_threads);
     return TDICE_SUCCESS ;
 }
 
@@ -1177,7 +1394,6 @@ static void fill_system_vector_steady
             } // FOR_EVERY_ROW
         } // FOR_EVERY_LAYER
     }
-
 }
 
 Error_t pluggable_heatsink(ThermalData_t *tdata, Dimensions_t *dimensions)
@@ -1319,11 +1535,19 @@ SimResult_t emulate_steady
 
     fill_system_vector_steady (dimensions, tdata->Temperatures, tdata->PowerGrid.Sources) ;
 
-    // printf("system matrix info:\n");
-    // for(CellIndex_t i = 0; i < dimensions->Grid.NConnections; i++)
-    //     printf("%d:\t%f\n", i, *(tdata->SM_A.Values+i));
+    // String_t temp = "Vector_b.txt" ;
+    // Vector_b_print (tdata->Temperatures, dimensions->Grid.NCells, temp) ;
 
-    Error_t res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
+    Error_t res;
+    struct timespec start, end;
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    res = solve_sparse_linear_system (&tdata->SM_A, &tdata->SLUMatrix_B) ;
+
+    // Time consumption for solving the equation
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    fprintf (stdout, "Solve took %.5f sec\n",
+        (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9 ) ;
 
     if (res != TDICE_SUCCESS)
 
@@ -1427,4 +1651,320 @@ Error_t print_thermal_map
     fclose (output_file) ;
 
     return TDICE_SUCCESS ;
+}
+
+void print_die_cell_material_non_uniform
+(
+    CellIndex_t *layer_cell_record,
+    StackElementList_t *stack_elements_list, 
+    Dimensions_t* dimensions
+)
+{
+    if (dimensions->NonUniform == 1)
+    {
+        FILE *output_file = fopen ("cell_material_non_uniform.txt", "w") ;
+
+        if (output_file == NULL)
+        {
+            fprintf (stderr, "Unable to open output file 'cell_material_non_uniform.txt'\n") ;
+        }
+
+        StackElementListNode_t *stkeln ;
+        for (stkeln  = stack_elements_list->Last ;
+             stkeln != NULL ;
+             stkeln  = stkeln->Prev)
+        { 
+            StackElement_t *stkel = &stkeln->Data ;
+
+            switch (stkel->SEType)
+            {
+                case TDICE_STACK_ELEMENT_DIE:
+                {
+                    CellIndex_t index = stkel->Offset ;
+                    CellIndex_t cell_index = 0u ;
+                    CellIndex_t i = 0u;
+                    Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First;
+
+                    CellIndex_t layer_index = 0u ;
+                    LayerListNode_t *lnd ;
+                    
+
+                    fprintf (output_file, "%s\n", stkel->Id) ;
+
+                    for (lnd  = layer_list_end (&stkel->Pointer.Die->Layers) ;
+                        lnd != NULL ;
+                        lnd  = layer_list_prev (lnd))
+                    {
+                        fprintf (output_file, "Die_Layer: %d\n", layer_index) ;
+
+                        if (index == 0u && layer_index == 0u)
+                        {
+                            for (; i < layer_cell_record[index + layer_index]; i ++)
+                            {
+                                fprintf (output_file, "%-3d  Material: %-10s Heat Capacity: %.2e   Layer: %d\n", 
+                                         cell_index, cell_i->Data.Material.Id, cell_i->Data.Material.VolumetricHeatCapacity, cell_i->Data.layer_info) ;
+                                cell_i = cell_i->Next;
+                                cell_index ++;
+                            }
+                            cell_index = 0u;
+                        }
+                        else
+                        {
+                            for (; i < layer_cell_record[index + layer_index - 1]; i ++)
+                                cell_i = cell_i->Next;
+
+                            for (; i < layer_cell_record[index + layer_index]; i ++)
+                            {
+                                 fprintf (output_file, "%-3d  Material: %-10s Heat Capacity: %.2e   Layer: %d\n", 
+                                         cell_index, cell_i->Data.Material.Id, cell_i->Data.Material.VolumetricHeatCapacity, cell_i->Data.layer_info) ;
+                                cell_i = cell_i->Next;
+                                cell_index ++;
+                            }
+                            cell_index = 0u;
+                        }
+
+                        layer_index ++;
+                    }
+                    break ;
+
+                }
+
+                case TDICE_STACK_ELEMENT_LAYER :
+                {
+                    fprintf (output_file, "Stack_Layer:   %s\n", stkel->Id) ;
+                    break ;
+                }
+
+                case TDICE_STACK_ELEMENT_CHANNEL :
+                {
+                    fprintf (output_file, "Channel:   %s\n", stkel->Id) ;
+                    break ;
+                }
+            
+                case TDICE_STACK_ELEMENT_NONE :
+                {
+                    fprintf (stderr, "Unsupported stack element type\n") ;
+                    break ;
+                }
+                default :
+                {
+                    fprintf (stderr, "Unsupported stack element type\n") ;
+                    break ;
+                }
+            }
+        }
+        fclose (output_file) ;     
+    }
+}
+
+void print_conductance_map_non_uniform
+(
+    CellIndex_t *layer_cell_record,
+    StackElementList_t *stack_elements_list, 
+    Dimensions_t* dimensions
+)
+{
+
+    if (dimensions->NonUniform == 1)
+    {
+
+        //1 Store and output the conductance for each non-uniform cell
+        CellDimension_t *conductance_list ;
+        conductance_list = (CellDimension_t *) malloc (sizeof(CellDimension_t) * dimensions->Grid.NCells) ;
+        // CellIndex_t counter = 0;
+        // CellIndex_t num_elements = dimensions->Grid.NCells;
+
+        // FILE *filevtk = fopen ("conductance_non_uniform.vtk", "w") ;
+        // if (filevtk == NULL)
+        // {
+        //     fprintf (stderr, "Unable to open vtk file 'conductance_non_uniform.vtk'\n") ;
+        // }
+       
+        // //output head information for vtk
+        // fprintf (filevtk, "# vtk DataFile Version 3.0\n");
+        // fprintf (filevtk, "3D Conductance Map\n");
+        // fprintf (filevtk, "ASCII\n");
+        // fprintf (filevtk, "DATASET UNSTRUCTURED_GRID\n");
+
+        // // Number of points (8 points per hexahedron)
+        // fprintf (filevtk, "POINTS %d float\n", dimensions->Grid.NCells * 8);
+
+        // for (Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First; cell_i != NULL; cell_i = cell_i->Next)
+        // {
+        //     // 8 corners of the hexahedron
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y, cell_i->Data.left_z);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y, cell_i->Data.left_z);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y, cell_i->Data.left_z + cell_i->Data.height);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y, cell_i->Data.left_z + cell_i->Data.height);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x + cell_i->Data.length, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z + cell_i->Data.height);
+        //     fprintf(filevtk, "%f %f %f\n", cell_i->Data.left_x, cell_i->Data.left_y + cell_i->Data.width, cell_i->Data.left_z + cell_i->Data.height);
+        //     // only calculate the z-direction conductance here
+        //     *(conductance_list+counter) = cell_i->Data.Material.ThermalConductivity[2] * cell_i->Data.length * cell_i->Data.width / cell_i->Data.height;
+        //     counter++;  
+        // }
+
+        // // Write the hexahedron elements (8 points per hexahedron)
+        // fprintf(filevtk, "CELLS %d %d\n", num_elements, num_elements * 9);
+        // for (CellIndex_t i = 0; i < num_elements; i++) 
+        // {
+        //     fprintf(filevtk, "8 %d %d %d %d %d %d %d %d\n", 
+        //         i * 8, i * 8 + 1, i * 8 + 2, i * 8 + 3,
+        //         i * 8 + 4, i * 8 + 5, i * 8 + 6, i * 8 + 7);
+        // }
+
+        // // Cell types (12 corresponds to VTK_HEXAHEDRON)
+        // fprintf(filevtk, "CELL_TYPES %d\n", num_elements);
+        // for (CellIndex_t i = 0; i < num_elements; i++) 
+        // {
+        //     fprintf(filevtk, "12\n");
+        // }
+
+        // // Temperature data (assigning values to each hexahedron)
+        // fprintf(filevtk, "CELL_DATA %d\n", num_elements);
+        // fprintf(filevtk, "SCALARS Conductance float 1\n");
+        // fprintf(filevtk, "LOOKUP_TABLE default\n");
+        // counter = 0 ;
+        // for (CellIndex_t i = 0; i < num_elements; i++) 
+        // {
+        //     fprintf(filevtk, "%f\n", *(conductance_list+counter));
+        //     counter++;
+        // }
+        
+        // fprintf (filevtk, "\n") ;
+        // fclose (filevtk) ;
+        // --------------------------------------------------------------------------------------------------------------
+        // output the total conductance for each layer
+        FILE *output_file = fopen ("conductance_layer.txt", "w") ;
+
+        if (output_file == NULL)
+        {
+            fprintf (stderr, "Unable to open output file 'conductance_layer.txt'\n") ;
+        }
+
+        StackElementListNode_t *stkeln ;
+        for (stkeln  = stack_elements_list->Last ;
+             stkeln != NULL ;
+             stkeln  = stkeln->Prev)
+        { 
+            StackElement_t *stkel = &stkeln->Data ;
+
+            switch (stkel->SEType)
+            {
+                case TDICE_STACK_ELEMENT_DIE:
+                {
+                    CellIndex_t index = stkel->Offset ;
+                    CellIndex_t cell_index = 0u ;   // index within one layer
+                    CellIndex_t i = 0u;
+                    Non_uniform_cellListNode_t* cell_i = dimensions->Cell_list.First;
+                    Conductance_t layer_conductance  = 0;  // total z-direction conductance
+                    Conductance_t layer_area  = 0;         // total area for grids
+                    Conductance_t layer_height  = 0;       // height for that layer
+
+                    CellIndex_t layer_index = 0u ;         // number of grids for that layer
+                    LayerListNode_t *lnd ;
+                    
+
+                    fprintf (output_file, "%s\n", stkel->Id) ;
+
+                    for (lnd  = layer_list_end (&stkel->Pointer.Die->Layers) ;
+                        lnd != NULL ;
+                        lnd  = layer_list_prev (lnd))
+                    {
+
+                        if (index == 0u && layer_index == 0u)
+                        {
+                            layer_height = cell_i->Data.height ;
+                            for (; i < layer_cell_record[index + layer_index]; i ++)
+                            {  
+                                // add conductance for each cell
+                                layer_conductance += cell_i->Data.Material.ThermalConductivity[2] * cell_i->Data.length * cell_i->Data.width / cell_i->Data.height;
+                                layer_area += cell_i->Data.length * cell_i->Data.width ;
+                                cell_i = cell_i->Next;
+                                cell_index ++;
+                            }
+                    
+                        }
+                        else
+                        {
+                            /*for (; i < layer_cell_record[index + layer_index - 1]; i ++)
+                                cell_i = cell_i->Next;*/
+                            cell_i = dimensions->Cell_pointer[layer_cell_record[index + layer_index - 1]] ;
+
+                            layer_height = cell_i->Data.height ;
+                            for (i = layer_cell_record[index + layer_index - 1]; i < layer_cell_record[index + layer_index]; i ++)
+                            {
+                                layer_conductance += cell_i->Data.Material.ThermalConductivity[2] * cell_i->Data.length * cell_i->Data.width / cell_i->Data.height;
+                                layer_area += cell_i->Data.length * cell_i->Data.width ;
+                                cell_i = cell_i->Next;
+                                cell_index ++;
+                            }
+                            
+                        }
+                        fprintf (output_file, "Cells: %d     Area: %f     Ave_Length: %f     Height: %f     Conductance: %f     \n", 
+                                    cell_index, layer_area, sqrt(layer_area / cell_index), layer_height, layer_conductance) ;
+                                         
+                        layer_conductance = 0 ;
+                        layer_area = 0 ;
+                        cell_index = 0u ;
+                        layer_index ++ ;    
+                    }
+                    fprintf (output_file, "\n") ;
+                    break ;
+
+                }
+
+                case TDICE_STACK_ELEMENT_LAYER :
+                {
+                    fprintf (output_file, "(!not profiled) Layer:   %s\n\n", stkel->Id) ;
+                    break ;
+                }
+
+                case TDICE_STACK_ELEMENT_CHANNEL :
+                {
+                    fprintf (output_file, "(!not profiled) Channel:   %s\n\n", stkel->Id) ;
+                    break ;
+                }
+            
+                case TDICE_STACK_ELEMENT_NONE :
+                {
+                    fprintf (stderr, "Unsupported stack element type\n") ;
+                    break ;
+                }
+                default :
+                {
+                    fprintf (stderr, "Unsupported stack element type\n") ;
+                    break ;
+                }
+            }
+        }
+        fclose (output_file) ;  
+
+        free(conductance_list);
+    }   
+
+}
+
+void print_connections_non_uniform
+(
+    Dimensions_t* dimensions
+)
+{
+    if (dimensions->NonUniform == 1)
+    {
+        FILE *output_file = fopen ("cell_connection.txt", "w") ;
+
+        if (output_file == NULL)
+        {
+            fprintf (stderr, "Unable to open output file 'cell_connection.txt'\n") ;
+        }
+
+        ConnectionListNode_t* i_cell;
+        for(i_cell = dimensions->connections_list.First; i_cell!=NULL; i_cell=i_cell->Next)
+        {
+            fprintf (output_file, "%d %d\n", i_cell->Data.node1 + 1, i_cell->Data.node2 + 1) ;
+        }
+         fclose (output_file) ;
+    }
 }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -206,12 +206,33 @@ material
 
             YYABORT ;
         }
-
         string_copy (&material->Id, &$2) ;
+        material->ThermalConductivity[0] = (SolidTC_t)  $6 ;
+        material->ThermalConductivity[1] = (SolidTC_t)  $6 ;
+        material->ThermalConductivity[2] = (SolidTC_t)  $6 ;
+        material->VolumetricHeatCapacity = (SolidVHC_t) $11;
+        string_destroy (&$2) ;
+    }
 
-        material->ThermalConductivity    = (SolidTC_t) $6 ;
-        material->VolumetricHeatCapacity = (SolidVHC_t) $11 ;
+  | MATERIAL IDENTIFIER ':'                     // $2
+        THERMAL CONDUCTIVITY     DVALUE ',' DVALUE ',' DVALUE ';'     // $6 $8 $10
+        VOLUMETRIC HEAT CAPACITY DVALUE ';'     // $15
+    {
+        Material_t *material = $$ = material_calloc () ;
 
+        if (material == NULL)
+        {
+            LAYOUTERROR ("Malloc material failed") ;
+
+            string_destroy (&$2) ;
+
+            YYABORT ;
+        }
+        string_copy (&material->Id, &$2) ;
+        material->ThermalConductivity[0] = (SolidTC_t)  $6 ;
+        material->ThermalConductivity[1] = (SolidTC_t)  $8 ;
+        material->ThermalConductivity[2] = (SolidTC_t)  $10;
+        material->VolumetricHeatCapacity = (SolidVHC_t) $15;
         string_destroy (&$2) ;
     }
   ;

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -58,8 +58,10 @@ extern "C"
 #include "power_grid.h"
 #include "dimensions.h"
 #include "connection_list.h"
+#include "material_list.h"
+#include "layer_list.h"
 
-#include "slu_ddefs.h"
+#include "slu_mt_ddefs.h"
 
 /******************************************************************************/
 
@@ -133,8 +135,9 @@ extern "C"
      * \param layer_type_record the vector contains the layer type information of each layer in the position_info
      * \param stack_elements_list the list of stack element (bottom first)
      * \param dimensions the dimensions of the IC
+     * \param materials  defined materials list in stk file
      */
-    void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions);
+    void get_cell_position(ChipDimension_t (*position_info)[4], CellIndex_t *layer_cell_record, CellIndex_t *layer_type_record, StackElementList_t *stack_elements_list, Dimensions_t* dimensions, MaterialList_t* materials);
 
     /*! Get the Minkowski difference between two cells
      * \param minkowski_diff the vector contains the minkowski difference information
@@ -173,13 +176,22 @@ extern "C"
         Dimensions_t* dimensions
     );
 
+ /*! Output connections between cells 
+     * \param dimensions the dimensions of the IC
+     */
+    void print_connections_non_uniform
+    (
+        Dimensions_t* dimensions
+    );
+
     /*! Allocs and initialize memory and prepares the LU factorization
      *
      * \param tdata       the address of the ThermalData to fill
      * \param list       the list of stack element (bottom first)
      * \param dimensions the dimensions of the IC
      * \param analysis   the address of the Analysis structure
-     *
+     * \param materials  defined material list in stk file
+
      * \return \c TDICE_FAILURE if the memory allocation fails or the syatem
      *              matrix cannot be split in A=LU.
      * \return \c TDICE_SUCCESS otherwise
@@ -190,10 +202,21 @@ extern "C"
         ThermalData_t      *tdata,
         StackElementList_t *list,
         Dimensions_t       *dimensions,
-        Analysis_t         *analysis
+        Analysis_t         *analysis,
+        MaterialList_t     *materials
     ) ;
 
+    /*! Set the number of cores for non-uniform and superlu_mt
+     *
+     * \param analysis   the address of the Analysis structure
 
+     * \return \c TDICE_FAILURE 
+     * \return \c TDICE_SUCCESS 
+     */
+    Error_t set_parallel_cores
+    (
+        Quantity_t         num
+    ) ;
 
     /*! Destroys the content of the fields of the structure \a tdata
      *
@@ -363,6 +386,35 @@ extern "C"
         String_t            file_name
     ) ;
 
+
+    /*! Generate a text file with the thermal map of a stack element
+     *
+     * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param stack_elements_list the list of stack element (bottom first)
+     * \param dimensions the dimensions of the IC
+     */
+
+    void print_die_cell_material_non_uniform
+    (
+        CellIndex_t *layer_cell_record,
+        StackElementList_t *stack_elements_list, 
+        Dimensions_t* dimensions
+    ) ;
+
+        /*! Generate a vtk file with the conductance map, a txt file with the averaged conductance for each layer
+     *
+     * \param layer_cell_record the vector contains the end index of each layer in the position_info
+     * \param stack_elements_list the list of stack element (bottom first)
+     * \param dimensions the dimensions of the IC
+     */
+
+    void print_conductance_map_non_uniform
+    (
+        CellIndex_t *layer_cell_record,
+        StackElementList_t *stack_elements_list, 
+        Dimensions_t* dimensions
+    );
+    
 /******************************************************************************/
 
 #ifdef __cplusplus

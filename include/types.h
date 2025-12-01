@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -211,6 +211,11 @@ extern "C"
      * For cell, layer, row, columns indexes and for counting too */
 
     typedef uint32_t CellIndex_t ;
+
+    /*! Definition of the type LUIndex_t
+     *
+     * For LU factorization */
+    typedef long LUIndex_t ;
 
 
 /******************************************************************************/
@@ -504,7 +509,8 @@ extern "C"
         TDICE_OUTPUT_TYPE_TFLPEL,     //!< A single floorplan element
         TDICE_OUTPUT_TYPE_TMAP,       //!< The thermal map of a stack element
         TDICE_OUTPUT_TYPE_PMAP,       //!< The power map of a die (its floorplan)
-        TDICE_OUTPUT_TYPE_TCOOLANT    //!< The coolant leaving the cavity
+        TDICE_OUTPUT_TYPE_TCOOLANT,   //!< The coolant leaving the cavity
+        TDICE_OUTPUT_TYPE_T3D         //!< 3D output of all elements
     } ;
 
 

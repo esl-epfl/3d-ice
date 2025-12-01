@@ -1,0 +1,8 @@
+Layer3
+Cells: 191760     Area: 59999999.999969     Height: 100.000000     Conductance: 78.000000     
+
+Layer2
+Cells: 98518     Area: 89760000.000091     Height: 30.000000     Conductance: 14.960000     
+
+Layer1
+Cells: 32875     Area: 89759999.999941     Height: 50.000000     Conductance: 691.152000     

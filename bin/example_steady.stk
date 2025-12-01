@@ -27,6 +27,7 @@ microchannel 4rm :
 dimensions :
    chip length 10000, width 10000 ;
    cell length   100, width   100 ;
+   non-uniform false;
 
 layer PCB :
    height 10 ;
@@ -51,6 +52,7 @@ stack:
 solver:
    steady ;
    initial temperature 300.0 ;
+   numofcores 1 ;
 
 output:
    T        (  MEMORY_DIE, 5000, 3000, "output1.txt",             final ) ;

@@ -23,7 +23,11 @@ def _parse_line(line):
     return the key and match result of the first matching regex
     """
     for key, rx in rx_dict.items():
+        print("line:'")
+        print(line)
         match = rx.search(line)
+        print("match:")
+        print(match)
         if match:
             return key, match
     # if there are no matches
@@ -38,14 +42,18 @@ def get_flp_data(file_path):
             # print(key, match)
             if key == 'block_name':
                 block_name = match.group("block_name")
+                print("block name read in")
             if key == 'position':
                 position_x = match.group(2)
                 position_y = match.group(3)
+                print("position read in")
             if key == 'dimension':
                 dimension_x = match.group(2)
                 dimension_y = match.group(3)
+                print("dimension read in")
             if key == 'power1':
                 power1 = match.group("power1")
+                print("power1 read in")
 
                 row = {
                     'block_name': block_name,

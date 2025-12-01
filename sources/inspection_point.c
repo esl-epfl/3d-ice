@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -214,6 +214,13 @@ void inspection_point_print
 
             break ;
 
+        case TDICE_OUTPUT_TYPE_T3D :
+
+            fprintf (stream, "%sT3D  \"%s\", ",
+                prefix, ipoint->FileName) ;
+
+            break ;
+
         case TDICE_OUTPUT_TYPE_PMAP :
 
             fprintf (stream, "%sPmap     (%s, \"%s\", ",
@@ -327,6 +334,7 @@ bool is_inspection_point
         case TDICE_OUTPUT_TYPE_TCELL :
         case TDICE_OUTPUT_TYPE_TMAP :
         case TDICE_OUTPUT_TYPE_PMAP :
+        case TDICE_OUTPUT_TYPE_T3D:
 
             return true ;
 
@@ -353,16 +361,21 @@ Error_t generate_inspection_point_header
     String_t           prefix
 )
 {
-    FILE *output_stream = fopen (ipoint->FileName, "w") ;
 
-    if (output_stream == NULL)
+    FILE *output_stream = NULL;
+    if (ipoint->OType != TDICE_OUTPUT_TYPE_T3D)
     {
-        fprintf (stderr,
-            "Inspection Point: Cannot open output file %s\n",
-            ipoint->FileName);
+        output_stream = fopen (ipoint->FileName, "w") ;
+        if (output_stream == NULL)
+        {
+            fprintf (stderr,
+                "Inspection Point: Cannot open output file %s\n",
+                ipoint->FileName);
 
-        return TDICE_FAILURE ;
+             return TDICE_FAILURE ;
+        }
     }
+    
 
     switch (ipoint->OType)
     {
@@ -492,6 +505,10 @@ Error_t generate_inspection_point_header
 
             break ;
 
+        case TDICE_OUTPUT_TYPE_T3D:
+
+            break;
+
         case TDICE_OUTPUT_TYPE_PMAP :
             if (dimensions->NonUniform == 1)
             {
@@ -554,8 +571,11 @@ Error_t generate_inspection_point_header
             goto header_error ;
     }
 
-    fclose (output_stream) ;
-
+    if (output_stream != NULL)
+    {
+        fclose (output_stream) ;
+    }
+    
     return TDICE_SUCCESS ;
 
 header_error :
@@ -573,24 +593,29 @@ Error_t generate_inspection_point_output
     Dimensions_t      *dimensions,
     Temperature_t     *temperatures,
     Source_t          *sources,
-    Time_t             current_time
+    Time_t            current_time,
+    Quantity_t        timestep_index,
+    Quantity_t        slotlength
 )
 {
     Quantity_t index = 0;
     Quantity_t n_flp_el;
     Temperature_t temperature, *result ;
+    FILE *output_stream = NULL;
 
-    FILE *output_stream = fopen (ipoint->FileName, "a") ;
-
-    if (output_stream == NULL)
+    if (ipoint->OType != TDICE_OUTPUT_TYPE_T3D)
     {
-        fprintf (stderr,
-            "Inspection Point: Cannot open output file %s\n",
-            ipoint->FileName);
+        output_stream = fopen (ipoint->FileName, "a") ;
 
-        return TDICE_FAILURE ;
+        if (output_stream == NULL)
+        {
+            fprintf (stderr,
+                "Inspection Point: Cannot open output file %s\n",
+                ipoint->FileName);
+            return TDICE_FAILURE ;
+        }
     }
-
+    
     switch (ipoint->OType)
     {
         case TDICE_OUTPUT_TYPE_TCELL :
@@ -632,7 +657,7 @@ Error_t generate_inspection_point_output
 
 
             fprintf (output_stream,
-                "%5.3f \t %7.3f\n", current_time, *(temperatures + index)) ;
+                "%f \t %7.3f\n", current_time, *(temperatures + index)) ;
 
             break ;
 
@@ -759,6 +784,13 @@ Error_t generate_inspection_point_output
 
             break ;
 
+        case TDICE_OUTPUT_TYPE_T3D :
+
+            print_thermal_map_3D (dimensions, temperatures, timestep_index, 
+                                    slotlength, ipoint->FileName, ipoint->Instant);
+
+            break;
+
         case TDICE_OUTPUT_TYPE_PMAP :
 
             stack_element_print_power_map
@@ -839,8 +871,11 @@ Error_t generate_inspection_point_output
             goto output_error ;
     }
 
-    fclose (output_stream) ;
-
+    if (output_stream != NULL)
+    {
+        fclose (output_stream) ;
+    }
+        
     return TDICE_SUCCESS ;
 
 output_error :

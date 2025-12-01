@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -38,6 +38,7 @@
 
 #include <stdlib.h> // For the memory functions calloc/free
 #include <assert.h>
+#include <time.h>
 
 #include "thermal_grid.h"
 #include "macros.h"
@@ -340,14 +341,10 @@ Capacity_t get_capacity_non_uniform
     switch (tgrid->LayersTypeProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
-        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
-
+        
             return (  get_volumetric_heat_capacity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
                                                     dimensions)
@@ -355,6 +352,18 @@ Capacity_t get_capacity_non_uniform
                     * i_cell->Data.width
                     * get_cell_height (dimensions, layer_index)
                    ) ;
+
+        case TDICE_LAYER_SOURCE :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+
+            return (  get_volumetric_heat_capacity_non_uniform (i_cell)
+                    * i_cell->Data.length
+                    * i_cell->Data.width
+                    * get_cell_height (dimensions, layer_index)
+                   ) ;
+
         case TDICE_LAYER_CHANNEL_4RM :
 
             if (i_cell->Data.isChannel)
@@ -419,7 +428,7 @@ Capacity_t get_capacity_non_uniform
 }
 
 /******************************************************************************/
-
+// for uniform mode
 
 Capacity_t get_capacity
 (
@@ -544,32 +553,52 @@ Conductance_t get_conductance_non_uniform_z
         //Therefore, in the following cases, the layer is actually connected to the bottom/top layer.
 
         case TDICE_LAYER_SOLID :
+            cell_height = get_cell_height (dimensions, layer_index);
+            if (layer_index != 0 && layer_index != dimensions->Grid.NLayers-1 )
+                cell_height = cell_height/2.0;
+            return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
+                * i_cell->Data.value) /  cell_height ;
+
         case TDICE_LAYER_SOURCE :
             cell_height = get_cell_height (dimensions, layer_index);
             if (layer_index != 0 && layer_index != dimensions->Grid.NLayers-1 )
                 cell_height = cell_height/2.0;
-            return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+            return (get_thermal_conductivity_non_uniform (node, 2)
                 * i_cell->Data.value) /  cell_height ;
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER : 
+            assert(layer_index == last_layer (dimensions));
+            if (layer_index == first_layer (dimensions))
+
+                return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
+                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)) ;
+            else
+
+                return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
+                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+
         case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
             assert(layer_index == last_layer (dimensions));
             if (layer_index == first_layer (dimensions))
 
-                return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+                return (get_thermal_conductivity_non_uniform (node, 2)
                         * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)) ;
             else
 
-                return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+                return (get_thermal_conductivity_non_uniform (node, 2)
                         * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
 
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+
+            return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
+                    * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
-            return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+            return (get_thermal_conductivity_non_uniform (node, 2)
                     * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
 
         case TDICE_LAYER_CHANNEL_4RM :
@@ -583,7 +612,7 @@ Conductance_t get_conductance_non_uniform_z
 
             else
 
-                return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index, 0, 0, dimensions)
+                return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index, 0, 0, dimensions, 2)
                         * i_cell->Data.value )
                         / (get_cell_height (dimensions, layer_index) / 2.0) ;
 
@@ -609,9 +638,9 @@ Conductance_t get_conductance_non_uniform_z
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 0, 0,
-                                                dimensions)
+                                                dimensions, 2)
                     * i_cell->Data.value
-                )
+                   )
                     / (get_cell_height (dimensions, layer_index) / 2.0)
                     * (1.0 - tgrid->Channel->Porosity) ;
 
@@ -655,14 +684,21 @@ Conductance_t get_conductance_non_uniform_y
     switch (tgrid->LayersTypeProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
-        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+        
+            return ( get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 1)
+            * length_value
+            * get_cell_height (dimensions, layer_index) )
+            / ( node->Data.width / 2.0) ;
+
+        case TDICE_LAYER_SOURCE :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
-            return ( get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions)
+
+            return ( get_thermal_conductivity_non_uniform (node, 1)
             * length_value
             * get_cell_height (dimensions, layer_index) )
             / ( node->Data.width / 2.0) ;
@@ -679,7 +715,7 @@ Conductance_t get_conductance_non_uniform_y
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
-                                                    dimensions)
+                                                    dimensions, 1)
                         * length_value
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -702,7 +738,7 @@ Conductance_t get_conductance_non_uniform_y
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
-                                                    dimensions)
+                                                    dimensions, 1)
                     * length_value
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -756,17 +792,24 @@ Conductance_t get_conductance_non_uniform_x
     switch (tgrid->LayersTypeProfile [layer_index])
     {
         case TDICE_LAYER_SOLID :
-        case TDICE_LAYER_SOURCE :
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
-        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
-
+        
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 0, 0,
-                                                dimensions)
+                                                dimensions, 0)
+                    * i_cell->Data.value
+                    * get_cell_height (dimensions, layer_index)
+                   )
+                    / (node->Data.length / 2.0) ;
+
+        case TDICE_LAYER_SOURCE :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+
+            return (  get_thermal_conductivity_non_uniform (node, 0)
                     * i_cell->Data.value
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -784,7 +827,7 @@ Conductance_t get_conductance_non_uniform_x
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
-                                                    dimensions)
+                                                    dimensions, 0)
                         * i_cell->Data.value
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -827,14 +870,26 @@ Conductance_t get_conductance_non_uniform
 )
 {
     *sign_note = 1.0; // default value
-    Non_uniform_cellListNode_t* node1 = dimensions->Cell_list.First;
+    /*Non_uniform_cellListNode_t* node1 = dimensions->Cell_list.First;
     Non_uniform_cellListNode_t* node2 = dimensions->Cell_list.First;
 
     for (CellIndex_t i = 0; i<node1_index; i++)
         node1 = node1->Next;
 
     for (CellIndex_t i = 0; i<node2_index; i++)
-        node2 = node2->Next;
+        node2 = node2->Next;*/
+    Non_uniform_cellListNode_t* node1 = dimensions->Cell_pointer[node1_index];
+    Non_uniform_cellListNode_t* node2 = dimensions->Cell_pointer[node2_index];
+    
+    /*/// test for time
+    fprintf (stdout, "\n (i)Access to the list point took %.5f sec\n",
+        ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+    */
+
+    /*/// test for time
+    fprintf (stdout, "\n (i)Access to the list point took %.5f sec\n",
+        ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+    */
 
     Conductance_t g1;
     Conductance_t g2;
@@ -852,6 +907,11 @@ Conductance_t get_conductance_non_uniform
         }
         g1 = get_conductance_non_uniform_z(tgrid, dimensions, i_cell, node1, direction_note);
         g2 = get_conductance_non_uniform_z(tgrid, dimensions, i_cell, node2, -direction_note);
+
+        /*// test for time
+        fprintf (stdout, "\n (ii)Calculate the conductance took %.5f sec\n",
+            ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+        */
 
         if(g1 == 0)
             return -g2;
@@ -930,7 +990,7 @@ Conductance_t get_conductance_top
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -940,7 +1000,7 @@ Conductance_t get_conductance_top
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -952,7 +1012,7 @@ Conductance_t get_conductance_top
             return (  2.0
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                     * tgrid->TopHeatSink->AmbientHTC
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
@@ -963,7 +1023,7 @@ Conductance_t get_conductance_top
                     + 2.0
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                    ) ;
             
         case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER:
@@ -976,7 +1036,7 @@ Conductance_t get_conductance_top
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -986,7 +1046,7 @@ Conductance_t get_conductance_top
             
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                         )
@@ -998,7 +1058,7 @@ Conductance_t get_conductance_top
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     )
@@ -1019,7 +1079,7 @@ Conductance_t get_conductance_top
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -1048,7 +1108,7 @@ Conductance_t get_conductance_top
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
@@ -1107,7 +1167,7 @@ Conductance_t get_conductance_bottom
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -1117,7 +1177,7 @@ Conductance_t get_conductance_bottom
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -1130,7 +1190,7 @@ Conductance_t get_conductance_bottom
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                     )
@@ -1142,7 +1202,7 @@ Conductance_t get_conductance_bottom
             return (  2.0
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                     * tgrid->BottomHeatSink->AmbientHTC
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
@@ -1153,7 +1213,7 @@ Conductance_t get_conductance_bottom
                     + 2.0
                     * get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                    ) ;
 
         case TDICE_LAYER_CHANNEL_4RM :
@@ -1171,7 +1231,7 @@ Conductance_t get_conductance_bottom
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 2)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_width  (dimensions, row_index)
                        )
@@ -1200,7 +1260,7 @@ Conductance_t get_conductance_bottom
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 2)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_width  (dimensions, row_index)
                    )
@@ -1259,7 +1319,7 @@ Conductance_t get_conductance_north
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 1)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -1277,7 +1337,7 @@ Conductance_t get_conductance_north
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 1)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -1295,7 +1355,7 @@ Conductance_t get_conductance_north
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 1)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -1355,7 +1415,7 @@ Conductance_t get_conductance_south
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 1)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -1373,7 +1433,7 @@ Conductance_t get_conductance_south
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 1)
                         * get_cell_length (dimensions, column_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -1391,7 +1451,7 @@ Conductance_t get_conductance_south
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 1)
                     * get_cell_length (dimensions, column_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -1451,7 +1511,7 @@ Conductance_t get_conductance_east
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 0)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -1469,7 +1529,7 @@ Conductance_t get_conductance_east
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 0)
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
                        )
@@ -1532,7 +1592,7 @@ Conductance_t get_conductance_west
 
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 row_index, column_index,
-                                                dimensions)
+                                                dimensions, 0)
                     * get_cell_width  (dimensions, row_index)
                     * get_cell_height (dimensions, layer_index)
                    )
@@ -1550,7 +1610,7 @@ Conductance_t get_conductance_west
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     row_index, column_index,
-                                                    dimensions)
+                                                    dimensions, 0)
                         * get_cell_width  (dimensions, row_index)
                         * get_cell_height (dimensions, layer_index)
                        )

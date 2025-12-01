@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -37,7 +37,7 @@
  ******************************************************************************/
 
 #include <stdlib.h> // For the memory functions malloc/free
-
+#include <time.h>
 #include "system_matrix.h"
 #include "macros.h"
 
@@ -48,12 +48,8 @@ void system_matrix_init (SystemMatrix_t* sysmatrix)
     sysmatrix->ColumnPointers = NULL ;
     sysmatrix->RowIndices     = NULL;
     sysmatrix->Values         = NULL ;
-    sysmatrix->Size           = (CellIndex_t) 0u ;
-    sysmatrix->NNz            = (CellIndex_t) 0u ;
-
-    sysmatrix->SLU_PermutationMatrixR = NULL ;
-    sysmatrix->SLU_PermutationMatrixC = NULL ;
-    sysmatrix->SLU_Etree              = NULL ;
+    sysmatrix->Size           = (LUIndex_t) 0 ;
+    sysmatrix->NNz            = (LUIndex_t) 0 ;
 
     sysmatrix->SLUMatrix_A.Store          = NULL ;
     sysmatrix->SLUMatrix_A_Permuted.Store = NULL ;
@@ -62,22 +58,47 @@ void system_matrix_init (SystemMatrix_t* sysmatrix)
 
     sysmatrix->SLU_Info = 0 ;
 
-    sysmatrix->SLU_Stat.panel_histo = NULL ;
-    sysmatrix->SLU_Stat.utime       = NULL ;
-    sysmatrix->SLU_Stat.ops         = NULL ;
-    sysmatrix->SLU_Stat.TinyPivots  = (int) 0 ;
-    sysmatrix->SLU_Stat.RefineSteps = (int) 0 ;
-    sysmatrix->SLU_Stat.expansions  = (int) 0 ;
+    sysmatrix->SLU_MT_Gstat.panel_histo = NULL ;
+    sysmatrix->SLU_MT_Gstat.utime       = NULL ;
+    sysmatrix->SLU_MT_Gstat.ops         = NULL ;
+    sysmatrix->SLU_MT_Gstat.procstat    = NULL ;
+    sysmatrix->SLU_MT_Gstat.panstat     = NULL ;
+    sysmatrix->SLU_MT_Gstat.num_panels  = 0 ;
+    sysmatrix->SLU_MT_Gstat.dom_flopcnt = 0.0f ;
+    sysmatrix->SLU_MT_Gstat.flops_last_P_panels = 0.0f ;
+    sysmatrix->SLU_MT_Gstat.stat_relax  = NULL ;
+    sysmatrix->SLU_MT_Gstat.stat_col    = NULL ;
+    sysmatrix->SLU_MT_Gstat.stat_snode  = NULL ;
+    sysmatrix->SLU_MT_Gstat.panhows     = NULL ;
+    sysmatrix->SLU_MT_Gstat.cp_panel    = NULL ;
+    sysmatrix->SLU_MT_Gstat.desc_eft    = NULL ;
+    sysmatrix->SLU_MT_Gstat.cp_firstkid = NULL ;
+    sysmatrix->SLU_MT_Gstat.cp_nextkid  = NULL ;
+    sysmatrix->SLU_MT_Gstat.height      = NULL ;
+    sysmatrix->SLU_MT_Gstat.flops_by_height = NULL ;
 
-    set_default_options (&sysmatrix->SLU_Options) ;
 
-    sysmatrix->SLU_Options.Fact            = DOFACT ;
-    sysmatrix->SLU_Options.PrintStat       = NO ;
-    sysmatrix->SLU_Options.Equil           = NO ;
-    sysmatrix->SLU_Options.SymmetricMode   = YES ;
+    sysmatrix->SLU_Options.nprocs          = 0 ;
+    sysmatrix->SLU_Options.fact            = DOFACT ;
+    sysmatrix->SLU_Options.trans           = NOTRANS ;
+    sysmatrix->SLU_Options.refact          = NO ;
+    sysmatrix->SLU_Options.panel_size      = sp_ienv(1);
+    sysmatrix->SLU_Options.relax           = sp_ienv(2);
+    sysmatrix->SLU_Options.diag_pivot_thresh = 0.001 ;
+    sysmatrix->SLU_Options.drop_tol        = 0.0 ;
     sysmatrix->SLU_Options.ColPerm         = MMD_AT_PLUS_A ;
-    sysmatrix->SLU_Options.RowPerm         = NOROWPERM ;
-    sysmatrix->SLU_Options.DiagPivotThresh = 0.001 ;
+    sysmatrix->SLU_Options.usepr           = NO ;
+    sysmatrix->SLU_Options.SymmetricMode   = YES ;
+    sysmatrix->SLU_Options.PrintStat       = NO ;
+
+    sysmatrix->SLU_Options.perm_c          = NULL ;
+    sysmatrix->SLU_Options.perm_r          = NULL ;
+    sysmatrix->SLU_Options.work            = NULL ;
+    sysmatrix->SLU_Options.lwork           = 0 ;
+    sysmatrix->SLU_Options.etree           = NULL ;
+    sysmatrix->SLU_Options.colcnt_h        = NULL ;
+    sysmatrix->SLU_Options.part_super_h    = NULL ;
+
 }
 
 /******************************************************************************/
@@ -86,19 +107,19 @@ Error_t system_matrix_build
 (
     SystemMatrix_t *sysmatrix,
     CellIndex_t     size,
-    CellIndex_t     nnz
+    CellIndex_t     nnz, 
+    CellIndex_t     threads
 )
 {
     sysmatrix->Size = size ;
     sysmatrix->NNz  = nnz ;
 
-    sysmatrix->RowIndices = (CellIndex_t *) malloc (sizeof(CellIndex_t) * nnz) ;
+    sysmatrix->RowIndices = (LUIndex_t *) malloc (sizeof(LUIndex_t) * nnz) ;
 
     if (sysmatrix->RowIndices == NULL)
-
         return TDICE_FAILURE ;
 
-    sysmatrix->ColumnPointers = (CellIndex_t *) malloc (sizeof(CellIndex_t) * (size + 1)) ;
+    sysmatrix->ColumnPointers = (LUIndex_t *) malloc (sizeof(LUIndex_t) * (size + 1)) ;
 
     if (sysmatrix->ColumnPointers == NULL)
     {
@@ -118,14 +139,24 @@ Error_t system_matrix_build
     dCreate_CompCol_Matrix
 
         (&sysmatrix->SLUMatrix_A, sysmatrix->Size, sysmatrix->Size, sysmatrix->NNz,
-          sysmatrix->Values, (int*) sysmatrix->RowIndices, (int*) sysmatrix->ColumnPointers,
+          sysmatrix->Values, (int_t*) sysmatrix->RowIndices, (int_t*) sysmatrix->ColumnPointers,
          SLU_NC, SLU_D, SLU_GE) ;
 
     /* Alloc SLU permutation matrices and elimination tree */
 
-    sysmatrix->SLU_PermutationMatrixR = (int *) malloc (sizeof(int) * sysmatrix->Size) ;
+    sysmatrix->SLU_Options.perm_r = (int_t *) malloc (sizeof(int_t) * sysmatrix->Size) ;
+    if (sysmatrix->SLU_Options.perm_r == NULL )
+    {
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
 
-    if (sysmatrix->SLU_PermutationMatrixR == NULL )
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->SLU_Options.perm_c = (int_t *) malloc(sizeof(int_t) * sysmatrix->Size) ;
+    if (sysmatrix->SLU_Options.perm_c == NULL )
     {
         free (sysmatrix->ColumnPointers) ;
         free (sysmatrix->RowIndices) ;
@@ -133,12 +164,12 @@ Error_t system_matrix_build
 
         Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
+        free (sysmatrix->SLU_Options.perm_r) ;
         return TDICE_FAILURE ;
     }
 
-    sysmatrix->SLU_PermutationMatrixC = (int *) malloc(sizeof(int) * sysmatrix->Size) ;
-
-    if (sysmatrix->SLU_PermutationMatrixC == NULL )
+    sysmatrix->SLU_Options.etree = (int_t *) malloc (sizeof(int_t) * sysmatrix->Size) ;
+    if (sysmatrix->SLU_Options.etree == NULL)
     {
         free (sysmatrix->ColumnPointers) ;
         free (sysmatrix->RowIndices) ;
@@ -146,14 +177,13 @@ Error_t system_matrix_build
 
         Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-        free (sysmatrix->SLU_PermutationMatrixR) ;
-
+        free (sysmatrix->SLU_Options.perm_r) ;
+        free (sysmatrix->SLU_Options.perm_c) ;
         return TDICE_FAILURE ;
     }
 
-    sysmatrix->SLU_Etree = (int *) malloc (sizeof(int) * sysmatrix->Size) ;
-
-    if (sysmatrix->SLU_Etree == NULL)
+    sysmatrix->SLU_Options.colcnt_h = (int_t *) malloc (sizeof(int_t) * sysmatrix->Size) ;
+    if (sysmatrix->SLU_Options.colcnt_h == NULL)
     {
         free (sysmatrix->ColumnPointers) ;
         free (sysmatrix->RowIndices) ;
@@ -161,14 +191,234 @@ Error_t system_matrix_build
 
         Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
 
-        free (sysmatrix->SLU_PermutationMatrixR) ;
-        free (sysmatrix->SLU_PermutationMatrixC) ;
-
+        free (sysmatrix->SLU_Options.perm_r) ;
+        free (sysmatrix->SLU_Options.perm_c) ;
+        free (sysmatrix->SLU_Options.etree) ;
         return TDICE_FAILURE ;
     }
 
-    StatInit (&sysmatrix->SLU_Stat) ;
+    sysmatrix->SLU_Options.part_super_h = (int_t *) malloc (sizeof(int_t) * sysmatrix->Size) ;
+    if (sysmatrix->SLU_Options.part_super_h == NULL)
+    {
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
 
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
+
+        free (sysmatrix->SLU_Options.perm_r) ;
+        free (sysmatrix->SLU_Options.perm_c) ;
+        free (sysmatrix->SLU_Options.etree) ;
+        free (sysmatrix->SLU_Options.colcnt_h) ;
+        return TDICE_FAILURE ;
+    }
+
+    // Initiate Gstat_t
+    StatAlloc(sysmatrix->Size, threads, sysmatrix->SLU_Options.panel_size, sysmatrix->SLU_Options.relax, &sysmatrix->SLU_MT_Gstat) ;
+    StatInit (sysmatrix->Size, threads, &sysmatrix->SLU_MT_Gstat) ;
+
+    sysmatrix->SLU_Options.nprocs = threads ;
+
+    // Allocate memory for L and U supermatrix
+    if (allocate_U_Matrix(sysmatrix) != TDICE_SUCCESS)
+    {
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
+        free (sysmatrix->SLU_Options.perm_r) ;
+        free (sysmatrix->SLU_Options.perm_c) ;
+        free (sysmatrix->SLU_Options.etree) ;
+        free (sysmatrix->SLU_Options.colcnt_h) ;
+        free (sysmatrix->SLU_Options.part_super_h) ;
+        StatFree(&sysmatrix->SLU_MT_Gstat) ;
+        return TDICE_FAILURE ;
+    }
+
+    if (allocate_L_Matrix(sysmatrix) != TDICE_SUCCESS)
+    {
+        free (sysmatrix->ColumnPointers) ;
+        free (sysmatrix->RowIndices) ;
+        free (sysmatrix->Values) ;
+        Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
+        free (sysmatrix->SLU_Options.perm_r) ;
+        free (sysmatrix->SLU_Options.perm_c) ;
+        free (sysmatrix->SLU_Options.etree) ;
+        free (sysmatrix->SLU_Options.colcnt_h) ;
+        free (sysmatrix->SLU_Options.part_super_h) ;
+        StatFree(&sysmatrix->SLU_MT_Gstat) ;
+
+        Destroy_CompCol_NCP   (&sysmatrix->SLUMatrix_U) ;
+        return TDICE_FAILURE ;
+    }
+    return TDICE_SUCCESS ;
+}
+
+/******************************************************************************/
+
+Error_t allocate_L_Matrix (SystemMatrix_t *sysmatrix)
+{
+    LUIndex_t n = sysmatrix->Size ;
+    LUIndex_t nnzL ;           // Estimate number of nonzeros in L
+    if (sp_ienv(6) < 0)
+    {
+        nnzL = (-sp_ienv(6)) * sysmatrix->NNz ;         // sp_ienv(6) is a growth factor
+    }
+    else
+    {
+        nnzL = sp_ienv(6) ;
+    }
+    LUIndex_t super = sp_ienv(3) ;
+
+    sysmatrix->Nzval_L = (double*)malloc(nnzL * sizeof(double)) ;
+    if (sysmatrix->Nzval_L == NULL)
+    {
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Nzval_colbeg = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Nzval_colbeg == NULL)
+    {
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Nzval_colend = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Nzval_colend == NULL)
+    {
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Rowind_L = (int_t*)malloc(nnzL * sizeof(int_t)) ;
+    if (sysmatrix->Rowind_L == NULL)
+    {
+        free(sysmatrix->Nzval_colend) ;
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Rowind_colbeg = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Rowind_colbeg == NULL)
+    {
+        free(sysmatrix->Rowind_L) ;
+        free(sysmatrix->Nzval_colend) ;
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Rowind_colend = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Rowind_colend == NULL)
+    {
+        free(sysmatrix->Rowind_colbeg) ;
+        free(sysmatrix->Rowind_L) ;
+        free(sysmatrix->Nzval_colend) ;
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Col_to_sup = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Col_to_sup == NULL)
+    {
+        free(sysmatrix->Rowind_colend) ;
+        free(sysmatrix->Rowind_colbeg) ;
+        free(sysmatrix->Rowind_L) ;
+        free(sysmatrix->Nzval_colend) ;
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+    sysmatrix->Col_to_sup[n] = super ;
+
+    sysmatrix->Sup_to_colbeg = (int_t*)malloc((super + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Sup_to_colbeg == NULL)
+    {
+        free(sysmatrix->Col_to_sup) ;
+        free(sysmatrix->Rowind_colend) ;
+        free(sysmatrix->Rowind_colbeg) ;
+        free(sysmatrix->Rowind_L) ;
+        free(sysmatrix->Nzval_colend) ;
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Sup_to_colend = (int_t*)malloc((super + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Sup_to_colend == NULL)
+    {
+        free(sysmatrix->Sup_to_colbeg) ;
+        free(sysmatrix->Col_to_sup) ;
+        free(sysmatrix->Rowind_colend) ;
+        free(sysmatrix->Rowind_colbeg) ;
+        free(sysmatrix->Rowind_L) ;
+        free(sysmatrix->Nzval_colend) ;
+        free(sysmatrix->Nzval_colbeg) ;
+        free(sysmatrix->Nzval_L) ;
+        return TDICE_FAILURE ;
+    }
+    // Allocate the L matrix (SuperMatrix)
+    dCreate_SuperNode_Permuted(&sysmatrix->SLUMatrix_L, n, n, nnzL,
+                                sysmatrix->Nzval_L, (int_t*)sysmatrix->Nzval_colbeg, (int_t*)sysmatrix->Nzval_colend,
+                                (int_t*)sysmatrix->Rowind_L, (int_t*)sysmatrix->Rowind_colbeg, (int_t*)sysmatrix->Rowind_colend,
+                                (int_t*)sysmatrix->Col_to_sup, (int_t*)sysmatrix->Sup_to_colbeg, (int_t*)sysmatrix->Sup_to_colend,
+                                SLU_SCP, SLU_D, SLU_TRLU) ;
+    return TDICE_SUCCESS ;
+
+}
+
+/******************************************************************************/
+
+Error_t allocate_U_Matrix (SystemMatrix_t *sysmatrix)
+{
+    LUIndex_t n = sysmatrix->Size ;
+    LUIndex_t nnzU ;              // Estimate number of nonzeros in U
+    if (sp_ienv(7) < 0)
+    {
+        nnzU = (-sp_ienv(7)) * sysmatrix->NNz ;    // sp_ienv(7) is a growth factor
+    }
+    else
+    {
+        nnzU = sp_ienv(7) ;
+    }
+         
+    sysmatrix->Nzval_U = (double*)malloc(nnzU * sizeof(double)) ;
+    if (sysmatrix->Nzval_U == NULL)
+    {
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Colbeg = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Colbeg == NULL)
+    {
+        free(sysmatrix->Nzval_U) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Colend = (int_t*)malloc((n + 1) * sizeof(int_t)) ;
+    if (sysmatrix->Colend == NULL)
+    {
+        free(sysmatrix->Colbeg) ;
+        free(sysmatrix->Nzval_U) ;
+        return TDICE_FAILURE ;
+    }
+
+    sysmatrix->Rowind_U = (int_t*)malloc(nnzU * sizeof(int_t)) ;
+    if (sysmatrix->Rowind_U == NULL)
+    {
+        free(sysmatrix->Colend) ;
+        free(sysmatrix->Colbeg) ;
+        free(sysmatrix->Nzval_U) ;
+        return TDICE_FAILURE ;
+    }
+
+    // Allocate the U matrix (SuperMatrix)
+    dCreate_CompCol_Permuted(&sysmatrix->SLUMatrix_U, n, n, nnzU, sysmatrix->Nzval_U,
+                              (int_t*)sysmatrix->Rowind_U, (int_t*)sysmatrix->Colbeg, (int_t*)sysmatrix->Colend,
+                              SLU_NCP, SLU_D, SLU_TRU);
     return TDICE_SUCCESS ;
 }
 
@@ -176,50 +426,45 @@ Error_t system_matrix_build
 
 Error_t do_factorization (SystemMatrix_t *sysmatrix)
 {
-    if (sysmatrix->SLU_Options.Fact == DOFACT)
+    if (sysmatrix->SLU_Options.fact == DOFACT)
     {
         get_perm_c
 
             (sysmatrix->SLU_Options.ColPerm, &sysmatrix->SLUMatrix_A,
-            sysmatrix->SLU_PermutationMatrixC) ;
+            sysmatrix->SLU_Options.perm_c) ;
 
-        sp_preorder
+        sp_colorder
 
-            (&sysmatrix->SLU_Options, &sysmatrix->SLUMatrix_A,
-            sysmatrix->SLU_PermutationMatrixC, sysmatrix->SLU_Etree,
+            (&sysmatrix->SLUMatrix_A, sysmatrix->SLU_Options.perm_c, &sysmatrix->SLU_Options,
             &sysmatrix->SLUMatrix_A_Permuted) ;
     }
-    else if (sysmatrix->SLU_Options.Fact == FACTORED)
+    else if (sysmatrix->SLU_Options.fact == FACTORED)
     {
-         sysmatrix->SLU_Options.Fact = SamePattern_SameRowPerm ;
+        //nothing to do
     }
     else
     {
         fprintf (stderr, "ERROR: wrong factorization status %d\n",
-            sysmatrix->SLU_Options.Fact) ;
+            sysmatrix->SLU_Options.fact) ;
 
         return TDICE_FAILURE ;
     }
 
-    dgstrf
+    pdgstrf
 
         (&sysmatrix->SLU_Options, &sysmatrix->SLUMatrix_A_Permuted,
-         sp_ienv(2), sp_ienv(1), /* relax and panel size */
-         sysmatrix->SLU_Etree,
-         NULL, 0,                /* work and lwork */
-         sysmatrix->SLU_PermutationMatrixC, sysmatrix->SLU_PermutationMatrixR,
-         &sysmatrix->SLUMatrix_L, &sysmatrix->SLUMatrix_U,
-         &sysmatrix->SLU_Stat, &sysmatrix->SLU_Info) ;
+         sysmatrix->SLU_Options.perm_r, &sysmatrix->SLUMatrix_L, &sysmatrix->SLUMatrix_U,
+         &sysmatrix->SLU_MT_Gstat, &sysmatrix->SLU_Info) ;
 
     if (sysmatrix->SLU_Info == 0)
     {
-        sysmatrix->SLU_Options.Fact = FACTORED ;
+        sysmatrix->SLU_Options.fact = FACTORED ;
 
         return TDICE_SUCCESS ;
     }
     else
     {
-        fprintf (stderr, "SuperLu factorization error %d\n", sysmatrix->SLU_Info) ;
+        fprintf (stderr, "SuperLu factorization error %ld\n", sysmatrix->SLU_Info) ;
 
         return TDICE_FAILURE ;
     }
@@ -233,19 +478,41 @@ void system_matrix_destroy (SystemMatrix_t *sysmatrix)
     free (sysmatrix->RowIndices) ;
     free (sysmatrix->Values) ;
 
-    free (sysmatrix->SLU_PermutationMatrixR) ;
-    free (sysmatrix->SLU_PermutationMatrixC) ;
-    free (sysmatrix->SLU_Etree) ;
+    // free L matrix
+    free (sysmatrix->Nzval_L) ;
+    free (sysmatrix->Nzval_colbeg) ;
+    free (sysmatrix->Nzval_colend) ;
+    free (sysmatrix->Rowind_L) ;
+    free (sysmatrix->Rowind_colbeg) ;
+    free (sysmatrix->Rowind_colend) ;
+    free (sysmatrix->Col_to_sup) ;
+    free (sysmatrix->Sup_to_colbeg) ;
+    free (sysmatrix->Sup_to_colend) ;
+    //Destroy_SuperNode_SCP (&sysmatrix->SLUMatrix_L) ;
+    //free (sysmatrix->SLUMatrix_L.Store) ;
+    Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_L) ;
 
-    StatFree (&sysmatrix->SLU_Stat) ;
+    // free U matrix
+    free (sysmatrix->Nzval_U) ;
+    free (sysmatrix->Rowind_U) ;
+    free (sysmatrix->Colbeg) ;
+    free (sysmatrix->Colend) ;
+    //Destroy_CompCol_NCP   (&sysmatrix->SLUMatrix_U) ;
+    //free (sysmatrix->SLUMatrix_U.Store) ;
+    Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_U) ;
 
     Destroy_SuperMatrix_Store (&sysmatrix->SLUMatrix_A) ;
+    
+    StatFree (&sysmatrix->SLU_MT_Gstat) ;
+    free (sysmatrix->SLU_Options.perm_r) ;
+    free (sysmatrix->SLU_Options.perm_c) ;
+    free (sysmatrix->SLU_Options.etree) ;
+    free (sysmatrix->SLU_Options.colcnt_h) ;
+    free (sysmatrix->SLU_Options.part_super_h) ;
 
-    if (sysmatrix->SLU_Options.Fact != DOFACT )
+    if (sysmatrix->SLU_Options.fact != DOFACT )
     {
         Destroy_CompCol_Permuted (&sysmatrix->SLUMatrix_A_Permuted) ;
-        Destroy_SuperNode_Matrix (&sysmatrix->SLUMatrix_L) ;
-        Destroy_CompCol_Matrix   (&sysmatrix->SLUMatrix_U) ;
     }
 
     system_matrix_init (sysmatrix) ;
@@ -288,6 +555,10 @@ static SystemMatrix_t add_solid_column_non_uniform
 
     // *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
     // ChipDimension_t matrix_tmp[dimensions->Grid.NConnections][3];
+    
+    /// Present time consumption for test
+    // clock_t Time = clock() ;
+
     ChipDimension_t (*matrix_tmp)[3] = malloc(dimensions->Grid.NConnections * sizeof(ChipDimension_t[3]));
     memset(matrix_tmp, 0, dimensions->Grid.NConnections * sizeof(ChipDimension_t[3]));
     CellIndex_t matrix_tmp_index = 0;
@@ -295,6 +566,7 @@ static SystemMatrix_t add_solid_column_non_uniform
     Conductance_t sign_note;
     for(i_cell = dimensions->connections_list.First; i_cell!=NULL; i_cell=i_cell->Next)
     {
+
         matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node2; //r
         matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node1; //c
         matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->Data.node2, i_cell->Data.node1, &sign_note);  //v
@@ -306,7 +578,15 @@ static SystemMatrix_t add_solid_column_non_uniform
         matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node2; //c
         matrix_tmp[matrix_tmp_index][2] = sign_note*matrix_tmp[matrix_tmp_index-1][2];  //v
         matrix_tmp_index++;
+
     }
+
+    // test for time
+    fprintf (stdout, "\nCells: %d \n", dimensions->Grid.NCells) ;
+    fprintf (stdout, "Connection List: %d \n", matrix_tmp_index) ;
+    // fprintf (stdout, "  (2.1) fill non-diagonal elements took %.5f sec\n",
+    //     ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
+    // clock_t Time2_1 = clock() ;
 
     // fill diagnal value with boundary condition
     CellIndex_t matrix_tmp_index_2 = matrix_tmp_index;
@@ -319,10 +599,11 @@ static SystemMatrix_t add_solid_column_non_uniform
         matrix_tmp[matrix_tmp_index_3][1] = matrix_tmp_index_3-matrix_tmp_index_2;
 
         // fill the value
-        Non_uniform_cellListNode_t* node = dimensions->Cell_list.First;
         CellIndex_t node_index = matrix_tmp_index_3-matrix_tmp_index_2;
+        /*Non_uniform_cellListNode_t* node = dimensions->Cell_list.First;
         for (CellIndex_t i = 0; i<node_index; i++)
-            node = node->Next;
+            node = node->Next;*/
+        Non_uniform_cellListNode_t* node = dimensions->Cell_pointer[node_index];
         
         if (analysis->AnalysisType == TDICE_ANALYSIS_TYPE_TRANSIENT)
         {
@@ -338,12 +619,11 @@ static SystemMatrix_t add_solid_column_non_uniform
             {
                 // Darong_TODO: Support more layers
                 case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
-                case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
 
                     matrix_tmp[matrix_tmp_index_3][2] += (  2.0
                             * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
                                                         0, 0,
-                                                        dimensions)
+                                                        dimensions, 2)
                             * thermal_grid->TopHeatSink->AmbientHTC
                             * node->Data.length
                             * node->Data.width
@@ -354,9 +634,26 @@ static SystemMatrix_t add_solid_column_non_uniform
                             + 2.0
                             * get_thermal_conductivity (thermal_grid->LayersProfile + layer_index,
                                                         0, 0,
-                                                        dimensions)
+                                                        dimensions, 2)
                         ) ;
                         break;
+
+                case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
+
+                    matrix_tmp[matrix_tmp_index_3][2] += (  2.0
+                            * get_thermal_conductivity_non_uniform (node, 2)
+                            * thermal_grid->TopHeatSink->AmbientHTC
+                            * node->Data.length
+                            * node->Data.width
+                        )
+                        /
+                        (  get_cell_height (dimensions, layer_index)
+                            * thermal_grid->TopHeatSink->AmbientHTC
+                            + 2.0
+                            * get_thermal_conductivity_non_uniform (node, 2)
+                        ) ;
+                        break;
+
 
                 case TDICE_LAYER_CHANNEL_4RM :
                     if (node->Data.isChannel == 1)
@@ -387,6 +684,11 @@ static SystemMatrix_t add_solid_column_non_uniform
         }
     }
 
+    // // test for time
+    // fprintf (stdout, "  (2.2) fill diagonal elements took %.5f sec\n",
+    //     ( (double)clock() - Time2_1 ) / CLOCKS_PER_SEC ) ;
+    // clock_t Time2_2 = clock() ;
+
     // sum
     matrix_tmp_index_3 = matrix_tmp_index_2;
     for(; matrix_tmp_index>0; matrix_tmp_index--) // go back and add all the conductance to the diagnal one
@@ -395,8 +697,17 @@ static SystemMatrix_t add_solid_column_non_uniform
         matrix_tmp[matrix_tmp_index_3][2] += -matrix_tmp[matrix_tmp_index-1][2]; // add the conduactance
     }
 
+//    // test for time
+//     fprintf (stdout, "  (2.3) sum diagonal elements took %.5f sec\n",
+//         ( (double)clock() - Time2_2 ) / CLOCKS_PER_SEC ) ;
+//     clock_t Time2_3 = clock() ;
+
     qsort(matrix_tmp, dimensions->Grid.NConnections, sizeof matrix_tmp[0],compare);
     
+    // //test for time
+    // fprintf (stdout, "  (2.4) sort took %.5f sec\n",
+    //     ( (double)clock() - Time2_3 ) / CLOCKS_PER_SEC ) ;
+    // clock_t Time2_4 = clock() ;
 
     // fill the system matrix
     *sysmatrix.ColumnPointers = *(sysmatrix.ColumnPointers - 1) ;
@@ -414,9 +725,14 @@ static SystemMatrix_t add_solid_column_non_uniform
             layer_tmp = (CellIndex_t) matrix_tmp[i][1];
         }
         (*sysmatrix.ColumnPointers)++ ;
-        // printf("r:%d, c:%d, v:%f\n",*(sysmatrix.RowIndices-1),*(sysmatrix.ColumnPointers-1),*(sysmatrix.Values-1));
+        //printf("r:%d, c:%d, v:%f\n",*(sysmatrix.RowIndices-1),*(sysmatrix.ColumnPointers-1),*(sysmatrix.Values-1));
+        //fprintf (stdout, "r:%d, c:%d, v:%f\n",*(sysmatrix.RowIndices-1),*(sysmatrix.ColumnPointers-1),*(sysmatrix.Values-1)) ; fflush (stdout) ;
 
     }
+
+    // //test for time
+    // fprintf (stdout, "  (2.5) fill sparse matrix took %.5f sec\n",
+    //     ( (double)clock() - Time2_4 ) / CLOCKS_PER_SEC ) ;
 
     free(matrix_tmp);
     return sysmatrix ;
@@ -2021,14 +2337,14 @@ Error_t solve_sparse_linear_system (SystemMatrix_t *sysmatrix, SuperMatrix *b)
 {
     dgstrs
 
-        (NOTRANS, &sysmatrix->SLUMatrix_L, &sysmatrix->SLUMatrix_U,
-         sysmatrix->SLU_PermutationMatrixC, sysmatrix->SLU_PermutationMatrixR,
-         b, &sysmatrix->SLU_Stat, &sysmatrix->SLU_Info) ;
+        (sysmatrix->SLU_Options.trans, &sysmatrix->SLUMatrix_L, &sysmatrix->SLUMatrix_U,
+         sysmatrix->SLU_Options.perm_r, sysmatrix->SLU_Options.perm_c,
+         b, &sysmatrix->SLU_MT_Gstat, &sysmatrix->SLU_Info) ;
 
     if (sysmatrix->SLU_Info < 0)
     {
         fprintf (stderr,
-            "Error (%d) while solving linear system\n", sysmatrix->SLU_Info) ;
+            "Error (%ld) while solving linear system\n", sysmatrix->SLU_Info) ;
 
         return TDICE_FAILURE ;
     }
@@ -2048,7 +2364,7 @@ void system_matrix_print (SystemMatrix_t sysmatrix, String_t file_name)
         return ;
     }
 
-    CellIndex_t row, column ;
+    LUIndex_t row, column ;
 
     for (column = 0 ; column < sysmatrix.Size ; column++)
 
@@ -2056,7 +2372,7 @@ void system_matrix_print (SystemMatrix_t sysmatrix, String_t file_name)
              row < sysmatrix.ColumnPointers[column + 1] ;
              row++)
 
-            fprintf (file, "%9d\t%9d\t%32.24f\n",
+            fprintf (file, "%9ld\t%9ld\t%32.24f\n",
                 sysmatrix.RowIndices[row] + 1, column + 1,
                 sysmatrix.Values[row]) ;
 
@@ -2064,3 +2380,20 @@ void system_matrix_print (SystemMatrix_t sysmatrix, String_t file_name)
 }
 
 /******************************************************************************/
+
+
+void Vector_b_print (double *vector, LUIndex_t len, String_t file_name)
+{
+    FILE* file = fopen (file_name, "w") ;
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Cannot open file %s\n", file_name) ;
+        return ;
+    }
+
+    for (LUIndex_t i = 0; i < len; i++)
+        fprintf(file, "%32.24f\n", vector[i]);
+
+    fclose (file) ;
+}

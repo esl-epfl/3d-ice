@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -111,7 +111,7 @@ int main (int argc, char** argv)
 
     error = thermal_data_build
 
-        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis) ;
+        (&tdata, &stkd.StackElements, stkd.Dimensions, &analysis, &stkd.Materials) ;
 
     if (error != TDICE_SUCCESS)    goto ftd_error ;
 
@@ -310,7 +310,8 @@ int main (int argc, char** argv)
 
                     (&output, stkd.Dimensions,
                      tdata.Temperatures, tdata.PowerGrid.Sources,
-                     get_simulated_time (&analysis), instant) ;
+                     get_simulated_time (&analysis), analysis.CurrentTime, 
+                     analysis.SlotLength, instant) ;
 
                 break ;
             }

@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -57,6 +57,7 @@ void ic_element_init (ICElement_t *icel)
     icel->NE_Column = (CellIndex_t) 0u ;
     icel->Index_start = (CellIndex_t) 0u ;
     icel->Index_end = (CellIndex_t) 0u ;
+    material_init (&icel->Material) ;
 }
 
 /******************************************************************************/
@@ -77,6 +78,7 @@ void ic_element_copy (ICElement_t *dst, ICElement_t *src)
     dst->NE_Column = src->NE_Column ;
     dst->Index_start    = src->Index_start ;
     dst->Index_end = src->Index_end ;
+    material_copy(&dst->Material, &src->Material);
 }
 
 /******************************************************************************/
@@ -84,7 +86,7 @@ void ic_element_copy (ICElement_t *dst, ICElement_t *src)
 void ic_element_destroy (ICElement_t *icel)
 {
     // Nothing to do ...
-
+    material_destroy (&icel->Material) ;
     ic_element_init (icel) ;
 }
 
@@ -212,18 +214,17 @@ bool check_intersection
     // return true ;
 
 }
-
 /******************************************************************************/
 
 bool check_location (ICElement_t *icel, Dimensions_t *dimensions)
 {
     return (   (icel->SW_X <  0.0)
 
-               || (icel->SW_X + icel->Length > get_chip_length (dimensions))
+               || ((icel->SW_X + icel->Length - get_chip_length (dimensions)) > EPSILON)
 
             || (icel->SW_Y <  0.0)
 
-               || (icel->SW_Y + icel->Width > get_chip_width (dimensions)) ) ;
+               || ((icel->SW_Y + icel->Width - get_chip_width (dimensions)) > EPSILON) ) ;
 }
 
 /******************************************************************************/

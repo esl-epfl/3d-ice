@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -52,7 +52,7 @@ extern "C"
 
 #include "types.h"
 #include "string_t.h"
-
+#include "material.h"
 #include "dimensions.h"
 
 /******************************************************************************/
@@ -115,6 +115,11 @@ extern "C"
         /*! (Non-uniform scenario) The end index of the of the thermal cell in the non-uniform thermal cell list */
 
         CellIndex_t Index_end ;
+
+        /*! (Non-uniform scenario) The material composing the ic element */
+
+        Material_t Material ;
+
     } ;
 
     /*! Definition of the type ICElement_t */

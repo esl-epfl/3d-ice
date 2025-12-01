@@ -1,5 +1,5 @@
 /******************************************************************************
- * This file is part of 3D-ICE, version 3.1.0 .                               *
+ * This file is part of 3D-ICE, version 4.0 .                                 *
  *                                                                            *
  * 3D-ICE is free software: you can  redistribute it and/or  modify it  under *
  * the terms of the  GNU General  Public  License as  published by  the  Free *
@@ -22,8 +22,8 @@
  *          Giseong Bak                 Martino Ruggiero                      *
  *          Thomas Brunschwiler         Eder Zulian                           *
  *          Federico Terraneo           Darong Huang                          *
- *          Luis Costero                Marina Zapater                        *
- *          David Atienza                                                     *
+ *          Kai Zhu                     Luis Costero                          *
+ *          Marina Zapater              David Atienza                         *
  *                                                                            *
  * For any comment, suggestion or request  about 3D-ICE, please  register and *
  * write to the mailing list (see http://listes.epfl.ch/doc.cgi?liste=3d-ice) *
@@ -80,7 +80,7 @@ extern "C"
 
         OutputType_t OType ;
 
-        /*! The kind of quantity to be measured */
+        /*! The kind of quantity to be measured(minimum, average, maximum) */
 
         OutputQuantity_t Quantity ;
 
@@ -298,6 +298,8 @@ extern "C"
      * \param temperatures pointer to the first element of the temparature array
      * \param sources      pointer to the first element of the source array
      * \param current_time time instant of the measurement
+     * \param timestep_index index of current time step
+     * \param slotlength     time slot divided by time step
      *
      * \return FIXME
      */
@@ -308,7 +310,9 @@ extern "C"
         Dimensions_t      *dimensions,
         Temperature_t     *temperatures,
         Source_t          *sources,
-        Time_t             current_time
+        Time_t             current_time,
+        Quantity_t         timestep_index,
+        Quantity_t         slotlength
     ) ;
 
 

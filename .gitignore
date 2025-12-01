@@ -18,3 +18,4 @@ heatsink_plugin/heatsinks/HS483/HS483.HS483_P14752_VariableFanSpeed_Interface3DI
 heatsink_plugin/heatsinks/cuplex_kryos_21606/.dummy
 heatsink_plugin/heatsinks/cuplex_kryos_21606/Cuplex.Cuplex21606_ConstantFlowRate_Interface3DICE/
 heatsink_plugin/heatsinks/cuplex_kryos_21606/Cuplex.Cuplex21606_VariableFlowRate_Interface3DICE/
+.vscode/
