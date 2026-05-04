@@ -101,16 +101,16 @@ static Error_t extract_message_bytes
     return TDICE_SUCCESS ;
 }
 
-static Error_t request_tflp_average_slot_output
+static Error_t request_tflp_slot_output
 (
-    Socket_t   *client_socket,
-    Quantity_t  slot_index
+    Socket_t         *client_socket,
+    Quantity_t        slot_index,
+    OutputQuantity_t  quantity
 )
 {
     NetworkMessage_t request, reply ;
     OutputInstant_t  instant  = TDICE_OUTPUT_INSTANT_SLOT ;
     OutputType_t     type     = TDICE_OUTPUT_TYPE_TFLP ;
-    OutputQuantity_t quantity = TDICE_OUTPUT_QUANTITY_AVERAGE ;
     Quantity_t nresults, result_index, word_index ;
     float time ;
 
@@ -252,6 +252,30 @@ static Error_t request_tflp_average_slot_output
     }
 
     network_message_destroy (&reply) ;
+
+    return TDICE_SUCCESS ;
+}
+
+static Error_t request_tflp_slot_outputs
+(
+    Socket_t   *client_socket,
+    Quantity_t  slot_index
+)
+{
+    if (request_tflp_slot_output
+        (client_socket, slot_index, TDICE_OUTPUT_QUANTITY_AVERAGE) != TDICE_SUCCESS)
+
+        return TDICE_FAILURE ;
+
+    if (request_tflp_slot_output
+        (client_socket, slot_index, TDICE_OUTPUT_QUANTITY_MAXIMUM) != TDICE_SUCCESS)
+
+        return TDICE_FAILURE ;
+
+    if (request_tflp_slot_output
+        (client_socket, slot_index, TDICE_OUTPUT_QUANTITY_MINIMUM) != TDICE_SUCCESS)
+
+        return TDICE_FAILURE ;
 
     return TDICE_SUCCESS ;
 }
@@ -639,7 +663,7 @@ int main (int argc, char** argv)
 
         network_message_destroy (&server_reply) ;
 
-        if (request_tflp_average_slot_output (&client_socket, slot_index) != TDICE_SUCCESS)
+        if (request_tflp_slot_outputs (&client_socket, slot_index) != TDICE_SUCCESS)
         {
             fclose (tmap) ;
             if (power_trace != NULL)
