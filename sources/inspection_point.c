@@ -37,6 +37,7 @@
  ******************************************************************************/
 
 #include <stdlib.h> // For the memory functions malloc/free
+#include <string.h> // For strlen/memcpy
 
 #include "inspection_point.h"
 
@@ -334,9 +335,12 @@ bool is_inspection_point
         case TDICE_OUTPUT_TYPE_TCELL :
         case TDICE_OUTPUT_TYPE_TMAP :
         case TDICE_OUTPUT_TYPE_PMAP :
-        case TDICE_OUTPUT_TYPE_T3D:
 
             return true ;
+
+        case TDICE_OUTPUT_TYPE_T3D:
+
+            return false ;
 
         case TDICE_OUTPUT_TYPE_TFLP :
         case TDICE_OUTPUT_TYPE_TCOOLANT :
@@ -657,7 +661,7 @@ Error_t generate_inspection_point_output
 
 
             fprintf (output_stream,
-                "%f \t %7.3f\n", current_time, *(temperatures + index)) ;
+                "%f \t %16.12f\n", current_time, *(temperatures + index)) ;
 
             break ;
 
@@ -887,6 +891,229 @@ output_error :
 
 /******************************************************************************/
 
+static Quantity_t get_non_uniform_inspection_cell_index
+(
+    InspectionPoint_t *ipoint,
+    Dimensions_t      *dimensions
+)
+{
+    Quantity_t index = 0u ;
+    CellIndex_t layer_offset = get_source_layer_offset (ipoint->StackElement) ;
+
+    for (Non_uniform_cellListNode_t *cell_i = dimensions->Cell_list.First ;
+         cell_i != NULL ;
+         cell_i = cell_i->Next, index++)
+    {
+        if (cell_i->Data.layer_info != layer_offset)
+
+            continue ;
+
+        if (   ipoint->Xval >= cell_i->Data.left_x
+            && ipoint->Xval <  cell_i->Data.left_x + cell_i->Data.length
+            && ipoint->Yval >= cell_i->Data.left_y
+            && ipoint->Yval <  cell_i->Data.left_y + cell_i->Data.width)
+
+            return index ;
+    }
+
+    return 0u ;
+}
+
+/******************************************************************************/
+
+static Quantity_t get_non_uniform_layer_start
+(
+    StackElement_t *stkel,
+    Dimensions_t   *dimensions
+)
+{
+    Quantity_t index = 0u ;
+    CellIndex_t layer_offset = get_source_layer_offset (stkel) ;
+
+    for (Non_uniform_cellListNode_t *cell_i = dimensions->Cell_list.First ;
+         cell_i != NULL ;
+         cell_i = cell_i->Next, index++)
+    {
+        if (cell_i->Data.layer_info == layer_offset)
+
+            return index ;
+    }
+
+    return 0u ;
+}
+
+/******************************************************************************/
+
+static CellIndex_t get_non_uniform_layer_cell_count
+(
+    StackElement_t *stkel,
+    Dimensions_t   *dimensions
+)
+{
+    CellIndex_t count = 0u ;
+    CellIndex_t layer_offset = get_source_layer_offset (stkel) ;
+
+    for (Non_uniform_cellListNode_t *cell_i = dimensions->Cell_list.First ;
+         cell_i != NULL ;
+         cell_i = cell_i->Next)
+    {
+        if (cell_i->Data.layer_info == layer_offset)
+
+            count++ ;
+    }
+
+    return count ;
+}
+
+/******************************************************************************/
+
+static void insert_message_bytes
+(
+    NetworkMessage_t     *message,
+    const unsigned char  *bytes,
+    Quantity_t            nbytes
+)
+{
+    Quantity_t index ;
+
+    for (index = 0u ; index < nbytes ; index += sizeof (MessageWord_t))
+    {
+        MessageWord_t word = 0u ;
+        Quantity_t remaining = nbytes - index ;
+        Quantity_t chunk =
+            remaining < sizeof (MessageWord_t) ? remaining : sizeof (MessageWord_t) ;
+
+        memcpy (&word, bytes + index, chunk) ;
+
+        insert_message_word (message, &word) ;
+    }
+}
+
+/******************************************************************************/
+
+static String_t get_output_quantity_label (OutputQuantity_t quantity)
+{
+    switch (quantity)
+    {
+        case TDICE_OUTPUT_QUANTITY_MAXIMUM :
+
+            return (String_t) "Maximum" ;
+
+        case TDICE_OUTPUT_QUANTITY_MINIMUM :
+
+            return (String_t) "Minimum" ;
+
+        case TDICE_OUTPUT_QUANTITY_AVERAGE :
+
+            return (String_t) "Average" ;
+
+        case TDICE_OUTPUT_QUANTITY_GRADIENT :
+
+            return (String_t) "Gradient" ;
+
+        default :
+
+            return (String_t) "Unknown" ;
+    }
+}
+
+/******************************************************************************/
+
+static Error_t build_tflp_header
+(
+    InspectionPoint_t *ipoint,
+    char             **header,
+    Quantity_t        *header_length
+)
+{
+    String_t prefix = (String_t) "% " ;
+    String_t quantity_label = get_output_quantity_label (ipoint->Quantity) ;
+    FloorplanElementListNode_t *flpeln ;
+    size_t total_length = 0u ;
+    size_t offset = 0u ;
+    int nchars ;
+
+    nchars = snprintf
+    (
+        NULL, 0u,
+        "%s%s temperatures for the floorplan of the die %s\n%sTime(s) \t ",
+        prefix, quantity_label, ipoint->StackElement->Id, prefix
+    ) ;
+
+    if (nchars < 0)
+
+        return TDICE_FAILURE ;
+
+    total_length += (size_t) nchars ;
+
+    for (flpeln  = floorplan_element_list_begin (&ipoint->StackElement->Pointer.Die->Floorplan.ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
+    {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
+        nchars = snprintf (NULL, 0u, "%s(K) \t ", flpel->Id) ;
+
+        if (nchars < 0)
+
+            return TDICE_FAILURE ;
+
+        total_length += (size_t) nchars ;
+    }
+
+    total_length += 1u ;
+
+    *header = (char *) malloc (total_length + 1u) ;
+
+    if (*header == NULL)
+
+        return TDICE_FAILURE ;
+
+    nchars = snprintf
+    (
+        *header + offset, total_length + 1u - offset,
+        "%s%s temperatures for the floorplan of the die %s\n%sTime(s) \t ",
+        prefix, quantity_label, ipoint->StackElement->Id, prefix
+    ) ;
+
+    if (nchars < 0)
+
+        goto error ;
+
+    offset += (size_t) nchars ;
+
+    for (flpeln  = floorplan_element_list_begin (&ipoint->StackElement->Pointer.Die->Floorplan.ElementsList) ;
+         flpeln != NULL ;
+         flpeln  = floorplan_element_list_next (flpeln))
+    {
+        FloorplanElement_t *flpel = floorplan_element_list_data (flpeln) ;
+
+        nchars = snprintf (*header + offset, total_length + 1u - offset, "%s(K) \t ", flpel->Id) ;
+
+        if (nchars < 0)
+
+            goto error ;
+
+        offset += (size_t) nchars ;
+    }
+
+    (*header) [offset++] = '\n' ;
+    (*header) [offset] = '\0' ;
+
+    *header_length = (Quantity_t) offset ;
+
+    return TDICE_SUCCESS ;
+
+error:
+
+    free (*header) ;
+    *header = NULL ;
+
+    return TDICE_FAILURE ;
+}
+
+/******************************************************************************/
+
 void fill_message_inspection_point
 (
     InspectionPoint_t *ipoint,
@@ -901,11 +1128,19 @@ void fill_message_inspection_point
     {
         case TDICE_OUTPUT_TYPE_TCELL :
         {
-            Quantity_t index = get_cell_offset_in_stack
+            Quantity_t index ;
 
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 ipoint->RowIndex, ipoint->ColumnIndex) ;
+            if (dimensions->NonUniform == 1)
+
+                index = get_non_uniform_inspection_cell_index (ipoint, dimensions) ;
+
+            else
+
+                index = get_cell_offset_in_stack
+
+                    (dimensions,
+                     get_source_layer_offset(ipoint->StackElement),
+                     ipoint->RowIndex, ipoint->ColumnIndex) ;
 
             float temperature = *(temperatures + index) ;
 
@@ -915,11 +1150,17 @@ void fill_message_inspection_point
         }
         case TDICE_OUTPUT_TYPE_TFLP :
         {
-            temperatures += get_cell_offset_in_stack
+            char *header = NULL ;
+            Quantity_t file_name_length ;
+            Quantity_t header_length ;
 
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
+            if (dimensions->NonUniform != 1)
+
+                temperatures += get_cell_offset_in_stack
+
+                    (dimensions,
+                     get_source_layer_offset(ipoint->StackElement),
+                     first_row (dimensions), first_column (dimensions)) ;
 
             Temperature_t *tmp ;
             Quantity_t nflp, index ;
@@ -960,26 +1201,43 @@ void fill_message_inspection_point
                 break ;
             }
 
+            if (build_tflp_header (ipoint, &header, &header_length) != TDICE_SUCCESS)
+            {
+                free (tmp) ;
+
+                break ;
+            }
+
+            file_name_length = (Quantity_t) strlen (ipoint->FileName) ;
+
+            insert_message_word (message, &file_name_length) ;
+            insert_message_word (message, &header_length) ;
             insert_message_word (message, &nflp) ;
+
+            insert_message_bytes (message, (unsigned char *) ipoint->FileName, file_name_length) ;
+            insert_message_bytes (message, (unsigned char *) header, header_length) ;
 
             for (index = 0 ; index != nflp ; index++)
             {
-                Temperature_t t = tmp [ index ] ;
+                float t = tmp [ index ] ;
 
                 insert_message_word (message, &t) ;
             }
 
+            free (header) ;
             free (tmp) ;
 
             break ;
         }
         case TDICE_OUTPUT_TYPE_TFLPEL :
         {
-            temperatures += get_cell_offset_in_stack
+            if (dimensions->NonUniform != 1)
 
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
+                temperatures += get_cell_offset_in_stack
+
+                    (dimensions,
+                     get_source_layer_offset(ipoint->StackElement),
+                     first_row (dimensions), first_column (dimensions)) ;
 
 
             float temperature ;
@@ -1022,32 +1280,60 @@ void fill_message_inspection_point
         }
         case TDICE_OUTPUT_TYPE_TMAP :
         {
-            CellIndex_t n ;
-
-            n = get_number_of_rows (dimensions) ;
-
-            insert_message_word (message, &n) ;
-
-            n = get_number_of_columns (dimensions) ;
-
-            insert_message_word (message, &n) ;
-
-            Quantity_t index = get_cell_offset_in_stack
-
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
-
-            CellIndex_t row ;
-            CellIndex_t column ;
-
-            for (row = first_row (dimensions) ; row <= last_row  (dimensions) ; row++)
+            if (dimensions->NonUniform == 1)
             {
-                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
-                {
-                    float temperature = *(temperatures + index++) ;
+                CellIndex_t n = 1u ;
 
-                    insert_message_word (message, &temperature) ;
+                insert_message_word (message, &n) ;
+
+                n = get_non_uniform_layer_cell_count (ipoint->StackElement, dimensions) ;
+
+                insert_message_word (message, &n) ;
+
+                Quantity_t index = 0u ;
+                CellIndex_t layer_offset = get_source_layer_offset (ipoint->StackElement) ;
+
+                for (Non_uniform_cellListNode_t *cell_i = dimensions->Cell_list.First ;
+                     cell_i != NULL ;
+                     cell_i = cell_i->Next, index++)
+                {
+                    if (cell_i->Data.layer_info == layer_offset)
+                    {
+                        float temperature = *(temperatures + index) ;
+
+                        insert_message_word (message, &temperature) ;
+                    }
+                }
+            }
+            else
+            {
+                CellIndex_t n ;
+
+                n = get_number_of_rows (dimensions) ;
+
+                insert_message_word (message, &n) ;
+
+                n = get_number_of_columns (dimensions) ;
+
+                insert_message_word (message, &n) ;
+
+                Quantity_t index = get_cell_offset_in_stack
+
+                    (dimensions,
+                     get_source_layer_offset(ipoint->StackElement),
+                     first_row (dimensions), first_column (dimensions)) ;
+
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row  (dimensions) ; row++)
+                {
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    {
+                        float temperature = *(temperatures + index++) ;
+
+                        insert_message_word (message, &temperature) ;
+                    }
                 }
             }
 
@@ -1055,32 +1341,60 @@ void fill_message_inspection_point
         }
         case TDICE_OUTPUT_TYPE_PMAP :
         {
-            CellIndex_t n ;
-
-            n = get_number_of_rows (dimensions) ;
-
-            insert_message_word (message, &n) ;
-
-            n = get_number_of_columns (dimensions) ;
-
-            insert_message_word (message, &n) ;
-
-            Quantity_t index = get_cell_offset_in_stack
-
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
-
-            CellIndex_t row ;
-            CellIndex_t column ;
-
-            for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+            if (dimensions->NonUniform == 1)
             {
-                for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
-                {
-                    float source = *(sources + index++) ;
+                CellIndex_t n = 1u ;
 
-                    insert_message_word (message, &source) ;
+                insert_message_word (message, &n) ;
+
+                n = get_non_uniform_layer_cell_count (ipoint->StackElement, dimensions) ;
+
+                insert_message_word (message, &n) ;
+
+                Quantity_t index = 0u ;
+                CellIndex_t layer_offset = get_source_layer_offset (ipoint->StackElement) ;
+
+                for (Non_uniform_cellListNode_t *cell_i = dimensions->Cell_list.First ;
+                     cell_i != NULL ;
+                     cell_i = cell_i->Next, index++)
+                {
+                    if (cell_i->Data.layer_info == layer_offset)
+                    {
+                        float source = *(sources + index) ;
+
+                        insert_message_word (message, &source) ;
+                    }
+                }
+            }
+            else
+            {
+                CellIndex_t n ;
+
+                n = get_number_of_rows (dimensions) ;
+
+                insert_message_word (message, &n) ;
+
+                n = get_number_of_columns (dimensions) ;
+
+                insert_message_word (message, &n) ;
+
+                Quantity_t index = get_cell_offset_in_stack
+
+                    (dimensions,
+                     get_source_layer_offset(ipoint->StackElement),
+                     first_row (dimensions), first_column (dimensions)) ;
+
+                CellIndex_t row ;
+                CellIndex_t column ;
+
+                for (row = first_row (dimensions) ; row <= last_row (dimensions) ; row++)
+                {
+                    for (column = first_column (dimensions) ; column <= last_column (dimensions) ; column++)
+                    {
+                        float source = *(sources + index++) ;
+
+                        insert_message_word (message, &source) ;
+                    }
                 }
             }
 
@@ -1088,11 +1402,19 @@ void fill_message_inspection_point
         }
         case TDICE_OUTPUT_TYPE_TCOOLANT :
         {
-            temperatures += get_cell_offset_in_stack
+            if (dimensions->NonUniform == 1)
 
-                (dimensions,
-                 get_source_layer_offset(ipoint->StackElement),
-                 first_row (dimensions), first_column (dimensions)) ;
+                temperatures += get_non_uniform_layer_start
+
+                    (ipoint->StackElement, dimensions) ;
+
+            else
+
+                temperatures += get_cell_offset_in_stack
+
+                    (dimensions,
+                     get_source_layer_offset(ipoint->StackElement),
+                     first_row (dimensions), first_column (dimensions)) ;
 
             float temperature ;
 

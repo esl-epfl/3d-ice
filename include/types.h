@@ -614,9 +614,10 @@ extern "C"
          *
          * if OutputType_t is Tcell, Tflpel or Tcoolant.
          *
-         * | nflp | T 1 | ... | T nflp |
+         * | filename_length | header_length | nflp | filename | header | T 1 | ... | T nflp |
          *
          * if OutputType_t is Tflp (nflp is its number of floorplan elements).
+         * filename and header are packed as MessageWord_t chunks.
          *
          * | nrows | ncolumns | T 1 | ... | T (nrows x ncolumns) |
          *
@@ -708,6 +709,22 @@ extern "C"
          */
 
         TDICE_SIMULATE_STEP,
+
+
+
+        /*! \brief Request output files generated from the stack output section
+         *
+         * The client sends a message without payload :
+         *
+         * | 2 | TDICE_SEND_OUTPUT_FILES |
+         *
+         * The server will send back all generated output files it can open:
+         *
+         * | length | TDICE_SEND_OUTPUT_FILES | nfiles |
+         * | filename_length | file_length | filename bytes | file bytes | ...
+         */
+
+        TDICE_SEND_OUTPUT_FILES,
     } ;
 
 
@@ -721,6 +738,45 @@ extern "C"
     /*! Definition of the type MessageWord_t */
 
     typedef uint32_t MessageWord_t ;
+
+
+
+    /******************************************************************************/
+
+    /*! \enum StackElementType_t
+     *
+     * Enumeration to collect the types of a stack element
+     */
+
+    enum SolverType_t
+    {
+        USE_CPU_DIRECT_LU = 0,                //!< cpu direct solver
+        USE_GPU_DIRECT_LU  ,                  //!< gpu direct(lu) solver
+        USE_GPU_DIRECT_CHOLESKY ,             //!< gpu direct(cholesky) solver
+        USE_GPU_ITERATIVE_CG ,                //!< gpu iterative(cg) solver
+        USE_GPU_ITERATIVE_BICG                //!< gpu iterative(bicg) solver
+    } ;
+
+    /*! The definition of the type SolverType_t */
+
+    typedef enum SolverType_t SolverType_t ;
+
+    /******************************************************************************/
+
+    /*! struct SolverTime_t
+     *
+     * Struct to record the time consumption for each phase 
+     */
+    struct SolverTime_t
+    {
+        double factorization_time;            //!< time for factorization/precondition
+        double solve_time;                    //!< time for solving/iteration              
+        double overall_time;                  //!< total time
+    } ;
+
+    /*! The definition of the type TimeSolver_t */
+
+    typedef struct SolverTime_t SolverTime_t ;
 
 /******************************************************************************/
 

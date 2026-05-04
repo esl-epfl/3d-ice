@@ -37,7 +37,9 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "types.h"
 #include "network_socket.h"
@@ -48,6 +50,197 @@
 #include "analysis.h"
 #include "output.h"
 #include "powers_queue.h"
+
+#define MAX_OUTPUT_FILES_TO_TRANSFER 1024u
+
+static void insert_message_bytes
+(
+    NetworkMessage_t *message,
+    unsigned char    *bytes,
+    Quantity_t        nbytes
+)
+{
+    Quantity_t index ;
+
+    for (index = 0u ; index < nbytes ; index += sizeof (MessageWord_t))
+    {
+        MessageWord_t word = 0u ;
+        Quantity_t remaining = nbytes - index ;
+        Quantity_t chunk =
+            remaining < sizeof (MessageWord_t) ? remaining : sizeof (MessageWord_t) ;
+
+        memcpy (&word, bytes + index, chunk) ;
+
+        insert_message_word (message, &word) ;
+    }
+}
+
+static bool output_file_already_added
+(
+    String_t    file_name,
+    String_t   added_files [],
+    Quantity_t nfiles
+)
+{
+    Quantity_t index ;
+
+    for (index = 0u ; index != nfiles ; index++)
+    {
+        if (strcmp (file_name, added_files [index]) == 0)
+
+            return true ;
+    }
+
+    return false ;
+}
+
+static Error_t append_file_to_message
+(
+    NetworkMessage_t *message,
+    String_t          file_name,
+    String_t          added_files [],
+    Quantity_t       *nfiles
+)
+{
+    if (file_name == NULL || file_name [0] == '\0')
+
+        return TDICE_SUCCESS ;
+
+    if (output_file_already_added (file_name, added_files, *nfiles) == true)
+
+        return TDICE_SUCCESS ;
+
+    if (*nfiles == MAX_OUTPUT_FILES_TO_TRANSFER)
+
+        return TDICE_FAILURE ;
+
+    FILE *file = fopen (file_name, "rb") ;
+
+    if (file == NULL)
+    {
+        fprintf (stderr, "warning: cannot open output file %s for transfer\n", file_name) ;
+
+        return TDICE_SUCCESS ;
+    }
+
+    if (fseek (file, 0L, SEEK_END) != 0)
+    {
+        fclose (file) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    long file_length_long = ftell (file) ;
+
+    if (file_length_long < 0)
+    {
+        fclose (file) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    rewind (file) ;
+
+    Quantity_t file_name_length = (Quantity_t) strlen (file_name) ;
+    Quantity_t file_length      = (Quantity_t) file_length_long ;
+
+    insert_message_word  (message, &file_name_length) ;
+    insert_message_word  (message, &file_length) ;
+    insert_message_bytes (message, (unsigned char *) file_name, file_name_length) ;
+
+    if (file_length != 0u)
+    {
+        unsigned char *file_content = (unsigned char *) malloc (file_length) ;
+
+        if (file_content == NULL)
+        {
+            fclose (file) ;
+
+            return TDICE_FAILURE ;
+        }
+
+        size_t nread = fread (file_content, 1u, file_length, file) ;
+
+        fclose (file) ;
+
+        if (nread != file_length)
+        {
+            free (file_content) ;
+
+            return TDICE_FAILURE ;
+        }
+
+        insert_message_bytes (message, file_content, file_length) ;
+
+        free (file_content) ;
+    }
+    else
+    {
+        fclose (file) ;
+    }
+
+    added_files [*nfiles] = file_name ;
+    (*nfiles)++ ;
+
+    return TDICE_SUCCESS ;
+}
+
+static Error_t append_output_files_from_list
+(
+    NetworkMessage_t      *message,
+    InspectionPointList_t *list,
+    String_t               added_files [],
+    Quantity_t            *nfiles
+)
+{
+    InspectionPointListNode_t *ipn ;
+
+    for (ipn  = inspection_point_list_begin (list) ;
+         ipn != NULL ;
+         ipn  = inspection_point_list_next (ipn))
+    {
+        InspectionPoint_t *ipoint = inspection_point_list_data (ipn) ;
+
+        if (append_file_to_message
+            (message, ipoint->FileName, added_files, nfiles) != TDICE_SUCCESS)
+
+            return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+static Error_t build_output_files_message
+(
+    Output_t         *output,
+    NetworkMessage_t *message
+)
+{
+    Quantity_t nfiles = 0u ;
+    String_t added_files [MAX_OUTPUT_FILES_TO_TRANSFER] ;
+
+    build_message_head  (message, TDICE_SEND_OUTPUT_FILES) ;
+    insert_message_word (message, &nfiles) ;
+
+    if (append_output_files_from_list
+        (message, &output->InspectionPointListFinal, added_files, &nfiles) != TDICE_SUCCESS)
+
+        return TDICE_FAILURE ;
+
+    if (append_output_files_from_list
+        (message, &output->InspectionPointListSlot, added_files, &nfiles) != TDICE_SUCCESS)
+
+        return TDICE_FAILURE ;
+
+    if (append_output_files_from_list
+        (message, &output->InspectionPointListStep, added_files, &nfiles) != TDICE_SUCCESS)
+
+        return TDICE_FAILURE ;
+
+    memcpy (message->Content, &nfiles, sizeof (MessageWord_t)) ;
+
+    return TDICE_SUCCESS ;
+}
 
 int main (int argc, char** argv)
 {
@@ -312,6 +505,28 @@ int main (int argc, char** argv)
                      tdata.Temperatures, tdata.PowerGrid.Sources,
                      get_simulated_time (&analysis), analysis.CurrentTime, 
                      analysis.SlotLength, instant) ;
+
+                break ;
+            }
+
+        /**********************************************************************/
+
+            case TDICE_SEND_OUTPUT_FILES :
+            {
+                network_message_init (&reply) ;
+
+                if (build_output_files_message (&output, &reply) != TDICE_SUCCESS)
+                {
+                    fprintf (stderr, "error: build output files message\n") ;
+
+                    network_message_destroy (&reply) ;
+
+                    goto sim_error ;
+                }
+
+                send_message_to_socket (&client_socket, &reply) ;
+
+                network_message_destroy (&reply) ;
 
                 break ;
             }

@@ -207,7 +207,7 @@ Error_t send_message_to_socket
 
     // Begin points to th beginning of the message ...
 
-    MessageWord_t *begin = (MessageWord_t *) message->Memory ;
+    unsigned char *begin = (unsigned char *) message->Memory ;
 
     while (length > 0)
     {
@@ -236,9 +236,9 @@ Error_t send_message_to_socket
 
         length -= (size_t) bwritten ;
 
-        // moves the pointer forward (# of words sent)
+        // moves the pointer forward (# of bytes sent)
 
-        begin += (MessageWord_t) (bwritten / sizeof (MessageWord_t)) ;
+        begin += bwritten ;
     }
 
     return TDICE_SUCCESS ;
@@ -256,9 +256,36 @@ Error_t receive_message_from_socket
 
     // reads the first word : the number of words to receive
 
-    ssize_t bread = read (socket->Id, &message_length, sizeof(message_length)) ;
+    unsigned char *length_begin = (unsigned char *) &message_length ;
+    size_t length_bytes = sizeof (message_length) ;
 
-    if (bread < 0 || bread != sizeof(message_length))
+    while (length_bytes > 0)
+    {
+        ssize_t bread = read (socket->Id, length_begin, length_bytes) ;
+
+        if (bread < 0)
+        {
+            if (errno == EINTR)
+
+                continue ;
+
+            perror ("ERROR :: read message length failure") ;
+
+            return TDICE_FAILURE ;
+        }
+
+        if (bread == 0)
+        {
+            perror ("ERROR :: read message length failure") ;
+
+            return TDICE_FAILURE ;
+        }
+
+        length_bytes -= (size_t) bread ;
+        length_begin += bread ;
+    }
+
+    if (message_length == 0u)
     {
         perror ("ERROR :: read message length failure") ;
 
@@ -281,11 +308,11 @@ Error_t receive_message_from_socket
 
     message_length *= sizeof (MessageWord_t) ;
 
-    MessageWord_t *begin = message->MType ;
+    unsigned char *begin = (unsigned char *) message->MType ;
 
     while (message_length > 0)
     {
-        bread = read (socket->Id, begin, message_length) ;
+        ssize_t bread = read (socket->Id, begin, message_length) ;
 
         if (bread < 0)
         {
@@ -301,13 +328,20 @@ Error_t receive_message_from_socket
             }
         }
 
+        if (bread == 0)
+        {
+            perror ("ERROR :: read failure") ;
+
+            return TDICE_FAILURE ;
+        }
+
         // decreases by the #bytes read
 
         message_length -= (size_t) bread ;
 
-        // moves the pointer forward (# of words received)
+        // moves the pointer forward (# of bytes received)
 
-        begin += (MessageWord_t) (bread / sizeof(MessageWord_t)) ;
+        begin += bread ;
     }
 
     return TDICE_SUCCESS ;
