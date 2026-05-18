@@ -69,6 +69,9 @@ static void insert_message_bytes
         Quantity_t chunk =
             remaining < sizeof (MessageWord_t) ? remaining : sizeof (MessageWord_t) ;
 
+        if (chunk > sizeof (MessageWord_t))
+            chunk = sizeof (MessageWord_t) ;
+
         memcpy (&word, bytes + index, chunk) ;
 
         insert_message_word (message, &word) ;
@@ -237,7 +240,8 @@ static Error_t build_output_files_message
 
         return TDICE_FAILURE ;
 
-    memcpy (message->Content, &nfiles, sizeof (MessageWord_t)) ;
+    if (message->Content != NULL)
+        memcpy (message->Content, &nfiles, sizeof (MessageWord_t)) ;
 
     return TDICE_SUCCESS ;
 }
