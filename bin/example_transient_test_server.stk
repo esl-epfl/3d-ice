@@ -33,9 +33,7 @@ layer   CONN_TO_PCB     PCB                                    discretization 2 
 solver:
    transient step 0.02, slot 0.2 ;
    initial temperature 300.0 ;
-   type cpu_direct_lu ;
    numofcores 10 ;   
-   tolerance 1e-8 ;
 
 output:
      Tflp( TOP_DIE,    "output_top_die_flp_avg.txt",    average, slot );
