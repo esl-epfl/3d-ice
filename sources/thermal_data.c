@@ -45,6 +45,13 @@
 #include <cblas.h> 
 /******************************************************************************/
 
+static void set_openblas_threads (void)
+{
+    openblas_set_num_threads (1) ;
+}
+
+/******************************************************************************/
+
 static void init_data (double* data, uint32_t size, double init_value)
 {
     while (size--) *data++ = init_value ;
@@ -1045,6 +1052,7 @@ Error_t thermal_data_build
     struct timespec start, node1, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
 
+    set_openblas_threads () ;
     set_parallel_cores(analysis->NumOfCores);
 
     // re-evaluate the number of thermal grids

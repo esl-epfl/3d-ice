@@ -37,9 +37,9 @@
  ******************************************************************************/
 
 #include <stdio.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "types.h"
 #include "network_socket.h"
@@ -52,6 +52,25 @@
 #include "powers_queue.h"
 
 #define MAX_OUTPUT_FILES_TO_TRANSFER 1024u
+#define TERMINATION_SENTINEL (-1.0f)
+#define DEFAULT_POWER_TRACE_POLL_SECONDS 1u
+
+typedef enum
+{
+    SERVER_MODE_SOCKET,
+    SERVER_MODE_LOCAL_TRACE
+} ServerMode_t ;
+
+typedef struct
+{
+    ServerMode_t mode ;
+    char        *stk_file ;
+    Quantity_t   server_port ;
+    char        *power_trace_file ;
+    int          follow_power_trace ;
+    int          terminate_on_sentinel ;
+    unsigned int poll_seconds ;
+} ServerOptions_t ;
 
 static void insert_message_bytes
 (
@@ -242,6 +261,463 @@ static Error_t build_output_files_message
     return TDICE_SUCCESS ;
 }
 
+static Error_t write_output_instant
+(
+    Output_t        *output,
+    Dimensions_t    *dimensions,
+    ThermalData_t   *tdata,
+    Analysis_t      *analysis,
+    bool            *headers,
+    OutputInstant_t  instant
+)
+{
+    Error_t error ;
+
+    if (*headers == false)
+    {
+        error = generate_output_headers
+
+            (output, dimensions, (String_t)"% ") ;
+
+        if (error != TDICE_SUCCESS)
+        {
+            fprintf (stderr, "error in initializing output files \n ") ;
+
+            return error ;
+        }
+
+        *headers = true ;
+    }
+
+    return generate_output
+
+        (output, dimensions,
+         tdata->Temperatures, tdata->PowerGrid.Sources,
+         get_simulated_time (analysis), analysis->CurrentTime,
+         analysis->SlotLength, instant) ;
+}
+
+static void print_usage (char *exe_name)
+{
+    fprintf (stderr, "Usage: \"%s file.stk server_port\"\n", exe_name) ;
+    fprintf (stderr,
+        "       \"%s file.stk --power-trace trace.txt --until-minus-one [--follow] [--poll seconds]\"\n",
+        exe_name) ;
+}
+
+static int is_positive_integer (char *value)
+{
+    if (*value == '\0')
+
+        return 0 ;
+
+    for ( ; *value != '\0' ; value++)
+    {
+        if (*value < '0' || *value > '9')
+
+            return 0 ;
+    }
+
+    return 1 ;
+}
+
+static void server_options_init (ServerOptions_t *options)
+{
+    options->mode                  = SERVER_MODE_SOCKET ;
+    options->stk_file              = NULL ;
+    options->server_port           = 0u ;
+    options->power_trace_file      = NULL ;
+    options->follow_power_trace    = 0 ;
+    options->terminate_on_sentinel = 0 ;
+    options->poll_seconds          = DEFAULT_POWER_TRACE_POLL_SECONDS ;
+}
+
+static Error_t parse_server_options
+(
+    int              argc,
+    char           **argv,
+    ServerOptions_t *options
+)
+{
+    int arg_index ;
+
+    server_options_init (options) ;
+
+    if (argc < 3)
+    {
+        print_usage (argv [0]) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    options->stk_file = argv [1] ;
+
+    if (argc == 3 && argv [2][0] != '-')
+    {
+        options->mode        = SERVER_MODE_SOCKET ;
+        options->server_port = (Quantity_t) atoi (argv [2]) ;
+
+        return TDICE_SUCCESS ;
+    }
+
+    options->mode = SERVER_MODE_LOCAL_TRACE ;
+
+    for (arg_index = 2 ; arg_index != argc ; arg_index++)
+    {
+        if (strcmp (argv [arg_index], "--power-trace") == 0)
+        {
+            if (++arg_index == argc)
+            {
+                fprintf (stderr, "--power-trace requires a file path\n") ;
+                print_usage (argv [0]) ;
+
+                return TDICE_FAILURE ;
+            }
+
+            options->power_trace_file = argv [arg_index] ;
+        }
+        else if (strcmp (argv [arg_index], "--follow") == 0)
+        {
+            options->follow_power_trace = 1 ;
+        }
+        else if (strcmp (argv [arg_index], "--until-minus-one") == 0)
+        {
+            options->terminate_on_sentinel = 1 ;
+        }
+        else if (strcmp (argv [arg_index], "--poll") == 0)
+        {
+            if (++arg_index == argc || is_positive_integer (argv [arg_index]) == 0)
+            {
+                fprintf (stderr, "--poll requires a positive integer number of seconds\n") ;
+                print_usage (argv [0]) ;
+
+                return TDICE_FAILURE ;
+            }
+
+            options->poll_seconds = (unsigned int) atoi (argv [arg_index]) ;
+
+            if (options->poll_seconds == 0u)
+            {
+                fprintf (stderr, "--poll requires a positive integer number of seconds\n") ;
+                print_usage (argv [0]) ;
+
+                return TDICE_FAILURE ;
+            }
+        }
+        else
+        {
+            fprintf (stderr, "Unknown server option %s\n", argv [arg_index]) ;
+            print_usage (argv [0]) ;
+
+            return TDICE_FAILURE ;
+        }
+    }
+
+    if (options->power_trace_file == NULL)
+    {
+        fprintf (stderr, "local server mode requires --power-trace\n") ;
+        print_usage (argv [0]) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    if (options->terminate_on_sentinel == 0)
+    {
+        fprintf (stderr, "local server mode requires --until-minus-one\n") ;
+        print_usage (argv [0]) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    return TDICE_SUCCESS ;
+}
+
+static Error_t insert_power_values_from_array
+(
+    ThermalData_t *tdata,
+    Quantity_t     nflpel,
+    float         *powers
+)
+{
+    PowersQueue_t queue ;
+    Quantity_t    index ;
+    Error_t       error ;
+
+    powers_queue_init (&queue) ;
+    powers_queue_build (&queue, nflpel) ;
+
+    for (index = 0u ; index != nflpel ; index++)
+
+        put_into_powers_queue (&queue, powers [index]) ;
+
+    error = insert_power_values (&tdata->PowerGrid, &queue) ;
+
+    powers_queue_destroy (&queue) ;
+
+    return error ;
+}
+
+static SimResult_t simulate_slot_and_write_output
+(
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    Output_t           *output,
+    ThermalData_t      *tdata,
+    bool               *headers
+)
+{
+    SimResult_t result = emulate_slot (tdata, stkd->Dimensions, analysis) ;
+
+    if (result == TDICE_SLOT_DONE &&
+        write_output_instant
+        (output, stkd->Dimensions, tdata, analysis,
+         headers, TDICE_OUTPUT_INSTANT_SLOT) != TDICE_SUCCESS)
+    {
+        fprintf (stderr, "error: generate slot output\n") ;
+
+        result = TDICE_SOLVER_ERROR ;
+    }
+
+    return result ;
+}
+
+static Error_t read_power_trace_value
+(
+    FILE        *power_trace,
+    int          follow_power_trace,
+    Quantity_t   slot_index,
+    Quantity_t   value_index,
+    unsigned int poll_seconds,
+    float       *power
+)
+{
+    int waiting = 0 ;
+
+    for ( ; ; )
+    {
+        int result = fscanf (power_trace, "%f", power) ;
+
+        if (result == 1)
+
+            return TDICE_SUCCESS ;
+
+        if (result == EOF && follow_power_trace != 0)
+        {
+            if (waiting == 0)
+            {
+                fprintf (stdout,
+                    "Waiting for power trace values for slot %u, element %u ...\n",
+                    (unsigned int) slot_index,
+                    (unsigned int) value_index) ;
+                fflush (stdout) ;
+
+                waiting = 1 ;
+            }
+
+            clearerr (power_trace) ;
+            sleep (poll_seconds) ;
+
+            continue ;
+        }
+
+        fprintf (stderr,
+            "Cannot read power trace value for slot %u, element %u\n",
+            (unsigned int) slot_index,
+            (unsigned int) value_index) ;
+
+        return TDICE_FAILURE ;
+    }
+}
+
+static FILE *open_power_trace_file
+(
+    char        *power_trace_file,
+    int          follow_power_trace,
+    unsigned int poll_seconds
+)
+{
+    FILE *power_trace ;
+    int   waiting = 0 ;
+
+    for ( ; ; )
+    {
+        power_trace = fopen (power_trace_file, "r") ;
+
+        if (power_trace != NULL)
+
+            return power_trace ;
+
+        if (follow_power_trace == 0)
+        {
+            fprintf (stderr, "Cannot open power trace file %s\n", power_trace_file) ;
+
+            return NULL ;
+        }
+
+        if (waiting == 0)
+        {
+            fprintf (stdout, "Waiting for power trace file %s ...\n", power_trace_file) ;
+            fflush (stdout) ;
+
+            waiting = 1 ;
+        }
+
+        sleep (poll_seconds) ;
+    }
+}
+
+static int is_termination_slot
+(
+    float      *powers,
+    Quantity_t  nflpel
+)
+{
+    Quantity_t index ;
+
+    for (index = 0u ; index != nflpel ; index++)
+    {
+        if (powers [index] != TERMINATION_SENTINEL)
+
+            return 0 ;
+    }
+
+    return 1 ;
+}
+
+static void print_slot_progress
+(
+    Analysis_t  *analysis,
+    Quantity_t  *slot_counter
+)
+{
+    fprintf (stdout, "%.3f ", get_simulated_time (analysis)) ;
+
+    fflush (stdout) ;
+
+    if (++(*slot_counter) == 10u)
+    {
+        fprintf (stdout, "\n") ;
+
+        *slot_counter = 0u ;
+    }
+}
+
+static Error_t run_local_power_trace_mode
+(
+    ServerOptions_t    *options,
+    StackDescription_t *stkd,
+    Analysis_t         *analysis,
+    Output_t           *output,
+    ThermalData_t      *tdata,
+    bool               *headers
+)
+{
+    FILE       *power_trace ;
+    float      *powers ;
+    Quantity_t  nflpel ;
+    Quantity_t  slot_index ;
+    Quantity_t  slot_counter = 0u ;
+    Quantity_t  index ;
+    Error_t     error ;
+
+    fprintf (stdout, "Running local power trace mode.\n") ;
+    fflush (stdout) ;
+
+    power_trace = open_power_trace_file
+        (options->power_trace_file,
+         options->follow_power_trace,
+         options->poll_seconds) ;
+
+    if (power_trace == NULL)
+
+        return TDICE_FAILURE ;
+
+    nflpel = get_total_number_of_floorplan_elements (stkd) ;
+
+    if (nflpel == 0u)
+    {
+        fprintf (stderr, "error: stack has no floorplan elements\n") ;
+        fclose (power_trace) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    powers = (float *) malloc (sizeof (float) * nflpel) ;
+
+    if (powers == NULL)
+    {
+        fprintf (stderr, "error: cannot allocate local power slot\n") ;
+        fclose (power_trace) ;
+
+        return TDICE_FAILURE ;
+    }
+
+    for (slot_index = 0u ; ; slot_index++)
+    {
+        SimResult_t result ;
+
+        for (index = 0u ; index != nflpel ; index++)
+        {
+            if (read_power_trace_value
+                (power_trace,
+                 options->follow_power_trace,
+                 slot_index,
+                 index,
+                 options->poll_seconds,
+                 &powers [index]) != TDICE_SUCCESS)
+            {
+                free (powers) ;
+                fclose (power_trace) ;
+
+                return TDICE_FAILURE ;
+            }
+        }
+
+        if (options->terminate_on_sentinel != 0 &&
+            is_termination_slot (powers, nflpel) != 0)
+        {
+            fprintf (stdout,
+                "Received all-minus-one termination slot at slot %u; stopping simulation.\n",
+                (unsigned int) slot_index) ;
+
+            break ;
+        }
+
+        error = insert_power_values_from_array (tdata, nflpel, powers) ;
+
+        if (error != TDICE_SUCCESS)
+        {
+            fprintf (stderr, "error: insert power values\n") ;
+            free (powers) ;
+            fclose (power_trace) ;
+
+            return TDICE_FAILURE ;
+        }
+
+        result = simulate_slot_and_write_output (stkd, analysis, output, tdata, headers) ;
+
+        if (result == TDICE_END_OF_SIMULATION)
+
+            break ;
+
+        if (result != TDICE_SLOT_DONE)
+        {
+            fprintf (stderr, "error %d: emulate slot\n", result) ;
+            free (powers) ;
+            fclose (power_trace) ;
+
+            return TDICE_FAILURE ;
+        }
+
+        print_slot_progress (analysis, &slot_counter) ;
+    }
+
+    free (powers) ;
+    fclose (power_trace) ;
+
+    return TDICE_SUCCESS ;
+}
+
 int main (int argc, char** argv)
 {
     StackDescription_t stkd ;
@@ -251,7 +727,9 @@ int main (int argc, char** argv)
 
     Error_t error ;
 
-    Quantity_t server_port, slot_counter = 0u ;
+    ServerOptions_t options ;
+
+    Quantity_t slot_counter = 0u ;
 
     Socket_t server_socket, client_socket ;
 
@@ -261,19 +739,9 @@ int main (int argc, char** argv)
 
     /* Checks if all arguments are there **************************************/
 
-#define NARGC        3
-#define EXE_NAME     argv[0]
-#define STK_FILE     argv[1]
-#define SERVER_PORT  argv[2]
-
-    if (argc != NARGC)
-    {
-        fprintf (stderr, "Usage: \"%s file.stk server_port\n", EXE_NAME) ;
+    if (parse_server_options (argc, argv, &options) != TDICE_SUCCESS)
 
         return EXIT_FAILURE ;
-    }
-
-    server_port = atoi (SERVER_PORT) ;
 
     /* Parses stack file (fills stack descrition and analysis) ****************/
 
@@ -283,7 +751,7 @@ int main (int argc, char** argv)
     analysis_init          (&analysis) ;
     output_init            (&output) ;
 
-    error = parse_stack_description_file (STK_FILE, &stkd, &analysis, &output) ;
+    error = parse_stack_description_file (options.stk_file, &stkd, &analysis, &output) ;
 
     if (error != TDICE_SUCCESS)    return EXIT_FAILURE ;
 
@@ -310,13 +778,25 @@ int main (int argc, char** argv)
 
     fprintf (stdout, "done !\n") ;
 
+    if (options.mode == SERVER_MODE_LOCAL_TRACE)
+    {
+        error = run_local_power_trace_mode
+            (&options, &stkd, &analysis, &output, &tdata, &headers) ;
+
+        thermal_data_destroy      (&tdata) ;
+        stack_description_destroy (&stkd) ;
+        output_destroy            (&output) ;
+
+        return error == TDICE_SUCCESS ? EXIT_SUCCESS : EXIT_FAILURE ;
+    }
+
     /* Creates socket *********************************************************/
 
     fprintf (stdout, "Creating socket ... ") ; fflush (stdout) ;
 
     socket_init (&server_socket) ;
 
-    error = open_server_socket (&server_socket, server_port) ;
+    error = open_server_socket (&server_socket, options.server_port) ;
 
     if (error != TDICE_SUCCESS)    goto socket_error ;
 

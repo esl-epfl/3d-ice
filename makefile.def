@@ -41,7 +41,7 @@
  ##############################################################################
 
 3DICE_LIBNAME   = threed-ice
-3DICE_VERSION   = 3.1.0
+3DICE_VERSION   = 4.0.0
 3DICE_RELEASE   = $(3DICE_LIBNAME)-$(3DICE_VERSION)
 
 3DICE_INCLUDE   = $(3DICE_MAIN)/include
