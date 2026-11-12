@@ -185,6 +185,17 @@ extern "C"
         CellIndex_t    column_index
     ) ;
 
+    /*! Conductance from a non-uniform bottom cell to the bottom ambient.
+     * Includes half-cell conduction in series with the configured bottom HTC.
+     * Source layers use the cell's material, including its z conductivity.
+     */
+    Conductance_t get_conductance_bottom_non_uniform
+    (
+        ThermalGrid_t *tgrid,
+        Dimensions_t *dimensions,
+        Non_uniform_cellListNode_t *node
+    );
+
     /*! Return the conductance of the non-unifrom thermal node in the z direction
      *
      * The function prints a message on stderr in case of error

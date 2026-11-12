@@ -655,6 +655,13 @@ static SystemMatrix_t add_solid_column_non_uniform
                         break;
 
 
+                case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
+                case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
+                    matrix_tmp[matrix_tmp_index_3][2] +=
+                        get_conductance_bottom_non_uniform
+                            (thermal_grid, dimensions, node);
+                    break;
+
                 case TDICE_LAYER_CHANNEL_4RM :
                     if (node->Data.isChannel == 1)
                     {

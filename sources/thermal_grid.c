@@ -530,6 +530,36 @@ Capacity_t get_capacity
 }
 
 /******************************************************************************/
+Conductance_t get_conductance_bottom_non_uniform
+(
+    ThermalGrid_t *tgrid,
+    Dimensions_t *dimensions,
+    Non_uniform_cellListNode_t *node
+)
+{
+    CellIndex_t layer_index = node->Data.layer_info;
+    SolidTC_t conductivity;
+    switch (tgrid->LayersTypeProfile[layer_index])
+    {
+        case TDICE_LAYER_SOLID_CONNECTED_TO_PCB:
+            conductivity = get_thermal_conductivity
+                (tgrid->LayersProfile + layer_index, 0, 0, dimensions, 2);
+            break;
+        case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB:
+            conductivity = get_thermal_conductivity_non_uniform (node, 2);
+            break;
+        default:
+            fprintf (stderr, "Cell is not connected to the bottom heat sink\n");
+            return 0.0;
+    }
+
+    AmbientHTC_t htc = tgrid->BottomHeatSink->AmbientHTC;
+    return (2.0 * conductivity * htc * node->Data.length * node->Data.width)
+         / (get_cell_height (dimensions, layer_index) * htc + 2.0 * conductivity);
+}
+
+/******************************************************************************/
+
 Conductance_t get_conductance_non_uniform_z
 (
     ThermalGrid_t *tgrid,

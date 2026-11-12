@@ -516,40 +516,13 @@ void power_grid_fill
         if (dimensions->NonUniform == 1)
         {
             // bottom heatsink grids are aligned with the bottom layer
-            Non_uniform_cellListNode_t* cell_tmp = dimensions->Cell_list.First;
-            if (pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOLID_CONNECTED_TO_PCB)  // no source layer
+            for (Non_uniform_cellListNode_t *cell_tmp = dimensions->Cell_list.First;
+                 cell_tmp != NULL && cell_tmp->Data.layer_info == 0u;
+                 cell_tmp = cell_tmp->Next)
             {
-                for( CellIndex_t layer_info = cell_tmp->Data.layer_info;
-                     cell_tmp != NULL && layer_info == cell_tmp->Data.layer_info;
-                     cell_tmp=cell_tmp->Next)
-                {
-                    
-                    *tmp += ( get_thermal_conductivity (tgrid->LayersProfile + layer_info,
-                                                         0, 0,
-                                                         dimensions, 2)
-                              * cell_tmp->Data.length
-                              * cell_tmp->Data.width
-                            )
-                              / (get_cell_height (dimensions, layer_info) / 2.0) ;
-                    tmp++;
-                }
+                *tmp++ += get_conductance_bottom_non_uniform
+                    (tgrid, dimensions, cell_tmp);
             }
-            else if (pgrid->LayersTypeProfile [ 0 ] == TDICE_LAYER_SOURCE_CONNECTED_TO_PCB)  //source layer
-            {
-                for( CellIndex_t layer_info = cell_tmp->Data.layer_info;
-                     cell_tmp != NULL && layer_info == cell_tmp->Data.layer_info;
-                     cell_tmp=cell_tmp->Next)
-                {
-                    
-                    *tmp += (  get_thermal_conductivity_non_uniform (cell_tmp, 2)
-                             * cell_tmp->Data.length
-                             * cell_tmp->Data.width
-                            )
-                             / (get_cell_height (dimensions, layer_info) / 2.0) ;
-                    tmp++;
-                }
-            }
-                
         }
         else  //uniform
         {
