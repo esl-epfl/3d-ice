@@ -202,7 +202,7 @@ extern "C"
     (
         ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
-        ConnectionListNode_t* i_cell,
+        const Connection_t* i_cell,
         Non_uniform_cellListNode_t* node,
         int16_t direction_note
     );
@@ -245,7 +245,7 @@ extern "C"
     (
         ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
-        ConnectionListNode_t* i_cell,
+        const Connection_t* i_cell,
         Non_uniform_cellListNode_t* node
     );
 
@@ -267,7 +267,7 @@ extern "C"
     (
         ThermalGrid_t *tgrid,
         Dimensions_t  *dimensions,
-        ConnectionListNode_t* i_cell,
+        const Connection_t* i_cell,
         CellIndex_t    node1_index,
         CellIndex_t    node2_index,
         Conductance_t* sign_note

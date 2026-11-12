@@ -40,7 +40,8 @@
 #include <omp.h>
 #include "thermal_data.h"
 #include "macros.h"
-#include "connection_list.h"
+#include "nonuniform_spatial_index.h"
+#include "nonuniform_connections.h"
 #include "time.h"
 #include <cblas.h> 
 /******************************************************************************/
@@ -753,286 +754,490 @@ ChipDimension_t get_overlap_area(ChipDimension_t *minkowski_diff, ChipDimension_
 
 /******************************************************************************/
 // get connections of each grid in the same layer
-void get_connections_in_layer
+typedef struct ConnectionVector_t
+{
+    Connection_t *Values;
+    size_t Size;
+    size_t Capacity;
+} ConnectionVector_t;
+
+static bool connection_vector_append
+(
+    ConnectionVector_t *vector,
+    Connection_t       *connection
+)
+{
+    if (vector->Size == vector->Capacity)
+    {
+        size_t capacity = vector->Capacity == 0u
+            ? 4096u : vector->Capacity * 2u;
+        if (capacity < vector->Capacity
+            || capacity > SIZE_MAX / sizeof(Connection_t))
+            return false;
+
+        Connection_t *values = (Connection_t *) realloc
+            (vector->Values, capacity * sizeof(Connection_t));
+        if (values == NULL)
+            return false;
+
+        vector->Values = values;
+        vector->Capacity = capacity;
+    }
+
+    vector->Values[vector->Size++] = *connection;
+    return true;
+}
+
+static ConnectionVector_t *connection_vectors_create
+(
+    int *number_of_vectors
+)
+{
+    int count = omp_get_max_threads();
+    if (count < 1)
+        count = 1;
+
+    ConnectionVector_t *vectors = (ConnectionVector_t *) calloc
+        ((size_t) count, sizeof(ConnectionVector_t));
+    if (vectors != NULL)
+        *number_of_vectors = count;
+    return vectors;
+}
+
+static void connection_vectors_destroy
+(
+    ConnectionVector_t *vectors,
+    int                 number_of_vectors
+)
+{
+    if (vectors == NULL)
+        return;
+
+    for (int index = 0; index != number_of_vectors; index++)
+        free (vectors[index].Values);
+    free (vectors);
+}
+
+static Error_t connection_vectors_commit
+(
+    Dimensions_t       *dimensions,
+    ConnectionVector_t *vectors,
+    int                 number_of_vectors
+)
+{
+    uint64_t added = 0u;
+    for (int index = 0; index != number_of_vectors; index++)
+        added += vectors[index].Size;
+
+    if (added == 0u)
+        return TDICE_SUCCESS;
+
+    uint64_t total = (uint64_t) dimensions->NNonUniformConnections + added;
+    if (total > (uint64_t) ((Quantity_t) -1)
+        || total > SIZE_MAX / sizeof(Connection_t))
+        return TDICE_FAILURE;
+
+    Connection_t *connections = total == 0u ? NULL
+        : (Connection_t *) realloc
+            (dimensions->Connections, (size_t) total * sizeof(Connection_t));
+    if (total != 0u && connections == NULL)
+        return TDICE_FAILURE;
+
+    dimensions->Connections = connections;
+    size_t output = dimensions->NNonUniformConnections;
+    for (int index = 0; index != number_of_vectors; index++)
+    {
+        if (vectors[index].Size != 0u)
+            memcpy (dimensions->Connections + output, vectors[index].Values,
+                    vectors[index].Size * sizeof(Connection_t));
+        output += vectors[index].Size;
+    }
+
+    dimensions->NNonUniformConnections = (Quantity_t) total;
+    return TDICE_SUCCESS;
+}
+
+/******************************************************************************/
+static Error_t get_connections_in_layer_indexed
 (
     CellIndex_t* layer_cell_record,
     CellIndex_t* layer_type_record,
-    ChipDimension_t (*position_info_ptr)[4], 
-    Dimensions_t* dimensions
+    ChipDimension_t (*position_info_ptr)[4],
+    Dimensions_t* dimensions,
+    NonuniformSpatialCache_t *cache
 )
 {
-    ConnectionList_t* connections_list = &dimensions->connections_list;
-    CellIndex_t layer_start_index = 0;
+    int number_of_vectors = 0;
+    ConnectionVector_t *vectors =
+        connection_vectors_create (&number_of_vectors);
+    if (vectors == NULL)
+        return TDICE_FAILURE;
 
-    CellIndex_t layer_end_index;
-    CellIndex_t layer_type;
+    CellIndex_t layer_start_index = 0u;
+    int failed = 0;
+    double start_time = omp_get_wtime();
+    /* Legacy direction tests compare products to EPSILON. For disjoint
+     * intervals with gap g the product is >= g*g, so an EPSILON-only margin
+     * would miss accepted pairs of very thin cells. Keep the exact tests below. */
+    const ChipDimension_t padding = fmax (EPSILON, sqrt (EPSILON));
 
-    // Get the start time
-    //double start_time = omp_get_wtime();
-    //clock_t Time_start = clock() ;
-
-    for (CellIndex_t layer_index = 0; layer_index < dimensions->Grid.NLayers+1; layer_index++)
+    for (CellIndex_t layer_index = 0;
+         layer_index < dimensions->Grid.NLayers + 1u;
+         layer_index++)
     {
-        layer_end_index = layer_cell_record[layer_index];
-        layer_type =  layer_type_record[layer_index];
-        if(layer_index == dimensions->Grid.NLayers && layer_type != 4)
+        CellIndex_t layer_end_index = layer_cell_record[layer_index];
+        CellIndex_t layer_type = layer_type_record[layer_index];
+        if (layer_index == dimensions->Grid.NLayers && layer_type != 4)
             continue;
 
-        #pragma omp parallel
+        const NonuniformSpatialIndex_t *index =
+            nonuniform_spatial_cache_get
+                (cache, layer_start_index, layer_end_index);
+        if (index == NULL)
         {
-            ConnectionList_t local_list;
-            connection_list_init(&local_list);
+            failed = 1;
+            break;
+        }
 
-            #pragma omp for schedule(dynamic, 100)
-            for (CellIndex_t i_x = layer_start_index; i_x < layer_end_index; i_x++)
+        #pragma omp parallel shared(failed)
+        {
+            ConnectionVector_t *local_vector =
+                vectors + omp_get_thread_num();
+            NonuniformSpatialCandidates_t candidates = {0};
+
+            #pragma omp for schedule(static, 1)
+            for (CellIndex_t i_x = layer_start_index;
+                 i_x < layer_end_index; i_x++)
             {
-                for (CellIndex_t i_y = i_x+1; i_y < layer_end_index; i_y++)
+                if (!nonuniform_spatial_query
+                        (index, position_info_ptr[i_x], padding, i_x + 1u,
+                         &candidates, NULL))
                 {
-                    // a simplified GJK algorithm to detect interconnect cells in a single layer
+                    #pragma omp atomic write
+                    failed = 1;
+                    continue;
+                }
+                for (size_t candidate = 0; candidate < candidates.Size; candidate++)
+                {
+                    CellIndex_t i_y = candidates.Values[candidate];
                     ChipDimension_t minkowski_diff[4];
-                    // first compute the Minkowski difference
-                    get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
+                    get_minkowski_difference
+                        (minkowski_diff, position_info_ptr, i_x, i_y);
 
-                    // if two rectangles interconnect with each other, Minkowski difference should contain the origin point (0, 0)
-                    if (fabs(minkowski_diff[0]) < EPSILON || fabs(minkowski_diff[1]) < EPSILON || fabs(minkowski_diff[2]) < EPSILON || fabs(minkowski_diff[3]) < EPSILON)
+                    if (   fabs(minkowski_diff[0]) < EPSILON
+                        || fabs(minkowski_diff[1]) < EPSILON
+                        || fabs(minkowski_diff[2]) < EPSILON
+                        || fabs(minkowski_diff[3]) < EPSILON)
                     {
-                        // furthermore, it should cross the origin point
-                        if (minkowski_diff[0] * minkowski_diff[2] + minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
+                        if (minkowski_diff[0] * minkowski_diff[2]
+                            + minkowski_diff[1] * minkowski_diff[3]
+                            < -EPSILON)
                         {
-                            Connection_t new_connection;
-                            connection_init(&new_connection);
-                            new_connection.node1 = i_x;
-                            new_connection.node2 = i_y;
-                            new_connection.node1_layer = layer_index;
-                            new_connection.node2_layer = layer_index;
+                            Connection_t connection;
+                            connection_init (&connection);
+                            connection.node1 = i_x;
+                            connection.node2 = i_y;
+                            connection.node1_layer = layer_index;
+                            connection.node2_layer = layer_index;
 
-                            // Find the interconnect length
-                            if (fabs(minkowski_diff[0] * minkowski_diff[2]) < EPSILON)
+                            if (fabs(minkowski_diff[0] * minkowski_diff[2])
+                                < EPSILON)
                             {
-                                if (layer_type == 1 || layer_type == 2 || layer_type == 3)
+                                if (layer_type == 1 || layer_type == 2
+                                    || layer_type == 3)
                                     continue;
-                                new_connection.value = (fabs(minkowski_diff[1])<=fabs(minkowski_diff[3])) ? fabs(minkowski_diff[1]) : fabs(minkowski_diff[3]);
-                                new_connection.direction = 1; //two nodes interconect in direction x
+                                connection.value =
+                                    fabs(minkowski_diff[1])
+                                        <= fabs(minkowski_diff[3])
+                                    ? fabs(minkowski_diff[1])
+                                    : fabs(minkowski_diff[3]);
+                                connection.direction = 1;
                             }
-                            else if (fabs(minkowski_diff[1] * minkowski_diff[3]) < EPSILON)
+                            else if (fabs
+                                (minkowski_diff[1] * minkowski_diff[3])
+                                < EPSILON)
                             {
                                 if (layer_type == 1 || layer_type == 3)
                                     continue;
-                                new_connection.value = (fabs(minkowski_diff[0])<=fabs(minkowski_diff[2])) ? fabs(minkowski_diff[0]) : fabs(minkowski_diff[2]);
-                                new_connection.direction = 2; //two nodes interconect in direction y
+                                connection.value =
+                                    fabs(minkowski_diff[0])
+                                        <= fabs(minkowski_diff[2])
+                                    ? fabs(minkowski_diff[0])
+                                    : fabs(minkowski_diff[2]);
+                                connection.direction = 2;
                             }
                             else
-                                fprintf (stderr, "Cannot determine interconnect length\n") ;
+                            {
+                                fprintf (stderr,
+                                    "Cannot determine interconnect length\n");
+                                /* Preserve the original zero-valued record. */
+                            }
 
-                            connection_list_insert_end(&local_list, &new_connection);
+                            if (connection_vector_append
+                                    (local_vector, &connection) == false)
+                            {
+                                #pragma omp atomic write
+                                failed = 1;
+                            }
                         }
                     }
                 }
             }
-            #pragma omp critical
-            {
-                // add to the global connection list
-                connection_list_merge(connections_list, &local_list);
-            }   
+            nonuniform_spatial_candidates_destroy (&candidates);
         }
+
+        if (failed != 0)
+            break;
         layer_start_index = layer_end_index;
     }
 
-    // double end_time = omp_get_wtime();
-    // // Calculate and print the total time taken
-    // double time_taken = end_time - start_time;
-    
-    // fprintf (stdout, "  (1.2) build connections in the same layer took %.5f sec\n", time_taken) ;
-    //fprintf (stdout, "Time function took %.5f sec\n",
-    //( (double)clock() - Time_start ) / CLOCKS_PER_SEC ) ;
+    Error_t result = failed == 0
+        ? connection_vectors_commit
+            (dimensions, vectors, number_of_vectors)
+        : TDICE_FAILURE;
+    connection_vectors_destroy (vectors, number_of_vectors);
 
+    fprintf (stdout,
+        "  (1.2) build connections in the same layer took %.5f sec\n",
+        omp_get_wtime() - start_time);
+    return result;
+}
+
+/******************************************************************************/
+Error_t get_connections_in_layer
+(
+    CellIndex_t* layer_cell_record,
+    CellIndex_t* layer_type_record,
+    ChipDimension_t (*position_info_ptr)[4],
+    Dimensions_t* dimensions
+)
+{
+    NonuniformSpatialCache_t cache;
+    nonuniform_spatial_cache_init (&cache, position_info_ptr);
+    Error_t result = get_connections_in_layer_indexed
+        (layer_cell_record, layer_type_record, position_info_ptr, dimensions,
+         &cache);
+    nonuniform_spatial_cache_destroy (&cache);
+    return result;
 }
 
 /******************************************************************************/
 // get connections between layers (bottom->top)
-void get_connections_between_layer
+static void build_connections_between_ranges
 (
-    CellIndex_t* layer_cell_record, 
-    CellIndex_t* layer_type_record,
-    ChipDimension_t (*position_info_ptr)[4], 
-    Dimensions_t* dimensions
+    ConnectionVector_t *vectors,
+    NonuniformSpatialCache_t *cache,
+    ChipDimension_t   (*position_info_ptr)[4],
+    CellIndex_t         bottom_start,
+    CellIndex_t         bottom_end,
+    CellIndex_t         top_start,
+    CellIndex_t         top_end,
+    CellIndex_t         bottom_layer,
+    CellIndex_t         top_layer,
+    int                *failed
 )
 {
-    ConnectionList_t* connections_list = &dimensions->connections_list;
-    // First define the information between the bottom layer and its upper layer
-    CellIndex_t botom_layer_start_index = 0;
-
-    CellIndex_t botom_layer_end_index;
-    CellIndex_t top_layer_start_index;
-    CellIndex_t top_layer_end_index;
-    CellIndex_t bottom_layer_type;
-    CellIndex_t top_layer_type;
-
-    // Get the start time
-    // double start_time = omp_get_wtime();
-
-    // enumerate all the layers
-    for (CellIndex_t layer_index = 1; layer_index < dimensions->Grid.NLayers + 1; layer_index++)
+    if (*failed != 0)
+        return;
+    const NonuniformSpatialIndex_t *index =
+        nonuniform_spatial_cache_get (cache, top_start, top_end);
+    if (index == NULL)
     {
-        bottom_layer_type = layer_type_record[layer_index-1];
-        top_layer_type = layer_type_record[layer_index];
-        if(layer_index == dimensions->Grid.NLayers && top_layer_type != 4)
-            continue;
-        if ( (bottom_layer_type == 2 && top_layer_type == 2) || (bottom_layer_type == 3 && top_layer_type == 2))
+        *failed = 1;
+        return;
+    }
+    #pragma omp parallel shared(failed)
+    {
+        ConnectionVector_t *local_vector =
+            vectors + omp_get_thread_num();
+        NonuniformSpatialCandidates_t candidates = {0};
+
+        #pragma omp for schedule(static)
+        for (CellIndex_t bottom = bottom_start;
+             bottom < bottom_end; bottom++)
         {
-            botom_layer_start_index = layer_cell_record[layer_index-3];
-            botom_layer_end_index = layer_cell_record[layer_index-2];
-            top_layer_start_index = layer_cell_record[layer_index-1];
-            top_layer_end_index = layer_cell_record[layer_index];
-            
-            #pragma omp parallel
+            if (!nonuniform_spatial_query
+                    (index, position_info_ptr[bottom], 0.0, top_start,
+                     &candidates, NULL))
             {
-                ConnectionList_t local_list;
-                connection_list_init(&local_list);
+                #pragma omp atomic write
+                *failed = 1;
+                continue;
+            }
+            for (size_t candidate = 0; candidate < candidates.Size; candidate++)
+            {
+                CellIndex_t top = candidates.Values[candidate];
+                ChipDimension_t minkowski_diff[4];
+                get_minkowski_difference
+                    (minkowski_diff, position_info_ptr, bottom, top);
 
-                #pragma omp for schedule(static)
-                // enumerate all the elements in a bottom layer
-                for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
+                if (   fabs(minkowski_diff[0] * minkowski_diff[2])
+                           > EPSILON
+                    && fabs(minkowski_diff[1] * minkowski_diff[3])
+                           > EPSILON
+                    && minkowski_diff[0] * minkowski_diff[2] < -EPSILON
+                    && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
                 {
-                    // enumerate all the elements in an upper layer
-                    for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
+                    Connection_t connection;
+                    connection_init (&connection);
+                    connection.node1 = bottom;
+                    connection.node2 = top;
+                    connection.node1_layer = bottom_layer;
+                    connection.node2_layer = top_layer;
+                    connection.value = get_overlap_area
+                        (minkowski_diff, position_info_ptr, bottom, top);
+                    connection.direction = 0;
+
+                    if (connection_vector_append
+                            (local_vector, &connection) == false)
                     {
-                        ChipDimension_t minkowski_diff[4];
-                        // first compute Minkowski difference
-                        get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                        // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
-                            if (minkowski_diff[0] * minkowski_diff[2] < -EPSILON && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
-                            {
-                                // add the connection information to the connections variable
-                                Connection_t new_connection;
-                                connection_init(&new_connection);
-                                new_connection.node1 = i_x;
-                                new_connection.node2 = i_y;
-                                new_connection.node1_layer = layer_index-1;
-                                new_connection.node2_layer = layer_index;
-
-                                // overlap area is the minum area
-                                new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
-                                new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-
-                                connection_list_insert_end(&local_list, &new_connection);
-                            }
-                        }
+                        #pragma omp atomic write
+                        *failed = 1;
                     }
                 }
-                #pragma omp critical
-                {
-                    connection_list_merge(connections_list, &local_list);
-                }
             }
-            
-            botom_layer_start_index = layer_cell_record[layer_index-2];
-            botom_layer_end_index = layer_cell_record[layer_index-1];
-            top_layer_start_index = layer_cell_record[layer_index];
-            top_layer_end_index = layer_cell_record[layer_index+1];
-            
-            #pragma omp parallel
+        }
+        nonuniform_spatial_candidates_destroy (&candidates);
+    }
+}
+
+static Error_t get_connections_between_layer_indexed
+(
+    CellIndex_t* layer_cell_record,
+    CellIndex_t* layer_type_record,
+    ChipDimension_t (*position_info_ptr)[4],
+    Dimensions_t* dimensions,
+    NonuniformSpatialCache_t *cache
+)
+{
+    int number_of_vectors = 0;
+    ConnectionVector_t *vectors =
+        connection_vectors_create (&number_of_vectors);
+    if (vectors == NULL)
+        return TDICE_FAILURE;
+
+    CellIndex_t bottom_start = 0u;
+    int failed = 0;
+    double start_time = omp_get_wtime();
+
+    for (CellIndex_t layer_index = 1u;
+         layer_index < dimensions->Grid.NLayers + 1u;
+         layer_index++)
+    {
+        CellIndex_t bottom_type = layer_type_record[layer_index - 1u];
+        CellIndex_t top_type = layer_type_record[layer_index];
+        if (layer_index == dimensions->Grid.NLayers && top_type != 4)
+            continue;
+
+        if ((bottom_type == 2 && top_type == 2)
+            || (bottom_type == 3 && top_type == 2))
+        {
+            if (layer_index < 3u || layer_index >= dimensions->Grid.NLayers)
             {
-                ConnectionList_t local_list;
-                connection_list_init(&local_list);
-
-                #pragma omp for schedule(static)
-                // enumerate all the elements in a bottom layer
-                for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
-                {
-                    // enumerate all the elements in an upper layer
-                    for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
-                    {
-                        ChipDimension_t minkowski_diff[4];
-                        // first compute Minkowski difference
-                        get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                        // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
-                            if (minkowski_diff[0] * minkowski_diff[2] < -EPSILON && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
-                            {
-                                // add the connection information to the connections variable
-                                Connection_t new_connection;
-                                connection_init(&new_connection);
-                                new_connection.node1 = i_x;
-                                new_connection.node2 = i_y;
-                                new_connection.node1_layer = layer_index-1;
-                                new_connection.node2_layer = layer_index;
-
-                                // overlap area is the minum area
-                                new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
-                                new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-
-                                connection_list_insert_end(&local_list, &new_connection);
-                            }
-                        }
-                    }
-                }
-                #pragma omp critical
-                {
-                    connection_list_merge(connections_list, &local_list);
-                }
+                failed = 1;
+                break;
             }
-            
-            botom_layer_start_index = botom_layer_end_index;
+            build_connections_between_ranges
+                (vectors, cache, position_info_ptr,
+                 layer_cell_record[layer_index - 3u],
+                 layer_cell_record[layer_index - 2u],
+                 layer_cell_record[layer_index - 1u],
+                 layer_cell_record[layer_index],
+                 layer_index - 1u, layer_index, &failed);
+
+            build_connections_between_ranges
+                (vectors, cache, position_info_ptr,
+                 layer_cell_record[layer_index - 2u],
+                 layer_cell_record[layer_index - 1u],
+                 layer_cell_record[layer_index],
+                 layer_cell_record[layer_index + 1u],
+                 layer_index - 1u, layer_index, &failed);
+
+            bottom_start = layer_cell_record[layer_index - 1u];
         }
         else
         {
-            botom_layer_end_index = layer_cell_record[layer_index-1];
-            top_layer_start_index = layer_cell_record[layer_index-1];
-            top_layer_end_index = layer_cell_record[layer_index];
-            
-            #pragma omp parallel
-            {
-                ConnectionList_t local_list;
-                connection_list_init(&local_list);
+            CellIndex_t bottom_end =
+                layer_cell_record[layer_index - 1u];
+            CellIndex_t top_start = bottom_end;
+            CellIndex_t top_end = layer_cell_record[layer_index];
 
-                #pragma omp for schedule(static)
-                // enumerate all the elements in a bottom layer
-                for (CellIndex_t i_x = botom_layer_start_index; i_x < botom_layer_end_index; i_x++)
-                {
-                    // enumerate all the elements in an upper layer
-                    for (CellIndex_t i_y = top_layer_start_index; i_y < top_layer_end_index; i_y++)
-                    {
-                        ChipDimension_t minkowski_diff[4];
-                        // first compute Minkowski difference
-                        get_minkowski_difference(minkowski_diff, position_info_ptr, i_x, i_y);
-                        // Minkowski difference should contain the origin point (0, 0) if two cells have overlap area
-                        if (fabs(minkowski_diff[0] * minkowski_diff[2]) > EPSILON && fabs(minkowski_diff[1] * minkowski_diff[3]) > EPSILON ){
-                            if (minkowski_diff[0] * minkowski_diff[2] < -EPSILON && minkowski_diff[1] * minkowski_diff[3] < -EPSILON)
-                            {
-                                // add the connection information to the connections variable
-                                Connection_t new_connection;
-                                connection_init(&new_connection);
-                                new_connection.node1 = i_x;
-                                new_connection.node2 = i_y;
-                                new_connection.node1_layer = layer_index-1;
-                                new_connection.node2_layer = layer_index;
+            build_connections_between_ranges
+                (vectors, cache, position_info_ptr,
+                 bottom_start, bottom_end, top_start, top_end,
+                 layer_index - 1u, layer_index, &failed);
+            bottom_start = top_start;
+        }
 
-                                // overlap area is the minum area
-                                new_connection.value = get_overlap_area(minkowski_diff, position_info_ptr, i_x, i_y);
-                                new_connection.direction = 0; //connect direction is Z(=0) for two nodes in different layers;
-                                connection_list_insert_end(&local_list, &new_connection);
-                            }
-                        }
-                    }
-                }
-
-                #pragma omp critical
-                {
-                    connection_list_merge(connections_list, &local_list);
-                }
-            }
-            botom_layer_start_index = top_layer_start_index;
-        }    
-
+        if (failed != 0)
+            break;
     }
 
-    // double end_time = omp_get_wtime();
-    // // Calculate and print the total time taken
-    // double time_taken = end_time - start_time;
-    // /// Present time consumption for test
-    // fprintf (stdout, "  (1.3) build connections between layers took %.5f sec\n", time_taken) ;
+    Error_t result = failed == 0
+        ? connection_vectors_commit
+            (dimensions, vectors, number_of_vectors)
+        : TDICE_FAILURE;
+    connection_vectors_destroy (vectors, number_of_vectors);
+
+    fprintf (stdout,
+        "  (1.3) build connections between layers took %.5f sec\n",
+        omp_get_wtime() - start_time);
+    return result;
+}
+
+/******************************************************************************/
+Error_t get_connections_between_layer
+(
+    CellIndex_t* layer_cell_record,
+    CellIndex_t* layer_type_record,
+    ChipDimension_t (*position_info_ptr)[4],
+    Dimensions_t* dimensions
+)
+{
+    NonuniformSpatialCache_t cache;
+    nonuniform_spatial_cache_init (&cache, position_info_ptr);
+    Error_t result = get_connections_between_layer_indexed
+        (layer_cell_record, layer_type_record, position_info_ptr, dimensions,
+         &cache);
+    nonuniform_spatial_cache_destroy (&cache);
+    return result;
+}
+
+/******************************************************************************/
+
+Error_t build_nonuniform_connections
+(
+    CellIndex_t *layer_ends,
+    CellIndex_t *layer_types,
+    ChipDimension_t (*positions)[4],
+    Dimensions_t *dimensions
+)
+{
+    Dimensions_t staged = {0};
+    staged.Grid = dimensions->Grid;
+    NonuniformSpatialCache_t cache;
+    nonuniform_spatial_cache_init (&cache, positions);
+    Error_t result = get_connections_in_layer_indexed
+        (layer_ends, layer_types, positions, &staged, &cache);
+    if (result == TDICE_SUCCESS)
+        result = get_connections_between_layer_indexed
+            (layer_ends, layer_types, positions, &staged, &cache);
+    nonuniform_spatial_cache_destroy (&cache);
+
+    uint64_t nnz = 2u * (uint64_t) staged.NNonUniformConnections
+                 + dimensions->Grid.NCells;
+    if (nnz > UINT32_MAX)
+        result = TDICE_FAILURE;
+    if (result == TDICE_FAILURE)
+    {
+        free (staged.Connections);
+        return TDICE_FAILURE;
+    }
+    free (dimensions->Connections);
+    dimensions->Connections = staged.Connections;
+    dimensions->NNonUniformConnections = staged.NNonUniformConnections;
+    dimensions->Grid.NConnections = (CellIndex_t) nnz;
+    return TDICE_SUCCESS;
 }
 
 /******************************************************************************/
@@ -1066,9 +1271,11 @@ Error_t thermal_data_build
         CellIndex_t layer_cell_record[dimensions->Grid.NLayers+1]; // record the end index of each layer in the position_info
         dimensions->Cell_pointer = ( Non_uniform_cellListNode_t **)malloc(dimensions->Grid.NCells * sizeof ( Non_uniform_cellListNode_t *));
 
-        if (dimensions->Cell_pointer == NULL)
+        if (position_info_ptr == NULL || dimensions->Cell_pointer == NULL)
         {
+            free (position_info_ptr);
             free (dimensions->Cell_pointer) ;
+            dimensions->Cell_pointer = NULL;
             return TDICE_FAILURE ;
         }
 
@@ -1088,19 +1295,14 @@ Error_t thermal_data_build
         // fprintf (stdout, "\n  (1.1) generate non-uniform cell took %.5f sec\n",
         // ( (double)clock() - Time ) / CLOCKS_PER_SEC ) ;
 
-        // get connections of each grid in the same layer
-        get_connections_in_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
-
-        // get connections between layers (bottom->top)
-        get_connections_between_layer(layer_cell_record, layer_type_record, position_info_ptr, dimensions);
-
-        // test connection relationship
-        //print_connections_non_uniform(dimensions);
-
-        // update number of connections
-        dimensions->Grid.NConnections =  2*(dimensions->connections_list.Size)+dimensions->Grid.NCells;
-
+        result = build_nonuniform_connections
+            (layer_cell_record, layer_type_record, position_info_ptr, dimensions);
         free(position_info_ptr);
+        if (result == TDICE_FAILURE)
+        {
+            fprintf (stderr, "Cannot build non-uniform cell connections\n");
+            return TDICE_FAILURE;
+        }
     }
 
     tdata->Size = get_number_of_cells (dimensions) ;
@@ -1968,10 +2170,10 @@ void print_connections_non_uniform
             fprintf (stderr, "Unable to open output file 'cell_connection.txt'\n") ;
         }
 
-        ConnectionListNode_t* i_cell;
-        for(i_cell = dimensions->connections_list.First; i_cell!=NULL; i_cell=i_cell->Next)
+        for (Quantity_t index = 0; index < dimensions->NNonUniformConnections; index++)
         {
-            fprintf (output_file, "%d %d\n", i_cell->Data.node1 + 1, i_cell->Data.node2 + 1) ;
+            const Connection_t *connection = &dimensions->Connections[index];
+            fprintf (output_file, "%d %d\n", connection->node1 + 1, connection->node2 + 1) ;
         }
          fclose (output_file) ;
     }

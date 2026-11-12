@@ -562,20 +562,20 @@ static SystemMatrix_t add_solid_column_non_uniform
     ChipDimension_t (*matrix_tmp)[3] = malloc(dimensions->Grid.NConnections * sizeof(ChipDimension_t[3]));
     memset(matrix_tmp, 0, dimensions->Grid.NConnections * sizeof(ChipDimension_t[3]));
     CellIndex_t matrix_tmp_index = 0;
-    ConnectionListNode_t* i_cell;
+    const Connection_t* i_cell;
     Conductance_t sign_note;
-    for(i_cell = dimensions->connections_list.First; i_cell!=NULL; i_cell=i_cell->Next)
+    for (Quantity_t index = 0; index < dimensions->NNonUniformConnections; index++)
     {
-
-        matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node2; //r
-        matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node1; //c
-        matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->Data.node2, i_cell->Data.node1, &sign_note);  //v
+        i_cell = &dimensions->Connections[index];
+        matrix_tmp[matrix_tmp_index][0] = i_cell->node2; //r
+        matrix_tmp[matrix_tmp_index][1] = i_cell->node1; //c
+        matrix_tmp[matrix_tmp_index][2] = get_conductance_non_uniform(thermal_grid, dimensions, i_cell, i_cell->node2, i_cell->node1, &sign_note);  //v
         #ifdef PRINT_DEBUG_INFO
-            printf("r:%d, c:%d, v:%f\n",i_cell->Data.node2,i_cell->Data.node1,matrix_tmp[matrix_tmp_index][2]);
+            printf("r:%d, c:%d, v:%f\n",i_cell->node2,i_cell->node1,matrix_tmp[matrix_tmp_index][2]);
         #endif
         matrix_tmp_index++;
-        matrix_tmp[matrix_tmp_index][0] = i_cell->Data.node1; //r
-        matrix_tmp[matrix_tmp_index][1] = i_cell->Data.node2; //c
+        matrix_tmp[matrix_tmp_index][0] = i_cell->node1; //r
+        matrix_tmp[matrix_tmp_index][1] = i_cell->node2; //c
         matrix_tmp[matrix_tmp_index][2] = sign_note*matrix_tmp[matrix_tmp_index-1][2];  //v
         matrix_tmp_index++;
 

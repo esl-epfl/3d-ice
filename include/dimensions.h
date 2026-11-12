@@ -339,8 +339,11 @@ struct HeatSink_t; //Forward decalration
         /*! Non-uniform thermal cell list */
         Non_uniform_cellList_t Cell_list;
 
-        /*! Connection list for non-uniform thermal cells */
-        ConnectionList_t connections_list;
+        /*! Contiguous undirected connections between non-uniform cells. */
+        Connection_t *Connections;
+
+        /*! Number of entries in Connections (not matrix nonzeros). */
+        Quantity_t NNonUniformConnections;
 
     } ;
 

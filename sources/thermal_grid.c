@@ -534,7 +534,7 @@ Conductance_t get_conductance_non_uniform_z
 (
     ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
-    ConnectionListNode_t* i_cell,
+    const Connection_t* i_cell,
     Non_uniform_cellListNode_t* node,
     int16_t direction_note
 )
@@ -544,7 +544,7 @@ Conductance_t get_conductance_non_uniform_z
     if (layer_index>=dimensions->Grid.NLayers) //spreder layer
     {
         HeatSink_t *sink = tgrid->TopHeatSink;
-        return get_spreader_conductance_top_bottom_nonuniform(sink, i_cell->Data.value);
+        return get_spreader_conductance_top_bottom_nonuniform(sink, i_cell->value);
     }
     switch (tgrid->LayersTypeProfile [layer_index])
     {
@@ -557,81 +557,81 @@ Conductance_t get_conductance_non_uniform_z
             if (layer_index != 0 && layer_index != dimensions->Grid.NLayers-1 )
                 cell_height = cell_height/2.0;
             return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
-                * i_cell->Data.value) /  cell_height ;
+                * i_cell->value) /  cell_height ;
 
         case TDICE_LAYER_SOURCE :
             cell_height = get_cell_height (dimensions, layer_index);
             if (layer_index != 0 && layer_index != dimensions->Grid.NLayers-1 )
                 cell_height = cell_height/2.0;
             return (get_thermal_conductivity_non_uniform (node, 2)
-                * i_cell->Data.value) /  cell_height ;
+                * i_cell->value) /  cell_height ;
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_SPREADER : 
             assert(layer_index == last_layer (dimensions));
             if (layer_index == first_layer (dimensions))
 
                 return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
-                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)) ;
+                        * i_cell->value) /  (get_cell_height (dimensions, layer_index)) ;
             else
 
                 return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
-                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+                        * i_cell->value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
 
         case TDICE_LAYER_SOURCE_CONNECTED_TO_SPREADER :
             assert(layer_index == last_layer (dimensions));
             if (layer_index == first_layer (dimensions))
 
                 return (get_thermal_conductivity_non_uniform (node, 2)
-                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)) ;
+                        * i_cell->value) /  (get_cell_height (dimensions, layer_index)) ;
             else
 
                 return (get_thermal_conductivity_non_uniform (node, 2)
-                        * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+                        * i_cell->value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
 
 
         case TDICE_LAYER_SOLID_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOLID_CONNECTED_TO_PCB :
 
             return (get_thermal_conductivity (tgrid->LayersProfile + layer_index,0,0,dimensions, 2)
-                    * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+                    * i_cell->value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
 
         case TDICE_LAYER_SOURCE_CONNECTED_TO_AMBIENT :
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (get_thermal_conductivity_non_uniform (node, 2)
-                    * i_cell->Data.value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
+                    * i_cell->value) /  (get_cell_height (dimensions, layer_index)/2.0) ;
 
         case TDICE_LAYER_CHANNEL_4RM :
 
             if (node->Data.isChannel)
                 if (direction_note == 1)
-                    return  tgrid->Channel->Coolant.HTCTop * i_cell->Data.value ;
+                    return  tgrid->Channel->Coolant.HTCTop * i_cell->value ;
                 else
-                    return  tgrid->Channel->Coolant.HTCBottom * i_cell->Data.value ;
+                    return  tgrid->Channel->Coolant.HTCBottom * i_cell->value ;
                 
 
             else
 
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index, 0, 0, dimensions, 2)
-                        * i_cell->Data.value )
+                        * i_cell->value )
                         / (get_cell_height (dimensions, layer_index) / 2.0) ;
 
         case TDICE_LAYER_CHANNEL_2RM :
             
             if (direction_note == 1)
-                return tgrid->Channel->Coolant.HTCTop * i_cell->Data.value ;
+                return tgrid->Channel->Coolant.HTCTop * i_cell->value ;
             else
-                return tgrid->Channel->Coolant.HTCBottom * i_cell->Data.value ;
+                return tgrid->Channel->Coolant.HTCBottom * i_cell->value ;
 
         case TDICE_LAYER_PINFINS_INLINE :
 
             return EFFECTIVE_HTC_PF_INLINE (tgrid->Channel->Coolant.DarcyVelocity)
-                    * i_cell->Data.value ;
+                    * i_cell->value ;
 
         case TDICE_LAYER_PINFINS_STAGGERED :
 
             return EFFECTIVE_HTC_PF_STAGGERED (tgrid->Channel->Coolant.DarcyVelocity)
-                    * i_cell->Data.value ;
+                    * i_cell->value ;
 
         case TDICE_LAYER_VWALL_CHANNEL :
         case TDICE_LAYER_VWALL_PINFINS :
@@ -639,7 +639,7 @@ Conductance_t get_conductance_non_uniform_z
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 0, 0,
                                                 dimensions, 2)
-                    * i_cell->Data.value
+                    * i_cell->value
                    )
                     / (get_cell_height (dimensions, layer_index) / 2.0)
                     * (1.0 - tgrid->Channel->Porosity) ;
@@ -772,7 +772,7 @@ Conductance_t get_conductance_non_uniform_x
 (
     ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
-    ConnectionListNode_t* i_cell,
+    const Connection_t* i_cell,
     Non_uniform_cellListNode_t* node
 )
 {
@@ -799,7 +799,7 @@ Conductance_t get_conductance_non_uniform_x
             return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                 0, 0,
                                                 dimensions, 0)
-                    * i_cell->Data.value
+                    * i_cell->value
                     * get_cell_height (dimensions, layer_index)
                    )
                     / (node->Data.length / 2.0) ;
@@ -810,7 +810,7 @@ Conductance_t get_conductance_non_uniform_x
         case TDICE_LAYER_SOURCE_CONNECTED_TO_PCB :
 
             return (  get_thermal_conductivity_non_uniform (node, 0)
-                    * i_cell->Data.value
+                    * i_cell->value
                     * get_cell_height (dimensions, layer_index)
                    )
                     / (node->Data.length / 2.0) ;
@@ -820,7 +820,7 @@ Conductance_t get_conductance_non_uniform_x
             if (node->Data.isChannel)
 
                 return tgrid->Channel->Coolant.HTCSide
-                    * i_cell->Data.value
+                    * i_cell->value
                     * get_cell_height (dimensions, layer_index) ;
 
             else
@@ -828,7 +828,7 @@ Conductance_t get_conductance_non_uniform_x
                 return (  get_thermal_conductivity (tgrid->LayersProfile + layer_index,
                                                     0, 0,
                                                     dimensions, 0)
-                        * i_cell->Data.value
+                        * i_cell->value
                         * get_cell_height (dimensions, layer_index)
                        )
                         / (node->Data.length / 2.0) ;
@@ -863,7 +863,7 @@ Conductance_t get_conductance_non_uniform
 (
     ThermalGrid_t *tgrid,
     Dimensions_t  *dimensions,
-    ConnectionListNode_t* i_cell,
+    const Connection_t* i_cell,
     CellIndex_t    node1_index,
     CellIndex_t    node2_index,
     Conductance_t* sign_note
@@ -894,7 +894,7 @@ Conductance_t get_conductance_non_uniform
     Conductance_t g1;
     Conductance_t g2;
     
-    if(i_cell->Data.direction == 0) // z direction
+    if(i_cell->direction == 0) // z direction
     {
         int16_t direction_note;
         if (node1->Data.layer_info < node2->Data.layer_info)
@@ -920,13 +920,13 @@ Conductance_t get_conductance_non_uniform
         else
             return -PARALLEL(g1,g2);
     }
-    else if(i_cell->Data.direction == 1) //West East
+    else if(i_cell->direction == 1) //West East
     {
         g1 = get_conductance_non_uniform_x(tgrid, dimensions, i_cell, node1);
         g2 = get_conductance_non_uniform_x(tgrid, dimensions, i_cell, node2);
         return -PARALLEL(g1,g2);
     }
-    else if(i_cell->Data.direction == 2) // North South
+    else if(i_cell->direction == 2) // North South
     {
         Conductance_t direction_note;
         if (node1->Data.left_y < node2->Data.left_y)
@@ -941,12 +941,12 @@ Conductance_t get_conductance_non_uniform
         if (node2->Data.isChannel == 1)
         {
             *sign_note = -1;
-            return get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node2, direction_note);
+            return get_conductance_non_uniform_y(tgrid, dimensions, i_cell->value, node2, direction_note);
         }
         else
         {
-            g1 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node1, direction_note);
-            g2 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->Data.value, node2, -direction_note);
+            g1 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->value, node1, direction_note);
+            g2 = get_conductance_non_uniform_y(tgrid, dimensions, i_cell->value, node2, -direction_note);
             return -PARALLEL(g1,g2);
         }
         

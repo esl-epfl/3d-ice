@@ -147,13 +147,15 @@ extern "C"
      */
     void get_minkowski_difference(ChipDimension_t *minkowski_diff, ChipDimension_t (*position_info)[4], int i_x, int i_y);
 
-    /*! get connections of each grid in the same layer
+    /*! Append connections of each grid in the same layer.
+     * Returns TDICE_FAILURE on allocation failure or invalid geometry;
+     * the existing connection array is unchanged on failure.
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
      * \param layer_type_record the vector contains the layer type information of each layer in the position_info
      * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param dimensions the dimensions of the IC
      */
-    void get_connections_in_layer
+    Error_t get_connections_in_layer
     (
         CellIndex_t* layer_cell_record, 
         CellIndex_t* layer_type_record,
@@ -162,13 +164,15 @@ extern "C"
         
     );
 
-    /*! Get connections between layers (from bottom to top)
+    /*! Append connections between layers (from bottom to top).
+     * Returns TDICE_FAILURE on allocation failure or invalid geometry;
+     * the existing connection array is unchanged on failure.
      * \param layer_cell_record the vector contains the end index of each layer in the position_info
      * \param layer_type_record the vector contains the layer type information of each layer in the position_info
      * \param position_info_ptr position info contains "left_x, left_y, right_x, right_y" for each thermal cell
      * \param dimensions the dimensions of the IC
      */
-    void get_connections_between_layer
+    Error_t get_connections_between_layer
     (
         CellIndex_t* layer_cell_record, 
         CellIndex_t* layer_type_record,

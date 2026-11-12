@@ -182,24 +182,55 @@ void dimensions_init (Dimensions_t *dimensions)
     dimensions->Cell_pointer = NULL;
 
     non_uniform_cell_list_init(&dimensions->Cell_list);
-    connection_list_init(&dimensions->connections_list);
+    dimensions->Connections = NULL;
+    dimensions->NNonUniformConnections = 0u;
 }
 
 /******************************************************************************/
 
 void dimensions_copy (Dimensions_t *dst, Dimensions_t *src)
 {
+    if (dst == src)
+        return;
     dimensions_destroy (dst) ;
     dst->NonUniform = src->NonUniform;
     dst->Discr_X = src->Discr_X;
     dst->Discr_Y = src->Discr_Y;
-    dst->Cell_pointer = src->Cell_pointer;
     cell_dimensions_copy (&dst->Cell, &src->Cell) ;
     grid_dimensions_copy (&dst->Grid, &src->Grid) ;
     chip_dimensions_copy (&dst->Chip, &src->Chip) ;
 
     non_uniform_cell_list_copy(&dst->Cell_list, &src->Cell_list) ;
-    connection_list_copy(&dst->connections_list, &src->connections_list) ;
+    if (dst->Cell_list.Size != src->Cell_list.Size)
+        goto copy_failed;
+    /* A copied index must point into the copied cells, never into src. */
+    if (src->Cell_pointer != NULL && src->Cell_list.Size != 0u)
+    {
+        dst->Cell_pointer = malloc
+            ((size_t) src->Cell_list.Size * sizeof(*dst->Cell_pointer));
+        if (dst->Cell_pointer == NULL)
+            goto copy_failed;
+        Non_uniform_cellListNode_t *cell = dst->Cell_list.First;
+        for (Quantity_t i = 0; i < dst->Cell_list.Size; i++, cell = cell->Next)
+            dst->Cell_pointer[i] = cell;
+    }
+    if (src->NNonUniformConnections != 0u)
+    {
+        size_t bytes = (size_t) src->NNonUniformConnections
+                     * sizeof(*dst->Connections);
+        if (bytes / sizeof(*dst->Connections) != src->NNonUniformConnections)
+            goto copy_failed;
+        dst->Connections = malloc (bytes);
+        if (dst->Connections == NULL)
+            goto copy_failed;
+        memcpy (dst->Connections, src->Connections, bytes);
+        dst->NNonUniformConnections = src->NNonUniformConnections;
+    }
+    return;
+
+copy_failed:
+    fprintf (stderr, "Cannot copy non-uniform dimensions\n");
+    dimensions_destroy (dst);
 }
 
 /******************************************************************************/
@@ -212,7 +243,7 @@ void dimensions_destroy (Dimensions_t *dimensions)
 
     if (dimensions->Cell_pointer != NULL)            free (dimensions->Cell_pointer) ;
     non_uniform_cell_list_destroy(&dimensions->Cell_list);
-    connection_list_destroy(&dimensions->connections_list);
+    free (dimensions->Connections);
     
     dimensions_init (dimensions) ;
 }
